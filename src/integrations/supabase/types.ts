@@ -3580,6 +3580,56 @@ export type Database = {
           },
         ]
       }
+      inbound_leads: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          promoted_company_id: string | null
+          source: string | null
+          status: Database["public"]["Enums"]["inbound_lead_status"]
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          promoted_company_id?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["inbound_lead_status"]
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          promoted_company_id?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["inbound_lead_status"]
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_leads_promoted_company_id_fkey"
+            columns: ["promoted_company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insight_cards: {
         Row: {
           action_detail: string | null
@@ -9205,6 +9255,7 @@ export type Database = {
         | "time"
         | "rating_1_10"
       grade_letter: "A" | "B" | "C" | "D" | "F"
+      inbound_lead_status: "new" | "reviewed" | "promoted" | "archived"
       incident_type:
         | "late_arrival"
         | "no_show"
@@ -9545,6 +9596,7 @@ export const Constants = {
         "rating_1_10",
       ],
       grade_letter: ["A", "B", "C", "D", "F"],
+      inbound_lead_status: ["new", "reviewed", "promoted", "archived"],
       incident_type: [
         "late_arrival",
         "no_show",
