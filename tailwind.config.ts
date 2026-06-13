@@ -24,6 +24,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Marketing-site extra surface tokens (resolved within `.stm-marketing` scope)
+        panel: "hsl(var(--panel))",
+        "panel-elevated": "hsl(var(--panel-elevated))",
+        "border-strong": "hsl(var(--border-strong))",
+        "accent-soft": "hsl(var(--accent-soft))",
+        electric: "hsl(var(--electric))",
+        violet: "hsl(var(--violet))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
