@@ -55,6 +55,17 @@ interface QueueItem {
 const newId = () => Math.random().toString(36).slice(2, 10);
 
 export const SculptureUploadTab = () => {
+  // Phase 1: render-time guard. If `sculpture` is disabled, show a stub.
+  // Hook is intentionally inlined to avoid a separate file edit.
+  const { useIntegrationDisabled } = require('@/hooks/useIntegrationDisabled');
+  const disabled = (useIntegrationDisabled as (n: string) => boolean)('sculpture');
+  if (disabled) {
+    return (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        Sculpture Hospitality integration is disabled. Coming soon.
+      </div>
+    );
+  }
   const { data: venues = [] } = useVenues();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
