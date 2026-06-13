@@ -8,13 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ExternalLink, Plus, Sparkles } from "lucide-react";
+import { ExternalLink, Plus, Sparkles, Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  useCompany, useContacts, useDeals, useInteractions, useCrmMutations,
+  useCompany, useContacts, useDeals, useInteractions, useCrmMutations, useCompanyLinkCounts,
   type CrmInteractionType,
 } from "@/hooks/useCrm";
 import { useApp } from "@/context/AppContext";
+import { ArchiveOrDeleteDialog, type LinkedLine } from "@/components/shared/ArchiveOrDeleteDialog";
 
 export function CompanyDetail({ companyId, onOpenChange }: {
   companyId: string | null; onOpenChange: (open: boolean) => void;
@@ -26,6 +27,8 @@ export function CompanyDetail({ companyId, onOpenChange }: {
   const dealsQ = useDeals();
   const interactionsQ = useInteractions(companyId);
   const m = useCrmMutations();
+  const linkCounts = useCompanyLinkCounts(companyId);
+  const [delOpen, setDelOpen] = useState(false);
 
   const company = companyQ.data;
   const deals = (dealsQ.data ?? []).filter((d) => d.company_id === companyId);
@@ -67,6 +70,7 @@ export function CompanyDetail({ companyId, onOpenChange }: {
               <SheetTitle className="flex items-center gap-2">
                 {company.name}
                 <Badge variant="outline">{company.status}</Badge>
+                {company.archived && <Badge variant="outline">archived</Badge>}
               </SheetTitle>
             </SheetHeader>
 
@@ -80,6 +84,54 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                   <Sparkles className="h-4 w-4 mr-2" /> Create Project from this Company
                 </Button>
               ) : null}
+
+              <div className="flex gap-2">
+                {company.archived ? (
+                  <Button variant="outline" size="sm" className="flex-1"
+                    onClick={async () => {
+                      await m.restoreCompany.mutateAsync(company.id);
+                      toast.success("Restored");
+                    }}>
+                    <ArchiveRestore className="h-4 w-4 mr-1" /> Restore
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => setDelOpen(true)}>
+                    <Archive className="h-4 w-4 mr-1" /> Archive or delete…
+                  </Button>
+                )}
+                {company.archived && (
+                  <Button variant="destructive" size="sm" onClick={() => setDelOpen(true)}>
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete…
+                  </Button>
+                )}
+              </div>
+
+              <ArchiveOrDeleteDialog
+                open={delOpen}
+                onOpenChange={setDelOpen}
+                entityLabel="company"
+                entityName={company.name}
+                allowArchive={!company.archived}
+                linkedLines={(() => {
+                  const lc = linkCounts.data;
+                  if (!lc) return [];
+                  const lines: LinkedLine[] = [];
+                  if (lc.deals)        lines.push({ count: lc.deals,        label: lc.deals === 1 ? 'deal' : 'deals', effect: 'destroyed' });
+                  if (lc.interactions) lines.push({ count: lc.interactions, label: lc.interactions === 1 ? 'interaction' : 'interactions', effect: 'destroyed' });
+                  if (lc.contacts)     lines.push({ count: lc.contacts,     label: lc.contacts === 1 ? 'contact' : 'contacts', effect: 'unlinked' });
+                  return lines;
+                })()}
+                onArchive={async (reason) => {
+                  await m.archiveCompany.mutateAsync({ id: company.id, reason });
+                  toast.success("Archived");
+                  onOpenChange(false);
+                }}
+                onDelete={async () => {
+                  await m.deleteCompany.mutateAsync(company.id);
+                  toast.success("Deleted");
+                  onOpenChange(false);
+                }}
+              />
 
               <Card>
                 <CardContent className="p-3 text-sm space-y-1">
