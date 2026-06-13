@@ -9,7 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { PortfolioBottomNav } from './PortfolioBottomNav';
 import { useAuth } from '@/context/AuthContext';
 import { usePreview } from '@/context/PreviewContext';
-import { ownerMode } from '@/config/ownerMode';
+import { useOwnerMode } from '@/hooks/useOwnerMode';
 import { ROLE_LABELS, UserRole } from '@/types/roles';
 import { useTaskBadgeCount } from '@/hooks/useTaskBadgeCount';
 import { useUnreadCounts } from '@/hooks/useUnreadCounts';
@@ -32,6 +32,7 @@ export const PortfolioLayout = ({ children }: PortfolioLayoutProps) => {
   const { totalUnread: chatUnreadCount } = useUnreadCounts();
   const isMobile = useIsMobile();
   const { isAdmin, profile, role } = useAuth();
+  const flags = useOwnerMode();
   const { isPreview, previewRoleLabel, setPreviewRole } = usePreview();
   const navigate = useNavigate();
   const location = useLocation();
@@ -73,7 +74,7 @@ export const PortfolioLayout = ({ children }: PortfolioLayoutProps) => {
             </div>
 
             {/* Legacy nav items — hidden in owner mode, preserved for re-enabling */}
-            {ownerMode.showStaffTools && (
+            {flags.showStaffTools && (
               <SidebarSection title="Tools">
                 <SidebarLink href="/tasks" icon={CheckSquare} badge={taskBadgeCount} badgeVariant="urgent">Tasks</SidebarLink>
                 <SidebarLink href="/logs" icon={ClipboardList}>Logs</SidebarLink>
@@ -81,14 +82,14 @@ export const PortfolioLayout = ({ children }: PortfolioLayoutProps) => {
               </SidebarSection>
             )}
 
-            {ownerMode.showMarketingTools && (
+            {flags.showMarketingTools && (
               <SidebarSection title="Marketing">
                 <SidebarLink href="/marketing" icon={Megaphone}>Marketing</SidebarLink>
                 <SidebarLink href="/social-media" icon={Smartphone}>Social Media</SidebarLink>
               </SidebarSection>
             )}
 
-            {ownerMode.showPillarNav && (
+            {flags.showPillarNav && (
               <SidebarSection title="Pillars">
                 <SidebarLink href="/sales" icon={DollarSign}>Revenue</SidebarLink>
                 <SidebarLink href="/labor" icon={UsersIcon}>Labor</SidebarLink>

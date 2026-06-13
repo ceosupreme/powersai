@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, Users } from 'lucide-react';
+import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, Users, CheckSquare, ClipboardList, MessageCircle, Megaphone, Smartphone, DollarSign, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,8 +12,20 @@ const primaryItems = [
   { to: '/insights', icon: Lightbulb, label: 'Insights' },
 ];
 
-const secondaryItems = [
+const baseSecondaryItems = [
   { to: '/admin', icon: Settings, label: 'Settings' },
+];
+
+const adminSecondaryItems = [
+  { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
+  { to: '/logs', icon: ClipboardList, label: 'Logs' },
+  { to: '/chat', icon: MessageCircle, label: 'Chat' },
+  { to: '/marketing', icon: Megaphone, label: 'Marketing' },
+  { to: '/social-media', icon: Smartphone, label: 'Social' },
+  { to: '/sales', icon: DollarSign, label: 'Revenue' },
+  { to: '/labor', icon: Users, label: 'Labor' },
+  { to: '/operations', icon: Settings, label: 'Operations' },
+  { to: '/guest-experience', icon: Star, label: 'Guest Exp' },
 ];
 
 export const PortfolioBottomNav = () => {
@@ -22,6 +34,7 @@ export const PortfolioBottomNav = () => {
   const { selectedBar } = useApp();
   const { role, isAdmin } = useAuth();
   const canSeeEmployees = role === 'owner' || role === 'gm' || isAdmin;
+  const secondaryItems = isAdmin ? [...baseSecondaryItems, ...adminSecondaryItems] : baseSecondaryItems;
 
   // Build nav items — add Employees (if permitted) then Weekly Review when a venue is selected
   const navItems = [
