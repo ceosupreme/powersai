@@ -1,3 +1,5 @@
+// DEAD CODE — retired bar-era social analytics page. /social-media now redirects to /marketing-hub in App.tsx.
+// Left on disk as a breadcrumb; safe to delete in a later cleanup pass.
 import { useState, useEffect } from 'react';
 import { Smartphone } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';

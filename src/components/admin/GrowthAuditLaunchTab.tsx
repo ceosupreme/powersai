@@ -20,7 +20,7 @@ export const GrowthAuditLaunchTab = () => {
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-foreground">Growth Audit</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-              Find growth opportunities per venue and turn them into ready-to-execute campaigns.
+              Find growth opportunities per project and turn them into ready-to-execute campaigns.
               Lives at its own dedicated page; this tab is just the launch point.
             </p>
             <Button onClick={() => navigate('/growth-audit')} className="mt-4 gap-2">
