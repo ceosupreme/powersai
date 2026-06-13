@@ -1,36 +1,45 @@
-## Plan: Wire venue_contacts into deep-dive solution mode
+## Why the screen is blank
 
-### 1. New shared tool: `get_venue_contacts`
+This project was just remixed, which gave you a fresh, empty backend. I checked it:
 
-File: `supabase/functions/_shared/ai-tools.ts`
+- `auth.users`: 1 (just you)
+- `user_roles`: 0
+- `user_venue_roles`: 0
+- `venues`: 0
+- `weeks`: 0
+- `weekly_core`: 0
 
-Append a read-only tool to `buildTools()` that queries the existing `public.venue_contacts` table:
+The schema migrated fine, but **no data was copied over** (the original project's venues, roles, weekly scorecards, etc. don't transfer on a remix). The Dashboard renders nothing because there is no venue, no week, no role, and no scorecard to draw — so the page sits empty after the loader disappears.
 
-- Scope: `venue_id = scope.venueId` (uuid).
-- Filter: `is_active = true`.
-- Select: `name, role_label, phone, email, note`.
-- Return: `{ venue: scope.venueName, contacts: [...] }` (each contact includes all selected fields).
-- On error: `{ error: error.message }`.
+On top of that, the new account you signed up with has **no role and no venue assignment**, so even once data exists the app doesn't know what to show you.
 
-This tool is automatically available to `followup` mode and `ask-barpulse` because it lives in the shared registry. No changes to those surfaces.
+## Plan to get the app loading
 
-### 2. Extend solution-mode system prompt
+### 1. Grant your account `owner` access
+Insert one row into `user_roles` (`role = 'owner'`) and one row into `user_venue_roles` (`role = 'owner'`, `venue_id = NULL` — the portfolio-level owner role the `RoleContext` looks for). This unblocks the protected routes and makes the portfolio/dashboard layout resolve.
 
-File: `supabase/functions/insight-deep-dive/index.ts`
+### 2. Seed one venue + venue assignment
+Insert a single row into `venues` (name like "Demo Venue") and a matching row into `venue_assignments` for your user so `AppContext` can pick it as the "selected bar". Without a venue, `accessibleBars` stays empty and Dashboard has nothing to query against.
 
-In the `solution` mode system prompt (the `sys` variable inside the `if (mode === "solution")` block), append the following guidance paragraph at the end, just before the existing `Output exactly:` section:
+### 3. Seed one current week + an empty `weekly_core` row
+Insert a `weeks` row for the current ISO week (Mon–Sun, PT) keyed to the new venue, plus a matching `weekly_core` row with nulls/zeros. This lets `useSupabaseWeeks` return a row so `selectedWeek` resolves and the Dashboard renders its score hero + pillar cards (showing "—" for missing metrics, per the project's data-integrity rules).
 
-```
-You may call get_venue_contacts to see this venue's saved contacts (vendors, trades, reps, etc.). If a contact clearly fits the issue, name them and their contact method in your recommendation (e.g. "call your plumber, Mike — 555-1234"). Only name a contact that genuinely matches the problem — do not attach an unrelated contact just because one exists. If there are no contacts, or none fit, give the same recommendation without a name and do NOT mention that contacts are missing or suggest adding any. Contacts are a bonus when present, never a dependency.
-```
+### 4. Confirm in the preview
+Reload `/dashboard`. You should see the layout, score hero (0/—), four pillar cards with dashes, an empty alerts block, and the Toast widget. Real numbers will start filling in once the Toast / 7shifts / Asana sync crons run against the secrets you just set.
 
-Leave the `initial` mode and `followup` mode prompts completely untouched.
+## What I will NOT do
 
-### Out of scope (not touched)
-- Initial mode, followup mode
-- Contacts admin UI (`EditBarDialog.tsx`)
-- `venue_contacts` schema / migration
-- Insight cards, scoring, sync, frontend modal
+- Backfill historical metrics, insights, or briefings — those require running the edge-function sync pipeline with real integration data, not SQL seeds.
+- Touch the original project's data.
+- Auto-confirm emails or change auth settings.
 
-### Verification
-After deployment, a "solution" deep-dive request for an insight at a venue with active contacts should include `get_venue_contacts` in the available tool set. The model can optionally surface a matching contact in its `## What To Do` bullets.
+## Technical notes
+
+- Seeding happens via a new `supabase/migrations/<timestamp>_seed_remix_bootstrap.sql` file so it's reproducible and audited.
+- The migration is idempotent (uses `ON CONFLICT DO NOTHING` and looks up your user by `auth.users.email = 'ceosupreme@gmail.com'`, which I saw in the auth logs — confirm this is the right account before I run it).
+- No app code changes; this is data-only.
+
+## Confirm before I build
+
+1. Is `ceosupreme@gmail.com` the account you want promoted to `owner`?
+2. Do you want a single placeholder "Demo Venue", or should I create one venue per real location (in which case please paste the venue names)?
