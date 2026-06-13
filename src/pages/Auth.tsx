@@ -1,3 +1,4 @@
+// DEAD CODE — unrouted BarPulse-era login. Not referenced anywhere in App.tsx; the active login is src/pages/Login.tsx → src/components/login/LoginAuthCard.tsx. Safe to delete in a later cleanup pass.
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';

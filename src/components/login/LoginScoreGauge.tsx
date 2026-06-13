@@ -1,3 +1,4 @@
+// DEAD CODE — BarPulse-era login hero widget. Only used by LoginBrandPanel, which is itself unimported. Safe to delete in a later cleanup pass.
 import { useEffect, useState } from 'react';
 
 interface LoginScoreGaugeProps {
