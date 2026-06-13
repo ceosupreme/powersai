@@ -6,6 +6,7 @@ import { useToastData } from '@/hooks/useToastData';
 import { cn, formatCurrency, formatPercent, todayPacific } from '@/lib/utils';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
+import { useIntegrationDisabled } from '@/hooks/useIntegrationDisabled';
 
 interface ToastLiveWidgetProps {
   className?: string;
@@ -33,6 +34,7 @@ const getLastCompleteWeek = () => {
 export const ToastLiveWidget = ({ className, barId, title }: ToastLiveWidgetProps) => {
   const { selectedWeek } = useApp();
   const { session } = useAuth();
+  const toastDisabled = useIntegrationDisabled('toast');
 
   const dateRange = useMemo(() => {
     if (selectedWeek?.week_start && selectedWeek?.week_end) {
@@ -41,13 +43,16 @@ export const ToastLiveWidget = ({ className, barId, title }: ToastLiveWidgetProp
     return getLastCompleteWeek();
   }, [selectedWeek]);
 
-  const { data, isLoading, error, refetch, isFetching } = useToastData({
+  const { data: rawData, isLoading, error, refetch, isFetching } = useToastData({
     startDate: dateRange.start,
     endDate: dateRange.end,
     venueId: barId,
-  });
+  }, { enabled: !toastDisabled });
 
-  const hasLaborData = data && (data.labor.totalHours > 0 || data.labor.totalCost > 0);
+  // Treat disabled/invalid payloads as no data
+  const data = rawData && (rawData as any).labor ? rawData : null;
+
+  const hasLaborData = !!data && (data.labor.totalHours > 0 || data.labor.totalCost > 0);
 
   const formatTime = (date: string) => {
     const d = new Date(date);
@@ -87,6 +92,18 @@ export const ToastLiveWidget = ({ className, barId, title }: ToastLiveWidgetProp
           <span className="font-medium">Authentication Required</span>
         </div>
         <p className="text-sm text-muted-foreground">Please log in to view performance data.</p>
+      </div>
+    );
+  }
+
+  if (toastDisabled) {
+    return (
+      <div className={cn('bg-card border border-border rounded-lg p-6', className)}>
+        <div className="flex items-center gap-3 text-muted-foreground mb-2">
+          <BarChart3 className="w-5 h-5" />
+          <span className="font-medium">Performance data unavailable</span>
+        </div>
+        <p className="text-sm text-muted-foreground">Toast integration is currently disabled.</p>
       </div>
     );
   }
