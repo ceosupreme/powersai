@@ -4,24 +4,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Briefcase, Inbox } from "lucide-react";
+import { Plus, Briefcase, Inbox, MoreVertical, ArchiveRestore } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { PipelineBoard } from "@/components/crm/PipelineBoard";
 import { CompanyDetail } from "@/components/crm/CompanyDetail";
 import { InboundLeadsPanel } from "@/components/crm/InboundLeadsPanel";
 import { useInboundLeads } from "@/hooks/useInboundLeads";
 import {
-  useCompanies, useContacts, useFollowUpsDue, useCrmMutations,
+  useCompanies, useContacts, useFollowUpsDue, useCrmMutations, useCompanyLinkCounts,
+  type CrmCompany,
 } from "@/hooks/useCrm";
+import { ArchiveOrDeleteDialog, type LinkedLine } from "@/components/shared/ArchiveOrDeleteDialog";
 import { todayPacific } from "@/lib/utils";
 
 export default function Crm() {
   const [selected, setSelected] = useState<string | null>(null);
-  const companies = useCompanies();
+  const [showArchivedCompanies, setShowArchivedCompanies] = useState(false);
+  const companies = useCompanies({ onlyArchived: showArchivedCompanies });
   const contacts = useContacts();
   const followups = useFollowUpsDue();
   const inboundNew = useInboundLeads("new");
   const m = useCrmMutations();
   const [newCompanyName, setNewCompanyName] = useState("");
+  const [target, setTarget] = useState<CrmCompany | null>(null);
+  const linkCounts = useCompanyLinkCounts(target?.id ?? null);
   const today = todayPacific();
 
   return (
@@ -64,10 +75,16 @@ export default function Crm() {
               setNewCompanyName("");
             }}><Plus className="h-4 w-4 mr-1" /> Add</Button>
           </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Switch id="archived-companies" checked={showArchivedCompanies}
+              onCheckedChange={setShowArchivedCompanies} />
+            <Label htmlFor="archived-companies" className="cursor-pointer">Show archived</Label>
+          </div>
           <div className="grid md:grid-cols-2 gap-2">
             {(companies.data ?? []).map((c) => (
-              <Card key={c.id} className="cursor-pointer" onClick={() => setSelected(c.id)}>
-                <CardContent className="p-3 flex items-center justify-between">
+              <Card key={c.id} className="cursor-pointer">
+                <CardContent className="p-3 flex items-center justify-between gap-2"
+                  onClick={() => setSelected(c.id)}>
                   <div>
                     <div className="font-medium">{c.name}</div>
                     {c.website && <div className="text-xs text-muted-foreground">{c.website}</div>}
@@ -75,10 +92,39 @@ export default function Crm() {
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{c.status}</Badge>
                     {c.linked_project_id && <Badge>linked</Badge>}
+                    {c.archived && <Badge variant="outline">archived</Badge>}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      {c.archived ? (
+                        <Button size="icon" variant="ghost" className="h-7 w-7"
+                          onClick={() => m.restoreCompany.mutate(c.id, {
+                            onSuccess: () => toast.success(`Restored "${c.name}"`),
+                          })}>
+                          <ArchiveRestore className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-7 w-7">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setTarget(c)}>
+                              Archive or delete…
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
+            {(companies.data ?? []).length === 0 && (
+              <div className="text-sm text-muted-foreground p-4 text-center md:col-span-2">
+                {showArchivedCompanies ? "No archived companies." : "No companies yet."}
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -124,6 +170,34 @@ export default function Crm() {
       </Tabs>
 
       <CompanyDetail companyId={selected} onOpenChange={(o) => !o && setSelected(null)} />
+
+      {target && (
+        <ArchiveOrDeleteDialog
+          open={!!target}
+          onOpenChange={(o) => { if (!o) setTarget(null); }}
+          entityLabel="company"
+          entityName={target.name}
+          linkedLines={(() => {
+            const lc = linkCounts.data;
+            if (!lc) return [];
+            const lines: LinkedLine[] = [];
+            // ON DELETE CASCADE
+            if (lc.deals)        lines.push({ count: lc.deals,        label: lc.deals === 1 ? 'deal' : 'deals', effect: 'destroyed' });
+            if (lc.interactions) lines.push({ count: lc.interactions, label: lc.interactions === 1 ? 'interaction' : 'interactions', effect: 'destroyed' });
+            // ON DELETE SET NULL
+            if (lc.contacts)     lines.push({ count: lc.contacts,     label: lc.contacts === 1 ? 'contact' : 'contacts', effect: 'unlinked' });
+            return lines;
+          })()}
+          onArchive={async (reason) => {
+            await m.archiveCompany.mutateAsync({ id: target.id, reason });
+            toast.success(`Archived "${target.name}"`);
+          }}
+          onDelete={async () => {
+            await m.deleteCompany.mutateAsync(target.id);
+            toast.success(`Deleted "${target.name}"`);
+          }}
+        />
+      )}
     </div>
   );
 }
