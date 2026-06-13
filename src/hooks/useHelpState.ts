@@ -7,11 +7,17 @@ export interface HelpStateRow {
   user_id: string;
   help_enabled: boolean;
   dismissed_keys: string[];
+  last_backup_at: string | null;
+  setup_completed_at: string | null;
+  setup_skipped_at: string | null;
 }
 
 const DEFAULT: Omit<HelpStateRow, "user_id"> = {
   help_enabled: true,
   dismissed_keys: [],
+  last_backup_at: null,
+  setup_completed_at: null,
+  setup_skipped_at: null,
 };
 
 export function useHelpState() {
@@ -26,7 +32,7 @@ export function useHelpState() {
       if (!user?.id) return { user_id: "", ...DEFAULT };
       const { data, error } = await supabase
         .from("user_help_state")
-        .select("user_id, help_enabled, dismissed_keys")
+        .select("user_id, help_enabled, dismissed_keys, last_backup_at, setup_completed_at, setup_skipped_at")
         .eq("user_id", user.id)
         .maybeSingle();
       if (error) throw error;
@@ -42,6 +48,16 @@ export function useHelpState() {
         user_id: user.id,
         help_enabled: patch.help_enabled ?? current.help_enabled,
         dismissed_keys: patch.dismissed_keys ?? current.dismissed_keys,
+        last_backup_at:
+          patch.last_backup_at !== undefined ? patch.last_backup_at : current.last_backup_at,
+        setup_completed_at:
+          patch.setup_completed_at !== undefined
+            ? patch.setup_completed_at
+            : current.setup_completed_at,
+        setup_skipped_at:
+          patch.setup_skipped_at !== undefined
+            ? patch.setup_skipped_at
+            : current.setup_skipped_at,
       };
       const { error } = await supabase
         .from("user_help_state")
@@ -54,6 +70,9 @@ export function useHelpState() {
 
   const helpEnabled = query.data?.help_enabled ?? true;
   const dismissed = query.data?.dismissed_keys ?? [];
+  const lastBackupAt = query.data?.last_backup_at ?? null;
+  const setupCompletedAt = query.data?.setup_completed_at ?? null;
+  const setupSkippedAt = query.data?.setup_skipped_at ?? null;
 
   const isDismissed = useCallback(
     (k: string) => dismissed.includes(k),
@@ -78,13 +97,41 @@ export function useHelpState() {
     [upsert],
   );
 
+  const markBackupTaken = useCallback(
+    () => upsert.mutate({ last_backup_at: new Date().toISOString() }),
+    [upsert],
+  );
+
+  const markSetupCompleted = useCallback(
+    () => upsert.mutate({ setup_completed_at: new Date().toISOString() }),
+    [upsert],
+  );
+
+  const markSetupSkipped = useCallback(
+    () => upsert.mutate({ setup_skipped_at: new Date().toISOString() }),
+    [upsert],
+  );
+
+  const relaunchSetup = useCallback(
+    () => upsert.mutate({ setup_completed_at: null, setup_skipped_at: null }),
+    [upsert],
+  );
+
   return {
     helpEnabled,
     dismissedKeys: dismissed,
+    lastBackupAt,
+    setupCompletedAt,
+    setupSkippedAt,
+    setupDismissed: !!(setupCompletedAt || setupSkippedAt),
     isLoading: query.isLoading,
     isDismissed,
     dismiss,
     resetAll,
     setHelpEnabled,
+    markBackupTaken,
+    markSetupCompleted,
+    markSetupSkipped,
+    relaunchSetup,
   };
 }
