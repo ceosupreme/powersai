@@ -51,6 +51,7 @@ import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
+import { SetupWizard } from "@/components/help/SetupWizard";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -68,6 +69,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <SetupWizard />
               <Routes>
                 <Route path="/auth" element={<Login />} />
                 <Route path="/login" element={<Login />} />
