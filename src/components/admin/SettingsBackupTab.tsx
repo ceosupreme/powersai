@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BACKUP_TABLES, countTable, type BackupTable } from "@/lib/backupExport";
 import { useBackupExport } from "@/hooks/useBackupExport";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 type Counts = Record<string, number | null>;
 

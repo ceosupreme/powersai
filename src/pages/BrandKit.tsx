@@ -85,6 +85,10 @@ export default function BrandKit() {
         )}
       </header>
 
+      <HelpTip helpKey={HELP_KEYS.brandVault} title="One kit per project">
+        Colors, taglines, hashtags, links, and uploaded assets all belong to this single kit. Archive hides the kit but keeps everything intact and restorable. Deleting an asset record does not delete the underlying file in storage.
+      </HelpTip>
+
       {k && (
         <ArchiveOrDeleteDialog
           open={dialogOpen}
