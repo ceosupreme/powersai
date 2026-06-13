@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-seven-shifts — pulls the active+inactive employee roster from 7shifts
 // for every venue with sevenshifts_api_enabled=true, upserts into
 // employee_profiles, and runs the Toast↔7shifts matching pass at the end.
@@ -12,7 +13,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { runMatchingPass } from "../_shared/employee-matching.ts";
 import { detectVendorAccount } from "../_shared/vendor-account-detector.ts";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // context-sources-pull
 // Dispatcher that runs every registered ContextSourceAdapter for a venue (or
 // for all active venues), upserts results into context_items, and records a
@@ -7,7 +8,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { ALL_CONTEXT_SOURCES, type VenueRow } from '../_shared/context-sources/index.ts';
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

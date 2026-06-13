@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Polls Asana for status of approved action_items and writes back.
 // Triggered every 15 minutes via pg_cron.
 
@@ -8,7 +9,6 @@ const corsHeaders = {
 };
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const ASANA_BASE = "https://app.asana.com/api/1.0";
 const OPT_FIELDS =

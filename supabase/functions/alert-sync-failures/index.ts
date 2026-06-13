@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Sweep edge function: scans sync_runs for genuinely-unresolved failed/partial
 // runs and creates one Asana alert task per row in section 1212842230116263,
 // assigned to Supreme. Idempotent via sync_runs.alert_task_gid.
@@ -6,7 +7,6 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const SECTION_GID = "1212842230116263";
 const ASANA_WORKSPACE_GID = "16292914201127";

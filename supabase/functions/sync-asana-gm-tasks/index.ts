@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Syncs each venue's GM Asana task workload into asana_gm_tasks cache.
 // Strategy: completed_since=now-14d returns ALL incomplete tasks (any age) +
 // tasks completed in the last 14 days. One call per GM, paginated.
@@ -9,7 +10,6 @@ const corsHeaders = {
 };
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const ASANA_BASE = "https://app.asana.com/api/1.0";
 const WORKSPACE_GID = "16292914201127";

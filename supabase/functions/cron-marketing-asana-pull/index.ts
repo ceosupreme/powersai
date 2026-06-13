@@ -1,9 +1,9 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Scheduled background sync for Asana → BarPulse. Runs every 2h during
 // business hours via pg_cron. Per-venue try/catch so one failure doesn't
 // kill the rest. Tracks consecutive failures in venue_asana_sync_health.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

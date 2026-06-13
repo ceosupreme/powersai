@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Per-venue setup: ensures the "Marketing Efforts" section + 10 marketing
 // custom fields exist on the venue's quarterly Asana project, persists their
 // GIDs into venue_execution_adapters. Idempotent.
@@ -10,7 +11,6 @@ const corsHeaders = {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
   MARKETING_FIELD_DEFS,
   MARKETING_SECTION_NAME,
   type MarketingFieldKey,

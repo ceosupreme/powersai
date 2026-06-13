@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-employees — pulls the employee roster from Toast for every venue
 // with toast_api_enabled=true and upserts into employee_profiles. Runs the
 // matching pass at the end so newly-arrived Toast rows get paired with any
@@ -9,7 +10,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { runMatchingPass } from "../_shared/employee-matching.ts";
 import { detectVendorAccount } from "../_shared/vendor-account-detector.ts";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

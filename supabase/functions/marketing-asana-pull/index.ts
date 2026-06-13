@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Pulls Asana state back into BarPulse.
 //
 // Modes:
@@ -17,7 +18,6 @@ const corsHeaders = {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { type MarketingFieldKey } from "../_shared/marketing-asana-fields.ts";
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const ASANA_BASE = "https://app.asana.com/api/1.0";
 const TASK_OPT_FIELDS =

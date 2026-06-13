@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-time-entries — pulls Toast time entries (with breaks) for the
 // previous business day per venue, and additionally pulls modifiedDate-based
 // updates to catch retroactive edits to recently-synced entries.
@@ -15,7 +16,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import {
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
   getRestaurantConfig,
   previousBusinessDate,
   isPastCloseout,

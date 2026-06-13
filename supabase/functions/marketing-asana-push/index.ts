@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Pushes a Marketing Hub campaign to its venue's Asana board.
 // Supports dry_run preview (no writes) and live writes (gated by
 // venue_execution_adapters.live_writes_enabled).
@@ -14,7 +15,6 @@ const corsHeaders = {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
   MARKETING_FIELD_DEFS,
   MARKETING_SUBTASK_TEMPLATE,
   type MarketingFieldKey,

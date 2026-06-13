@@ -1,10 +1,10 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // website-pagespeed-daily — lightweight Core Web Vitals snapshot for one venue.
 // Uses Google PageSpeed Insights v5 (mobile strategy). API key reuses
 // GOOGLE_PLACES_API_KEY (must be unrestricted or have PageSpeed enabled).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { fetchWithTimeout } from '../_shared/website-fetch.ts';
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

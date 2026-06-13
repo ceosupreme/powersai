@@ -1,8 +1,8 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Probe the Toast ANALYTICS API (/era/v1) to enumerate every restaurant
 // in the management group. Uses the shared analytics credentials.
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
