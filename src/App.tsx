@@ -20,8 +20,6 @@ import Labor from "./pages/Labor";
 import Operations from "./pages/Operations";
 import GuestExperience from "./pages/GuestExperience";
 import Insights from "./pages/Insights";
-import SocialMedia from "./pages/SocialMedia";
-import Marketing from "./pages/Marketing";
 import Admin from "./pages/Admin";
 import AdminSyncHealth from "./pages/AdminSyncHealth";
 import GrowthAudit from "./pages/GrowthAudit";
@@ -126,16 +124,8 @@ const App = () => {
                     <AppLayout><InsightsAudit /></AppLayout>
                   </ProtectedRoute>
                 } />
-                <Route path="/social-media" element={
-                  <ProtectedRoute>
-                    <AppLayout><SocialMedia /></AppLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/marketing" element={
-                  <ProtectedRoute>
-                    <AppLayout><Marketing /></AppLayout>
-                  </ProtectedRoute>
-                } />
+                <Route path="/social-media" element={<Navigate to="/marketing-hub" replace />} />
+                <Route path="/marketing" element={<Navigate to="/marketing-hub" replace />} />
                 <Route path="/admin" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><Admin /></AppLayout>
