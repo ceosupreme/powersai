@@ -9,6 +9,8 @@ import {
   useInboundLeads, useInboundLeadMutations,
   type InboundLeadStatus,
 } from "@/hooks/useInboundLeads";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export function InboundLeadsPanel() {
   const [status, setStatus] = useState<InboundLeadStatus>("new");
@@ -17,6 +19,9 @@ export function InboundLeadsPanel() {
 
   return (
     <div className="space-y-3">
+      <HelpTip helpKey={HELP_KEYS.crmInbound} title="What lands here">
+        Submissions from the public marketing site write to <code>inbound_leads</code> (admin-only). Triage by archiving noise, promoting real opportunities into the regular CRM flow, or hard-deleting via the protection dialog.
+      </HelpTip>
       <Tabs value={status} onValueChange={(v) => setStatus(v as InboundLeadStatus)}>
         <TabsList>
           <TabsTrigger value="new">New {leads.data?.length ? <Badge className="ml-2">{leads.data.length}</Badge> : null}</TabsTrigger>

@@ -43,6 +43,8 @@ import {
   Palette,
   Briefcase,
   Inbox as InboxIcon,
+  HelpCircle,
+  Rocket,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -94,6 +96,12 @@ const toolNavItems = [
   { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
   { path: '/marketing', label: 'Marketing', icon: Megaphone, pageKey: 'marketing' as PageKey },
   { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'marketing' as PageKey },
+];
+
+// Help/launch nav items — available to all authenticated users
+const helpNavItems = [
+  { path: '/help', label: 'Help Center', icon: HelpCircle, pageKey: 'dashboard' as PageKey },
+  { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' as PageKey },
 ];
 
 // Dev Tools removed - role preview handled by role system
@@ -324,6 +332,46 @@ export const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
         )}
+
+        {/* Help & launch */}
+        <SidebarGroup className="p-2 pt-0 border-t border-sidebar-border/50 mt-2">
+          {!isCollapsed && (
+            <div className="px-3 py-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Help
+              </span>
+            </div>
+          )}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {helpNavItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative",
+                          isActive
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50"
+                        )}
+                      >
+                        {isActive && (
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
+                        )}
+                        <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary")} />
+                        {!isCollapsed && <span className="font-medium flex-1">{item.label}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
       </SidebarContent>
 

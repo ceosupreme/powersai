@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BACKUP_TABLES, countTable, type BackupTable } from "@/lib/backupExport";
 import { useBackupExport } from "@/hooks/useBackupExport";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 type Counts = Record<string, number | null>;
 
@@ -46,6 +48,9 @@ export function SettingsBackupTab() {
 
   return (
     <div className="space-y-6">
+      <HelpTip helpKey={HELP_KEYS.backupBeforeChanges} title="Back up before big changes">
+        Pull a Full JSON Backup before bulk edits, integration cutovers, or anything you can't easily undo. Exports run through your authenticated session — RLS guarantees you only see your own data.
+      </HelpTip>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

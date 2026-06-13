@@ -12,6 +12,8 @@ import {
   type CaptureStatus, type CaptureType, type CaptureItem,
 } from "@/hooks/useCaptureInbox";
 import { useIntegrationDisabled } from "@/hooks/useIntegrationDisabled";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 const TYPES: CaptureType[] = ["task","idea","note","brand_asset","crm_lead","content_idea"];
 
@@ -133,6 +135,9 @@ export default function Inbox() {
           <TabsTrigger value="routed">Routed</TabsTrigger>
           <TabsTrigger value="archived">Archived</TabsTrigger>
         </TabsList>
+        <HelpTip helpKey={HELP_KEYS.captureSuggest} title="AI suggests, you accept" className="mt-3">
+          When an item lands here, the AI proposes a type and project — exactly once per item. Nothing files automatically. Click Accept to take the suggestion, or pick your own type + project and click Route.
+        </HelpTip>
         <TabsContent value={status} className="mt-3 space-y-2">
           {(items.data ?? []).length === 0 && (
             <div className="text-sm text-muted-foreground">Nothing here.</div>

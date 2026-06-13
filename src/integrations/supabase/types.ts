@@ -7175,6 +7175,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_checklist_progress: {
+        Row: {
+          completed_at: string
+          item_key: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          item_key: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          item_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_help_state: {
+        Row: {
+          created_at: string
+          dismissed_keys: string[]
+          help_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dismissed_keys?: string[]
+          help_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dismissed_keys?: string[]
+          help_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_page_permissions: {
         Row: {
           created_at: string

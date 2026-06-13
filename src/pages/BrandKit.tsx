@@ -15,6 +15,8 @@ import {
 } from '@/hooks/useBrandKit';
 import { AssetUploader } from '@/components/brand-kit/AssetUploader';
 import { ArchiveOrDeleteDialog, type LinkedLine } from '@/components/shared/ArchiveOrDeleteDialog';
+import { HelpTip } from '@/components/help/HelpTip';
+import { HELP_KEYS } from '@/config/helpKeys';
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(text).then(() => toast.success('Copied'));
@@ -82,6 +84,10 @@ export default function BrandKit() {
           <Button size="sm" variant="ghost" onClick={() => setShowArchived(true)}>Show archived</Button>
         )}
       </header>
+
+      <HelpTip helpKey={HELP_KEYS.brandVault} title="One kit per project">
+        Colors, taglines, hashtags, links, and uploaded assets all belong to this single kit. Archive hides the kit but keeps everything intact and restorable. Deleting an asset record does not delete the underlying file in storage.
+      </HelpTip>
 
       {k && (
         <ArchiveOrDeleteDialog
