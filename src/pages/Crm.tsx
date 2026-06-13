@@ -117,6 +117,10 @@ export default function Crm() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="inbound" className="mt-4">
+          <InboundLeadsPanel />
+        </TabsContent>
       </Tabs>
 
       <CompanyDetail companyId={selected} onOpenChange={(o) => !o && setSelected(null)} />
