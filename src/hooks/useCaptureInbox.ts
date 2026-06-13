@@ -59,8 +59,11 @@ export function useCaptureMutations() {
         if (type === "task" && project_id) {
           const title = (raw_text.split("\n")[0] || "Untitled").slice(0, 200);
           const { error: tErr } = await supabase.from("tasks").insert({
-            title, description: raw_text, venue_id: project_id, created_by: userId!,
-            status: "todo",
+            title, description: raw_text,
+            bar_id: project_id,
+            venue_id: project_id,
+            created_by: userId!,
+            status: "Todo",
           } as any);
           if (tErr) throw tErr;
         } else if (type === "crm_lead") {
