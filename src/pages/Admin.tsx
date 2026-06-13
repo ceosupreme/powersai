@@ -4,10 +4,11 @@ import { useAuth } from '@/context/AuthContext';
 
 import { UsersTab } from '@/components/admin/UsersTab';
 import { SettingsTab } from '@/components/admin/SettingsTab';
-import { Users, ShieldCheck, Settings, Lock, Sparkles, Megaphone } from 'lucide-react';
+import { Users, ShieldCheck, Settings, Lock, Sparkles, Megaphone, Layers } from 'lucide-react';
 import { RolePageDefaults } from '@/components/admin/RolePageDefaults';
 import { GrowthAuditLaunchTab } from '@/components/admin/GrowthAuditLaunchTab';
 import { MarketingHubLaunchTab } from '@/components/admin/MarketingHubLaunchTab';
+import { SettingsPillarsTab } from '@/components/admin/SettingsPillarsTab';
 
 const Admin = () => {
   const { isAdmin, isLoading } = useAuth();
@@ -84,6 +85,13 @@ const Admin = () => {
               <Megaphone className="h-4 w-4" />
               <span className="hidden sm:inline">Marketing Hub</span>
             </TabsTrigger>
+            <TabsTrigger
+              value="pillars"
+              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
+            >
+              <Layers className="h-4 w-4" />
+              <span className="hidden sm:inline">Pillars</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4 animate-fade-in-up">
@@ -104,6 +112,10 @@ const Admin = () => {
 
           <TabsContent value="marketing-hub" className="space-y-4 animate-fade-in-up">
             <MarketingHubLaunchTab />
+          </TabsContent>
+
+          <TabsContent value="pillars" className="space-y-4 animate-fade-in-up">
+            <SettingsPillarsTab />
           </TabsContent>
         </Tabs>
       </div>

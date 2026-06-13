@@ -801,6 +801,31 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 )}
               </TabsContent>
 
+              {/* ── PILLARS ────────────────────────────────────── */}
+              <TabsContent value="pillars" className="mt-0 space-y-4">
+                {editingBar ? (
+                  <Card className="bg-muted/20 border-border">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Layers className="h-4 w-4 text-muted-foreground" /> Project Pillars
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ProjectPillarOverridesPanel
+                        projectId={editingBar.id}
+                        projectType={formData.project_type}
+                      />
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="bg-muted/20 border-dashed border-border">
+                    <CardContent className="py-4 text-xs text-muted-foreground text-center">
+                      Save the project first to configure pillars.
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
               {/* ── ADVANCED ───────────────────────────────────── */}
               <TabsContent value="advanced" className="mt-0 space-y-4">
                 {editingBar && (
