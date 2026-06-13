@@ -15,7 +15,6 @@ import {
 } from '@/hooks/useBrandKit';
 import { AssetUploader } from '@/components/brand-kit/AssetUploader';
 import { ArchiveOrDeleteDialog, type LinkedLine } from '@/components/shared/ArchiveOrDeleteDialog';
-import { useState as useReactState } from 'react';
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(text).then(() => toast.success('Copied'));
@@ -30,7 +29,7 @@ export default function BrandKit() {
   const saveKit = useSaveKit(projectId);
   const archiveM = useBrandKitArchive();
   const linkCounts = useBrandKitLinkCounts(kitId);
-  const [dialogOpen, setDialogOpen] = useReactState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Local form state
   const k = kitQuery.data;
