@@ -69,39 +69,58 @@ import { usePreview } from '@/context/PreviewContext';
 import { UserRole, ROLE_LABELS } from '@/types/roles';
 import { NotificationPanel } from '@/components/staff/NotificationPanel';
 
-// Main navigation items (top section - no label)
-const mainNavItems = [
-  { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' as PageKey },
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard, pageKey: 'dashboard' as PageKey },
-  { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' as PageKey },
-  { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' as PageKey },
-];
+type NavItem = {
+  path: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  pageKey: PageKey;
+  hasBadge?: 'tasks' | 'chat';
+};
 
-// Pillar navigation items (middle section - no label, visual separation)
-const pillarNavItems = [
-  { path: '/sales', label: 'Revenue', icon: DollarSign, pageKey: 'sales' as PageKey },
-  { path: '/labor', label: 'Labor', icon: Users, pageKey: 'labor' as PageKey },
-  { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' as PageKey },
-  { path: '/operations', label: 'Delivery', icon: Settings, pageKey: 'operations' as PageKey },
-  { path: '/guest-experience', label: 'Client Experience', icon: Star, pageKey: 'guest_experience' as PageKey },
-];
+type NavGroup = { label: string; items: NavItem[] };
 
-// Tool navigation items (bottom section - "Tools" label)
-const toolNavItems = [
-  { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat' as const, pageKey: 'chat' as PageKey },
-  { path: '/inbox', label: 'Inbox', icon: InboxIcon, pageKey: 'dashboard' as PageKey },
-  { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' as PageKey },
-  { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks' as const, pageKey: 'tasks' as PageKey },
-  { path: '/logs', label: 'Daily Logs', icon: ClipboardList, pageKey: 'logs' as PageKey },
-  { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
-  { path: '/marketing', label: 'Marketing', icon: Megaphone, pageKey: 'marketing' as PageKey },
-  { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'marketing' as PageKey },
-];
-
-// Help/launch nav items — available to all authenticated users
-const helpNavItems = [
-  { path: '/help', label: 'Help Center', icon: HelpCircle, pageKey: 'dashboard' as PageKey },
-  { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' as PageKey },
+// Agency-OS sidebar groups
+const navGroups: NavGroup[] = [
+  {
+    label: 'Workspace',
+    items: [
+      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
+      { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
+      { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
+      { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
+    ],
+  },
+  {
+    label: 'CRM & Sales',
+    items: [
+      { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' },
+      { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'dashboard' },
+      { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'dashboard' },
+    ],
+  },
+  {
+    label: 'Brand & Content',
+    items: [
+      { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'dashboard' },
+      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'dashboard' },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks', pageKey: 'tasks' },
+      { path: '/logs', label: 'Logs', icon: ClipboardList, pageKey: 'logs' },
+      { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat', pageKey: 'chat' },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { path: '/help', label: 'Help', icon: HelpCircle, pageKey: 'dashboard' },
+      { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' },
+      { path: '/admin', label: 'Settings', icon: Settings, pageKey: 'dashboard' },
+    ],
+  },
 ];
 
 // Dev Tools removed - role preview handled by role system
