@@ -46,6 +46,8 @@ import NotFound from "./pages/NotFound";
 import RolePreview from "./pages/RolePreview";
 import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
+import Crm from "./pages/Crm";
+import Inbox from "./pages/Inbox";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -150,6 +152,16 @@ const App = () => {
                 <Route path="/brand-kit" element={
                   <ProtectedRoute>
                     <AppLayout><BrandKit /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/crm" element={
+                  <ProtectedRoute>
+                    <AppLayout><Crm /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/inbox" element={
+                  <ProtectedRoute>
+                    <AppLayout><Inbox /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/employees" element={
