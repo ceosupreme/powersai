@@ -48,6 +48,9 @@ export function SettingsBackupTab() {
 
   return (
     <div className="space-y-6">
+      <HelpTip helpKey={HELP_KEYS.backupBeforeChanges} title="Back up before big changes">
+        Pull a Full JSON Backup before bulk edits, integration cutovers, or anything you can't easily undo. Exports run through your authenticated session — RLS guarantees you only see your own data.
+      </HelpTip>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

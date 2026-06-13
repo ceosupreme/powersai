@@ -25,6 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { OnboardingChecklist } from '@/components/growth-audit/onboarding/OnboardingChecklist';
 import { UpcomingOpportunitiesWidget } from '@/components/growth-audit/context/UpcomingOpportunitiesWidget';
+import { HelpTip } from '@/components/help/HelpTip';
+import { HELP_KEYS } from '@/config/helpKeys';
 
 const fmtScore = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toString());
 
