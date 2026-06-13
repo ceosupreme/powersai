@@ -1,61 +1,62 @@
-## Backup & Export — Final Plan (approved scope)
+## Sidebar IA rebuild — nav config only
 
-Legacy log row-count check ran: `gm_logs`, `lead_logs`, `shift_logs`, `manager_logs`, `log_entries`, `log_entry_values` — **all 0 rows**. Excluded as agreed.
+### Route reality check (all confirmed in `src/App.tsx`)
 
-Additive only. New UI in Settings, client-side CSV/JSON generation through the **authenticated** Supabase client so RLS scopes every export. No schema changes, no new secrets, no edge function, no cron.
+| Nav item | Route | Exists? |
+|---|---|---|
+| Portfolio | `/portfolio` | ✅ |
+| Weekly Review | `/weekly-review` | ✅ |
+| Insights | `/insights` | ✅ |
+| CRM | `/crm` | ✅ |
+| Inbound Leads | `/crm?tab=inbound` | ⚠️ Tab inside `/crm` (already wired with a `TabsTrigger value="inbound"`). Will link to `/crm?tab=inbound` — requires a tiny read of the `tab` query param inside `Crm.tsx` to honor it. **One-line read** of `useSearchParams` to set the default `Tabs` value. This is the only file outside nav-config that gets touched, and it adds no new behavior beyond honoring an existing tab. If you'd rather keep this pass purely nav-only, I'll link to `/crm` and add a memory item to revisit. **Default plan: do the one-line tab-honoring change.** |
+| Capture Inbox | `/inbox` | ✅ |
+| Brand Vault | `/brand-kit` | ✅ |
+| Growth Audit | `/growth-audit` | ✅ |
+| Tasks | `/tasks` | ✅ |
+| Logs | `/logs` | ✅ |
+| Chat | `/chat` | ✅ |
+| Help | `/help` | ✅ |
+| Launch Checklist | `/launch` | ✅ |
+| Settings | `/admin` | ✅ (Settings is the Admin page's primary tab) |
 
-### Tables included (live-inventoried columns)
+### What changes
 
-**CRM** — `crm_companies`, `crm_contacts`, `crm_deals`, `crm_interactions`
-**Brand Vault** — `brand_kits`, `brand_kit_colors`, `brand_kit_taglines`, `brand_kit_hashtags`, `brand_kit_links`, `brand_kit_assets` *(metadata only: `storage_path`, `file_name`, `asset_type`, `mime_type`, `file_size`, etc. — no binaries)*
-**Capture** — `capture_items`
-**Inbound Leads** — `inbound_leads`
-**Projects** — `venues`, `pillar_templates`, `project_pillar_overrides`, `project_pillar_scores`
-**Tasks** — `tasks`, `task_comments`, `task_activity`
-**Authored content** — `knowledge_base`, `voice_notes`, `user_preferences`
-**Marketing** — `marketing_campaigns`, `marketing_events`, `promotions`
+**`src/components/layout/AppSidebar.tsx`** — replace the three nav-item arrays (`mainNavItems`, `pillarNavItems`, `toolNavItems`) and the `helpNavItems` array with five labeled groups, rendered with the existing `SidebarGroup` + `SidebarMenu` machinery (Tasks/Chat keep their existing badge wiring):
 
-Columns are read live via `select('*')` — CSV headers reflect actual schema at export time, no hardcoded field lists.
+- **Workspace** — Today (`/workspace`), Portfolio, Weekly Review, Insights
+  - (Kept "Today" because `/workspace` is the agency-OS home; not in the user's enumerated list, but removing it would orphan a key page. Flag in plan: if you want it removed, say so.)
+- **CRM & Sales** — CRM, Inbound Leads, Capture Inbox
+- **Brand & Content** — Brand Vault, Growth Audit
+- **Tools** — Tasks, Logs, Chat
+- **System** — Help, Launch Checklist, Settings
 
-### Excluded (and why)
-- Derived/generated: `weekly_briefings`, `weekly_core`, `weekly_scorecard` — system regenerates.
-- Legacy logs (above) — confirmed empty.
-- Asset binaries — metadata + `storage_path` only, per spec.
+Removed from sidebar (routes untouched): `/sales` Revenue, `/labor` Labor, `/operations` Delivery, `/guest-experience` Client Experience, `/employees` Team, `/social-media` Social Media, `/marketing` Marketing. Direct URL visits still render their pages.
 
-### UI
+**`src/components/layout/BottomNav.tsx`** (mobile drawer) — mirror the same 5 groups in the "More" sheet; keep the 4 primary tabs at the bottom but swap the pillar-era ones for: Home (`/workspace`), Weekly, Inbox (`/inbox`), Chat. The "More" drawer holds the rest of the new groups.
 
-New `src/components/admin/SettingsBackupTab.tsx` registered as a new tab in `src/components/admin/SettingsTab.tsx` ("Backup & Export", `Download` icon, `subtab=backup`). Zero existing tabs renamed or moved.
+**`src/components/layout/PortfolioBottomNav.tsx`** (owner portfolio shell) — same overhaul: Portfolio + Insights primary; the "More" sheet's admin-only block replaced with the new 5-group set.
 
-Contents:
-- Header + reminder: *"Back up your data regularly, especially before major changes."*
-- Brief instructions: choose export → download → save somewhere safe.
-- **Per-entity CSV** — grouped list with row count + Download CSV button per table. Per-button loading spinner.
-- **Full JSON Backup** — single button, downloads `supreme-team-backup-YYYY-MM-DD.json`:
-  ```json
-  { "exported_at": "...", "exported_by": "<uid>", "version": 1,
-    "tables": { "crm_companies": [...], ... } }
-  ```
-- Empty tables → valid empty CSV (header row only if known, otherwise empty file) and `[]` in JSON. No crash.
+**`src/pages/Crm.tsx`** — read `?tab=` from `useSearchParams`, pass as `defaultValue` to the existing `<Tabs>` so `/crm?tab=inbound` lands on the Inbound Leads tab. No other behavior changes.
 
-### Implementation
+**Not touched:** `ShiftExecutionBottomNav` and `VenueLeadershipBottomNav` are scoped to shift workers / venue leadership (lead/foh/boh) — they're operational, not the agency OS, and don't surface CRM/Brand Vault concepts. Out of scope per "all RELEVANT shells."
 
-- `src/lib/backupExport.ts` — `BACKUP_TABLES` registry, `fetchTable(name)` via authenticated client, `toCSV(rows)` (RFC 4180 escaping, JSON-stringified objects, alphabetical headers with `id` pinned front and `created_at`/`updated_at` pinned back), `downloadBlob(filename, mime, content)` anchor-tag pattern.
-- `src/hooks/useBackupExport.ts` — per-table loading state + toast errors; `exportCsv(name)` and `exportFullJson()`.
-- `src/components/admin/SettingsBackupTab.tsx` — UI.
-- `src/components/admin/SettingsTab.tsx` — add one `TabsTrigger` + `TabsContent` for `backup`.
+### Constraints honored
 
-### Verification (after build)
+- Zero route deletions, zero page-component changes (besides the one-line tab read in `Crm.tsx`), zero database changes.
+- Page-permission filtering (`canAccessPage`) retained for every entry using the same `pageKey` values currently in use, mapped sensibly (`/crm`, `/inbox`, `/brand-kit`, `/help`, `/launch` already use `pageKey: 'dashboard'` — keep as-is; `/portfolio` uses `'dashboard'`; `/growth-audit` uses `'dashboard'`).
+- Help system unaffected: Help / Launch are nav destinations (always-visible), not help affordances; they don't read `helpEnabled`.
+- Pre-existing CSS / collapsed-mode styling reused verbatim.
 
-1. As admin, export each CSV → headers match `information_schema.columns` for that table; row count matches `select count(*)` under that user's JWT.
-2. As a non-admin user, export same CSVs → only their own RLS-permitted rows present; first user's data absent. Cross-checked via psql `count(*) group by created_by`.
-3. Empty table case (e.g. fresh user with no `voice_notes`) → header-only CSV, no error, JSON has `[]`.
-4. Full JSON parses; every listed table is a key; per-table row counts match individual CSVs.
-5. **RLS / network proof**: Open browser Network tab during an export → confirm each PostgREST request carries `Authorization: Bearer <user-jwt>` (NOT the service-role JWT) and `apikey: <publishable>`. Confirm no edge function call exists. State this explicitly in the verification summary.
+### Verification
 
-### Out of scope (explicit)
-- No schema/migration changes.
-- No edge function (volumes are small; if any future table grows beyond client-side practical limits I'll propose an RLS-respecting edge function then).
-- No storage binary export.
-- No scheduling/cron.
+1. Sidebar visual inspection — five labeled groups appear in order; Revenue/Labor/Operations/Guest Experience/Marketing/Social Media gone.
+2. Click each of the 14 nav links → route mounts (no 404).
+3. CRM, Brand Vault, Capture Inbox, Growth Audit, Help, Launch Checklist all reachable from sidebar.
+4. Direct-visit `/sales`, `/labor`, `/operations`, `/guest-experience`, `/marketing`, `/social-media` → pages still render.
+5. Mobile bottom-nav "More" sheet shows the same 5 groups.
+6. `tsc --noEmit` clean. `git diff --name-only` lists only `AppSidebar.tsx`, `BottomNav.tsx`, `PortfolioBottomNav.tsx`, `Crm.tsx`.
 
-Ready to build on approval.
+### Two decisions to confirm
+
+- **Keep `/workspace` ("Today") in Workspace group?** It's the natural agency-OS home; you didn't name it, but dropping it leaves it orphan-only-via-URL. Default: keep.
+- **`/crm?tab=inbound` requires a one-line `useSearchParams` read in `Crm.tsx`.** Default: do it (purely additive, no behavior change for `/crm` visitors). Otherwise link Inbound Leads to plain `/crm`.

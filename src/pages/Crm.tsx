@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,12 @@ import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function Crm() {
   const [selected, setSelected] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const validTabs = ["pipeline", "companies", "contacts", "followups", "inbound"] as const;
+  const initialTab = (validTabs as readonly string[]).includes(searchParams.get("tab") ?? "")
+    ? (searchParams.get("tab") as string)
+    : "pipeline";
+  const [tab, setTab] = useState<string>(initialTab);
   const [showArchivedCompanies, setShowArchivedCompanies] = useState(false);
   const companies = useCompanies({ onlyArchived: showArchivedCompanies });
   const contacts = useContacts();
@@ -53,7 +60,12 @@ export default function Crm() {
         Deals flow Lead → Pitch → Proposal → Won/Lost. When a deal hits Won, graduate the company into an active project so you can operate against it. Archive keeps history; delete cascades — the dialog will tell you exactly what dies and what gets orphaned.
       </HelpTip>
 
-      <Tabs defaultValue="pipeline">
+      <Tabs value={tab} onValueChange={(v) => {
+        setTab(v);
+        const next = new URLSearchParams(searchParams);
+        if (v === "pipeline") next.delete("tab"); else next.set("tab", v);
+        setSearchParams(next, { replace: true });
+      }}>
         <TabsList>
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
           <TabsTrigger value="companies">Companies</TabsTrigger>

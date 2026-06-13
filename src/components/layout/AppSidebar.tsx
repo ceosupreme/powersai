@@ -69,39 +69,58 @@ import { usePreview } from '@/context/PreviewContext';
 import { UserRole, ROLE_LABELS } from '@/types/roles';
 import { NotificationPanel } from '@/components/staff/NotificationPanel';
 
-// Main navigation items (top section - no label)
-const mainNavItems = [
-  { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' as PageKey },
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard, pageKey: 'dashboard' as PageKey },
-  { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' as PageKey },
-  { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' as PageKey },
-];
+type NavItem = {
+  path: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  pageKey: PageKey;
+  hasBadge?: 'tasks' | 'chat';
+};
 
-// Pillar navigation items (middle section - no label, visual separation)
-const pillarNavItems = [
-  { path: '/sales', label: 'Revenue', icon: DollarSign, pageKey: 'sales' as PageKey },
-  { path: '/labor', label: 'Labor', icon: Users, pageKey: 'labor' as PageKey },
-  { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' as PageKey },
-  { path: '/operations', label: 'Delivery', icon: Settings, pageKey: 'operations' as PageKey },
-  { path: '/guest-experience', label: 'Client Experience', icon: Star, pageKey: 'guest_experience' as PageKey },
-];
+type NavGroup = { label: string; items: NavItem[] };
 
-// Tool navigation items (bottom section - "Tools" label)
-const toolNavItems = [
-  { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat' as const, pageKey: 'chat' as PageKey },
-  { path: '/inbox', label: 'Inbox', icon: InboxIcon, pageKey: 'dashboard' as PageKey },
-  { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' as PageKey },
-  { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks' as const, pageKey: 'tasks' as PageKey },
-  { path: '/logs', label: 'Daily Logs', icon: ClipboardList, pageKey: 'logs' as PageKey },
-  { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
-  { path: '/marketing', label: 'Marketing', icon: Megaphone, pageKey: 'marketing' as PageKey },
-  { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'marketing' as PageKey },
-];
-
-// Help/launch nav items — available to all authenticated users
-const helpNavItems = [
-  { path: '/help', label: 'Help Center', icon: HelpCircle, pageKey: 'dashboard' as PageKey },
-  { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' as PageKey },
+// Agency-OS sidebar groups
+const navGroups: NavGroup[] = [
+  {
+    label: 'Workspace',
+    items: [
+      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
+      { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
+      { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
+      { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
+    ],
+  },
+  {
+    label: 'CRM & Sales',
+    items: [
+      { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' },
+      { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'dashboard' },
+      { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'dashboard' },
+    ],
+  },
+  {
+    label: 'Brand & Content',
+    items: [
+      { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'dashboard' },
+      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'dashboard' },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks', pageKey: 'tasks' },
+      { path: '/logs', label: 'Logs', icon: ClipboardList, pageKey: 'logs' },
+      { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat', pageKey: 'chat' },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { path: '/help', label: 'Help', icon: HelpCircle, pageKey: 'dashboard' },
+      { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' },
+      { path: '/admin', label: 'Settings', icon: Settings, pageKey: 'dashboard' },
+    ],
+  },
 ];
 
 // Dev Tools removed - role preview handled by role system
@@ -124,20 +143,13 @@ export const AppSidebar = () => {
   const { canAccessPage, profile, role, isAdmin } = useAuth();
   const { isPreview, previewRole, setPreviewRole } = usePreview();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  
-  // Filter nav items based on page permissions
-  const filteredMainNavItems = useMemo(() => 
-    mainNavItems.filter(item => canAccessPage(item.pageKey)),
-    [canAccessPage]
-  );
-  
-  const filteredPillarNavItems = useMemo(() => 
-    pillarNavItems.filter(item => canAccessPage(item.pageKey)),
-    [canAccessPage]
-  );
-  
-  const filteredToolNavItems = useMemo(() => 
-    toolNavItems.filter(item => canAccessPage(item.pageKey)),
+
+  // Filter groups + items based on page permissions; drop empty groups.
+  const filteredGroups = useMemo(
+    () =>
+      navGroups
+        .map((g) => ({ ...g, items: g.items.filter((i) => canAccessPage(i.pageKey)) }))
+        .filter((g) => g.items.length > 0),
     [canAccessPage]
   );
 
@@ -196,183 +208,73 @@ export const AppSidebar = () => {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main Navigation - Top Section (no label) */}
-        <SidebarGroup className="p-2">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredMainNavItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.label}
-                    >
-                      <Link
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative",
-                          isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50"
-                        )}
-                      >
-                        {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
-                        )}
-                        <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary")} />
-                        {!isCollapsed && (
-                          <span className="font-medium flex-1">{item.label}</span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Pillar Navigation - Middle Section (visual separator, no label) */}
-        {filteredPillarNavItems.length > 0 && (
-        <SidebarGroup className="p-2 pt-0 border-t border-sidebar-border/50 mt-2">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredPillarNavItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.label}
-                    >
-                      <Link
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative",
-                          isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50"
-                        )}
-                      >
-                        {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
-                        )}
-                        <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary")} />
-                        {!isCollapsed && (
-                          <span className="font-medium flex-1">{item.label}</span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        )}
-
-        {/* Tools Navigation - Bottom Section (with "Tools" label) */}
-        {filteredToolNavItems.length > 0 && (
-        <SidebarGroup className="p-2 pt-0 border-t border-sidebar-border/50 mt-2">
-          {!isCollapsed && (
-            <div className="px-3 py-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Tools
-              </span>
-            </div>
-          )}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredToolNavItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                const badgeCount = item.hasBadge === 'tasks' ? taskBadgeCount : item.hasBadge === 'chat' ? chatUnreadCount : 0;
-                const showBadge = badgeCount && badgeCount > 0;
-                
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.label}
-                    >
-                      <Link
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative",
-                          isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50"
-                        )}
-                      >
-                        {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
-                        )}
-                        <div className="relative">
-                          <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary")} />
-                          <CountBadge count={badgeCount} max={9} className="absolute -top-1.5 -right-1.5 h-4 w-4 p-0 justify-center" />
-                        </div>
-                        {!isCollapsed && (
-                          <span className="font-medium flex-1">{item.label}</span>
-                        )}
-                        {!isCollapsed && <CountBadge count={badgeCount} className="ml-auto" />}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        )}
-
-        {/* Help & launch */}
-        <SidebarGroup className="p-2 pt-0 border-t border-sidebar-border/50 mt-2">
-          {!isCollapsed && (
-            <div className="px-3 py-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Help
-              </span>
-            </div>
-          )}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {helpNavItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                      <Link
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative",
-                          isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50"
-                        )}
-                      >
-                        {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
-                        )}
-                        <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-primary")} />
-                        {!isCollapsed && <span className="font-medium flex-1">{item.label}</span>}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
+        {filteredGroups.map((group, idx) => (
+          <SidebarGroup
+            key={group.label}
+            className={cn(
+              'p-2',
+              idx > 0 && 'pt-0 border-t border-sidebar-border/50 mt-2'
+            )}
+          >
+            {!isCollapsed && (
+              <div className="px-3 py-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {group.label}
+                </span>
+              </div>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const [pathOnly] = item.path.split('?');
+                  const isActive = location.pathname === pathOnly;
+                  const Icon = item.icon;
+                  const badgeCount =
+                    item.hasBadge === 'tasks'
+                      ? taskBadgeCount
+                      : item.hasBadge === 'chat'
+                      ? chatUnreadCount
+                      : 0;
+                  return (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                        <Link
+                          to={item.path}
+                          className={cn(
+                            'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative',
+                            isActive
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:text-primary hover:bg-sidebar-accent/50'
+                          )}
+                        >
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
+                          )}
+                          <div className="relative">
+                            <Icon className={cn('h-5 w-5 shrink-0', isActive && 'text-primary')} />
+                            {item.hasBadge && (
+                              <CountBadge
+                                count={badgeCount}
+                                max={9}
+                                className="absolute -top-1.5 -right-1.5 h-4 w-4 p-0 justify-center"
+                              />
+                            )}
+                          </div>
+                          {!isCollapsed && (
+                            <span className="font-medium flex-1">{item.label}</span>
+                          )}
+                          {!isCollapsed && item.hasBadge && (
+                            <CountBadge count={badgeCount} className="ml-auto" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter className="p-2 border-t border-sidebar-border space-y-2">
