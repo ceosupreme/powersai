@@ -86,7 +86,7 @@ export const QuickGenerateDialog = ({ open, onOpenChange, venueContext }: Props)
             <Sparkles className="w-4 h-4 text-primary" /> Quick Generate
           </DialogTitle>
           <p className="text-xs text-muted-foreground">
-            Generate marketing assets for a one-off — brand takeover, holiday push, theme night, etc.
+            Generate marketing assets for a one-off — product launch, partner takeover, holiday push, etc.
             Not tied to a finding or campaign.
           </p>
         </DialogHeader>
@@ -99,7 +99,7 @@ export const QuickGenerateDialog = ({ open, onOpenChange, venueContext }: Props)
               rows={4}
               value={brief}
               onChange={(e) => setBrief(e.target.value)}
-              placeholder="Brand rep stopping by next Friday for a takeover — need social posts and a staff script."
+              placeholder="Launching a new service tier next Friday — need social posts and a customer-facing script."
               className="text-sm"
             />
           </div>
@@ -110,7 +110,7 @@ export const QuickGenerateDialog = ({ open, onOpenChange, venueContext }: Props)
               id="cat"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="Brand partnership, Holiday, Theme night…"
+              placeholder="Partnership, Holiday, Product launch…"
               className="h-8 text-sm"
             />
           </div>
