@@ -21,6 +21,7 @@ import { GlobalSearchModal } from '@/components/shared/GlobalSearchModal';
 import { useUnreadCounts } from '@/hooks/useUnreadCounts';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { QuickCaptureButton } from '@/components/inbox/QuickCaptureButton';
 
 interface GlobalHeaderProps {
   showVenueSelector?: boolean;
@@ -176,6 +177,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
           >
             <Search className="h-5 w-5" />
           </Button>
+          <QuickCaptureButton />
         </div>
       </header>
 
