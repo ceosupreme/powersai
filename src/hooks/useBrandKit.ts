@@ -12,6 +12,9 @@ export type BrandKit = {
   secondary_font: string | null;
   do_notes: string | null;
   dont_notes: string | null;
+  archived?: boolean;
+  archived_at?: string | null;
+  archive_reason?: string | null;
 };
 export type BrandColor = { id: string; kit_id: string; label: string | null; hex: string; role: string | null; sort_order: number };
 export type BrandTagline = { id: string; kit_id: string; text: string; context: string | null; sort_order: number };
@@ -25,15 +28,16 @@ export type BrandAsset = {
 
 export const BRAND_BUCKET = 'brand-assets';
 
-export function useBrandKitData(projectId: string | null | undefined) {
+export function useBrandKitData(projectId: string | null | undefined, opts: { includeArchived?: boolean } = {}) {
   const qc = useQueryClient();
 
   const kitQuery = useQuery({
-    queryKey: ['brand-kit', projectId],
+    queryKey: ['brand-kit', projectId, opts.includeArchived ? 'all' : 'active'],
     enabled: !!projectId,
     queryFn: async (): Promise<BrandKit | null> => {
-      const { data, error } = await supabase
-        .from('brand_kits').select('*').eq('project_id', projectId!).maybeSingle();
+      let q = supabase.from('brand_kits').select('*').eq('project_id', projectId!);
+      if (!opts.includeArchived) q = q.eq('archived', false);
+      const { data, error } = await q.maybeSingle();
       if (error) throw error;
       return data as BrandKit | null;
     },
@@ -106,6 +110,64 @@ export function useBrandKitData(projectId: string | null | undefined) {
   });
 
   return { kitQuery, kitId, ensureKit, colors, taglines, hashtags, links, assets };
+}
+
+export type BrandKitLinkCounts = {
+  colors: number; taglines: number; hashtags: number; links: number; assets: number;
+};
+
+export function useBrandKitLinkCounts(kitId: string | null) {
+  return useQuery({
+    queryKey: ['brand-kit-link-counts', kitId],
+    enabled: !!kitId,
+    queryFn: async (): Promise<BrandKitLinkCounts> => {
+      const tables = ['brand_kit_colors','brand_kit_taglines','brand_kit_hashtags','brand_kit_links','brand_kit_assets'] as const;
+      const results = await Promise.all(
+        tables.map((t) => supabase.from(t).select('id', { count: 'exact', head: true }).eq('kit_id', kitId!))
+      );
+      results.forEach((r) => { if (r.error) throw r.error; });
+      return {
+        colors: results[0].count ?? 0,
+        taglines: results[1].count ?? 0,
+        hashtags: results[2].count ?? 0,
+        links: results[3].count ?? 0,
+        assets: results[4].count ?? 0,
+      };
+    },
+  });
+}
+
+export function useBrandKitArchive() {
+  const qc = useQueryClient();
+  const inv = () => qc.invalidateQueries({ queryKey: ['brand-kit'] });
+  return {
+    archiveKit: useMutation({
+      mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+        const { error } = await supabase.from('brand_kits')
+          .update({ archived: true, archived_at: new Date().toISOString(), archive_reason: reason ?? null })
+          .eq('id', id);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+      onError: (e: any) => toast.error(e.message ?? 'Archive failed'),
+    }),
+    restoreKit: useMutation({
+      mutationFn: async (id: string) => {
+        const { error } = await supabase.from('brand_kits')
+          .update({ archived: false, archived_at: null, archive_reason: null }).eq('id', id);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+    }),
+    deleteKit: useMutation({
+      mutationFn: async (id: string) => {
+        const { error } = await supabase.from('brand_kits').delete().eq('id', id);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+      onError: (e: any) => toast.error(e.message ?? 'Delete failed'),
+    }),
+  };
 }
 
 export function useSaveKit(projectId: string | null | undefined) {
