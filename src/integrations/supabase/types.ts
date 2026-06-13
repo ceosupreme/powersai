@@ -5428,6 +5428,42 @@ export type Database = {
           },
         ]
       }
+      pillar_templates: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          id: string
+          pillar_key: string
+          pillar_label: string
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          sort_order: number
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          pillar_key: string
+          pillar_label: string
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          pillar_key?: string
+          pillar_label?: string
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           asana_gid: string | null
@@ -5475,6 +5511,94 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      project_pillar_overrides: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          id: string
+          pillar_key: string
+          pillar_label: string
+          project_id: string
+          sort_order: number
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          pillar_key: string
+          pillar_label: string
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          pillar_key?: string
+          pillar_label?: string
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_pillar_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_pillar_scores: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          pillar_key: string
+          project_id: string
+          score: number | null
+          updated_at: string
+          updated_by: string | null
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          pillar_key: string
+          project_id: string
+          score?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          pillar_key?: string
+          project_id?: string
+          score?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_pillar_scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promo_redemptions: {
         Row: {
@@ -7750,6 +7874,7 @@ export type Database = {
           lng: number | null
           name: string
           owner_name: string | null
+          project_type: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id: string | null
           sevenshifts_api_enabled: boolean
           slug: string | null
@@ -7790,6 +7915,7 @@ export type Database = {
           lng?: number | null
           name: string
           owner_name?: string | null
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
@@ -7830,6 +7956,7 @@ export type Database = {
           lng?: number | null
           name?: string
           owner_name?: string | null
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
@@ -9316,6 +9443,12 @@ export type Database = {
         | "carousel"
         | "text"
         | "other"
+      project_type_enum:
+        | "client"
+        | "content_channel"
+        | "internal_brand"
+        | "app_build"
+        | "service_offer"
       promo_type:
         | "happy_hour"
         | "special"
@@ -9662,6 +9795,13 @@ export const Constants = {
         "carousel",
         "text",
         "other",
+      ],
+      project_type_enum: [
+        "client",
+        "content_channel",
+        "internal_brand",
+        "app_build",
+        "service_offer",
       ],
       promo_type: [
         "happy_hour",
