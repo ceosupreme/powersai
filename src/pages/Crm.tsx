@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Briefcase } from "lucide-react";
+import { Plus, Briefcase, Inbox } from "lucide-react";
 import { PipelineBoard } from "@/components/crm/PipelineBoard";
 import { CompanyDetail } from "@/components/crm/CompanyDetail";
+import { InboundLeadsPanel } from "@/components/crm/InboundLeadsPanel";
+import { useInboundLeads } from "@/hooks/useInboundLeads";
 import {
   useCompanies, useContacts, useFollowUpsDue, useCrmMutations,
 } from "@/hooks/useCrm";
@@ -17,6 +19,7 @@ export default function Crm() {
   const companies = useCompanies();
   const contacts = useContacts();
   const followups = useFollowUpsDue();
+  const inboundNew = useInboundLeads("new");
   const m = useCrmMutations();
   const [newCompanyName, setNewCompanyName] = useState("");
   const today = todayPacific();
@@ -40,6 +43,10 @@ export default function Crm() {
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
           <TabsTrigger value="followups">
             Follow-ups {followups.data?.length ? <Badge className="ml-2">{followups.data.length}</Badge> : null}
+          </TabsTrigger>
+          <TabsTrigger value="inbound">
+            <Inbox className="h-3.5 w-3.5 mr-1" />
+            Inbound {inboundNew.data?.length ? <Badge className="ml-2">{inboundNew.data.length}</Badge> : null}
           </TabsTrigger>
         </TabsList>
 
@@ -109,6 +116,10 @@ export default function Crm() {
               })}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="inbound" className="mt-4">
+          <InboundLeadsPanel />
         </TabsContent>
       </Tabs>
 
