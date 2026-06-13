@@ -24,10 +24,11 @@ import { FindingCard } from './FindingCard';
 import { FindingDetail } from './FindingDetail';
 import { useFindings, useFindingMutation, findingsKey } from './useFindings';
 import { useGrowthScores } from '../useGrowthScores';
+import { useIsHospitalityProject, HOSPITALITY_ONLY_CATEGORIES } from '@/hooks/useIsHospitalityProject';
 
 const SEVERITIES: FindingSeverity[] = ['Critical', 'High', 'Medium', 'Low'];
 const STATUSES: FindingStatus[] = ['New', 'In Progress', 'Sent to Marketing Hub', 'Resolved', 'Dismissed', 'Snoozed'];
-const CATEGORIES = Object.keys(CATEGORY_LABEL) as FindingCategoryKey[];
+const ALL_CATEGORIES = Object.keys(CATEGORY_LABEL) as FindingCategoryKey[];
 
 type SortKey = 'priority' | 'created' | 'severity' | 'upside';
 
@@ -35,7 +36,20 @@ export const FindingsView = () => {
   const { selectedBar } = useApp();
   const venueId = selectedBar?.id ?? null;
   const findingsQ = useFindings(venueId);
-  const findings = findingsQ.data ?? [];
+  const isHospitality = useIsHospitalityProject(venueId).data ?? false;
+  const rawFindings = findingsQ.data ?? [];
+  // Hide hospitality-only categories on non-hospitality projects so they don't
+  // appear in the list, the count badge, the category filter pills, or detail.
+  const findings = isHospitality
+    ? rawFindings
+    : rawFindings.filter(
+        (f) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(f.category),
+      );
+  const CATEGORIES = isHospitality
+    ? ALL_CATEGORIES
+    : ALL_CATEGORIES.filter(
+        (c) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(c),
+      );
   const { primary } = useGrowthScores(venueId);
   const mutate = useFindingMutation(venueId);
   const { isAdmin } = useAuth();
@@ -130,9 +144,9 @@ export const FindingsView = () => {
   if (!selectedBar) {
     return (
       <Card className="p-10 text-center bg-card/30 border-dashed">
-        <h2 className="text-lg font-semibold text-foreground">Select a venue</h2>
+        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Choose a venue from the global header to see Growth Audit findings.
+          Choose a project from the global header to see Growth Audit findings.
         </p>
       </Card>
     );
