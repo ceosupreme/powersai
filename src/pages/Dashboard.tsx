@@ -17,6 +17,10 @@ import { useAlerts, useWeeklyCores } from '@/hooks/useVenueData';
 import { useSupabaseWeeks, SupabaseWeekScorecard, usePeriodConfig, usePriorYearCore } from '@/hooks/useSupabaseWeekData';
 import { useDailyMetricsForWeek } from '@/hooks/useDailyMetricsForWeek';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffectivePillars, useProjectType } from '@/hooks/useEffectivePillars';
+import { isCanonicalClientSetup } from '@/lib/effectivePillars';
+import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
+import { usePermissions } from '@/hooks/usePermissions';
 
 // Maps canonical PillarMetricConfig[] to the format expected by DashboardPillarCard
 function mapMetrics(
@@ -45,6 +49,13 @@ function mapMetrics(
 
 const Dashboard = () => {
   const { selectedBar, selectedWeek, isLoading: appLoading, supabaseBarId } = useApp();
+
+  // Project-type-aware pillar resolution. For client + canonical template (no
+  // overrides), we render the existing hardcoded path UNCHANGED — visual diff = 0.
+  const { data: projectType } = useProjectType(supabaseBarId);
+  const { data: effectivePillars = [] } = useEffectivePillars(supabaseBarId, projectType);
+  const { hasPermission } = usePermissions();
+  const renderClientPath = !projectType || isCanonicalClientSetup(projectType, effectivePillars);
 
   // Fetch Supabase weeks + scorecards
   const { data: supabaseWeeks = [], isLoading: supabaseLoading } = useSupabaseWeeks(supabaseBarId || undefined);
@@ -96,6 +107,26 @@ const Dashboard = () => {
 
   if (!selectedWeek) {
     return <EmptyState message="No week data available" title="No week data available" description="Select a bar and week from the header to view your dashboard." />;
+  }
+
+  // Non-client project (or client with overrides) — manual pillar tiles.
+  if (!renderClientPath && supabaseBarId) {
+    return (
+      <>
+        <div className="mb-6 animate-fade-in-up">
+          <h1 className="text-2xl font-bold text-foreground">{selectedBar?.bar_name ?? 'Project'}</h1>
+          <p className="text-xs text-muted-foreground">
+            Week of {selectedWeek.week_start} · {projectType?.replace('_', ' ')}
+          </p>
+        </div>
+        <NonClientPillarsDashboard
+          projectId={supabaseBarId}
+          weekStart={selectedWeek.week_start}
+          pillars={effectivePillars}
+          canEdit={hasPermission('admin', 'edit') || hasPermission('owner', 'edit')}
+        />
+      </>
+    );
   }
 
   return (
