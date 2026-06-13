@@ -157,15 +157,10 @@ export function SetupWizard() {
                 Back
               </Button>
             )}
-            {!isLast && (
-              <Button size="sm" onClick={() => setStep(step + 1)}>
-                Skip step
-              </Button>
-            )}
             {isLast ? (
               <Button size="sm" onClick={finish}>Finish</Button>
             ) : (
-              <Button size="sm" variant="default" onClick={() => setStep(step + 1)}>
+              <Button size="sm" onClick={() => setStep(step + 1)}>
                 Next
               </Button>
             )}
