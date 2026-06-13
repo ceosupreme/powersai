@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useHelpState } from "@/hooks/useHelpState";
 import {
   BACKUP_TABLES,
   fetchTable,
@@ -11,6 +12,7 @@ import {
 
 export function useBackupExport() {
   const { toast } = useToast();
+  const { markBackupTaken } = useHelpState();
   const [loadingTable, setLoadingTable] = useState<string | null>(null);
   const [loadingFull, setLoadingFull] = useState(false);
 
@@ -20,6 +22,7 @@ export function useBackupExport() {
       const rows = await fetchTable(name);
       const csv = toCSV(rows);
       downloadBlob(`${name}-${todayStamp()}.csv`, "text/csv;charset=utf-8", csv);
+      markBackupTaken();
       toast({
         title: "Export complete",
         description: `${name}: ${rows.length} row${rows.length === 1 ? "" : "s"}.`,
@@ -63,6 +66,7 @@ export function useBackupExport() {
         "application/json",
         JSON.stringify(payload, null, 2),
       );
+      markBackupTaken();
       toast({
         title: "Full backup ready",
         description: `${BACKUP_TABLES.length} tables, ${totalRows} total rows.`,
