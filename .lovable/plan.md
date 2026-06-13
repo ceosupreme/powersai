@@ -1,28 +1,35 @@
-## Problem
+## Why sidebar items are missing
 
-The Admin page (`/admin`) already renders a Settings tab (`SettingsTab`). The reason you can't reach it is the sidebar user menu only shows the **Settings** link when `role === 'admin'`:
+The app is in "owner-only monitoring mode" (`src/config/ownerMode.ts → enabled: true`). That deliberately hides three sidebar sections in `PortfolioLayout` (the layout admins use) and trims `PortfolioBottomNav` on mobile:
 
-```tsx
-// src/components/layout/AppSidebar.tsx
-{role === 'admin' && (
-  <DropdownMenuItem asChild>
-    <Link to="/admin">Settings</Link>
-  </DropdownMenuItem>
-)}
-```
+- **Tools** — Tasks, Logs, Chat
+- **Marketing** — Marketing, Social Media
+- **Pillars** — Revenue, Labor, Operations, Guest Experience
 
-The remix seed gave your account the `owner` role only — not `admin` — so that menu item (and the whole `/admin` entry point) is hidden. The session replay confirms the dropdown shows just **Notifications** and **Sign out**.
+`PortfolioLayout` reads the raw `ownerMode` flags, so even admins get the trimmed view. There is already a `useOwnerMode()` hook that opens every section when an admin is in **Preview** mode — we just need it to also open them whenever the current user is an admin (preview or not), and to thread that into the bottom nav.
 
-## Fix
+## Fix (3 small edits)
 
-Add an `admin` row in `user_roles` for `ceosupreme@gmail.com` (keeping the existing `owner` row). That's all that's needed — the Settings menu item will appear, `/admin` will open, and the Settings tab is already wired up inside it.
+1. **`src/hooks/useOwnerMode.ts`** — open all flags when `isAdmin` too.
+   - Import `useAuth` and short-circuit with the same "all true" object whenever `isAdmin || isPreview || !ownerMode.enabled`.
 
-### Migration (idempotent)
+2. **`src/components/layout/PortfolioLayout.tsx`** — stop reading `ownerMode` directly; use `useOwnerMode()`.
+   - Replace `import { ownerMode } from '@/config/ownerMode'` with `import { useOwnerMode } from '@/hooks/useOwnerMode'`.
+   - `const flags = useOwnerMode();` and swap the three `ownerMode.show*` checks for `flags.show*`.
+   - Effect: admins now see Tools, Marketing, and Pillars sections in the desktop sidebar.
 
-```sql
-INSERT INTO public.user_roles (user_id, role)
-SELECT id, 'admin'::app_role FROM auth.users WHERE email = 'ceosupreme@gmail.com'
-ON CONFLICT (user_id, role) DO NOTHING;
-```
+3. **`src/components/layout/PortfolioBottomNav.tsx`** — show the hidden routes to admins on mobile.
+   - Add admin-only secondary items: Weekly Review (already conditional), plus Tasks, Logs, Chat, Marketing, Social Media, Sales, Labor, Operations, Guest Experience — appended into the existing **More** sheet so the bottom bar itself stays uncluttered.
 
-No frontend code changes. After the migration, reload the app and open the user menu in the sidebar — **Settings** will be visible and route to the Admin panel's Settings tab.
+## Notes / not changed
+
+- **Routes are not blocked for admins today.** `ProtectedRoute` already bypasses role gating for admins, and the pillar/tools routes are registered globally — admins can already reach them by URL. This fix only restores them to navigation.
+- **`ownerMode.enabled` stays `true`** so non-admin roles continue to see the trimmed executive view. We are *not* turning off owner mode globally; we are only making admin a full-access exception, consistent with how preview mode already works.
+- **No DB / RLS / migration changes.** All gates downstream (`canAccessPage`, `user_can_access_page`, `user_has_bar_access`) already return `true` for admins.
+
+## Verification
+
+After implementation, hard-refresh the app as the admin user and check:
+- Desktop sidebar shows MAIN + Tools + Marketing + Pillars sections.
+- Mobile bottom nav's **More** sheet lists every hidden route.
+- Navigating to `/tasks`, `/logs`, `/sales`, `/marketing`, etc. opens the page (not a redirect).

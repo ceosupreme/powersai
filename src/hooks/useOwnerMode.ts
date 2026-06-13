@@ -1,5 +1,6 @@
 import { usePreview } from '@/context/PreviewContext';
 import { ownerMode } from '@/config/ownerMode';
+import { useAuth } from '@/context/AuthContext';
 
 /**
  * Preview-aware ownerMode flags.
@@ -8,8 +9,9 @@ import { ownerMode } from '@/config/ownerMode';
  */
 export function useOwnerMode() {
   const { isPreview } = usePreview();
+  const { isAdmin } = useAuth();
 
-  if (!ownerMode.enabled || isPreview) {
+  if (!ownerMode.enabled || isPreview || isAdmin) {
     return {
       enabled: ownerMode.enabled,
       showStaffTools: true,
