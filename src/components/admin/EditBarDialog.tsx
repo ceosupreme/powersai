@@ -354,7 +354,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6 pt-4 border-b border-border">
-              <TabsList className="bg-muted/40 grid grid-cols-5 w-full">
+              <TabsList className="bg-muted/40 grid grid-cols-6 w-full">
                 <TabsTrigger value="basic" className="gap-1.5 text-xs">
                   <Building2 className="h-3.5 w-3.5" /> Basic
                 </TabsTrigger>
@@ -366,6 +366,9 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 </TabsTrigger>
                 <TabsTrigger value="contacts" className="gap-1.5 text-xs" disabled={!editingBar}>
                   <BookUser className="h-3.5 w-3.5" /> Contacts
+                </TabsTrigger>
+                <TabsTrigger value="pillars" className="gap-1.5 text-xs" disabled={!editingBar}>
+                  <Layers className="h-3.5 w-3.5" /> Pillars
                 </TabsTrigger>
                 <TabsTrigger value="advanced" className="gap-1.5 text-xs">
                   <SettingsIcon className="h-3.5 w-3.5" /> Advanced
@@ -412,6 +415,25 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                           {TIMEZONES.map(tz => <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Project Type</Label>
+                      <Select
+                        value={formData.project_type}
+                        onValueChange={(v) => set('project_type', v as ProjectType)}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="client">Client</SelectItem>
+                          <SelectItem value="content_channel">Content Channel</SelectItem>
+                          <SelectItem value="internal_brand">Internal Brand</SelectItem>
+                          <SelectItem value="app_build">App Build</SelectItem>
+                          <SelectItem value="service_offer">Service Offer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Drives which pillar template this project inherits. Changing this does not delete existing data.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
