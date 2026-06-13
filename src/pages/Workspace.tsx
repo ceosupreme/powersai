@@ -144,6 +144,10 @@ const Workspace = () => {
 
       <OnboardingChecklist venueId={venueId} />
 
+      <HelpTip helpKey={HELP_KEYS.pillarsByType} title="Why pillars differ by project">
+        Pillars come from the project's type (pillar_templates) plus any per-project overrides. A content-channel project will surface a different set of pillars than a client venue — that's intentional, not a glitch.
+      </HelpTip>
+
       {/* Header strip — 4 tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Tile
