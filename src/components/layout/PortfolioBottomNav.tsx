@@ -4,7 +4,6 @@ import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, CheckSquar
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
-import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 
 const primaryItems = [
