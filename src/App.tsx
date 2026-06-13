@@ -49,6 +49,8 @@ import BrandKit from "./pages/BrandKit";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
+import HelpCenter from "./pages/HelpCenter";
+import LaunchChecklist from "./pages/LaunchChecklist";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -165,6 +167,16 @@ const App = () => {
                 <Route path="/inbox" element={
                   <ProtectedRoute>
                     <AppLayout><Inbox /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/help" element={
+                  <ProtectedRoute>
+                    <AppLayout><HelpCenter /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/launch" element={
+                  <ProtectedRoute>
+                    <AppLayout><LaunchChecklist /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/employees" element={
