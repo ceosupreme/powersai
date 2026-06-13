@@ -1,3 +1,4 @@
+// DEAD CODE — BarPulse-era login hero panel. No longer imported (Login.tsx now renders a clean centered card). Safe to delete in a later cleanup pass, along with LoginScoreGauge and LoginPulseChart.
 import { Activity, BarChart3, CheckCircle, Zap } from 'lucide-react';
 import LoginScoreGauge from './LoginScoreGauge';
 import LoginPulseChart from './LoginPulseChart';
