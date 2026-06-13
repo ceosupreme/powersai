@@ -3,18 +3,20 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   CalendarCheck, 
-  DollarSign, 
-  Star,
   Menu,
   Lightbulb,
-  Users,
-  Settings,
-  Smartphone,
   CheckSquare,
   ClipboardList,
   LogOut,
-  Megaphone,
   MessageCircle,
+  Sunrise,
+  Briefcase,
+  Inbox as InboxIcon,
+  Palette,
+  Activity,
+  HelpCircle,
+  Rocket,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,22 +34,25 @@ import { useUnreadCounts } from '@/hooks/useUnreadCounts';
 
 // Primary nav items shown directly in bottom nav
 const primaryNavItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Home', pageKey: 'dashboard' as PageKey },
+  { to: '/workspace', icon: Sunrise, label: 'Today', pageKey: 'dashboard' as PageKey },
   { to: '/weekly-review', icon: CalendarCheck, label: 'Weekly', pageKey: 'weekly_review' as PageKey },
+  { to: '/inbox', icon: InboxIcon, label: 'Inbox', pageKey: 'dashboard' as PageKey },
   { to: '/chat', icon: MessageCircle, label: 'Chat', pageKey: 'chat' as PageKey, hasBadge: true },
-  { to: '/insights', icon: Lightbulb, label: 'Insights', pageKey: 'insights' as PageKey },
 ];
 
-// Secondary nav items shown in "More" drawer
+// Secondary nav items shown in "More" drawer — mirrors sidebar groups
 const secondaryNavItems = [
-  { to: '/sales', icon: DollarSign, label: 'Revenue', pageKey: 'sales' as PageKey },
-  { to: '/guest-experience', icon: Star, label: 'Client Experience', pageKey: 'guest_experience' as PageKey },
-  { to: '/labor', icon: Users, label: 'Labor', pageKey: 'labor' as PageKey },
-  { to: '/operations', icon: Settings, label: 'Delivery', pageKey: 'operations' as PageKey },
-  { to: '/marketing', icon: Megaphone, label: 'Marketing', pageKey: 'marketing' as PageKey },
+  { to: '/portfolio', icon: LayoutDashboard, label: 'Portfolio', pageKey: 'dashboard' as PageKey },
+  { to: '/insights', icon: Lightbulb, label: 'Insights', pageKey: 'insights' as PageKey },
+  { to: '/crm', icon: Briefcase, label: 'CRM', pageKey: 'dashboard' as PageKey },
+  { to: '/crm?tab=inbound', icon: InboxIcon, label: 'Inbound', pageKey: 'dashboard' as PageKey },
+  { to: '/brand-kit', icon: Palette, label: 'Brand Vault', pageKey: 'dashboard' as PageKey },
+  { to: '/growth-audit', icon: Activity, label: 'Growth Audit', pageKey: 'dashboard' as PageKey },
   { to: '/tasks', icon: CheckSquare, label: 'Tasks', pageKey: 'tasks' as PageKey },
-  { to: '/logs', icon: ClipboardList, label: 'Daily Logs', pageKey: 'logs' as PageKey },
-  { to: '/social-media', icon: Smartphone, label: 'Social Media', pageKey: 'social_media' as PageKey },
+  { to: '/logs', icon: ClipboardList, label: 'Logs', pageKey: 'logs' as PageKey },
+  { to: '/help', icon: HelpCircle, label: 'Help', pageKey: 'dashboard' as PageKey },
+  { to: '/launch', icon: Rocket, label: 'Launch', pageKey: 'dashboard' as PageKey },
+  { to: '/admin', icon: Settings, label: 'Settings', pageKey: 'dashboard' as PageKey },
 ];
 
 export const BottomNav = () => {
