@@ -143,7 +143,7 @@ export async function mockGenerateActionPack(
       body: a.tone === 'data-led'
         ? `${venue} regulars already know — but here's the proof. ${finding.title.toLowerCase()}. Come see why.`
         : a.tone === 'story-led'
-        ? `One of those nights at ${venue}${where}: ${finding.diagnosis.split('.')[0]}. Pull up a stool.`
+        ? `Here's the story from ${venue}${where}: ${finding.diagnosis.split('.')[0]}. Worth a closer look.`
         : `Heads up${where ? ` ${ctx.city}` : ''}: this week at ${venue}. ${finding.recommendedAction.split('.')[0]}.`,
     });
   });
