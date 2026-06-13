@@ -440,6 +440,22 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                         Drives which pillar template this project inherits. Changing this does not delete existing data.
                       </p>
                     </div>
+                    <div className="space-y-1.5">
+                      <Label>Hospitality project</Label>
+                      <div className="flex items-center gap-3 h-10 px-3 rounded-md border border-input bg-background">
+                        <Switch
+                          checked={formData.is_hospitality}
+                          onCheckedChange={(v) => set('is_hospitality', v)}
+                        />
+                        <span className="text-sm">
+                          {formData.is_hospitality ? 'Yes — bar / restaurant / venue' : 'No'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Enables hospitality-only Growth Audit categories (Revenue Patterns, Menu Marketing,
+                        Event Performance, Operational Readiness) and the Ops Readiness Gate.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
