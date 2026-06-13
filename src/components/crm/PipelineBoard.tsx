@@ -1,9 +1,17 @@
 import { useMemo } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { STAGES, useDeals, useCompanies, useCrmMutations, type CrmDealStage } from "@/hooks/useCrm";
+import { ArrowRight, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import {
+  STAGES, useDeals, useCompanies, useCrmMutations, type CrmDeal, type CrmDealStage,
+} from "@/hooks/useCrm";
+import { ArchiveOrDeleteDialog } from "@/components/shared/ArchiveOrDeleteDialog";
 
 const STAGE_LABEL: Record<CrmDealStage, string> = {
   lead: "Lead", pitch: "Pitch", proposal: "Proposal", won: "Won", lost: "Lost",
@@ -12,7 +20,8 @@ const STAGE_LABEL: Record<CrmDealStage, string> = {
 export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: string) => void }) {
   const deals = useDeals();
   const companies = useCompanies();
-  const { moveDealStage } = useCrmMutations();
+  const { moveDealStage, archiveDeal, deleteDeal } = useCrmMutations();
+  const [target, setTarget] = useState<CrmDeal | null>(null);
 
   const companyById = useMemo(
     () => Object.fromEntries((companies.data ?? []).map((c) => [c.id, c])),
@@ -54,6 +63,18 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
                         → {STAGE_LABEL[nextStage]} <ArrowRight className="ml-1 h-3 w-3" />
                       </Button>
                     )}
+                    <div className="absolute top-1 right-1" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" className="h-6 w-6">
+                            <MoreVertical className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setTarget(d)}>Archive or delete…</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -61,6 +82,25 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
           </div>
         </div>
       ))}
+
+      {target && (
+        <ArchiveOrDeleteDialog
+          open={!!target}
+          onOpenChange={(o) => { if (!o) setTarget(null); }}
+          entityLabel="deal"
+          entityName={target.title}
+          linkedLines={[]}
+          extraNote="Linked interactions will be kept but unlinked from this deal."
+          onArchive={async (reason) => {
+            await archiveDeal.mutateAsync({ id: target.id, reason });
+            toast.success("Deal archived");
+          }}
+          onDelete={async () => {
+            await deleteDeal.mutateAsync(target.id);
+            toast.success("Deal deleted");
+          }}
+        />
+      )}
     </div>
   );
 }
