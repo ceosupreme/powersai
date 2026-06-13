@@ -18,8 +18,8 @@ import {
 } from '@/components/ui/select';
 
 const CATEGORIES = [
-  'sports_bar','music_venue','cocktail_lounge','dive_bar','brunch_spot',
-  'neighborhood_pub','family_friendly','late_night','other',
+  'agency','professional_services','retail','restaurant','hospitality',
+  'fitness','healthcare','b2b_saas','nonprofit','other',
 ] as const;
 
 type Row = {
@@ -114,10 +114,10 @@ export const VenueProgrammingContextPanel = () => {
           <Sparkles className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-base font-semibold text-foreground">Venue Programming Context</h3>
+          <h3 className="text-base font-semibold text-foreground">Project Context</h3>
           <p className="text-xs text-muted-foreground">
             Drives the Local Context analyzer's relevance matching. Set the primary category and
-            tag features/themes that describe what this venue actually programs.
+            tag the audience, features, and themes that describe what this project does.
           </p>
         </div>
       </div>
