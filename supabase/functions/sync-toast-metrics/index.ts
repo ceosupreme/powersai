@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-metrics — writes daily_metrics from the Toast Analytics API.
 //
 // Authoritative sources:
@@ -561,6 +562,8 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+  const __disabled = await guardIntegration('toast', corsHeaders);
+  if (__disabled) return __disabled;
 
   try {
     const supabase = createClient(

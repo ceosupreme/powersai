@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Per-venue setup: ensures the "Marketing Efforts" section + 10 marketing
 // custom fields exist on the venue's quarterly Asana project, persists their
 // GIDs into venue_execution_adapters. Idempotent.
@@ -20,6 +21,8 @@ const ASANA_BASE = "https://app.asana.com/api/1.0";
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const asanaToken = Deno.env.get("ASANA_ACCESS_TOKEN");
     if (!asanaToken) {

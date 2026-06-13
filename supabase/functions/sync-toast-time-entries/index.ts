@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-time-entries — pulls Toast time entries (with breaks) for the
 // previous business day per venue, and additionally pulls modifiedDate-based
 // updates to catch retroactive edits to recently-synced entries.
@@ -451,6 +452,8 @@ async function syncVenueTimeEntries(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('toast', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     let body: { venue_id?: string; business_date?: string; mode?: "daily" | "backfill" | "manual" } = {};
     try { body = await req.json(); } catch { /* empty body ok */ }

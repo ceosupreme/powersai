@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import {
@@ -33,6 +34,8 @@ const sanitizeText = (s: string | null | undefined): string | null => {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('sculpture', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,

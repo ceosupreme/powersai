@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-employees — pulls the employee roster from Toast for every venue
 // with toast_api_enabled=true and upserts into employee_profiles. Runs the
 // matching pass at the end so newly-arrived Toast rows get paired with any
@@ -286,6 +287,8 @@ async function syncVenueEmployees(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('toast', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     let body: { venue_id?: string } = {};
     try { body = await req.json(); } catch { /* empty body ok */ }

@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Posts a single comment to the Asana task tied to a campaign. Used for AI
 // post-event analysis write-back and Growth Audit auto-resolve notes.
 
@@ -12,6 +13,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const asanaToken = Deno.env.get("ASANA_ACCESS_TOKEN");
     if (!asanaToken) throw new Error("ASANA_ACCESS_TOKEN not set");

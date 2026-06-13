@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Pushes a Marketing Hub campaign to its venue's Asana board.
 // Supports dry_run preview (no writes) and live writes (gated by
 // venue_execution_adapters.live_writes_enabled).
@@ -47,6 +48,8 @@ type CampaignPayload = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const asanaToken = Deno.env.get("ASANA_ACCESS_TOKEN");
     if (!asanaToken) throw new Error("ASANA_ACCESS_TOKEN not set");

@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Syncs each venue's GM Asana task workload into asana_gm_tasks cache.
 // Strategy: completed_since=now-14d returns ALL incomplete tasks (any age) +
 // tasks completed in the last 14 days. One call per GM, paginated.
@@ -77,6 +78,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
 
   const startedAt = Date.now();
   const asanaToken = Deno.env.get("ASANA_ACCESS_TOKEN");

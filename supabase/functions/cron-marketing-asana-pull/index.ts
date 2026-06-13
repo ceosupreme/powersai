@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Scheduled background sync for Asana → BarPulse. Runs every 2h during
 // business hours via pg_cron. Per-venue try/catch so one failure doesn't
 // kill the rest. Tracks consecutive failures in venue_asana_sync_health.
@@ -14,6 +15,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);

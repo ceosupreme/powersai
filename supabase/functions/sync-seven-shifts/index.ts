@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-seven-shifts — pulls the active+inactive employee roster from 7shifts
 // for every venue with sevenshifts_api_enabled=true, upserts into
 // employee_profiles, and runs the Toast↔7shifts matching pass at the end.
@@ -227,6 +228,8 @@ async function syncVenueRoster(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('seven_shifts', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const token = Deno.env.get("SEVEN_SHIFTS_ACCESS_TOKEN");
     if (!token) throw new Error("SEVEN_SHIFTS_ACCESS_TOKEN not configured");

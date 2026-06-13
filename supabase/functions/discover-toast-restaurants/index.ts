@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Probe the Toast ANALYTICS API (/era/v1) to enumerate every restaurant
 // in the management group. Uses the shared analytics credentials.
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -33,6 +34,8 @@ async function getAnalyticsToken(): Promise<string> {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('toast', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,

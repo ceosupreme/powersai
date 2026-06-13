@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { SculptureSiteMappingPanel } from './SculptureSiteMappingPanel';
+import { useIntegrationDisabled } from '@/hooks/useIntegrationDisabled';
 
 // =====================================================================
 // Smart Sculpture Upload — auto-detects report type, venue, and period.
@@ -55,6 +56,14 @@ interface QueueItem {
 const newId = () => Math.random().toString(36).slice(2, 10);
 
 export const SculptureUploadTab = () => {
+  const disabled = useIntegrationDisabled('sculpture');
+  if (disabled) {
+    return (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        Sculpture Hospitality integration is disabled. Coming soon.
+      </div>
+    );
+  }
   const { data: venues = [] } = useVenues();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);

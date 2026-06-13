@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Sweep edge function: scans sync_runs for genuinely-unresolved failed/partial
 // runs and creates one Asana alert task per row in section 1212842230116263,
 // assigned to Supreme. Idempotent via sync_runs.alert_task_gid.
@@ -48,6 +49,8 @@ function todayPTDateOnly(): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,

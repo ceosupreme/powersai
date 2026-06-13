@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // context-sources-pull
 // Dispatcher that runs every registered ContextSourceAdapter for a venue (or
 // for all active venues), upserts results into context_items, and records a
@@ -20,6 +21,8 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('local_context', corsHeaders);
+  if (__disabled) return __disabled;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
   try {

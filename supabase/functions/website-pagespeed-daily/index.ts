@@ -1,3 +1,4 @@
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // website-pagespeed-daily — lightweight Core Web Vitals snapshot for one venue.
 // Uses Google PageSpeed Insights v5 (mobile strategy). API key reuses
 // GOOGLE_PLACES_API_KEY (must be unrestricted or have PageSpeed enabled).
@@ -15,6 +16,8 @@ const PSI_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('pagespeed', corsHeaders);
+  if (__disabled) return __disabled;
   let body: { venue_id?: string } = {};
   try { body = await req.json(); } catch { /* empty */ }
   const venueId = body.venue_id;

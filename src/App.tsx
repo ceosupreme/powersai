@@ -31,6 +31,7 @@ import Logs from "./pages/Logs";
 import LogNew from "./pages/LogNew";
 import LogDetail from "./pages/LogDetail";
 import LogInterview from "./pages/LogInterview";
+import { useIntegrationDisabled } from "@/hooks/useIntegrationDisabled";
 import Chat from "./pages/Chat";
 import LeadShiftDashboard from "./pages/LeadShiftDashboard";
 import StaffTasksPage from "./pages/StaffTasksPage";
@@ -182,7 +183,7 @@ const App = () => {
                 } />
                 <Route path="/logs/interview/:id" element={
                   <ProtectedRoute>
-                    <AppLayout><LogInterview /></AppLayout>
+                    <AppLayout><VoiceGatedInterview /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/chat" element={
@@ -237,3 +238,9 @@ const App = () => {
 };
 
 export default App;
+
+function VoiceGatedInterview() {
+  const disabled = useIntegrationDisabled('openai_voice');
+  if (disabled) return <Navigate to="/logs" replace />;
+  return <LogInterview />;
+}
