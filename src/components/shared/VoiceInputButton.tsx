@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranscribeAudio } from '@/hooks/useVoiceNotes';
+import { useIntegrationDisabled } from '@/hooks/useIntegrationDisabled';
 
 interface VoiceInputButtonProps {
   onTranscript: (text: string) => void;
@@ -13,6 +14,7 @@ interface VoiceInputButtonProps {
 
 export function VoiceInputButton({ onTranscript, disabled, className }: VoiceInputButtonProps) {
   const [state, setState] = useState<'idle' | 'recording' | 'transcribing'>('idle');
+  const voiceDisabled = useIntegrationDisabled('openai_voice');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -76,6 +78,8 @@ export function VoiceInputButton({ onTranscript, disabled, className }: VoiceInp
     if (state === 'idle') startRecording();
     else if (state === 'recording') stopRecording();
   }, [state, startRecording, stopRecording]);
+
+  if (voiceDisabled) return null;
 
   return (
     <Button
