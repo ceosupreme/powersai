@@ -35,17 +35,9 @@ const adminSecondaryItems = [
 export const PortfolioBottomNav = () => {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
-  const { selectedBar } = useApp();
-  const { role, isAdmin } = useAuth();
-  const canSeeEmployees = role === 'owner' || role === 'gm' || isAdmin;
+  const { isAdmin } = useAuth();
   const secondaryItems = isAdmin ? [...baseSecondaryItems, ...adminSecondaryItems] : baseSecondaryItems;
-
-  // Build nav items — add Employees (if permitted) then Weekly Review when a venue is selected
-  const navItems = [
-    ...primaryItems,
-    ...(canSeeEmployees ? [{ to: '/employees', icon: Users, label: 'Employees' }] : []),
-    ...(selectedBar ? [{ to: '/weekly-review', icon: CalendarCheck, label: 'Review' }] : []),
-  ];
+  const navItems = primaryItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-secondary/95 backdrop-blur-lg border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] safe-bottom">
