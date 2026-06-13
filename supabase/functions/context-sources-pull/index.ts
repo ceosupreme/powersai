@@ -7,6 +7,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { ALL_CONTEXT_SOURCES, type VenueRow } from '../_shared/context-sources/index.ts';
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,6 +21,8 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('local_context', corsHeaders);
+  if (__disabled) return __disabled;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
   try {

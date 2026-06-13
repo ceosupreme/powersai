@@ -6,6 +6,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const SECTION_GID = "1212842230116263";
 const ASANA_WORKSPACE_GID = "16292914201127";
@@ -48,6 +49,8 @@ function todayPTDateOnly(): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('asana', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,

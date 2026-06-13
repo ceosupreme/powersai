@@ -9,6 +9,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { runMatchingPass } from "../_shared/employee-matching.ts";
 import { detectVendorAccount } from "../_shared/vendor-account-detector.ts";
+import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -286,6 +287,8 @@ async function syncVenueEmployees(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const __disabled = await guardIntegration('toast', corsHeaders);
+  if (__disabled) return __disabled;
   try {
     let body: { venue_id?: string } = {};
     try { body = await req.json(); } catch { /* empty body ok */ }
