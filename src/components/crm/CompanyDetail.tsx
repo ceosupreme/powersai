@@ -16,6 +16,7 @@ import {
 } from "@/hooks/useCrm";
 import { useApp } from "@/context/AppContext";
 import { ArchiveOrDeleteDialog, type LinkedLine } from "@/components/shared/ArchiveOrDeleteDialog";
+import { SuggestionsPanel } from "@/components/help/SuggestionsPanel";
 
 export function CompanyDetail({ companyId, onOpenChange }: {
   companyId: string | null; onOpenChange: (open: boolean) => void;
@@ -75,6 +76,12 @@ export function CompanyDetail({ companyId, onOpenChange }: {
             </SheetHeader>
 
             <div className="mt-4 space-y-4">
+              <SuggestionsPanel
+                title="Suggestions for this company"
+                hideWhenEmpty
+                filter={(s) => s.scope?.kind === "company" && s.scope.id === company.id}
+              />
+
               {company.linked_project_id ? (
                 <Button onClick={viewProject} variant="outline" className="w-full">
                   <ExternalLink className="h-4 w-4 mr-2" /> View Project
