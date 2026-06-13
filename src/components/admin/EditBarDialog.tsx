@@ -15,11 +15,13 @@ import {
 } from '@/components/ui/select';
 import {
   Building2, Plug, UserPlus, Settings as SettingsIcon, Loader2, Search,
-  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote,
+  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote, Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { AsanaLogSourcesEditor } from './AsanaLogSourcesEditor';
+import { ProjectPillarOverridesPanel } from './ProjectPillarOverridesPanel';
+import type { ProjectType } from '@/lib/effectivePillars';
 
 interface Bar {
   id: string;
@@ -33,6 +35,7 @@ interface Bar {
   asana_lead_log_task_gid: string | null;
   google_place_id: string | null;
   task_source: string | null;
+  project_type?: ProjectType | null;
   created_at: string;
   user_count?: number;
   last_sync?: string | null;
@@ -52,6 +55,7 @@ interface FormData {
   asana_write_section_gid: string;
   google_place_id: string;
   task_source: string;
+  project_type: ProjectType;
 }
 
 interface VenueLeader {
@@ -113,6 +117,7 @@ const defaultForm: FormData = {
   asana_write_section_gid: '',
   google_place_id: '',
   task_source: 'none',
+  project_type: 'client',
 };
 
 interface Props {
@@ -162,6 +167,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       asana_write_section_gid: (editingBar as any).asana_write_section_gid || '',
       google_place_id: editingBar.google_place_id || '',
       task_source: editingBar.task_source || 'none',
+      project_type: (editingBar.project_type as ProjectType) || 'client',
     } : defaultForm);
     setPlaceResults([]);
     setVenueLeaders([]);
@@ -299,6 +305,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         asana_write_section_gid: formData.asana_write_section_gid.trim() || null,
         google_place_id: formData.google_place_id.trim() || null,
         task_source: formData.task_source,
+        project_type: formData.project_type,
       };
       if (editingBar) {
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
