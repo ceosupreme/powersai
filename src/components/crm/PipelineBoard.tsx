@@ -50,7 +50,7 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
               const stageIdx = STAGES.indexOf(stage);
               const nextStage = STAGES[Math.min(stageIdx + 1, STAGES.length - 1)];
               return (
-                <Card key={d.id} className="cursor-pointer" onClick={() => c && onSelectCompany(c.id)}>
+                <Card key={d.id} className="cursor-pointer relative" onClick={() => c && onSelectCompany(c.id)}>
                   <CardContent className="p-3 space-y-2">
                     <div className="text-xs text-muted-foreground truncate">{c?.name ?? "—"}</div>
                     <div className="text-sm font-medium truncate">{d.title}</div>
