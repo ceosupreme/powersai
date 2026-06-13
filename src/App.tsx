@@ -48,7 +48,7 @@ import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
-import Marketing from "./pages/Marketing";
+import MarketingSite from "./pages/Marketing";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -71,7 +71,7 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 {/* Public landing page — signed-out visitors see marketing,
                     signed-in users get redirected into the app (handled inside Marketing). */}
-                <Route path="/" element={<Marketing />} />
+                <Route path="/" element={<MarketingSite />} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>
