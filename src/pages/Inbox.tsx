@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,22 @@ function ItemRow({ item }: { item: CaptureItem }) {
   const aiDisabled = useIntegrationDisabled("capture_ai_routing");
   const [project, setProject] = useState<string>(item.suggested_project_id ?? "");
   const [type, setType] = useState<CaptureType | "">(item.suggested_type ?? "");
+
+  // Lazy auto-fire: request a suggestion exactly once per unclassified inbox item.
+  // Guards (any one short-circuits): kill-switch off, item not in inbox, status
+  // already past 'none' (pending/suggested/accepted/rejected), or this row instance
+  // already fired. The ref + status check together prevent StrictMode double-invoke
+  // and re-render loops from spending Gateway calls.
+  const firedRef = useRef(false);
+  useEffect(() => {
+    if (firedRef.current) return;
+    if (aiDisabled) return;
+    if (item.status !== "inbox") return;
+    if (item.ai_suggestion_status !== "none") return;
+    firedRef.current = true;
+    m.requestSuggestion.mutate(item.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item.id, item.status, item.ai_suggestion_status, aiDisabled]);
 
   const route = async (overrideProject?: string, overrideType?: CaptureType) => {
     const finalType = (overrideType || type) as CaptureType;
