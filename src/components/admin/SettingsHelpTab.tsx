@@ -3,11 +3,14 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { RotateCcw, HelpCircle, Rocket } from "lucide-react";
+import { RotateCcw, HelpCircle, Rocket, Sparkles } from "lucide-react";
 import { useHelpState } from "@/hooks/useHelpState";
 
 export function SettingsHelpTab() {
-  const { helpEnabled, dismissedKeys, setHelpEnabled, resetAll, isLoading } = useHelpState();
+  const {
+    helpEnabled, dismissedKeys, setHelpEnabled, resetAll, isLoading,
+    setupCompletedAt, setupSkippedAt, relaunchSetup,
+  } = useHelpState();
 
   return (
     <div className="space-y-4">
@@ -47,6 +50,28 @@ export function SettingsHelpTab() {
             >
               <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
               Reset all
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-border/60">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">Setup wizard</Label>
+              <p className="text-xs text-muted-foreground">
+                {setupCompletedAt
+                  ? `Completed ${new Date(setupCompletedAt).toLocaleDateString()}.`
+                  : setupSkippedAt
+                  ? `Skipped ${new Date(setupSkippedAt).toLocaleDateString()}.`
+                  : "Not run yet."}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isLoading}
+              onClick={() => relaunchSetup()}
+            >
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              Re-launch wizard
             </Button>
           </div>
         </CardContent>

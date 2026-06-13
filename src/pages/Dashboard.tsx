@@ -12,6 +12,7 @@ import { ToastLiveWidget } from '@/components/shared/ToastLiveWidget';
 import { DashboardScoreHero } from '@/components/dashboard/DashboardScoreHero';
 import { DashboardPillarCard } from '@/components/dashboard/DashboardPillarCard';
 import { DashboardBriefing } from '@/components/dashboard/DashboardBriefing';
+import { SuggestionsPanel } from '@/components/help/SuggestionsPanel';
 
 import { useAlerts, useWeeklyCores } from '@/hooks/useVenueData';
 import { useSupabaseWeeks, SupabaseWeekScorecard, usePeriodConfig, usePriorYearCore } from '@/hooks/useSupabaseWeekData';
@@ -148,6 +149,11 @@ const Dashboard = () => {
           wins={scorecard?.wins}
           keyDrivers={scorecard?.key_drivers}
         />
+      </div>
+
+      {/* Suggested next steps */}
+      <div className="mb-6">
+        <SuggestionsPanel hideWhenEmpty />
       </div>
 
       {/* Pillar Cards Grid */}

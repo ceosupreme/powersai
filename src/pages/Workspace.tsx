@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { OnboardingChecklist } from '@/components/growth-audit/onboarding/OnboardingChecklist';
 import { UpcomingOpportunitiesWidget } from '@/components/growth-audit/context/UpcomingOpportunitiesWidget';
 import { HelpTip } from '@/components/help/HelpTip';
+import { SuggestionsPanel } from '@/components/help/SuggestionsPanel';
 import { HELP_KEYS } from '@/config/helpKeys';
 
 const fmtScore = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toString());
@@ -147,6 +148,8 @@ const Workspace = () => {
       <HelpTip helpKey={HELP_KEYS.pillarsByType} title="Why pillars differ by project">
         Pillars come from the project's type (pillar_templates) plus any per-project overrides. A content-channel project will surface a different set of pillars than a client venue — that's intentional, not a glitch.
       </HelpTip>
+
+      <SuggestionsPanel hideWhenEmpty />
 
       {/* Header strip — 4 tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

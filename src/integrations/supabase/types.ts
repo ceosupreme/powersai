@@ -7198,6 +7198,9 @@ export type Database = {
           created_at: string
           dismissed_keys: string[]
           help_enabled: boolean
+          last_backup_at: string | null
+          setup_completed_at: string | null
+          setup_skipped_at: string | null
           updated_at: string
           user_id: string
         }
@@ -7205,6 +7208,9 @@ export type Database = {
           created_at?: string
           dismissed_keys?: string[]
           help_enabled?: boolean
+          last_backup_at?: string | null
+          setup_completed_at?: string | null
+          setup_skipped_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -7212,6 +7218,9 @@ export type Database = {
           created_at?: string
           dismissed_keys?: string[]
           help_enabled?: boolean
+          last_backup_at?: string | null
+          setup_completed_at?: string | null
+          setup_skipped_at?: string | null
           updated_at?: string
           user_id?: string
         }
