@@ -916,6 +916,79 @@ export type Database = {
           },
         ]
       }
+      capture_items: {
+        Row: {
+          ai_reasoning: string | null
+          ai_suggestion_status: Database["public"]["Enums"]["capture_ai_status"]
+          created_at: string
+          created_by: string
+          id: string
+          raw_text: string
+          routed_at: string | null
+          routed_project_id: string | null
+          routed_type: Database["public"]["Enums"]["capture_routed_type"] | null
+          status: Database["public"]["Enums"]["capture_item_status"]
+          suggested_project_id: string | null
+          suggested_type:
+            | Database["public"]["Enums"]["capture_routed_type"]
+            | null
+          updated_at: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          ai_suggestion_status?: Database["public"]["Enums"]["capture_ai_status"]
+          created_at?: string
+          created_by?: string
+          id?: string
+          raw_text: string
+          routed_at?: string | null
+          routed_project_id?: string | null
+          routed_type?:
+            | Database["public"]["Enums"]["capture_routed_type"]
+            | null
+          status?: Database["public"]["Enums"]["capture_item_status"]
+          suggested_project_id?: string | null
+          suggested_type?:
+            | Database["public"]["Enums"]["capture_routed_type"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          ai_suggestion_status?: Database["public"]["Enums"]["capture_ai_status"]
+          created_at?: string
+          created_by?: string
+          id?: string
+          raw_text?: string
+          routed_at?: string | null
+          routed_project_id?: string | null
+          routed_type?:
+            | Database["public"]["Enums"]["capture_routed_type"]
+            | null
+          status?: Database["public"]["Enums"]["capture_item_status"]
+          suggested_project_id?: string | null
+          suggested_type?:
+            | Database["public"]["Enums"]["capture_routed_type"]
+            | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capture_items_routed_project_id_fkey"
+            columns: ["routed_project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capture_items_suggested_project_id_fkey"
+            columns: ["suggested_project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_channel_members: {
         Row: {
           channel_id: string
@@ -9056,6 +9129,20 @@ export type Database = {
         | "dismissed"
         | "snoozed"
         | "modified"
+      capture_ai_status:
+        | "none"
+        | "pending"
+        | "suggested"
+        | "accepted"
+        | "rejected"
+      capture_item_status: "inbox" | "routed" | "archived"
+      capture_routed_type:
+        | "task"
+        | "idea"
+        | "note"
+        | "brand_asset"
+        | "crm_lead"
+        | "content_idea"
       chat_channel_type: "team" | "dm"
       confidence_level: "high" | "medium" | "low"
       crm_company_status: "prospect" | "active" | "past" | "archived"
@@ -9384,6 +9471,22 @@ export const Constants = {
         "dismissed",
         "snoozed",
         "modified",
+      ],
+      capture_ai_status: [
+        "none",
+        "pending",
+        "suggested",
+        "accepted",
+        "rejected",
+      ],
+      capture_item_status: ["inbox", "routed", "archived"],
+      capture_routed_type: [
+        "task",
+        "idea",
+        "note",
+        "brand_asset",
+        "crm_lead",
+        "content_idea",
       ],
       chat_channel_type: ["team", "dm"],
       confidence_level: ["high", "medium", "low"],
