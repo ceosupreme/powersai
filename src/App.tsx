@@ -45,6 +45,7 @@ import InsightsAudit from "./pages/InsightsAudit";
 import NotFound from "./pages/NotFound";
 import RolePreview from "./pages/RolePreview";
 import Workspace from "./pages/Workspace";
+import BrandKit from "./pages/BrandKit";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -144,6 +145,11 @@ const App = () => {
                 <Route path="/marketing-hub" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><MarketingHub /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/brand-kit" element={
+                  <ProtectedRoute>
+                    <AppLayout><BrandKit /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/employees" element={
