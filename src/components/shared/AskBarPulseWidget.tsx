@@ -179,7 +179,7 @@ export const AskBarPulseWidget = ({ context }: AskBarPulseWidgetProps) => {
         >
           <div className="flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-primary" />
-            <span>Ask BarPulse</span>
+            <span>Ask Supreme</span>
             {messages.length > 0 && !isExpanded && (
               <span className="px-1.5 py-0.5 text-[10px] bg-primary/20 text-primary rounded-full">
                 {messages.length}

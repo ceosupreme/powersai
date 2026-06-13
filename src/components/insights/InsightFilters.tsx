@@ -71,7 +71,7 @@ export const InsightFilters = ({
             <SelectValue placeholder="Venue" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Venues</SelectItem>
+            <SelectItem value="all">All Projects</SelectItem>
             {venues.map(v => (
               <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
             ))}
@@ -102,8 +102,8 @@ export const InsightFilters = ({
           <SelectItem value="all">All Pillars</SelectItem>
           <SelectItem value="Revenue">Revenue</SelectItem>
           <SelectItem value="Labor">Labor</SelectItem>
-          <SelectItem value="Operations">Operations</SelectItem>
-          <SelectItem value="Guest Experience">Guest Exp</SelectItem>
+          <SelectItem value="Operations">Delivery</SelectItem>
+          <SelectItem value="Guest Experience">Client Experience</SelectItem>
         </SelectContent>
       </Select>
 

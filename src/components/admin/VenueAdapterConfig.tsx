@@ -122,7 +122,7 @@ export const VenueAdapterConfig = () => {
       </div>
       <p className="text-xs text-muted-foreground mb-4">
         Asana is the only adapter for now. The <code>live_writes_enabled</code> flag is the single
-        source of truth for whether BarPulse can create real Asana tasks for that venue. Run a dry-run
+        source of truth for whether Supreme Team Media can create real Asana tasks for that venue. Run a dry-run
         preview from a campaign first; only flip this on after the dry-run looks correct.
       </p>
 

@@ -187,7 +187,7 @@ export const GoogleRatingOverrideCard = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1.5">
-          <Label>Select Venue</Label>
+          <Label>Select Project</Label>
           <Select value={selectedVenue} onValueChange={setSelectedVenue}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a venue..." />

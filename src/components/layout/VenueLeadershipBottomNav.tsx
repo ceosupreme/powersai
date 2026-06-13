@@ -42,8 +42,8 @@ export const VenueLeadershipBottomNav = () => {
   const allSecondaryItems = [
     { to: '/sales', icon: DollarSign, label: 'Revenue' },
     { to: '/labor', icon: CalendarCheck, label: 'Labor' },
-    { to: '/operations', icon: Settings, label: 'Operations' },
-    { to: '/guest-experience', icon: Star, label: 'Guest Exp.' },
+    { to: '/operations', icon: Settings, label: 'Delivery' },
+    { to: '/guest-experience', icon: Star, label: 'Client Exp.' },
     { to: '/logs', icon: ClipboardList, label: 'Logs' },
   ];
 

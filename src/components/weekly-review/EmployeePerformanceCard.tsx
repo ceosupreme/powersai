@@ -124,7 +124,7 @@ export const EmployeePerformanceCard = ({ supabaseBarId, currentWeek, venueName 
     return (
       <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
         <Users className="w-5 h-5 text-muted-foreground" />
-        <span className="font-semibold text-sm text-foreground">Employee Performance</span>
+        <span className="font-semibold text-sm text-foreground">Team Performance</span>
         <span className="text-xs text-muted-foreground">
           — no active employees tracked for this venue this week
         </span>
@@ -156,7 +156,7 @@ export const EmployeePerformanceCard = ({ supabaseBarId, currentWeek, venueName 
         >
           <div className="flex items-center gap-3 min-w-0">
             <Users className="w-5 h-5 text-primary shrink-0" />
-            <span className="font-semibold text-sm text-foreground">Employee Performance</span>
+            <span className="font-semibold text-sm text-foreground">Team Performance</span>
             <span className="text-[10px] text-muted-foreground truncate">
               {current!.activeEmployees} active employees
             </span>

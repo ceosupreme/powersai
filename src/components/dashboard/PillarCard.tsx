@@ -12,10 +12,10 @@ interface PillarCardProps {
 }
 
 const pillarConfig = {
-  Revenue: { icon: DollarSign, color: 'text-primary', label: 'Sales' },
+  Revenue: { icon: DollarSign, color: 'text-primary', label: 'Revenue' },
   Labor: { icon: Users, color: 'text-blue', label: 'Labor' },
-  Operations: { icon: Settings, color: 'text-gold', label: 'Operations' },
-  'Guest Experience': { icon: Heart, color: 'text-signal-green', label: 'Guest Exp' },
+  Operations: { icon: Settings, color: 'text-gold', label: 'Delivery' },
+  'Guest Experience': { icon: Heart, color: 'text-signal-green', label: 'Client Experience' },
 };
 
 // Helper function to parse drivers into bullet points

@@ -156,7 +156,7 @@ export const CampaignDetail = ({
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>Fill in BarPulse</Button>
+                    <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>Fill in Supreme Team Media</Button>
                     {permalink && (
                       <Button size="sm" variant="ghost" asChild>
                         <a href={permalink} target="_blank" rel="noreferrer">Open in Asana</a>

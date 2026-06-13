@@ -40,10 +40,10 @@ const primaryNavItems = [
 
 // Secondary nav items shown in "More" drawer
 const secondaryNavItems = [
-  { to: '/sales', icon: DollarSign, label: 'Sales', pageKey: 'sales' as PageKey },
-  { to: '/guest-experience', icon: Star, label: 'Guest Experience', pageKey: 'guest_experience' as PageKey },
+  { to: '/sales', icon: DollarSign, label: 'Revenue', pageKey: 'sales' as PageKey },
+  { to: '/guest-experience', icon: Star, label: 'Client Experience', pageKey: 'guest_experience' as PageKey },
   { to: '/labor', icon: Users, label: 'Labor', pageKey: 'labor' as PageKey },
-  { to: '/operations', icon: Settings, label: 'Operations', pageKey: 'operations' as PageKey },
+  { to: '/operations', icon: Settings, label: 'Delivery', pageKey: 'operations' as PageKey },
   { to: '/marketing', icon: Megaphone, label: 'Marketing', pageKey: 'marketing' as PageKey },
   { to: '/tasks', icon: CheckSquare, label: 'Tasks', pageKey: 'tasks' as PageKey },
   { to: '/logs', icon: ClipboardList, label: 'Daily Logs', pageKey: 'logs' as PageKey },

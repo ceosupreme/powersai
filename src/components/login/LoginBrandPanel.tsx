@@ -21,7 +21,7 @@ const LoginBrandPanel = () => {
           </div>
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
         </div>
-        <span className="text-2xl font-bold text-white tracking-tight">BarPulse</span>
+        <span className="text-2xl font-bold text-white tracking-tight">Supreme Team Media</span>
       </div>
 
       {/* Tagline */}
@@ -56,7 +56,7 @@ const LoginBrandPanel = () => {
             {[
               { label: 'Revenue', value: 92, color: 'from-emerald-500 to-emerald-400' },
               { label: 'Labor', value: 78, color: 'from-amber-500 to-yellow-400' },
-              { label: 'Operations', value: 85, color: 'from-blue-500 to-cyan-400' },
+              { label: 'Delivery', value: 85, color: 'from-blue-500 to-cyan-400' },
               { label: 'Guest', value: 88, color: 'from-purple-500 to-violet-400' },
               { label: 'Marketing', value: 71, color: 'from-pink-500 to-rose-400' },
             ].map((pillar, index) => (

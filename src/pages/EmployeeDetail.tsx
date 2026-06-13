@@ -79,7 +79,7 @@ const EmployeeDetail = () => {
         <Button variant="ghost" size="sm" onClick={() => navigate('/employees')}>
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Button>
-        <div className="mt-4 text-muted-foreground">Employee not found.</div>
+        <div className="mt-4 text-muted-foreground">Person not found.</div>
       </div>
     );
   }

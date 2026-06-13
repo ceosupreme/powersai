@@ -56,7 +56,7 @@ const GuestExtraContent = ({ selectedWeek, selectedBar }: { selectedWeek: any; s
 const GuestExperience = () => (
   <PillarPage
     pillar="Guest Experience"
-    title="Guest Experience"
+    title="Client Experience"
     metrics={GUEST_METRICS}
     ChartComponent={GuestExperienceCharts}
     extraContent={({ selectedWeek, selectedBar }) => (

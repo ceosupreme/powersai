@@ -37,7 +37,7 @@ export const StaffSidebar = ({ tasksBadge = 0, chatBadge = 0, logsBadge = 0 }: S
       {/* Logo */}
       <div className="h-14 flex items-center gap-2 px-4 border-b border-sidebar-border">
         <Activity className="h-5 w-5 text-primary" />
-        <span className="font-semibold text-foreground">BarPulse</span>
+        <span className="font-semibold text-foreground">Supreme Team Media</span>
       </div>
 
       {/* Navigation */}

@@ -191,6 +191,6 @@ export const CAMPAIGN_ORIGINS: CampaignOrigin[] = [
 
 export const ORIGIN_LABEL: Record<CampaignOrigin, string> = {
   growth_audit: 'Growth Audit',
-  manual_barpulse: 'Manual (BarPulse)',
+  manual_barpulse: 'Manual (Supreme Team Media)',
   manual_external: 'Manual (External)',
 };

@@ -52,7 +52,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 <SelectTrigger className="w-[130px] md:w-[180px] h-10 md:h-11 bg-card/50 border-border/50 text-foreground hover:bg-card hover:border-primary/30 transition-all duration-200 rounded-xl">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-primary hidden sm:block" />
-                    <SelectValue placeholder="Select Bar" />
+                    <SelectValue placeholder="Select Project" />
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-card/95 backdrop-blur-md border-border/50 rounded-xl shadow-xl">

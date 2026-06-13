@@ -58,9 +58,9 @@ export const TrendChart = ({ scorecards, currentWeekId }: TrendChartProps) => {
               formatter={(value: number, name: string) => {
                 const labels: Record<string, string> = {
                   score: 'Overall',
-                  salesScore: 'Sales',
+                  salesScore: 'Revenue',
                   laborScore: 'Labor',
-                  opsScore: 'Operations',
+                  opsScore: 'Delivery',
                   guestScore: 'Guest Exp',
                 };
                 return [value, labels[name] || name];
@@ -137,7 +137,7 @@ export const TrendChart = ({ scorecards, currentWeekId }: TrendChartProps) => {
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-0.5 bg-orange rounded" />
-          <span className="text-muted-foreground">Sales</span>
+          <span className="text-muted-foreground">Revenue</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-0.5 bg-signal-green rounded" />

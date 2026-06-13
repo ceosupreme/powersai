@@ -247,12 +247,12 @@ export const BarsTab = () => {
           <DialogTrigger asChild>
             <Button onClick={openAddDialog} className="gap-2 w-full sm:w-auto">
               <Plus className="h-4 w-4" />
-              Add Bar
+              Add Project
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-card border-border mx-4 sm:mx-auto max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingBar ? 'Edit Bar' : 'Add New Bar'}</DialogTitle>
+              <DialogTitle>{editingBar ? 'Edit Project' : 'Add New Project'}</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {editingBar ? 'Update the bar details below.' : 'Enter the details for the new bar location.'}
               </DialogDescription>
@@ -456,7 +456,7 @@ export const BarsTab = () => {
                 <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="w-full sm:w-auto">Cancel</Button>
                 <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
                   {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {editingBar ? 'Save Changes' : 'Add Bar'}
+                  {editingBar ? 'Save Changes' : 'Add Project'}
                 </Button>
               </DialogFooter>
             </form>

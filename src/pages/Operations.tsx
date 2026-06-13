@@ -7,7 +7,7 @@ import { DrinkMixCard } from '@/components/operations/DrinkMixCard';
 const Operations = () => (
   <PillarPage
     pillar="Operations"
-    title="Operations"
+    title="Delivery"
     metrics={OPERATIONS_METRICS}
     ChartComponent={OperationsCharts}
     extraContent={() => (

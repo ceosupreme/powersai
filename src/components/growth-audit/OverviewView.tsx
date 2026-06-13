@@ -76,7 +76,7 @@ export const OverviewView = () => {
             Traffic-driving campaigns are gated by Ops Readiness.
           </div>
           <div className="text-muted-foreground mt-0.5">
-            BarPulse won't push covers a venue can't serve. Findings that drive traffic carry the
+            Supreme Team Media won't push covers a venue can't serve. Findings that drive traffic carry the
             current gate status; operational, reputation, content, and conversion fixes are never gated.
           </div>
         </div>

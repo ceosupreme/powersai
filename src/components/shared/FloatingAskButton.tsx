@@ -9,7 +9,7 @@ export const FloatingAskButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
   const { supabaseBarId, selectedBar } = useApp();
-  const venueName = selectedBar?.bar_name || 'BarPulse';
+  const venueName = selectedBar?.bar_name || 'Supreme Team Media';
 
   return (
     <>
@@ -26,7 +26,7 @@ export const FloatingAskButton = () => {
               ? 'bottom-20 right-4 w-12 h-12'
               : 'bottom-6 right-6 w-14 h-14'
           )}
-          aria-label="Ask BarPulse"
+          aria-label="Ask Supreme"
         >
           <Lightbulb className={cn(isMobile ? 'w-5 h-5' : 'w-6 h-6')} />
         </button>
@@ -52,7 +52,7 @@ export const FloatingAskButton = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/50">
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Ask BarPulse — {venueName}</h2>
+                <h2 className="text-sm font-semibold text-foreground">Ask Supreme — {venueName}</h2>
               </div>
               <button
                 onClick={() => setIsOpen(false)}

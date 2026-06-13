@@ -125,7 +125,7 @@ const Auth = () => {
         } else {
           toast({
             title: 'Account created!',
-            description: 'Welcome to BarPulse. You are now signed in.',
+            description: 'Welcome to Supreme Team Media. You are now signed in.',
           });
           navigate(from, { replace: true });
         }
@@ -163,10 +163,10 @@ const Auth = () => {
       <div className="flex items-center gap-3 mb-8 animate-fade-in-up relative z-10">
         <img 
           src={barpulseLogo} 
-          alt="BarPulse" 
+          alt="Supreme Team Media" 
           className="w-14 h-14 object-contain"
         />
-        <span className="text-3xl font-bold text-foreground tracking-tight">BarPulse</span>
+        <span className="text-3xl font-bold text-foreground tracking-tight">Supreme Team Media</span>
       </div>
 
       <Card className="w-full max-w-md bg-card/90 backdrop-blur-md border-border/50 shadow-2xl shadow-black/30 animate-fade-in-up stagger-1 relative z-10 rounded-2xl">

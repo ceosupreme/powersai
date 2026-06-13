@@ -155,7 +155,7 @@ export default function StaffMyShift() {
           </div>
           <div className="grid grid-cols-4 gap-3">
             <StatCard
-              label="Sales"
+              label="Revenue"
               value={fmt(myStats.sales)}
               subtext={`${myStats.salesChange >= 0 ? '↑' : '↓'}${Math.abs(myStats.salesChange)}%`}
               subtextColor={myStats.salesChange >= 0 ? 'green' : 'red'}

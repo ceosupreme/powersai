@@ -974,7 +974,7 @@ export const ManualDataUploadTab = () => {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="labor">Labor</SelectItem>
-                      <SelectItem value="sales">Sales</SelectItem>
+                      <SelectItem value="sales">Revenue</SelectItem>
                       <SelectItem value="both">Both</SelectItem>
                     </SelectContent>
                   </Select>
@@ -1224,7 +1224,7 @@ export const ManualDataUploadTab = () => {
               {kdsPreview && (
                 <div className="space-y-3">
                   <div className="text-sm space-y-1 p-3 rounded-lg bg-muted/30 border border-border/30">
-                    <p><strong>Venue:</strong> {kdsPreview.venue?.name || <span className="text-amber-500">Not detected — please select above</span>}</p>
+                    <p><strong>Project:</strong> {kdsPreview.venue?.name || <span className="text-amber-500">Not detected — please select above</span>}</p>
                     <p><strong>Total Tickets:</strong> {kdsPreview.total_tickets}</p>
                     <p><strong>Days:</strong> {kdsPreview.days?.length || 0}</p>
                     {kdsPreview.detected_location && (
