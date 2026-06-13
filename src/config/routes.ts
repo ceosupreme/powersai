@@ -19,8 +19,6 @@ export const routeConfig: Record<string, RouteConfig> = {
   '/labor': { roles: ['owner', 'gm'] },
   '/operations': { roles: ['owner', 'gm'] },
   '/guest-experience': { roles: ['owner', 'gm'] },
-  '/marketing': { roles: ['owner', 'gm'] },
-  '/social-media': { roles: ['owner', 'gm'] },
   '/employees': { roles: ['owner', 'gm'] },
 
   // Shared routes (all roles)

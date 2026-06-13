@@ -102,6 +102,7 @@ const navGroups: NavGroup[] = [
     label: 'Brand & Content',
     items: [
       { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'dashboard' },
+      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'dashboard' },
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'dashboard' },
     ],
   },

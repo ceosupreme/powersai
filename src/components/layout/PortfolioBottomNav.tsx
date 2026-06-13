@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, CheckSquare, ClipboardList, MessageCircle, Briefcase, Inbox as InboxIcon, Palette, Activity, HelpCircle, Rocket, Sunrise } from 'lucide-react';
+import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, CheckSquare, ClipboardList, MessageCircle, Briefcase, Inbox as InboxIcon, Palette, Activity, Megaphone, HelpCircle, Rocket, Sunrise } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +19,7 @@ const baseSecondaryItems = [
   { to: '/crm?tab=inbound', icon: InboxIcon, label: 'Inbound' },
   { to: '/inbox', icon: InboxIcon, label: 'Capture' },
   { to: '/brand-kit', icon: Palette, label: 'Brand Vault' },
+  { to: '/marketing-hub', icon: Megaphone, label: 'Marketing Hub' },
   { to: '/growth-audit', icon: Activity, label: 'Growth Audit' },
   { to: '/help', icon: HelpCircle, label: 'Help' },
   { to: '/launch', icon: Rocket, label: 'Launch' },

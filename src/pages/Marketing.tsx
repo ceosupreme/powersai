@@ -1,3 +1,5 @@
+// DEAD CODE — retired bar-era pillar page. /marketing now redirects to /marketing-hub in App.tsx.
+// Left on disk as a breadcrumb; safe to delete in a later cleanup pass.
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useApp } from '@/context/AppContext';
