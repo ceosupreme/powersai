@@ -43,6 +43,8 @@ import {
   Palette,
   Briefcase,
   Inbox as InboxIcon,
+  HelpCircle,
+  Rocket,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -94,6 +96,12 @@ const toolNavItems = [
   { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
   { path: '/marketing', label: 'Marketing', icon: Megaphone, pageKey: 'marketing' as PageKey },
   { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'marketing' as PageKey },
+];
+
+// Help/launch nav items — available to all authenticated users
+const helpNavItems = [
+  { path: '/help', label: 'Help Center', icon: HelpCircle, pageKey: 'dashboard' as PageKey },
+  { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' as PageKey },
 ];
 
 // Dev Tools removed - role preview handled by role system
