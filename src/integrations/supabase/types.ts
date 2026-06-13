@@ -865,6 +865,9 @@ export type Database = {
       }
       brand_kits: {
         Row: {
+          archive_reason: string | null
+          archived: boolean
+          archived_at: string | null
           bio_long: string | null
           bio_short: string | null
           brand_voice: string | null
@@ -879,6 +882,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           bio_long?: string | null
           bio_short?: string | null
           brand_voice?: string | null
@@ -893,6 +899,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           bio_long?: string | null
           bio_short?: string | null
           brand_voice?: string | null
@@ -1269,6 +1278,9 @@ export type Database = {
       }
       crm_companies: {
         Row: {
+          archive_reason: string | null
+          archived: boolean
+          archived_at: string | null
           created_at: string
           created_by: string
           id: string
@@ -1281,6 +1293,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -1293,6 +1308,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -1316,6 +1334,9 @@ export type Database = {
       }
       crm_contacts: {
         Row: {
+          archive_reason: string | null
+          archived: boolean
+          archived_at: string | null
           company_id: string | null
           created_at: string
           created_by: string
@@ -1330,6 +1351,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           company_id?: string | null
           created_at?: string
           created_by?: string
@@ -1344,6 +1368,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           company_id?: string | null
           created_at?: string
           created_by?: string
@@ -1369,6 +1396,9 @@ export type Database = {
       }
       crm_deals: {
         Row: {
+          archive_reason: string | null
+          archived: boolean
+          archived_at: string | null
           company_id: string
           created_at: string
           created_by: string
@@ -1385,6 +1415,9 @@ export type Database = {
           won_at: string | null
         }
         Insert: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           company_id: string
           created_at?: string
           created_by?: string
@@ -1401,6 +1434,9 @@ export type Database = {
           won_at?: string | null
         }
         Update: {
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
           company_id?: string
           created_at?: string
           created_by?: string
