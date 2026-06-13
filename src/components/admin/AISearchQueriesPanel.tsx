@@ -295,7 +295,7 @@ const VenuePanel = ({ venueId, venueName }: { venueId: string; venueName: string
             <Input
               value={newQuery}
               onChange={(e) => setNewQuery(e.target.value)}
-              placeholder='e.g. "Best happy hour bar in Gaslamp?"'
+              placeholder='e.g. "Best marketing agency in San Diego?"'
               className="h-8 text-xs"
               disabled={overCap}
               onKeyDown={(e) => { if (e.key === 'Enter') addQuery(); }}
