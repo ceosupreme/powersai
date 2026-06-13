@@ -9,7 +9,7 @@ interface UseToastDataOptions {
   venueId?: string;
 }
 
-export const useToastData = (options?: UseToastDataOptions) => {
+export const useToastData = (options?: UseToastDataOptions, queryOptions?: { enabled?: boolean }) => {
   const { session } = useAuth();
   
   return useQuery({
@@ -49,7 +49,7 @@ export const useToastData = (options?: UseToastDataOptions) => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes client cache
     refetchOnWindowFocus: false,
-    enabled: !!session?.access_token,
+    enabled: !!session?.access_token && (queryOptions?.enabled ?? true),
     retry: 2,
     retryDelay: 1000,
   });
