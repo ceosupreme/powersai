@@ -6,13 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Copy, Palette } from 'lucide-react';
+import { Plus, X, Copy, Palette, Archive, ArchiveRestore } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useBrandKitData, useSaveKit, useChildMutations,
+  useBrandKitArchive, useBrandKitLinkCounts,
   type BrandColor, type BrandTagline, type BrandHashtag, type BrandLink,
 } from '@/hooks/useBrandKit';
 import { AssetUploader } from '@/components/brand-kit/AssetUploader';
+import { ArchiveOrDeleteDialog, type LinkedLine } from '@/components/shared/ArchiveOrDeleteDialog';
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(text).then(() => toast.success('Copied'));
@@ -21,8 +23,13 @@ const copy = (text: string) => {
 export default function BrandKit() {
   const { selectedBar } = useApp();
   const projectId = selectedBar?.id ?? null;
-  const { kitQuery, kitId, ensureKit, colors, taglines, hashtags, links, assets } = useBrandKitData(projectId);
+  const [showArchived, setShowArchived] = useState(false);
+  const { kitQuery, kitId, ensureKit, colors, taglines, hashtags, links, assets } =
+    useBrandKitData(projectId, { includeArchived: showArchived });
   const saveKit = useSaveKit(projectId);
+  const archiveM = useBrandKitArchive();
+  const linkCounts = useBrandKitLinkCounts(kitId);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Local form state
   const k = kitQuery.data;
@@ -54,11 +61,57 @@ export default function BrandKit() {
         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <Palette className="h-5 w-5 text-primary" />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Brand Kit</h1>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            Brand Kit
+            {k?.archived && <Badge variant="outline" className="text-xs">Archived</Badge>}
+          </h1>
           <p className="text-sm text-muted-foreground">{selectedBar?.bar_name}</p>
         </div>
+        {k && !k.archived && (
+          <Button size="sm" variant="outline" onClick={() => setDialogOpen(true)}>
+            <Archive className="h-4 w-4 mr-1" /> Archive…
+          </Button>
+        )}
+        {k?.archived && (
+          <Button size="sm" variant="outline" onClick={() => archiveM.restoreKit.mutate(k.id)}>
+            <ArchiveRestore className="h-4 w-4 mr-1" /> Restore
+          </Button>
+        )}
+        {!kitQuery.data && !showArchived && (
+          <Button size="sm" variant="ghost" onClick={() => setShowArchived(true)}>Show archived</Button>
+        )}
       </header>
+
+      {k && (
+        <ArchiveOrDeleteDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          entityLabel="brand kit"
+          entityName={selectedBar?.bar_name ?? 'this kit'}
+          allowArchive={!k.archived}
+          extraNote="Storage files (uploaded images, PDFs) live in object storage and are kept separately — only the asset records here are removed."
+          linkedLines={(() => {
+            const lc = linkCounts.data;
+            if (!lc) return [];
+            const lines: LinkedLine[] = [];
+            if (lc.colors)   lines.push({ count: lc.colors,   label: 'color records',   effect: 'destroyed' });
+            if (lc.taglines) lines.push({ count: lc.taglines, label: 'tagline records', effect: 'destroyed' });
+            if (lc.hashtags) lines.push({ count: lc.hashtags, label: 'hashtag records', effect: 'destroyed' });
+            if (lc.links)    lines.push({ count: lc.links,    label: 'link records',    effect: 'destroyed' });
+            if (lc.assets)   lines.push({ count: lc.assets,   label: 'asset records',   effect: 'destroyed' });
+            return lines;
+          })()}
+          onArchive={async (reason) => {
+            await archiveM.archiveKit.mutateAsync({ id: k.id, reason });
+            toast.success('Brand kit archived');
+          }}
+          onDelete={async () => {
+            await archiveM.deleteKit.mutateAsync(k.id);
+            toast.success('Brand kit deleted');
+          }}
+        />
+      )}
 
       {/* Voice & bios */}
       <Card>
