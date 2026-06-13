@@ -358,7 +358,7 @@ const VenuePanel = ({ venueId, venueName }: { venueId: string; venueName: string
             <Input
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
-              placeholder="e.g. karaoke bar gaslamp"
+              placeholder="e.g. marketing agency san diego"
               className="h-8 text-xs"
               disabled={overCap}
               onKeyDown={(e) => { if (e.key === 'Enter') addKeyword(); }}
