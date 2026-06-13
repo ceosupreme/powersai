@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN IF NOT EXISTS google_place_id TEXT;

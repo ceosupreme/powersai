@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN IF NOT EXISTS asana_score_assignee_gid text;

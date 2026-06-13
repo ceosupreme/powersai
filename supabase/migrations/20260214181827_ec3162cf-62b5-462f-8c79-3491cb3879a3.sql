@@ -1,0 +1,1 @@
+ALTER TABLE period_config ADD COLUMN name text;

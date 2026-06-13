@@ -1,0 +1,1 @@
+ALTER TABLE weekly_scorecard DROP CONSTRAINT IF EXISTS weekly_scorecard_week_id_key;

@@ -1,0 +1,1 @@
+ALTER TABLE public.shift_logs ADD COLUMN IF NOT EXISTS log_category text DEFAULT NULL;

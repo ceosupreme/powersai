@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS public.idx_insights_dedupe_unique_daily_v2;

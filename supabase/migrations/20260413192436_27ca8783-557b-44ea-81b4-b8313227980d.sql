@@ -1,0 +1,1 @@
+ALTER TABLE weekly_core DROP CONSTRAINT IF EXISTS weekly_core_week_id_key;

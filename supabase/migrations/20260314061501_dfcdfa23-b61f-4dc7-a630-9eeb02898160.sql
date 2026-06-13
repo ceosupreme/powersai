@@ -1,0 +1,1 @@
+ALTER TABLE insights ADD COLUMN IF NOT EXISTS insight_mode TEXT NOT NULL DEFAULT 'daily';

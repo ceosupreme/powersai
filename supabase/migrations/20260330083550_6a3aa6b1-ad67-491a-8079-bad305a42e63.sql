@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN yelp_business_id TEXT;

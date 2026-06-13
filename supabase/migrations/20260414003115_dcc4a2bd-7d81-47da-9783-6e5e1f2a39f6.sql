@@ -1,0 +1,1 @@
+DELETE FROM insights WHERE title ILIKE '%0 GM logs submitted%' AND source_date >= '2026-03-24';

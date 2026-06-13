@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN asana_gid TEXT DEFAULT NULL;

@@ -1,0 +1,435 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* BarPulse AI Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Teal/Cyan - Primary Brand */
+    --primary: 187 100% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Light Secondary */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* Green Accent */
+    --accent: 160 84% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 45 100% 45%;
+    --warning-foreground: 222 47% 11%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 187 100% 35%;
+
+    --radius: 0.75rem;
+
+    /* BarPulse Custom Colors */
+    --navy: 222 47% 11%;
+    --teal: 187 100% 42%;
+    --signal-green: 142 71% 40%;
+    --coral-red: 0 84% 55%;
+    --gold: 38 92% 45%;
+    --blue: 217 91% 55%;
+    --orange: 25 95% 50%;
+
+    /* Grade Colors */
+    --grade-a: 142 71% 40%;
+    --grade-b: 217 91% 55%;
+    --grade-c: 38 92% 45%;
+    --grade-d: 25 95% 50%;
+    --grade-f: 0 84% 55%;
+
+    /* Severity Colors */
+    --severity-high: 0 84% 55%;
+    --severity-medium: 38 92% 45%;
+    --severity-low: 142 71% 40%;
+
+    /* Card Styles */
+    --card-border: 220 13% 91%;
+    --card-hover: 220 14% 96%;
+
+    /* Sidebar - Light */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 187 100% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 187 100% 35%;
+  }
+
+  .dark {
+    /* BarPulse AI Dark Theme - Rich Navy */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 41% 16%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 41% 16%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Teal/Cyan - Primary Brand */
+    --primary: 187 100% 42%;
+    --primary-foreground: 222 47% 11%;
+
+    /* Navy Secondary */
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Green Accent */
+    --accent: 160 84% 39%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --warning: 45 100% 50%;
+    --warning-foreground: 222 47% 11%;
+
+    --border: 217 33% 22%;
+    --input: 217 33% 22%;
+    --ring: 187 100% 42%;
+
+    --radius: 0.75rem;
+
+    /* BarPulse Custom Colors */
+    --navy: 222 47% 11%;
+    --teal: 187 100% 42%;
+    --signal-green: 142 71% 45%;
+    --coral-red: 0 84% 60%;
+    --gold: 38 92% 50%;
+    --blue: 217 91% 60%;
+    --orange: 25 95% 53%;
+
+    /* Grade Colors */
+    --grade-a: 142 71% 45%;
+    --grade-b: 217 91% 60%;
+    --grade-c: 38 92% 50%;
+    --grade-d: 25 95% 53%;
+    --grade-f: 0 84% 60%;
+
+    /* Severity Colors */
+    --severity-high: 0 84% 60%;
+    --severity-medium: 38 92% 50%;
+    --severity-low: 142 71% 45%;
+
+    /* Card Styles */
+    --card-border: 217 33% 22%;
+    --card-hover: 222 41% 20%;
+
+    /* Sidebar - Rich Navy */
+    --sidebar-background: 222 47% 14%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 187 100% 42%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 20%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 22%;
+    --sidebar-ring: 187 100% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-semibold;
+  }
+}
+
+@layer components {
+  /* Score Display */
+  .score-large {
+    @apply text-5xl font-bold font-sans tracking-tight;
+  }
+
+  .score-grade {
+    @apply text-4xl font-bold font-sans;
+  }
+
+  /* Section Headers */
+  .section-header {
+    @apply text-sm font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-2;
+  }
+
+  .section-header::before,
+  .section-header::after {
+    content: '';
+    @apply flex-1 h-px bg-border;
+  }
+
+  /* Card Styles */
+  .card-metric {
+    @apply bg-card border border-transparent rounded-lg p-4 shadow-lg shadow-black/40 transition-all duration-200;
+  }
+
+  .card-metric:hover {
+    @apply bg-card-hover shadow-xl shadow-black/50 border-primary/50;
+  }
+
+  /* Severity Indicators */
+  .severity-dot {
+    @apply w-2 h-2 rounded-full inline-block mr-2;
+  }
+
+  .severity-high {
+    @apply bg-destructive;
+  }
+
+  .severity-medium {
+    @apply bg-gold;
+  }
+
+  .severity-low {
+    @apply bg-signal-green;
+  }
+
+  /* Trend Indicators */
+  .trend-up {
+    @apply text-signal-green;
+  }
+
+  .trend-down {
+    @apply text-destructive;
+  }
+
+  .trend-flat {
+    @apply text-muted-foreground;
+  }
+
+  /* Button Variants */
+  .btn-approve {
+    @apply bg-signal-green/20 text-signal-green border border-signal-green/30 hover:bg-signal-green/30 transition-all duration-200;
+  }
+
+  .btn-reject {
+    @apply bg-destructive/20 text-destructive border border-destructive/30 hover:bg-destructive/30 transition-all duration-200;
+  }
+
+  /* Sparkline Container */
+  .sparkline-container {
+    @apply bg-card border border-border rounded-lg p-4;
+  }
+
+  /* Nav Active State */
+  .nav-active {
+    @apply text-foreground border-b-2 border-primary;
+  }
+
+  .nav-inactive {
+    @apply text-muted-foreground hover:text-primary transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  /* Grade Color Utilities */
+  .text-grade-a { @apply text-signal-green; }
+  .text-grade-b { @apply text-blue; }
+  .text-grade-c { @apply text-gold; }
+  .text-grade-d { @apply text-orange; }
+  .text-grade-f { @apply text-destructive; }
+
+  .bg-grade-a { @apply bg-signal-green; }
+  .bg-grade-b { @apply bg-blue; }
+  .bg-grade-c { @apply bg-gold; }
+  .bg-grade-d { @apply bg-orange; }
+  .bg-grade-f { @apply bg-destructive; }
+
+  /* Animated Pulse */
+  .pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  /* Critical Alert Pulse - GPU accelerated with box-shadow */
+  .animate-pulse-critical {
+    animation: pulse-critical 2s ease-in-out infinite;
+    will-change: box-shadow;
+  }
+
+  @keyframes pulse-critical {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(0 84% 60% / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 6px hsl(0 84% 60% / 0);
+    }
+  }
+
+  /* Touch-Friendly Utilities */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .touch-target-lg {
+    @apply min-h-[48px] min-w-[48px];
+  }
+
+  /* Safe Area Insets for Mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-lg;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-200;
+  }
+
+  .hover-glow:hover {
+    @apply shadow-[0_0_20px_rgba(23,162,184,0.2)];
+  }
+
+  /* Card Hover Enhancements */
+  .card-interactive {
+    @apply transition-all duration-200 ease-out cursor-pointer;
+  }
+
+  .card-interactive:hover {
+    @apply -translate-y-0.5 shadow-xl shadow-black/50 border-primary/20;
+  }
+
+  .card-interactive:active {
+    @apply translate-y-0 shadow-lg;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-background/80 backdrop-blur-md;
+  }
+
+  .glass-card {
+    @apply bg-card/90 backdrop-blur-sm border-border/50;
+  }
+
+  /* Gradient Utilities */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary/20 via-primary/10 to-transparent;
+  }
+
+  .gradient-glow {
+    background: radial-gradient(ellipse at center, hsl(187 78% 42% / 0.15) 0%, transparent 70%);
+  }
+
+  /* Score Glow Animation */
+  @keyframes score-glow {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.3));
+    }
+    50% {
+      filter: drop-shadow(0 0 16px hsl(var(--primary) / 0.5));
+    }
+  }
+
+  .animate-score-glow {
+    animation: score-glow 3s ease-in-out infinite;
+  }
+
+  /* Fade In Animation */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.3s ease-out forwards;
+  }
+
+  /* Staggered Animation Delays */
+  .stagger-1 { animation-delay: 50ms; }
+  .stagger-2 { animation-delay: 100ms; }
+  .stagger-3 { animation-delay: 150ms; }
+  .stagger-4 { animation-delay: 200ms; }
+  .stagger-5 { animation-delay: 250ms; }
+
+  /* Input Focus Enhancement */
+  .input-focus {
+    @apply focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+  }
+
+  /* Mobile Typography Adjustments */
+  @media (max-width: 640px) {
+    .mobile-text-adjust {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+
+  /* Shimmer Loading Effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}

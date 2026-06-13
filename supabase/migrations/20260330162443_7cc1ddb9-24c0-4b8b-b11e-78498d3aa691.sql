@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN asana_log_project_gid TEXT;

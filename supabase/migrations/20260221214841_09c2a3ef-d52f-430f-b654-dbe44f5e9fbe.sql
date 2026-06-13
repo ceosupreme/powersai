@@ -1,0 +1,45 @@
+
+-- Migration 1: New ENUMs (idempotent)
+
+DO $$ BEGIN CREATE TYPE grade_letter AS ENUM ('A', 'B', 'C', 'D', 'F'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE pillar_type AS ENUM ('revenue', 'labor', 'operations', 'guest_experience'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE confidence_level AS ENUM ('high', 'medium', 'low'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE trend_direction AS ENUM ('up', 'down', 'flat'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE severity_level AS ENUM ('critical', 'high', 'medium', 'low'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE approval_status AS ENUM ('unreviewed', 'approved', 'dismissed', 'snoozed', 'modified'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE execution_status AS ENUM ('todo', 'in_progress', 'done', 'blocked', 'cancelled'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE dismiss_reason AS ENUM ('already_addressed', 'not_relevant', 'will_address_later', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE effort_level_enum AS ENUM ('quick', 'short', 'medium', 'long', 'project'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE log_intent AS ENUM ('incident', 'accident', 'maintenance', 'guest_issue', 'shift_notes', 'shoutout', 'end_of_shift', 'voice_note'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE log_severity AS ENUM ('critical', 'high', 'medium', 'low', 'positive', 'info'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE shift_type_enum AS ENUM ('am', 'pm', 'night', 'double'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE shift_rating AS ENUM ('great', 'good', 'okay', 'rough', 'disaster'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE week_rating AS ENUM ('excellent', 'good', 'average', 'below_average', 'poor'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE sales_vs_forecast AS ENUM ('above', 'at', 'below'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE weather_type AS ENUM ('sunny', 'cloudy', 'rainy', 'stormy', 'cold', 'hot'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE pacing_type AS ENUM ('above', 'at', 'below'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE staffing_level AS ENUM ('overstaffed', 'adequate', 'understaffed', 'critical'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE week_status AS ENUM ('open', 'closed', 'locked', 'in_review'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE employment_type AS ENUM ('full_time', 'part_time', 'seasonal', 'temporary'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE employment_status AS ENUM ('active', 'inactive', 'terminated', 'on_leave', 'suspended'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE incident_type AS ENUM ('late_arrival', 'no_show', 'callout', 'early_leave', 'policy_violation', 'guest_complaint', 'cash_handling', 'insubordination', 'dress_code', 'safety', 'positive', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE action_taken_type AS ENUM ('verbal_warning', 'written_warning', 'final_warning', 'suspension', 'termination', 'coaching', 'recognition', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE review_type AS ENUM ('30_day', '60_day', '90_day', 'annual', 'promotion', 'pip', 'exit', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE performance_rating AS ENUM ('exceeds', 'meets', 'below', 'unsatisfactory'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE termination_reason AS ENUM ('voluntary_resignation', 'involuntary_termination', 'job_abandonment', 'end_of_season', 'mutual_agreement', 'layoff', 'retirement', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE staff_context AS ENUM ('foh', 'boh'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE doc_scope AS ENUM ('company_wide', 'venue_specific'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE doc_category AS ENUM ('sop', 'policy', 'training', 'menu', 'recipe', 'safety', 'compliance', 'onboarding', 'reference', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE doc_status AS ENUM ('draft', 'active', 'under_review', 'archived', 'superseded'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE access_level AS ENUM ('all_staff', 'managers_only', 'gm_only', 'owner_only'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE insight_type_enum AS ENUM ('anomaly', 'trend', 'comparison', 'prediction', 'threshold', 'correlation', 'recommendation', 'celebration'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE insight_source AS ENUM ('ai_daily', 'ai_weekly', 'system', 'manual'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE feedback_vote AS ENUM ('up', 'down'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE social_platform AS ENUM ('instagram', 'facebook', 'tiktok', 'google', 'yelp', 'x', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE event_type_enum AS ENUM ('live_music', 'trivia', 'sports_viewing', 'holiday', 'private_event', 'community', 'promotion', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE post_type AS ENUM ('photo', 'video', 'reel', 'story', 'carousel', 'text', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE performance_label AS ENUM ('excellent', 'good', 'average', 'below_average', 'poor'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE promo_type AS ENUM ('happy_hour', 'special', 'seasonal', 'event_based', 'loyalty', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE ingestion_status AS ENUM ('pending', 'running', 'completed', 'failed', 'partial'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE run_type AS ENUM ('toast_daily', 'toast_weekly', 'sevenshifts_daily', 'asana_sync', 'ai_daily', 'ai_weekly', 'manual_import', 'migration'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE review_platform AS ENUM ('google', 'yelp', 'tripadvisor', 'facebook', 'opentable', 'other'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;

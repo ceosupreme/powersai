@@ -1,0 +1,1 @@
+UPDATE daily_metrics SET labor_pct = 0, labor_cost = 0 WHERE date >= '2025-03-02' AND date <= '2025-03-11' AND labor_pct > 0 AND labor_pct < 1;

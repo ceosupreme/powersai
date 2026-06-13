@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN IF NOT EXISTS asana_log_section_gid TEXT NULL;

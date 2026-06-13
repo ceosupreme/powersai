@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BarPulse | Restaurant Operations Dashboard</title>
+    <meta name="description" content="Weekly scorecards, alerts, insights, and actionable tasks for bar and restaurant GMs. Data-driven operations intelligence.">
+    <meta name="theme-color" content="#0F172A" />
+
+    <!-- Mobile Web App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+    
+    
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:title" content="BarPulse | Restaurant Operations Dashboard">
+  <meta name="twitter:title" content="BarPulse | Restaurant Operations Dashboard">
+  <meta property="og:description" content="Weekly scorecards, alerts, insights, and actionable tasks for bar and restaurant GMs. Data-driven operations intelligence.">
+  <meta name="twitter:description" content="Weekly scorecards, alerts, insights, and actionable tasks for bar and restaurant GMs. Data-driven operations intelligence.">
+  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7574b75a-f517-457f-9083-8e65d4a06b43/id-preview-11b69a67--8e1af904-fd16-47e1-833f-7a3efdea81d3.lovable.app-1771713135857.png">
+  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7574b75a-f517-457f-9083-8e65d4a06b43/id-preview-11b69a67--8e1af904-fd16-47e1-833f-7a3efdea81d3.lovable.app-1771713135857.png">
+</head>
+
+  <body>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(r) { r.unregister(); });
+        });
+        caches.keys().then(function(names) {
+          names.forEach(function(name) { caches.delete(name); });
+        });
+      }
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+-- Clean up 7shifts-written splh values for 2025 dates (wrong year, created by backfill)
+UPDATE daily_metrics SET splh = NULL WHERE date >= '2025-03-02' AND date <= '2025-03-11' AND splh > 0 AND labor_cost = 0 AND labor_pct = 0;

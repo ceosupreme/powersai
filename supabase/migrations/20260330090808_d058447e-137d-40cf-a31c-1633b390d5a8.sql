@@ -1,0 +1,14 @@
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS sidework_completion_pct DECIMAL;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS sidework_tasks_total INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS sidework_tasks_completed INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_lates INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_no_shows INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_dropped_shifts INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_shift_bids INTEGER;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_avg_shift_score DECIMAL;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_avg_tenure DECIMAL;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS engage_composite_score DECIMAL;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS yelp_rating DECIMAL;
+ALTER TABLE public.weekly_core ADD COLUMN IF NOT EXISTS online_reputation_score DECIMAL;
+ALTER TABLE public.period_config ADD COLUMN IF NOT EXISTS sidework_completion_target DECIMAL;
+ALTER TABLE public.period_config ADD COLUMN IF NOT EXISTS engage_score_target DECIMAL;

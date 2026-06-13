@@ -1,0 +1,1 @@
+ALTER TABLE public.daily_metrics ADD COLUMN IF NOT EXISTS worked_hours numeric, ADD COLUMN IF NOT EXISTS schedule_variance_hours numeric;

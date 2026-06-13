@@ -1,0 +1,1 @@
+UPDATE public.lead_logs SET is_parsed=false, parse_error=NULL WHERE id='d71cc0ae-e8fa-48dd-826f-6711e69607f3';
