@@ -61,14 +61,14 @@ export const ACTION_PACK_BLUEPRINTS: Record<FindingType, ActionPackBlueprint> = 
     assets: [
       { kind: 'social_post', title: 'Hero post + 2 follow-ups featuring the item' },
       { kind: 'gbp_post', title: 'GBP product post with photo and price' },
-      { kind: 'staff_script', title: 'Suggestive-sell script for FOH' },
+      { kind: 'staff_script', title: 'Suggestive-sell script for customer-facing team' },
       { kind: 'menu_callout', title: 'Menu placement spec (position, badge, copy)' },
     ],
   },
   event_lift_opportunity: {
-    summary: 'Capture the missing category lift on an event night with complementary product.',
+    summary: 'Capture the missing category lift on a launch / event window with complementary product.',
     assets: [
-      { kind: 'social_post', title: 'Event-night cross-promo post' },
+      { kind: 'social_post', title: 'Launch-window cross-promo post' },
       { kind: 'menu_callout', title: 'Event-only menu insert (cross-category items)' },
       { kind: 'campaign_brief', title: 'Cross-promo brief with attach-rate target' },
     ],
