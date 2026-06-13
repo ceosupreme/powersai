@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEffectivePillars, useProjectType } from '@/hooks/useEffectivePillars';
 import { isCanonicalClientSetup } from '@/lib/effectivePillars';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/context/AuthContext';
 
 // Maps canonical PillarMetricConfig[] to the format expected by DashboardPillarCard
 function mapMetrics(
@@ -54,7 +54,7 @@ const Dashboard = () => {
   // overrides), we render the existing hardcoded path UNCHANGED — visual diff = 0.
   const { data: projectType } = useProjectType(supabaseBarId);
   const { data: effectivePillars = [] } = useEffectivePillars(supabaseBarId, projectType);
-  const { hasPermission } = usePermissions();
+  const { isAdmin } = useAuth();
   const renderClientPath = !projectType || isCanonicalClientSetup(projectType, effectivePillars);
 
   // Fetch Supabase weeks + scorecards
@@ -123,7 +123,7 @@ const Dashboard = () => {
           projectId={supabaseBarId}
           weekStart={selectedWeek.week_start}
           pillars={effectivePillars}
-          canEdit={hasPermission('admin', 'edit') || hasPermission('owner', 'edit')}
+          canEdit={isAdmin}
         />
       </>
     );
