@@ -316,12 +316,6 @@ const LoginAuthCard = () => {
           </button>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-white/[0.06] text-center">
-          <p className="text-xs text-muted-foreground/60">
-            Bar management intelligence platform
-          </p>
-        </div>
       </div>
 
       {/* Footer links */}
