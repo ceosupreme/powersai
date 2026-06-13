@@ -41,6 +41,8 @@ import {
   X,
   Sunrise,
   Palette,
+  Briefcase,
+  Inbox as InboxIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -85,6 +87,8 @@ const pillarNavItems = [
 // Tool navigation items (bottom section - "Tools" label)
 const toolNavItems = [
   { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat' as const, pageKey: 'chat' as PageKey },
+  { path: '/inbox', label: 'Inbox', icon: InboxIcon, pageKey: 'dashboard' as PageKey },
+  { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' as PageKey },
   { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks' as const, pageKey: 'tasks' as PageKey },
   { path: '/logs', label: 'Daily Logs', icon: ClipboardList, pageKey: 'logs' as PageKey },
   { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
