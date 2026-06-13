@@ -1,0 +1,1 @@
+ALTER TABLE public.venues ADD COLUMN IF NOT EXISTS is_hospitality boolean NOT NULL DEFAULT false;

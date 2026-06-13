@@ -36,6 +36,7 @@ interface Bar {
   google_place_id: string | null;
   task_source: string | null;
   project_type?: ProjectType | null;
+  is_hospitality?: boolean | null;
   created_at: string;
   user_count?: number;
   last_sync?: string | null;
@@ -56,6 +57,7 @@ interface FormData {
   google_place_id: string;
   task_source: string;
   project_type: ProjectType;
+  is_hospitality: boolean;
 }
 
 interface VenueLeader {
@@ -118,6 +120,7 @@ const defaultForm: FormData = {
   google_place_id: '',
   task_source: 'none',
   project_type: 'client',
+  is_hospitality: false,
 };
 
 interface Props {
@@ -168,6 +171,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       google_place_id: editingBar.google_place_id || '',
       task_source: editingBar.task_source || 'none',
       project_type: (editingBar.project_type as ProjectType) || 'client',
+      is_hospitality: Boolean((editingBar as any).is_hospitality),
     } : defaultForm);
     setPlaceResults([]);
     setVenueLeaders([]);
@@ -306,6 +310,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         google_place_id: formData.google_place_id.trim() || null,
         task_source: formData.task_source,
         project_type: formData.project_type,
+        is_hospitality: formData.is_hospitality,
       };
       if (editingBar) {
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
@@ -433,6 +438,22 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       </Select>
                       <p className="text-xs text-muted-foreground">
                         Drives which pillar template this project inherits. Changing this does not delete existing data.
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Hospitality project</Label>
+                      <div className="flex items-center gap-3 h-10 px-3 rounded-md border border-input bg-background">
+                        <Switch
+                          checked={formData.is_hospitality}
+                          onCheckedChange={(v) => set('is_hospitality', v)}
+                        />
+                        <span className="text-sm">
+                          {formData.is_hospitality ? 'Yes — bar / restaurant / venue' : 'No'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Enables hospitality-only Growth Audit categories (Revenue Patterns, Menu Marketing,
+                        Event Performance, Operational Readiness) and the Ops Readiness Gate.
                       </p>
                     </div>
                   </CardContent>

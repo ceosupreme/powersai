@@ -79,23 +79,22 @@ const mk = (base: MkInput): Finding => {
 
 // ===== One mock finding per canonical type (10 total) =====
 export const MOCK_FINDINGS: Finding[] = [
-  // 1. Soft Shift Opportunity — gated (Caution): mid-week BOH thin
+  // 1. Soft Shift Opportunity — generic mid-week demand window
   mk({
     id: 'f1',
     type: 'soft_shift_opportunity',
-    title: 'Tuesday 4–7pm revenue 28% below weekday happy-hour baseline',
+    title: 'Tuesday afternoon traffic 28% below weekday baseline',
     severity: 'High',
     revenueUpside: 4, ease: 4, confidence: 4, operationalRisk: 2,
-    gateReason: 'Mid-week BOH coverage already thin; verify staffing holds before pushing happy-hour traffic.',
     evidence: {
-      summary: 'Trailing 8 weeks: Tue 4–7pm $1,820 net vs weekday HH baseline $2,540. Cover counts down 22% in same window.',
+      summary: 'Trailing 8 weeks: Tuesday 1–5pm sessions and conversions both ~28% below the weekday afternoon baseline.',
       sources: [
-        { label: 'Toast — Daily metrics', ref: 'toast.daily' },
-        { label: 'Schedule (7shifts)', ref: '7shifts.schedule' },
+        { label: 'Sales / performance data', ref: 'analytics.daily' },
+        { label: 'Marketing log', ref: 'asana.marketing' },
       ],
     },
-    diagnosis: "Tuesday 4–7pm revenue is 28% below the venue's weekday happy-hour average. The shift has the same physical capacity but is leaking the local after-work crowd to nearby competitors.",
-    recommendedAction: 'Test a targeted pre-karaoke happy hour (Tue 4–7pm) with a 4-week measurement window before scaling.',
+    diagnosis: "Tuesday afternoon performance is 28% below the weekday afternoon average. Capacity is identical; the slot is simply under-promoted relative to peers.",
+    recommendedAction: 'Test a targeted mid-week promotion for Tuesday afternoons with a 4-week measurement window before scaling.',
     status: 'New',
     createdAt: '2026-05-06T14:00:00Z',
   }),
@@ -104,184 +103,181 @@ export const MOCK_FINDINGS: Finding[] = [
   mk({
     id: 'f2',
     type: 'strong_shift_amplification',
-    title: 'Saturday brunch 35% above brunch baseline — amplify',
+    title: 'Saturday performance 35% above baseline — amplify',
     severity: 'Medium',
     revenueUpside: 4, ease: 4, confidence: 5, operationalRisk: 1,
     evidence: {
-      summary: 'Trailing 6 weeks: Sat brunch $7,420 net vs brunch baseline $5,490. Cover counts and avg ticket both up.',
+      summary: 'Trailing 6 weeks: Saturday output 35% above the Saturday baseline. Conversion rate and average order both up.',
       sources: [
-        { label: 'Toast — Daily metrics', ref: 'toast.daily' },
-        { label: 'Toast — Item mix', ref: 'toast.menu_mix' },
+        { label: 'Sales / performance data', ref: 'analytics.daily' },
+        { label: 'Product / offer mix', ref: 'analytics.mix' },
       ],
     },
-    diagnosis: 'Saturday brunch revenue is 35% above the brunch baseline — amplify with marketing. The shift already has product-market fit; reach is the bottleneck, not the offering.',
-    recommendedAction: 'Build a 4-post content series + subscriber email + menu callout around Saturday brunch over the next 4 weeks.',
+    diagnosis: 'Saturday performance is 35% above baseline — amplify with marketing. The window already has product-market fit; reach is the bottleneck, not the offering.',
+    recommendedAction: 'Build a 4-post content series + subscriber email + landing-page callout around the Saturday offer over the next 4 weeks.',
     status: 'In Progress',
     createdAt: '2026-05-04T10:00:00Z',
   }),
 
-  // 3. Menu Item Under-Promotion
+  // 3. Menu Item Under-Promotion → generic top-offer under-promotion
   mk({
     id: 'f3',
     type: 'menu_item_under_promotion',
-    title: 'Wings: 18% of food revenue, 0 marketing efforts in last 90 days',
+    title: 'Top offer drives 18% of revenue, 0 marketing efforts in last 90 days',
     severity: 'Medium',
     revenueUpside: 3, ease: 5, confidence: 5, operationalRisk: 1,
     evidence: {
-      summary: 'Wings = 18% of food revenue trailing 90d, 64% gross margin. Marketing log shows 0 social/GBP/email mentions in the same window.',
+      summary: 'Top offer = 18% of revenue trailing 90d at strong margin. Marketing log shows 0 social/email/landing-page mentions in the same window.',
       sources: [
-        { label: 'Toast — Item mix', ref: 'toast.menu_mix' },
-        { label: 'Marketing log (Asana)', ref: 'asana.marketing' },
+        { label: 'Product / offer mix', ref: 'analytics.mix' },
+        { label: 'Marketing log', ref: 'asana.marketing' },
       ],
     },
-    diagnosis: 'Wings generate 18% of food revenue at 64% margin but appear in zero recent marketing efforts. The item is doing the work organically — promotion will compound it.',
-    recommendedAction: 'Feature wings in social, GBP posts, and FOH staff scripts for the next 30 days.',
+    diagnosis: 'The top offer generates 18% of revenue at strong margin but appears in zero recent marketing efforts. The offer is doing the work organically — promotion will compound it.',
+    recommendedAction: 'Feature the offer in social, landing-page callouts, and customer-facing scripts for the next 30 days.',
     status: 'New',
     createdAt: '2026-05-05T09:00:00Z',
   }),
 
-  // 4. Event Lift Opportunity
+  // 4. Event Lift Opportunity → generic launch lift gap
   mk({
     id: 'f4',
     type: 'event_lift_opportunity',
-    title: 'Karaoke lifts beverages 40% but food sales stay flat',
+    title: 'Webinar drives a 40% lead lift but downstream conversions stay flat',
     severity: 'Medium',
     revenueUpside: 3, ease: 4, confidence: 4, operationalRisk: 2,
-    gateReason: 'Adding food attach increases BOH load on a high-volume night. Confirm prep capacity before launch.',
     evidence: {
-      summary: 'Karaoke nights (Thu/Sat): bev avg +40% vs same-DOW baseline; food avg +3%. Attach rate 0.8 food items/cover vs 1.4 baseline.',
+      summary: 'Last 6 webinars: top-of-funnel leads +40% vs same-DOW baseline; signups / closed-won flat. Attach rate well below baseline.',
       sources: [
-        { label: 'Toast — Item mix', ref: 'toast.menu_mix' },
+        { label: 'Product / offer mix', ref: 'analytics.mix' },
         { label: 'Event calendar', ref: 'events.calendar' },
       ],
     },
-    diagnosis: 'Karaoke lifts beverage sales 40% but food sales stay flat. The crowd is engaged and spending — they just have nothing easy to share over.',
-    recommendedAction: 'Add a karaoke shareables menu insert + cross-promo (e.g. "Round + Wings" combo) to capture food attach.',
+    diagnosis: 'Webinars lift top-of-funnel leads 40% but downstream conversion stays flat. The audience is engaged — there is no easy next step to act on.',
+    recommendedAction: 'Add a complementary offer + follow-up sequence to capture the downstream conversion.',
     status: 'New',
     createdAt: '2026-05-03T11:00:00Z',
   }),
 
-  // 5. Event Underperformance
+  // 5. Event Underperformance → generic recurring program
   mk({
     id: 'f5',
     type: 'event_underperformance',
-    title: 'Monday open-mic averages $4,200 vs Monday baseline of $4,100',
+    title: 'Monthly newsletter averages identical results to non-newsletter months',
     severity: 'Low',
     revenueUpside: 2, ease: 3, confidence: 4, operationalRisk: 2,
     evidence: {
-      summary: 'Trailing 12 Mondays with open-mic: $4,200 net avg vs Monday no-event baseline $4,100. Cover counts identical.',
+      summary: 'Trailing 12 newsletters: revenue lift indistinguishable from non-newsletter months. Open / click rates flat.',
       sources: [
-        { label: 'Toast — Daily metrics', ref: 'toast.daily' },
+        { label: 'Sales / performance data', ref: 'analytics.daily' },
         { label: 'Event calendar', ref: 'events.calendar' },
       ],
     },
-    diagnosis: 'Monday open-mic occurs weekly but revenue is statistically equivalent to non-event Mondays. The event is consuming staff bandwidth and stage cost without lift.',
-    recommendedAction: 'Replace open-mic with a tested format (trivia or industry night) for 4 weeks; if no lift, discontinue.',
+    diagnosis: 'The monthly newsletter occurs reliably but performance is statistically equivalent to non-newsletter months. It is consuming team bandwidth without measurable lift.',
+    recommendedAction: 'Replace with a tested format (segmented offer, story-led series) for 4 weeks; if no lift, discontinue.',
     status: 'Snoozed',
     snoozedUntil: '2026-05-20',
     createdAt: '2026-04-15T09:00:00Z',
   }),
 
-  // 6. Reputation Theme Opportunity
+  // 6. Reputation Theme Opportunity → generic praise theme
   mk({
     id: 'f6',
     type: 'reputation_theme_opportunity',
-    title: 'Karaoke and atmosphere are top positive review themes — feature them',
+    title: 'Responsiveness and clarity are top positive review themes — feature them',
     severity: 'Medium',
     revenueUpside: 3, ease: 5, confidence: 4, operationalRisk: 1,
     evidence: {
-      summary: 'Last 90d reviews: "karaoke" mentioned positively in 38%, "atmosphere/vibe" in 31%. Marketing log shows ~5% of posts reference either.',
+      summary: 'Last 90d reviews: "responsive" mentioned positively in 38%, "clear / easy to work with" in 31%. Marketing log references either in ~5% of posts.',
       sources: [
         { label: 'Review sentiment classifier', ref: 'reviews.sentiment' },
-        { label: 'Yelp Business API', ref: 'yelp.reviews' },
-        { label: 'Marketing log (Asana)', ref: 'asana.marketing' },
+        { label: 'Google Reviews', ref: 'google.reviews' },
+        { label: 'Marketing log', ref: 'asana.marketing' },
       ],
     },
-    diagnosis: 'Reviews praise karaoke and atmosphere but marketing rarely features either. Guests are already telling the story — repeat it.',
-    recommendedAction: 'Convert karaoke + atmosphere review themes into a 4-post social series and refresh GBP highlights.',
+    diagnosis: 'Reviews praise responsiveness and clarity but marketing rarely features either. Customers are already telling the story — repeat it.',
+    recommendedAction: 'Convert the top review themes into a 4-post social-proof series and refresh website testimonials.',
     status: 'New',
     createdAt: '2026-05-02T16:00:00Z',
   }),
 
-  // 7. Reputation Risk — surfaces the operational gate reason
+  // 7. Reputation Risk — generic ops risk surfaced via reviews
   mk({
     id: 'f7',
     type: 'reputation_risk',
-    title: 'Reviews mention slow service after 10pm — late-night ops risk',
+    title: 'Reviews mention slow response times this month — service risk',
     severity: 'High',
     revenueUpside: 2, ease: 2, confidence: 5, operationalRisk: 1,
     evidence: {
-      summary: '9 of last 30 reviews cite slow service after 10pm. KDS ticket time avg 18.4 min vs 12 min target in the same window.',
+      summary: '9 of last 30 reviews cite slow responses. Average first-response time 32h vs 12h target in the same window.',
       sources: [
         { label: 'Review sentiment classifier', ref: 'reviews.sentiment' },
-        { label: 'Toast KDS ticket times', ref: 'toast.kds' },
-        { label: '7shifts schedule', ref: '7shifts.schedule' },
+        { label: 'Service / fulfillment signals', ref: 'ops.service' },
       ],
     },
-    diagnosis: 'Reviews mention slow service after 10pm — operational concern. This is the same shift driving the Caution gate; reputation will keep degrading if traffic is added.',
-    recommendedAction: 'Flag late-night for ops fix (staffing + expo workflow). Do not push late-night traffic until KDS ticket time clears 12 min for 2 consecutive weeks.',
+    diagnosis: 'Reviews mention slow response times — operational concern. Reputation will keep degrading if more demand is added on top.',
+    recommendedAction: 'Flag intake / response workflow for ops fix. Do not push acquisition traffic until response time clears the 12h target for 2 consecutive weeks.',
     status: 'In Progress',
     createdAt: '2026-04-29T08:00:00Z',
   }),
 
-  // 8. Operational Readiness Blocker — Needs Ops Fix First
+  // 8. Operational Readiness Blocker — generic capacity blocker
   mk({
     id: 'f8',
     type: 'operational_readiness_blocker',
-    title: 'Friday late-night labor 22% under capacity vs covers',
+    title: 'Fulfillment capacity 22% below modeled demand',
     severity: 'Critical',
     revenueUpside: 4, ease: 2, confidence: 5, operationalRisk: 1,
     evidence: {
-      summary: 'Wed–Sat 10pm–close: 3.1 staff scheduled vs 4.0 modeled requirement; ticket times 18.4 min vs 12 target; 9/30 reviews cite slow service.',
+      summary: 'Peak windows: 3.1 staff available vs 4.0 modeled requirement; response time 32h vs 12 target; 9/30 reviews cite slow service.',
       sources: [
-        { label: '7shifts schedule', ref: '7shifts.schedule' },
-        { label: 'Toast KDS ticket times', ref: 'toast.kds' },
+        { label: 'Schedule / staffing data', ref: 'ops.schedule' },
+        { label: 'Service / fulfillment signals', ref: 'ops.service' },
         { label: 'Review sentiment classifier', ref: 'reviews.sentiment' },
       ],
     },
-    diagnosis: 'Friday late-night demand is high but labor is below 7shifts target and reviews confirm capacity strain. This is the venue\'s ops bottleneck and the reason the Ops Readiness Gate is in Caution.',
-    recommendedAction: 'Add 1 BOH and 1 FOH to Wed–Sat 9:30pm–close. Re-evaluate gate in 2 weeks.',
+    diagnosis: 'Demand is high but fulfillment capacity is below the modeled target and reviews confirm strain. This is the project\'s ops bottleneck.',
+    recommendedAction: 'Add capacity (staffing or workflow change) to peak windows. Re-evaluate in 2 weeks.',
     status: 'In Progress',
     createdAt: '2026-04-28T13:00:00Z',
   }),
 
-  // 9. Private Party / Group Conversion Gap
+  // 9. Private Party / Group Conversion Gap → generic conversion-page gap
   mk({
     id: 'f9',
     type: 'private_party_conversion_gap',
-    title: 'Website lacks private party page despite venue size and group demand',
+    title: 'Website lacks a dedicated services / inquiry page despite inbound demand',
     severity: 'High',
     revenueUpside: 5, ease: 3, confidence: 4, operationalRisk: 1,
     evidence: {
-      summary: 'Site audit: no /private-events page, no inquiry form, no group package. Site chat logs show 24 group inquiries in last 60d routed to generic email.',
+      summary: 'Site audit: no /services landing page, no structured inquiry form, no packaged tier. Inbound logs show 24 inquiries in 60d routed to a generic email.',
       sources: [
         { label: 'Site audit', ref: 'audit.site' },
-        { label: 'Site chat transcripts', ref: 'site.chat' },
+        { label: 'Inbound logs', ref: 'site.inbound' },
       ],
     },
-    diagnosis: 'No private party page, inquiry form, or package found on the website. Group demand is arriving via chat and bouncing because there is no path to convert it.',
-    recommendedAction: 'Build a private-party landing page, structured inquiry form, two-tier package, and a 3-touch follow-up sequence.',
+    diagnosis: 'No dedicated services page, structured inquiry form, or productized tier on the website. Demand is arriving and bouncing because there is no clear path to convert it.',
+    recommendedAction: 'Build a services landing page, structured inquiry form, two-tier package, and a 3-touch follow-up sequence.',
     status: 'New',
     createdAt: '2026-05-01T15:00:00Z',
   }),
 
-  // 10. Local Visibility Gap — Sent to Marketing Hub example
+  // 10. Local Visibility Gap — generic local-business keyword
   mk({
     id: 'f10',
     type: 'local_visibility_gap',
-    title: 'Not appearing for "karaoke bar Gaslamp" despite category leadership',
+    title: 'Not appearing for "marketing agency san diego" despite strong reviews',
     severity: 'Medium',
     revenueUpside: 4, ease: 3, confidence: 4, operationalRisk: 2,
-    gateReason: 'Search-driven karaoke traffic peaks Thu–Sat late-night — same window as the late-night ops issue. Verify staffing before pushing.',
     evidence: {
-      summary: 'BrightLocal: rank avg 9.4 over last 14d for "karaoke bar Gaslamp" (and 5 related queries). Only 2 other venues in Gaslamp offer karaoke — both rank top 3.',
+      summary: 'Local rank tracker: avg rank 9.4 over last 14d for "marketing agency san diego" (and 5 related queries). Two competitors with weaker review profiles rank top 3.',
       sources: [
-        { label: 'BrightLocal rank tracker', ref: 'brightlocal.local_pack' },
+        { label: 'Local rank tracker', ref: 'brightlocal.local_pack' },
         { label: 'Google Business Profile API', ref: 'gbp.attributes' },
       ],
     },
-    diagnosis: 'Venue is not appearing for "karaoke bar Gaslamp" despite being one of the few karaoke venues in the area. GBP signals (attributes, post cadence, photo freshness) are well below the two ranking competitors.',
-    recommendedAction: 'GBP refresh + weekly posts + photos + attribute updates + a review-request push mentioning "karaoke" for the next 4 weeks.',
+    diagnosis: 'Project is not appearing for "marketing agency san diego" despite a strong review profile. GBP signals (attributes, post cadence, photo freshness) are well below the two ranking competitors.',
+    recommendedAction: 'GBP refresh + weekly posts + photos + attribute updates + a review-request push tied to the core service keyword for the next 4 weeks.',
     status: 'Sent to Marketing Hub',
     createdAt: '2026-04-25T13:00:00Z',
   }),

@@ -11,6 +11,7 @@ import { TopPrioritiesList } from './TopPrioritiesList';
 import { QuickStatsStrip } from './QuickStatsStrip';
 import { useGrowthScores, useRefreshAudit } from './useGrowthScores';
 import { OnboardingChecklist } from './onboarding/OnboardingChecklist';
+import { useIsHospitalityProject } from '@/hooks/useIsHospitalityProject';
 
 export const OverviewView = () => {
   const { selectedBar } = useApp();
@@ -19,13 +20,14 @@ export const OverviewView = () => {
   const venueId = selectedBar?.id ?? null;
   const { primary, categories, priorities, quickStats, isLoading } = useGrowthScores(venueId);
   const refresh = useRefreshAudit(venueId);
+  const isHospitality = useIsHospitalityProject(venueId).data ?? false;
 
   if (!selectedBar) {
     return (
       <Card className="p-10 text-center bg-card/30 border-dashed">
-        <h2 className="text-lg font-semibold text-foreground">Select a venue</h2>
+        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Choose a venue from the global header to see Growth Audit data.
+          Choose a project from the global header to see Growth Audit data.
         </p>
       </Card>
     );
@@ -44,7 +46,7 @@ export const OverviewView = () => {
       {/* Header strip */}
       <Card className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-l-4 border-l-emerald-500/70">
         <div>
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">Venue</div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">Project</div>
           <div className="text-lg font-semibold text-foreground">{selectedBar.bar_name}</div>
           <div className="text-xs text-muted-foreground mt-1">
             Last refresh: {primary.lastRunLabel}
@@ -63,24 +65,26 @@ export const OverviewView = () => {
         onViewDataSources={() => setSearchParams({ subtab: 'data-sources' })}
       />
 
-      {/* Ops Readiness Gate principle banner — the differentiator */}
-      <div
-        id="ops-gate-principle"
-        className="rounded-lg border border-accent/40 bg-accent/10 p-3 flex items-start gap-3 scroll-mt-24"
-      >
-        <div className="p-1.5 rounded-md bg-accent/20 text-accent-foreground shrink-0">
-          <ShieldAlert className="w-4 h-4" />
-        </div>
-        <div className="flex-1 text-xs leading-relaxed">
-          <div className="font-semibold text-foreground">
-            Traffic-driving campaigns are gated by Ops Readiness.
+      {/* Ops Readiness Gate is hospitality-only — banner hides for other projects. */}
+      {isHospitality && (
+        <div
+          id="ops-gate-principle"
+          className="rounded-lg border border-accent/40 bg-accent/10 p-3 flex items-start gap-3 scroll-mt-24"
+        >
+          <div className="p-1.5 rounded-md bg-accent/20 text-accent-foreground shrink-0">
+            <ShieldAlert className="w-4 h-4" />
           </div>
-          <div className="text-muted-foreground mt-0.5">
-            Supreme Team Media won't push covers a venue can't serve. Findings that drive traffic carry the
-            current gate status; operational, reputation, content, and conversion fixes are never gated.
+          <div className="flex-1 text-xs leading-relaxed">
+            <div className="font-semibold text-foreground">
+              Traffic-driving campaigns are gated by Ops Readiness.
+            </div>
+            <div className="text-muted-foreground mt-0.5">
+              We won't push demand a venue can't serve. Findings that drive traffic carry the
+              current gate status; operational, reputation, content, and conversion fixes are never gated.
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <CategoryScoreGrid categories={categories} />
 
