@@ -48,7 +48,7 @@ import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
-import MarketingSite from "./pages/Marketing";
+import MarketingSite from "./pages/MarketingSite";
 
 // Re-export for any remaining imports from App
 export { queryClient };
