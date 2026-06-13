@@ -15,6 +15,8 @@ import {
 } from '@/hooks/useBrandKit';
 import { AssetUploader } from '@/components/brand-kit/AssetUploader';
 import { ArchiveOrDeleteDialog, type LinkedLine } from '@/components/shared/ArchiveOrDeleteDialog';
+import { HelpTip } from '@/components/help/HelpTip';
+import { HELP_KEYS } from '@/config/helpKeys';
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(text).then(() => toast.success('Copied'));

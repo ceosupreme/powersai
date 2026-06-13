@@ -21,6 +21,8 @@ import {
 } from "@/hooks/useCrm";
 import { ArchiveOrDeleteDialog, type LinkedLine } from "@/components/shared/ArchiveOrDeleteDialog";
 import { todayPacific } from "@/lib/utils";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function Crm() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -46,6 +48,10 @@ export default function Crm() {
           <p className="text-sm text-muted-foreground">Pipeline, contacts, and follow-ups</p>
         </div>
       </header>
+
+      <HelpTip helpKey={HELP_KEYS.crmPipeline} title="How the pipeline works">
+        Deals flow Lead → Pitch → Proposal → Won/Lost. When a deal hits Won, graduate the company into an active project so you can operate against it. Archive keeps history; delete cascades — the dialog will tell you exactly what dies and what gets orphaned.
+      </HelpTip>
 
       <Tabs defaultValue="pipeline">
         <TabsList>
