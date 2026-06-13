@@ -655,6 +655,267 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_kit_assets: {
+        Row: {
+          asset_type: string | null
+          created_at: string
+          file_name: string
+          file_size: number | null
+          id: string
+          kit_id: string
+          mime_type: string | null
+          storage_path: string
+          updated_at: string
+          uploaded_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          asset_type?: string | null
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          id?: string
+          kit_id: string
+          mime_type?: string | null
+          storage_path: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          asset_type?: string | null
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          id?: string
+          kit_id?: string
+          mime_type?: string | null
+          storage_path?: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kit_assets_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_kit_colors: {
+        Row: {
+          created_at: string
+          hex: string
+          id: string
+          kit_id: string
+          label: string | null
+          role: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hex: string
+          id?: string
+          kit_id: string
+          label?: string | null
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hex?: string
+          id?: string
+          kit_id?: string
+          label?: string | null
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kit_colors_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_kit_hashtags: {
+        Row: {
+          created_at: string
+          group_label: string | null
+          id: string
+          kit_id: string
+          sort_order: number
+          tag: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_label?: string | null
+          id?: string
+          kit_id: string
+          sort_order?: number
+          tag: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_label?: string | null
+          id?: string
+          kit_id?: string
+          sort_order?: number
+          tag?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kit_hashtags_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_kit_links: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          kit_id: string
+          label: string | null
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          kit_id: string
+          label?: string | null
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          kit_id?: string
+          label?: string | null
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kit_links_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_kit_taglines: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          kit_id: string
+          sort_order: number
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          kit_id: string
+          sort_order?: number
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          kit_id?: string
+          sort_order?: number
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kit_taglines_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_kits: {
+        Row: {
+          bio_long: string | null
+          bio_short: string | null
+          brand_voice: string | null
+          created_at: string
+          created_by: string | null
+          do_notes: string | null
+          dont_notes: string | null
+          id: string
+          primary_font: string | null
+          project_id: string
+          secondary_font: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio_long?: string | null
+          bio_short?: string | null
+          brand_voice?: string | null
+          created_at?: string
+          created_by?: string | null
+          do_notes?: string | null
+          dont_notes?: string | null
+          id?: string
+          primary_font?: string | null
+          project_id: string
+          secondary_font?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio_long?: string | null
+          bio_short?: string | null
+          brand_voice?: string | null
+          created_at?: string
+          created_by?: string | null
+          do_notes?: string | null
+          dont_notes?: string | null
+          id?: string
+          primary_font?: string | null
+          project_id?: string
+          secondary_font?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kits_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_channel_members: {
         Row: {
           channel_id: string
@@ -8532,8 +8793,13 @@ export type Database = {
         Args: { p_key: number; p_spacing_ms: number }
         Returns: undefined
       }
+      user_can_access_kit: { Args: { _kit_id: string }; Returns: boolean }
       user_can_access_page: {
         Args: { _page_key: string; _user_id: string }
+        Returns: boolean
+      }
+      user_can_access_project: {
+        Args: { _project_id: string }
         Returns: boolean
       }
       user_has_bar_access: {

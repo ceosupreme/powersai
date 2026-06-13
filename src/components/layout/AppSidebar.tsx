@@ -40,6 +40,7 @@ import {
   User,
   X,
   Sunrise,
+  Palette,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -88,6 +89,7 @@ const toolNavItems = [
   { path: '/logs', label: 'Daily Logs', icon: ClipboardList, pageKey: 'logs' as PageKey },
   { path: '/social-media', label: 'Social Media', icon: Smartphone, pageKey: 'social_media' as PageKey },
   { path: '/marketing', label: 'Marketing', icon: Megaphone, pageKey: 'marketing' as PageKey },
+  { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'marketing' as PageKey },
 ];
 
 // Dev Tools removed - role preview handled by role system
