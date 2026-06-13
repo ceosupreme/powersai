@@ -30,6 +30,7 @@ import {
   type ReadinessGate,
   type Severity,
 } from './scoreBands';
+import { HOSPITALITY_ONLY_CATEGORIES } from '@/hooks/useIsHospitalityProject';
 
 export type CategoryKey = FindingCategoryKey;
 
@@ -185,27 +186,40 @@ function reputationConfidenceFromStatus(rep: ReputationStatus | null | undefined
 
 /**
  * Website & Conversion raw score from a weekly crawl snapshot.
- * Inventory completeness 50% (menu, happy hour, events, private party w/ form,
- * contact form, reservations, email signup), perf 25% (PSI), SEO 25%
- * (titles+meta+h1 coverage, schema, https, mobile, alt text).
+ * Hospitality projects: inventory completeness 50% (menu, happy hour, events,
+ * private party w/ form, contact form, reservations, email signup), perf 25%
+ * (PSI), SEO 25% (titles+meta+h1 coverage, schema, https, mobile, alt text).
+ * Non-hospitality projects: a generic 5-item core-pages inventory (about page,
+ * contact form, email signup, https, mobile-friendly) using fields already on
+ * `website_snapshots` — no new columns required.
  */
 export function websiteScoreFromSnapshot(
   weekly: WebsiteSnapshot | null | undefined,
   pagespeed: WebsiteSnapshot | null | undefined,
+  isHospitality: boolean = true,
 ): number | null {
   if (!weekly) return null;
   const ageDays = (Date.now() - Date.parse(weekly.captured_at)) / DAY;
   if (ageDays > 60) return null;
 
-  const inv = [
-    weekly.has_menu_page && !weekly.menu_is_pdf_only,
-    weekly.has_happy_hour_page,
-    weekly.has_events_page,
-    weekly.has_private_party_page && weekly.private_party_has_form,
-    weekly.has_contact_form,
-    weekly.has_reservations_page,
-    weekly.has_email_signup,
-  ];
+  const inv = isHospitality
+    ? [
+        weekly.has_menu_page && !weekly.menu_is_pdf_only,
+        weekly.has_happy_hour_page,
+        weekly.has_events_page,
+        weekly.has_private_party_page && weekly.private_party_has_form,
+        weekly.has_contact_form,
+        weekly.has_reservations_page,
+        weekly.has_email_signup,
+      ]
+    : [
+        // Generic core pages — works for agencies, SaaS, retail, services, etc.
+        weekly.has_about_page,
+        weekly.has_contact_form,
+        weekly.has_email_signup,
+        weekly.https_enabled,
+        weekly.mobile_friendly,
+      ];
   const inventory = inv.reduce((s, v) => s + (v ? 1 : 0), 0) / inv.length;
 
   const perfRaw = pagespeed?.perf_score ?? weekly.perf_score;
@@ -273,8 +287,13 @@ export function deriveCategoryScores(
   web?: WebsiteStatus | null,
   mapPack?: MapPackSummary | null,
   aiSearch?: AiSearchSummary | null,
+  isHospitality: boolean = true,
 ): CategoryScore[] {
-  return (Object.keys(CATEGORY_LABEL) as CategoryKey[]).map((key) => {
+  const allKeys = Object.keys(CATEGORY_LABEL) as CategoryKey[];
+  const visible = isHospitality
+    ? allKeys
+    : allKeys.filter((k) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(k));
+  return visible.map((key) => {
     const inCat = findings.filter((f) => f.category === key);
     const active = inCat.filter(isActive);
     // Reputation Theme Opportunity findings don't deduct from score.
@@ -319,7 +338,7 @@ export function deriveCategoryScores(
     }
 
     if (key === 'website') {
-      const raw = websiteScoreFromSnapshot(web?.weekly, web?.pagespeed);
+      const raw = websiteScoreFromSnapshot(web?.weekly, web?.pagespeed, isHospitality);
       if (raw !== null) {
         score = round(raw - penalty);
       }
@@ -409,16 +428,28 @@ export function derivePrimaryMetrics(
   findings: Finding[],
   cats: CategoryScore[],
   lastRunIso: string | null | undefined,
+  isHospitality: boolean = true,
 ): PrimaryMetrics {
-  const opsCat = cats.find((c) => c.key === 'operational');
-  const opsScore = opsCat?.score ?? 100;
-  const scoreGate = deriveGate(opsScore);
-  const { gate, reason: overrideReason, blocker } = deriveOpsGateOverride(findings, scoreGate);
-  const reason =
-    overrideReason ??
-    (gate === 'Green Light'
-      ? 'No active operational blockers detected. Traffic-driving campaigns are clear to push.'
-      : 'Operational signals are below threshold. Resolve before pushing traffic-driving campaigns.');
+  // Ops Readiness Gate is hospitality-only. For non-hospitality projects we
+  // explicitly do NOT call deriveOpsGateOverride / deriveGate so they can't
+  // silently suppress traffic-driving findings. GateBadge.computeGateState
+  // returns null for a null/Green-Light gate on non-traffic-driving findings
+  // and never suppresses anything when isTrafficDriving is false.
+  let gate: ReadinessGate = 'Green Light';
+  let reason =
+    'Ops Readiness Gate is hospitality-only and does not apply to this project.';
+  if (isHospitality) {
+    const opsCat = cats.find((c) => c.key === 'operational');
+    const opsScore = opsCat?.score ?? 100;
+    const scoreGate = deriveGate(opsScore);
+    const ov = deriveOpsGateOverride(findings, scoreGate);
+    gate = ov.gate;
+    reason =
+      ov.reason ??
+      (gate === 'Green Light'
+        ? 'No active operational blockers detected. Traffic-driving campaigns are clear to push.'
+        : 'Operational signals are below threshold. Resolve before pushing traffic-driving campaigns.');
+  }
 
   const totalUpside = findings
     .filter(isActive)
