@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { SculptureSiteMappingPanel } from './SculptureSiteMappingPanel';
+import { useIntegrationDisabled } from '@/hooks/useIntegrationDisabled';
 
 // =====================================================================
 // Smart Sculpture Upload — auto-detects report type, venue, and period.
@@ -55,10 +56,7 @@ interface QueueItem {
 const newId = () => Math.random().toString(36).slice(2, 10);
 
 export const SculptureUploadTab = () => {
-  // Phase 1: render-time guard. If `sculpture` is disabled, show a stub.
-  // Hook is intentionally inlined to avoid a separate file edit.
-  const { useIntegrationDisabled } = require('@/hooks/useIntegrationDisabled');
-  const disabled = (useIntegrationDisabled as (n: string) => boolean)('sculpture');
+  const disabled = useIntegrationDisabled('sculpture');
   if (disabled) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
