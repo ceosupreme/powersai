@@ -77,11 +77,11 @@ const mainNavItems = [
 
 // Pillar navigation items (middle section - no label, visual separation)
 const pillarNavItems = [
-  { path: '/sales', label: 'Sales', icon: DollarSign, pageKey: 'sales' as PageKey },
+  { path: '/sales', label: 'Revenue', icon: DollarSign, pageKey: 'sales' as PageKey },
   { path: '/labor', label: 'Labor', icon: Users, pageKey: 'labor' as PageKey },
-  { path: '/employees', label: 'Employees', icon: Users, pageKey: 'employees' as PageKey },
-  { path: '/operations', label: 'Operations', icon: Settings, pageKey: 'operations' as PageKey },
-  { path: '/guest-experience', label: 'Guest Experience', icon: Star, pageKey: 'guest_experience' as PageKey },
+  { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' as PageKey },
+  { path: '/operations', label: 'Delivery', icon: Settings, pageKey: 'operations' as PageKey },
+  { path: '/guest-experience', label: 'Client Experience', icon: Star, pageKey: 'guest_experience' as PageKey },
 ];
 
 // Tool navigation items (bottom section - "Tools" label)
@@ -175,7 +175,7 @@ export const AppSidebar = () => {
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-sans text-lg font-bold text-foreground tracking-tight">
-                Bar Pulse
+                Supreme Team Media
               </span>
               {profile?.assigned_bar_name && (
                 <span className="text-xs text-muted-foreground">

@@ -16,7 +16,7 @@ export const MarketingHubLaunchTab = () => {
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-foreground">Marketing Hub</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-              Plan, schedule, and measure every campaign — Growth-Audit-driven, manually created in BarPulse,
+              Plan, schedule, and measure every campaign — Growth-Audit-driven, manually created in Supreme Team Media,
               or pulled in from external execution systems. Lives at its own dedicated page; this tab is just the launch point.
             </p>
             <Button onClick={() => navigate('/marketing-hub')} className="mt-4 gap-2">

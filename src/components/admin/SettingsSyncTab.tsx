@@ -462,7 +462,7 @@ export const SettingsSyncTab = () => {
                 <SelectValue placeholder="Select venue" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Venues</SelectItem>
+                <SelectItem value="all">All Projects</SelectItem>
                 {venues.map(v => (
                   <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
                 ))}

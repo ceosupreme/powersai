@@ -21,7 +21,7 @@ export const ThemeSettings = () => {
           Theme Preferences
         </CardTitle>
         <CardDescription>
-          Choose how BarPulse looks for you
+          Choose how Supreme Team Media looks for you
         </CardDescription>
       </CardHeader>
       <CardContent>

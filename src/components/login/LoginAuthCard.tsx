@@ -113,7 +113,7 @@ const LoginAuthCard = () => {
         } else {
           toast({
             title: 'Account created!',
-            description: 'Welcome to BarPulse. You are now signed in.',
+            description: 'Welcome to Supreme Team Media. You are now signed in.',
           });
           navigate(from, { replace: true });
         }
@@ -139,7 +139,7 @@ const LoginAuthCard = () => {
             {isLogin ? 'Welcome back' : 'Create an account'}
           </h2>
           <p className="text-muted-foreground text-sm">
-            {isLogin ? 'Sign in to your dashboard' : 'Get started with BarPulse'}
+            {isLogin ? 'Sign in to your dashboard' : 'Get started with Supreme Team Media'}
           </p>
         </div>
 

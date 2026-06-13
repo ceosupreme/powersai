@@ -185,7 +185,7 @@ export const GbpManualEntryDrawer = ({ open, onOpenChange, venueId, venueName }:
 
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground">NAP consistency</h3>
-            <p className="text-xs text-muted-foreground">Toggle off any field where Google does NOT match the BarPulse record.</p>
+            <p className="text-xs text-muted-foreground">Toggle off any field where Google does NOT match the Supreme Team Media record.</p>
             <div className="grid grid-cols-1 gap-2">
               {(['name', 'address', 'phone'] as const).map((f) => (
                 <div key={f} className="flex items-center justify-between rounded border border-border p-2">

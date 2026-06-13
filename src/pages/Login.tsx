@@ -77,7 +77,7 @@ const Login = () => {
                 </div>
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 blur-lg opacity-40" />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">BarPulse</span>
+              <span className="text-xl font-bold text-white tracking-tight">Supreme Team Media</span>
             </div>
             <p className="text-muted-foreground text-sm">Your bar's operating system.</p>
           </div>

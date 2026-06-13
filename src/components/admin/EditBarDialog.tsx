@@ -843,7 +843,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={isSaving} className="w-full sm:w-auto">Cancel</Button>
             <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {editingBar ? 'Save Changes' : 'Add Venue'}
+              {editingBar ? 'Save Changes' : 'Add Project'}
             </Button>
           </DialogFooter>
         </form>

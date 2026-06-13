@@ -129,7 +129,7 @@ export const TaskFiltersComponent = ({ filters, sort, onFiltersChange, onSortCha
               <SelectValue placeholder="Bar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Bars</SelectItem>
+              <SelectItem value="all">All Projects</SelectItem>
             {accessibleBars.map((bar) => (
               <SelectItem key={bar.id} value={bar.id}>
                 {bar.bar_name}

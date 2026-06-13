@@ -34,10 +34,10 @@ const pages = [
   { label: 'Tasks', href: '/tasks', icon: CheckSquare },
   { label: 'Chat', href: '/chat', icon: MessageCircle },
   { label: 'Logs', href: '/logs', icon: FileText },
-  { label: 'Sales', href: '/sales', icon: BarChart3 },
+  { label: 'Revenue', href: '/sales', icon: BarChart3 },
   { label: 'Labor', href: '/labor', icon: Users },
-  { label: 'Operations', href: '/operations', icon: Settings },
-  { label: 'Guest Experience', href: '/guest-experience', icon: Users },
+  { label: 'Delivery', href: '/operations', icon: Settings },
+  { label: 'Client Experience', href: '/guest-experience', icon: Users },
 ];
 
 const quickActions = [

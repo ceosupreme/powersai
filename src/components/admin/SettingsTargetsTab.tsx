@@ -73,7 +73,7 @@ const FIELD_GROUPS = [
     ],
   },
   {
-    label: 'Guest Experience Targets', icon: Star,
+    label: 'Client Experience Targets', icon: Star,
     fields: [
       { key: 'weekly_guests_target', label: 'Weekly Guests', type: 'number' },
       { key: 'tip_pct_target', label: 'Tip %', type: 'percent' },
@@ -174,7 +174,7 @@ export const SettingsTargetsTab = () => {
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
-              <Label>Select Bar</Label>
+              <Label>Select Project</Label>
               <Select value={selectedBarId || ''} onValueChange={v => setSelectedBarId(v)}>
                 <SelectTrigger><SelectValue placeholder="Choose a bar..." /></SelectTrigger>
                 <SelectContent>
@@ -265,7 +265,7 @@ export const SettingsTargetsTab = () => {
                     { key: 'weight_guest', label: 'Guest' },
                     { key: 'weight_revenue', label: 'Revenue' },
                     { key: 'weight_labor', label: 'Labor' },
-                    { key: 'weight_operations', label: 'Operations' },
+                    { key: 'weight_operations', label: 'Delivery' },
                   ].map(w => (
                     <div key={w.key} className="space-y-1.5">
                       <Label className="text-xs">{w.label}</Label>

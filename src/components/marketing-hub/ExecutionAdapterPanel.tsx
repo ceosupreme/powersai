@@ -109,7 +109,7 @@ export const ExecutionAdapterPanel = ({
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <div>
             <div className="font-medium">Sync Lost</div>
-            <div>Asana task was deleted. Campaign and history preserved in BarPulse.</div>
+            <div>Asana task was deleted. Campaign and history preserved in Supreme Team Media.</div>
           </div>
         </div>
       )}

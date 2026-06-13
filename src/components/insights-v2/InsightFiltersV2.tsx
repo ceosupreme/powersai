@@ -17,7 +17,7 @@ const pillars: { key: PillarV2 | null; label: string; icon: typeof DollarSign }[
   { key: null, label: 'All', icon: Settings },
   { key: 'Revenue', label: 'Revenue', icon: DollarSign },
   { key: 'Labor', label: 'Labor', icon: Users },
-  { key: 'Operations', label: 'Operations', icon: Settings },
+  { key: 'Operations', label: 'Delivery', icon: Settings },
   { key: 'Guest', label: 'Guest', icon: Star },
   { key: 'Marketing', label: 'Marketing', icon: Megaphone },
 ];

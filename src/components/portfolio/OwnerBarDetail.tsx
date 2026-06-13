@@ -24,7 +24,7 @@ const SIGNAL_LABELS: Record<string, string> = {
 const PILLAR_LABELS = [
   { key: 'revenue_score', label: 'Revenue', prefix: 'r' },
   { key: 'labor_score', label: 'Labor', prefix: 'l' },
-  { key: 'operations_score', label: 'Operations', prefix: 'o' },
+  { key: 'operations_score', label: 'Delivery', prefix: 'o' },
   { key: 'guest_score', label: 'Guest', prefix: 'g' },
 ];
 

@@ -28,7 +28,7 @@ export const StaffTopBar = ({ onNotificationsClick }: StaffTopBarProps) => {
         <div className="flex items-center gap-2 min-w-0">
           <div className="flex items-center gap-1.5 text-primary">
             <Activity className="h-5 w-5 flex-shrink-0" />
-            <span className="font-semibold text-sm hidden sm:block">BarPulse</span>
+            <span className="font-semibold text-sm hidden sm:block">Supreme Team Media</span>
           </div>
           <span className="text-muted-foreground hidden sm:block">·</span>
           <span className="text-sm text-foreground truncate">

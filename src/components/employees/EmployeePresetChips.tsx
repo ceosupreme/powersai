@@ -44,7 +44,7 @@ export const EmployeePresetChips = ({ active, onChange }: Props) => {
   return (
     <div className="flex flex-wrap gap-2">
       <Chip keyName="allstars" label="All-stars" Icon={Sparkles} />
-      <Chip keyName="attention" label="Needs attention" Icon={AlertTriangle} />
+      <Chip keyName="attention" label="Follow up" Icon={AlertTriangle} />
       <Chip keyName="newhires" label="New hires" Icon={UserPlus} />
     </div>
   );

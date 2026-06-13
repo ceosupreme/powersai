@@ -75,7 +75,7 @@ export const ShiftExecutionLayout = ({ children }: ShiftExecutionLayoutProps) =>
               <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
                 <Activity className="w-6 h-6 text-primary" />
               </div>
-              <span className="font-sans text-lg font-bold text-foreground tracking-tight">Bar Pulse</span>
+              <span className="font-sans text-lg font-bold text-foreground tracking-tight">Supreme Team Media</span>
             </Link>
           </div>
 

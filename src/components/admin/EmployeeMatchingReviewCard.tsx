@@ -61,7 +61,7 @@ export const EmployeeMatchingReviewCard = () => {
   if (loading) {
     return (
       <Card>
-        <CardHeader><CardTitle>Employee Matching Review</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Person Matching Review</CardTitle></CardHeader>
         <CardContent><Loader2 className="h-5 w-5 animate-spin text-primary" /></CardContent>
       </Card>
     );
@@ -70,7 +70,7 @@ export const EmployeeMatchingReviewCard = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Employee Matching Review ({rows.length})</CardTitle>
+        <CardTitle>Person Matching Review ({rows.length})</CardTitle>
       </CardHeader>
       <CardContent>
         {rows.length === 0 ? (

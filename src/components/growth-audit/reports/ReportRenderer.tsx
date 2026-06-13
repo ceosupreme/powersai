@@ -31,7 +31,7 @@ const Cover = ({ snap }: { snap: ReportSnapshot }) => (
       <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-600">
         <Sparkles className="w-6 h-6" />
       </div>
-      <div className="text-sm font-semibold tracking-wide text-foreground">BarPulse · Growth Audit</div>
+      <div className="text-sm font-semibold tracking-wide text-foreground">Supreme Team Media · Growth Audit</div>
     </div>
 
     <div className="space-y-4">

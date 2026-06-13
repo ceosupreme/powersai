@@ -16,7 +16,7 @@ const FAKE_FIELD_NAMES = [
   ['expected_revenue_impact', 'Expected Revenue Impact'],
   ['toast_promo_code', 'Linked Toast Discount or Promo Code'],
   ['linked_menu_items', 'Linked Menu Items'],
-  ['barpulse_sync_id', 'BarPulse Sync ID'],
+  ['barpulse_sync_id', 'Supreme Team Media Sync ID'],
 ] as const;
 
 const fieldValue = (key: string, c: Campaign): string | number | null => {

@@ -165,8 +165,8 @@ const Insights = () => {
   const PILLAR_SECTIONS = [
     { key: 'Revenue', title: 'Revenue', icon: '💰', colorClass: 'text-primary', borderColorClass: 'border-primary/30' },
     { key: 'Labor', title: 'Labor', icon: '👥', colorClass: 'text-blue-400', borderColorClass: 'border-blue-400/30' },
-    { key: 'Operations', title: 'Operations', icon: '⚙️', colorClass: 'text-orange', borderColorClass: 'border-orange/30' },
-    { key: 'Guest Experience', title: 'Guest Experience', icon: '⭐', colorClass: 'text-gold', borderColorClass: 'border-gold/30' },
+    { key: 'Operations', title: 'Delivery', icon: '⚙️', colorClass: 'text-orange', borderColorClass: 'border-orange/30' },
+    { key: 'Guest Experience', title: 'Client Experience', icon: '⭐', colorClass: 'text-gold', borderColorClass: 'border-gold/30' },
   ] as const;
 
   const pillarGroupedCards = useMemo(() => {

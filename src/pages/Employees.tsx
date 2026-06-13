@@ -141,7 +141,7 @@ const Employees = () => {
       <header className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
           <Users className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Employees</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Team</h1>
         </div>
         <p className="text-sm text-muted-foreground">
           {selectedBar?.bar_name || selectedBar?.id || 'Select a venue'} · {filtered.length} of {employees.length}

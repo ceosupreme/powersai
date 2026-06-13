@@ -97,7 +97,7 @@ export const SettingsBarsTab = () => {
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <CardTitle className="text-base sm:text-lg font-semibold">Venues</CardTitle>
         <Button onClick={() => openDialog()} className="gap-2 w-full sm:w-auto">
-          <Plus className="h-4 w-4" /> Add Venue
+          <Plus className="h-4 w-4" /> Add Project
         </Button>
       </CardHeader>
       <CardContent className="px-3 sm:px-6">

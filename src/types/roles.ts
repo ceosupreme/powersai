@@ -36,9 +36,9 @@ export const roleToHomeRoute: Record<UserRole, string> = {
 export const ROLE_LABELS: Record<UserRole, string> = {
   owner: 'Owner',
   gm: 'General Manager',
-  lead: 'Shift Lead',
-  foh: 'Front of House',
-  boh: 'Back of House',
+  lead: 'Lead',
+  foh: 'Producer',
+  boh: 'Contributor',
 };
 
 export const ROLE_PRIORITY: Record<UserRole, number> = {

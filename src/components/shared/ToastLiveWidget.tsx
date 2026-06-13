@@ -196,8 +196,8 @@ export const ToastLiveWidget = ({ className, barId, title }: ToastLiveWidgetProp
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricBlock label="Total Labor" value={formatCurrency(data.labor.totalCost)} subValue={`${data.labor.totalHours.toFixed(1)}h`} />
                 <MetricBlock label="Labor %" value={formatPercent(data.labor.laborPercent)} valueClass={data.labor.laborPercent > 25 ? 'text-destructive' : 'text-signal-green'} />
-                {hasBOHLabor && <MetricBlock label="BOH Labor" value={formatCurrency(data.labor.bohLabor.cost)} subValue={`${data.labor.bohLabor.hours.toFixed(1)}h`} />}
-                {hasFOHLabor && <MetricBlock label="FOH Labor" value={formatCurrency(data.labor.fohLabor.cost)} subValue={`${data.labor.fohLabor.hours.toFixed(1)}h`} />}
+                {hasBOHLabor && <MetricBlock label="Contributor Hours" value={formatCurrency(data.labor.bohLabor.cost)} subValue={`${data.labor.bohLabor.hours.toFixed(1)}h`} />}
+                {hasFOHLabor && <MetricBlock label="Producer Hours" value={formatCurrency(data.labor.fohLabor.cost)} subValue={`${data.labor.fohLabor.hours.toFixed(1)}h`} />}
               </div>
             )}
 
