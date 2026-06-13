@@ -36,6 +36,7 @@ interface Bar {
   google_place_id: string | null;
   task_source: string | null;
   project_type?: ProjectType | null;
+  is_hospitality?: boolean | null;
   created_at: string;
   user_count?: number;
   last_sync?: string | null;
@@ -56,6 +57,7 @@ interface FormData {
   google_place_id: string;
   task_source: string;
   project_type: ProjectType;
+  is_hospitality: boolean;
 }
 
 interface VenueLeader {
@@ -118,6 +120,7 @@ const defaultForm: FormData = {
   google_place_id: '',
   task_source: 'none',
   project_type: 'client',
+  is_hospitality: false,
 };
 
 interface Props {
@@ -168,6 +171,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       google_place_id: editingBar.google_place_id || '',
       task_source: editingBar.task_source || 'none',
       project_type: (editingBar.project_type as ProjectType) || 'client',
+      is_hospitality: Boolean((editingBar as any).is_hospitality),
     } : defaultForm);
     setPlaceResults([]);
     setVenueLeaders([]);
@@ -306,6 +310,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         google_place_id: formData.google_place_id.trim() || null,
         task_source: formData.task_source,
         project_type: formData.project_type,
+        is_hospitality: formData.is_hospitality,
       };
       if (editingBar) {
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
