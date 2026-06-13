@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Target, RefreshCw, Bot, Mail, Package, Upload, Star, FileSearch, ShieldCheck } from 'lucide-react';
+import { Building2, Target, RefreshCw, Bot, Mail, Package, Upload, Star, FileSearch, ShieldCheck, Download } from 'lucide-react';
 import { SettingsBarsTab } from './SettingsBarsTab';
 import { SettingsTargetsTab } from './SettingsTargetsTab';
 import { SettingsSyncTab } from './SettingsSyncTab';
@@ -11,6 +11,7 @@ import { ManualDataUploadTab } from './ManualDataUploadTab';
 import { GoogleRatingOverrideCard } from './GoogleRatingOverrideCard';
 import { DataAuditTab } from './DataAuditTab';
 import { SettingsComplianceTab } from './SettingsComplianceTab';
+import { SettingsBackupTab } from './SettingsBackupTab';
 
 export const SettingsTab = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,6 +69,10 @@ export const SettingsTab = () => {
           <ShieldCheck className="h-4 w-4" />
           <span className="hidden sm:inline">Compliance</span>
         </TabsTrigger>
+        <TabsTrigger value="backup" className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
+          <Download className="h-4 w-4" />
+          <span className="hidden sm:inline">Backup & Export</span>
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="bars"><SettingsBarsTab /></TabsContent>
@@ -80,6 +85,7 @@ export const SettingsTab = () => {
       <TabsContent value="google-ratings"><GoogleRatingOverrideCard /></TabsContent>
       <TabsContent value="data-audit"><DataAuditTab /></TabsContent>
       <TabsContent value="compliance"><SettingsComplianceTab /></TabsContent>
+      <TabsContent value="backup"><SettingsBackupTab /></TabsContent>
     </Tabs>
   );
 };
