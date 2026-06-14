@@ -1,0 +1,1 @@
+ALTER TABLE public.venues DROP COLUMN IF EXISTS is_hospitality;
