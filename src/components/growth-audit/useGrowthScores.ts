@@ -11,10 +11,6 @@ import { useWebsiteStatus } from './data-sources/useWebsiteStatus';
 import { useMapPackSummary } from './data-sources/useMapPackSummary';
 import { useAiSearchSummary } from './data-sources/useAiSearchSummary';
 import {
-  useIsHospitalityProject,
-  HOSPITALITY_ONLY_CATEGORIES,
-} from '@/hooks/useIsHospitalityProject';
-import {
   deriveCategoryScores,
   derivePrimaryMetrics,
   deriveTopPriorities,
@@ -65,8 +61,6 @@ export function useGrowthScores(venueId: string | null | undefined): GrowthScore
   const website = useWebsiteStatus(venueId);
   const mapPack = useMapPackSummary(venueId);
   const aiSearch = useAiSearchSummary(venueId);
-  const hospitalityQ = useIsHospitalityProject(venueId);
-  const isHospitality = hospitalityQ.data ?? false;
 
   const lastRunAt = runs.data?.triggered_at ?? null;
   const gbpSnap = gbp.data?.snapshot ?? null;
@@ -76,25 +70,18 @@ export function useGrowthScores(venueId: string | null | undefined): GrowthScore
   const ai = aiSearch.data ?? null;
 
   const { primary, categories, priorities, quickStats } = useMemo(() => {
-    const raw = findings.data ?? [];
-    // For non-hospitality projects, hide findings from the 4 hospitality-only
-    // categories so they don't leak into Top Priorities, quickStats, etc.
-    const list = isHospitality
-      ? raw
-      : raw.filter(
-          (f) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(f.category),
-        );
-    const cats = deriveCategoryScores(list, gbpSnap, rep, web, mp, ai, isHospitality);
+    const list = findings.data ?? [];
+    const cats = deriveCategoryScores(list, gbpSnap, rep, web, mp, ai);
     return {
       categories: cats,
-      primary: derivePrimaryMetrics(list, cats, lastRunAt, isHospitality),
+      primary: derivePrimaryMetrics(list, cats, lastRunAt),
       priorities: deriveTopPriorities(list),
       quickStats: deriveQuickStats(list),
     };
-  }, [findings.data, lastRunAt, gbpSnap, rep, web, mp, ai, isHospitality]);
+  }, [findings.data, lastRunAt, gbpSnap, rep, web, mp, ai]);
 
   return {
-    isLoading: findings.isLoading || runs.isLoading || hospitalityQ.isLoading,
+    isLoading: findings.isLoading || runs.isLoading,
     error: findings.error ?? runs.error,
     primary,
     categories,

@@ -5,8 +5,33 @@ import { confidenceTone, getScoreBand } from './scoreBands';
 import type { CategoryScore } from './deriveScores';
 
 export const CategoryScoreCard = ({ cat }: { cat: CategoryScore }) => {
-  const band = getScoreBand(cat.score);
   const Icon = cat.icon;
+
+  if (cat.unscored || cat.score === null) {
+    return (
+      <Card className="p-4 border border-border/60 bg-card/40">
+        <div className="flex items-start justify-between gap-2">
+          <div className="p-1.5 rounded-md bg-muted text-muted-foreground">
+            <Icon className="w-4 h-4" />
+          </div>
+          <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border">
+            No data yet
+          </Badge>
+        </div>
+        <div className="mt-3 text-xs font-medium text-foreground leading-tight min-h-[2.25rem]">
+          {cat.name}
+        </div>
+        <div className="mt-2 flex items-baseline gap-2">
+          <div className="text-2xl font-bold text-muted-foreground">—</div>
+        </div>
+        <div className="mt-2 text-[11px] text-muted-foreground">
+          Not enough data to score yet
+        </div>
+      </Card>
+    );
+  }
+
+  const band = getScoreBand(cat.score);
   const TrendIcon = cat.trend > 0 ? ArrowUp : cat.trend < 0 ? ArrowDown : ArrowRight;
   const trendColor = cat.trend > 0 ? 'text-emerald-600' : cat.trend < 0 ? 'text-destructive' : 'text-muted-foreground';
 

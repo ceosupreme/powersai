@@ -30,7 +30,6 @@ import {
   type ReadinessGate,
   type Severity,
 } from './scoreBands';
-import { HOSPITALITY_ONLY_CATEGORIES } from '@/hooks/useIsHospitalityProject';
 
 export type CategoryKey = FindingCategoryKey;
 
@@ -38,14 +37,15 @@ export type CategoryScore = {
   key: CategoryKey;
   name: string;
   icon: LucideIcon;
-  score: number;
+  score: number | null;
+  unscored?: boolean;
   trend: number;
   openFindings: number;
   confidence: DataConfidence;
 };
 
 export type PrimaryMetrics = {
-  growthScore: number;
+  growthScore: number | null;
   growthTrend: number;
   opportunityLevel: OpportunityLevel;
   opportunityDollars: string;
@@ -186,40 +186,27 @@ function reputationConfidenceFromStatus(rep: ReputationStatus | null | undefined
 
 /**
  * Website & Conversion raw score from a weekly crawl snapshot.
- * Hospitality projects: inventory completeness 50% (menu, happy hour, events,
- * private party w/ form, contact form, reservations, email signup), perf 25%
- * (PSI), SEO 25% (titles+meta+h1 coverage, schema, https, mobile, alt text).
- * Non-hospitality projects: a generic 5-item core-pages inventory (about page,
- * contact form, email signup, https, mobile-friendly) using fields already on
- * `website_snapshots` — no new columns required.
+ * Universal 5-item generic core-pages inventory (about page, contact form,
+ * email signup, https, mobile-friendly) at 50%; perf 25% (PSI); SEO 25%
+ * (title+meta+h1 coverage, schema, https, mobile, alt text). Honest for any
+ * business type — a restaurant still scores fine on these checks.
  */
 export function websiteScoreFromSnapshot(
   weekly: WebsiteSnapshot | null | undefined,
   pagespeed: WebsiteSnapshot | null | undefined,
-  isHospitality: boolean = true,
 ): number | null {
   if (!weekly) return null;
   const ageDays = (Date.now() - Date.parse(weekly.captured_at)) / DAY;
   if (ageDays > 60) return null;
 
-  const inv = isHospitality
-    ? [
-        weekly.has_menu_page && !weekly.menu_is_pdf_only,
-        weekly.has_happy_hour_page,
-        weekly.has_events_page,
-        weekly.has_private_party_page && weekly.private_party_has_form,
-        weekly.has_contact_form,
-        weekly.has_reservations_page,
-        weekly.has_email_signup,
-      ]
-    : [
-        // Generic core pages — works for agencies, SaaS, retail, services, etc.
-        weekly.has_about_page,
-        weekly.has_contact_form,
-        weekly.has_email_signup,
-        weekly.https_enabled,
-        weekly.mobile_friendly,
-      ];
+  const inv = [
+    // Generic core pages — works for agencies, SaaS, retail, services, restaurants, etc.
+    weekly.has_about_page,
+    weekly.has_contact_form,
+    weekly.has_email_signup,
+    weekly.https_enabled,
+    weekly.mobile_friendly,
+  ];
   const inventory = inv.reduce((s, v) => s + (v ? 1 : 0), 0) / inv.length;
 
   const perfRaw = pagespeed?.perf_score ?? weekly.perf_score;
@@ -287,22 +274,19 @@ export function deriveCategoryScores(
   web?: WebsiteStatus | null,
   mapPack?: MapPackSummary | null,
   aiSearch?: AiSearchSummary | null,
-  isHospitality: boolean = true,
 ): CategoryScore[] {
   const allKeys = Object.keys(CATEGORY_LABEL) as CategoryKey[];
-  const visible = isHospitality
-    ? allKeys
-    : allKeys.filter((k) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(k));
-  return visible.map((key) => {
+  return allKeys.map((key) => {
     const inCat = findings.filter((f) => f.category === key);
     const active = inCat.filter(isActive);
     // Reputation Theme Opportunity findings don't deduct from score.
     const penalty = active
       .filter((f) => !(key === 'reputation' && f.type === 'reputation_theme_opportunity'))
       .reduce((sum, f) => sum + (SEV_PENALTY[f.severity] ?? 5), 0);
-    let score = round(100 - penalty);
+    let score: number | null = round(100 - penalty);
     let confidence: DataConfidence = active.length === 0 ? 'Complete' : 'Partial';
     let trend = 0;
+    let hasSourceSignal = false;
 
     if (key === 'local') {
       const gbpRaw = localScoreFromSnapshot(gbpSnap);
@@ -314,6 +298,7 @@ export function deriveCategoryScores(
       if (mp) parts.push({ score: mp.score, weight: 0.30 });
       if (ai) parts.push({ score: ai.score, weight: 0.25 });
       if (parts.length > 0) {
+        hasSourceSignal = true;
         const totalW = parts.reduce((s, p) => s + p.weight, 0);
         const raw = parts.reduce((s, p) => s + p.score * p.weight, 0) / totalW;
         score = round(raw - penalty);
@@ -332,17 +317,35 @@ export function deriveCategoryScores(
     if (key === 'reputation') {
       const raw = reputationScoreFromStatus(rep);
       if (raw !== null) {
+        hasSourceSignal = true;
         score = round(raw - penalty);
       }
       confidence = reputationConfidenceFromStatus(rep);
     }
 
     if (key === 'website') {
-      const raw = websiteScoreFromSnapshot(web?.weekly, web?.pagespeed, isHospitality);
+      const raw = websiteScoreFromSnapshot(web?.weekly, web?.pagespeed);
       if (raw !== null) {
+        hasSourceSignal = true;
         score = round(raw - penalty);
       }
       confidence = websiteConfidenceFromSnapshot(web);
+    }
+
+    // Honest "no data" state: zero active findings AND no source signal →
+    // unscored. Excludes the category from Growth Score averaging so empty
+    // categories don't post fake 100s.
+    if (active.length === 0 && !hasSourceSignal) {
+      return {
+        key,
+        name: CATEGORY_LABEL[key],
+        icon: CATEGORY_ICONS[key],
+        score: null,
+        unscored: true,
+        trend: 0,
+        openFindings: 0,
+        confidence: 'Unavailable',
+      };
     }
 
     return {
@@ -357,15 +360,17 @@ export function deriveCategoryScores(
   });
 }
 
-export function deriveGrowthScore(cats: CategoryScore[]): number {
+export function deriveGrowthScore(cats: CategoryScore[]): number | null {
   let weighted = 0;
   let totalW = 0;
   for (const c of cats) {
+    if (c.unscored || c.score === null) continue;
     const w = CATEGORY_WEIGHTS[c.key] ?? 1;
     weighted += c.score * w;
     totalW += w;
   }
-  return round(totalW ? weighted / totalW : 0);
+  if (totalW === 0) return null;
+  return round(weighted / totalW);
 }
 
 const opportunityLevel = (totalUpside: number): OpportunityLevel => {
@@ -428,28 +433,14 @@ export function derivePrimaryMetrics(
   findings: Finding[],
   cats: CategoryScore[],
   lastRunIso: string | null | undefined,
-  isHospitality: boolean = true,
 ): PrimaryMetrics {
-  // Ops Readiness Gate is hospitality-only. For non-hospitality projects we
-  // explicitly do NOT call deriveOpsGateOverride / deriveGate so they can't
-  // silently suppress traffic-driving findings. GateBadge.computeGateState
-  // returns null for a null/Green-Light gate on non-traffic-driving findings
-  // and never suppresses anything when isTrafficDriving is false.
-  let gate: ReadinessGate = 'Green Light';
-  let reason =
-    'Ops Readiness Gate is hospitality-only and does not apply to this project.';
-  if (isHospitality) {
-    const opsCat = cats.find((c) => c.key === 'operational');
-    const opsScore = opsCat?.score ?? 100;
-    const scoreGate = deriveGate(opsScore);
-    const ov = deriveOpsGateOverride(findings, scoreGate);
-    gate = ov.gate;
-    reason =
-      ov.reason ??
-      (gate === 'Green Light'
-        ? 'No active operational blockers detected. Traffic-driving campaigns are clear to push.'
-        : 'Operational signals are below threshold. Resolve before pushing traffic-driving campaigns.');
-  }
+  // Ops Readiness Gate is currently neutralized — empty reason is the inert
+  // sentinel that the UI uses to hide the tile/banner and that
+  // GateBadge.computeGateState reads to render no badge. The mechanism
+  // (deriveOpsGateOverride / deriveGate) is preserved for a future
+  // business-health repurpose; we just don't call it here.
+  const gate: ReadinessGate = 'Green Light';
+  const reason = '';
 
   const totalUpside = findings
     .filter(isActive)

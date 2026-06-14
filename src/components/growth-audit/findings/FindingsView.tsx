@@ -24,7 +24,6 @@ import { FindingCard } from './FindingCard';
 import { FindingDetail } from './FindingDetail';
 import { useFindings, useFindingMutation, findingsKey } from './useFindings';
 import { useGrowthScores } from '../useGrowthScores';
-import { useIsHospitalityProject, HOSPITALITY_ONLY_CATEGORIES } from '@/hooks/useIsHospitalityProject';
 
 const SEVERITIES: FindingSeverity[] = ['Critical', 'High', 'Medium', 'Low'];
 const STATUSES: FindingStatus[] = ['New', 'In Progress', 'Sent to Marketing Hub', 'Resolved', 'Dismissed', 'Snoozed'];
@@ -36,20 +35,8 @@ export const FindingsView = () => {
   const { selectedBar } = useApp();
   const venueId = selectedBar?.id ?? null;
   const findingsQ = useFindings(venueId);
-  const isHospitality = useIsHospitalityProject(venueId).data ?? false;
-  const rawFindings = findingsQ.data ?? [];
-  // Hide hospitality-only categories on non-hospitality projects so they don't
-  // appear in the list, the count badge, the category filter pills, or detail.
-  const findings = isHospitality
-    ? rawFindings
-    : rawFindings.filter(
-        (f) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(f.category),
-      );
-  const CATEGORIES = isHospitality
-    ? ALL_CATEGORIES
-    : ALL_CATEGORIES.filter(
-        (c) => !(HOSPITALITY_ONLY_CATEGORIES as readonly string[]).includes(c),
-      );
+  const findings = findingsQ.data ?? [];
+  const CATEGORIES = ALL_CATEGORIES;
   const { primary } = useGrowthScores(venueId);
   const mutate = useFindingMutation(venueId);
   const { isAdmin } = useAuth();
