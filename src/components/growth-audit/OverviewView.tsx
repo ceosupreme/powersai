@@ -4,14 +4,13 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/context/AppContext';
 import { useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, ShieldAlert, Loader2 } from 'lucide-react';
+import { RefreshCw, Loader2 } from 'lucide-react';
 import { PrimaryMetricsRow } from './PrimaryMetricsRow';
 import { CategoryScoreGrid } from './CategoryScoreGrid';
 import { TopPrioritiesList } from './TopPrioritiesList';
 import { QuickStatsStrip } from './QuickStatsStrip';
 import { useGrowthScores, useRefreshAudit } from './useGrowthScores';
 import { OnboardingChecklist } from './onboarding/OnboardingChecklist';
-import { useIsHospitalityProject } from '@/hooks/useIsHospitalityProject';
 
 export const OverviewView = () => {
   const { selectedBar } = useApp();
@@ -20,7 +19,6 @@ export const OverviewView = () => {
   const venueId = selectedBar?.id ?? null;
   const { primary, categories, priorities, quickStats, isLoading } = useGrowthScores(venueId);
   const refresh = useRefreshAudit(venueId);
-  const isHospitality = useIsHospitalityProject(venueId).data ?? false;
 
   if (!selectedBar) {
     return (
@@ -65,26 +63,11 @@ export const OverviewView = () => {
         onViewDataSources={() => setSearchParams({ subtab: 'data-sources' })}
       />
 
-      {/* Ops Readiness Gate is hospitality-only — banner hides for other projects. */}
-      {isHospitality && (
-        <div
-          id="ops-gate-principle"
-          className="rounded-lg border border-accent/40 bg-accent/10 p-3 flex items-start gap-3 scroll-mt-24"
-        >
-          <div className="p-1.5 rounded-md bg-accent/20 text-accent-foreground shrink-0">
-            <ShieldAlert className="w-4 h-4" />
-          </div>
-          <div className="flex-1 text-xs leading-relaxed">
-            <div className="font-semibold text-foreground">
-              Traffic-driving campaigns are gated by Ops Readiness.
-            </div>
-            <div className="text-muted-foreground mt-0.5">
-              We won't push demand a venue can't serve. Findings that drive traffic carry the
-              current gate status; operational, reputation, content, and conversion fixes are never gated.
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Ops Readiness Gate is currently neutralized (inert sentinel:
+          readiness='Green Light' && readinessReason==''). PrimaryMetricsRow
+          hides its gate tile in that state and GateBadge stays silent. The
+          mechanism is preserved in deriveOpsGateOverride/deriveGate for a
+          future business-health repurpose. */}
 
       <CategoryScoreGrid categories={categories} />
 

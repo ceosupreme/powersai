@@ -7957,7 +7957,6 @@ export type Database = {
           google_place_id: string | null
           id: string
           is_active: boolean | null
-          is_hospitality: boolean
           lat: number | null
           lng: number | null
           name: string
@@ -7999,7 +7998,6 @@ export type Database = {
           google_place_id?: string | null
           id?: string
           is_active?: boolean | null
-          is_hospitality?: boolean
           lat?: number | null
           lng?: number | null
           name: string
@@ -8041,7 +8039,6 @@ export type Database = {
           google_place_id?: string | null
           id?: string
           is_active?: boolean | null
-          is_hospitality?: boolean
           lat?: number | null
           lng?: number | null
           name?: string

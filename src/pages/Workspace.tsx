@@ -83,7 +83,7 @@ const Workspace = () => {
   const opsScore = scorecard?.overall_score ?? null;
   const opsGrade = scorecard?.overall_grade ?? null;
   const growthScore = primary.growthScore;
-  const growthBand = getScoreBand(growthScore);
+  const growthBand = getScoreBand(growthScore ?? 0);
 
   const today = new Date().toISOString().slice(0, 10);
   const in7 = new Date(Date.now() + 7 * 86400_000).toISOString().slice(0, 10);
@@ -160,7 +160,7 @@ const Workspace = () => {
         />
         <Tile
           icon={TrendingUp} label="Growth score"
-          value={growthLoading ? '…' : String(growthScore)}
+          value={growthLoading ? '…' : growthScore === null ? '—' : String(growthScore)}
           accent={growthBand.text}
           hint={primary.opportunityLevel + ' opportunity'}
         />

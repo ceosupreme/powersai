@@ -1,12 +1,14 @@
 import { Badge } from '@/components/ui/badge';
-import { ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, AlertTriangle } from 'lucide-react';
 import type { ReadinessGate } from './scoreBands';
 
-export type GateState = 'safe' | 'caution' | 'block' | null;
+export type GateState = 'caution' | 'block' | null;
 
 export const computeGateState = (isTrafficDriving: boolean, gate: ReadinessGate): GateState => {
   if (!isTrafficDriving) return null;
-  if (gate === 'Green Light') return 'safe';
+  // Green Light (passed or inert sentinel) renders no badge. Only escalated
+  // states announce themselves. Mechanism preserved upstream for future use.
+  if (gate === 'Green Light') return null;
   if (gate === 'Caution') return 'caution';
   return 'block';
 };
@@ -17,13 +19,6 @@ export const GateBadge = ({ state, overridden }: { state: GateState; overridden?
     return (
       <Badge variant="outline" className="text-[10px] gap-1 bg-muted text-muted-foreground border-border">
         <AlertTriangle className="w-3 h-3" /> Override active
-      </Badge>
-    );
-  }
-  if (state === 'safe') {
-    return (
-      <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-500/15 text-emerald-600 border-emerald-500/30">
-        <ShieldCheck className="w-3 h-3" /> Traffic-safe
       </Badge>
     );
   }
