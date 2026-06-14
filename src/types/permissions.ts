@@ -13,7 +13,12 @@ export type PageKey =
   | 'employees'
   | 'tasks'
   | 'logs'
-  | 'chat';
+  | 'chat'
+  | 'crm'
+  | 'brand_kit'
+  | 'marketing_hub'
+  | 'growth_audit'
+  | 'capture_inbox';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -62,6 +67,11 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'tasks', label: 'Tasks', canDisable: true },
   { key: 'logs', label: 'Daily Logs', canDisable: true },
   { key: 'chat', label: 'Chat', canDisable: true },
+  { key: 'crm', label: 'CRM', canDisable: true },
+  { key: 'brand_kit', label: 'Brand Vault', canDisable: true },
+  { key: 'marketing_hub', label: 'Marketing Hub', canDisable: true },
+  { key: 'growth_audit', label: 'Growth Audit', canDisable: true },
+  { key: 'capture_inbox', label: 'Capture Inbox', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -81,4 +91,9 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/logs': 'logs',
   '/logs/new': 'logs',
   '/chat': 'chat',
+  '/crm': 'crm',
+  '/brand-kit': 'brand_kit',
+  '/marketing-hub': 'marketing_hub',
+  '/growth-audit': 'growth_audit',
+  '/inbox': 'capture_inbox',
 };
