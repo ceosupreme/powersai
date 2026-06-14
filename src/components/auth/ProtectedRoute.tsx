@@ -7,14 +7,16 @@ import { UserRole, roleToHomeRoute } from '@/types/roles';
 import { getAllowedRoles } from '@/config/routes';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { toast } from 'sonner';
+import { PageKey } from '@/types/permissions';
 
 interface ProtectedRouteProps {
   children: ReactNode;
   allowedRoles?: UserRole[];
+  pageKey?: PageKey;
 }
 
-export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { user, isLoading, isAdmin } = useAuth();
+export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRouteProps) => {
+  const { user, isLoading, isAdmin, canAccessPage } = useAuth();
   const { currentRole, isLoading: roleLoading } = useRole();
   const { isPreview } = usePreview();
   const location = useLocation();
@@ -73,6 +75,16 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
       toast.error("You don't have access to this page");
     }
     return <Navigate to={roleToHomeRoute[currentRole]} replace />;
+  }
+
+  // Per-page permission gate (admin already returned above)
+  if (pageKey && !canAccessPage(pageKey)) {
+    if (toastShownRef.current !== location.pathname) {
+      toastShownRef.current = location.pathname;
+      toast.error("You don't have access to this page");
+    }
+    const home = currentRole ? roleToHomeRoute[currentRole] : '/dashboard';
+    return <Navigate to={home} replace />;
   }
 
   return <>{children}</>;

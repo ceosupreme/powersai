@@ -93,17 +93,17 @@ const navGroups: NavGroup[] = [
   {
     label: 'CRM & Sales',
     items: [
-      { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'dashboard' },
-      { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'dashboard' },
-      { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'dashboard' },
+      { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'crm' },
+      { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'crm' },
+      { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
     ],
   },
   {
     label: 'Brand & Content',
     items: [
-      { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'dashboard' },
-      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'dashboard' },
-      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'dashboard' },
+      { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'brand_kit' },
+      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
+      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
     ],
   },
   {

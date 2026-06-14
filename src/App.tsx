@@ -137,27 +137,27 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/growth-audit" element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute allowedRoles={['owner']} pageKey="growth_audit">
                     <AppLayout><GrowthAudit /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/marketing-hub" element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute allowedRoles={['owner']} pageKey="marketing_hub">
                     <AppLayout><MarketingHub /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/brand-kit" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute pageKey="brand_kit">
                     <AppLayout><BrandKit /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/crm" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute pageKey="crm">
                     <AppLayout><Crm /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/inbox" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute pageKey="capture_inbox">
                     <AppLayout><Inbox /></AppLayout>
                   </ProtectedRoute>
                 } />
