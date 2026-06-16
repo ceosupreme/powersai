@@ -44,6 +44,7 @@ import NotFound from "./pages/NotFound";
 import RolePreview from "./pages/RolePreview";
 import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
+import ContentPipeline from "./pages/ContentPipeline";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
