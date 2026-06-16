@@ -998,6 +998,53 @@ export type Database = {
           },
         ]
       }
+      channel_revenue: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          period_month: string
+          product_id: string | null
+          project_id: string
+          revenue_type: string
+          source_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          period_month: string
+          product_id?: string | null
+          project_id: string
+          revenue_type: string
+          source_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          period_month?: string
+          product_id?: string | null
+          project_id?: string
+          revenue_type?: string
+          source_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_revenue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_channel_members: {
         Row: {
           channel_id: string
