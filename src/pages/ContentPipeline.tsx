@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
-import { useAppContext } from "@/context/AppContext";
+import { useApp } from "@/context/AppContext";
 import { ContentItem, useContentItems } from "@/hooks/useContentItems";
 import { ContentListView } from "@/components/content/ContentListView";
 import { ContentKanbanView } from "@/components/content/ContentKanbanView";
 import { ContentItemDialog } from "@/components/content/ContentItemDialog";
 
 export default function ContentPipeline() {
-  const { selectedBar } = useAppContext();
+  const { selectedBar } = useApp();
   const projectId = selectedBar?.id ?? null;
   const { data: items = [], isLoading } = useContentItems(projectId);
   const [dialogOpen, setDialogOpen] = useState(false);
