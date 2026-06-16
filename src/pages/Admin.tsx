@@ -43,7 +43,7 @@ const Admin = () => {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
             <p className="text-muted-foreground text-sm">
-              Manage users, roles, and bar assignments
+              Manage users, roles, and project access.
             </p>
           </div>
         </div>
