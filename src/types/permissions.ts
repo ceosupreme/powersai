@@ -19,7 +19,8 @@ export type PageKey =
   | 'marketing_hub'
   | 'growth_audit'
   | 'capture_inbox'
-  | 'content_pipeline';
+  | 'content_pipeline'
+  | 'revenue';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -74,6 +75,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'growth_audit', label: 'Growth Audit', canDisable: true },
   { key: 'capture_inbox', label: 'Capture Inbox', canDisable: true },
   { key: 'content_pipeline', label: 'Content Pipeline', canDisable: true },
+  { key: 'revenue', label: 'Channel Revenue', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -99,4 +101,5 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/growth-audit': 'growth_audit',
   '/inbox': 'capture_inbox',
   '/content': 'content_pipeline',
+  '/revenue': 'revenue',
 };
