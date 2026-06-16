@@ -477,7 +477,7 @@ export const UsersTab = () => {
                 <Textarea
                   value={csvData}
                   onChange={(e) => setCsvData(e.target.value)}
-                  placeholder={`email, name, role, bar_name\njohn@example.com, John Smith, manager, Downtown Bar`}
+                  placeholder={`email, name, role, project_name\njohn@example.com, John Smith, manager, Acme Website Redesign`}
                   className="min-h-[100px] bg-background border-border font-mono text-xs"
                 />
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -524,7 +524,7 @@ export const UsersTab = () => {
                           <TableHead className="text-muted-foreground text-xs">Email</TableHead>
                           <TableHead className="text-muted-foreground text-xs">Name</TableHead>
                           <TableHead className="text-muted-foreground text-xs">Role</TableHead>
-                          <TableHead className="text-muted-foreground text-xs">Bar</TableHead>
+                          <TableHead className="text-muted-foreground text-xs">Project</TableHead>
                           <TableHead className="text-muted-foreground text-xs w-[60px]"></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -650,7 +650,7 @@ export const UsersTab = () => {
                   <TableHead className="text-muted-foreground text-xs sm:text-sm">Name</TableHead>
                   <TableHead className="text-muted-foreground text-xs sm:text-sm">Email</TableHead>
                   <TableHead className="text-muted-foreground text-xs sm:text-sm">Role</TableHead>
-                  <TableHead className="text-muted-foreground text-xs sm:text-sm">Bar</TableHead>
+                  <TableHead className="text-muted-foreground text-xs sm:text-sm">Project</TableHead>
                   <TableHead className="text-muted-foreground text-xs sm:text-sm hidden md:table-cell">Joined</TableHead>
                   <TableHead className="text-muted-foreground text-xs sm:text-sm text-right">Actions</TableHead>
                 </TableRow>

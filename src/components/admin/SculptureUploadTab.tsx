@@ -1,3 +1,4 @@
+// Hidden from Settings UI (Phase C). Preserved as reusable upload/ingest infrastructure — do not delete.
 import { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

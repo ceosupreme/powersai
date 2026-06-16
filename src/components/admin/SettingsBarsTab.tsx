@@ -79,7 +79,7 @@ export const SettingsBarsTab = () => {
       })));
     } catch (e) {
       console.error(e);
-      toast.error('Failed to load venues');
+      toast.error('Failed to load projects');
     } finally {
       setIsLoading(false);
     }

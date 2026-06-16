@@ -1,3 +1,4 @@
+// Hidden from Settings UI (Phase C). Preserved as reusable upload/ingest infrastructure — do not delete.
 import { useState, useEffect, useCallback } from 'react';
 import { format, addDays, parseISO, startOfWeek } from 'date-fns';
 import {

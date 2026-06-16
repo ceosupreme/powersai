@@ -1,3 +1,4 @@
+// Hidden from Settings UI (Phase C). Preserved as reusable upload/ingest infrastructure — do not delete.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

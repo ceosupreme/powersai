@@ -126,7 +126,7 @@ export const GoogleRatingOverrideCard = () => {
     try {
       const { data, error } = await supabase.functions.invoke('sync-google-ratings');
       if (error) throw error;
-      toast.success(`Synced ${data?.synced || 0} venue(s) from Google`);
+      toast.success(`Synced ${data?.synced || 0} project(s) from Google`);
       if (selectedVenue) {
         const { data: snap } = await supabase
           .from('review_snapshots')
@@ -190,7 +190,7 @@ export const GoogleRatingOverrideCard = () => {
           <Label>Select Project</Label>
           <Select value={selectedVenue} onValueChange={setSelectedVenue}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a venue..." />
+            <SelectValue placeholder="Choose a project..." />
             </SelectTrigger>
             <SelectContent>
               {venues.map(v => (

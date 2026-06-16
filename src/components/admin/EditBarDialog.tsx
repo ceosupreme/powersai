@@ -285,7 +285,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.bar_code.trim()) {
-      toast.error('Name and bar code are required');
+      toast.error('Name and project code are required');
       setActiveTab('basic');
       return;
     }
@@ -311,17 +311,17 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
         if (error) throw error;
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
-        toast.success('Venue updated');
+        toast.success('Project updated');
       } else {
         const { error } = await supabase.from('venues').insert(payload);
         if (error) throw error;
-        toast.success('Venue created');
+        toast.success('Project created');
       }
       onOpenChange(false);
       onSaved();
     } catch (e: any) {
       console.error(e);
-      toast.error('Failed to save venue');
+      toast.error('Failed to save project');
     } finally { setIsSaving(false); }
   };
 
@@ -332,10 +332,10 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       await supabase.from('profiles').update({ assigned_bar_id: null, assigned_bar_name: null }).eq('assigned_bar_id', editingBar.id);
       const { error } = await supabase.from('venues').delete().eq('id', editingBar.id);
       if (error) throw error;
-      toast.success('Venue deleted');
+      toast.success('Project deleted');
       onOpenChange(false);
       onDeleted?.();
-    } catch { toast.error('Failed to delete venue'); }
+    } catch { toast.error('Failed to delete project'); }
   };
 
   return (
