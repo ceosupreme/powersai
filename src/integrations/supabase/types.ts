@@ -6832,6 +6832,7 @@ export type Database = {
           assignee_id: string | null
           bar_id: string
           completed_at: string | null
+          content_item_id: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -6849,6 +6850,7 @@ export type Database = {
           assignee_id?: string | null
           bar_id: string
           completed_at?: string | null
+          content_item_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -6866,6 +6868,7 @@ export type Database = {
           assignee_id?: string | null
           bar_id?: string
           completed_at?: string | null
+          content_item_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -6884,6 +6887,13 @@ export type Database = {
             columns: ["assignee_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
             referencedColumns: ["id"]
           },
           {
