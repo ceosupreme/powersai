@@ -20,12 +20,12 @@ export function useContentAutomationRuns(contentItemId: string | undefined) {
     queryKey: ["content-automation-runs", contentItemId],
     queryFn: async (): Promise<AutomationRun[]> => {
       const { data, error } = await supabase
-        .from("content_automation_runs")
+        .from("content_automation_runs" as any)
         .select("*")
         .eq("content_item_id", contentItemId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as AutomationRun[];
+      return ((data ?? []) as unknown) as AutomationRun[];
     },
   });
 }
