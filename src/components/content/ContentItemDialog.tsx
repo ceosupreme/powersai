@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { STAGES, STAGE_LABELS, FORMATS, FORMAT_LABELS } from "./contentStages";
 import { ContentItem, useContentItemMutations } from "@/hooks/useContentItems";
 import { ContentItemLinkedTasks } from "./ContentItemLinkedTasks";
+import { ContentAutomationRuns } from "./ContentAutomationRuns";
 import { useChannelProducts } from "@/hooks/useChannelProducts";
 
 interface Props {
@@ -188,7 +189,10 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
             </label>
           </div>
           {item && projectId ? (
-            <ContentItemLinkedTasks itemId={item.id} projectId={projectId} />
+            <>
+              <ContentItemLinkedTasks itemId={item.id} projectId={projectId} />
+              <ContentAutomationRuns itemId={item.id} />
+            </>
           ) : (
             <p className="text-xs text-muted-foreground border-t pt-3">Save this content item first to add linked tasks.</p>
           )}
