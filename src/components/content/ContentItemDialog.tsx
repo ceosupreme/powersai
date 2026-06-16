@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { STAGES, STAGE_LABELS, FORMATS, FORMAT_LABELS } from "./contentStages";
 import { ContentItem, useContentItemMutations } from "@/hooks/useContentItems";
+import { ContentItemLinkedTasks } from "./ContentItemLinkedTasks";
 
 interface Props {
   open: boolean;
@@ -173,6 +174,11 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
               Monetized
             </label>
           </div>
+          {item && projectId ? (
+            <ContentItemLinkedTasks itemId={item.id} projectId={projectId} />
+          ) : (
+            <p className="text-xs text-muted-foreground border-t pt-3">Save this content item first to add linked tasks.</p>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

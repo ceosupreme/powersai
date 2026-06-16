@@ -1,98 +1,52 @@
-## Step 2: Content Pipeline
+## Step 3: Link tasks to content items
 
-### 1. Database — new `content_items` table (migration)
+Additive only. One nullable FK + index on `tasks`, plus a minimal "Linked Tasks" surface inside the existing content item dialog. No enum changes, no new tables, no Tasks-page redesign.
 
-Project-scoped, mirrors conventions used by `tasks` / `crm_deals` / `marketing_campaigns` (FK to `venues.id`, RLS via `user_can_access_project`, `updated_at` trigger via `handle_updated_at`).
+### 1. Migration (schema only)
 
 ```sql
-CREATE TABLE public.content_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id uuid NOT NULL REFERENCES public.venues(id) ON DELETE CASCADE,
-  title text NOT NULL,
-  format text,                       -- soft values: long_form | short | livestream | community
-  stage text NOT NULL DEFAULT 'idea',-- soft values: idea|script|record|edit|thumbnail|scheduled|published
-  hook text,
-  cta text,
-  primary_keyword text,
-  affiliate_link text,
-  product_id uuid,                   -- plain nullable uuid; NO FK (channel_products doesn't exist yet)
-  due_date date,
-  scheduled_at timestamptz,
-  published_at timestamptz,
-  is_repurposed boolean NOT NULL DEFAULT false,
-  is_monetized  boolean NOT NULL DEFAULT false,
-  performance jsonb,
-  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
+ALTER TABLE public.tasks
+  ADD COLUMN IF NOT EXISTS content_item_id uuid NULL
+    REFERENCES public.content_items(id) ON DELETE SET NULL;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.content_items TO authenticated;
-GRANT ALL ON public.content_items TO service_role;
-
-ALTER TABLE public.content_items ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "view content_items for accessible projects"
-  ON public.content_items FOR SELECT TO authenticated
-  USING (public.user_can_access_project(project_id));
-CREATE POLICY "insert content_items for accessible projects"
-  ON public.content_items FOR INSERT TO authenticated
-  WITH CHECK (public.user_can_access_project(project_id) AND created_by = auth.uid());
-CREATE POLICY "update content_items for accessible projects"
-  ON public.content_items FOR UPDATE TO authenticated
-  USING (public.user_can_access_project(project_id));
-CREATE POLICY "delete content_items for accessible projects"
-  ON public.content_items FOR DELETE TO authenticated
-  USING (public.user_can_access_project(project_id));
-
-CREATE INDEX content_items_project_stage_idx ON public.content_items(project_id, stage);
-CREATE TRIGGER trg_content_items_updated_at
-  BEFORE UPDATE ON public.content_items
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE INDEX IF NOT EXISTS idx_tasks_content_item_id
+  ON public.tasks(content_item_id)
+  WHERE content_item_id IS NOT NULL;
 ```
 
-No FK on `product_id` (channel_products doesn't exist yet — added in a later step). `format`/`stage` left as text (matches Step 1 decision for `content_status`).
+- Nullable → all existing rows stay null, no rewrite.
+- `ON DELETE SET NULL` per your call: deleting a content item leaves its tasks intact, link is cleared.
+- No touch to `task_status`, `task_priority`, `tasks.*` columns, RLS, or grants. Existing tasks RLS already governs row access (channel = venue = project, same access path).
 
-### 2. Frontend — pipeline page
+### 2. Type updates (non-schema)
 
-**New files:**
-- `src/hooks/useContentItems.ts` — list/create/update/delete via supabase client, filtered by `selectedBar.id`; React Query keys `['content-items', projectId]`.
-- `src/components/content/contentStages.ts` — `STAGES` const + label map + format label map (single source of truth).
-- `src/components/content/ContentItemDialog.tsx` — create/edit modal with all fields. Product field is a disabled input with helper text "Linked products coming soon".
-- `src/components/content/ContentListView.tsx` — table: title / format / stage (inline `Select` dropdown to change) / due date / repurposed+monetized badges / row click → edit. Filter chips by stage.
-- `src/components/content/ContentKanbanView.tsx` — 7 columns, cards with "next stage" arrow button (matches existing `PipelineBoard.tsx` pattern — no dnd library is installed; CRM/Marketing-Hub boards use the same click-to-advance pattern). Each card shows title, format pill, due date, repurposed/monetized badges.
-- `src/pages/ContentPipeline.tsx` — page shell: header with channel name, `Tabs` toggle (List default / Kanban), "New Content Item" button. Empty-state when selected project isn't a `content_channel`.
+- `src/types/tasks.ts`: add `content_item_id?: string | null` to `Task` and `CreateTaskInput`.
+- `src/integrations/supabase/types.ts` regenerates automatically post-migration.
 
-**Route:** `/content` in `src/App.tsx`, wrapped in `ProtectedRoute` with `pageKey="content_pipeline"`.
+### 3. Minimal UI in the content item dialog
 
-**Nav:** add a "Content Pipeline" link in the sidebar (`src/components/layout/Sidebar*.tsx`) under the BRAND & CONTENT section (next to Brand Vault) — only the placement file gets edited.
+Surface lives only on the content-item side (per spec). Only shown when editing an existing item (need an `id` to link against).
 
-### 3. Permission key
+- New small component `src/components/content/ContentItemLinkedTasks.tsx`:
+  - Query: `tasks` where `content_item_id = item.id`, select `id, title, status, due_date, assignee:profiles(...)`. Read-only list (title + status badge + due date).
+  - "New Task" inline form (title + priority + due_date) → calls existing `useCreateTask()` with:
+    - `bar_id: String(projectId)` (channels are venues; `tasks.bar_id` is text)
+    - `content_item_id: item.id` (passed through the existing insert path — extending `CreateTaskInput` is enough; no new mutation)
+    - Defaults: `priority: 'Medium'`, `status: 'Todo'`
+  - On success: invalidate `['tasks']` and a new `['content-item-tasks', item.id]` query key.
+- `ContentItemDialog.tsx`: when `item` is present, render `<ContentItemLinkedTasks itemId={item.id} projectId={projectId} />` as a new section below the form. New items (pre-save) show a "Save first to add linked tasks" hint.
 
-In `src/types/permissions.ts`:
-- add `'content_pipeline'` to `PageKey`
-- add `{ key:'content_pipeline', label:'Content Pipeline', canDisable:true }` to `PAGE_CONFIG`
-- add `'/content': 'content_pipeline'` to `ROUTE_TO_PAGE_KEY`
+### 4. Tasks-page indicator — SKIP
 
-Admin sees by default (`user_can_access_page` falls through to admin bypass; `role_page_defaults` rows can be seeded later if desired — not in scope for this step).
+Per spec ("if cheap, else skip"), skipping. Tasks page columns are dense and adding a join + cell is more than trivial. Noted as a future enhancement; the content-item-side surface is the contract.
 
-### 4. Scoping behavior
-
-- Page reads `selectedBar` from `AppContext`; queries `content_items` where `project_id = selectedBar.id`.
-- RLS guarantees a user only sees items for channels they can access regardless of which project is selected.
-- New items written with `project_id = selectedBar.id`, `created_by = auth.uid()`.
-
-### Out of scope (deferred)
-- `channel_products`, `channel_revenue`, `affiliate_programs` tables.
-- Automation engine / triggers on stage transitions.
-- Editor for `performance` jsonb.
-- Channel creation flow.
-- Any change to `marketing_campaigns`, `tasks`, or other existing tables.
+### Out of scope
+- Enum changes, new tables, Tasks-page redesign.
+- Automation that auto-spawns tasks on stage transition (Step 6).
+- Bidirectional UI on individual TaskCard/TaskDetailDrawer.
 
 ### Verification
-1. Migration applied; `content_items` exists with RLS + 4 policies + GRANTs + updated_at trigger.
-2. `/content` loads for selected channel; List view default; inline stage dropdown updates the row.
-3. Kanban toggle shows 7 stage columns sharing the same data; advancing a card updates `stage`; reflects back in List on switch.
-4. Create/edit dialog saves all fields; product field is the placeholder; repurposed/monetized are checkbox flags (not stages).
-5. Nav link visible; `content_pipeline` permission key gatable; admin sees by default.
-6. `tsc` clean. `marketing_campaigns` untouched; no `channel_products`/`channel_revenue`/`affiliate_programs` tables; `product_id` is a plain nullable uuid with no FK.
+1. `\d public.tasks` shows `content_item_id uuid` nullable, FK → `content_items(id)` `ON DELETE SET NULL`; index present. `task_status`/`task_priority`/other columns unchanged. Existing rows all null.
+2. From a content item dialog: linked tasks list renders; creating a task writes a row with correct `content_item_id` + `bar_id` (channel id) via existing `useCreateTask`.
+3. Manual delete of a `content_items` row leaves matching `tasks` rows intact with `content_item_id` flipped to null.
+4. `tsc` clean. No new tables, no enum changes, no parallel task hook/mutation — `useCreateTask` is the single write path.
