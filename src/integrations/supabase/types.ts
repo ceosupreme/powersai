@@ -1303,9 +1303,67 @@ export type Database = {
           },
         ]
       }
+      content_automation_runs: {
+        Row: {
+          content_item_id: string
+          created_at: string
+          error: string | null
+          id: string
+          project_id: string
+          rule_key: string
+          status: string
+          task_ids: string[]
+          tasks_created: number
+          triggered_by: string | null
+          undone_at: string | null
+        }
+        Insert: {
+          content_item_id: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          project_id: string
+          rule_key?: string
+          status?: string
+          task_ids?: string[]
+          tasks_created?: number
+          triggered_by?: string | null
+          undone_at?: string | null
+        }
+        Update: {
+          content_item_id?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          project_id?: string
+          rule_key?: string
+          status?: string
+          task_ids?: string[]
+          tasks_created?: number
+          triggered_by?: string | null
+          undone_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_automation_runs_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_automation_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_items: {
         Row: {
           affiliate_link: string | null
+          automation_fired_at: string | null
           created_at: string
           created_by: string | null
           cta: string | null
@@ -1327,6 +1385,7 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          automation_fired_at?: string | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
@@ -1348,6 +1407,7 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          automation_fired_at?: string | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
