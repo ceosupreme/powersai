@@ -41,6 +41,7 @@ import {
   X,
   Sunrise,
   Palette,
+  Film,
   Briefcase,
   Inbox as InboxIcon,
   HelpCircle,
