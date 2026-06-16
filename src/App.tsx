@@ -152,6 +152,11 @@ const App = () => {
                     <AppLayout><BrandKit /></AppLayout>
                   </ProtectedRoute>
                 } />
+                <Route path="/content" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><ContentPipeline /></AppLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/crm" element={
                   <ProtectedRoute pageKey="crm">
                     <AppLayout><Crm /></AppLayout>
