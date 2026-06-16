@@ -7949,6 +7949,7 @@ export type Database = {
           asana_write_section_gid: string | null
           bar_code: string | null
           city: string | null
+          content_status: string | null
           created_at: string
           current_secret_shop_cleanliness_pct: number | null
           current_secret_shop_date: string | null
@@ -7959,13 +7960,16 @@ export type Database = {
           is_active: boolean | null
           lat: number | null
           lng: number | null
+          monetization_model: string | null
           name: string
+          niche: string | null
           owner_name: string | null
           project_type: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id: string | null
           sevenshifts_api_enabled: boolean
           slug: string | null
           state: string | null
+          subscriber_count: number | null
           task_source: string | null
           timezone: string | null
           toast_api_enabled: boolean
@@ -7974,7 +7978,10 @@ export type Database = {
           toast_restaurant_guid: string | null
           updated_at: string
           venue_name: string | null
+          weekly_production_goal: number | null
           yelp_business_id: string | null
+          youtube_channel_id: string | null
+          youtube_channel_url: string | null
         }
         Insert: {
           address?: string | null
@@ -7990,6 +7997,7 @@ export type Database = {
           asana_write_section_gid?: string | null
           bar_code?: string | null
           city?: string | null
+          content_status?: string | null
           created_at?: string
           current_secret_shop_cleanliness_pct?: number | null
           current_secret_shop_date?: string | null
@@ -8000,13 +8008,16 @@ export type Database = {
           is_active?: boolean | null
           lat?: number | null
           lng?: number | null
+          monetization_model?: string | null
           name: string
+          niche?: string | null
           owner_name?: string | null
           project_type?: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
           state?: string | null
+          subscriber_count?: number | null
           task_source?: string | null
           timezone?: string | null
           toast_api_enabled?: boolean
@@ -8015,7 +8026,10 @@ export type Database = {
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null
+          weekly_production_goal?: number | null
           yelp_business_id?: string | null
+          youtube_channel_id?: string | null
+          youtube_channel_url?: string | null
         }
         Update: {
           address?: string | null
@@ -8031,6 +8045,7 @@ export type Database = {
           asana_write_section_gid?: string | null
           bar_code?: string | null
           city?: string | null
+          content_status?: string | null
           created_at?: string
           current_secret_shop_cleanliness_pct?: number | null
           current_secret_shop_date?: string | null
@@ -8041,13 +8056,16 @@ export type Database = {
           is_active?: boolean | null
           lat?: number | null
           lng?: number | null
+          monetization_model?: string | null
           name?: string
+          niche?: string | null
           owner_name?: string | null
           project_type?: Database["public"]["Enums"]["project_type_enum"]
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
           state?: string | null
+          subscriber_count?: number | null
           task_source?: string | null
           timezone?: string | null
           toast_api_enabled?: boolean
@@ -8056,7 +8074,10 @@ export type Database = {
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null
+          weekly_production_goal?: number | null
           yelp_business_id?: string | null
+          youtube_channel_id?: string | null
+          youtube_channel_url?: string | null
         }
         Relationships: []
       }
