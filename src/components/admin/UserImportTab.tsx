@@ -1,3 +1,4 @@
+// Unmounted/unused (Phase C). Bar-era or not-yet-wired — deletion decision deferred to a later pass.
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';

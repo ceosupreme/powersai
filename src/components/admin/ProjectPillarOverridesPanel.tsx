@@ -1,3 +1,4 @@
+// Unmounted but INTENDED — to be surfaced inside Project Settings (Phase D). Not dead code; do not delete.
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';

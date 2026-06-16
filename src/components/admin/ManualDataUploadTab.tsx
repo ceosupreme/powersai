@@ -1,3 +1,4 @@
+// Hidden from Settings UI (Phase C). Preserved as reusable upload/ingest infrastructure — do not delete.
 import { useState, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

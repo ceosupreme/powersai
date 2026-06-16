@@ -1,3 +1,4 @@
+// Unmounted/unused (Phase C). Bar-era or not-yet-wired — deletion decision deferred to a later pass.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
