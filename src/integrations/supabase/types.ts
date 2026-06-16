@@ -1129,6 +1129,80 @@ export type Database = {
           },
         ]
       }
+      content_items: {
+        Row: {
+          affiliate_link: string | null
+          created_at: string
+          created_by: string | null
+          cta: string | null
+          due_date: string | null
+          format: string | null
+          hook: string | null
+          id: string
+          is_monetized: boolean
+          is_repurposed: boolean
+          performance: Json | null
+          primary_keyword: string | null
+          product_id: string | null
+          project_id: string
+          published_at: string | null
+          scheduled_at: string | null
+          stage: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affiliate_link?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta?: string | null
+          due_date?: string | null
+          format?: string | null
+          hook?: string | null
+          id?: string
+          is_monetized?: boolean
+          is_repurposed?: boolean
+          performance?: Json | null
+          primary_keyword?: string | null
+          product_id?: string | null
+          project_id: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          stage?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affiliate_link?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta?: string | null
+          due_date?: string | null
+          format?: string | null
+          hook?: string | null
+          id?: string
+          is_monetized?: boolean
+          is_repurposed?: boolean
+          performance?: Json | null
+          primary_keyword?: string | null
+          product_id?: string | null
+          project_id?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          stage?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       context_calendar_entries: {
         Row: {
           category: string

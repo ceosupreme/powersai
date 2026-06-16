@@ -44,6 +44,7 @@ import NotFound from "./pages/NotFound";
 import RolePreview from "./pages/RolePreview";
 import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
+import ContentPipeline from "./pages/ContentPipeline";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
@@ -149,6 +150,11 @@ const App = () => {
                 <Route path="/brand-kit" element={
                   <ProtectedRoute pageKey="brand_kit">
                     <AppLayout><BrandKit /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/content" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><ContentPipeline /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/crm" element={
