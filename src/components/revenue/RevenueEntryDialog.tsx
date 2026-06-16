@@ -13,6 +13,7 @@ import {
   monthToFirstDay,
   useChannelRevenueMutations,
 } from "@/hooks/useChannelRevenue";
+import { useChannelProducts } from "@/hooks/useChannelProducts";
 
 interface Props {
   open: boolean;
@@ -31,10 +32,12 @@ const empty = {
   amount: "",
   period_month: currentMonth(),
   source_note: "",
+  product_id: "",
 };
 
 export function RevenueEntryDialog({ open, onOpenChange, projectId, entry }: Props) {
   const { create, update } = useChannelRevenueMutations(projectId);
+  const { data: products = [] } = useChannelProducts();
   const [form, setForm] = useState<any>(empty);
 
   useEffect(() => {
@@ -44,6 +47,7 @@ export function RevenueEntryDialog({ open, onOpenChange, projectId, entry }: Pro
         amount: String(entry.amount ?? ""),
         period_month: entry.period_month?.slice(0, 7) ?? currentMonth(),
         source_note: entry.source_note ?? "",
+        product_id: entry.product_id ?? "",
       });
     } else {
       setForm(empty);
@@ -62,6 +66,7 @@ export function RevenueEntryDialog({ open, onOpenChange, projectId, entry }: Pro
       amount: amt,
       period_month: monthToFirstDay(form.period_month),
       source_note: form.source_note?.trim() || null,
+      product_id: form.product_id || null,
     };
     try {
       if (entry) {
@@ -126,7 +131,15 @@ export function RevenueEntryDialog({ open, onOpenChange, projectId, entry }: Pro
           </div>
           <div>
             <Label>Linked Product</Label>
-            <Input disabled placeholder="Linked products coming soon" />
+            <Select value={form.product_id || "__none__"} onValueChange={(v) => set("product_id", v === "__none__" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">None</SelectItem>
+                {products.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>
