@@ -46,6 +46,8 @@ import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
 import ContentPipeline from "./pages/ContentPipeline";
 import ChannelRevenue from "./pages/ChannelRevenue";
+import AffiliatePrograms from "./pages/AffiliatePrograms";
+import Products from "./pages/Products";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
@@ -161,6 +163,16 @@ const App = () => {
                 <Route path="/revenue" element={
                   <ProtectedRoute pageKey="revenue">
                     <AppLayout><ChannelRevenue /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/affiliate-programs" element={
+                  <ProtectedRoute pageKey="affiliate_programs">
+                    <AppLayout><AffiliatePrograms /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/products" element={
+                  <ProtectedRoute pageKey="products">
+                    <AppLayout><Products /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/crm" element={
