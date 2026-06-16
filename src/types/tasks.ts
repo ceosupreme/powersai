@@ -18,6 +18,7 @@ export interface Task {
   completed_at?: string | null;
   created_at: string;
   updated_at: string;
+  content_item_id?: string | null;
   // Joined data
   assignee?: {
     id: string;
@@ -77,6 +78,7 @@ export interface CreateTaskInput {
   priority?: TaskPriority;
   status?: TaskStatus;
   estimated_minutes?: number;
+  content_item_id?: string | null;
 }
 
 export interface UpdateTaskInput {
