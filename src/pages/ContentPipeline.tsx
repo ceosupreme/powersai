@@ -1,0 +1,70 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
+import { useAppContext } from "@/context/AppContext";
+import { ContentItem, useContentItems } from "@/hooks/useContentItems";
+import { ContentListView } from "@/components/content/ContentListView";
+import { ContentKanbanView } from "@/components/content/ContentKanbanView";
+import { ContentItemDialog } from "@/components/content/ContentItemDialog";
+
+export default function ContentPipeline() {
+  const { selectedBar } = useAppContext();
+  const projectId = selectedBar?.id ?? null;
+  const { data: items = [], isLoading } = useContentItems(projectId);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<ContentItem | null>(null);
+
+  const openNew = () => { setEditing(null); setDialogOpen(true); };
+  const openEdit = (it: ContentItem) => { setEditing(it); setDialogOpen(true); };
+
+  if (!projectId) {
+    return (
+      <div className="p-6">
+        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+          Select a channel to view its content pipeline.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Content Pipeline</h1>
+          <p className="text-sm text-muted-foreground">{selectedBar?.name}</p>
+        </div>
+        <Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> New Content Item</Button>
+      </div>
+
+      <Tabs defaultValue="list">
+        <TabsList>
+          <TabsTrigger value="list">List</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban</TabsTrigger>
+        </TabsList>
+        <TabsContent value="list" className="mt-4">
+          {isLoading ? (
+            <div className="text-sm text-muted-foreground">Loading…</div>
+          ) : (
+            <ContentListView items={items} projectId={projectId} onEdit={openEdit} />
+          )}
+        </TabsContent>
+        <TabsContent value="kanban" className="mt-4">
+          {isLoading ? (
+            <div className="text-sm text-muted-foreground">Loading…</div>
+          ) : (
+            <ContentKanbanView items={items} projectId={projectId} onEdit={openEdit} />
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <ContentItemDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        projectId={projectId}
+        item={editing}
+      />
+    </div>
+  );
+}
