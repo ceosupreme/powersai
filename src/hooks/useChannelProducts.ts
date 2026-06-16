@@ -68,7 +68,7 @@ export function useChannelProductMutations() {
         .select("*")
         .single();
       if (error) throw error;
-      return data as ChannelProduct;
+      return data as unknown as ChannelProduct;
     },
     onSuccess: invalidate,
   });
@@ -82,7 +82,7 @@ export function useChannelProductMutations() {
         .select("*")
         .single();
       if (error) throw error;
-      return data as ChannelProduct;
+      return data as unknown as ChannelProduct;
     },
     onSuccess: invalidate,
   });
@@ -136,10 +136,10 @@ export function useContentChannels() {
   return useQuery({
     queryKey: ["content-channels"],
     queryFn: async (): Promise<{ id: string; bar_name: string }[]> => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("venues")
         .select("id, bar_name")
-        .eq("project_type" as any, "content_channel")
+        .eq("project_type", "content_channel")
         .order("bar_name");
       if (error) throw error;
       return (data ?? []) as any;
