@@ -224,6 +224,48 @@ export type Database = {
           },
         ]
       }
+      affiliate_programs: {
+        Row: {
+          commission_detail: string | null
+          commission_type: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          link: string | null
+          name: string
+          niche: string | null
+          notes: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_detail?: string | null
+          commission_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          name: string
+          niche?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_detail?: string | null
+          commission_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          name?: string
+          niche?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_call_log: {
         Row: {
           cost_usd: number | null
@@ -998,6 +1040,84 @@ export type Database = {
           },
         ]
       }
+      channel_product_channels: {
+        Row: {
+          created_at: string
+          product_id: string
+          project_id: string
+        }
+        Insert: {
+          created_at?: string
+          product_id: string
+          project_id: string
+        }
+        Update: {
+          created_at?: string
+          product_id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_product_channels_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "channel_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_product_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_products: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          funnel_stage: string | null
+          id: string
+          lead_magnet: string | null
+          monthly_sales: number | null
+          name: string
+          notes: string | null
+          price: number | null
+          sales_page_url: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          funnel_stage?: string | null
+          id?: string
+          lead_magnet?: string | null
+          monthly_sales?: number | null
+          name: string
+          notes?: string | null
+          price?: number | null
+          sales_page_url?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          funnel_stage?: string | null
+          id?: string
+          lead_magnet?: string | null
+          monthly_sales?: number | null
+          name?: string
+          notes?: string | null
+          price?: number | null
+          sales_page_url?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       channel_revenue: {
         Row: {
           amount: number
@@ -1036,6 +1156,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "channel_revenue_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "channel_products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "channel_revenue_project_id_fkey"
             columns: ["project_id"]
@@ -1241,6 +1368,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "content_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "channel_products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "content_items_project_id_fkey"
             columns: ["project_id"]
