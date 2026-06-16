@@ -33,7 +33,7 @@ export default function ContentPipeline() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Content Pipeline</h1>
-          <p className="text-sm text-muted-foreground">{selectedBar?.name}</p>
+          <p className="text-sm text-muted-foreground">{selectedBar?.bar_name}</p>
         </div>
         <Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> New Content Item</Button>
       </div>
