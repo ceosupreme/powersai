@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { STAGES, STAGE_LABELS, FORMATS, FORMAT_LABELS } from "./contentStages";
 import { ContentItem, useContentItemMutations } from "@/hooks/useContentItems";
 import { ContentItemLinkedTasks } from "./ContentItemLinkedTasks";
+import { useChannelProducts } from "@/hooks/useChannelProducts";
 
 interface Props {
   open: boolean;
@@ -26,6 +27,7 @@ const empty = {
   cta: "",
   primary_keyword: "",
   affiliate_link: "",
+  product_id: "",
   due_date: "",
   scheduled_at: "",
   published_at: "",
@@ -35,6 +37,7 @@ const empty = {
 
 export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props) {
   const { create, update } = useContentItemMutations(projectId);
+  const { data: products = [] } = useChannelProducts();
   const [form, setForm] = useState<any>(empty);
 
   useEffect(() => {
@@ -47,6 +50,7 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
         cta: item.cta ?? "",
         primary_keyword: item.primary_keyword ?? "",
         affiliate_link: item.affiliate_link ?? "",
+        product_id: item.product_id ?? "",
         due_date: item.due_date ?? "",
         scheduled_at: item.scheduled_at ? item.scheduled_at.slice(0, 16) : "",
         published_at: item.published_at ? item.published_at.slice(0, 16) : "",
@@ -73,6 +77,7 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       cta: form.cta || null,
       primary_keyword: form.primary_keyword || null,
       affiliate_link: form.affiliate_link || null,
+      product_id: form.product_id || null,
       due_date: form.due_date || null,
       scheduled_at: form.scheduled_at ? new Date(form.scheduled_at).toISOString() : null,
       published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
@@ -148,7 +153,15 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
           </div>
           <div>
             <Label>Linked Product</Label>
-            <Input disabled placeholder="Linked products coming soon" />
+            <Select value={form.product_id || "__none__"} onValueChange={(v) => set("product_id", v === "__none__" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">None</SelectItem>
+                {products.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>

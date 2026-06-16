@@ -46,6 +46,8 @@ import {
   Inbox as InboxIcon,
   HelpCircle,
   Rocket,
+  Link2,
+  Package,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -105,6 +107,8 @@ const navGroups: NavGroup[] = [
       { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'brand_kit' },
       { path: '/content', label: 'Content Pipeline', icon: Film, pageKey: 'content_pipeline' },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
+      { path: '/products', label: 'Products', icon: Package, pageKey: 'products' },
+      { path: '/affiliate-programs', label: 'Affiliate Programs', icon: Link2, pageKey: 'affiliate_programs' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
     ],
