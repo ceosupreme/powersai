@@ -27,7 +27,7 @@ export function Hero() {
               style={{ animationDelay: "160ms" }}
             >
               AI Operations Systems That Show Owners{" "}
-              <span className="bg-gradient-to-r from-electric via-accent to-violet bg-clip-text text-transparent">
+              <span className="text-accent">
                 What&apos;s Working, What&apos;s Slipping,
               </span>{" "}
               and What To Do Next
