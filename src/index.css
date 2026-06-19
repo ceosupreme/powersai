@@ -441,30 +441,31 @@
  * HSL form (project uses HSL custom-property convention).
  * ============================================================ */
 .stm-marketing {
-  /* Warm carbon dark scope */
-  --background: 156 16% 7%;          /* #0E1512 */
-  --foreground: 150 12% 94%;         /* #ECF1EE */
-  --muted-foreground: 152 10% 60%;   /* #8FA39A */
-  --muted: 152 16% 13%;
-  --panel: 152 16% 11%;              /* #16201B */
-  --panel-elevated: 152 15% 13%;
-  --card: 152 16% 11%;
-  --card-foreground: 150 12% 94%;
-  --popover: 152 16% 11%;
-  --popover-foreground: 150 12% 94%;
-  --primary: 162 80% 40%;            /* #14B88A emerald */
-  --primary-foreground: 156 16% 7%;
-  --secondary: 152 16% 15%;
-  --secondary-foreground: 150 12% 94%;
-  --accent: 162 80% 40%;             /* emerald — single accent */
-  --accent-foreground: 156 16% 7%;
-  --accent-soft: 32 95% 58%;         /* amber — warn-only */
-  --destructive: 0 75% 55%;
-  --destructive-foreground: 150 12% 94%;
-  --border: 150 12% 94% / 0.08;      /* #24332C feel */
-  --border-strong: 150 12% 94% / 0.16;
-  --input: 150 12% 94% / 0.12;
-  --ring: 162 80% 40%;
+  /* Warm bone editorial scope */
+  --background: 44 38% 95%;          /* #F7F4EC */
+  --foreground: 48 18% 7%;           /* #15140F */
+  --muted-foreground: 38 12% 38%;    /* #6B6555 */
+  --muted: 42 24% 90%;
+  --panel: 42 60% 98%;               /* #FFFDF7 */
+  --panel-elevated: 0 0% 100%;
+  --card: 42 60% 98%;
+  --card-foreground: 48 18% 7%;
+  --popover: 42 60% 98%;
+  --popover-foreground: 48 18% 7%;
+  --primary: 156 71% 19%;            /* #0E5236 forest */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 42 24% 90%;
+  --secondary-foreground: 48 18% 7%;
+  --accent: 156 71% 19%;             /* forest — single accent */
+  --accent-foreground: 0 0% 100%;
+  --accent-soft: 152 64% 34%;        /* #1F8F63 — small live indicators */
+  --signal: 152 64% 34%;
+  --destructive: 18 86% 41%;         /* #C2410C */
+  --destructive-foreground: 0 0% 100%;
+  --border: 40 32% 87%;              /* #E7E0D2 */
+  --border-strong: 40 24% 78%;
+  --input: 40 32% 87%;
+  --ring: 156 71% 19%;
 
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
