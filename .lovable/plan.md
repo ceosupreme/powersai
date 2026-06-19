@@ -1,66 +1,94 @@
-# Client Acquisition Layer (on top of existing CRM)
+## Marketing site restyle — carbon / ivory / emerald + typography + dedupe
 
-Reuses `crm_companies` / `crm_deals` — no parallel lead system. Adds an account-wide offers library, AI lead analysis tied to a CRM company, and AI outreach drafting tied to that analysis. Drafting only; nothing is sent.
+Visual restyle only. No changes to lead-capture (`Contact` → `submit-inbound-lead` → `inbound_leads` → CRM), routing, Log in, content/copy, or back-office.
 
-## 1. Schema (one migration)
+---
 
-### `service_offers` — account-wide library (mirrors `affiliate_programs` RLS)
-Columns: `id`, `name`, `description`, `who_its_for`, `problem_solved`, `deliverables` (text), `timeline`, `starter_price` (numeric), `premium_price` (numeric), `best_target`, `status` ('active'|'draft'), `created_by`, `created_at`, `updated_at`.
-- GRANT to `authenticated` + `service_role`. RLS: any authenticated user can SELECT/INSERT/UPDATE/DELETE (matches `affiliate_programs`).
-- `updated_at` trigger.
+### 1. Central color system (single source of truth)
 
-### `crm_lead_analyses` — persisted AI analysis on a CRM company
-Columns: `id`, `company_id` uuid FK → `crm_companies(id)` ON DELETE CASCADE, `deal_id` uuid NULL FK → `crm_deals(id)` ON DELETE SET NULL, `source_kind` ('url'|'text'), `source_url`, `source_text`, `fetched_content` text NULL (raw page text snapshot), `summary` text, `recommended_offer_id` uuid NULL FK → `service_offers(id)` ON DELETE SET NULL, `recommendation_reason` text, `priority` ('high'|'medium'|'low'), `model` text, `created_by`, `created_at`.
-- RLS: reuse CRM scoping — same `using/with check` pattern as `crm_companies` (admin OR has access). Latest row per company surfaces in UI; full history preserved.
+All tokens are already scoped under `.stm-marketing` in `src/index.css` (lines 443–658). I'll rewrite ONLY that scoped block — the app/back-office tokens above it are untouched.
 
-### `crm_outreach_drafts` — persisted AI outreach attached to an analysis
-Columns: `id`, `analysis_id` uuid FK → `crm_lead_analyses(id)` ON DELETE CASCADE, `company_id` uuid FK → `crm_companies(id)` ON DELETE CASCADE, `offer_id` uuid NULL FK → `service_offers(id)` ON DELETE SET NULL, `channel` ('cold_email'|'linkedin_dm'|'instagram_dm'|'sms'), `tone` text, `opener` text, `sequence` jsonb (`[{day:1,label,body}, ...]`), `model`, `created_by`, `created_at`, `updated_at`.
-- RLS: same CRM scoping as analyses. UPDATE allowed so user can edit drafted copy.
-- `updated_at` trigger.
+**Dark scope (`.stm-marketing` default):**
+```
+--background: 156 16% 7%    /* #0E1512 warm near-black */
+--panel / --card: 152 16% 11%   /* #16201B */
+--panel-elevated: 152 15% 13%
+--border: 152 16% 17% / strong 152 16% 22%   /* #24332C */
+--foreground: 150 12% 94%   /* #ECF1EE */
+--muted-foreground: 152 10% 60%   /* #8FA39A */
+--accent / --primary / --ring: 162 80% 40%   /* #14B88A emerald */
+--accent-soft: 32 95% 58%   /* amber, kept ONLY for warn states */
+```
 
-Seed `service_offers` with the 7 named offers (active, `created_by = NULL` so a deleted user doesn't orphan, but every row stays editable/deletable per RLS).
+**Light scope (`.stm-marketing .section-light`):**
+```
+--background: 42 25% 94%    /* #F4F1EA ivory */
+--panel / --card: 0 0% 100% /* #FFFFFF */
+--border: 40 20% 85%        /* #E2DDD1 */
+--foreground: 30 12% 9%     /* #1A1714 */
+--muted-foreground: 32 9% 39%   /* #6B6459 */
+/* accent inherits emerald */
+```
 
-## 2. Edge functions (Lovable AI Gateway, capture-classify pattern)
+**Dead tokens removed:** `--electric` (199 89% 65%), `--violet` (265 89% 66%), and every hard-coded `217 91% 60%` / `265 89% 66%` / `199 89% 65%` HSL inside `.stm-marketing` utilities (`glow-ember`, `section-alt`, `hover-lift`, `glow-border`, `ring-gradient`, `live-dot` keyframes, `section-light-tint`). Each is replaced with the emerald token so there is no electric blue or violet residue anywhere.
 
-Both use `LOVABLE_API_KEY` → `https://ai.gateway.lovable.dev/v1/chat/completions`, model `google/gemini-2.5-flash`, service-role client for writes, JWT verified in code, CORS headers.
+**Hero gradient text** in `Hero.tsx` (`from-electric via-accent to-violet`) is the only component-level color override and will be swapped to a subtle emerald/ivory treatment — single edit, no copy change.
 
-### `crm-analyze-lead`
-Body: `{ company_id, deal_id?, source_kind: 'url'|'text', source_url?, source_text? }`.
-- If `url`: `fetch(url)` with 8s timeout + browser-ish UA, strip HTML to text (~15k chars). On any failure (non-200, timeout, blocked) return `{ ok:false, code:'fetch_failed', message:'Couldn't read the URL — paste details instead' }` — UI shows that hint and switches to text mode. **No throw.**
-- Loads all `service_offers` where `status='active'`, passes name + who_its_for + problem_solved + best_target to the prompt.
-- Prompt asks for strict JSON: `{ summary, recommended_offer_id, recommendation_reason, priority }`.
-- Inserts row into `crm_lead_analyses`; returns it.
+**Result:** every component reads `bg-background`, `text-foreground`, `text-accent`, `border-border`, etc. and inherits the new system. No per-component color edits needed beyond the one Hero gradient line.
 
-### `crm-generate-outreach`
-Body: `{ analysis_id, channel, tone?, sequence_days?: number[] (default [1,3,7,14,30]) }`.
-- Loads analysis + recommended offer + company. Prompt asks for `{ opener, sequence: [{day,label,body}] }` written TO the matched offer in the chosen channel/tone.
-- Inserts row into `crm_outreach_drafts`; returns it. No send.
+---
 
-Register both in `supabase/config.toml` with `verify_jwt = true` (CRM data; users must be authed).
+### 2. Central typography
 
-## 3. Frontend
+In the same `.stm-marketing` block (`src/index.css`):
 
-### Offers library — `/offers`
-- `src/pages/Offers.tsx` + `src/components/offers/ServiceOfferDialog.tsx` + `src/hooks/useServiceOffers.ts` (mirror `useAffiliatePrograms`).
-- Table list with status badge, edit/delete, "+ New Offer" dialog.
-- Permissions: add `'offers'` to `PageKey`, `PAGE_CONFIG`, `ROUTE_TO_PAGE_KEY` in `src/types/permissions.ts`. Add nav entry in `AppSidebar.tsx` (Briefcase icon, in same group as Products/Affiliate Programs).
-- Route added in `src/App.tsx` behind `ProtectedRoute`.
+- **Body / default** (`.stm-marketing { font-family: ... }`): Inter — already set, kept.
+- **Headlines** (`.stm-marketing .font-display`): Space Grotesk — already set, kept and reinforced. All section headings already use `font-display`.
+- **Mono labels** (`.stm-marketing .font-mono-label`, `.eyebrow` variants): JetBrains Mono — kept ONLY for small technical labels (eyebrows, "DAILY BRIEF", "OPERATION SCORE", timestamps, "4/4 CONNECTED").
+- **Audit pass**: grep for `font-mono` usage inside `src/components/marketing/**` and downgrade any non-label usages (e.g. hero pill, brand lockup tagline). Specifically:
+  - `Nav.tsx` brand lockup name → `font-display`; tagline → small Inter uppercase tracking (drops the blocky mono look). Currently uses mono — this is the only "brand lockup" edit.
+  - Any `font-mono` on body paragraphs or large headlines gets removed.
 
-### CRM Company detail — Client Acquisition panel
-- New `src/components/crm/LeadAnalysisPanel.tsx` mounted inside `CompanyDetail.tsx`.
-  - Shows latest analysis (summary, matched offer badge w/ link to `/offers`, reason, priority chip, timestamp).
-  - "Analyze Lead" button opens dialog: radio URL/Text → input → calls `crm-analyze-lead`. URL-fetch-fail surfaces the inline fallback message and pre-selects Text.
-  - "History" disclosure lists prior analyses.
-- New `src/components/crm/OutreachDraftPanel.tsx` (below analysis panel).
-  - "Generate Outreach" button (disabled until an analysis exists): pick channel (cold_email/linkedin_dm/instagram_dm/sms), tone (free text), sequence day chips (default 1/3/7/14/30, add/remove).
-  - Renders opener + each step in editable textareas; Save (UPDATE) and Copy buttons per block. Lists prior drafts.
-- Hooks: `src/hooks/useLeadAnalyses.ts`, `src/hooks/useOutreachDrafts.ts` (TanStack Query, invoke edge functions + direct table reads/updates).
+Google Fonts import at the top of `index.css` already loads Space Grotesk + Inter + JetBrains Mono — no new requests.
 
-## 4. Verification checklist
-1. `/offers` lists the 7 seeded rows; create/edit/delete works; nav + permission key in place.
-2. From a CRM company: Analyze Lead with URL → on block, inline "couldn't read URL, paste details" appears and Text mode is pre-selected; analysis row persists in `crm_lead_analyses` and renders.
-3. Generate Outreach against latest analysis → row in `crm_outreach_drafts`; opener + sequence editable + saved; Copy works; no send path exists.
-4. No new tables shadow `crm_companies`/`crm_deals`; service_offers RLS = authenticated CRUD; both edge functions use Lovable AI Gateway with `google/gemini-2.5-flash`; `tsc` clean.
+---
 
-## Out of scope
-No sending integrations, no campaign scheduler, no email-template engine, no changes to existing CRM tables (only new FKs pointing at them), no changes to capture-classify, products, affiliate programs, pillar scoring, or marketing_campaigns.
+### 3. Scorecard / "one live view" instances — KEEP/CUT audit
+
+Every place I found that renders a scorecard, dashboard mockup, or "one live view" widget:
+
+| # | Location | What it is | Decision |
+|---|---|---|---|
+| 1 | `Hero.tsx` → `HeroTriage` | Interactive "pick what hurts most" triage card | **KEEP** (routing element, unique) |
+| 2 | `ConnectiveLayer.tsx` | Before/After "Disconnected tools → One live view" split | **KEEP** (most persuasive) |
+| 3 | `showcase/OpsDashboardShowcase.tsx` | Standalone "Every tool…condensed into one live view" dashboard mockup section | **CUT** (duplicates #2's idea with a mockup) |
+| 4 | `WhatIBuild.tsx` top Panel | "Weekly owner scorecard / What a week actually looks like" 4-metric strip above the service grid | **CUT** (duplicates #2; service grid below stays intact) |
+| 5 | `Proof.tsx` | BarPulse case study — mentions "4-pillar weekly scorecard" in body copy, no widget | **KEEP** (text only, it's the case study) |
+
+**Cut implementation:**
+- Remove `<OpsDashboardShowcase />` import + usage in `src/pages/MarketingSite.tsx` (file itself left on disk, unreferenced — non-destructive).
+- In `WhatIBuild.tsx`, delete the top `<Panel>…</Panel>` block (lines ~23–50) and its unused `LiveDot` import; service grid (`items.map(...)`) is preserved verbatim.
+
+Net result: the "one live view" concept appears strongly **twice** — Hero triage + Before/After.
+
+---
+
+### 4. Files touched
+
+- `src/index.css` — rewrite `.stm-marketing` token block + `.section-light` block + scoped utilities (single edit, central).
+- `src/components/marketing/site/Nav.tsx` — brand lockup typography swap (mono → display + small sans tagline).
+- `src/components/marketing/sections/Hero.tsx` — replace `from-electric via-accent to-violet` gradient with emerald treatment.
+- `src/components/marketing/sections/WhatIBuild.tsx` — delete top scorecard Panel.
+- `src/pages/MarketingSite.tsx` — remove `OpsDashboardShowcase` import + render line.
+
+Untouched: `Contact.tsx`, contact-form plumbing, edge function `submit-inbound-lead`, `inbound_leads` table, `App.tsx` routing, Log in link, all back-office code, all other marketing section structure/content.
+
+---
+
+### Verify
+
+1. Grep `src/components/marketing` and `.stm-marketing` block for `217 91% 60%`, `199 89% 65%`, `265 89% 66%`, `electric`, `violet`, `#3B82F6` → zero hits.
+2. Grep `font-mono` inside marketing → only on small label classes (`font-mono-label`, eyebrow pills, timestamps).
+3. `MarketingSite.tsx` no longer imports `OpsDashboardShowcase`; `WhatIBuild.tsx` no longer renders the scorecard Panel.
+4. `Contact.tsx` unchanged (diff = 0 lines); routing in `App.tsx` unchanged.
+5. `tsc` clean.
