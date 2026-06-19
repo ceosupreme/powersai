@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MonoLabel } from "./primitives";
-
 const links = [
   { href: "#lead-followup", label: "Lead Follow-Up" },
   { href: "#ops-dashboard", label: "Dashboard" },
@@ -38,9 +36,9 @@ export function Nav() {
           <span className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
             Supreme Team Media
           </span>
-          <MonoLabel className="hidden text-[0.62rem] md:block">
+          <span className="hidden text-[0.62rem] font-medium uppercase tracking-[0.16em] text-muted-foreground md:block">
             AI Systems &amp; Operational Intelligence Studio
-          </MonoLabel>
+          </span>
         </a>
 
         <nav className="hidden items-center gap-8 md:flex">

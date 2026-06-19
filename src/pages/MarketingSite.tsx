@@ -5,7 +5,6 @@ import { Nav } from "@/components/marketing/site/Nav";
 import { Hero } from "@/components/marketing/sections/Hero";
 import { TechStack } from "@/components/marketing/sections/TechStack";
 import { LeadFollowUpShowcase } from "@/components/marketing/sections/showcase/LeadFollowUpShowcase";
-import { OpsDashboardShowcase } from "@/components/marketing/sections/showcase/OpsDashboardShowcase";
 import { InsightsShowcase } from "@/components/marketing/sections/showcase/InsightsShowcase";
 import { ChatMarquee } from "@/components/marketing/sections/ChatMarquee";
 import { AssistantShowcase } from "@/components/marketing/sections/showcase/AssistantShowcase";
@@ -70,7 +69,6 @@ export default function Marketing() {
         <Hero />
         <TechStack />
         <LeadFollowUpShowcase />
-        <OpsDashboardShowcase />
         <InsightsShowcase />
         <ChatMarquee />
         <AssistantShowcase />
