@@ -17,6 +17,9 @@ import {
 import { useApp } from "@/context/AppContext";
 import { ArchiveOrDeleteDialog, type LinkedLine } from "@/components/shared/ArchiveOrDeleteDialog";
 import { SuggestionsPanel } from "@/components/help/SuggestionsPanel";
+import { LeadAnalysisPanel } from "@/components/crm/LeadAnalysisPanel";
+import { OutreachDraftPanel } from "@/components/crm/OutreachDraftPanel";
+import type { LeadAnalysis } from "@/hooks/useLeadAnalyses";
 
 export function CompanyDetail({ companyId, onOpenChange }: {
   companyId: string | null; onOpenChange: (open: boolean) => void;
@@ -30,6 +33,7 @@ export function CompanyDetail({ companyId, onOpenChange }: {
   const m = useCrmMutations();
   const linkCounts = useCompanyLinkCounts(companyId);
   const [delOpen, setDelOpen] = useState(false);
+  const [latestAnalysis, setLatestAnalysis] = useState<LeadAnalysis | null>(null);
 
   const company = companyQ.data;
   const deals = (dealsQ.data ?? []).filter((d) => d.company_id === companyId);
@@ -234,6 +238,14 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                   </div>
                 ))}
               </section>
+
+              {/* Client Acquisition: AI lead analysis + outreach drafts */}
+              <LeadAnalysisPanel
+                companyId={company.id}
+                defaultWebsite={company.website}
+                onAnalysisChange={setLatestAnalysis}
+              />
+              <OutreachDraftPanel companyId={company.id} analysis={latestAnalysis} />
             </div>
           </>
         )}
