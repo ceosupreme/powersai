@@ -48,6 +48,7 @@ import {
   Rocket,
   Link2,
   Package,
+  Tag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -98,6 +99,7 @@ const navGroups: NavGroup[] = [
     items: [
       { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'crm' },
       { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'crm' },
+      { path: '/offers', label: 'Offers', icon: Tag, pageKey: 'offers' },
       { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
     ],
   },

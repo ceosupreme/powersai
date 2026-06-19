@@ -22,7 +22,8 @@ export type PageKey =
   | 'content_pipeline'
   | 'revenue'
   | 'affiliate_programs'
-  | 'products';
+  | 'products'
+  | 'offers';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -80,6 +81,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'revenue', label: 'Channel Revenue', canDisable: true },
   { key: 'affiliate_programs', label: 'Affiliate Programs', canDisable: true },
   { key: 'products', label: 'Products', canDisable: true },
+  { key: 'offers', label: 'Offers', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -108,4 +110,5 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/revenue': 'revenue',
   '/affiliate-programs': 'affiliate_programs',
   '/products': 'products',
+  '/offers': 'offers',
 };

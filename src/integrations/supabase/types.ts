@@ -1841,6 +1841,146 @@ export type Database = {
           },
         ]
       }
+      crm_lead_analyses: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          deal_id: string | null
+          fetched_content: string | null
+          id: string
+          model: string | null
+          priority: string | null
+          recommendation_reason: string | null
+          recommended_offer_id: string | null
+          source_kind: string
+          source_text: string | null
+          source_url: string | null
+          summary: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          deal_id?: string | null
+          fetched_content?: string | null
+          id?: string
+          model?: string | null
+          priority?: string | null
+          recommendation_reason?: string | null
+          recommended_offer_id?: string | null
+          source_kind: string
+          source_text?: string | null
+          source_url?: string | null
+          summary?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          deal_id?: string | null
+          fetched_content?: string | null
+          id?: string
+          model?: string | null
+          priority?: string | null
+          recommendation_reason?: string | null
+          recommended_offer_id?: string | null
+          source_kind?: string
+          source_text?: string | null
+          source_url?: string | null
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_lead_analyses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_lead_analyses_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_lead_analyses_recommended_offer_id_fkey"
+            columns: ["recommended_offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_outreach_drafts: {
+        Row: {
+          analysis_id: string
+          channel: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          model: string | null
+          offer_id: string | null
+          opener: string | null
+          sequence: Json
+          tone: string | null
+          updated_at: string
+        }
+        Insert: {
+          analysis_id: string
+          channel: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          model?: string | null
+          offer_id?: string | null
+          opener?: string | null
+          sequence?: Json
+          tone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          analysis_id?: string
+          channel?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          model?: string | null
+          offer_id?: string | null
+          opener?: string | null
+          sequence?: Json
+          tone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_outreach_drafts_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "crm_lead_analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_outreach_drafts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_outreach_drafts_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_metrics: {
         Row: {
           airtable_synced: boolean | null
@@ -6373,6 +6513,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      service_offers: {
+        Row: {
+          best_target: string | null
+          created_at: string
+          created_by: string | null
+          deliverables: string | null
+          description: string | null
+          id: string
+          name: string
+          premium_price: number | null
+          problem_solved: string | null
+          starter_price: number | null
+          status: string
+          timeline: string | null
+          updated_at: string
+          who_its_for: string | null
+        }
+        Insert: {
+          best_target?: string | null
+          created_at?: string
+          created_by?: string | null
+          deliverables?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          premium_price?: number | null
+          problem_solved?: string | null
+          starter_price?: number | null
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          who_its_for?: string | null
+        }
+        Update: {
+          best_target?: string | null
+          created_at?: string
+          created_by?: string | null
+          deliverables?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          premium_price?: number | null
+          problem_solved?: string | null
+          starter_price?: number | null
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          who_its_for?: string | null
+        }
+        Relationships: []
       }
       shift_feedback: {
         Row: {
