@@ -7,7 +7,7 @@ export function Hero() {
     <section id="top" className="relative overflow-hidden pb-32 pt-40 md:pb-40 md:pt-56">
       <Container className="relative">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-20">
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-8">
             <div className="reveal" style={{ animationDelay: "60ms" }}>
               <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
                 AI Systems &amp; Operational Intelligence Studio
@@ -50,7 +50,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-4">
             <div className="reveal relative" style={{ animationDelay: "320ms" }}>
               <HeroTriage />
             </div>
