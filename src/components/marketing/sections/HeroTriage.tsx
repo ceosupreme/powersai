@@ -18,15 +18,10 @@ export function HeroTriage() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-7 md:p-8 shadow-[0_1px_0_rgba(0,0,0,0.02),0_24px_60px_-40px_rgba(20,20,15,0.25)]">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <HelpCircle size={14} className="text-accent" />
-          <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-foreground/70">
-            stm/triage
-          </span>
-        </div>
-        <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
-          30s
+      <div className="flex items-center gap-2">
+        <HelpCircle size={14} className="text-accent" />
+        <span className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Quick triage
         </span>
       </div>
 
@@ -53,7 +48,7 @@ export function HeroTriage() {
             >
               <span
                 className={
-                  "inline-flex h-7 w-7 items-center justify-center rounded-md border font-mono text-[0.7rem] " +
+                  "inline-flex h-7 w-7 items-center justify-center rounded-md border text-[0.7rem] font-medium " +
                   (on
                     ? "border-accent bg-accent text-accent-foreground"
                     : "border-border text-foreground/70")
@@ -80,7 +75,7 @@ export function HeroTriage() {
         </button>
         <a
           href="#contact"
-          className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
+          className="text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
         >
           None of these → talk to a human
         </a>
@@ -93,7 +88,7 @@ export function HeroTriage() {
           { k: "Audit log", v: "Full" },
         ].map((m) => (
           <div key={m.k}>
-            <div className="font-mono text-[0.55rem] uppercase tracking-[0.16em] text-muted-foreground">
+            <div className="text-[0.6rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {m.k}
             </div>
             <div className="mt-1 text-[0.8rem] text-foreground">{m.v}</div>

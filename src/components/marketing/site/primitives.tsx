@@ -3,7 +3,13 @@ import type { HTMLAttributes, PropsWithChildren } from "react";
 
 export function MonoLabel({ className, children, ...rest }: HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span {...rest} className={cn("font-mono-label text-muted-foreground", className)}>
+    <span
+      {...rest}
+      className={cn(
+        "text-[0.62rem] font-medium uppercase tracking-[0.18em] text-muted-foreground",
+        className,
+      )}
+    >
       {children}
     </span>
   );
@@ -69,7 +75,7 @@ export function Container({
   children,
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <div className={cn("mx-auto w-full max-w-[1180px] px-6 md:px-10", className)}>
+    <div className={cn("mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:px-20", className)}>
       {children}
     </div>
   );
