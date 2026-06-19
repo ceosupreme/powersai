@@ -48,6 +48,7 @@ import ContentPipeline from "./pages/ContentPipeline";
 import ChannelRevenue from "./pages/ChannelRevenue";
 import AffiliatePrograms from "./pages/AffiliatePrograms";
 import Products from "./pages/Products";
+import Offers from "./pages/Offers";
 import Crm from "./pages/Crm";
 import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
@@ -173,6 +174,11 @@ const App = () => {
                 <Route path="/products" element={
                   <ProtectedRoute pageKey="products">
                     <AppLayout><Products /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/offers" element={
+                  <ProtectedRoute pageKey="offers">
+                    <AppLayout><Offers /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/crm" element={
