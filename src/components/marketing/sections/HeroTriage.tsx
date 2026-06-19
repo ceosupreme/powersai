@@ -17,15 +17,15 @@ export function HeroTriage() {
   }
 
   return (
-    <div className="glow-border relative overflow-hidden rounded-xl p-6 md:p-7">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-7 md:p-8 shadow-[0_1px_0_rgba(0,0,0,0.02),0_24px_60px_-40px_rgba(20,20,15,0.25)]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HelpCircle size={14} className="text-accent" />
-          <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-foreground/80">
+          <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-foreground/70">
             stm/triage
           </span>
         </div>
-        <span className="rounded-full border border-border bg-background/60 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
           30s
         </span>
       </div>
@@ -47,8 +47,8 @@ export function HeroTriage() {
               className={
                 "w-full text-left flex items-center gap-3 rounded-md border px-3.5 py-3 transition-all duration-200 " +
                 (on
-                  ? "border-accent bg-accent/10"
-                  : "border-border bg-background/40 hover:border-accent/40 hover:bg-accent/5")
+                  ? "border-accent bg-accent/[0.06]"
+                  : "border-border bg-transparent hover:border-accent/40 hover:bg-accent/[0.04]")
               }
             >
               <span
@@ -56,14 +56,14 @@ export function HeroTriage() {
                   "inline-flex h-7 w-7 items-center justify-center rounded-md border font-mono text-[0.7rem] " +
                   (on
                     ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border bg-background/50 text-foreground/80")
+                    : "border-border text-foreground/70")
                 }
               >
                 {o.key}
               </span>
               <span className="text-[0.92rem] text-foreground">{o.label}</span>
               {on && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-accent live-dot" />
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[hsl(var(--signal))] live-dot" />
               )}
             </button>
           );
