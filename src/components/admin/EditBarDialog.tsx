@@ -542,7 +542,6 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
 
                 {/* Asana — Log Sources */}
                 {editingBar ? (
-                  <div className="space-y-4">
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
