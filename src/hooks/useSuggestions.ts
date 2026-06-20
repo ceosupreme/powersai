@@ -248,7 +248,7 @@ export function useSuggestions() {
         if (!p.project_type) {
           out.push({
             dismissKey: `sugg:no-project-type:${p.id}`,
-            title: `${p.bar_name}: no project type set`,
+            title: `${p.name}: no project type set`,
             body: "Pick a vertical so the right pillars and qualifier questions apply.",
             href: `/admin?tab=projects&project=${p.id}`,
             ctaLabel: "Set type",
@@ -303,7 +303,7 @@ export function useSuggestions() {
         if (reviewedProjects.has(p.id)) continue;
         out.push({
           dismissKey: `sugg:weekly-review-due:${p.id}:${weekStart}`,
-          title: `${p.bar_name}: no Weekly Review this week`,
+          title: `${p.name}: no Weekly Review this week`,
           body: "Grade the pillars so the Pillar Score stays fresh.",
           href: "/weekly-review",
           ctaLabel: "Open Weekly Review",
@@ -321,7 +321,7 @@ export function useSuggestions() {
         if (!proj) continue;
         out.push({
           dismissKey: `sugg:open-findings:${pid}:${count}`,
-          title: `${proj.bar_name}: ${count} open growth finding${count === 1 ? "" : "s"}`,
+          title: `${proj.name}: ${count} open growth finding${count === 1 ? "" : "s"}`,
           body: "Review and clear them on the Growth Audit.",
           href: "/growth-audit",
           ctaLabel: "Open Growth Audit",
@@ -335,7 +335,7 @@ export function useSuggestions() {
         if (projectsWithContent.has(p.id)) continue;
         out.push({
           dismissKey: `sugg:no-content:${p.id}`,
-          title: `${p.bar_name}: no content items yet`,
+          title: `${p.name}: no content items yet`,
           body: "Add an item to start using the 7-stage pipeline.",
           href: "/content",
           ctaLabel: "Open Content",
@@ -346,13 +346,13 @@ export function useSuggestions() {
       // --- N: No Channel Revenue logged this month ---
       const ym = now.toISOString().slice(0, 7);
       const projectsWithRevenueThisMonth = new Set(
-        channelRevenue.filter((r) => (r.month ?? "").slice(0, 7) === ym).map((r) => r.project_id),
+        channelRevenue.filter((r) => (r.period_month ?? "").slice(0, 7) === ym).map((r) => r.project_id),
       );
       for (const p of projects) {
         if (projectsWithRevenueThisMonth.has(p.id)) continue;
         out.push({
           dismissKey: `sugg:no-revenue:${p.id}:${ym}`,
-          title: `${p.bar_name}: no revenue logged for ${ym}`,
+          title: `${p.name}: no revenue logged for ${ym}`,
           body: "Log Channel Revenue so the Monetization pillar has data.",
           href: "/channel-revenue",
           ctaLabel: "Open Channel Revenue",
