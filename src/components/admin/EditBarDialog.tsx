@@ -327,7 +327,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
     }
     setIsSaving(true);
     try {
-      const payload = {
+      const payload: Record<string, any> = {
         name: formData.name.trim(),
         bar_code: formData.bar_code.trim(),
         address: formData.address.trim() || null,
@@ -350,6 +350,8 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
         toast.success('Project updated');
       } else {
+        // Carry the originating lead forward so the new client record references it.
+        if (sourceLeadId) payload.source_lead_id = sourceLeadId;
         const { data: inserted, error } = await supabase
           .from('venues')
           .insert(payload)
@@ -357,6 +359,38 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
           .single();
         if (error) throw error;
         newId = (inserted as any)?.id as string | undefined;
+        // Post-create wiring for lead-sourced creations: leadership contact + bridge stamps.
+        if (newId && initialProposal && sourceLeadId) {
+          const c = initialProposal.contact;
+          if (c && (c.display_name || c.email || c.phone)) {
+            const role = (c.role_label || '').toLowerCase();
+            const role_type =
+              role.includes('owner') ? 'owner'
+              : role.includes('gm') || role.includes('general manager') ? 'gm'
+              : 'lead_staff';
+            await supabase.from('venue_leadership_contacts').insert({
+              venue_id: newId,
+              display_name: c.display_name || c.email || c.phone || 'Lead Contact',
+              role_type,
+              is_primary: true,
+              is_active: true,
+            });
+          }
+          if (c && (c.display_name || c.email || c.phone)) {
+            await supabase.from('venue_contacts' as any).insert({
+              venue_id: newId,
+              name: c.display_name || c.email || c.phone || 'Lead Contact',
+              role_label: c.role_label || 'Primary contact',
+              phone: c.phone || null,
+              email: c.email || null,
+              note: 'Imported from inbound lead',
+            });
+          }
+          await supabase
+            .from('inbound_leads')
+            .update({ status: 'promoted', promoted_venue_id: newId })
+            .eq('id', sourceLeadId);
+        }
         toast.success('Project created');
       }
       onOpenChange(false);
