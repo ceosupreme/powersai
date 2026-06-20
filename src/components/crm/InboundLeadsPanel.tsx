@@ -20,7 +20,7 @@ export function InboundLeadsPanel() {
   return (
     <div className="space-y-3">
       <HelpTip helpKey={HELP_KEYS.crmInbound} title="What lands here">
-        Submissions from the public marketing site write to <code>inbound_leads</code> (admin-only). Triage by archiving noise, promoting real opportunities into the regular CRM flow, or hard-deleting via the protection dialog.
+        Three sources land here: the public marketing site form, the Lead Qualifier at <code>/qualify/&lt;vertical&gt;</code> (voice/chat/form), and manual inserts. Each row carries the channel, the structured answers, and the transcript when there is one. Promote real opportunities into the CRM flow; archive noise; the protection dialog handles hard deletes.
       </HelpTip>
       <Tabs value={status} onValueChange={(v) => setStatus(v as InboundLeadStatus)}>
         <TabsList>
