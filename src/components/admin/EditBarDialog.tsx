@@ -809,6 +809,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
               {/* ── PILLARS ────────────────────────────────────── */}
               <TabsContent value="pillars" className="mt-0 space-y-4">
                 {editingBar ? (
+                  <div className="space-y-4">
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
