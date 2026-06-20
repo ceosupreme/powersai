@@ -25,6 +25,7 @@ import { ProjectLeakVectorOverridesPanel } from './ProjectLeakVectorOverridesPan
 import { ProjectQualifierOverridesPanel } from './ProjectQualifierOverridesPanel';
 import type { ProjectType } from '@/lib/effectivePillars';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
+import type { ProjectSetupProposal } from '@/hooks/useLeadProposal';
 
 interface Bar {
   id: string;
@@ -129,9 +130,13 @@ interface Props {
   editingBar: Bar | null;
   onSaved: (newVenueId?: string) => void;
   onDeleted?: () => void;
+  /** When creating a new venue, optionally pre-fill from a lead proposal. */
+  initialProposal?: ProjectSetupProposal | null;
+  /** Stamped onto `venues.source_lead_id` for the new venue. */
+  sourceLeadId?: string | null;
 }
 
-export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDeleted }: Props) => {
+export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDeleted, initialProposal, sourceLeadId }: Props) => {
   const [formData, setFormData] = useState<FormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
@@ -157,7 +162,8 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
   useEffect(() => {
     if (!open) return;
     setActiveTab('basic');
-    setFormData(editingBar ? {
+    if (editingBar) {
+      setFormData({
       name: editingBar.name,
       bar_code: editingBar.bar_code || '',
       address: editingBar.address || '',
@@ -172,7 +178,22 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       google_place_id: editingBar.google_place_id || '',
       task_source: editingBar.task_source || 'none',
       project_type: (editingBar.project_type as ProjectType) || 'client',
-    } : defaultForm);
+      });
+    } else if (initialProposal) {
+      const d = initialProposal.direct;
+      const seededName = (d.name || '').trim();
+      const seededType = (d.type_ok(d.project_type, projectTypes)) || defaultForm.project_type;
+      setFormData({
+        ...defaultForm,
+        name: seededName,
+        bar_code: deriveBarCode(seededName),
+        address: d.address || '',
+        timezone: d.timezone || defaultForm.timezone,
+        project_type: seededType as ProjectType,
+      });
+    } else {
+      setFormData(defaultForm);
+    }
     setPlaceResults([]);
     setVenueLeaders([]);
     setNewLeaderName('');
@@ -188,7 +209,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       fetchVenueLeaders(editingBar.id);
       fetchVenueContacts(editingBar.id);
     }
-  }, [open, editingBar]);
+  }, [open, editingBar, initialProposal, projectTypes]);
 
   const fetchVenueLeaders = async (venueId: string) => {
     const { data } = await supabase
