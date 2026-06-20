@@ -1,87 +1,129 @@
-# Build 1 — Lead Qualifier (Home Services test cell)
+# Help & Onboarding Refresh — Plan
 
-## Existing pieces I'll reuse
+Goal: bring the existing help framework (it still only covers ~7 early features) up to date for every current feature, especially the new ones (Lead Qualifier, Project Types/Verticals, Config editor, Content Pipeline, Channel Revenue, Affiliate Libraries, Weekly Review, Insights, Marketing Hub, Chat, Logs). Reuse all current components — `HELP_ARTICLES`, `HELP_KEYS`, `HelpTip`, `SetupWizard`, `SuggestionsPanel` / `useSuggestions`, `LAUNCH_CHECKLIST`, `useChecklist`, `SettingsHelpTab`. No new framework. Additive only.
 
-**Voice (extend, don't rebuild):**
-- `src/hooks/useRealtimeVoiceInterview.ts` — WebRTC mic + OpenAI Realtime client over WSS. Today it takes log-form `sections` and walks fields. I'll **generalize** it: accept a generic `QualifierField[]` (id, label, type, options, required) instead of `LogSection[]`, and a system-prompt builder. The audio loop, connection state machine, transcript handling, and barge-in are kept as-is.
-- `src/components/shared/VoiceInterviewMode.tsx` — mic UI / progress / transcripts. Reused; switched to the generic field shape.
-- `supabase/functions/openai-realtime-proxy/index.ts` — WSS proxy to OpenAI Realtime. Reused. Extended to accept a `mode=qualifier` + a JSON `qualifier_context` (vertical, fields, ready_definition) and produce a tailored system prompt that conducts a friendly back-and-forth, asks one thing at a time, and emits a final `function_call` (`submit_qualified_lead`) with structured field values when done.
-- Hardcoded WSS host in `useRealtimeVoiceInterview.ts` will be switched to `import.meta.env.VITE_SUPABASE_URL` (current value points at a different project ref — bug for our project).
+## 1. Help Center articles (`src/config/helpArticles.ts`)
 
-**Config-driven (Build 0):**
-- `useEffectiveQualifierFields(projectId)` + `useQualifierConfig(projectType)` → the agent reads its question list AND `ready_definition` from these hooks; nothing about Home Services is hardcoded in agent code. Swap the project's type → questions change.
+Keep existing 9 articles. Add the following new entries (same `HelpArticle` shape, plain-language, multi-section):
 
-**CRM + intake:**
-- `inbound_leads` (extend) → promote into `crm_companies` / `crm_contacts` / `crm_deals` using the existing promote pattern. All qualified leads route through `inbound_leads` first so we keep a single intake surface and the existing review UI (`InboundLeadsPanel`) still works.
-- `submit-inbound-lead` edge function — extended to accept qualifier payload + transcript.
+- `concepts-overview` — "How this OS fits together": Portfolio → selected project → everything is project-scoped (except account-wide libraries). The two scores: Pillar Score (Weekly Review) vs Growth Score (Growth Audit). Where data comes from.
+- `project-types-verticals` — Replaces light "projects" article context. Explains that a project type = a vertical. Its template controls **pillars + leak vectors + qualifier fields**. Per-project overrides REPLACE the template list. Adding a new vertical = configuring a type, not coding.
+- `config-editor` — Admin → Settings → Pillars/Leak Vectors/Qualifier Fields tabs, plus per-project override panels on Edit Project. Plain explanation of each of the three concepts.
+- `weekly-review` — Setting/updating pillar scores; what each pillar means; produces the Pillar Score.
+- `insights` — AI observations on the active project; how to read them.
+- `portfolio` — The home view; selecting a project sets active project everywhere.
+- `lead-qualifier` — Voice/chat/form qualifier at `/qualify/[vertical]`; questions come from the project type's qualifier fields; qualified leads flow into Inbound Leads → CRM. Includes "how to test", "how to change the questions" (point to config editor).
+- `inbound-leads` — Where web/qualifier leads land; promote to CRM company + deal.
+- `content-pipeline` — Items, 7 stages, List/Kanban; usage flow.
+- `channel-revenue` — Logging revenue by channel/month; feeds Monetization pillar.
+- `marketing-hub` — Campaigns overview.
+- `affiliate-products-libraries` — Account-wide libraries (vs project-scoped data).
+- `tasks-logs-chat` — Single short tool article covering all three.
+- `permissions` — Role basics, who sees what.
 
-## What's new
+Existing `projects`, `crm`, `capture-inbox`, `growth-audit`, `brand-vault`, `backup-export`, `archive-vs-delete`, `marketing-site-inbound`, `getting-started` articles: updated where stale (e.g. mention Pillar Score vs Growth Score, mention qualifier in CRM flow), but not removed.
 
-### 1. Schema (one migration)
+## 2. HelpTip keys (`src/config/helpKeys.ts`) + placements
 
-Extend `public.inbound_leads`:
-- `phone text`
-- `project_type text` (FK-ish to `project_types.id`, default `'home_services'`)
-- `route_to text not null default 'self'` (values: `self` | `operator` | `client`)
-- `qualifier_data jsonb not null default '{}'` — structured field values keyed by `field_key`
-- `is_ready boolean not null default false`
-- `not_ready_reason text`
-- `transcript jsonb not null default '[]'` — `[{role, text, at}]`
-- `conversation_channel text` (`voice` | `chat` | `form` | `phone`)
-- Keep `message` (becomes the lead's opening line / summary). Existing RLS and `promoted_company_id` unchanged.
+Extend `HELP_KEYS` with new dismissible inline tips, and drop a `<HelpTip>` at the top of each major page (where the pattern is already used). New keys + page mounting:
 
-No new CRM tables — qualifier data lives structured on `inbound_leads.qualifier_data` and is copied into `crm_deals.notes` summary + `crm_contacts.phone` on promote.
+- `portfolio` → `src/pages/PortfolioOverview.tsx`
+- `weeklyReview` → `src/pages/WeeklyReview.tsx`
+- `insights` → `src/pages/Insights.tsx`
+- `qualifierPublic` → `src/pages/QualifyLanding.tsx` (only when admin previewing? — actually only when no fields configured; otherwise hidden by `helpEnabled`)
+- `inboundLeads` → `src/components/crm/InboundLeadsPanel.tsx`
+- `contentPipeline` → `src/pages/ContentPipeline.tsx`
+- `channelRevenue` → `src/pages/ChannelRevenue.tsx`
+- `marketingHub` → `src/pages/MarketingHub.tsx`
+- `affiliatePrograms`, `products` → respective pages
+- `tasks`, `logs`, `chat` → respective pages
+- `configEditor` → `SettingsPillarsTab` header (one tip explaining pillars/leak vectors/qualifier fields)
+- `projectOverrides` → top of overrides stack in `EditBarDialog`
 
-### 2. Edge functions
+All existing keys (`crmPipeline`, `crmInbound`, `brandVault`, `captureSuggest`, `pillarsByType`, `backupBeforeChanges`) preserved.
 
-- **`qualifier-session`** (POST, public, honeypot + per-IP rate-limit copied from `submit-inbound-lead`) — given `{ project_id, project_type }`, returns the resolved qualifier field list + `ready_definition` + `primary_channel` (server-side fetch so the public page doesn't need auth). Lets us keep the agent prompt server-built.
-- **`submit-inbound-lead`** (existing, extended) — accept new payload: `{ phone?, project_type, qualifier_data, transcript, is_ready, not_ready_reason?, conversation_channel, route_to }`. Server re-evaluates `is_ready` against `ready_definition` as a sanity check. Always inserts (qualified or not).
-- **`openai-realtime-proxy`** (existing, extended) — new query mode `mode=qualifier`. Reads `project_id` and fetches fields + ready_definition server-side, builds the system prompt:
-  > "You are a friendly intake agent for {vertical_label}. Ask one short question at a time covering: {fields}. Use plain language. When you have enough to decide, call `submit_qualified_lead` with the structured values and a one-sentence summary."
-  Tools: one function `submit_qualified_lead({ qualifier_data, is_ready, not_ready_reason, summary })`. On function-call, the client posts to `submit-inbound-lead` with the assembled transcript.
+## 3. SetupWizard (`src/components/help/SetupWizard.tsx`)
 
-### 3. Frontend
+Replace the 7-step legacy flow with an updated sensible getting-started order, same component, same `useHelpState` plumbing:
 
-- **Route `/qualify/home-services`** (`src/pages/QualifyLanding.tsx`) — branded light/forest landing page (reuses marketing tokens / primitives), single CTA: **"Talk to our intake agent"**. Below: chat fallback + 5-field form fallback. Plain language, friendly.
-- **`src/components/qualifier/VoiceQualifier.tsx`** — wraps the generalized `VoiceInterviewMode`. Loads fields via `useEffectiveQualifierFields(projectId)` and ready_definition via `useQualifierConfig(projectType)`. Streams transcript into local state; on agent function-call → POSTs to `submit-inbound-lead`.
-- **`src/components/qualifier/ChatQualifier.tsx`** — text fallback. Uses the AI Gateway (`google/gemini-3-flash-preview`) via a new `qualifier-chat` edge function (same system prompt builder shared with the realtime proxy).
-- **`src/components/qualifier/FormQualifier.tsx`** — last-resort static form, fields rendered from the same config.
-- `App.tsx` — public route `/qualify/:slug` (no auth).
+1. Welcome — what the OS is (operator, CRM, qualifier, weekly review).
+2. Create or pick a project (Portfolio).
+3. Pick its **project type / vertical** (Edit Project → Type).
+4. Configure / review the **qualifier fields** for that type (Settings → Qualifier Fields).
+5. Try the **Lead Qualifier** at `/qualify/<vertical>` and watch a lead land in **Inbound Leads**.
+6. Set up the **Brand Vault** (optional).
+7. Run your first **Weekly Review** → see the Pillar Score.
+8. Check the **Growth Audit** → understand Growth Score (vs Pillar Score).
+9. Capture Inbox + CRM tour (condensed from current steps).
+10. Where to get help — Help Center, Launch Checklist.
 
-### 4. Generalizing the voice hook
+## 4. Launch Checklist (`src/config/launchChecklist.ts`)
 
-`useRealtimeVoiceInterview` gets a sibling `useRealtimeQualifierAgent({ projectId, projectType, onComplete })` that shares the same `AudioRecorder`/`AudioQueue`/state machine but:
-- doesn't require `sections`,
-- passes `mode=qualifier&project_id=...` to the proxy,
-- listens for `response.function_call_arguments.done` (already streamed by Realtime) and resolves with the structured payload.
+Rewrite the list to reflect real current getting-started flow (keep launch-prep items at the bottom). New ordered keys:
 
-`VoiceInterviewMode` is refactored to accept a generic `{ progressLabel, totalSteps?, currentStep? }` so it renders for both log interviews and the qualifier.
+1. `setup:create-project` — Create your first project (link `/portfolio`).
+2. `setup:pick-project-type` — Set its type/vertical (link `/admin?tab=projects`).
+3. `setup:review-pillars` — Review pillars for this type (link Settings → Pillars).
+4. `setup:review-qualifier-fields` — Review/seed qualifier fields (link Settings → Qualifier Fields).
+5. `setup:try-qualifier` — Run the qualifier (link `/qualify/<slug>`), see a lead land in Inbound Leads.
+6. `setup:promote-lead` — Promote a lead to CRM.
+7. `setup:brand-vault` — Set up brand kit.
+8. `setup:weekly-review` — Submit a Weekly Review → Pillar Score.
+9. `setup:growth-audit` — Open Growth Audit → Growth Score.
+10. `setup:channel-revenue` — Log one Channel Revenue entry.
+11. `setup:content-pipeline` — Add one Content item.
+12. `setup:capture-verify` — (existing) inbox 5-step verification.
+13. `launch:rls-audit`, `launch:full-backup`, `launch:marketing-review`, `launch:ai-routing-sanity`, `launch:archive-protection`, `launch:domain-dns`, `launch:help-content-recheck` — kept from existing list, demoted to the end as launch-prep.
 
-### 5. Phone answering (capability honesty)
+`useChecklist` schema is key-based — existing completed rows for kept keys keep working; new keys start unchecked. No migration needed.
 
-**Not built in this build.** What it requires:
-- A real phone number + Twilio Voice (the **Twilio connector exists** in this workspace per `standard_connectors`; not yet linked).
-- A Twilio Voice webhook → new edge function `twilio-voice-qualifier` returning TwiML that bridges the call to OpenAI Realtime via `<Connect><Stream>` over Twilio Media Streams (μ-law 8 kHz). The `openai-realtime-proxy` needs a second entry point that talks Twilio's binary frame format instead of browser WebRTC frames — non-trivial but doable.
-- Once that's in, the same `mode=qualifier` system prompt + `submit_qualified_lead` tool produce the same `inbound_leads` row (with `conversation_channel='phone'`, `phone` captured from Twilio caller-id).
+## 5. Smart suggestions (`src/hooks/useSuggestions.ts`)
 
-If you want phone in this build, approve linking Twilio and I'll add it as Build 1b. Otherwise the web voice agent ships and we add phone in a follow-up without changing the data model.
+Add new grounded suggestion sources, alongside the 7 existing ones:
 
-### 6. Promote to CRM
+- **No project type set** — projects whose `project_type` is null (or default `general` when others exist). CTA: open Edit Project.
+- **Project type missing qualifier fields** — for any project whose type has zero rows in `project_type_qualifier_fields` AND no per-project overrides. CTA: Settings → Qualifier Fields.
+- **Qualifier has captured leads not yet promoted** — `inbound_leads` rows with `is_ready=true` and `status='new'`. CTA: Inbound Leads.
+- **Project has no Weekly Review this week** — projects without a `project_pillar_scores` row for the current ISO week. CTA: Weekly Review.
+- **Project has open Growth findings** — count from `growth_findings` where status='open'. CTA: Growth Audit.
+- **Content Pipeline empty** — project with zero `content_items`. CTA: Content Pipeline.
+- **Channel Revenue not logged this month** — project with no `channel_revenue` row for current month. CTA: Channel Revenue.
 
-Reuses existing flow in `InboundLeadsPanel`: when you click "Promote" on a qualified lead, it creates `crm_companies` (from `business_name`/`location`), `crm_contacts` (name/email/phone), and a `crm_deals` row with `notes` = formatted qualifier summary + link back to the inbound_leads id. `route_to='self'` filters to your pipeline today; the column lets us split to `operator`/`client` later without schema change.
+All wrapped in `try/catch`-style optional resolution so a missing table never breaks the panel; gated by `helpEnabled` and dismiss keys identical to existing pattern.
 
-## Tradeoffs / call-outs
+## 6. Empty-state copy
 
-- **Phone** deliberately out of scope here (see §5).
-- **`ready_definition` is free-text today.** The agent uses it as guidance + we sanity-check on the server with a small rule pack (required fields present + `urgency != none` + `service_area` matches). A structured rule format is a later build.
-- **Transcript** stored as JSON on `inbound_leads` (small per row); not denormalized to a separate table yet — keep it simple.
-- WSS URL bug in `useRealtimeVoiceInterview` gets fixed as part of the refactor.
+Add a one-time empty-state explainer (existing card pattern, not a new component) to each NEW page when its primary table is empty:
+
+- `QualifyLanding` (admin preview only — public visitor view unchanged)
+- `ContentPipeline`
+- `ChannelRevenue`
+- `AffiliatePrograms`, `Products`
+- `Insights` (when no insights yet)
+- `WeeklyReview` (when no scores submitted)
+- `InboundLeadsPanel` (when zero leads)
+
+Each uses the same `Card` + icon + short copy + CTA pattern already in use elsewhere; honors `helpEnabled` via reading from `useHelpState` for the explanation block.
+
+## 7. Out of scope (non-changes)
+
+- No new DB tables; reuse `user_help_state` + `user_checklist_progress`.
+- No edits to scoring, dashboard branching, RLS, or integrations.
+- No new help framework; only data + small placements in existing components.
+
+## Files changed
+
+- `src/config/helpArticles.ts` — add ~13 articles, update existing.
+- `src/config/helpKeys.ts` — add new keys.
+- `src/config/launchChecklist.ts` — re-ordered + extended.
+- `src/components/help/SetupWizard.tsx` — updated steps.
+- `src/hooks/useSuggestions.ts` — added suggestion sources.
+- Page files for `<HelpTip>` + empty-state inserts: `PortfolioOverview`, `WeeklyReview`, `Insights`, `QualifyLanding`, `ContentPipeline`, `ChannelRevenue`, `MarketingHub`, `AffiliatePrograms`, `Products`, `Tasks`, `Logs`, `Chat`, `crm/InboundLeadsPanel`, `admin/SettingsPillarsTab`, `admin/EditBarDialog` (overrides section header).
 
 ## Verify
 
-1. Voice extension named: `useRealtimeVoiceInterview` + `VoiceInterviewMode` + `openai-realtime-proxy`, generalized — not rebuilt.
-2. `/qualify/home-services` opens, mic button starts a real back-and-forth, chat + form fallbacks present.
-3. Changing `project_type_qualifier_fields` rows for `home_services` (or pointing the page at a different `project_type`) changes the agent's questions with zero code change.
-4. Phone: not built; §5 lists exactly what it needs.
-5. Qualified lead → row in `inbound_leads` with `qualifier_data` populated, `transcript` saved, `is_ready=true`, `route_to='self'`; Promote button pushes to `crm_*`. Not-ready leads written with `is_ready=false` + `not_ready_reason`.
-6. No parallel CRM/AI stack. `tsc` clean.
+- Help Center lists every feature/concept above; existing articles still work.
+- Checklist items appear in the new getting-started order; progress persists.
+- Each new page shows a dismissible tip / empty-state explainer on first open.
+- Suggestions panel surfaces qualifier/weekly-review/content/revenue prompts when conditions are true.
+- `tsc` clean.

@@ -11,6 +11,8 @@ import {
 import { ProductDialog } from "@/components/products/ProductDialog";
 import { formatUSD } from "@/hooks/useChannelRevenue";
 import { toast } from "sonner";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function ProductsPage() {
   const { data: items = [], isLoading } = useChannelProducts();
@@ -39,6 +41,12 @@ export default function ProductsPage() {
           <Plus className="h-4 w-4 mr-1" /> New Product
         </Button>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.products} title="Account-wide library">
+        Products & Courses is shared across all projects — switching projects does NOT change
+        this list. Tag the channels that promote each product so you can connect content and
+        revenue back to the catalog entry.
+      </HelpTip>
 
       <div className="rounded-lg border">
         <Table>

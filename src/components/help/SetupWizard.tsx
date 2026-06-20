@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useHelpState } from "@/hooks/useHelpState";
 import { useAuth } from "@/context/AuthContext";
-import { Sparkles, Folder, Palette, Inbox, Users, Compass, ArrowRight } from "lucide-react";
+import { Sparkles, Folder, Palette, Inbox, Users, Compass, ArrowRight, Layers, ListChecks, Mic, ClipboardCheck, TrendingUp } from "lucide-react";
 
 type Step = {
   icon: React.ComponentType<{ className?: string }>;
@@ -18,13 +18,13 @@ type Step = {
 const STEPS: Step[] = [
   {
     icon: Sparkles,
-    title: "Welcome to Supreme Team Media OS",
+    title: "Welcome to your Operator OS",
     body: (
       <>
-        This is your agency operating system: manage <strong>projects</strong>,
-        a shared <strong>Brand Vault</strong>, a <strong>CRM</strong> for prospects and clients, and a
-        <strong> Capture Inbox</strong> for stray ideas. The wizard guides you — it never creates
-        anything on its own.
+        This OS runs your business across projects: a <strong>CRM</strong>, a public{" "}
+        <strong>Lead Qualifier</strong> (voice + chat), a <strong>Weekly Review</strong> that produces
+        your Pillar Score, a <strong>Growth Audit</strong> that produces your Growth Score, plus
+        Content, Revenue, Brand, Tasks, Logs, and Chat — all scoped to the project you've selected.
       </>
     ),
   },
@@ -33,70 +33,111 @@ const STEPS: Step[] = [
     title: "Create or pick your first project",
     body: (
       <>
-        Projects are the unit of work. Head to the Workspace to create a new project or open an
-        existing one. You'll come back here when you're done.
+        Open Portfolio and add a project (or pick an existing one). Whatever you pick becomes the{" "}
+        <strong>active project</strong> everywhere else.
       </>
     ),
-    actionHref: "/workspace",
-    actionLabel: "Open Workspace",
+    actionHref: "/portfolio",
+    actionLabel: "Open Portfolio",
+  },
+  {
+    icon: Layers,
+    title: "Pick the project's type (= the vertical)",
+    body: (
+      <>
+        A project's <strong>type</strong> decides which pillars, leak vectors, and qualifier questions
+        apply. Adding a new vertical = configuring a type, not coding. Open the project in Admin and
+        set its type.
+      </>
+    ),
+    actionHref: "/admin?tab=projects",
+    actionLabel: "Open Projects admin",
+  },
+  {
+    icon: ListChecks,
+    title: "Review the qualifier questions",
+    body: (
+      <>
+        Settings → <strong>Qualifier Fields</strong> shows the questions the Lead Qualifier will ask
+        for this vertical. Edit them and the live agent updates — no deploy.
+      </>
+    ),
+    actionHref: "/admin?tab=settings&subtab=qualifier",
+    actionLabel: "Open Qualifier Fields",
+  },
+  {
+    icon: Mic,
+    title: "Try the Lead Qualifier",
+    body: (
+      <>
+        Visit <code>/qualify/&lt;vertical&gt;</code> (e.g. /qualify/home-services). Talk or chat
+        through it. A new row should appear under <strong>Inbound Leads</strong> in the CRM with the
+        answers and transcript.
+      </>
+    ),
+    actionHref: "/qualify/home-services",
+    actionLabel: "Open qualifier",
   },
   {
     icon: Palette,
-    title: "Set up a Brand Kit (optional)",
+    title: "Brand Vault (optional)",
     body: (
       <>
-        Drop colors, fonts, taglines, and voice into the Brand Vault for the project you picked.
-        You can skip this and add it later.
+        Drop colors, taglines, hashtags, links, and asset files into the project's brand kit. Skip
+        and come back later if you want.
       </>
     ),
     actionHref: "/brand-kit",
     actionLabel: "Open Brand Vault",
   },
   {
-    icon: Inbox,
-    title: "Capture Inbox",
+    icon: ClipboardCheck,
+    title: "Run your first Weekly Review",
     body: (
       <>
-        Anything you jot down lands here. AI suggests a project + type; you confirm or change
-        the routing. Nothing gets filed automatically without your nod.
+        Grade each pillar for this week. The Weekly Review rolls them up into the{" "}
+        <strong>Pillar Score</strong> — your 'how are we doing' number.
+      </>
+    ),
+    actionHref: "/weekly-review",
+    actionLabel: "Open Weekly Review",
+  },
+  {
+    icon: TrendingUp,
+    title: "Open the Growth Audit",
+    body: (
+      <>
+        Growth Audit produces the <strong>Growth Score</strong> — 'where can we grow'. It's separate
+        from the Pillar Score. 'No data yet' is normal until an audit runs.
+      </>
+    ),
+    actionHref: "/growth-audit",
+    actionLabel: "Open Growth Audit",
+  },
+  {
+    icon: Inbox,
+    title: "Capture Inbox + CRM",
+    body: (
+      <>
+        Capture anything fast — AI suggests a type + project, you accept. In the CRM, archive is the
+        safe default; promote inbound leads into companies + deals.
       </>
     ),
     actionHref: "/inbox",
-    actionLabel: "Open Inbox",
-  },
-  {
-    icon: Users,
-    title: "CRM",
-    body: (
-      <>
-        Track companies → deals → graduate a won deal into a real project. Archive replaces
-        delete by default, so history sticks around.
-      </>
-    ),
-    actionHref: "/crm",
-    actionLabel: "Open CRM",
+    actionLabel: "Open Capture Inbox",
   },
   {
     icon: Compass,
     title: "When you're stuck",
     body: (
       <>
-        The <strong>Help Center</strong> has short articles per feature, and the{" "}
-        <strong>Launch Checklist</strong> tracks setup tasks. Both live in the sidebar.
+        The <strong>Help Center</strong> has a short article per feature, and the{" "}
+        <strong>Launch Checklist</strong> tracks setup tasks. Both live in the sidebar; re-launch this
+        wizard any time from Settings → Help.
       </>
     ),
     actionHref: "/help",
     actionLabel: "Open Help Center",
-  },
-  {
-    icon: Sparkles,
-    title: "You're set",
-    body: (
-      <>
-        Hit Finish to land on the Dashboard. You can re-launch this wizard any time from
-        Settings → Help.
-      </>
-    ),
   },
 ];
 

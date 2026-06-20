@@ -7,6 +7,72 @@ export interface LaunchChecklistItem {
 
 export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
   {
+    key: "setup:create-project",
+    title: "Create your first project",
+    description: "Projects are the unit of work. From Portfolio, add a project — this becomes the active project everywhere else in the app.",
+    link: { to: "/portfolio", label: "Open Portfolio" },
+  },
+  {
+    key: "setup:pick-project-type",
+    title: "Pick the project's type (vertical)",
+    description: "The project type decides which pillars, leak vectors, and qualifier questions apply. Open the project in Admin and set its type — that's how you 'choose a vertical'.",
+    link: { to: "/admin?tab=projects", label: "Open Projects admin" },
+  },
+  {
+    key: "setup:review-pillars",
+    title: "Review pillars for that type",
+    description: "Settings → Pillars shows the pillar template per type. Edit or add pillars; per-project overrides REPLACE the template when set.",
+    link: { to: "/admin?tab=settings&subtab=pillars", label: "Open Pillars editor" },
+  },
+  {
+    key: "setup:review-qualifier-fields",
+    title: "Review the qualifier questions for that type",
+    description: "Settings → Qualifier Fields shows the questions the Lead Qualifier will ask for this vertical. Change them here and the live qualifier updates — no code change.",
+    link: { to: "/admin?tab=settings&subtab=qualifier", label: "Open Qualifier Fields" },
+  },
+  {
+    key: "setup:try-qualifier",
+    title: "Try the Lead Qualifier end-to-end",
+    description: "Open /qualify/<vertical> (e.g. /qualify/home-services). Talk or chat with the AI agent. A qualified lead should land in Inbound Leads with its transcript + answers.",
+    link: { to: "/qualify/home-services", label: "Open qualifier" },
+  },
+  {
+    key: "setup:promote-lead",
+    title: "Promote a lead into the CRM",
+    description: "From CRM → Inbound Leads, take one captured lead and graduate it to a company + deal. This is the flow your sales pipeline uses.",
+    link: { to: "/crm", label: "Open CRM" },
+  },
+  {
+    key: "setup:brand-vault",
+    title: "Set up the Brand Vault for the project",
+    description: "Drop colors, taglines, hashtags, links, and asset files into the project's brand kit. Optional — but it's where everything brand-related lives.",
+    link: { to: "/brand-kit", label: "Open Brand Vault" },
+  },
+  {
+    key: "setup:weekly-review",
+    title: "Run your first Weekly Review",
+    description: "Set this week's pillar scores. The Weekly Review produces the project's Pillar Score — 'how are we doing'.",
+    link: { to: "/weekly-review", label: "Open Weekly Review" },
+  },
+  {
+    key: "setup:growth-audit",
+    title: "Open the Growth Audit",
+    description: "Growth Audit produces the Growth Score — 'where can we grow'. It's separate from the Pillar Score. 'No data yet' is normal until an audit runs.",
+    link: { to: "/growth-audit", label: "Open Growth Audit" },
+  },
+  {
+    key: "setup:channel-revenue",
+    title: "Log one Channel Revenue entry",
+    description: "Channel Revenue tracks income by source/month and feeds the Monetization pillar. Add one row so the data starts populating.",
+    link: { to: "/channel-revenue", label: "Open Channel Revenue" },
+  },
+  {
+    key: "setup:content-pipeline",
+    title: "Add one item to the Content Pipeline",
+    description: "Content Pipeline tracks items through 7 stages (idea → published). Use List or Kanban view. Add one item to see the flow.",
+    link: { to: "/content", label: "Open Content Pipeline" },
+  },
+  {
     key: "launch:domain-dns",
     title: "Point the supremeteammedia domain at this project",
     description: "Configure DNS at your registrar so supremeteammedia.com resolves to this app. Then publish from Lovable so the custom domain is live.",

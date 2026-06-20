@@ -10,6 +10,8 @@ import {
 } from "@/hooks/useAffiliatePrograms";
 import { AffiliateProgramDialog } from "@/components/affiliate/AffiliateProgramDialog";
 import { toast } from "sonner";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function AffiliateProgramsPage() {
   const { data: items = [], isLoading } = useAffiliatePrograms();
@@ -38,6 +40,12 @@ export default function AffiliateProgramsPage() {
           <Plus className="h-4 w-4 mr-1" /> New Program
         </Button>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.affiliatePrograms} title="Account-wide library">
+        Affiliate Programs is one of two account-wide libraries (the other is Products). Unlike
+        most pages, switching projects does NOT change what shows here — build the catalog once
+        and reference it from any project's content, campaigns, or revenue entries.
+      </HelpTip>
 
       <div className="rounded-lg border">
         <Table>

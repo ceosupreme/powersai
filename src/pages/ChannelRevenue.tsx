@@ -6,6 +6,8 @@ import { ChannelRevenue as ChannelRevenueRow, useChannelRevenue } from "@/hooks/
 import { RevenueSummaryCards } from "@/components/revenue/RevenueSummaryCards";
 import { RevenueTable } from "@/components/revenue/RevenueTable";
 import { RevenueEntryDialog } from "@/components/revenue/RevenueEntryDialog";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function ChannelRevenue() {
   const { selectedBar } = useApp();
@@ -36,6 +38,11 @@ export default function ChannelRevenue() {
         </div>
         <Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> New Entry</Button>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.channelRevenue} title="Channel Revenue">
+        Log income by channel and month. This feeds the Monetization pillar in the Weekly Review —
+        without entries here, that pillar can't grade.
+      </HelpTip>
 
       <RevenueSummaryCards items={items} />
 

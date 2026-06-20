@@ -14,6 +14,8 @@ import { ProjectType } from '@/lib/effectivePillars';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
 import { SettingsLeakVectorsTab } from './SettingsLeakVectorsTab';
 import { SettingsQualifierFieldsTab } from './SettingsQualifierFieldsTab';
+import { HelpTip } from '@/components/help/HelpTip';
+import { HELP_KEYS } from '@/config/helpKeys';
 
 interface PillarTemplate {
   id: string;
@@ -105,6 +107,13 @@ export const SettingsPillarsTab = () => {
 
   return (
     <div className="space-y-4">
+      <HelpTip helpKey={HELP_KEYS.configEditor} title="What you're editing here">
+        Each project type (vertical) carries a CONFIG TEMPLATE. <strong>Pillars</strong> are
+        what the Weekly Review grades. <strong>Leak vectors</strong> are where revenue leaks
+        (surfaced in Growth Audit). <strong>Qualifier fields</strong> are the questions the
+        public Lead Qualifier asks at <code>/qualify/&lt;vertical&gt;</code>. Edit here and the
+        whole vertical updates. Per-project overrides live in Edit Project.
+      </HelpTip>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">

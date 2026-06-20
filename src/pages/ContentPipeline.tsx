@@ -7,6 +7,8 @@ import { ContentItem, useContentItems } from "@/hooks/useContentItems";
 import { ContentListView } from "@/components/content/ContentListView";
 import { ContentKanbanView } from "@/components/content/ContentKanbanView";
 import { ContentItemDialog } from "@/components/content/ContentItemDialog";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function ContentPipeline() {
   const { selectedBar } = useApp();
@@ -37,6 +39,12 @@ export default function ContentPipeline() {
         </div>
         <Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> New Content Item</Button>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.contentPipeline} title="Content Pipeline">
+        Plan, draft, and ship content through 7 stages (idea → published). Switch between List
+        and Kanban views. Scoped to the active project — switch project from Portfolio to see a
+        different pipeline.
+      </HelpTip>
 
       <Tabs defaultValue="list">
         <TabsList>
