@@ -7,9 +7,13 @@ import { Label } from '@/components/ui/label';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Plus, Trash2, Save, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProjectType } from '@/lib/effectivePillars';
+import { useProjectTypes } from '@/hooks/useProjectTypes';
+import { SettingsLeakVectorsTab } from './SettingsLeakVectorsTab';
+import { SettingsQualifierFieldsTab } from './SettingsQualifierFieldsTab';
 
 interface PillarTemplate {
   id: string;
@@ -21,16 +25,9 @@ interface PillarTemplate {
   data_source: string | null;
 }
 
-const PROJECT_TYPES: { value: ProjectType; label: string }[] = [
-  { value: 'client', label: 'Client' },
-  { value: 'content_channel', label: 'Content Channel' },
-  { value: 'internal_brand', label: 'Internal Brand' },
-  { value: 'app_build', label: 'App Build' },
-  { value: 'service_offer', label: 'Service Offer' },
-];
-
 export const SettingsPillarsTab = () => {
   const [projectType, setProjectType] = useState<ProjectType>('client');
+  const { data: projectTypes = [] } = useProjectTypes();
   const [rows, setRows] = useState<PillarTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -112,11 +109,11 @@ export const SettingsPillarsTab = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Layers className="h-4 w-4 text-primary" />
-            Pillar Templates
+            Project-Type Config
           </CardTitle>
           <p className="text-xs text-muted-foreground">
-            Defaults for each project type. Projects inherit these unless overridden in Project Settings.
-            Editing a template affects every project of that type without a per-project override.
+            Per-type templates: pillars, leak vectors, and qualifier fields.
+            Projects inherit these unless overridden in Project Settings.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -125,19 +122,31 @@ export const SettingsPillarsTab = () => {
             <Select value={projectType} onValueChange={(v) => setProjectType(v as ProjectType)}>
               <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {PROJECT_TYPES.map((pt) => (
-                  <SelectItem key={pt.value} value={pt.value}>{pt.label}</SelectItem>
+                {projectTypes.map((pt) => (
+                  <SelectItem key={pt.id} value={pt.id}>
+                    {pt.label}{pt.is_vertical ? ' · vertical' : ''}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <span className="ml-auto text-xs text-muted-foreground">
-              Weight sum: <span className={weightSum === 100 ? 'text-signal-green' : 'text-amber-500'}>{weightSum}</span>
-            </span>
           </div>
 
-          {loading ? (
+          <Tabs defaultValue="pillars" className="w-full">
+            <TabsList>
+              <TabsTrigger value="pillars">Pillars</TabsTrigger>
+              <TabsTrigger value="leak_vectors">Leak Vectors</TabsTrigger>
+              <TabsTrigger value="qualifier_fields">Qualifier Fields</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="pillars" className="space-y-4 pt-4">
+              <div className="flex justify-end">
+                <span className="text-xs text-muted-foreground">
+                  Weight sum: <span className={weightSum === 100 ? 'text-signal-green' : 'text-amber-500'}>{weightSum}</span>
+                </span>
+              </div>
+              {loading ? (
             <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin" /></div>
-          ) : (
+              ) : (
             <div className="space-y-2">
               {rows.map((r) => (
                 <div key={r.id} className="grid grid-cols-12 gap-2 items-center bg-muted/30 rounded-md p-2">
@@ -176,7 +185,7 @@ export const SettingsPillarsTab = () => {
                 </div>
               ))}
             </div>
-          )}
+              )}
 
           <div className="grid grid-cols-12 gap-2 items-center border-t pt-3">
             <Input
@@ -200,6 +209,16 @@ export const SettingsPillarsTab = () => {
               </Button>
             </div>
           </div>
+            </TabsContent>
+
+            <TabsContent value="leak_vectors" className="pt-4">
+              <SettingsLeakVectorsTab projectType={projectType} />
+            </TabsContent>
+
+            <TabsContent value="qualifier_fields" className="pt-4">
+              <SettingsQualifierFieldsTab projectType={projectType} />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
