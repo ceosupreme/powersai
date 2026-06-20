@@ -122,6 +122,26 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Fire-and-forget Build C follow-up sequence enrollment. If the project for
+  // this lead is enrolled in follow_up_sequence automation, enqueue drafts.
+  // Errors here do NOT block the lead submission response.
+  try {
+    if (inserted?.id) {
+      const url = `${supabaseUrl}/functions/v1/enqueue-followup-sequence`;
+      // Don't await — best-effort.
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+        body: JSON.stringify({ lead_id: inserted.id }),
+      }).catch((e) => console.error("[submit-inbound-lead] enqueue-followup error", e));
+    }
+  } catch (e) {
+    console.error("[submit-inbound-lead] enqueue dispatch failed", e);
+  }
+
   return new Response(JSON.stringify({ ok: true, id: inserted?.id }), {
     status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
