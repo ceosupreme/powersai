@@ -5,7 +5,8 @@ export type ProjectType =
   | 'content_channel'
   | 'internal_brand'
   | 'app_build'
-  | 'service_offer';
+  | 'service_offer'
+  | 'home_services';
 
 export interface EffectivePillar {
   pillar_key: string;
