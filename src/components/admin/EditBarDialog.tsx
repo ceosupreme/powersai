@@ -107,6 +107,14 @@ const TIMEZONES = [
   { value: 'Pacific/Honolulu', label: 'Hawaii (Honolulu)' },
 ];
 
+/** Derive a default bar_code from a venue name (uppercase initials, fallback prefix). */
+function deriveBarCode(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '';
+  if (words.length === 1) return words[0].slice(0, 4).toUpperCase();
+  return words.slice(0, 4).map((w) => w[0]).join('').toUpperCase();
+}
+
 const defaultForm: FormData = {
   name: '',
   bar_code: '',
@@ -182,14 +190,17 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
     } else if (initialProposal) {
       const d = initialProposal.direct;
       const seededName = (d.name || '').trim();
-      const seededType = (d.type_ok(d.project_type, projectTypes)) || defaultForm.project_type;
+      const proposedType = d.project_type ?? '';
+      const typeIsValid = projectTypes.length === 0
+        ? !!proposedType
+        : projectTypes.some((pt) => pt.id === proposedType);
       setFormData({
         ...defaultForm,
         name: seededName,
         bar_code: deriveBarCode(seededName),
         address: d.address || '',
         timezone: d.timezone || defaultForm.timezone,
-        project_type: seededType as ProjectType,
+        project_type: (typeIsValid ? proposedType : defaultForm.project_type) as ProjectType,
       });
     } else {
       setFormData(defaultForm);
