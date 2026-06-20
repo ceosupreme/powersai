@@ -655,6 +655,158 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_message_queue: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          body: string
+          channel: Database["public"]["Enums"]["automation_channel"]
+          created_at: string
+          created_by: string | null
+          dedupe_key: string | null
+          edited_body: string | null
+          id: string
+          metadata: Json
+          model: string | null
+          project_id: string
+          recipient_contact_id: string | null
+          recipient_snapshot: Json
+          reject_reason: string | null
+          scheduled_for: string | null
+          send_attempted_at: string | null
+          send_result: Json | null
+          source_run_id: string | null
+          status: Database["public"]["Enums"]["automation_queue_status"]
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          body: string
+          channel: Database["public"]["Enums"]["automation_channel"]
+          created_at?: string
+          created_by?: string | null
+          dedupe_key?: string | null
+          edited_body?: string | null
+          id?: string
+          metadata?: Json
+          model?: string | null
+          project_id: string
+          recipient_contact_id?: string | null
+          recipient_snapshot?: Json
+          reject_reason?: string | null
+          scheduled_for?: string | null
+          send_attempted_at?: string | null
+          send_result?: Json | null
+          source_run_id?: string | null
+          status?: Database["public"]["Enums"]["automation_queue_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          automation_key?: Database["public"]["Enums"]["automation_key"]
+          body?: string
+          channel?: Database["public"]["Enums"]["automation_channel"]
+          created_at?: string
+          created_by?: string | null
+          dedupe_key?: string | null
+          edited_body?: string | null
+          id?: string
+          metadata?: Json
+          model?: string | null
+          project_id?: string
+          recipient_contact_id?: string | null
+          recipient_snapshot?: Json
+          reject_reason?: string | null
+          scheduled_for?: string | null
+          send_attempted_at?: string | null
+          send_result?: Json | null
+          source_run_id?: string | null
+          status?: Database["public"]["Enums"]["automation_queue_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_message_queue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_send_log: {
+        Row: {
+          adapter: string
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          body: string | null
+          channel: Database["public"]["Enums"]["automation_channel"]
+          created_at: string
+          error: string | null
+          id: string
+          ok: boolean
+          project_id: string
+          provider_message_id: string | null
+          queue_id: string | null
+          raw: Json | null
+          subject: string | null
+          to_address: string | null
+        }
+        Insert: {
+          adapter: string
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          body?: string | null
+          channel: Database["public"]["Enums"]["automation_channel"]
+          created_at?: string
+          error?: string | null
+          id?: string
+          ok: boolean
+          project_id: string
+          provider_message_id?: string | null
+          queue_id?: string | null
+          raw?: Json | null
+          subject?: string | null
+          to_address?: string | null
+        }
+        Update: {
+          adapter?: string
+          automation_key?: Database["public"]["Enums"]["automation_key"]
+          body?: string | null
+          channel?: Database["public"]["Enums"]["automation_channel"]
+          created_at?: string
+          error?: string | null
+          id?: string
+          ok?: boolean
+          project_id?: string
+          provider_message_id?: string | null
+          queue_id?: string | null
+          raw?: Json | null
+          subject?: string | null
+          to_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_send_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_send_log_queue_id_fkey"
+            columns: ["queue_id"]
+            isOneToOne: false
+            referencedRelation: "automation_message_queue"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bar_targets: {
         Row: {
           bar_id: string
@@ -3097,6 +3249,66 @@ export type Database = {
           },
         ]
       }
+      followup_sequence_runs: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          enrollment_snapshot: Json
+          fired_at: string
+          id: string
+          lead_id: string
+          project_id: string
+          queued_message_ids: string[]
+          started_at: string
+          status: string
+          stop_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          enrollment_snapshot?: Json
+          fired_at?: string
+          id?: string
+          lead_id: string
+          project_id: string
+          queued_message_ids?: string[]
+          started_at?: string
+          status?: string
+          stop_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          enrollment_snapshot?: Json
+          fired_at?: string
+          id?: string
+          lead_id?: string
+          project_id?: string
+          queued_message_ids?: string[]
+          started_at?: string
+          status?: string
+          stop_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_sequence_runs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "inbound_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_sequence_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_fields: {
         Row: {
           created_at: string
@@ -4073,6 +4285,7 @@ export type Database = {
       }
       inbound_leads: {
         Row: {
+          automation_status: string | null
           business_name: string | null
           conversation_channel: string | null
           created_at: string
@@ -4082,6 +4295,7 @@ export type Database = {
           message: string | null
           name: string
           not_ready_reason: string | null
+          opted_out_at: string | null
           phone: string | null
           project_type: string | null
           promoted_company_id: string | null
@@ -4095,6 +4309,7 @@ export type Database = {
           user_agent: string | null
         }
         Insert: {
+          automation_status?: string | null
           business_name?: string | null
           conversation_channel?: string | null
           created_at?: string
@@ -4104,6 +4319,7 @@ export type Database = {
           message?: string | null
           name: string
           not_ready_reason?: string | null
+          opted_out_at?: string | null
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
@@ -4117,6 +4333,7 @@ export type Database = {
           user_agent?: string | null
         }
         Update: {
+          automation_status?: string | null
           business_name?: string | null
           conversation_channel?: string | null
           created_at?: string
@@ -4126,6 +4343,7 @@ export type Database = {
           message?: string | null
           name?: string
           not_ready_reason?: string | null
+          opted_out_at?: string | null
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
@@ -6037,6 +6255,148 @@ export type Database = {
         }
         Relationships: []
       }
+      project_automation_enrollments: {
+        Row: {
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          config: Json
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          automation_key: Database["public"]["Enums"]["automation_key"]
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          automation_key?: Database["public"]["Enums"]["automation_key"]
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_automation_enrollments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_customer_list_members: {
+        Row: {
+          attributes: Json
+          created_at: string
+          email: string | null
+          id: string
+          imported_at: string
+          last_visit_at: string | null
+          list_id: string
+          name: string | null
+          phone: string | null
+          project_id: string
+          segment: string | null
+          tags: string[]
+        }
+        Insert: {
+          attributes?: Json
+          created_at?: string
+          email?: string | null
+          id?: string
+          imported_at?: string
+          last_visit_at?: string | null
+          list_id: string
+          name?: string | null
+          phone?: string | null
+          project_id: string
+          segment?: string | null
+          tags?: string[]
+        }
+        Update: {
+          attributes?: Json
+          created_at?: string
+          email?: string | null
+          id?: string
+          imported_at?: string
+          last_visit_at?: string | null
+          list_id?: string
+          name?: string | null
+          phone?: string | null
+          project_id?: string
+          segment?: string | null
+          tags?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_customer_list_members_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "project_customer_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_customer_list_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_customer_lists: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          project_id: string
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          project_id: string
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          project_id?: string
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_customer_lists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_leak_vector_overrides: {
         Row: {
           benchmark: string | null
@@ -6480,6 +6840,62 @@ export type Database = {
           },
         ]
       }
+      reactivation_campaign_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ended_at: string | null
+          id: string
+          list_id: string | null
+          name: string | null
+          offer_snapshot: Json
+          project_id: string
+          queued_count: number
+          segment_snapshot: Json
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          list_id?: string | null
+          name?: string | null
+          offer_snapshot?: Json
+          project_id: string
+          queued_count?: number
+          segment_snapshot?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          list_id?: string | null
+          name?: string | null
+          offer_snapshot?: Json
+          project_id?: string
+          queued_count?: number
+          segment_snapshot?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reactivation_campaign_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_extraction_runs: {
         Row: {
           error: string | null
@@ -6511,6 +6927,53 @@ export type Database = {
             columns: ["review_id"]
             isOneToOne: true
             referencedRelation: "google_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_request_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          fired_at: string
+          id: string
+          project_id: string
+          queued_message_id: string | null
+          status: string
+          trigger_ref: string | null
+          trigger_source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          fired_at?: string
+          id?: string
+          project_id: string
+          queued_message_id?: string | null
+          status?: string
+          trigger_ref?: string | null
+          trigger_source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          fired_at?: string
+          id?: string
+          project_id?: string
+          queued_message_id?: string | null
+          status?: string
+          trigger_ref?: string | null
+          trigger_source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_request_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -10237,6 +10700,21 @@ export type Database = {
         | "dismissed"
         | "snoozed"
         | "modified"
+      automation_channel:
+        | "email"
+        | "sms"
+        | "linkedin_dm"
+        | "instagram_dm"
+        | "review_reply"
+      automation_key: "followup_sequence" | "reactivation" | "review_request"
+      automation_queue_status:
+        | "pending_review"
+        | "approved"
+        | "sending"
+        | "sent"
+        | "rejected"
+        | "failed"
+        | "canceled"
       capture_ai_status:
         | "none"
         | "pending"
@@ -10587,6 +11065,23 @@ export const Constants = {
         "dismissed",
         "snoozed",
         "modified",
+      ],
+      automation_channel: [
+        "email",
+        "sms",
+        "linkedin_dm",
+        "instagram_dm",
+        "review_reply",
+      ],
+      automation_key: ["followup_sequence", "reactivation", "review_request"],
+      automation_queue_status: [
+        "pending_review",
+        "approved",
+        "sending",
+        "sent",
+        "rejected",
+        "failed",
+        "canceled",
       ],
       capture_ai_status: [
         "none",
