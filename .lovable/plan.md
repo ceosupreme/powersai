@@ -1,115 +1,87 @@
-# Build 0 — Vertical = Project Type + Config Template
+# Build 1 — Lead Qualifier (Home Services test cell)
 
-Additive only. Replicates the `pillar_templates` → `project_pillar_overrides` pattern. No changes to scoring, dashboard branching, RLS on existing tables, or integrations.
+## Existing pieces I'll reuse
 
-## Part 1 — `project_types` lookup table
+**Voice (extend, don't rebuild):**
+- `src/hooks/useRealtimeVoiceInterview.ts` — WebRTC mic + OpenAI Realtime client over WSS. Today it takes log-form `sections` and walks fields. I'll **generalize** it: accept a generic `QualifierField[]` (id, label, type, options, required) instead of `LogSection[]`, and a system-prompt builder. The audio loop, connection state machine, transcript handling, and barge-in are kept as-is.
+- `src/components/shared/VoiceInterviewMode.tsx` — mic UI / progress / transcripts. Reused; switched to the generic field shape.
+- `supabase/functions/openai-realtime-proxy/index.ts` — WSS proxy to OpenAI Realtime. Reused. Extended to accept a `mode=qualifier` + a JSON `qualifier_context` (vertical, fields, ready_definition) and produce a tailored system prompt that conducts a friendly back-and-forth, asks one thing at a time, and emits a final `function_call` (`submit_qualified_lead`) with structured field values when done.
+- Hardcoded WSS host in `useRealtimeVoiceInterview.ts` will be switched to `import.meta.env.VITE_SUPABASE_URL` (current value points at a different project ref — bug for our project).
 
-Single migration:
+**Config-driven (Build 0):**
+- `useEffectiveQualifierFields(projectId)` + `useQualifierConfig(projectType)` → the agent reads its question list AND `ready_definition` from these hooks; nothing about Home Services is hardcoded in agent code. Swap the project's type → questions change.
 
-- `CREATE TABLE public.project_types (id text PK, label text NOT NULL, description text, sort_order int NOT NULL DEFAULT 0, is_vertical boolean NOT NULL DEFAULT false, created_at, updated_at)`. `id` matches the enum string value (text — enum values can't be FK'd).
-- GRANTs + RLS: read for `authenticated`; write for admins only (`has_role(auth.uid(),'admin')`), mirroring `pillar_templates` policy shape.
-- Seed 5 existing values: `client` "Client", `content_channel` "Content Channel", `internal_brand` "Internal Brand", `app_build` "App Build", `service_offer` "Service Offer". `is_vertical=false`.
-- `updated_at` trigger via existing `handle_updated_at()`.
+**CRM + intake:**
+- `inbound_leads` (extend) → promote into `crm_companies` / `crm_contacts` / `crm_deals` using the existing promote pattern. All qualified leads route through `inbound_leads` first so we keep a single intake surface and the existing review UI (`InboundLeadsPanel`) still works.
+- `submit-inbound-lead` edge function — extended to accept qualifier payload + transcript.
 
-Frontend wiring (after migration approval + types regen):
+## What's new
 
-- Add `src/hooks/useProjectTypes.ts` — small react-query hook returning `{id,label,is_vertical,sort_order}[]`.
-- `SettingsPillarsTab.tsx`: replace local `PROJECT_TYPES` const with hook data.
-- `EditBarDialog.tsx`: replace inline `<SelectItem>` literals with mapped hook data.
-- Same UI, same selected values (still write the enum string into `venues.project_type`).
+### 1. Schema (one migration)
 
-## Part 2 — Typed per-type config (mirror pillar pattern)
+Extend `public.inbound_leads`:
+- `phone text`
+- `project_type text` (FK-ish to `project_types.id`, default `'home_services'`)
+- `route_to text not null default 'self'` (values: `self` | `operator` | `client`)
+- `qualifier_data jsonb not null default '{}'` — structured field values keyed by `field_key`
+- `is_ready boolean not null default false`
+- `not_ready_reason text`
+- `transcript jsonb not null default '[]'` — `[{role, text, at}]`
+- `conversation_channel text` (`voice` | `chat` | `form` | `phone`)
+- Keep `message` (becomes the lead's opening line / summary). Existing RLS and `promoted_company_id` unchanged.
 
-Same migration (or a sibling — single batch). Each pair = template + override with identical shape/policies to `pillar_templates`/`project_pillar_overrides`.
+No new CRM tables — qualifier data lives structured on `inbound_leads.qualifier_data` and is copied into `crm_deals.notes` summary + `crm_contacts.phone` on promote.
 
-### 2a. `project_type_leak_vectors` (template)
-Columns: `id uuid PK`, `project_type project_type_enum NOT NULL`, `name text NOT NULL`, `detect_signal text`, `dollarize_formula text`, `benchmark text`, `severity text CHECK (severity IN ('headline','supporting'))`, `sort_order int`, timestamps. `UNIQUE (project_type, name)`.
+### 2. Edge functions
 
-### 2b. `project_leak_vector_overrides` (per-project, REPLACE-if-any)
-Same columns but `project_id uuid NOT NULL REFERENCES venues(id) ON DELETE CASCADE` instead of `project_type`. `UNIQUE (project_id, name)`.
+- **`qualifier-session`** (POST, public, honeypot + per-IP rate-limit copied from `submit-inbound-lead`) — given `{ project_id, project_type }`, returns the resolved qualifier field list + `ready_definition` + `primary_channel` (server-side fetch so the public page doesn't need auth). Lets us keep the agent prompt server-built.
+- **`submit-inbound-lead`** (existing, extended) — accept new payload: `{ phone?, project_type, qualifier_data, transcript, is_ready, not_ready_reason?, conversation_channel, route_to }`. Server re-evaluates `is_ready` against `ready_definition` as a sanity check. Always inserts (qualified or not).
+- **`openai-realtime-proxy`** (existing, extended) — new query mode `mode=qualifier`. Reads `project_id` and fetches fields + ready_definition server-side, builds the system prompt:
+  > "You are a friendly intake agent for {vertical_label}. Ask one short question at a time covering: {fields}. Use plain language. When you have enough to decide, call `submit_qualified_lead` with the structured values and a one-sentence summary."
+  Tools: one function `submit_qualified_lead({ qualifier_data, is_ready, not_ready_reason, summary })`. On function-call, the client posts to `submit-inbound-lead` with the assembled transcript.
 
-### 2c. `project_type_qualifier_fields` (template)
-Columns: `id uuid PK`, `project_type project_type_enum NOT NULL`, `field_key text NOT NULL`, `field_label text NOT NULL`, `field_type text CHECK (field_type IN ('text','select','number','boolean'))`, `is_shared boolean NOT NULL DEFAULT false`, `channel text CHECK (channel IN ('web_voice','phone','chat','sms','form'))`, `sort_order int`, timestamps. `UNIQUE (project_type, field_key)`.
+### 3. Frontend
 
-### 2c-bis. `project_type_qualifier_config` (per-type singleton)
-`project_type project_type_enum PRIMARY KEY`, `ready_definition text`, `primary_channel text`, timestamps. Per-type editable metadata for the vertical's "ready" rule.
+- **Route `/qualify/home-services`** (`src/pages/QualifyLanding.tsx`) — branded light/forest landing page (reuses marketing tokens / primitives), single CTA: **"Talk to our intake agent"**. Below: chat fallback + 5-field form fallback. Plain language, friendly.
+- **`src/components/qualifier/VoiceQualifier.tsx`** — wraps the generalized `VoiceInterviewMode`. Loads fields via `useEffectiveQualifierFields(projectId)` and ready_definition via `useQualifierConfig(projectType)`. Streams transcript into local state; on agent function-call → POSTs to `submit-inbound-lead`.
+- **`src/components/qualifier/ChatQualifier.tsx`** — text fallback. Uses the AI Gateway (`google/gemini-3-flash-preview`) via a new `qualifier-chat` edge function (same system prompt builder shared with the realtime proxy).
+- **`src/components/qualifier/FormQualifier.tsx`** — last-resort static form, fields rendered from the same config.
+- `App.tsx` — public route `/qualify/:slug` (no auth).
 
-### 2d. `project_qualifier_field_overrides` (per-project)
-Same shape as 2c but keyed by `project_id`. `UNIQUE (project_id, field_key)`.
+### 4. Generalizing the voice hook
 
-### GRANTs + RLS (identical pattern to pillar tables)
-- Templates (2a, 2c, 2c-bis): SELECT for `authenticated`; INSERT/UPDATE/DELETE admin-only via `has_role`.
-- Overrides (2b, 2d): all CRUD gated by `user_can_access_project(project_id)` — exact mirror of `project_pillar_overrides`.
-- `GRANT SELECT, INSERT, UPDATE, DELETE ON ... TO authenticated; GRANT ALL ... TO service_role;` on every new table.
+`useRealtimeVoiceInterview` gets a sibling `useRealtimeQualifierAgent({ projectId, projectType, onComplete })` that shares the same `AudioRecorder`/`AudioQueue`/state machine but:
+- doesn't require `sections`,
+- passes `mode=qualifier&project_id=...` to the proxy,
+- listens for `response.function_call_arguments.done` (already streamed by Realtime) and resolves with the structured payload.
 
-### Read logic (mirrors `fetchEffectivePillars`)
-New `src/lib/effectiveLeakVectors.ts` and `src/lib/effectiveQualifierFields.ts`:
-```ts
-fetchEffectiveLeakVectors(projectId, projectType):
-  const overrides = await select * from project_leak_vector_overrides where project_id = projectId
-  if (overrides.length) return overrides
-  return select * from project_type_leak_vectors where project_type = projectType
-```
-Same shape/REPLACE semantics for qualifier fields. Hooks: `useEffectiveLeakVectors(projectId)`, `useEffectiveQualifierFields(projectId)` that internally `useProjectType` to get the type then call the lib fn — identical structure to `useEffectivePillars`.
+`VoiceInterviewMode` is refactored to accept a generic `{ progressLabel, totalSteps?, currentStep? }` so it renders for both log interviews and the qualifier.
 
-## Part 3 — `home_services` vertical + seed
+### 5. Phone answering (capability honesty)
 
-**Two-migration sequence** (required: `ALTER TYPE ADD VALUE` must commit before any seed using that value):
+**Not built in this build.** What it requires:
+- A real phone number + Twilio Voice (the **Twilio connector exists** in this workspace per `standard_connectors`; not yet linked).
+- A Twilio Voice webhook → new edge function `twilio-voice-qualifier` returning TwiML that bridges the call to OpenAI Realtime via `<Connect><Stream>` over Twilio Media Streams (μ-law 8 kHz). The `openai-realtime-proxy` needs a second entry point that talks Twilio's binary frame format instead of browser WebRTC frames — non-trivial but doable.
+- Once that's in, the same `mode=qualifier` system prompt + `submit_qualified_lead` tool produce the same `inbound_leads` row (with `conversation_channel='phone'`, `phone` captured from Twilio caller-id).
 
-Migration A (combined with Parts 1+2):
-- `ALTER TYPE public.project_type_enum ADD VALUE IF NOT EXISTS 'home_services';`
-- Create all new tables above + RLS + GRANTs.
-- Seed `project_types` with 5 existing rows (NOT yet home_services — enum value not yet visible to a same-tx insert that references it via FK… text column is fine, so we CAN include home_services here as a text row).
+If you want phone in this build, approve linking Twilio and I'll add it as Build 1b. Otherwise the web voice agent ships and we add phone in a follow-up without changing the data model.
 
-Migration B (separate, after A commits):
-- Insert `pillar_templates` rows for `'home_services'`:
-  - Demand Capture (30), Sales & Estimates (25), Capacity & Dispatch (20), Retention & Membership (15), Reputation (10).
-- Insert `project_type_leak_vectors` for `'home_services'`:
-  - Missed calls (headline), Unsold estimates (headline), Lapsing memberships (supporting) — with detect_signal / dollarize_formula / benchmark text.
-- Insert `project_type_qualifier_fields` for `'home_services'`:
-  - Shared (`is_shared=true`): contact, location, urgency, budget_signal, timeline.
-  - Vertical (`is_shared=false`): trade, job_type, service_area, emergency_vs_scheduled, property_type.
-  - All `channel='phone'`.
-- Insert `project_type_qualifier_config`: ready_definition = "in-area job of a type the operator wants, with urgency + contactable"; primary_channel = "phone".
+### 6. Promote to CRM
 
-Because `ALTER TYPE ADD VALUE` cannot run in the same transaction as a statement that uses the new value, splitting into two migrations is the safe path.
+Reuses existing flow in `InboundLeadsPanel`: when you click "Promote" on a qualified lead, it creates `crm_companies` (from `business_name`/`location`), `crm_contacts` (name/email/phone), and a `crm_deals` row with `notes` = formatted qualifier summary + link back to the inbound_leads id. `route_to='self'` filters to your pipeline today; the column lets us split to `operator`/`client` later without schema change.
 
-## Part 4 — Admin surface (reuse existing patterns)
+## Tradeoffs / call-outs
 
-Extend `SettingsPillarsTab.tsx` into a tabbed editor (Pillars | Leak Vectors | Qualifier Fields) for the selected project type. Each tab is a near-clone of the existing pillar table-of-rows editor — same add/edit/delete row UX, same admin gating. Plus a small `ready_definition` + `primary_channel` form bound to `project_type_qualifier_config`.
-
-Extend `ProjectPillarOverridesPanel.tsx` (or add sibling `ProjectLeakVectorOverridesPanel` / `ProjectQualifierOverridesPanel` following the same shape) so a project can "Customize for this project" / "Reset to default" on leak vectors + qualifier fields. Same bulk-copy-from-template / delete-all semantics.
-
-No new admin framework. New components mirror existing files line-for-line on structure.
-
-## Files
-
-New SQL:
-- One migration for Part 1 + Part 2 schema (enum ADD VALUE + project_types + 5 new tables + RLS + GRANTs + seed of 5 existing project_types + updated_at triggers).
-- Second migration for Part 3 data seed (home_services pillar_templates + leak vectors + qualifier fields + qualifier_config row + project_types row for home_services).
-
-New TS:
-- `src/hooks/useProjectTypes.ts`
-- `src/lib/effectiveLeakVectors.ts`, `src/hooks/useEffectiveLeakVectors.ts`
-- `src/lib/effectiveQualifierFields.ts`, `src/hooks/useEffectiveQualifierFields.ts`
-- `src/components/admin/SettingsLeakVectorsTab.tsx` (or merged into SettingsPillarsTab as sub-tabs)
-- `src/components/admin/SettingsQualifierFieldsTab.tsx`
-- `src/components/admin/ProjectLeakVectorOverridesPanel.tsx`
-- `src/components/admin/ProjectQualifierOverridesPanel.tsx`
-
-Modified TS:
-- `src/components/admin/SettingsPillarsTab.tsx` — read project types from hook; wrap in tabs.
-- `src/components/admin/EditBarDialog.tsx` — read project types from hook.
-- `src/pages/Admin.tsx` (or wherever SettingsPillarsTab mounts) — render new tabs if it doesn't already container them.
-
-Untouched: `effectivePillars.ts`, `useEffectivePillars.ts`, `Dashboard.tsx`, `NonClientPillarsDashboard.tsx`, scoring engine, all RLS on existing tables, all integrations.
+- **Phone** deliberately out of scope here (see §5).
+- **`ready_definition` is free-text today.** The agent uses it as guidance + we sanity-check on the server with a small rule pack (required fields present + `urgency != none` + `service_area` matches). A structured rule format is a later build.
+- **Transcript** stored as JSON on `inbound_leads` (small per row); not denormalized to a separate table yet — keep it simple.
+- WSS URL bug in `useRealtimeVoiceInterview` gets fixed as part of the refactor.
 
 ## Verify
 
-1. `select * from project_types` returns 6 rows; both dropdowns render them (same UI).
-2. New tables exist, RLS on, GRANTs present, override read logic returns template when no overrides and override rows when present (mirrors `fetchEffectivePillars`).
-3. Create a venue with `project_type='home_services'` → Dashboard `isCanonicalClientSetup` returns false → renders `NonClientPillarsDashboard` with 5 seeded pillars; effective leak vectors + qualifier fields load from template; inserting a `project_leak_vector_overrides` row REPLACES the list for that project.
-4. Admin can CRUD leak vectors / qualifier fields per type and override per project, using the cloned patterns.
-5. `tsc` clean. No edits to scoring, fetchEffectivePillars, Dashboard branching, RLS on existing tables, or integrations.
-
-Awaiting approval before running migrations.
+1. Voice extension named: `useRealtimeVoiceInterview` + `VoiceInterviewMode` + `openai-realtime-proxy`, generalized — not rebuilt.
+2. `/qualify/home-services` opens, mic button starts a real back-and-forth, chat + form fallbacks present.
+3. Changing `project_type_qualifier_fields` rows for `home_services` (or pointing the page at a different `project_type`) changes the agent's questions with zero code change.
+4. Phone: not built; §5 lists exactly what it needs.
+5. Qualified lead → row in `inbound_leads` with `qualifier_data` populated, `transcript` saved, `is_ready=true`, `route_to='self'`; Promote button pushes to `crm_*`. Not-ready leads written with `is_ready=false` + `not_ready_reason`.
+6. No parallel CRM/AI stack. `tsc` clean.
