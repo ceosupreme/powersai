@@ -7,20 +7,15 @@ import type { ProjectType } from "@/lib/effectivePillars";
 import { VoiceQualifier } from "@/components/qualifier/VoiceQualifier";
 import { ChatQualifier } from "@/components/qualifier/ChatQualifier";
 import { FormQualifier } from "@/components/qualifier/FormQualifier";
-
-// Map landing slug -> vertical config key + display copy.
-const SLUG_TO_TYPE: Record<string, { projectType: ProjectType; brand: string; tagline: string }> = {
-  "home-services": {
-    projectType: "home_services" as ProjectType,
-    brand: "Home Services",
-    tagline: "Get a real estimate fast — no phone tag.",
-  },
-};
+import { useProjectTypeBySlug } from "@/hooks/useProjectTypes";
 
 export default function QualifyLanding() {
   const { slug = "home-services" } = useParams();
-  const cfg = SLUG_TO_TYPE[slug] ?? SLUG_TO_TYPE["home-services"];
-  const projectType = cfg.projectType;
+  const typeQ = useProjectTypeBySlug(slug);
+  const projectType = (typeQ.data?.id ?? "home_services") as ProjectType;
+  const brand = typeQ.data?.label ?? "Intake";
+  const tagline = typeQ.data?.description?.trim()
+    || "Tell us what you need — we'll get back to you fast.";
 
   // Fields are loaded for the form fallback; voice + chat load their own copy
   // server-side via the edge functions so the public page doesn't need auth.
@@ -31,8 +26,8 @@ export default function QualifyLanding() {
   const [submittedReady, setSubmittedReady] = useState(false);
 
   useEffect(() => {
-    document.title = `${cfg.brand} — talk to our intake assistant`;
-  }, [cfg.brand]);
+    document.title = `${brand} — talk to our intake assistant`;
+  }, [brand]);
 
   const handleSubmitted = (id: string, ready: boolean) => {
     setSubmittedLeadId(id);
@@ -44,13 +39,35 @@ export default function QualifyLanding() {
   // if visited outside the marketing site shell.
   const fields = useMemo(() => fieldsQ.data ?? [], [fieldsQ.data]);
 
+  if (typeQ.isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(40,33%,96%)] text-muted-foreground text-sm">
+        Loading…
+      </div>
+    );
+  }
+
+  if (!typeQ.data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(40,33%,96%)] px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="text-2xl font-semibold mb-2">Page not found</h1>
+          <p className="text-sm text-muted-foreground">
+            No intake configured for <code>/qualify/{slug}</code>. Add a project type with this
+            slug in Admin to enable it.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[hsl(40,33%,96%)] text-foreground">
       <header className="border-b border-border/60">
         <div className="max-w-5xl mx-auto px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded bg-forest" />
-            <span className="font-semibold">{cfg.brand}</span>
+            <span className="font-semibold">{brand}</span>
           </div>
           <span className="text-[11px] sm:text-xs text-muted-foreground">Powered by intake AI</span>
         </div>
@@ -62,7 +79,7 @@ export default function QualifyLanding() {
             New customer intake
           </p>
           <h1 className="text-[28px] leading-tight sm:text-4xl md:text-5xl font-semibold tracking-tight">
-            {cfg.tagline}
+            {tagline}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             Tell us what you need in a quick voice or text conversation. We'll get back to you
