@@ -455,6 +455,52 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
             <div className="flex-1 overflow-y-auto px-6 py-5">
               {/* ── BASIC ───────────────────────────────────────── */}
               <TabsContent value="basic" className="mt-0 space-y-4">
+                {!editingBar && initialProposal && (
+                  <Card className="border-primary/40 bg-primary/5">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Inbox className="h-4 w-4 text-primary" /> From inbound lead
+                        <Badge variant="outline" className="ml-1 text-[10px]">Pre-filled · confirm or edit</Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-xs">
+                      {initialProposal.contact && (
+                        <div className="rounded-md border border-border bg-background/60 p-2">
+                          <div className="font-medium text-sm">{initialProposal.contact.display_name ?? '—'}</div>
+                          <div className="text-muted-foreground">
+                            {[initialProposal.contact.email, initialProposal.contact.phone, initialProposal.contact.role_label].filter(Boolean).join(' · ') || '—'}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground mt-1">Saved as a leadership contact on create.</p>
+                        </div>
+                      )}
+                      {Object.keys(initialProposal.suggestions).length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          <div className="font-medium text-xs flex items-center gap-1.5">
+                            <Info className="h-3 w-3" /> Suggestions to review in the wizard
+                          </div>
+                          {initialProposal.suggestions.goals_summary && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Goals:</span> {initialProposal.suggestions.goals_summary}</div>
+                          )}
+                          {initialProposal.suggestions.primary_channel && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Channel:</span> {initialProposal.suggestions.primary_channel.value} <span className="italic">— {initialProposal.suggestions.primary_channel.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.pillar_focus && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Pillars:</span> {initialProposal.suggestions.pillar_focus.keys.join(', ')} <span className="italic">— {initialProposal.suggestions.pillar_focus.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.leak_vector_focus && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Leak vectors:</span> {initialProposal.suggestions.leak_vector_focus.keys.join(', ')} <span className="italic">— {initialProposal.suggestions.leak_vector_focus.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.not_ready_reason && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Not-ready reason:</span> {initialProposal.suggestions.not_ready_reason}</div>
+                          )}
+                        </div>
+                      )}
+                      {initialProposal.ai_status === 'failed' && (
+                        <p className="text-[11px] text-amber-600 dark:text-amber-400">AI suggestions unavailable — direct fields still pre-filled.</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
                 <Card className="bg-muted/20 border-border">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
