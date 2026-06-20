@@ -821,6 +821,32 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       />
                     </CardContent>
                   </Card>
+                  <Card className="bg-muted/20 border-border">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-muted-foreground" /> Leak Vectors
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ProjectLeakVectorOverridesPanel
+                        projectId={editingBar.id}
+                        projectType={formData.project_type}
+                      />
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-muted/20 border-border">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Info className="h-4 w-4 text-muted-foreground" /> Qualifier Fields
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ProjectQualifierOverridesPanel
+                        projectId={editingBar.id}
+                        projectType={formData.project_type}
+                      />
+                    </CardContent>
+                  </Card>
                 ) : (
                   <Card className="bg-muted/20 border-dashed border-border">
                     <CardContent className="py-4 text-xs text-muted-foreground text-center">
