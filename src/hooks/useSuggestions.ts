@@ -41,13 +41,6 @@ export function useSuggestions() {
         captureRes,
         followupsRes,
         kitsRes,
-        projectsRes,
-        leadsReadyRes,
-        pillarScoresRes,
-        openFindingsRes,
-        contentItemsRes,
-        channelRevenueRes,
-        qualifierFieldsRes,
       ] = await Promise.all([
         // Active companies (id + linked_project_id + name)
         supabase
@@ -85,28 +78,28 @@ export function useSuggestions() {
           .lte("follow_up_date", today),
         // Brand kits — by project_id
         supabase.from("brand_kits").select("project_id").eq("archived", false),
-        // Active projects with their type — for type/qualifier/pillar checks
-        supabase.from("venues").select("id, bar_name, project_type").eq("archived", false),
-        // Qualified leads not yet promoted
+      ]);
+
+      // Second batch — split to avoid deep type instantiation in Promise.all.
+      const [
+        projectsRes,
+        leadsReadyRes,
+        pillarScoresRes,
+        openFindingsRes,
+        contentItemsRes,
+        channelRevenueRes,
+        qualifierFieldsRes,
+      ] = await Promise.all([
+        supabase.from("venues").select("id, name, project_type").eq("is_active", true),
         supabase
           .from("inbound_leads")
           .select("id", { count: "exact", head: true })
           .eq("is_ready", true)
           .eq("status", "new"),
-        // Pillar scores for the current week
-        supabase
-          .from("project_pillar_scores")
-          .select("project_id, week_start"),
-        // Open growth findings
-        supabase
-          .from("growth_findings")
-          .select("venue_id")
-          .eq("status", "open"),
-        // Content items per project (any)
+        supabase.from("project_pillar_scores").select("project_id, week_start"),
+        supabase.from("growth_findings").select("venue_id").eq("status", "open"),
         supabase.from("content_items").select("project_id"),
-        // Channel revenue rows (we filter by month client-side)
-        supabase.from("channel_revenue").select("project_id, month"),
-        // Qualifier field counts per type
+        supabase.from("channel_revenue").select("project_id, period_month"),
         supabase.from("project_type_qualifier_fields").select("project_type"),
       ]);
 
@@ -115,11 +108,18 @@ export function useSuggestions() {
       const deals = dealsRes.data ?? [];
       const interactions = interactionsRes.data ?? [];
       const kits = kitsRes.data ?? [];
-      const projects = (projectsRes.data ?? []) as { id: string; bar_name: string; project_type: string | null }[];
+      const projects = ((projectsRes.data ?? []) as unknown) as {
+        id: string;
+        name: string;
+        project_type: string | null;
+      }[];
       const pillarScores = (pillarScoresRes.data ?? []) as { project_id: string; week_start: string }[];
       const openFindings = (openFindingsRes.data ?? []) as { venue_id: string }[];
       const contentItems = (contentItemsRes.data ?? []) as { project_id: string }[];
-      const channelRevenue = (channelRevenueRes.data ?? []) as { project_id: string; month: string }[];
+      const channelRevenue = ((channelRevenueRes.data ?? []) as unknown) as {
+        project_id: string;
+        period_month: string;
+      }[];
       const qualifierFieldRows = (qualifierFieldsRes.data ?? []) as { project_type: string }[];
 
       // --- A: Company with zero contacts ---
