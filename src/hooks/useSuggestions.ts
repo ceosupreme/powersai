@@ -41,6 +41,13 @@ export function useSuggestions() {
         captureRes,
         followupsRes,
         kitsRes,
+        projectsRes,
+        leadsReadyRes,
+        pillarScoresRes,
+        openFindingsRes,
+        contentItemsRes,
+        channelRevenueRes,
+        qualifierFieldsRes,
       ] = await Promise.all([
         // Active companies (id + linked_project_id + name)
         supabase
@@ -78,6 +85,29 @@ export function useSuggestions() {
           .lte("follow_up_date", today),
         // Brand kits — by project_id
         supabase.from("brand_kits").select("project_id").eq("archived", false),
+        // Active projects with their type — for type/qualifier/pillar checks
+        supabase.from("venues").select("id, bar_name, project_type").eq("archived", false),
+        // Qualified leads not yet promoted
+        supabase
+          .from("inbound_leads")
+          .select("id", { count: "exact", head: true })
+          .eq("is_ready", true)
+          .eq("status", "new"),
+        // Pillar scores for the current week
+        supabase
+          .from("project_pillar_scores")
+          .select("project_id, week_start"),
+        // Open growth findings
+        supabase
+          .from("growth_findings")
+          .select("venue_id")
+          .eq("status", "open"),
+        // Content items per project (any)
+        supabase.from("content_items").select("project_id"),
+        // Channel revenue rows (we filter by month client-side)
+        supabase.from("channel_revenue").select("project_id, month"),
+        // Qualifier field counts per type
+        supabase.from("project_type_qualifier_fields").select("project_type"),
       ]);
 
       const companies = companiesRes.data ?? [];
@@ -85,6 +115,12 @@ export function useSuggestions() {
       const deals = dealsRes.data ?? [];
       const interactions = interactionsRes.data ?? [];
       const kits = kitsRes.data ?? [];
+      const projects = (projectsRes.data ?? []) as { id: string; bar_name: string; project_type: string | null }[];
+      const pillarScores = (pillarScoresRes.data ?? []) as { project_id: string; week_start: string }[];
+      const openFindings = (openFindingsRes.data ?? []) as { venue_id: string }[];
+      const contentItems = (contentItemsRes.data ?? []) as { project_id: string }[];
+      const channelRevenue = (channelRevenueRes.data ?? []) as { project_id: string; month: string }[];
+      const qualifierFieldRows = (qualifierFieldsRes.data ?? []) as { project_type: string }[];
 
       // --- A: Company with zero contacts ---
       const contactCompanyIds = new Set(
@@ -204,6 +240,123 @@ export function useSuggestions() {
           body: "Export a backup so your authored data is safe.",
           href: "/admin?tab=backup",
           ctaLabel: "Export backup",
+        });
+      }
+
+      // --- H: Project with no type set ---
+      for (const p of projects) {
+        if (!p.project_type) {
+          out.push({
+            dismissKey: `sugg:no-project-type:${p.id}`,
+            title: `${p.bar_name}: no project type set`,
+            body: "Pick a vertical so the right pillars and qualifier questions apply.",
+            href: `/admin?tab=projects&project=${p.id}`,
+            ctaLabel: "Set type",
+            scope: { kind: "project", id: p.id },
+          });
+        }
+      }
+
+      // --- I: Project type missing qualifier fields ---
+      const fieldCountByType = new Map<string, number>();
+      for (const r of qualifierFieldRows) {
+        fieldCountByType.set(r.project_type, (fieldCountByType.get(r.project_type) ?? 0) + 1);
+      }
+      const flaggedTypes = new Set<string>();
+      for (const p of projects) {
+        if (!p.project_type) continue;
+        if ((fieldCountByType.get(p.project_type) ?? 0) > 0) continue;
+        if (flaggedTypes.has(p.project_type)) continue;
+        flaggedTypes.add(p.project_type);
+        out.push({
+          dismissKey: `sugg:no-qualifier-fields:${p.project_type}`,
+          title: `No qualifier questions for "${p.project_type}"`,
+          body: "Add fields so the Lead Qualifier knows what to ask for this vertical.",
+          href: "/admin?tab=settings&subtab=qualifier",
+          ctaLabel: "Configure",
+        });
+      }
+
+      // --- J: Qualified leads waiting to be promoted ---
+      const leadsReadyCount = leadsReadyRes.count ?? 0;
+      if (leadsReadyCount > 0) {
+        out.push({
+          dismissKey: `sugg:qualified-leads-pending:${leadsReadyCount}`,
+          title: `${leadsReadyCount} qualified lead${leadsReadyCount === 1 ? "" : "s"} waiting to promote`,
+          body: "Move them into the CRM as company + deal.",
+          href: "/crm",
+          ctaLabel: "Open CRM",
+        });
+      }
+
+      // --- K: Projects missing this week's Weekly Review ---
+      const now = new Date();
+      const dow = now.getDay(); // 0 Sun, 1 Mon
+      const mondayOffset = (dow + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - mondayOffset);
+      const weekStart = monday.toISOString().slice(0, 10);
+      const reviewedProjects = new Set(
+        pillarScores.filter((s) => s.week_start === weekStart).map((s) => s.project_id),
+      );
+      for (const p of projects) {
+        if (reviewedProjects.has(p.id)) continue;
+        out.push({
+          dismissKey: `sugg:weekly-review-due:${p.id}:${weekStart}`,
+          title: `${p.bar_name}: no Weekly Review this week`,
+          body: "Grade the pillars so the Pillar Score stays fresh.",
+          href: "/weekly-review",
+          ctaLabel: "Open Weekly Review",
+          scope: { kind: "project", id: p.id },
+        });
+      }
+
+      // --- L: Open growth findings per project ---
+      const findingsByProject = new Map<string, number>();
+      for (const f of openFindings) {
+        findingsByProject.set(f.venue_id, (findingsByProject.get(f.venue_id) ?? 0) + 1);
+      }
+      for (const [pid, count] of findingsByProject) {
+        const proj = projects.find((p) => p.id === pid);
+        if (!proj) continue;
+        out.push({
+          dismissKey: `sugg:open-findings:${pid}:${count}`,
+          title: `${proj.bar_name}: ${count} open growth finding${count === 1 ? "" : "s"}`,
+          body: "Review and clear them on the Growth Audit.",
+          href: "/growth-audit",
+          ctaLabel: "Open Growth Audit",
+          scope: { kind: "project", id: pid },
+        });
+      }
+
+      // --- M: Empty Content Pipeline per project ---
+      const projectsWithContent = new Set(contentItems.map((c) => c.project_id));
+      for (const p of projects) {
+        if (projectsWithContent.has(p.id)) continue;
+        out.push({
+          dismissKey: `sugg:no-content:${p.id}`,
+          title: `${p.bar_name}: no content items yet`,
+          body: "Add an item to start using the 7-stage pipeline.",
+          href: "/content",
+          ctaLabel: "Open Content",
+          scope: { kind: "project", id: p.id },
+        });
+      }
+
+      // --- N: No Channel Revenue logged this month ---
+      const ym = now.toISOString().slice(0, 7);
+      const projectsWithRevenueThisMonth = new Set(
+        channelRevenue.filter((r) => (r.month ?? "").slice(0, 7) === ym).map((r) => r.project_id),
+      );
+      for (const p of projects) {
+        if (projectsWithRevenueThisMonth.has(p.id)) continue;
+        out.push({
+          dismissKey: `sugg:no-revenue:${p.id}:${ym}`,
+          title: `${p.bar_name}: no revenue logged for ${ym}`,
+          body: "Log Channel Revenue so the Monetization pillar has data.",
+          href: "/channel-revenue",
+          ctaLabel: "Open Channel Revenue",
+          scope: { kind: "project", id: p.id },
         });
       }
 
