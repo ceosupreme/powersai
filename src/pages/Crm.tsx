@@ -66,7 +66,7 @@ export default function Crm() {
         if (v === "pipeline") next.delete("tab"); else next.set("tab", v);
         setSearchParams(next, { replace: true });
       }}>
-        <TabsList>
+        <TabsList className="w-full sm:w-auto overflow-x-auto justify-start no-scrollbar">
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
           <TabsTrigger value="companies">Companies</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>

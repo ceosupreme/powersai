@@ -1,129 +1,75 @@
-# Help & Onboarding Refresh — Plan
 
-Goal: bring the existing help framework (it still only covers ~7 early features) up to date for every current feature, especially the new ones (Lead Qualifier, Project Types/Verticals, Config editor, Content Pipeline, Channel Revenue, Affiliate Libraries, Weekly Review, Insights, Marketing Hub, Chat, Logs). Reuse all current components — `HELP_ARTICLES`, `HELP_KEYS`, `HelpTip`, `SetupWizard`, `SuggestionsPanel` / `useSuggestions`, `LAUNCH_CHECKLIST`, `useChecklist`, `SettingsHelpTab`. No new framework. Additive only.
+# Mobile Optimization Pass
 
-## 1. Help Center articles (`src/config/helpArticles.ts`)
+Goal: make every major surface usable and polished on phones (≤428px wide), matching the quality of desktop. Additive CSS/layout work only — no business logic, scoring, RLS, or integration changes.
 
-Keep existing 9 articles. Add the following new entries (same `HelpArticle` shape, plain-language, multi-section):
+## Scope (audit + fix)
 
-- `concepts-overview` — "How this OS fits together": Portfolio → selected project → everything is project-scoped (except account-wide libraries). The two scores: Pillar Score (Weekly Review) vs Growth Score (Growth Audit). Where data comes from.
-- `project-types-verticals` — Replaces light "projects" article context. Explains that a project type = a vertical. Its template controls **pillars + leak vectors + qualifier fields**. Per-project overrides REPLACE the template list. Adding a new vertical = configuring a type, not coding.
-- `config-editor` — Admin → Settings → Pillars/Leak Vectors/Qualifier Fields tabs, plus per-project override panels on Edit Project. Plain explanation of each of the three concepts.
-- `weekly-review` — Setting/updating pillar scores; what each pillar means; produces the Pillar Score.
-- `insights` — AI observations on the active project; how to read them.
-- `portfolio` — The home view; selecting a project sets active project everywhere.
-- `lead-qualifier` — Voice/chat/form qualifier at `/qualify/[vertical]`; questions come from the project type's qualifier fields; qualified leads flow into Inbound Leads → CRM. Includes "how to test", "how to change the questions" (point to config editor).
-- `inbound-leads` — Where web/qualifier leads land; promote to CRM company + deal.
-- `content-pipeline` — Items, 7 stages, List/Kanban; usage flow.
-- `channel-revenue` — Logging revenue by channel/month; feeds Monetization pillar.
-- `marketing-hub` — Campaigns overview.
-- `affiliate-products-libraries` — Account-wide libraries (vs project-scoped data).
-- `tasks-logs-chat` — Single short tool article covering all three.
-- `permissions` — Role basics, who sees what.
+Working through the app in this order, verifying each at 375px and 428px widths:
 
-Existing `projects`, `crm`, `capture-inbox`, `growth-audit`, `brand-vault`, `backup-export`, `archive-vs-delete`, `marketing-site-inbound`, `getting-started` articles: updated where stale (e.g. mention Pillar Score vs Growth Score, mention qualifier in CRM flow), but not removed.
+1. **Global shells & navigation**
+   - `layout/` components (AppLayout, sidebar, top bar, bottom nav)
+   - Confirm bottom nav clearance (`pb-24`) on every scroll container
+   - Hamburger/drawer behavior, safe-area insets, sticky headers not overlapping content
+   - `StaffLayout`, owner layout, public layout (QualifyLanding)
 
-## 2. HelpTip keys (`src/config/helpKeys.ts`) + placements
+2. **Tables → mobile cards**
+   Many tables overflow on phones. Convert or wrap with horizontal scroll + sticky first column where a card view isn't appropriate:
+   - `employees/EmployeeListTable`
+   - `portfolio/VenueComparisonTable`, `DailyFlashTable`
+   - `revenue/RevenueTable`
+   - `social/WeeklyPerformanceTable`
+   - `crm/PipelineBoard` (horizontal swipe lanes)
+   - `content/ContentKanbanView` (swipeable columns) / fallback to `ContentListView` on mobile
+   - CRM `InboundLeadsPanel`, `CompanyDetail`
 
-Extend `HELP_KEYS` with new dismissible inline tips, and drop a `<HelpTip>` at the top of each major page (where the pattern is already used). New keys + page mounting:
+3. **Dashboards & charts**
+   - `Dashboard`, `PortfolioOverview`, `WeeklyReview`, `Insights`, `GrowthAudit`, `Sales`, `Labor`, `GuestExperience`, `Operations`, `Marketing`, `SocialMedia`, `ChannelRevenue`, `ContentPipeline`
+   - Stack grid columns to 1 col under `md`, shrink chart heights, ensure `ResponsiveContainer` parents have explicit height, truncate long legends, wrap KPI rows
 
-- `portfolio` → `src/pages/PortfolioOverview.tsx`
-- `weeklyReview` → `src/pages/WeeklyReview.tsx`
-- `insights` → `src/pages/Insights.tsx`
-- `qualifierPublic` → `src/pages/QualifyLanding.tsx` (only when admin previewing? — actually only when no fields configured; otherwise hidden by `helpEnabled`)
-- `inboundLeads` → `src/components/crm/InboundLeadsPanel.tsx`
-- `contentPipeline` → `src/pages/ContentPipeline.tsx`
-- `channelRevenue` → `src/pages/ChannelRevenue.tsx`
-- `marketingHub` → `src/pages/MarketingHub.tsx`
-- `affiliatePrograms`, `products` → respective pages
-- `tasks`, `logs`, `chat` → respective pages
-- `configEditor` → `SettingsPillarsTab` header (one tip explaining pillars/leak vectors/qualifier fields)
-- `projectOverrides` → top of overrides stack in `EditBarDialog`
+4. **Dialogs / sheets**
+   - Audit all shadcn `Dialog` usages that are form-heavy (`RevenueEntryDialog`, `ContentItemDialog`, `ProductDialog`, `ServiceOfferDialog`, `AffiliateProgramDialog`, `CreateChannelDialog`, `StartDMDialog`, EditBar dialogs, admin override panels)
+   - Switch to bottom `Sheet` on mobile OR add `max-h-[90vh] overflow-y-auto`, full-width buttons, larger tap targets
 
-All existing keys (`crmPipeline`, `crmInbound`, `brandVault`, `captureSuggest`, `pillarsByType`, `backupBeforeChanges`) preserved.
+5. **Lead Qualifier (Build 1)** — critical, it's the public-facing demo
+   - `QualifyLanding` hero + tabs stack cleanly
+   - `VoiceQualifier` mic button ≥56px, transcript scrolls, mute/end buttons reachable one-handed
+   - `ChatQualifier` input docked above keyboard (`pb-[env(safe-area-inset-bottom)]`), messages scroll
+   - `FormQualifier` single column, large inputs (`h-12`), submit sticky
 
-## 3. SetupWizard (`src/components/help/SetupWizard.tsx`)
+6. **Chat & Inbox**
+   - `ChatLayout`: hide channel list behind sheet on mobile, show single-pane
+   - `MessageInput` keyboard avoidance
+   - `QuickCaptureButton` FAB position above bottom nav
 
-Replace the 7-step legacy flow with an updated sensible getting-started order, same component, same `useHelpState` plumbing:
+7. **Admin & Settings**
+   - `Admin` page tab list horizontal scroll
+   - Settings tabs (Pillars, LeakVectors, QualifierFields, Help) — tab triggers wrap, panels single-column, table-like rows become cards
 
-1. Welcome — what the OS is (operator, CRM, qualifier, weekly review).
-2. Create or pick a project (Portfolio).
-3. Pick its **project type / vertical** (Edit Project → Type).
-4. Configure / review the **qualifier fields** for that type (Settings → Qualifier Fields).
-5. Try the **Lead Qualifier** at `/qualify/<vertical>` and watch a lead land in **Inbound Leads**.
-6. Set up the **Brand Vault** (optional).
-7. Run your first **Weekly Review** → see the Pillar Score.
-8. Check the **Growth Audit** → understand Growth Score (vs Pillar Score).
-9. Capture Inbox + CRM tour (condensed from current steps).
-10. Where to get help — Help Center, Launch Checklist.
+8. **Help/Onboarding**
+   - `SetupWizard` modal fits viewport, step nav buttons full-width on mobile
+   - `HelpCenter` article list/detail single-column
+   - `SuggestionsPanel` cards stack
+   - `LaunchChecklist` page comfortable on mobile
 
-## 4. Launch Checklist (`src/config/launchChecklist.ts`)
+9. **Tap targets & typography**
+   - Icon-only buttons → `min-h-11 min-w-11`
+   - Reduce hero/H1 sizes on mobile (`text-3xl md:text-5xl`)
+   - Ensure no horizontal page scroll (audit `min-w-*`, fixed widths, long unbroken strings → `break-words`)
 
-Rewrite the list to reflect real current getting-started flow (keep launch-prep items at the bottom). New ordered keys:
+## Approach
 
-1. `setup:create-project` — Create your first project (link `/portfolio`).
-2. `setup:pick-project-type` — Set its type/vertical (link `/admin?tab=projects`).
-3. `setup:review-pillars` — Review pillars for this type (link Settings → Pillars).
-4. `setup:review-qualifier-fields` — Review/seed qualifier fields (link Settings → Qualifier Fields).
-5. `setup:try-qualifier` — Run the qualifier (link `/qualify/<slug>`), see a lead land in Inbound Leads.
-6. `setup:promote-lead` — Promote a lead to CRM.
-7. `setup:brand-vault` — Set up brand kit.
-8. `setup:weekly-review` — Submit a Weekly Review → Pillar Score.
-9. `setup:growth-audit` — Open Growth Audit → Growth Score.
-10. `setup:channel-revenue` — Log one Channel Revenue entry.
-11. `setup:content-pipeline` — Add one Content item.
-12. `setup:capture-verify` — (existing) inbox 5-step verification.
-13. `launch:rls-audit`, `launch:full-backup`, `launch:marketing-review`, `launch:ai-routing-sanity`, `launch:archive-protection`, `launch:domain-dns`, `launch:help-content-recheck` — kept from existing list, demoted to the end as launch-prep.
+- Reuse `use-mobile` hook for branching where layout fundamentally differs (table↔card, dialog↔sheet, multi-pane↔single-pane).
+- Prefer pure Tailwind responsive prefixes (`sm:`, `md:`, `lg:`) for everything else — no new abstractions.
+- No new dependencies. No design-token changes beyond what's already in `index.css` / `tailwind.config.ts`.
+- Verify by driving Playwright at 390×844 against `/`, `/portfolio`, `/weekly-review`, `/insights`, `/crm`, `/qualify/home-services`, `/content-pipeline`, `/channel-revenue`, `/chat`, `/admin`, `/help` — screenshot each, fix issues found, re-screenshot.
 
-`useChecklist` schema is key-based — existing completed rows for kept keys keep working; new keys start unchecked. No migration needed.
+## Out of scope
 
-## 5. Smart suggestions (`src/hooks/useSuggestions.ts`)
+- Scoring engine, RLS, edge functions, integrations, DB schema
+- Desktop redesign — only mobile parity adjustments
+- New features
 
-Add new grounded suggestion sources, alongside the 7 existing ones:
+## Deliverable
 
-- **No project type set** — projects whose `project_type` is null (or default `general` when others exist). CTA: open Edit Project.
-- **Project type missing qualifier fields** — for any project whose type has zero rows in `project_type_qualifier_fields` AND no per-project overrides. CTA: Settings → Qualifier Fields.
-- **Qualifier has captured leads not yet promoted** — `inbound_leads` rows with `is_ready=true` and `status='new'`. CTA: Inbound Leads.
-- **Project has no Weekly Review this week** — projects without a `project_pillar_scores` row for the current ISO week. CTA: Weekly Review.
-- **Project has open Growth findings** — count from `growth_findings` where status='open'. CTA: Growth Audit.
-- **Content Pipeline empty** — project with zero `content_items`. CTA: Content Pipeline.
-- **Channel Revenue not logged this month** — project with no `channel_revenue` row for current month. CTA: Channel Revenue.
-
-All wrapped in `try/catch`-style optional resolution so a missing table never breaks the panel; gated by `helpEnabled` and dismiss keys identical to existing pattern.
-
-## 6. Empty-state copy
-
-Add a one-time empty-state explainer (existing card pattern, not a new component) to each NEW page when its primary table is empty:
-
-- `QualifyLanding` (admin preview only — public visitor view unchanged)
-- `ContentPipeline`
-- `ChannelRevenue`
-- `AffiliatePrograms`, `Products`
-- `Insights` (when no insights yet)
-- `WeeklyReview` (when no scores submitted)
-- `InboundLeadsPanel` (when zero leads)
-
-Each uses the same `Card` + icon + short copy + CTA pattern already in use elsewhere; honors `helpEnabled` via reading from `useHelpState` for the explanation block.
-
-## 7. Out of scope (non-changes)
-
-- No new DB tables; reuse `user_help_state` + `user_checklist_progress`.
-- No edits to scoring, dashboard branching, RLS, or integrations.
-- No new help framework; only data + small placements in existing components.
-
-## Files changed
-
-- `src/config/helpArticles.ts` — add ~13 articles, update existing.
-- `src/config/helpKeys.ts` — add new keys.
-- `src/config/launchChecklist.ts` — re-ordered + extended.
-- `src/components/help/SetupWizard.tsx` — updated steps.
-- `src/hooks/useSuggestions.ts` — added suggestion sources.
-- Page files for `<HelpTip>` + empty-state inserts: `PortfolioOverview`, `WeeklyReview`, `Insights`, `QualifyLanding`, `ContentPipeline`, `ChannelRevenue`, `MarketingHub`, `AffiliatePrograms`, `Products`, `Tasks`, `Logs`, `Chat`, `crm/InboundLeadsPanel`, `admin/SettingsPillarsTab`, `admin/EditBarDialog` (overrides section header).
-
-## Verify
-
-- Help Center lists every feature/concept above; existing articles still work.
-- Checklist items appear in the new getting-started order; progress persists.
-- Each new page shows a dismissible tip / empty-state explainer on first open.
-- Suggestions panel surfaces qualifier/weekly-review/content/revenue prompts when conditions are true.
-- `tsc` clean.
+Each page above renders without horizontal scroll, with reachable controls, readable type, and working primary flows on a 390px viewport. `tsc` clean.

@@ -47,24 +47,24 @@ export default function QualifyLanding() {
   return (
     <div className="min-h-screen bg-[hsl(40,33%,96%)] text-foreground">
       <header className="border-b border-border/60">
-        <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded bg-forest" />
             <span className="font-semibold">{cfg.brand}</span>
           </div>
-          <span className="text-xs text-muted-foreground">Powered by intake AI</span>
+          <span className="text-[11px] sm:text-xs text-muted-foreground">Powered by intake AI</span>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-5 py-10 space-y-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-5 py-6 sm:py-10 space-y-6 sm:space-y-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
         <div className="space-y-3 text-center">
-          <p className="text-xs uppercase tracking-[0.18em] text-forest font-semibold">
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.18em] text-forest font-semibold">
             New customer intake
           </p>
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">
+          <h1 className="text-[28px] leading-tight sm:text-4xl md:text-5xl font-semibold tracking-tight">
             {cfg.tagline}
           </h1>
-          <p className="text-base text-muted-foreground max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             Tell us what you need in a quick voice or text conversation. We'll get back to you
             today — usually within the hour.
           </p>
@@ -85,10 +85,10 @@ export default function QualifyLanding() {
         )}
 
         <Tabs defaultValue="voice" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
-            <TabsTrigger value="voice"><Mic className="h-4 w-4 mr-1.5" /> Voice</TabsTrigger>
-            <TabsTrigger value="chat"><MessageSquare className="h-4 w-4 mr-1.5" /> Chat</TabsTrigger>
-            <TabsTrigger value="form"><FormInput className="h-4 w-4 mr-1.5" /> Form</TabsTrigger>
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto h-11">
+            <TabsTrigger value="voice" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><Mic className="h-4 w-4" /> Voice</TabsTrigger>
+            <TabsTrigger value="chat" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><MessageSquare className="h-4 w-4" /> Chat</TabsTrigger>
+            <TabsTrigger value="form" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><FormInput className="h-4 w-4" /> Form</TabsTrigger>
           </TabsList>
           <TabsContent value="voice" className="mt-5">
             <VoiceQualifier projectType={projectType} onSubmitted={handleSubmitted} />

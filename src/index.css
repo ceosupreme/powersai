@@ -672,3 +672,9 @@
   .stm-marketing .live-dot,
   .stm-marketing .node-pulse { animation: none !important; }
 }
+
+/* Hide scrollbar utility for horizontally-scrolling tab strips and chip rows on mobile */
+@layer utilities {
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
