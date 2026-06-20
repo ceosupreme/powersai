@@ -8,8 +8,21 @@ import { z } from "npm:zod@3.23.8";
 const Body = z.object({
   name: z.string().trim().min(1).max(200),
   business_name: z.string().trim().max(200).optional().nullable(),
-  email: z.string().trim().email().max(255),
-  message: z.string().trim().min(1).max(4000),
+  email: z.string().trim().email().max(255).optional().nullable(),
+  phone: z.string().trim().max(40).optional().nullable(),
+  message: z.string().trim().max(4000).optional().nullable(),
+  // Qualifier payload — all optional so the legacy contact form still works.
+  project_type: z.string().trim().max(80).optional().nullable(),
+  qualifier_data: z.record(z.unknown()).optional().nullable(),
+  is_ready: z.boolean().optional(),
+  not_ready_reason: z.string().trim().max(500).optional().nullable(),
+  transcript: z.array(z.object({
+    role: z.enum(["user", "assistant", "system"]),
+    text: z.string(),
+    at: z.string().optional(),
+  })).optional().nullable(),
+  conversation_channel: z.enum(["voice", "chat", "form", "phone"]).optional().nullable(),
+  route_to: z.enum(["self", "operator", "client"]).optional().nullable(),
   // Honeypot — must be empty. Real users never see/fill this field.
   company_website: z.string().max(0).optional().nullable(),
 });
@@ -64,9 +77,18 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Silently drop honeypot hits (already validated above as empty, but defensive
-  // — if the field is present at all with content, schema would have failed).
-  const { name, business_name, email, message } = parsed.data;
+  const {
+    name, business_name, email, phone, message,
+    project_type, qualifier_data, is_ready, not_ready_reason,
+    transcript, conversation_channel, route_to,
+  } = parsed.data;
+
+  // Either email or phone is required so we can actually contact the lead.
+  if (!email && !phone) {
+    return new Response(JSON.stringify({ error: "Email or phone is required" }), {
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -76,14 +98,22 @@ Deno.serve(async (req) => {
 
   const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
 
-  const { error } = await admin.from("inbound_leads").insert({
+  const { data: inserted, error } = await admin.from("inbound_leads").insert({
     name,
     business_name: business_name || null,
-    email,
-    message,
-    source: "public_site",
+    email: email || null,
+    phone: phone || null,
+    message: message || null,
+    project_type: project_type || null,
+    qualifier_data: qualifier_data ?? {},
+    is_ready: is_ready ?? false,
+    not_ready_reason: not_ready_reason || null,
+    transcript: transcript ?? [],
+    conversation_channel: conversation_channel || null,
+    route_to: route_to || "self",
+    source: project_type ? `qualifier:${project_type}` : "public_site",
     user_agent: userAgent,
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("[submit-inbound-lead] insert failed:", error);
@@ -92,7 +122,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ ok: true }), {
+  return new Response(JSON.stringify({ ok: true, id: inserted?.id }), {
     status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });

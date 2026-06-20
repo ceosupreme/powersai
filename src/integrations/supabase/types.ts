@@ -4074,40 +4074,64 @@ export type Database = {
       inbound_leads: {
         Row: {
           business_name: string | null
+          conversation_channel: string | null
           created_at: string
           email: string
           id: string
-          message: string
+          is_ready: boolean
+          message: string | null
           name: string
+          not_ready_reason: string | null
+          phone: string | null
+          project_type: string | null
           promoted_company_id: string | null
+          qualifier_data: Json
+          route_to: string
           source: string | null
           status: Database["public"]["Enums"]["inbound_lead_status"]
+          transcript: Json
           updated_at: string
           user_agent: string | null
         }
         Insert: {
           business_name?: string | null
+          conversation_channel?: string | null
           created_at?: string
           email: string
           id?: string
-          message: string
+          is_ready?: boolean
+          message?: string | null
           name: string
+          not_ready_reason?: string | null
+          phone?: string | null
+          project_type?: string | null
           promoted_company_id?: string | null
+          qualifier_data?: Json
+          route_to?: string
           source?: string | null
           status?: Database["public"]["Enums"]["inbound_lead_status"]
+          transcript?: Json
           updated_at?: string
           user_agent?: string | null
         }
         Update: {
           business_name?: string | null
+          conversation_channel?: string | null
           created_at?: string
           email?: string
           id?: string
-          message?: string
+          is_ready?: boolean
+          message?: string | null
           name?: string
+          not_ready_reason?: string | null
+          phone?: string | null
+          project_type?: string | null
           promoted_company_id?: string | null
+          qualifier_data?: Json
+          route_to?: string
           source?: string | null
           status?: Database["public"]["Enums"]["inbound_lead_status"]
+          transcript?: Json
           updated_at?: string
           user_agent?: string | null
         }

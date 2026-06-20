@@ -31,6 +31,10 @@ export default {
         "accent-soft": "hsl(var(--accent-soft))",
         electric: "hsl(var(--electric))",
         violet: "hsl(var(--violet))",
+        // Marketing/qualifier brand: light bone bg + deep forest green accent.
+        forest: "hsl(156 71% 19%)",
+        bone: "hsl(40 33% 96%)",
+        ink: "hsl(220 12% 12%)",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

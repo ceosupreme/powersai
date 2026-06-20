@@ -54,6 +54,7 @@ import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
+import QualifyLanding from "./pages/QualifyLanding";
 import { SetupWizard } from "@/components/help/SetupWizard";
 
 // Re-export for any remaining imports from App
@@ -79,6 +80,8 @@ const App = () => {
                 {/* Public landing page — signed-out visitors see marketing,
                     signed-in users get redirected into the app (handled inside Marketing). */}
                 <Route path="/" element={<MarketingSite />} />
+                {/* Public lead qualifier landing pages — one per vertical slug. */}
+                <Route path="/qualify/:slug" element={<QualifyLanding />} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>
