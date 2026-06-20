@@ -13,8 +13,8 @@ export function useEffectiveQualifierFields(
 ) {
   return useQuery({
     queryKey: ['effective-qualifier-fields', projectId, projectType],
-    enabled: !!projectId && !!projectType,
-    queryFn: () => fetchEffectiveQualifierFields(projectId!, projectType!),
+    enabled: !!projectType,
+    queryFn: () => fetchEffectiveQualifierFields(projectId ?? null, projectType!),
     staleTime: 60_000,
   });
 }

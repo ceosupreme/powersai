@@ -20,17 +20,18 @@ export interface EffectiveQualifierField {
  *   2. else project_type_qualifier_fields for the project's type
  */
 export async function fetchEffectiveQualifierFields(
-  projectId: string,
+  projectId: string | null,
   projectType: ProjectType,
 ): Promise<EffectiveQualifierField[]> {
-  const { data: overrides } = await (supabase as any)
-    .from('project_qualifier_field_overrides')
-    .select('field_key,field_label,field_type,is_shared,channel,sort_order')
-    .eq('project_id', projectId)
-    .order('sort_order', { ascending: true });
-
-  if (overrides && overrides.length > 0) {
-    return overrides.map((o: any) => ({ ...o, source: 'override' as const }));
+  if (projectId) {
+    const { data: overrides } = await (supabase as any)
+      .from('project_qualifier_field_overrides')
+      .select('field_key,field_label,field_type,is_shared,channel,sort_order')
+      .eq('project_id', projectId)
+      .order('sort_order', { ascending: true });
+    if (overrides && overrides.length > 0) {
+      return overrides.map((o: any) => ({ ...o, source: 'override' as const }));
+    }
   }
 
   const { data: templates } = await (supabase as any)
