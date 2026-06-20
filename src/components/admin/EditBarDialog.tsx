@@ -354,7 +354,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         if (sourceLeadId) payload.source_lead_id = sourceLeadId;
         const { data: inserted, error } = await supabase
           .from('venues')
-          .insert(payload)
+          .insert(payload as any)
           .select('id')
           .single();
         if (error) throw error;
