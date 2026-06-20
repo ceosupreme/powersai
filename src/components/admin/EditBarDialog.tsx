@@ -127,7 +127,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingBar: Bar | null;
-  onSaved: () => void;
+  onSaved: (newVenueId?: string) => void;
   onDeleted?: () => void;
 }
 
@@ -311,18 +311,24 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         task_source: formData.task_source,
         project_type: formData.project_type,
       };
+      let newId: string | undefined;
       if (editingBar) {
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
         if (error) throw error;
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
         toast.success('Project updated');
       } else {
-        const { error } = await supabase.from('venues').insert(payload);
+        const { data: inserted, error } = await supabase
+          .from('venues')
+          .insert(payload)
+          .select('id')
+          .single();
         if (error) throw error;
+        newId = (inserted as any)?.id as string | undefined;
         toast.success('Project created');
       }
       onOpenChange(false);
-      onSaved();
+      onSaved(newId);
     } catch (e: any) {
       console.error(e);
       toast.error('Failed to save project');

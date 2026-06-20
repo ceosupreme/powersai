@@ -6,10 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Plus, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Loader2, Pencil, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { EditBarDialog } from './EditBarDialog';
+import { VenueOnboardingWizard } from '@/components/onboarding/VenueOnboardingWizard';
+import { useVenueOnboardingProgress } from '@/hooks/useVenueOnboardingProgress';
+import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
+import { VenueLiveBadge } from '@/components/onboarding/VenueLiveBadge';
 
 interface Bar {
   id: string;
@@ -42,6 +46,7 @@ export const SettingsBarsTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBar, setEditingBar] = useState<Bar | null>(null);
+  const [wizardVenueId, setWizardVenueId] = useState<string | null>(null);
 
   const fetchBars = async () => {
     setIsLoading(true);
@@ -92,6 +97,11 @@ export const SettingsBarsTab = () => {
     setIsDialogOpen(true);
   };
 
+  const handleSaved = (newVenueId?: string) => {
+    fetchBars();
+    if (newVenueId) setWizardVenueId(newVenueId);
+  };
+
   return (
     <Card className="bg-card border-border">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
@@ -122,8 +132,11 @@ export const SettingsBarsTab = () => {
                 ) : bars.map(bar => (
                   <TableRow key={bar.id} className="hover:bg-muted/20">
                     <TableCell className="font-medium text-sm py-3">
-                      {bar.name}
-                      <span className="text-muted-foreground text-xs ml-2">({bar.user_count} users)</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span>{bar.name}</span>
+                        <span className="text-muted-foreground text-xs">({bar.user_count} users)</span>
+                        <VenueLiveStatusInline venueId={bar.id} />
+                      </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs font-mono hidden md:table-cell">{bar.bar_code || '—'}</TableCell>
                     <TableCell>
@@ -138,9 +151,14 @@ export const SettingsBarsTab = () => {
                       {bar.last_sync ? formatDistanceToNow(new Date(bar.last_sync), { addSuffix: true }) : 'Never'}
                     </TableCell>
                     <TableCell className="text-right py-3">
-                      <Button size="sm" variant="ghost" onClick={() => openDialog(bar)} className="h-8 px-3 gap-1.5">
-                        <Pencil className="h-3.5 w-3.5" /> Edit
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => setWizardVenueId(bar.id)} className="h-8 px-2 sm:px-3 gap-1.5">
+                          <Rocket className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Set up</span>
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => openDialog(bar)} className="h-8 px-2 sm:px-3 gap-1.5">
+                          <Pencil className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Edit</span>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -154,9 +172,32 @@ export const SettingsBarsTab = () => {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         editingBar={editingBar}
-        onSaved={fetchBars}
+        onSaved={handleSaved}
         onDeleted={fetchBars}
       />
+
+      {wizardVenueId && (
+        <VenueOnboardingWizard
+          open={!!wizardVenueId}
+          onOpenChange={(o) => { if (!o) setWizardVenueId(null); }}
+          venueId={wizardVenueId}
+        />
+      )}
     </Card>
   );
 };
+
+/** Tiny compact LIVE badge for the venues table — uses the same hooks as the wizard. */
+function VenueLiveStatusInline({ venueId }: { venueId: string }) {
+  const { statusFor } = useVenueOnboardingProgress(venueId);
+  const live = useVenueLiveStatus(statusFor);
+  return (
+    <VenueLiveBadge
+      compact
+      isLive={live.isLive}
+      phase3Pct={live.phase3Pct}
+      requiredDone={live.requiredDone}
+      requiredTotal={live.requiredTotal}
+    />
+  );
+}

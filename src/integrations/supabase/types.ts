@@ -6318,6 +6318,7 @@ export type Database = {
           id: string
           is_vertical: boolean
           label: string
+          slug: string
           sort_order: number
           updated_at: string
         }
@@ -6327,6 +6328,7 @@ export type Database = {
           id: string
           is_vertical?: boolean
           label: string
+          slug: string
           sort_order?: number
           updated_at?: string
         }
@@ -6336,6 +6338,7 @@ export type Database = {
           id?: string
           is_vertical?: boolean
           label?: string
+          slug?: string
           sort_order?: number
           updated_at?: string
         }
@@ -8408,6 +8411,39 @@ export type Database = {
         Update: {
           dismissed_at?: string
           user_id?: string
+          venue_id?: string
+        }
+        Relationships: []
+      }
+      venue_onboarding_progress: {
+        Row: {
+          auto_detected: boolean
+          id: string
+          notes: string | null
+          status: string
+          step_key: string
+          updated_at: string
+          updated_by: string | null
+          venue_id: string
+        }
+        Insert: {
+          auto_detected?: boolean
+          id?: string
+          notes?: string | null
+          status?: string
+          step_key: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id: string
+        }
+        Update: {
+          auto_detected?: boolean
+          id?: string
+          notes?: string | null
+          status?: string
+          step_key?: string
+          updated_at?: string
+          updated_by?: string | null
           venue_id?: string
         }
         Relationships: []
