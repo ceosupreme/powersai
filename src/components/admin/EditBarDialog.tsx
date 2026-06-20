@@ -21,7 +21,10 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { AsanaLogSourcesEditor } from './AsanaLogSourcesEditor';
 import { ProjectPillarOverridesPanel } from './ProjectPillarOverridesPanel';
+import { ProjectLeakVectorOverridesPanel } from './ProjectLeakVectorOverridesPanel';
+import { ProjectQualifierOverridesPanel } from './ProjectQualifierOverridesPanel';
 import type { ProjectType } from '@/lib/effectivePillars';
+import { useProjectTypes } from '@/hooks/useProjectTypes';
 
 interface Bar {
   id: string;
@@ -424,11 +427,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="client">Client</SelectItem>
-                          <SelectItem value="content_channel">Content Channel</SelectItem>
-                          <SelectItem value="internal_brand">Internal Brand</SelectItem>
-                          <SelectItem value="app_build">App Build</SelectItem>
-                          <SelectItem value="service_offer">Service Offer</SelectItem>
+                          {projectTypes.map((pt) => (
+                            <SelectItem key={pt.id} value={pt.id}>
+                              {pt.label}{pt.is_vertical ? ' · vertical' : ''}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground">
