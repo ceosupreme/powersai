@@ -28,6 +28,7 @@ import { ProjectPillarOverridesPanel } from '@/components/admin/ProjectPillarOve
 import { ProjectLeakVectorOverridesPanel } from '@/components/admin/ProjectLeakVectorOverridesPanel';
 import { ProjectQualifierOverridesPanel } from '@/components/admin/ProjectQualifierOverridesPanel';
 import { AsanaLogSourcesEditor } from '@/components/admin/AsanaLogSourcesEditor';
+import { AutomationEnrollmentPanel } from '@/components/automations/AutomationEnrollmentPanel';
 
 interface Props {
   open: boolean;
