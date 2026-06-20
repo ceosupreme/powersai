@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import {
   Building2, Plug, UserPlus, Settings as SettingsIcon, Loader2, Search,
-  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote, Layers,
+  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote, Layers, Inbox,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
