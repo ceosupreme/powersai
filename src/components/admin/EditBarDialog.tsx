@@ -21,7 +21,10 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { AsanaLogSourcesEditor } from './AsanaLogSourcesEditor';
 import { ProjectPillarOverridesPanel } from './ProjectPillarOverridesPanel';
+import { ProjectLeakVectorOverridesPanel } from './ProjectLeakVectorOverridesPanel';
+import { ProjectQualifierOverridesPanel } from './ProjectQualifierOverridesPanel';
 import type { ProjectType } from '@/lib/effectivePillars';
+import { useProjectTypes } from '@/hooks/useProjectTypes';
 
 interface Bar {
   id: string;
@@ -132,6 +135,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
   const [formData, setFormData] = useState<FormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const { data: projectTypes = [] } = useProjectTypes();
 
   const [venueLeaders, setVenueLeaders] = useState<VenueLeader[]>([]);
   const [newLeaderName, setNewLeaderName] = useState('');
@@ -424,11 +428,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="client">Client</SelectItem>
-                          <SelectItem value="content_channel">Content Channel</SelectItem>
-                          <SelectItem value="internal_brand">Internal Brand</SelectItem>
-                          <SelectItem value="app_build">App Build</SelectItem>
-                          <SelectItem value="service_offer">Service Offer</SelectItem>
+                          {projectTypes.map((pt) => (
+                            <SelectItem key={pt.id} value={pt.id}>
+                              {pt.label}{pt.is_vertical ? ' · vertical' : ''}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground">
@@ -538,6 +542,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
 
                 {/* Asana — Log Sources */}
                 {editingBar ? (
+                  <div className="space-y-4">
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -804,6 +809,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
               {/* ── PILLARS ────────────────────────────────────── */}
               <TabsContent value="pillars" className="mt-0 space-y-4">
                 {editingBar ? (
+                  <div className="space-y-4">
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -817,6 +823,33 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       />
                     </CardContent>
                   </Card>
+                  <Card className="bg-muted/20 border-border">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-muted-foreground" /> Leak Vectors
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ProjectLeakVectorOverridesPanel
+                        projectId={editingBar.id}
+                        projectType={formData.project_type}
+                      />
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-muted/20 border-border">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Info className="h-4 w-4 text-muted-foreground" /> Qualifier Fields
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ProjectQualifierOverridesPanel
+                        projectId={editingBar.id}
+                        projectType={formData.project_type}
+                      />
+                    </CardContent>
+                  </Card>
+                  </div>
                 ) : (
                   <Card className="bg-muted/20 border-dashed border-border">
                     <CardContent className="py-4 text-xs text-muted-foreground text-center">

@@ -6003,6 +6003,53 @@ export type Database = {
         }
         Relationships: []
       }
+      project_leak_vector_overrides: {
+        Row: {
+          benchmark: string | null
+          created_at: string
+          detect_signal: string | null
+          dollarize_formula: string | null
+          id: string
+          name: string
+          project_id: string
+          severity: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          benchmark?: string | null
+          created_at?: string
+          detect_signal?: string | null
+          dollarize_formula?: string | null
+          id?: string
+          name: string
+          project_id: string
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          benchmark?: string | null
+          created_at?: string
+          detect_signal?: string | null
+          dollarize_formula?: string | null
+          id?: string
+          name?: string
+          project_id?: string
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_leak_vector_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_pillar_overrides: {
         Row: {
           created_at: string
@@ -6090,6 +6137,185 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_qualifier_field_overrides: {
+        Row: {
+          channel: string | null
+          created_at: string
+          field_key: string
+          field_label: string
+          field_type: string
+          id: string
+          is_shared: boolean
+          project_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          field_key: string
+          field_label: string
+          field_type?: string
+          id?: string
+          is_shared?: boolean
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          field_key?: string
+          field_label?: string
+          field_type?: string
+          id?: string
+          is_shared?: boolean
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_qualifier_field_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_type_leak_vectors: {
+        Row: {
+          benchmark: string | null
+          created_at: string
+          detect_signal: string | null
+          dollarize_formula: string | null
+          id: string
+          name: string
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          severity: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          benchmark?: string | null
+          created_at?: string
+          detect_signal?: string | null
+          dollarize_formula?: string | null
+          id?: string
+          name: string
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          benchmark?: string | null
+          created_at?: string
+          detect_signal?: string | null
+          dollarize_formula?: string | null
+          id?: string
+          name?: string
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_type_qualifier_config: {
+        Row: {
+          created_at: string
+          primary_channel: string | null
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          ready_definition: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          primary_channel?: string | null
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          ready_definition?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          primary_channel?: string | null
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          ready_definition?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_type_qualifier_fields: {
+        Row: {
+          channel: string | null
+          created_at: string
+          field_key: string
+          field_label: string
+          field_type: string
+          id: string
+          is_shared: boolean
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          field_key: string
+          field_label: string
+          field_type?: string
+          id?: string
+          is_shared?: boolean
+          project_type: Database["public"]["Enums"]["project_type_enum"]
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          field_key?: string
+          field_label?: string
+          field_type?: string
+          id?: string
+          is_shared?: boolean
+          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_vertical: boolean
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          is_vertical?: boolean
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_vertical?: boolean
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       promo_redemptions: {
         Row: {
@@ -10073,6 +10299,7 @@ export type Database = {
         | "internal_brand"
         | "app_build"
         | "service_offer"
+        | "home_services"
       promo_type:
         | "happy_hour"
         | "special"
@@ -10426,6 +10653,7 @@ export const Constants = {
         "internal_brand",
         "app_build",
         "service_offer",
+        "home_services",
       ],
       promo_type: [
         "happy_hour",
