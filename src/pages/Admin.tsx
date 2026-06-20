@@ -49,7 +49,7 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 animate-fade-in-up stagger-1">
-          <TabsList className="bg-card/50 border border-border/50 rounded-xl p-1 w-full sm:w-auto">
+          <TabsList className="bg-card/50 border border-border/50 rounded-xl p-1 w-full sm:w-auto overflow-x-auto justify-start no-scrollbar">
             <TabsTrigger 
               value="users" 
               className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
