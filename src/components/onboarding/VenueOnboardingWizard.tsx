@@ -87,6 +87,8 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
         return <ProjectQualifierOverridesPanel projectId={venueId} projectType={meta.project_type} />;
       case 'asana_log_sources':
         return <AsanaLogSourcesEditor venueId={venueId} />;
+      case 'automations':
+        return <AutomationEnrollmentPanel projectId={venueId} />;
     }
   };
 

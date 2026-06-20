@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   Building2, Layers, MessageSquareText, Bell, Inbox, Users, Palette, Target,
-  Plug, BookOpen, ListChecks, MapPin, Search, Globe, Sparkles, Zap,
+  Plug, BookOpen, ListChecks, MapPin, Search, Globe, Sparkles, Zap, Send,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ProjectType } from '@/lib/effectivePillars';
@@ -30,7 +30,7 @@ export interface OnboardingStep {
   /** Where to send the user to actually configure this (link-out). */
   href?: (venueId: string) => string;
   /** Component embedded inline when present (passed { projectId, projectType }). */
-  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources';
+  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources' | 'automations';
 }
 
 const exists = async (table: string, filter: (q: any) => any): Promise<boolean> => {
@@ -252,6 +252,17 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     icon: Zap,
     manualOnly: true,
     href: () => `/admin?tab=settings&subtab=daily-flash`,
+  },
+  {
+    key: 'automations_enrollment',
+    phase: 'full_config',
+    title: 'Fulfillment automations',
+    description:
+      'Enroll this client in follow-up sequences, reactivation, and review requests. Nothing sends without approval.',
+    icon: Send,
+    inlineComponent: 'automations',
+    detector: async ({ venueId }) =>
+      exists('project_automation_enrollments', (q) => q.eq('project_id', venueId)),
   },
 ];
 
