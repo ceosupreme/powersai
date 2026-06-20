@@ -135,6 +135,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
   const [formData, setFormData] = useState<FormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const { data: projectTypes = [] } = useProjectTypes();
 
   const [venueLeaders, setVenueLeaders] = useState<VenueLeader[]>([]);
   const [newLeaderName, setNewLeaderName] = useState('');
