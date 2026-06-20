@@ -86,9 +86,9 @@ export default function QualifyLanding() {
 
         <Tabs defaultValue="voice" className="w-full">
           <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto h-11">
-            <TabsTrigger value="voice" className="text-sm"><Mic className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">Voice</span></TabsTrigger>
-            <TabsTrigger value="chat" className="text-sm"><MessageSquare className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">Chat</span></TabsTrigger>
-            <TabsTrigger value="form" className="text-sm"><FormInput className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">Form</span></TabsTrigger>
+            <TabsTrigger value="voice" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><Mic className="h-4 w-4" /> Voice</TabsTrigger>
+            <TabsTrigger value="chat" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><MessageSquare className="h-4 w-4" /> Chat</TabsTrigger>
+            <TabsTrigger value="form" className="text-xs sm:text-sm gap-1 sm:gap-1.5"><FormInput className="h-4 w-4" /> Form</TabsTrigger>
           </TabsList>
           <TabsContent value="voice" className="mt-5">
             <VoiceQualifier projectType={projectType} onSubmitted={handleSubmitted} />

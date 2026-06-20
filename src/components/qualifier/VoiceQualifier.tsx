@@ -71,18 +71,18 @@ export function VoiceQualifier({ projectType, onSubmitted }: Props) {
   if (!autoStarted) {
     return (
       <Card className="border-forest/30">
-        <CardContent className="flex flex-col items-center gap-5 py-10 text-center">
-          <div className="h-16 w-16 rounded-full bg-forest/10 flex items-center justify-center">
-            <Mic className="h-8 w-8 text-forest" />
+        <CardContent className="flex flex-col items-center gap-5 px-4 sm:px-6 py-8 sm:py-10 text-center">
+          <div className="h-20 w-20 rounded-full bg-forest/10 flex items-center justify-center">
+            <Mic className="h-9 w-9 text-forest" />
           </div>
           <div className="space-y-1">
-            <p className="text-lg font-semibold">Talk to our intake assistant</p>
+            <p className="text-base sm:text-lg font-semibold">Talk to our intake assistant</p>
             <p className="text-sm text-muted-foreground max-w-sm">
               A quick voice conversation — about 90 seconds. We'll ask a few simple questions
               and get back to you fast.
             </p>
           </div>
-          <Button size="lg" onClick={start} className="bg-forest hover:bg-forest/90 text-bone">
+          <Button size="lg" onClick={start} className="bg-forest hover:bg-forest/90 text-bone h-14 px-8 text-base w-full sm:w-auto">
             <Mic className="h-4 w-4 mr-2" /> Start the call
           </Button>
           <p className="text-xs text-muted-foreground">You'll be asked to share your microphone.</p>
@@ -112,7 +112,7 @@ export function VoiceQualifier({ projectType, onSubmitted }: Props) {
 
   return (
     <Card className="border-forest/30">
-      <CardContent className="flex flex-col items-center gap-6 py-10">
+      <CardContent className="flex flex-col items-center gap-6 px-4 sm:px-6 py-8 sm:py-10">
         <div className="h-32 flex items-center justify-center">
           {agent.isSpeaking ? (
             <div className="relative flex items-center justify-center">
@@ -174,7 +174,7 @@ export function VoiceQualifier({ projectType, onSubmitted }: Props) {
           </div>
         )}
 
-        <Button variant="outline" onClick={agent.disconnect}>
+        <Button variant="outline" onClick={agent.disconnect} className="min-h-11 w-full sm:w-auto">
           <PhoneOff className="h-4 w-4 mr-2" /> End call
         </Button>
       </CardContent>

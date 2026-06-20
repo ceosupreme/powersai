@@ -57,20 +57,20 @@ export function FormQualifier({ projectType, fields, onSubmitted }: Props) {
 
   return (
     <Card className="border-forest/20">
-      <CardContent className="p-5">
-        <form onSubmit={onSubmit} className="space-y-3">
+      <CardContent className="p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="name">Your name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required className="h-11" />
             </div>
             <div className="space-y-1">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input id="phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-1 sm:col-span-2">
               <Label htmlFor="email">Email (optional if phone provided)</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" />
             </div>
           </div>
           {fields.filter(f => f.field_key !== "contact").map((f) => (
@@ -82,24 +82,26 @@ export function FormQualifier({ projectType, fields, onSubmitted }: Props) {
                   value={values[f.field_key] ?? ""}
                   onChange={(e) => setValues((v) => ({ ...v, [f.field_key]: e.target.value }))}
                   placeholder="—"
+                  className="h-11"
                 />
               ) : f.field_key === "job_type" || f.field_key === "service_needed" ? (
                 <Textarea
                   id={f.field_key}
                   value={values[f.field_key] ?? ""}
                   onChange={(e) => setValues((v) => ({ ...v, [f.field_key]: e.target.value }))}
-                  rows={2}
+                  rows={3}
                 />
               ) : (
                 <Input
                   id={f.field_key}
                   value={values[f.field_key] ?? ""}
                   onChange={(e) => setValues((v) => ({ ...v, [f.field_key]: e.target.value }))}
+                  className="h-11"
                 />
               )}
             </div>
           ))}
-          <Button type="submit" disabled={submitting} className="w-full bg-forest hover:bg-forest/90 text-bone">
+          <Button type="submit" disabled={submitting} className="w-full bg-forest hover:bg-forest/90 text-bone h-12 text-base">
             {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Send request
           </Button>
