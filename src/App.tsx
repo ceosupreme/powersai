@@ -55,6 +55,8 @@ import MarketingSite from "./pages/MarketingSite";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
+import AutomationInbox from "./pages/AutomationInbox";
+import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import { SetupWizard } from "@/components/help/SetupWizard";
 
 // Re-export for any remaining imports from App
@@ -192,6 +194,16 @@ const App = () => {
                 <Route path="/inbox" element={
                   <ProtectedRoute pageKey="capture_inbox">
                     <AppLayout><Inbox /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/automations/inbox" element={
+                  <ProtectedRoute>
+                    <AppLayout><AutomationInbox /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/automations/reactivation" element={
+                  <ProtectedRoute>
+                    <AppLayout><ReactivationCampaigns /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/help" element={

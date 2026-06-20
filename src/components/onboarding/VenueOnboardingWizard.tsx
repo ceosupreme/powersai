@@ -28,6 +28,7 @@ import { ProjectPillarOverridesPanel } from '@/components/admin/ProjectPillarOve
 import { ProjectLeakVectorOverridesPanel } from '@/components/admin/ProjectLeakVectorOverridesPanel';
 import { ProjectQualifierOverridesPanel } from '@/components/admin/ProjectQualifierOverridesPanel';
 import { AsanaLogSourcesEditor } from '@/components/admin/AsanaLogSourcesEditor';
+import { AutomationEnrollmentPanel } from '@/components/automations/AutomationEnrollmentPanel';
 
 interface Props {
   open: boolean;
@@ -87,6 +88,8 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
         return <ProjectQualifierOverridesPanel projectId={venueId} projectType={meta.project_type} />;
       case 'asana_log_sources':
         return <AsanaLogSourcesEditor venueId={venueId} />;
+      case 'automations':
+        return <AutomationEnrollmentPanel projectId={venueId} />;
     }
   };
 
