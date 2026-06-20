@@ -1,149 +1,94 @@
-# Build A — Client Onboarding Wizard (Plan)
+## Build B — Intake → Config bridge
 
-Per-venue guided wizard that **assembles** existing admin panels into a phased, completeness-tracked flow. No panel logic is rebuilt; the wizard is pure orchestration over a new per-venue progress table, plus one data-driven fix to the qualifier slug.
+Carry an inbound_lead's `qualifier_data` / `transcript` forward into the new project's creation form (and the Build A wizard that opens after) so the operator confirms rather than re-keys. No parallel intake, no parallel creation path, no silent writes.
 
----
+### 1. Schema (additive — one small migration)
 
-## 1. Net-new schema (one migration)
+- `venues.source_lead_id uuid null references public.inbound_leads(id) on delete set null` + index. One project = one originating lead; the lead's transcript/qualifier_data is reachable from the client via this FK. (Cleaner than a link table — strictly 1:0..1, no extra join in the read path.)
+- No RLS change. No change to inbound_leads, project_types, or Build 0 tables.
 
-### `venue_onboarding_progress`
-```text
-id                uuid pk
-venue_id          uuid not null  (no FK if venues isn't safe to FK; mirror existing per-venue tables)
-step_key          text not null
-status            text not null check in ('not_started','complete','skipped')
-auto_detected     boolean not null default false   -- true when a detector set it, false when user marked
-notes             text
-updated_at        timestamptz default now()
-updated_by        uuid
-unique (venue_id, step_key)
+### 2. Mapping layer — edge function `lead-to-project-proposal`
+
+Modeled on `crm-analyze-lead` (service-role read, JSON-only output, Lovable AI Gateway, `google/gemini-2.5-flash`). Input: `{ lead_id }`. Output: a **proposal object** — never writes config.
+
+```ts
+type ProjectSetupProposal = {
+  lead_id: string;
+  // Direct fields — high confidence, pre-fill into EditBarDialog form
+  direct: {
+    name: string | null;            // business_name || qualifier_data.business_name
+    project_type: string | null;    // lead.project_type (already resolved by qualifier)
+    timezone: string | null;        // inferred from address only if unambiguous
+    address: string | null;         // qualifier_data.address / service_area
+  };
+  // Direct contact — pre-fill into the Contacts tab as a leadership_contact row
+  contact: {
+    display_name: string | null;
+    email: string | null;
+    phone: string | null;
+    role_label: string | null;      // 'owner' | 'gm' | 'manager' | free text
+  } | null;
+  // Interpreted — clearly marked suggestions; rendered with a "Suggested" pill
+  suggestions: {
+    primary_channel?: { value: string; rationale: string };
+    pillar_focus?: { keys: string[]; rationale: string };     // pillar_template ids the lead implied
+    leak_vector_focus?: { keys: string[]; rationale: string };
+    goals_summary?: string;          // 1–2 sentence operator note (budget/urgency/goals)
+    not_ready_reason?: string;       // surface lead.not_ready_reason verbatim
+  };
+  raw: { qualifier_data: unknown; transcript: unknown; conversation_channel: string | null };
+};
 ```
-- GRANTs: `authenticated` + `service_role`.
-- RLS: SELECT/INSERT/UPDATE/DELETE gated by `public.user_can_access_project(venue_id)` (mirrors existing per-venue tables).
-- `updated_at` trigger via existing `handle_updated_at()`.
 
-### `project_types.slug` (additive column)
-- Add `slug text unique` to `project_types`.
-- Backfill from existing rows: `slug = lower(regexp_replace(id::text, '_', '-', 'g'))` (e.g. `home_services → home-services`, matches the existing hardcoded slug).
-- Nothing else changes on the table.
+Rules:
+- Direct fields are extracted in code (deterministic) from `qualifier_data` keys + `business_name` + `email/phone`.
+- Interpreted fields go through the model with strict JSON output. If the AI call fails or returns invalid JSON, return `suggestions: {}` and still ship `direct`/`contact` — the bridge degrades gracefully (same pattern as `crm-analyze-lead`'s URL-fetch fallback).
+- Tight system prompt: "Propose values for an operator to confirm. Never invent contact info. Cite the lead's own words when proposing pillar/leak focus."
 
-No other schema changes. All other surfaces continue writing to their existing tables via their existing panels.
+### 3. Bridge into project creation (extend, don't replace)
 
----
+`InboundLeadsPanel.tsx` — add a new action on `new`/`reviewed` rows beside the existing **Promote to CRM** button:
 
-## 2. Step registry (single source of truth, code-side)
+- **"Create project from lead"** → calls `lead-to-project-proposal({ lead_id })`, then opens `EditBarDialog` with the proposal pre-filling form state. The existing **Promote to CRM** button is unchanged.
 
-`src/config/venueOnboardingSteps.ts` — declarative list. Each entry:
-```text
-{
-  key: string,                    // stable, persisted in venue_onboarding_progress.step_key
-  phase: 'identity' | 'go_live' | 'full_config',
-  title, description,
-  panelComponent: ReactComponent, // embedded existing panel
-  detector: (venueId) => Promise<'complete' | 'not_started'>, // optional
-  manualOnly?: boolean,           // skip auto-detection
-  required?: boolean              // for phase gating
+`EditBarDialog.tsx` — additive prop only:
+```ts
+interface Props {
+  // ...existing
+  initialProposal?: ProjectSetupProposal | null;
+  sourceLeadId?: string | null;
 }
 ```
+- When `editingBar` is null AND `initialProposal` is present, seed `formData` from `direct` (name, bar_code derived from name, address, timezone, project_type) instead of `defaultForm`. Existing edit path is untouched.
+- On create-insert, include `source_lead_id: sourceLeadId ?? null` in the payload — single source of truth for the write stays in this dialog's existing submit handler.
+- After successful insert, also (a) upsert the proposed `venue_leadership_contacts` row from `contact` (operator already saw/edited it via a new compact "From lead" section on the Contacts tab — confirmation, not silent), and (b) mark the inbound_lead `status='promoted'` and stamp `promoted_company_id` semantics-equivalent field if applicable (we set `inbound_leads.status='promoted'` + new field `promoted_venue_id uuid null` on inbound_leads — second tiny column in the same migration, mirrors the existing `promoted_company_id` pattern).
+- A small read-only "Suggestions from lead" panel renders interpreted fields with a **Use** button per suggestion (writes into the relevant override panel via its existing hooks — never silent). Pillar/leak suggestions become pre-checked items in the Build A wizard's existing override panels; they do not write until the operator saves those panels themselves.
 
-Steps registered (all reuse existing panels — wizard never recreates write logic):
+`SettingsBarsTab.tsx` — `handleSaved(newId)` already auto-opens `VenueOnboardingWizard`. No change. Because identity/contact rows are now populated on create, Build A's detectors flip the Identity + Contacts steps to `complete` on first wizard open. Pre-checked-but-unsaved override panels remain `not_started` until the operator saves them (intentional — preserves the "operator confirms" contract).
 
-**Phase 1 — Identity & Type (gating)**
-- `identity` — embeds `EditBarDialog`'s field set (extracted as `<VenueIdentityForm>` reading the same submit handler EditBarDialog already uses). Detector: `venues.name` + `bar_code` + `project_type` not null.
+### 4. Files touched
 
-**Phase 2 — Go-Live Essentials (gating for LIVE)**
-- `qualifier_config` — embeds `ProjectQualifierOverridesPanel` + a read-only summary of the resolved `project_type_qualifier_fields` / `project_type_qualifier_config`. Detector: `fetchEffectiveQualifierFields(venueId)` returns ≥1 field AND `project_type_qualifier_config` row exists with `ready_definition` + `primary_channel`.
-- `capture_channel` — embeds the new `/qualify/[slug]` link surface + a "test a lead" link. Detector: at least one `inbound_leads` row OR user manually marks complete.
-- `owner_notifications` — embeds `NotificationPreferencesCard`. Detector: `notification_preferences` row exists for venue with at least one channel enabled.
+Additive only:
+- `supabase/migrations/<ts>_intake_bridge.sql` — `venues.source_lead_id`, `inbound_leads.promoted_venue_id`, indexes.
+- `supabase/functions/lead-to-project-proposal/index.ts` — new edge function (Lovable AI Gateway via `LOVABLE_API_KEY`).
+- `supabase/config.toml` — register function (no other config change).
+- `src/hooks/useLeadProposal.ts` — `useMutation` wrapper around `supabase.functions.invoke('lead-to-project-proposal')`.
+- `src/components/crm/InboundLeadsPanel.tsx` — add "Create project from lead" action; lift `EditBarDialog` open state with `initialProposal` + `sourceLeadId`. Existing Promote to CRM untouched.
+- `src/components/admin/EditBarDialog.tsx` — accept `initialProposal` + `sourceLeadId`; seed form on create; include `source_lead_id` in insert payload; render compact "From lead" + "Suggestions from lead" sections only when present.
+- `src/hooks/useInboundLeads.ts` — add `promoted_venue_id` to the row type; (no behavior change to existing `promote` mutation).
+- `src/integrations/supabase/types.ts` — regenerated post-migration.
 
-**Phase 3 — Full Configuration (tracked, non-gating)**
-- `pillars` → `ProjectPillarOverridesPanel`. Detector: `project_pillar_overrides` row exists OR template resolves cleanly (manual-mark allowed).
-- `leak_vectors` → `ProjectLeakVectorOverridesPanel`. Detector: same pattern.
-- `contacts` → existing contacts panel from EditBarDialog (Leaders + Contacts tabs). Detector: ≥1 `venue_contacts` OR `venue_leadership_contacts` row.
-- `brand_kit` → `BrandKit` page embedded. Detector: `brand_kits` row exists for project.
-- `targets` → `SettingsTargetsTab`. Detector: `bar_targets` or `period_config` row exists.
-- `execution_adapter` → `VenueAdapterConfig`. Detector: `venue_execution_adapters` row exists.
-- `programming_context` → `VenueProgrammingContextPanel`. Detector: row in `venue_programming_context`.
-- `asana_log_sources` → `AsanaLogSourcesEditor`. Detector: ≥1 active `venue_asana_log_sources` row.
-- `gbp_mapping` → `GbpPlaceMappingPanel`. Detector: `gbp_place_mappings` row.
-- `map_pack` → `MapPackKeywordsPanel`. Detector: ≥1 `map_pack_keywords` row.
-- `ai_search` → `AISearchQueriesPanel`. Detector: ≥1 `ai_search_queries` row.
-- `website_mapping` → `WebsiteMappingPanel`. Detector: `website_mappings` row.
-- `auto_approve` → `AutoApproveSettingsCard`. Detector: config row OR manual mark.
-- `daily_flash` → `DailyFlashSettingsCard`. Detector: config row OR manual mark.
+Not touched: Build 0 resolution (`effectivePillars` / `effectiveLeakVectors` / `effectiveQualifierFields`), Build A wizard internals, `VenueOnboardingWizard.tsx` step list, qualifier landing/edge function, RLS on `inbound_leads` / `venues` / overrides, integrations.
 
-Steps with no clean DB signal are `manualOnly` (user toggles complete/skip).
+### 5. Verification
 
----
+1. `useInboundLeads` row with `qualifier_data` → "Create project from lead" → EditBarDialog opens with name/project_type/address/timezone/contact pre-filled; "Suggestions from lead" panel shows interpreted pillar/leak/channel/goals with rationales.
+2. Operator edits → Save runs the existing `handleSubmit` insert path with `source_lead_id` set; no other write path is introduced.
+3. Build A wizard auto-opens; Identity + Contacts steps detect complete; pillar/leak override panels show suggestion chips that only persist when the operator saves those panels.
+4. `select id, source_lead_id from venues where id = <new>` returns the lead id; `select promoted_venue_id, status from inbound_leads where id = <lead>` returns the new venue id + `promoted`.
+5. Promote-to-CRM button still works unchanged on the same row (the two actions are independent; status transitions are idempotent).
+6. AI failure path (force `lead-to-project-proposal` to throw) → bridge still fills `direct`/`contact`, suggestions panel shows "AI suggestions unavailable", operator can still create.
+7. `tsc --noEmit` clean. No change to Build 0, Build A behavior, RLS, integrations.
 
-## 3. Hooks (orchestration only)
-
-- `useVenueOnboardingProgress(venueId)` — loads `venue_onboarding_progress` rows, exposes `{ status[stepKey], setStatus(stepKey, status), markComplete, skip }`. Single Supabase upsert per write.
-- `useVenueOnboardingDetectors(venueId, steps)` — runs each step's detector in parallel (batched, not deep-instantiation-prone), updates `venue_onboarding_progress` with `auto_detected = true` only when the detector flips a `not_started` row to `complete`. Never overwrites a user-set `skipped` or `complete` status.
-- `useVenueLiveStatus(venueId)` — derives `{ isLive, phase1Complete, phase2Complete, phase3Pct }` from progress. `isLive = phase1 && phase2 all required steps complete`.
-
-These hooks are the only new state machinery. They do not write to any existing setup tables.
-
----
-
-## 4. UI
-
-- `src/components/onboarding/VenueOnboardingWizard.tsx` — built on top of `SetupWizard.tsx` shell pattern (reuses its Dialog + progress chrome by extracting a generic `<WizardShell>` if needed, otherwise composes the same primitives). Accepts `venueId`. Renders three phase tabs with per-step rows: status pill, embedded panel inline (accordion) or "Open" → Sheet on mobile, "Mark complete" / "Skip" buttons.
-- `src/components/onboarding/VenueLiveBadge.tsx` — "LIVE — capturing leads" badge + "X% configured" meter.
-- Entry points (re-openable):
-  - Admin → Venues list: per-row "Set up" button → opens wizard for that venue. Also auto-opens once after a new venue is created in `EditBarDialog` (without modifying EditBarDialog internals — wrap its `onSaved` at the parent).
-  - Venue detail page header: "Continue setup" button when `phase3Pct < 100`, "Setup ✓" when complete.
-- Mobile: phase tabs scroll horizontally (existing `.no-scrollbar` pattern); each step opens as a Sheet on `<md`.
-
----
-
-## 5. Data-driven qualifier slug
-
-- Add `project_types.slug` (migration above) + backfill.
-- `src/pages/QualifyLanding.tsx`: delete `SLUG_TO_TYPE`. Replace with a lookup hook `useProjectTypeBySlug(slug)` that queries `project_types` by `slug`.
-- `supabase/functions/qualifier-session/index.ts`: accept slug OR project_type id; resolve via `project_types.slug`.
-- Result: adding a vertical = one row in `project_types` (with slug). No code change for the URL to work.
-
----
-
-## 6. Edits to existing files (minimal, additive)
-
-- `EditBarDialog.tsx`: no internal changes. Parent that opens it gets a small wrapper that, on first-save of a new venue, opens the wizard for `venueId` — keeps EditBarDialog unchanged.
-- `QualifyLanding.tsx`: swap hardcoded map for data lookup (above).
-- `qualifier-session` edge function: slug-aware resolver.
-- `App.tsx`: nothing new — entry points are inside existing admin pages.
-
-Everything else (existing SetupWizard, LaunchChecklist, useChecklist, useVenueOnboarding, Build 0 resolution, RLS on existing tables, all integrations) is untouched.
-
----
-
-## 7. Phase gating logic
-
-```text
-isLive =
-  step.identity.status === 'complete' &&
-  step.qualifier_config.status === 'complete' &&
-  step.capture_channel.status in ('complete','skipped') &&
-  step.owner_notifications.status === 'complete'
-
-configuredPct = phase3.completedOrSkipped / phase3.total
-```
-The wizard surfaces both: a prominent "LIVE" gate state and a secondary "X% fully configured" meter.
-
----
-
-## 8. Verification
-
-1. Open Admin → Venues → click new venue → wizard opens scoped to that venueId; phase tabs render with detector-driven statuses.
-2. Fill Phase 1 identity + Phase 2 qualifier/notifications → `useVenueLiveStatus` flips `isLive = true`, badge shows "LIVE — capturing leads".
-3. Each embedded panel writes to its existing table (verified by reading the same row after the step closes); `venue_onboarding_progress` only ever stores `{venue_id, step_key, status}` — no parallel config writes.
-4. Detectors flip steps to `complete` after panel saves; user can manually `skip` or `mark complete` for manual-only steps.
-5. Visit `/qualify/<new-slug>` after inserting a new `project_types` row with that slug → qualifier loads without any code change.
-6. `tsc --noEmit` clean. Existing SetupWizard / LaunchChecklist / EditBarDialog / Build 0 resolution / RLS / integrations behave identically (smoke check).
-
-## Out of scope
-
-- Templated automation deployment (Build C).
-- Recovery report (Build D).
-- Intake-answers → config pre-population (Build B).
-- Any change to Build 0 template resolution or to the existing onboarding/checklist systems.
+### Out of scope
+- Templated automation deployment (Build C), Recovery report (Build D), changes to qualifier capture, any rewrite of `crm-analyze-lead` or the CRM promote flow's existing behavior, auto-writing AI suggestions into config.

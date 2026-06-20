@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import {
   Building2, Plug, UserPlus, Settings as SettingsIcon, Loader2, Search,
-  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote, Layers,
+  Plus, Trash2, Star, Zap, Info, BookUser, Phone, Mail, StickyNote, Layers, Inbox,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
@@ -25,6 +25,7 @@ import { ProjectLeakVectorOverridesPanel } from './ProjectLeakVectorOverridesPan
 import { ProjectQualifierOverridesPanel } from './ProjectQualifierOverridesPanel';
 import type { ProjectType } from '@/lib/effectivePillars';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
+import type { ProjectSetupProposal } from '@/hooks/useLeadProposal';
 
 interface Bar {
   id: string;
@@ -106,6 +107,14 @@ const TIMEZONES = [
   { value: 'Pacific/Honolulu', label: 'Hawaii (Honolulu)' },
 ];
 
+/** Derive a default bar_code from a venue name (uppercase initials, fallback prefix). */
+function deriveBarCode(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '';
+  if (words.length === 1) return words[0].slice(0, 4).toUpperCase();
+  return words.slice(0, 4).map((w) => w[0]).join('').toUpperCase();
+}
+
 const defaultForm: FormData = {
   name: '',
   bar_code: '',
@@ -129,9 +138,13 @@ interface Props {
   editingBar: Bar | null;
   onSaved: (newVenueId?: string) => void;
   onDeleted?: () => void;
+  /** When creating a new venue, optionally pre-fill from a lead proposal. */
+  initialProposal?: ProjectSetupProposal | null;
+  /** Stamped onto `venues.source_lead_id` for the new venue. */
+  sourceLeadId?: string | null;
 }
 
-export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDeleted }: Props) => {
+export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDeleted, initialProposal, sourceLeadId }: Props) => {
   const [formData, setFormData] = useState<FormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
@@ -157,7 +170,8 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
   useEffect(() => {
     if (!open) return;
     setActiveTab('basic');
-    setFormData(editingBar ? {
+    if (editingBar) {
+      setFormData({
       name: editingBar.name,
       bar_code: editingBar.bar_code || '',
       address: editingBar.address || '',
@@ -172,7 +186,25 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       google_place_id: editingBar.google_place_id || '',
       task_source: editingBar.task_source || 'none',
       project_type: (editingBar.project_type as ProjectType) || 'client',
-    } : defaultForm);
+      });
+    } else if (initialProposal) {
+      const d = initialProposal.direct;
+      const seededName = (d.name || '').trim();
+      const proposedType = d.project_type ?? '';
+      const typeIsValid = projectTypes.length === 0
+        ? !!proposedType
+        : projectTypes.some((pt) => pt.id === proposedType);
+      setFormData({
+        ...defaultForm,
+        name: seededName,
+        bar_code: deriveBarCode(seededName),
+        address: d.address || '',
+        timezone: d.timezone || defaultForm.timezone,
+        project_type: (typeIsValid ? proposedType : defaultForm.project_type) as ProjectType,
+      });
+    } else {
+      setFormData(defaultForm);
+    }
     setPlaceResults([]);
     setVenueLeaders([]);
     setNewLeaderName('');
@@ -188,7 +220,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       fetchVenueLeaders(editingBar.id);
       fetchVenueContacts(editingBar.id);
     }
-  }, [open, editingBar]);
+  }, [open, editingBar, initialProposal, projectTypes]);
 
   const fetchVenueLeaders = async (venueId: string) => {
     const { data } = await supabase
@@ -295,7 +327,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
     }
     setIsSaving(true);
     try {
-      const payload = {
+      const payload: Record<string, any> = {
         name: formData.name.trim(),
         bar_code: formData.bar_code.trim(),
         address: formData.address.trim() || null,
@@ -318,13 +350,47 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
         toast.success('Project updated');
       } else {
+        // Carry the originating lead forward so the new client record references it.
+        if (sourceLeadId) payload.source_lead_id = sourceLeadId;
         const { data: inserted, error } = await supabase
           .from('venues')
-          .insert(payload)
+          .insert(payload as any)
           .select('id')
           .single();
         if (error) throw error;
         newId = (inserted as any)?.id as string | undefined;
+        // Post-create wiring for lead-sourced creations: leadership contact + bridge stamps.
+        if (newId && initialProposal && sourceLeadId) {
+          const c = initialProposal.contact;
+          if (c && (c.display_name || c.email || c.phone)) {
+            const role = (c.role_label || '').toLowerCase();
+            const role_type =
+              role.includes('owner') ? 'owner'
+              : role.includes('gm') || role.includes('general manager') ? 'gm'
+              : 'lead_staff';
+            await supabase.from('venue_leadership_contacts').insert({
+              venue_id: newId,
+              display_name: c.display_name || c.email || c.phone || 'Lead Contact',
+              role_type,
+              is_primary: true,
+              is_active: true,
+            });
+          }
+          if (c && (c.display_name || c.email || c.phone)) {
+            await supabase.from('venue_contacts' as any).insert({
+              venue_id: newId,
+              name: c.display_name || c.email || c.phone || 'Lead Contact',
+              role_label: c.role_label || 'Primary contact',
+              phone: c.phone || null,
+              email: c.email || null,
+              note: 'Imported from inbound lead',
+            });
+          }
+          await supabase
+            .from('inbound_leads')
+            .update({ status: 'promoted', promoted_venue_id: newId })
+            .eq('id', sourceLeadId);
+        }
         toast.success('Project created');
       }
       onOpenChange(false);
@@ -389,6 +455,52 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
             <div className="flex-1 overflow-y-auto px-6 py-5">
               {/* ── BASIC ───────────────────────────────────────── */}
               <TabsContent value="basic" className="mt-0 space-y-4">
+                {!editingBar && initialProposal && (
+                  <Card className="border-primary/40 bg-primary/5">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Inbox className="h-4 w-4 text-primary" /> From inbound lead
+                        <Badge variant="outline" className="ml-1 text-[10px]">Pre-filled · confirm or edit</Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-xs">
+                      {initialProposal.contact && (
+                        <div className="rounded-md border border-border bg-background/60 p-2">
+                          <div className="font-medium text-sm">{initialProposal.contact.display_name ?? '—'}</div>
+                          <div className="text-muted-foreground">
+                            {[initialProposal.contact.email, initialProposal.contact.phone, initialProposal.contact.role_label].filter(Boolean).join(' · ') || '—'}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground mt-1">Saved as a leadership contact on create.</p>
+                        </div>
+                      )}
+                      {Object.keys(initialProposal.suggestions).length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          <div className="font-medium text-xs flex items-center gap-1.5">
+                            <Info className="h-3 w-3" /> Suggestions to review in the wizard
+                          </div>
+                          {initialProposal.suggestions.goals_summary && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Goals:</span> {initialProposal.suggestions.goals_summary}</div>
+                          )}
+                          {initialProposal.suggestions.primary_channel && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Channel:</span> {initialProposal.suggestions.primary_channel.value} <span className="italic">— {initialProposal.suggestions.primary_channel.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.pillar_focus && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Pillars:</span> {initialProposal.suggestions.pillar_focus.keys.join(', ')} <span className="italic">— {initialProposal.suggestions.pillar_focus.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.leak_vector_focus && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Leak vectors:</span> {initialProposal.suggestions.leak_vector_focus.keys.join(', ')} <span className="italic">— {initialProposal.suggestions.leak_vector_focus.rationale}</span></div>
+                          )}
+                          {initialProposal.suggestions.not_ready_reason && (
+                            <div className="text-muted-foreground"><span className="font-medium text-foreground">Not-ready reason:</span> {initialProposal.suggestions.not_ready_reason}</div>
+                          )}
+                        </div>
+                      )}
+                      {initialProposal.ai_status === 'failed' && (
+                        <p className="text-[11px] text-amber-600 dark:text-amber-400">AI suggestions unavailable — direct fields still pre-filled.</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
                 <Card className="bg-muted/20 border-border">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">

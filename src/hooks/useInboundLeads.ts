@@ -11,6 +11,10 @@ export type InboundLead = {
   message: string;
   status: InboundLeadStatus;
   promoted_company_id: string | null;
+  promoted_venue_id: string | null;
+  project_type: string | null;
+  is_ready: boolean | null;
+  conversation_channel: string | null;
   source: string | null;
   created_at: string;
 };

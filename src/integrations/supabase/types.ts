@@ -4085,6 +4085,7 @@ export type Database = {
           phone: string | null
           project_type: string | null
           promoted_company_id: string | null
+          promoted_venue_id: string | null
           qualifier_data: Json
           route_to: string
           source: string | null
@@ -4106,6 +4107,7 @@ export type Database = {
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
+          promoted_venue_id?: string | null
           qualifier_data?: Json
           route_to?: string
           source?: string | null
@@ -4127,6 +4129,7 @@ export type Database = {
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
+          promoted_venue_id?: string | null
           qualifier_data?: Json
           route_to?: string
           source?: string | null
@@ -4141,6 +4144,13 @@ export type Database = {
             columns: ["promoted_company_id"]
             isOneToOne: false
             referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbound_leads_promoted_venue_id_fkey"
+            columns: ["promoted_venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -8770,6 +8780,7 @@ export type Database = {
           seven_shifts_location_id: string | null
           sevenshifts_api_enabled: boolean
           slug: string | null
+          source_lead_id: string | null
           state: string | null
           subscriber_count: number | null
           task_source: string | null
@@ -8818,6 +8829,7 @@ export type Database = {
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
+          source_lead_id?: string | null
           state?: string | null
           subscriber_count?: number | null
           task_source?: string | null
@@ -8866,6 +8878,7 @@ export type Database = {
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
+          source_lead_id?: string | null
           state?: string | null
           subscriber_count?: number | null
           task_source?: string | null
@@ -8881,7 +8894,15 @@ export type Database = {
           youtube_channel_id?: string | null
           youtube_channel_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "venues_source_lead_id_fkey"
+            columns: ["source_lead_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       voice_notes: {
         Row: {
