@@ -655,6 +655,80 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_bundle_items: {
+        Row: {
+          automation_key: string
+          bundle_id: string
+          created_at: string
+          default_config: Json
+          id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          automation_key: string
+          bundle_id: string
+          created_at?: string
+          default_config?: Json
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          automation_key?: string
+          bundle_id?: string
+          created_at?: string
+          default_config?: Json
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "automation_bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_bundles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          project_type: string | null
+          sort_order: number
+          tier: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          project_type?: string | null
+          sort_order?: number
+          tier?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          project_type?: string | null
+          sort_order?: number
+          tier?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       automation_message_queue: {
         Row: {
           approved_at: string | null

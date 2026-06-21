@@ -11,6 +11,7 @@ import {
   useUpsertEnrollment,
   type AutomationKey,
 } from "@/hooks/useAutomationEnrollments";
+import { ApplyBundleControl } from "./ApplyBundleControl";
 
 interface Props { projectId: string }
 
@@ -65,6 +66,7 @@ export function AutomationEnrollmentPanel({ projectId }: Props) {
         Nothing reaches your customers without your approval. Every draft lands in the Automation Inbox first.
         Send-channel is pluggable — defaults to a manual/log adapter that records what would have sent.
       </p>
+      <ApplyBundleControl projectId={projectId} />
       {DEFS.map((def) => {
         const e = byKey[def.key];
         return (
