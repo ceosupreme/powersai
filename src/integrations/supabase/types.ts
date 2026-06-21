@@ -6970,6 +6970,71 @@ export type Database = {
           },
         ]
       }
+      recovery_reports: {
+        Row: {
+          created_at: string
+          estimate_basis: Json
+          estimated_dollars: number
+          generated_at: string
+          id: string
+          metrics: Json
+          narrative: string | null
+          narrative_edited: boolean
+          period_end: string
+          period_start: string
+          project_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estimate_basis?: Json
+          estimated_dollars?: number
+          generated_at?: string
+          id?: string
+          metrics?: Json
+          narrative?: string | null
+          narrative_edited?: boolean
+          period_end: string
+          period_start: string
+          project_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estimate_basis?: Json
+          estimated_dollars?: number
+          generated_at?: string
+          id?: string
+          metrics?: Json
+          narrative?: string | null
+          narrative_edited?: boolean
+          period_end?: string
+          period_start?: string
+          project_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recovery_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_extraction_runs: {
         Row: {
           error: string | null
