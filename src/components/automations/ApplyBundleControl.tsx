@@ -23,36 +23,33 @@ export function ApplyBundleControl({ projectId }: Props) {
   const { data: enrollments = [] } = useAutomationEnrollments(projectId);
   const apply = useApplyBundle();
   const [selected, setSelected] = useState<string>("");
-  const [projectType, setProjectType] = useState<string | null>(null);
-  const [projectTier, setProjectTier] = useState<string | null>(null);
   const [conflictOpen, setConflictOpen] = useState(false);
+  const [projectType, setProjectType] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data } = await (supabase as any)
         .from("venues")
-        .select("project_type, package_tier, tier")
+        .select("project_type")
         .eq("id", projectId)
         .maybeSingle();
       if (cancelled || !data) return;
       setProjectType(data.project_type ?? null);
-      setProjectTier(data.package_tier ?? data.tier ?? null);
     })();
     return () => { cancelled = true; };
   }, [projectId]);
 
   const sorted = useMemo(() => {
     const isSuggested = (b: AutomationBundle) =>
-      (!!projectType && b.project_type === projectType) ||
-      (!!projectTier && b.tier === projectTier);
+      !!projectType && b.project_type === projectType;
     return [...bundles].sort((a, b) => {
       const sa = isSuggested(a) ? 0 : 1;
       const sb = isSuggested(b) ? 0 : 1;
       if (sa !== sb) return sa - sb;
       return a.sort_order - b.sort_order;
     });
-  }, [bundles, projectType, projectTier]);
+  }, [bundles, projectType]);
 
   const selectedBundle = bundles.find((b) => b.id === selected);
   const existingKeys = new Set(enrollments.map((e) => e.automation_key));
@@ -85,8 +82,7 @@ export function ApplyBundleControl({ projectId }: Props) {
   };
 
   const isSuggested = (b: AutomationBundle) =>
-    (!!projectType && b.project_type === projectType) ||
-    (!!projectTier && b.tier === projectTier);
+    !!projectType && b.project_type === projectType;
 
   return (
     <Card className="p-4 space-y-3 bg-muted/30">
