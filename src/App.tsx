@@ -57,6 +57,7 @@ import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
 import AutomationInbox from "./pages/AutomationInbox";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
+import RecoveryReports from "./pages/RecoveryReports";
 import { SetupWizard } from "@/components/help/SetupWizard";
 
 // Re-export for any remaining imports from App
@@ -204,6 +205,11 @@ const App = () => {
                 <Route path="/automations/reactivation" element={
                   <ProtectedRoute>
                     <AppLayout><ReactivationCampaigns /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/automations/recovery-reports" element={
+                  <ProtectedRoute>
+                    <AppLayout><RecoveryReports /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/help" element={
