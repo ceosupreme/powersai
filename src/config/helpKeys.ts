@@ -23,6 +23,19 @@ export const HELP_KEYS = {
   configEditor: "help:config-editor",
   projectOverrides: "help:project-overrides",
   growthAudit: "help:growth-audit",
+  automationInbox: "help:automation-inbox",
+  automationBundles: "help:automation-bundles",
+  reactivation: "help:reactivation",
+  recoveryReports: "help:recovery-reports",
+  team: "help:team",
+  permissions: "help:permissions",
+  backup: "help:backup",
+  fulfillmentFlow: "help:fulfillment-flow",
+  approvalGate: "help:approval-gate",
+  accountVsProject: "help:account-vs-project",
+  twoScores: "help:two-scores",
+  captureInbox: "help:capture-inbox",
+  crmFulfillment: "help:crm-fulfillment",
 } as const;
 
 export type HelpKey = (typeof HELP_KEYS)[keyof typeof HELP_KEYS];
