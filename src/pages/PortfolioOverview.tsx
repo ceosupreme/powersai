@@ -20,6 +20,7 @@ import { useApp } from '@/context/AppContext';
 import { getGradeFromScore, getGradeColor } from '@/utils/scoring';
 import { OwnerBarDetail } from '@/components/portfolio/OwnerBarDetail';
 import { VenueComparisonTable } from '@/components/portfolio/VenueComparisonTable';
+import { PortfolioGetStartedCard } from '@/components/portfolio/PortfolioGetStartedCard';
 import { WeeklySnapshotWidget } from '@/components/weekly-review/WeeklySnapshotWidget';
 import { formatCurrency, formatPercent } from '@/utils/formatting';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -468,6 +469,7 @@ export default function PortfolioOverview() {
 
   return (
     <div className="space-y-6">
+      <PortfolioGetStartedCard />
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-3">
           <BarChart3 className="w-6 h-6 text-primary" />
