@@ -49,6 +49,9 @@ import {
   Link2,
   Package,
   Tag,
+  FileText,
+  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -79,40 +82,49 @@ type NavItem = {
   icon: typeof LayoutDashboard;
   pageKey: PageKey;
   hasBadge?: 'tasks' | 'chat';
+  adminOnly?: boolean;
 };
 
 type NavGroup = { label: string; items: NavItem[] };
 
-// Agency-OS sidebar groups
+// Single source of truth for the operator sidebar (admin/owner/gm layouts).
 const navGroups: NavGroup[] = [
   {
     label: 'Workspace',
     items: [
-      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
       { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
       { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
       { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
+      { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' },
     ],
   },
   {
-    label: 'CRM & Sales',
+    label: 'Clients & Leads',
     items: [
       { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'crm' },
       { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'crm' },
-      { path: '/offers', label: 'Offers', icon: Tag, pageKey: 'offers' },
       { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
+      { path: '/automations/inbox', label: 'Automation Inbox', icon: Zap, pageKey: 'automation_inbox' },
+      { path: '/automations/reactivation', label: 'Reactivation', icon: Sparkles, pageKey: 'reactivation' },
+      { path: '/automations/recovery-reports', label: 'Recovery Reports', icon: FileText, pageKey: 'recovery_reports' },
     ],
   },
   {
-    label: 'Brand & Content',
+    label: 'Growth & Marketing',
     items: [
-      { path: '/brand-kit', label: 'Brand Vault', icon: Palette, pageKey: 'brand_kit' },
-      { path: '/content', label: 'Content Pipeline', icon: Film, pageKey: 'content_pipeline' },
+      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
+      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
+      { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
+    ],
+  },
+  {
+    label: 'Brand & Assets',
+    items: [
+      { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'brand_kit' },
+      { path: '/offers', label: 'Offers', icon: Tag, pageKey: 'offers' },
       { path: '/products', label: 'Products', icon: Package, pageKey: 'products' },
       { path: '/affiliate-programs', label: 'Affiliate Programs', icon: Link2, pageKey: 'affiliate_programs' },
-      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
-      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
     ],
   },
   {
@@ -128,7 +140,7 @@ const navGroups: NavGroup[] = [
     items: [
       { path: '/help', label: 'Help', icon: HelpCircle, pageKey: 'dashboard' },
       { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' },
-      { path: '/admin', label: 'Settings', icon: Settings, pageKey: 'dashboard' },
+      { path: '/admin', label: 'Admin Panel', icon: Settings, pageKey: 'dashboard', adminOnly: true },
     ],
   },
 ];
@@ -158,9 +170,14 @@ export const AppSidebar = () => {
   const filteredGroups = useMemo(
     () =>
       navGroups
-        .map((g) => ({ ...g, items: g.items.filter((i) => canAccessPage(i.pageKey)) }))
+        .map((g) => ({
+          ...g,
+          items: g.items.filter(
+            (i) => (!i.adminOnly || isAdmin) && canAccessPage(i.pageKey)
+          ),
+        }))
         .filter((g) => g.items.length > 0),
-    [canAccessPage]
+    [canAccessPage, isAdmin]
   );
 
   const getInitials = (name: string | null) => {
