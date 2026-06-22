@@ -472,6 +472,202 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
   },
   {
+    slug: "fulfillment-flow",
+    title: "The fulfillment flow (end to end)",
+    tags: ["fulfillment", "flow", "factory", "qualifier", "automation", "recovery", "overview"],
+    summary: "How a lead becomes a recovered customer — Qualifier → Inbound → CRM → Project → Bundle → Inbox → Report.",
+    sections: [
+      {
+        heading: "1. Capture",
+        body: "A visitor hits /qualify/<vertical>. The AI agent (voice, chat, or form) asks the qualifier questions configured for that vertical and produces a structured lead.",
+      },
+      {
+        heading: "2. Inbound Leads",
+        body: "The lead lands in CRM → Inbound. You see the transcript, the structured answers, the channel, and the 'ready' flag. Archive junk, promote the rest.",
+      },
+      {
+        heading: "3. Promote into the CRM",
+        body: "Promoting a lead creates a company, a contact, and a deal in the Pipeline. Work the deal stages the same way you'd work any sales pipeline.",
+      },
+      {
+        heading: "4. Win → graduate to a project",
+        body: "When a deal hits Won, graduate the company into an active project. That project becomes the unit of work for everything downstream — brand, content, revenue, automations.",
+      },
+      {
+        heading: "5. Apply an Automation Bundle",
+        body: "In Admin → Automation Bundles, apply a bundle to the project. A bundle is a packaged set of automations (follow-up, reactivation, review requests). One click enrolls the project.",
+      },
+      {
+        heading: "6. The Automation Inbox (approval gate)",
+        body: "AI drafts customer messages for every enrolled automation. They pause in the Automation Inbox waiting for your approval. Approve, edit, or reject. Nothing sends until you say so.",
+      },
+      {
+        heading: "7. Recovery Report",
+        body: "Each week the Recovery Report rolls up what was recovered for the project — leads captured, follow-ups re-engaged, customers reactivated, reviews landed, with an estimated dollar value. Internal-first: you review and choose when to share with the client.",
+      },
+    ],
+  },
+  {
+    slug: "approval-gate",
+    title: "The approval gate (Automation Inbox)",
+    tags: ["approval", "automation", "inbox", "qa", "safety"],
+    summary: "Nothing sends to a customer without your approval. The Automation Inbox is where that QA happens.",
+    sections: [
+      {
+        heading: "What pauses for approval",
+        body: "Every AI-drafted customer message — follow-up sequences, reactivation campaigns, review requests — lands in the Automation Inbox as 'pending_review' instead of sending.",
+      },
+      {
+        heading: "What you can do",
+        body: "Approve as-is (the message sends), edit then approve (your edit replaces the draft), or reject (it never goes out). 'Send now' triggers immediate delivery once approved.",
+      },
+      {
+        heading: "Why this matters",
+        body: "It's the safety layer that lets you trust AI with customer-facing content. If a draft is off-brand or factually wrong, it never reaches the customer — you catch it in the inbox first.",
+      },
+    ],
+  },
+  {
+    slug: "automation-inbox",
+    title: "Automation Inbox",
+    tags: ["automation", "inbox", "approval", "messages", "drafts"],
+    summary: "Approve, edit, or reject every AI-drafted customer message before it sends.",
+    sections: [
+      {
+        heading: "Where it lives",
+        body: "CLIENTS & LEADS → Automation Inbox. Scoped to the active project.",
+      },
+      {
+        heading: "Filters",
+        body: "Filter by automation (follow-up / reactivation / review request) and by status (pending review / approved / sent / failed / rejected / canceled). Default view is 'pending review' for the active project.",
+      },
+      {
+        heading: "Editing before approval",
+        body: "Each draft is editable. Your edits replace the original body. Approve when you're happy; the message either sends immediately or at its scheduled time.",
+      },
+      {
+        heading: "After it sends",
+        body: "Sent rows stay in the inbox for audit. 'Failed' rows surface why the send didn't go through (e.g. invalid contact, channel error).",
+      },
+    ],
+  },
+  {
+    slug: "automation-bundles",
+    title: "Automation Bundles",
+    tags: ["automation", "bundles", "enrollment", "config"],
+    summary: "Apply a packaged set of automations to a project in one action.",
+    sections: [
+      {
+        heading: "What a bundle is",
+        body: "A bundle = a pre-configured set of automations (e.g. follow-up sequence + reactivation + review requests). Apply one to a project and that project is enrolled in every automation the bundle includes.",
+      },
+      {
+        heading: "Where to apply",
+        body: "Admin → Automation Bundles. Pick a project, pick a bundle, click apply. Enrollments show up immediately; AI starts drafting messages into the Automation Inbox on the next run.",
+      },
+      {
+        heading: "Per-automation control",
+        body: "After applying, you can toggle individual automations on/off per project from the project's automations panel — the bundle is just a fast on-ramp.",
+      },
+    ],
+  },
+  {
+    slug: "reactivation",
+    title: "Reactivation campaigns",
+    tags: ["reactivation", "win-back", "campaign", "customer list"],
+    summary: "Upload a customer list, pick an offer, AI drafts a win-back — you approve before anything sends.",
+    sections: [
+      {
+        heading: "What it does",
+        body: "Take a list of past customers, send them a tailored win-back offer. Useful for slow weeks, new menu drops, or seasonal pushes.",
+      },
+      {
+        heading: "The flow",
+        body: "1) Make sure the 'reactivation' automation is enabled for the project. 2) Create a list and import members (CSV: name, email, phone, last_visit_at). 3) Start a campaign with a name + offer. 4) AI drafts one message per member into the Automation Inbox. 5) You approve, edit, or reject each one.",
+      },
+      {
+        heading: "Where to find it",
+        body: "CLIENTS & LEADS → Reactivation. Scoped to the active project.",
+      },
+    ],
+  },
+  {
+    slug: "recovery-reports",
+    title: "Recovery Reports",
+    tags: ["recovery", "report", "weekly", "dollars", "client"],
+    summary: "Weekly internal-first report of what the automations recovered — you review and choose when to share.",
+    sections: [
+      {
+        heading: "What it shows",
+        body: "Per project, per week: leads captured, follow-ups re-engaged, customers reactivated, reviews landed, plus an estimated dollar value at work (avg ticket × close rate).",
+      },
+      {
+        heading: "Internal-first",
+        body: "Nothing here auto-delivers to clients. You review the numbers, edit the narrative, then copy or mark sent when you share. Draft → Reviewed → Sent are the three statuses.",
+      },
+      {
+        heading: "Where it lives",
+        body: "CLIENTS & LEADS → Recovery Reports. The weekly generator runs Monday mornings.",
+      },
+    ],
+  },
+  {
+    slug: "team",
+    title: "Team",
+    tags: ["team", "people", "members"],
+    summary: "Who's on the active project. Permissions controls what each person can do.",
+    sections: [
+      {
+        heading: "What you see",
+        body: "Members assigned to the active project — name, role, and contact info. Scoped to the project you've selected in Portfolio.",
+      },
+      {
+        heading: "Team vs Permissions",
+        body: "Team shows who's involved at a glance. Permissions (Admin) is where you grant/revoke roles. A user can be on multiple project teams with different roles in each.",
+      },
+    ],
+  },
+  {
+    slug: "account-wide-vs-project",
+    title: "Account-wide vs project-scoped",
+    tags: ["scope", "account", "project", "library"],
+    summary: "Most data follows the active project. A handful of things span every project.",
+    sections: [
+      {
+        heading: "Account-wide (don't change when you switch projects)",
+        body: "Affiliate Programs, Products, Permissions, Backup & Export, Project Types + config templates. Think of these as shared libraries and settings.",
+      },
+      {
+        heading: "Project-scoped (change with the active project)",
+        body: "Everything else — CRM, Brand Kit, Content, Channel Revenue, Weekly Review, Insights, Growth Audit, Automation Inbox, Reactivation, Recovery Reports, Marketing Hub, Tasks, Logs, Chat channels.",
+      },
+      {
+        heading: "Why this split",
+        body: "Libraries you build once and reuse everywhere shouldn't be duplicated per project. Operational data is project-specific so you can run multiple clients side-by-side without leaks.",
+      },
+    ],
+  },
+  {
+    slug: "two-scores",
+    title: "The two scores: Pillar Score vs Growth Score",
+    tags: ["scores", "pillar", "growth", "weekly", "audit"],
+    summary: "Two different questions, two different scores. Don't expect them to match.",
+    sections: [
+      {
+        heading: "Pillar Score — 'how are we doing'",
+        body: "Comes out of the Weekly Review. You grade each pillar that applies to the project, and the result rolls up into one number. Operational health, week by week.",
+      },
+      {
+        heading: "Growth Score — 'where can we grow'",
+        body: "Comes out of the Growth Audit. Scheduled audit findings (leak vectors, opportunities) produce a rolling score. 'No data yet' is normal until an audit has run.",
+      },
+      {
+        heading: "Why they're separate",
+        body: "Mixing 'how is the operation today' with 'where could we grow tomorrow' produces a number nobody can act on. Keeping them apart lets you see both pictures clearly.",
+      },
+    ],
+  },
+  {
     slug: "marketing-site-inbound",
     title: "Marketing site & inbound leads",
     tags: ["marketing", "site", "leads", "inbound", "public"],
