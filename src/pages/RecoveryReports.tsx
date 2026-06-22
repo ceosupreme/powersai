@@ -10,6 +10,8 @@ import {
   useRecoveryReportMutations,
   type RecoveryReport,
 } from "@/hooks/useRecoveryReports";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function RecoveryReports() {
   const { selectedBar } = useApp();
@@ -31,6 +33,12 @@ export default function RecoveryReports() {
           when you share with the client. Nothing here auto-delivers.
         </p>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.recoveryReports} title="Internal-first, then share">
+        Each Monday a draft is generated per project — leads captured, follow-ups re-engaged,
+        customers reactivated, reviews landed, with an estimated dollar value. Review, edit the
+        narrative, then Copy or Mark Sent when you're ready to share with the client.
+      </HelpTip>
 
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>

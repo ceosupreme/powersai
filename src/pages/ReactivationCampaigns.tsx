@@ -14,6 +14,8 @@ import {
   useStartReactivation,
 } from "@/hooks/useCustomerLists";
 import { useAutomationEnrollments } from "@/hooks/useAutomationEnrollments";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 export default function ReactivationCampaigns() {
   const { selectedBar } = useApp();
@@ -47,6 +49,12 @@ export default function ReactivationCampaigns() {
           Upload an old customer list, AI segments + drafts a win-back, you approve in the Automation Inbox.
         </p>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.reactivation} title="How a reactivation campaign works">
+        Create a list → import members (CSV: name, email, phone, last_visit_at) → start a campaign
+        with an offer → AI drafts one message per member → drafts land in the Automation Inbox for
+        your approval. Nothing sends until you approve it.
+      </HelpTip>
 
       {!enrolled && (
         <Card className="p-4 border-amber-500/30 bg-amber-500/5 text-sm">

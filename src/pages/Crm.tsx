@@ -60,6 +60,12 @@ export default function Crm() {
         Deals flow Lead → Pitch → Proposal → Won/Lost. When a deal hits Won, graduate the company into an active project so you can operate against it. Archive keeps history; delete cascades — the dialog will tell you exactly what dies and what gets orphaned.
       </HelpTip>
 
+      <HelpTip helpKey={HELP_KEYS.crmFulfillment} title="Where the CRM fits in the fulfillment flow">
+        Qualifier → Inbound Leads → promote into a CRM company + deal → Won → graduate to a project
+        → apply an Automation Bundle → AI drafts go to the Automation Inbox → Recovery Report shows
+        what was recovered. See the Help Center article "The fulfillment flow" for the full map.
+      </HelpTip>
+
       <Tabs value={tab} onValueChange={(v) => {
         setTab(v);
         const next = new URLSearchParams(searchParams);

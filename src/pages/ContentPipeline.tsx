@@ -40,10 +40,10 @@ export default function ContentPipeline() {
         <Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> New Content Item</Button>
       </div>
 
-      <HelpTip helpKey={HELP_KEYS.contentPipeline} title="Content Pipeline">
-        Plan, draft, and ship content through 7 stages (idea → published). Switch between List
-        and Kanban views. Scoped to the active project — switch project from Portfolio to see a
-        different pipeline.
+      <HelpTip helpKey={HELP_KEYS.contentPipeline} title="Content Pipeline — 7 stages">
+        Each item flows through 7 stages: idea → planned → drafting → review → scheduled →
+        published → archived. Use List for spreadsheet-style editing, Kanban for drag-and-drop.
+        Scoped to the active project — switch project from Portfolio to see a different pipeline.
       </HelpTip>
 
       <Tabs defaultValue="list">
