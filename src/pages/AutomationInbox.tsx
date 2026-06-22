@@ -13,6 +13,8 @@ import {
   type QueueStatus,
 } from "@/hooks/useAutomationQueue";
 import type { AutomationKey } from "@/hooks/useAutomationEnrollments";
+import { HelpTip } from "@/components/help/HelpTip";
+import { HELP_KEYS } from "@/config/helpKeys";
 
 const AUTOMATION_LABELS: Record<AutomationKey, string> = {
   followup_sequence: "Follow-up",
@@ -46,6 +48,12 @@ export default function AutomationInbox() {
           Every drafted customer message waits here. Approve, edit, or reject before anything sends.
         </p>
       </div>
+
+      <HelpTip helpKey={HELP_KEYS.automationInbox} title="This is the approval gate">
+        Every AI-drafted customer message (follow-ups, reactivation, review requests) pauses here as
+        "pending_review". Nothing reaches a real customer until you approve it. See the Help Center
+        article "The approval gate" for more.
+      </HelpTip>
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex gap-2 text-xs text-muted-foreground">

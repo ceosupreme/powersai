@@ -360,6 +360,110 @@ export function useSuggestions() {
         });
       }
 
+      // --- O–S: New-surface suggestions. Cast to any + allSettled so missing tables or
+      // missing generated types don't break the panel.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sb: any = supabase;
+      const [
+        pendingApprovalsRes,
+        enrollmentsRes,
+        recoveryReportsRes,
+        customerListsRes,
+      ] = await Promise.allSettled([
+        sb.from("automation_queue").select("project_id").eq("status", "pending_review"),
+        sb.from("automation_enrollments").select("project_id, enabled"),
+        sb.from("recovery_reports").select("id, project_id, status, period_end").in("status", ["draft", "reviewed"]),
+        sb.from("customer_lists").select("id, project_id, name, member_count"),
+      ]);
+
+      // O: Automation Inbox has pending drafts per project
+      if (pendingApprovalsRes.status === "fulfilled") {
+        const rows = ((pendingApprovalsRes.value.data ?? []) as unknown) as { project_id: string }[];
+        const byProject = new Map<string, number>();
+        for (const r of rows) byProject.set(r.project_id, (byProject.get(r.project_id) ?? 0) + 1);
+        for (const [pid, count] of byProject) {
+          const proj = projects.find((p) => p.id === pid);
+          if (!proj) continue;
+          out.push({
+            dismissKey: `sugg:automation-pending:${pid}:${count}`,
+            title: `${proj.name}: ${count} draft${count === 1 ? "" : "s"} waiting for approval`,
+            body: "Open the Automation Inbox to approve, edit, or reject each one.",
+            href: "/automation-inbox",
+            ctaLabel: "Open Automation Inbox",
+            scope: { kind: "project", id: pid },
+          });
+        }
+      }
+
+      // P: Project has no automation enrollments → suggest applying a bundle
+      if (enrollmentsRes.status === "fulfilled") {
+        const rows = ((enrollmentsRes.value.data ?? []) as unknown) as { project_id: string; enabled: boolean }[];
+        const enrolledProjects = new Set(rows.filter((r) => r.enabled).map((r) => r.project_id));
+        for (const p of projects) {
+          if (enrolledProjects.has(p.id)) continue;
+          out.push({
+            dismissKey: `sugg:no-automation-bundle:${p.id}`,
+            title: `${p.name}: no automations enrolled yet`,
+            body: "Apply an Automation Bundle in Admin so AI starts drafting customer messages.",
+            href: "/admin?tab=automation-bundles",
+            ctaLabel: "Apply a bundle",
+            scope: { kind: "project", id: p.id },
+          });
+        }
+      }
+
+      // Q: Recovery Report draft awaiting review per project
+      if (recoveryReportsRes.status === "fulfilled") {
+        const rows = ((recoveryReportsRes.value.data ?? []) as unknown) as {
+          id: string; project_id: string; status: string; period_end: string;
+        }[];
+        // Surface the latest pending per project only.
+        const latestByProject = new Map<string, { id: string; status: string; period_end: string }>();
+        for (const r of rows) {
+          const cur = latestByProject.get(r.project_id);
+          if (!cur || r.period_end > cur.period_end) {
+            latestByProject.set(r.project_id, { id: r.id, status: r.status, period_end: r.period_end });
+          }
+        }
+        for (const [pid, r] of latestByProject) {
+          const proj = projects.find((p) => p.id === pid);
+          if (!proj) continue;
+          const verb = r.status === "draft" ? "Review" : "Send";
+          out.push({
+            dismissKey: `sugg:recovery-report:${r.id}`,
+            title: `${proj.name}: Recovery Report for week of ${r.period_end} is ${r.status}`,
+            body: `${verb} the report when you're ready — internal-first, nothing auto-sends.`,
+            href: "/recovery-reports",
+            ctaLabel: "Open Recovery Reports",
+            scope: { kind: "project", id: pid },
+          });
+        }
+      }
+
+      // R: Customer list uploaded but no reactivation campaign drafted yet
+      if (customerListsRes.status === "fulfilled" && pendingApprovalsRes.status === "fulfilled") {
+        const lists = ((customerListsRes.value.data ?? []) as unknown) as {
+          id: string; project_id: string; name: string; member_count: number | null;
+        }[];
+        // Heuristic: list has members and the project has zero pending reactivation drafts.
+        const queueRows = ((pendingApprovalsRes.value.data ?? []) as unknown) as { project_id: string }[];
+        const projectsWithQueue = new Set(queueRows.map((q) => q.project_id));
+        for (const l of lists) {
+          if ((l.member_count ?? 0) === 0) continue;
+          if (projectsWithQueue.has(l.project_id)) continue;
+          const proj = projects.find((p) => p.id === l.project_id);
+          if (!proj) continue;
+          out.push({
+            dismissKey: `sugg:reactivation-list-idle:${l.id}`,
+            title: `${proj.name}: list "${l.name}" hasn't been campaigned yet`,
+            body: "Start a reactivation campaign — AI drafts go to the Automation Inbox.",
+            href: "/reactivation",
+            ctaLabel: "Open Reactivation",
+            scope: { kind: "project", id: l.project_id },
+          });
+        }
+      }
+
       return out.filter((s) => !isDismissed(s.dismissKey));
     },
   });
