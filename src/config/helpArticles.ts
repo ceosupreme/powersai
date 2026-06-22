@@ -10,12 +10,12 @@ export const HELP_ARTICLES: HelpArticle[] = [
   {
     slug: "concepts-overview",
     title: "How this OS fits together",
-    tags: ["overview", "concepts", "scores", "project", "vertical"],
-    summary: "The big-picture map: projects, the two scores, account-wide vs project-scoped data.",
+    tags: ["overview", "concepts", "scores", "project", "vertical", "fulfillment", "approval"],
+    summary: "The big-picture map: projects, the two scores, the fulfillment factory, the approval gate.",
     sections: [
       {
         heading: "Projects are the unit of work",
-        body: "Almost every page is scoped to the project you've selected in Portfolio. Switch projects and the whole app re-points at that project's CRM, brand, content, revenue, insights, and scores. A few things are account-wide (Affiliate Programs, Products, Permissions, Backup) — those don't change when you switch projects.",
+        body: "Almost every page is scoped to the project you've selected in Portfolio. Switch projects and the whole app re-points at that project's CRM, brand, content, revenue, insights, automations, and scores. A few things are account-wide (Affiliate Programs, Products, Permissions, Backup) — those don't change when you switch projects. See 'Account-wide vs project-scoped'.",
       },
       {
         heading: "Project type = vertical",
@@ -26,8 +26,12 @@ export const HELP_ARTICLES: HelpArticle[] = [
         body: "Pillar Score comes from the Weekly Review (you grade each pillar; it rolls up). It answers 'how are we doing right now?'. Growth Score comes from the Growth Audit (scheduled findings + opportunities). It answers 'where can we grow?'. They're separate on purpose — operations vs growth.",
       },
       {
-        heading: "Where leads come from",
-        body: "Three places: the marketing site form, the Lead Qualifier (voice/chat/form at /qualify/<vertical>), and manual entries. All land in Inbound Leads, which you promote into CRM companies + deals.",
+        heading: "The fulfillment factory (end to end)",
+        body: "A lead hits the Lead Qualifier → it lands in Inbound Leads → you promote it into a CRM company + deal → on close-won you graduate it to a project → you apply an Automation Bundle → AI drafts customer messages into the Automation Inbox → you approve them → the weekly Recovery Report shows what was recovered. The 'Fulfillment flow' article walks each step.",
+      },
+      {
+        heading: "The approval gate",
+        body: "Nothing sends to a real customer without operator approval. Every AI-drafted message — follow-ups, reactivation, review requests — pauses in the Automation Inbox. You approve, edit, or reject. That's the QA surface for the whole automation system.",
       },
     ],
   },
@@ -155,7 +159,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
       },
       {
         heading: "Where leads land",
-        body: "Every conversation creates a row in Inbound Leads with the structured answers, the transcript, the channel (voice/chat/form), and a 'ready' flag. From there you promote it into a CRM company + deal.",
+        body: "Every conversation creates a row in Inbound Leads with the structured answers, the transcript, the channel (voice/chat/form), and a 'ready' flag. From there you promote it into a CRM company + deal — see the 'Fulfillment flow' article for the full path.",
       },
       {
         heading: "Testing the flow",
@@ -175,7 +179,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
       },
       {
         heading: "Triaging",
-        body: "Archive junk (status='archived'). Promote a real lead into the CRM — that creates a company + contact + deal and copies the qualifier summary into the deal notes.",
+        body: "Archive junk (status='archived'). Promote a real lead into the CRM — that creates a company + contact + deal and copies the qualifier summary into the deal notes. Once the deal hits Won, graduate it to a project and apply an Automation Bundle so AI starts working it.",
       },
       {
         heading: "Why 'ready' matters",
@@ -295,11 +299,15 @@ export const HELP_ARTICLES: HelpArticle[] = [
       },
       {
         heading: "The main navigation",
-        body: "The sidebar surfaces the workspaces you have access to: Dashboard, Workspace, Weekly Review, CRM, Brand Vault, Capture Inbox, Tasks, Logs, Growth Audit, Marketing Hub, and Admin/Settings. What you see depends on your role.",
+        body: "The sidebar is grouped: WORKSPACE (Portfolio, Weekly Review, Insights, Team), CLIENTS & LEADS (CRM, Inbound Leads, Capture Inbox, Automation Inbox, Reactivation, Recovery Reports), GROWTH & MARKETING (Growth Audit, Marketing Hub, Content, Channel Revenue), BRAND & ASSETS (Brand Kit, Offers, Products, Affiliate Programs), TOOLS (Tasks, Logs, Chat), SYSTEM (Help, Launch Checklist, Admin). What you see depends on your role.",
       },
       {
         heading: "Pick a project",
         body: "Most analytical pages are project-scoped. Use the project switcher to change what you're looking at. Your selection is remembered per browser.",
+      },
+      {
+        heading: "Where to get unstuck",
+        body: "Help Center (sidebar → SYSTEM → Help) has one article per feature. The Launch Checklist tracks your real setup tasks. The Setup Wizard can be re-launched any time from Admin → Settings → Help & Guidance.",
       },
     ],
   },
