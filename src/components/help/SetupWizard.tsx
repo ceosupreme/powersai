@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useHelpState } from "@/hooks/useHelpState";
 import { useAuth } from "@/context/AuthContext";
-import { Sparkles, Folder, Palette, Inbox, Users, Compass, ArrowRight, Layers, ListChecks, Mic, ClipboardCheck, TrendingUp } from "lucide-react";
+import { Sparkles, Folder, Palette, Inbox, Users, Compass, ArrowRight, Layers, ListChecks, Mic, ClipboardCheck, TrendingUp, Plug, Package, ShieldCheck, FileText } from "lucide-react";
 
 type Step = {
   icon: React.ComponentType<{ className?: string }>;
@@ -18,13 +18,13 @@ type Step = {
 const STEPS: Step[] = [
   {
     icon: Sparkles,
-    title: "Welcome to your Operator OS",
+    title: "Welcome — and the two scores",
     body: (
       <>
-        This OS runs your business across projects: a <strong>CRM</strong>, a public{" "}
-        <strong>Lead Qualifier</strong> (voice + chat), a <strong>Weekly Review</strong> that produces
-        your Pillar Score, a <strong>Growth Audit</strong> that produces your Growth Score, plus
-        Content, Revenue, Brand, Tasks, Logs, and Chat — all scoped to the project you've selected.
+        This OS runs your business across projects. Two numbers to anchor on:{" "}
+        <strong>Pillar Score</strong> (Weekly Review — "how are we doing") and{" "}
+        <strong>Growth Score</strong> (Growth Audit — "where can we grow"). Everything else is
+        scoped to whichever project you select in Portfolio.
       </>
     ),
   },
@@ -66,8 +66,33 @@ const STEPS: Step[] = [
     actionLabel: "Open Qualifier Fields",
   },
   {
+    icon: Plug,
+    title: "Connect data sources (optional)",
+    body: (
+      <>
+        If this vertical reads from a POS, scheduling app, or review platform, wire it up in{" "}
+        <strong>Admin → Integrations</strong>. Skip if there's nothing to connect — most features
+        still work without it.
+      </>
+    ),
+    actionHref: "/admin?tab=integrations",
+    actionLabel: "Open Integrations",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Run your first Weekly Review",
+    body: (
+      <>
+        Grade each pillar for this week. The Weekly Review rolls them up into the{" "}
+        <strong>Pillar Score</strong>.
+      </>
+    ),
+    actionHref: "/weekly-review",
+    actionLabel: "Open Weekly Review",
+  },
+  {
     icon: Mic,
-    title: "Try the Lead Qualifier",
+    title: "Try the Lead Qualifier end-to-end",
     body: (
       <>
         Visit <code>/qualify/&lt;vertical&gt;</code> (e.g. /qualify/home-services). Talk or chat
@@ -79,52 +104,41 @@ const STEPS: Step[] = [
     actionLabel: "Open qualifier",
   },
   {
-    icon: Palette,
-    title: "Brand Vault (optional)",
-    body: (
-      <>
-        Drop colors, taglines, hashtags, links, and asset files into the project's brand kit. Skip
-        and come back later if you want.
-      </>
-    ),
-    actionHref: "/brand-kit",
-    actionLabel: "Open Brand Vault",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Run your first Weekly Review",
-    body: (
-      <>
-        Grade each pillar for this week. The Weekly Review rolls them up into the{" "}
-        <strong>Pillar Score</strong> — your 'how are we doing' number.
-      </>
-    ),
-    actionHref: "/weekly-review",
-    actionLabel: "Open Weekly Review",
-  },
-  {
-    icon: TrendingUp,
-    title: "Open the Growth Audit",
-    body: (
-      <>
-        Growth Audit produces the <strong>Growth Score</strong> — 'where can we grow'. It's separate
-        from the Pillar Score. 'No data yet' is normal until an audit runs.
-      </>
-    ),
-    actionHref: "/growth-audit",
-    actionLabel: "Open Growth Audit",
-  },
-  {
     icon: Inbox,
-    title: "Capture Inbox + CRM",
+    title: "Convert a lead → CRM",
     body: (
       <>
-        Capture anything fast — AI suggests a type + project, you accept. In the CRM, archive is the
-        safe default; promote inbound leads into companies + deals.
+        From <strong>CRM → Inbound</strong>, promote a real lead into a company + deal. When the
+        deal hits Won, graduate the company into a project to start operating against it.
       </>
     ),
-    actionHref: "/inbox",
-    actionLabel: "Open Capture Inbox",
+    actionHref: "/crm?tab=inbound",
+    actionLabel: "Open Inbound Leads",
+  },
+  {
+    icon: Package,
+    title: "Apply an Automation Bundle",
+    body: (
+      <>
+        A <strong>bundle</strong> is a packaged set of automations (follow-up, reactivation, review
+        requests). Apply one in Admin → Automation Bundles and AI starts drafting customer messages
+        for the project.
+      </>
+    ),
+    actionHref: "/admin?tab=automation-bundles",
+    actionLabel: "Open Automation Bundles",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Review the Automation Inbox (approval gate)",
+    body: (
+      <>
+        Every AI-drafted customer message pauses in the <strong>Automation Inbox</strong> until you
+        approve, edit, or reject it. Nothing sends without your approval.
+      </>
+    ),
+    actionHref: "/automation-inbox",
+    actionLabel: "Open Automation Inbox",
   },
   {
     icon: Compass,
