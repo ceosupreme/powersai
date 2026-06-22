@@ -360,32 +360,25 @@ export function useSuggestions() {
         });
       }
 
-      // --- O–S: New-surface suggestions. Wrapped in allSettled so missing tables don't break the panel. ---
+      // --- O–S: New-surface suggestions. Cast to any + allSettled so missing tables or
+      // missing generated types don't break the panel.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sb: any = supabase;
       const [
         pendingApprovalsRes,
         enrollmentsRes,
         recoveryReportsRes,
         customerListsRes,
       ] = await Promise.allSettled([
-        supabase
-          .from("automation_queue")
-          .select("project_id")
-          .eq("status", "pending_review"),
-        supabase
-          .from("automation_enrollments")
-          .select("project_id, enabled"),
-        supabase
-          .from("recovery_reports")
-          .select("id, project_id, status, period_end")
-          .in("status", ["draft", "reviewed"]),
-        supabase
-          .from("customer_lists")
-          .select("id, project_id, name, member_count"),
+        sb.from("automation_queue").select("project_id").eq("status", "pending_review"),
+        sb.from("automation_enrollments").select("project_id, enabled"),
+        sb.from("recovery_reports").select("id, project_id, status, period_end").in("status", ["draft", "reviewed"]),
+        sb.from("customer_lists").select("id, project_id, name, member_count"),
       ]);
 
       // O: Automation Inbox has pending drafts per project
       if (pendingApprovalsRes.status === "fulfilled") {
-        const rows = ((pendingApprovalsRes.value.data ?? []) as { project_id: string }[]);
+        const rows = ((pendingApprovalsRes.value.data ?? []) as unknown) as { project_id: string }[];
         const byProject = new Map<string, number>();
         for (const r of rows) byProject.set(r.project_id, (byProject.get(r.project_id) ?? 0) + 1);
         for (const [pid, count] of byProject) {
@@ -404,7 +397,7 @@ export function useSuggestions() {
 
       // P: Project has no automation enrollments → suggest applying a bundle
       if (enrollmentsRes.status === "fulfilled") {
-        const rows = ((enrollmentsRes.value.data ?? []) as { project_id: string; enabled: boolean }[]);
+        const rows = ((enrollmentsRes.value.data ?? []) as unknown) as { project_id: string; enabled: boolean }[];
         const enrolledProjects = new Set(rows.filter((r) => r.enabled).map((r) => r.project_id));
         for (const p of projects) {
           if (enrolledProjects.has(p.id)) continue;
@@ -421,9 +414,9 @@ export function useSuggestions() {
 
       // Q: Recovery Report draft awaiting review per project
       if (recoveryReportsRes.status === "fulfilled") {
-        const rows = ((recoveryReportsRes.value.data ?? []) as {
+        const rows = ((recoveryReportsRes.value.data ?? []) as unknown) as {
           id: string; project_id: string; status: string; period_end: string;
-        }[]);
+        }[];
         // Surface the latest pending per project only.
         const latestByProject = new Map<string, { id: string; status: string; period_end: string }>();
         for (const r of rows) {
@@ -449,11 +442,11 @@ export function useSuggestions() {
 
       // R: Customer list uploaded but no reactivation campaign drafted yet
       if (customerListsRes.status === "fulfilled" && pendingApprovalsRes.status === "fulfilled") {
-        const lists = ((customerListsRes.value.data ?? []) as {
+        const lists = ((customerListsRes.value.data ?? []) as unknown) as {
           id: string; project_id: string; name: string; member_count: number | null;
-        }[]);
+        }[];
         // Heuristic: list has members and the project has zero pending reactivation drafts.
-        const queueRows = ((pendingApprovalsRes.value.data ?? []) as { project_id: string }[]);
+        const queueRows = ((pendingApprovalsRes.value.data ?? []) as unknown) as { project_id: string }[];
         const projectsWithQueue = new Set(queueRows.map((q) => q.project_id));
         for (const l of lists) {
           if ((l.member_count ?? 0) === 0) continue;
