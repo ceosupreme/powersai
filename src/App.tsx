@@ -59,6 +59,7 @@ import AutomationInbox from "./pages/AutomationInbox";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
 import { SetupWizard } from "@/components/help/SetupWizard";
+import { ThemeSync } from "@/components/layout/ThemeSync";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -77,6 +78,7 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <SetupWizard />
+              <ThemeSync />
               <Routes>
                 <Route path="/auth" element={<Login />} />
                 <Route path="/login" element={<Login />} />
