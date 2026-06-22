@@ -4,10 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 
 import { UsersTab } from '@/components/admin/UsersTab';
 import { SettingsTab } from '@/components/admin/SettingsTab';
-import { Users, ShieldCheck, Settings, Lock, Sparkles, Megaphone, Layers } from 'lucide-react';
+import { Users, ShieldCheck, Settings, Lock, Layers } from 'lucide-react';
 import { RolePageDefaults } from '@/components/admin/RolePageDefaults';
-import { GrowthAuditLaunchTab } from '@/components/admin/GrowthAuditLaunchTab';
-import { MarketingHubLaunchTab } from '@/components/admin/MarketingHubLaunchTab';
 import { SettingsPillarsTab } from '@/components/admin/SettingsPillarsTab';
 
 const Admin = () => {
@@ -72,20 +70,6 @@ const Admin = () => {
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
             <TabsTrigger
-              value="growth-audit"
-              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Growth Audit</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="marketing-hub"
-              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
-            >
-              <Megaphone className="h-4 w-4" />
-              <span className="hidden sm:inline">Marketing Hub</span>
-            </TabsTrigger>
-            <TabsTrigger
               value="pillars"
               className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
@@ -104,14 +88,6 @@ const Admin = () => {
 
           <TabsContent value="settings" className="space-y-4 animate-fade-in-up">
             <SettingsTab />
-          </TabsContent>
-
-          <TabsContent value="growth-audit" className="space-y-4 animate-fade-in-up">
-            <GrowthAuditLaunchTab />
-          </TabsContent>
-
-          <TabsContent value="marketing-hub" className="space-y-4 animate-fade-in-up">
-            <MarketingHubLaunchTab />
           </TabsContent>
 
           <TabsContent value="pillars" className="space-y-4 animate-fade-in-up">

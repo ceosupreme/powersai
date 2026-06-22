@@ -23,7 +23,10 @@ export type PageKey =
   | 'revenue'
   | 'affiliate_programs'
   | 'products'
-  | 'offers';
+  | 'offers'
+  | 'automation_inbox'
+  | 'reactivation'
+  | 'recovery_reports';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -82,6 +85,9 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'affiliate_programs', label: 'Affiliate Programs', canDisable: true },
   { key: 'products', label: 'Products', canDisable: true },
   { key: 'offers', label: 'Offers', canDisable: true },
+  { key: 'automation_inbox', label: 'Automation Inbox', canDisable: true },
+  { key: 'reactivation', label: 'Reactivation', canDisable: true },
+  { key: 'recovery_reports', label: 'Recovery Reports', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -111,4 +117,7 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/affiliate-programs': 'affiliate_programs',
   '/products': 'products',
   '/offers': 'offers',
+  '/automations/inbox': 'automation_inbox',
+  '/automations/reactivation': 'reactivation',
+  '/automations/recovery-reports': 'recovery_reports',
 };
