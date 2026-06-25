@@ -424,6 +424,30 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
   },
   {
+    slug: "foundation-audit",
+    title: "Foundation Audit",
+    tags: ["foundation", "readiness", "audit", "score"],
+    summary: "Per-project readiness audit across legal, brand, web, Google, reviews, social, offers, and collateral. Vertical-specific items via templates + per-project overrides.",
+    sections: [
+      {
+        heading: "What it scores",
+        body: "A separate score from the Weekly Review or Growth Audit. It answers: 'Is this business actually set up properly?' — entity formed, insurance bound, GBP verified, website live, reviews flowing, social linked, a primary contact on file, and so on.",
+      },
+      {
+        heading: "Auto vs manual items",
+        body: "Items with a detection signal (GBP, website, brand kit, reviews, social, offers, contacts) auto-populate when you click Refresh audit. Legal/admin items (LLC, EIN, insurance, licenses, payment processor, etc.) are manual checkboxes with an optional evidence URL.",
+      },
+      {
+        heading: "Per-vertical config",
+        body: "Categories and items live in foundation_category_templates + foundation_item_templates, keyed by project_type, with per-project overrides. Adding a vertical = data seed, not code.",
+      },
+      {
+        heading: "Honest unscored",
+        body: "Categories with no answers stay unscored and are excluded from the overall readiness score — no fake 100s.",
+      },
+    ],
+  },
+  {
     slug: "backup-export",
     title: "Backup & Export",
     tags: ["backup", "export", "csv", "json"],

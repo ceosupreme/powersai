@@ -1,95 +1,104 @@
-# Public Work Showcase + Admin Editor
 
-A data-driven `portfolio_items` table powers a public `/work` gallery on the marketing site and an admin CRUD editor inside the app. Adding a piece = filling a form, never code.
+# Business Foundation Audit
 
-## Collision guards (locked in)
+A per-project, vertical-varying scored audit of real-world business readiness. Engine clones Growth Audit (`deriveScores.ts` + analyzer registry). Config clones Build 0 (template-per-type + per-project overrides + REPLACE resolver). State is its own per-venue table. No writes into Build A / launch checklist tables — only reads.
 
-- **Routes:** internal `/portfolio` (owner overview) is untouched. Public showcase lives at `/work` and `/work/:slug`.
-- **Access:** `portfolio_items` rows with `status='published'` are readable by anon (public site). Only `admin` (via `has_role`) can insert/update/delete. Mirrors the existing public-read pattern used for qualifier/inbound flows.
+---
 
-## Data model — `portfolio_items`
+## 1. Schema (one migration, additive)
 
-Single migration creating the table + grants + RLS + policies + storage bucket:
+### Config (Build 0 mirror)
+- `foundation_category_templates` — `project_type`, `category_key`, `label`, `weight numeric`, `sort_order`, timestamps. Unique `(project_type, category_key)`.
+- `foundation_item_templates` — `project_type`, `category_key`, `item_key`, `label`, `description`, `detection_signal text` (e.g. `gbp.verified`, `website.live`, `manual`), `is_manual_only bool`, `severity` (`low|medium|high|critical`), `sort_order`. Unique `(project_type, item_key)`.
+- `project_foundation_category_overrides` — `project_id`, `category_key`, `label`, `weight`, `sort_order`, `is_hidden`. Unique `(project_id, category_key)`.
+- `project_foundation_item_overrides` — `project_id`, `category_key`, `item_key`, `label`, `description`, `detection_signal`, `is_manual_only`, `severity`, `sort_order`, `is_hidden`. Unique `(project_id, item_key)`.
 
-```text
-id              uuid pk
-title           text not null
-slug            text unique not null         -- used by /work/:slug
-description     text
-client_or_vertical text
-category        text not null                -- filter tab key
-media_type      text not null check in
-                ('image','video','link','embed','case_study')
-image_url       text
-video_url       text
-external_url    text
-thumbnail_url   text
-case_study_body text                          -- markdown
-featured        boolean not null default false
-sort_order      int not null default 0
-status          text not null default 'draft' check in ('draft','published')
-created_at / updated_at  timestamptz, updated_at trigger
-```
+### State
+- `venue_foundation_item_status` — `venue_id`, `item_key`, `status` (`satisfied|missing|partial|unknown|not_applicable`), `evidence_url`, `detected_at`, `source` (`auto|manual`), `notes`, `updated_by`. Unique `(venue_id, item_key)`.
+- `foundation_audit_runs` — clone of `growth_audit_runs` (`venue_id`, `status`, `started_at`, `completed_at`, `inserted`, `updated`, `resolved`, `skipped`, `errors jsonb`, `ms`, `triggered_by`).
 
-Grants + RLS (follows project rule — GRANT in same migration):
+### RLS / grants
+Every table: GRANT to `authenticated` + `service_role` (no anon). Policies = admin OR `user_can_access_project(venue_id)` for project-scoped tables; templates readable by any authenticated user, admin-write.
 
-- `GRANT SELECT ON public.portfolio_items TO anon, authenticated;`
-- `GRANT INSERT,UPDATE,DELETE ON public.portfolio_items TO authenticated;`
-- `GRANT ALL ON public.portfolio_items TO service_role;`
-- Policy `portfolio_public_read`: `FOR SELECT TO anon, authenticated USING (status = 'published' OR public.has_role(auth.uid(),'admin'))`
-- Policy `portfolio_admin_write`: `FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'))`
+### Seed — `home_services`
+Categories (weights): Legal/Admin (1.5), Brand Identity (1.0), Web Presence (1.2), Google/Local (1.5), Reviews (1.2), Social (0.8), Offers/Channels (1.0), Collateral (0.6).
+Items per category with `detection_signal` or `is_manual_only=true` (LLC, EIN, bank, insurance, licenses, trademark, privacy/ToS, accounting, payment processor → manual; logo/colors/tagline → brand_kit auto; live site/SSL/mobile → website_snapshots; GBP claimed/verified/hours/photos → gbp_*; review count/rating → online_reviews; IG/FB linked → brand_kit_links + social_media_posts; service offers present → service_offers; primary contact → venue_contacts).
 
-**Storage:** create public bucket `portfolio-media` via `supabase--storage_create_bucket` (public=true) for images/thumbnails/uploaded video. RLS on `storage.objects`: public read for bucket; admin-only write. (Falls back to `brand-assets`-style signed flow only if workspace blocks public buckets.)
+---
 
-## Public surface (`/work`)
+## 2. Resolver (Build 0 mirror)
 
-New files under `src/components/marketing/work/` reusing existing marketing-site brand tokens (bone/forest) and `Nav` + `Footer`:
+`src/lib/effectiveFoundation.ts`
+- `fetchEffectiveFoundationCategories(projectId, projectType)`
+- `fetchEffectiveFoundationItems(projectId, projectType)`
+- REPLACE rule: if ANY override row exists for that project, return overrides ∪ non-overridden hidden=false templates? Match the exact semantics used in `effectivePillars` (full replace when any override exists). Hooks: `useEffectiveFoundationCategories`, `useEffectiveFoundationItems`.
 
-- `src/pages/Work.tsx` — fetches published items via supabase, groups by category, renders filter tabs (All + distinct categories), featured items shown first/larger in a bento grid.
-- `src/pages/WorkCaseStudy.tsx` — `/work/:slug`, fetches the single item where `media_type='case_study'` and renders `case_study_body` via markdown (reuse any existing markdown renderer; otherwise a minimal `react-markdown`-style component — check what's already imported before adding deps).
-- `src/components/marketing/work/PortfolioCard.tsx` — switches on `media_type`:
-  - `image` → thumbnail card, click opens lightbox (simple Dialog).
-  - `video` → inline `<video>` for direct URLs or iframe for YouTube/Vimeo embed URLs.
-  - `link` → card opens `external_url` in new tab.
-  - `embed` → iframe live preview of `external_url` with sandbox attrs.
-  - `case_study` → card links to `/work/${slug}`.
-- `src/components/marketing/work/CategoryTabs.tsx` — pill filter.
+---
 
-Routes added in `src/App.tsx` (public, no `ProtectedRoute`): `/work`, `/work/:slug`.
+## 3. Scoring (Growth Audit clone)
 
-Nav + Footer get a "Work" link (`src/components/marketing/site/Nav.tsx`, `src/components/marketing/sections/Footer.tsx`).
+`src/components/foundation-audit/deriveFoundationScores.ts`
+- Severity weights map (e.g. critical=4, high=3, medium=2, low=1).
+- Per category: raw = Σ(severityWeight × satisfiedFactor) / Σ(severityWeight) over items with a known state (`satisfied=1`, `partial=0.5`, `missing=0`, `unknown|not_applicable` excluded).
+- If a category has 0 scored items → `unscored: true`, excluded from overall (honest unscored — no fake 100s).
+- Overall = weighted average across scored categories using template weights.
+- Returns `{ overall, categories: [{ key, label, score, unscored, items, gaps }], topGaps, recommendedActions }`. Recommended actions = top-N missing items by `severity × categoryWeight`.
 
-`MarketingSite.tsx` keeps its existing signed-in redirect to `/portfolio` — `/work` is its own page so signed-in users hitting `/work` directly still see it (public).
+---
 
-## Admin editor
+## 4. Refresh engine (growth-audit-refresh clone)
 
-Mirrors `SettingsAutomationBundlesTab` pattern (list + dialog editor + reorder buttons).
+`supabase/functions/foundation-audit-refresh/index.ts` — dispatcher: insert `foundation_audit_runs` row, iterate checks registry, aggregate counters, mark complete.
 
-- `src/hooks/usePortfolioItems.ts` — `useQuery` list (admin sees all, public hook filters published) + mutations (create/update/delete/reorder) with toast feedback.
-- `src/components/admin/PortfolioItemsTab.tsx` — table of items with featured/published toggles, up/down reorder, edit/delete.
-- `src/components/admin/PortfolioItemDialog.tsx` — form: title, slug (auto-from-title, editable), description, client_or_vertical, category (combobox of existing + free text), media_type select that conditionally shows the relevant fields, thumbnail upload, image/video upload (reusing the same `supabase.storage` pattern from `useBrandKit.ts`), markdown body for case studies, featured + status toggles, sort_order.
-- Wired into `src/pages/Admin.tsx` as a new "Work / Portfolio" tab (admin-only — uses existing role gating already on the page).
+`supabase/functions/_shared/foundation-checks/` — registry of `{ id, itemKey, run(supabase, venueId) → { status, evidence_url?, detected_at } | null }`. One module per signal:
+- `gbp.ts` — claimed/verified/hours/photos from `gbp_place_mappings` + latest `gbp_snapshots`.
+- `website.ts` — live/ssl/mobile from `website_mappings` + `website_snapshots`.
+- `reviews.ts` — has reviews / rating ≥ X from `online_reviews` / `review_snapshots`.
+- `brand.ts` — logo/colors/tagline from `brand_kits`, `brand_kit_assets`, `brand_kit_colors`, `brand_kit_taglines`.
+- `social.ts` — IG/FB linked from `brand_kit_links` + activity from `social_media_posts`.
+- `offers.ts` — at least one `service_offers` row (+ channel coverage from `channel_products`).
+- `contacts.ts` — primary contact from `venue_contacts` / `venue_leadership_contacts`.
+- `build-a-bridge.ts` — for items that overlap Build A onboarding, READ `venue_onboarding_progress` (no writes).
 
-Upload helper: a small `uploadPortfolioMedia(file)` that mirrors `useBrandKit`'s upload (path = `${user.id}/${crypto.randomUUID()}-${filename}`), returns public URL from the `portfolio-media` bucket.
+Each check upserts into `venue_foundation_item_status` with `source='auto'`. Manual rows are only ever written with `source='manual'` (auto checks never clobber manual).
 
-## Files
+Trigger paths: button on FoundationAudit page (`supabase.functions.invoke`) and a weekly pg_cron job.
 
-**New**
-- `supabase/migrations/<ts>_portfolio_items.sql`
-- `src/hooks/usePortfolioItems.ts`
-- `src/pages/Work.tsx`, `src/pages/WorkCaseStudy.tsx`
-- `src/components/marketing/work/{PortfolioCard,CategoryTabs,Lightbox}.tsx`
-- `src/components/admin/{PortfolioItemsTab,PortfolioItemDialog}.tsx`
+---
 
-**Edited (additive)**
-- `src/App.tsx` — add `/work` + `/work/:slug` routes
-- `src/components/marketing/site/Nav.tsx`, `src/components/marketing/sections/Footer.tsx` — Work link
-- `src/pages/Admin.tsx` — add Portfolio tab
+## 5. UI (Growth Audit page clone)
+
+`src/pages/FoundationAudit.tsx` modeled on `GrowthAudit.tsx` — same tabbed shell, same `PrimaryMetricsRow`, same `CategoryScoreCard`, same data-sources sub-view shell.
+
+`src/components/foundation-audit/`
+- `useFoundationScores.ts` — resolves templates+overrides+state, returns `deriveFoundationScores` output for selected project.
+- `FoundationOverview.tsx` — overall readiness gauge, category grid (reuses `CategoryScoreCard`), top gaps, recommended actions, "Refresh audit" button.
+- `FoundationCategoriesView.tsx` — per category, list of items. Auto items show detected status + evidence link + last-detected timestamp; manual items render `Checkbox` (`satisfied`/`missing`) + optional `evidence_url` input + notes.
+- `FoundationGapsView.tsx` — flattened gap list with severity badges and recommended-fix copy.
+
+`src/hooks/useFoundationItemStatus.ts` — mutations for manual checkbox/evidence upserts (source='manual', `updated_by=auth.uid()`).
+
+### Nav + routing
+- Add route `/foundation-audit` in `src/App.tsx`.
+- Add nav item to `AppSidebar.tsx` in **GROWTH & MARKETING** group next to Growth Audit; `PageKey='foundation_audit'` added to `src/types/permissions.ts`.
+- Add help key + article entry (consistent with last build).
+
+---
 
 ## Verification
 
-1. Migration applies; admin tab can CRUD + upload + reorder + toggle featured/published.
-2. Logged-out visit to `/work` shows only published items, category filters work, each `media_type` renders correctly, featured items prominent.
-3. `/work/:slug` renders the case study body.
-4. Unauthenticated supabase select on `portfolio_items` returns only published rows; insert/update/delete denied unless admin.
-5. Internal `/portfolio` route untouched; no existing routes/RLS/features changed; `tsgo` clean.
+1. tsc clean.
+2. Templates fetch returns home_services categories+items; adding an override row flips resolver output (REPLACE behavior matches `effectivePillars`).
+3. Invoking `foundation-audit-refresh` for a venue with GBP/website/brand data populates `venue_foundation_item_status` rows with `source='auto'`; manual rows untouched.
+4. `deriveFoundationScores` returns `unscored:true` for a category with all-unknown items; overall excludes it.
+5. Foundation Audit page renders overall score, category grid, gaps, and lets a manual item be checked + evidence saved.
+6. No writes to `user_checklist_progress` or `venue_onboarding_progress` (only reads in `build-a-bridge.ts`).
+7. RLS: anon cannot read any `*_foundation_*` or `venue_foundation_*` table.
+
+---
+
+## Out of scope (explicit)
+
+- Public/shareable lead-magnet view (token+edge-function pattern) — not in this build.
+- Verticals beyond `home_services` — config is data; add via seed later.
+- Changes to Growth Audit, Build 0, Build A, RLS on existing tables, integrations.

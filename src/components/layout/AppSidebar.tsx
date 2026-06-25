@@ -113,6 +113,7 @@ const navGroups: NavGroup[] = [
     label: 'Growth & Marketing',
     items: [
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
+      { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },

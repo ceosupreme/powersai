@@ -36,6 +36,7 @@ export const HELP_KEYS = {
   twoScores: "help:two-scores",
   captureInbox: "help:capture-inbox",
   crmFulfillment: "help:crm-fulfillment",
+  foundationAudit: "help:foundation-audit",
 } as const;
 
 export type HelpKey = (typeof HELP_KEYS)[keyof typeof HELP_KEYS];
