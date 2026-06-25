@@ -52,6 +52,7 @@ import {
   FileText,
   Sparkles,
   Zap,
+  ShieldCheck as ShieldCheckIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -113,6 +114,7 @@ const navGroups: NavGroup[] = [
     label: 'Growth & Marketing',
     items: [
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
+      { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheckIcon, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
