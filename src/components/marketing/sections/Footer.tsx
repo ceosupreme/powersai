@@ -25,6 +25,7 @@ export function Footer() {
                 {l.label}
               </a>
             ))}
+            <Link to="/work" className="transition-colors hover:text-foreground">Work</Link>
             <Link to="/auth" className="transition-colors hover:text-foreground">Log in</Link>
           </nav>
 

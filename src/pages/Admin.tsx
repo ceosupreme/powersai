@@ -4,9 +4,10 @@ import { useAuth } from '@/context/AuthContext';
 
 import { UsersTab } from '@/components/admin/UsersTab';
 import { SettingsTab } from '@/components/admin/SettingsTab';
-import { Users, ShieldCheck, Settings, Lock, Layers } from 'lucide-react';
+import { Users, ShieldCheck, Settings, Lock, Layers, Briefcase } from 'lucide-react';
 import { RolePageDefaults } from '@/components/admin/RolePageDefaults';
 import { SettingsPillarsTab } from '@/components/admin/SettingsPillarsTab';
+import { PortfolioItemsTab } from '@/components/admin/PortfolioItemsTab';
 
 const Admin = () => {
   const { isAdmin, isLoading } = useAuth();
@@ -76,6 +77,13 @@ const Admin = () => {
               <Layers className="h-4 w-4" />
               <span className="hidden sm:inline">Pillars</span>
             </TabsTrigger>
+            <TabsTrigger
+              value="portfolio"
+              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
+            >
+              <Briefcase className="h-4 w-4" />
+              <span className="hidden sm:inline">Work / Portfolio</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4 animate-fade-in-up">
@@ -92,6 +100,10 @@ const Admin = () => {
 
           <TabsContent value="pillars" className="space-y-4 animate-fade-in-up">
             <SettingsPillarsTab />
+          </TabsContent>
+
+          <TabsContent value="portfolio" className="space-y-4 animate-fade-in-up">
+            <PortfolioItemsTab />
           </TabsContent>
         </Tabs>
       </div>

@@ -51,6 +51,12 @@ export function Nav() {
               {l.label}
             </a>
           ))}
+          <Link
+            to="/work"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Work
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -90,6 +96,13 @@ export function Nav() {
                 {l.label}
               </a>
             ))}
+            <Link
+              to="/work"
+              onClick={() => setOpen(false)}
+              className="rounded-sm px-2 py-3 text-sm text-foreground hover:bg-panel"
+            >
+              Work
+            </Link>
             <Link
               to="/auth"
               onClick={() => setOpen(false)}

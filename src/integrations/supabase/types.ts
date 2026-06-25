@@ -6281,6 +6281,66 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_items: {
+        Row: {
+          case_study_body: string | null
+          category: string
+          client_or_vertical: string | null
+          created_at: string
+          description: string | null
+          external_url: string | null
+          featured: boolean
+          id: string
+          image_url: string | null
+          media_type: string
+          slug: string
+          sort_order: number
+          status: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          case_study_body?: string | null
+          category?: string
+          client_or_vertical?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          media_type: string
+          slug: string
+          sort_order?: number
+          status?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          case_study_body?: string | null
+          category?: string
+          client_or_vertical?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          media_type?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           asana_gid: string | null

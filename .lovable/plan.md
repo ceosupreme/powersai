@@ -1,115 +1,95 @@
+# Public Work Showcase + Admin Editor
 
-## Goal
+A data-driven `portfolio_items` table powers a public `/work` gallery on the marketing site and an admin CRUD editor inside the app. Adding a piece = filling a form, never code.
 
-Bring the existing help framework current with the app as it stands today: cover the fulfillment factory (Qualifier → Inbound Leads → CRM → Project → Automation Bundle → Automation Inbox → Recovery Report), the Lead Qualifier + verticals/config model, the two scores, and the account-wide vs project-scoped distinction. Reuse the existing framework — no new system.
+## Collision guards (locked in)
 
-## Scope
+- **Routes:** internal `/portfolio` (owner overview) is untouched. Public showcase lives at `/work` and `/work/:slug`.
+- **Access:** `portfolio_items` rows with `status='published'` are readable by anon (public site). Only `admin` (via `has_role`) can insert/update/delete. Mirrors the existing public-read pattern used for qualifier/inbound flows.
 
-Touches **content + a few empty-state additions**, nothing structural. No new components, no schema, no nav changes.
+## Data model — `portfolio_items`
 
-### 1. `src/config/helpKeys.ts` — add stable keys for new features
+Single migration creating the table + grants + RLS + policies + storage bucket:
 
-Add: `automationInbox`, `automationBundles`, `reactivation`, `recoveryReports`, `team`, `permissions`, `backup`, `fulfillmentFlow`, `approvalGate`, `accountVsProject`, `twoScores`, `captureInbox`, `growthAuditEmpty`, `marketingHub`.
-
-(All keys are dismissible via the existing `useHelpState().dismiss()`.)
-
-### 2. `src/config/helpArticles.ts` — add/refresh articles
-
-**Refresh** (rewrite to match current nav + reality):
-- `concepts-overview` — add Automation Inbox + Recovery Reports + Bundles to the map; add "approval gate" paragraph.
-- `getting-started` — replace stale nav list (Brand Vault, etc.) with the rebuilt 6-group sidebar (WORKSPACE / CLIENTS & LEADS / GROWTH & MARKETING / BRAND & ASSETS / TOOLS / SYSTEM).
-- `lead-qualifier`, `inbound-leads`, `crm` — wire in the end-to-end fulfillment flow.
-
-**Add new articles**:
-- `fulfillment-flow` — the end-to-end map: Qualifier → Inbound Leads → CRM (won deal) → Project → Venue Setup Wizard → apply Automation Bundle → Automation Inbox approvals → Recovery Report.
-- `approval-gate` — nothing sends to a customer without operator approval; Automation Inbox is the QA surface.
-- `automation-inbox` — what queues there (AI-drafted messages from bundles + detectors), how to approve/edit/reject, what "sent" means.
-- `automation-bundles` — a bundle = a packaged set of automations applied to a client project in one action; where to apply; how to undo.
-- `reactivation` — win-back campaigns to an uploaded customer list (upload list → pick offer → drafts go to Automation Inbox).
-- `recovery-reports` — weekly "what we recovered" report; internal-first preview, operator reviews then sends.
-- `team` — Team page shows people across the active project; vs Permissions which controls access.
-- `account-wide-vs-project` — explicit list: Affiliate Programs, Products, Permissions, Backup = account-wide; everything else = active project.
-- `two-scores` — Pillar Score (Weekly Review) vs Growth Score (Growth Audit); separate on purpose.
-
-Existing articles (`brand-vault`, `crm`, `capture-inbox`, `content-pipeline`, `channel-revenue`, `marketing-hub`, `affiliate-products-libraries`, `tasks-logs-chat`, `permissions`, `growth-audit`, `backup-export`, `archive-vs-delete`, `marketing-site-inbound`, `weekly-review`, `insights`, `portfolio`, `project-types-verticals`, `config-editor`, `projects`) — keep, with light edits where wording references the old sidebar.
-
-### 3. `src/components/help/SetupWizard.tsx` — reorder + add steps
-
-Re-sequence to the real flow the user spec requested:
-
-1. Welcome + the two scores
-2. Create a project (Portfolio)
-3. Pick the project's type / vertical (Admin → Projects)
-4. Review qualifier questions for that type (Settings → Qualifier Fields)
-5. *(optional)* Connect data — point at integrations panel
-6. Run your first Weekly Review → produces Pillar Score
-7. Try the Lead Qualifier end-to-end (`/qualify/<vertical>`)
-8. Convert a lead → Inbound Leads → CRM company + deal
-9. Apply an Automation Bundle to the project
-10. Review the Automation Inbox (the approval gate)
-11. Where to go when stuck (Help Center + Launch Checklist)
-
-### 4. `src/config/launchChecklist.ts` — reorder + add items
-
-Reorder to match the wizard's flow and add the missing pieces:
-
-```
-1.  setup:create-project
-2.  setup:pick-project-type
-3.  setup:review-pillars
-4.  setup:review-qualifier-fields
-5.  setup:try-qualifier
-6.  setup:connect-data            (NEW — Admin → Integrations)
-7.  setup:weekly-review
-8.  setup:promote-lead
-9.  setup:apply-automation-bundle (NEW — Admin → Automation Bundles)
-10. setup:review-automation-inbox (NEW — /automation-inbox)
-11. setup:brand-vault             (optional, demoted)
-12. setup:growth-audit
-13. setup:channel-revenue
-14. setup:content-pipeline
-15. setup:reactivation            (NEW — optional)
-16. setup:recovery-reports        (NEW — review first report)
-… launch: items preserved unchanged.
+```text
+id              uuid pk
+title           text not null
+slug            text unique not null         -- used by /work/:slug
+description     text
+client_or_vertical text
+category        text not null                -- filter tab key
+media_type      text not null check in
+                ('image','video','link','embed','case_study')
+image_url       text
+video_url       text
+external_url    text
+thumbnail_url   text
+case_study_body text                          -- markdown
+featured        boolean not null default false
+sort_order      int not null default 0
+status          text not null default 'draft' check in ('draft','published')
+created_at / updated_at  timestamptz, updated_at trigger
 ```
 
-### 5. `src/hooks/useSuggestions.ts` — add smart suggestions for new surfaces
+Grants + RLS (follows project rule — GRANT in same migration):
 
-Append (mirroring the existing pattern, each grounded in real data):
+- `GRANT SELECT ON public.portfolio_items TO anon, authenticated;`
+- `GRANT INSERT,UPDATE,DELETE ON public.portfolio_items TO authenticated;`
+- `GRANT ALL ON public.portfolio_items TO service_role;`
+- Policy `portfolio_public_read`: `FOR SELECT TO anon, authenticated USING (status = 'published' OR public.has_role(auth.uid(),'admin'))`
+- Policy `portfolio_admin_write`: `FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'))`
 
-- **Automation Inbox has pending items** — query `automation_queue` (or equivalent) where status='pending', surface "N drafts waiting for approval".
-- **Automation Bundles never applied to a project** — query `automation_enrollments` per active project; suggest "Apply an automation bundle to <project>".
-- **Inbound lead older than 3 days, still 'new'** — surface alongside existing ready-lead suggestion.
-- **Recovery Report unread / never sent** — query `recovery_reports` per project.
-- **Reactivation list uploaded but no campaign launched** — query `customer_lists` w/ no associated campaign.
+**Storage:** create public bucket `portfolio-media` via `supabase--storage_create_bucket` (public=true) for images/thumbnails/uploaded video. RLS on `storage.objects`: public read for bucket; admin-only write. (Falls back to `brand-assets`-style signed flow only if workspace blocks public buckets.)
 
-(If a table doesn't exist under the exact name, fall back gracefully — `try/catch` per query so a missing table doesn't kill the panel. Use existing hooks `useAutomationQueue`, `useAutomationEnrollments`, `useRecoveryReports`, `useCustomerLists` if they already cover this.)
+## Public surface (`/work`)
 
-### 6. Empty-state `HelpTip` additions on the new pages
+New files under `src/components/marketing/work/` reusing existing marketing-site brand tokens (bone/forest) and `Nav` + `Footer`:
 
-Add one inline `<HelpTip helpKey={HELP_KEYS.X} title="…">` block at the top of each new page (dismissible, uses existing component). Pages:
+- `src/pages/Work.tsx` — fetches published items via supabase, groups by category, renders filter tabs (All + distinct categories), featured items shown first/larger in a bento grid.
+- `src/pages/WorkCaseStudy.tsx` — `/work/:slug`, fetches the single item where `media_type='case_study'` and renders `case_study_body` via markdown (reuse any existing markdown renderer; otherwise a minimal `react-markdown`-style component — check what's already imported before adding deps).
+- `src/components/marketing/work/PortfolioCard.tsx` — switches on `media_type`:
+  - `image` → thumbnail card, click opens lightbox (simple Dialog).
+  - `video` → inline `<video>` for direct URLs or iframe for YouTube/Vimeo embed URLs.
+  - `link` → card opens `external_url` in new tab.
+  - `embed` → iframe live preview of `external_url` with sandbox attrs.
+  - `case_study` → card links to `/work/${slug}`.
+- `src/components/marketing/work/CategoryTabs.tsx` — pill filter.
 
-- `src/pages/AutomationInbox.tsx` — explains the approval gate.
-- `src/pages/ReactivationCampaigns.tsx` — explains uploaded list → campaign → drafts in Automation Inbox.
-- `src/pages/RecoveryReports.tsx` — explains internal-first preview before send.
-- `src/pages/ContentPipeline.tsx` — already has a tip; rewrite copy to mention the 7 stages explicitly.
-- `src/pages/Crm.tsx` — add tip pointing at fulfillment-flow article on first visit (only when no companies exist).
-- `src/pages/QualifyLanding.tsx` — admin-preview hint only (visible when authenticated and `?preview=1`): "This is what your inbound visitors see; config in Settings → Qualifier Fields."
+Routes added in `src/App.tsx` (public, no `ProtectedRoute`): `/work`, `/work/:slug`.
 
-Each tip links to the matching new Help Center article (article slug in the body text).
+Nav + Footer get a "Work" link (`src/components/marketing/site/Nav.tsx`, `src/components/marketing/sections/Footer.tsx`).
 
-## Out of scope
+`MarketingSite.tsx` keeps its existing signed-in redirect to `/portfolio` — `/work` is its own page so signed-in users hitting `/work` directly still see it (public).
 
-- No nav changes.
-- No new tables.
-- No changes to RLS, integrations, or business logic.
-- Existing help components (`HelpTip`, `SuggestionsPanel`, `SetupWizard`, `LaunchChecklist`, `HelpCenter`) are reused as-is — only their content/config changes.
+## Admin editor
+
+Mirrors `SettingsAutomationBundlesTab` pattern (list + dialog editor + reorder buttons).
+
+- `src/hooks/usePortfolioItems.ts` — `useQuery` list (admin sees all, public hook filters published) + mutations (create/update/delete/reorder) with toast feedback.
+- `src/components/admin/PortfolioItemsTab.tsx` — table of items with featured/published toggles, up/down reorder, edit/delete.
+- `src/components/admin/PortfolioItemDialog.tsx` — form: title, slug (auto-from-title, editable), description, client_or_vertical, category (combobox of existing + free text), media_type select that conditionally shows the relevant fields, thumbnail upload, image/video upload (reusing the same `supabase.storage` pattern from `useBrandKit.ts`), markdown body for case studies, featured + status toggles, sort_order.
+- Wired into `src/pages/Admin.tsx` as a new "Work / Portfolio" tab (admin-only — uses existing role gating already on the page).
+
+Upload helper: a small `uploadPortfolioMedia(file)` that mirrors `useBrandKit`'s upload (path = `${user.id}/${crypto.randomUUID()}-${filename}`), returns public URL from the `portfolio-media` bucket.
+
+## Files
+
+**New**
+- `supabase/migrations/<ts>_portfolio_items.sql`
+- `src/hooks/usePortfolioItems.ts`
+- `src/pages/Work.tsx`, `src/pages/WorkCaseStudy.tsx`
+- `src/components/marketing/work/{PortfolioCard,CategoryTabs,Lightbox}.tsx`
+- `src/components/admin/{PortfolioItemsTab,PortfolioItemDialog}.tsx`
+
+**Edited (additive)**
+- `src/App.tsx` — add `/work` + `/work/:slug` routes
+- `src/components/marketing/site/Nav.tsx`, `src/components/marketing/sections/Footer.tsx` — Work link
+- `src/pages/Admin.tsx` — add Portfolio tab
 
 ## Verification
 
-1. `/help` lists every new article; search for "automation", "recovery", "bundle", "approval", "vertical", "score" returns hits.
-2. Open Launch Checklist — items appear in the new order; new items are present and toggle persists.
-3. Re-launch the wizard from Admin → Settings → Help & Guidance — new step sequence appears.
-4. Open Automation Inbox / Reactivation / Recovery Reports as a fresh user — each shows a dismissible HelpTip explaining the page.
-5. Suggestions panel surfaces new items when their conditions are met (pending automation drafts, never-applied bundle, etc.).
-6. `tsc --noEmit` clean. No existing tips/articles broken.
+1. Migration applies; admin tab can CRUD + upload + reorder + toggle featured/published.
+2. Logged-out visit to `/work` shows only published items, category filters work, each `media_type` renders correctly, featured items prominent.
+3. `/work/:slug` renders the case study body.
+4. Unauthenticated supabase select on `portfolio_items` returns only published rows; insert/update/delete denied unless admin.
+5. Internal `/portfolio` route untouched; no existing routes/RLS/features changed; `tsgo` clean.
