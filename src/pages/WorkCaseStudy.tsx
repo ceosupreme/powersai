@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import { Nav } from "@/components/marketing/site/Nav";
 import { Footer } from "@/components/marketing/sections/Footer";
 import { Container, MonoLabel } from "@/components/marketing/site/primitives";
@@ -70,8 +69,8 @@ export default function WorkCaseStudy() {
               )}
 
               {item.case_study_body && (
-                <div className="prose prose-invert mt-12 max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-accent prose-strong:text-foreground">
-                  <ReactMarkdown>{item.case_study_body}</ReactMarkdown>
+                <div className="mt-12 whitespace-pre-wrap text-base leading-relaxed text-muted-foreground">
+                  {item.case_study_body}
                 </div>
               )}
             </article>
