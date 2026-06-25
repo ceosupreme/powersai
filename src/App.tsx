@@ -60,6 +60,7 @@ import QualifyLanding from "./pages/QualifyLanding";
 import AutomationInbox from "./pages/AutomationInbox";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
+import FoundationAudit from "./pages/FoundationAudit";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
 
@@ -157,6 +158,11 @@ const App = () => {
                 <Route path="/growth-audit" element={
                   <ProtectedRoute allowedRoles={['owner']} pageKey="growth_audit">
                     <AppLayout><GrowthAudit /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/foundation-audit" element={
+                  <ProtectedRoute allowedRoles={['owner']} pageKey="foundation_audit">
+                    <AppLayout><FoundationAudit /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/marketing-hub" element={
