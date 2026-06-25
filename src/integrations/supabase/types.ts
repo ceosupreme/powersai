@@ -3413,6 +3413,144 @@ export type Database = {
         }
         Relationships: []
       }
+      foundation_audit_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          errors: number
+          id: string
+          inserted: number
+          notes: string | null
+          resolved: number
+          skipped: number
+          status: string
+          summary: Json | null
+          triggered_at: string
+          triggered_by: string | null
+          updated: number
+          venue_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          errors?: number
+          id?: string
+          inserted?: number
+          notes?: string | null
+          resolved?: number
+          skipped?: number
+          status?: string
+          summary?: Json | null
+          triggered_at?: string
+          triggered_by?: string | null
+          updated?: number
+          venue_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          errors?: number
+          id?: string
+          inserted?: number
+          notes?: string | null
+          resolved?: number
+          skipped?: number
+          status?: string
+          summary?: Json | null
+          triggered_at?: string
+          triggered_by?: string | null
+          updated?: number
+          venue_id?: string
+        }
+        Relationships: []
+      }
+      foundation_category_templates: {
+        Row: {
+          category_key: string
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          project_type: string
+          sort_order: number
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          category_key: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          project_type: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          category_key?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          project_type?: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      foundation_item_templates: {
+        Row: {
+          category_key: string
+          created_at: string
+          description: string | null
+          detection_signal: string
+          id: string
+          is_manual_only: boolean
+          item_key: string
+          label: string
+          project_type: string
+          recommended_fix: string | null
+          severity: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_key: string
+          created_at?: string
+          description?: string | null
+          detection_signal?: string
+          id?: string
+          is_manual_only?: boolean
+          item_key: string
+          label: string
+          project_type: string
+          recommended_fix?: string | null
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_key?: string
+          created_at?: string
+          description?: string | null
+          detection_signal?: string
+          id?: string
+          is_manual_only?: boolean
+          item_key?: string
+          label?: string
+          project_type?: string
+          recommended_fix?: string | null
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gbp_place_mappings: {
         Row: {
           consecutive_fetch_failures: number
@@ -6531,6 +6669,96 @@ export type Database = {
           },
         ]
       }
+      project_foundation_category_overrides: {
+        Row: {
+          category_key: string
+          created_at: string
+          description: string | null
+          id: string
+          is_hidden: boolean
+          label: string
+          project_id: string
+          sort_order: number
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          category_key: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          label: string
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          category_key?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_hidden?: boolean
+          label?: string
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      project_foundation_item_overrides: {
+        Row: {
+          category_key: string
+          created_at: string
+          description: string | null
+          detection_signal: string
+          id: string
+          is_hidden: boolean
+          is_manual_only: boolean
+          item_key: string
+          label: string
+          project_id: string
+          recommended_fix: string | null
+          severity: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_key: string
+          created_at?: string
+          description?: string | null
+          detection_signal?: string
+          id?: string
+          is_hidden?: boolean
+          is_manual_only?: boolean
+          item_key: string
+          label: string
+          project_id: string
+          recommended_fix?: string | null
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_key?: string
+          created_at?: string
+          description?: string | null
+          detection_signal?: string
+          id?: string
+          is_hidden?: boolean
+          is_manual_only?: boolean
+          item_key?: string
+          label?: string
+          project_id?: string
+          recommended_fix?: string | null
+          severity?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_leak_vector_overrides: {
         Row: {
           benchmark: string | null
@@ -9014,6 +9242,48 @@ export type Database = {
           last_field_setup_at?: string | null
           live_writes_enabled?: boolean
           updated_at?: string
+          venue_id?: string
+        }
+        Relationships: []
+      }
+      venue_foundation_item_status: {
+        Row: {
+          created_at: string
+          detected_at: string | null
+          evidence_url: string | null
+          id: string
+          item_key: string
+          notes: string | null
+          source: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          detected_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          item_key: string
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          detected_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          item_key?: string
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
           venue_id?: string
         }
         Relationships: []
