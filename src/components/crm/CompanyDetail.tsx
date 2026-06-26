@@ -20,6 +20,7 @@ import { SuggestionsPanel } from "@/components/help/SuggestionsPanel";
 import { LeadAnalysisPanel } from "@/components/crm/LeadAnalysisPanel";
 import { OutreachDraftPanel } from "@/components/crm/OutreachDraftPanel";
 import type { LeadAnalysis } from "@/hooks/useLeadAnalyses";
+import { useServicePackages } from "@/hooks/useServicePackages";
 
 export function CompanyDetail({ companyId, onOpenChange }: {
   companyId: string | null; onOpenChange: (open: boolean) => void;
@@ -44,7 +45,12 @@ export function CompanyDetail({ companyId, onOpenChange }: {
   const [intFollow, setIntFollow] = useState("");
 
   const [newContact, setNewContact] = useState({ first_name: "", last_name: "", email: "" });
-  const [newDeal, setNewDeal] = useState({ title: "", value: "" });
+  const [newDeal, setNewDeal] = useState<{ title: string; value: string; package_id: string }>(
+    { title: "", value: "", package_id: "" },
+  );
+  const { data: catalogPackages = [] } = useServicePackages({ activeOnly: true });
+  const packageNameById = (id: string | null) =>
+    id ? (catalogPackages.find((p) => p.id === id)?.name ?? null) : null;
 
   const graduate = async () => {
     if (!company) return;
@@ -180,23 +186,76 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                 <h3 className="text-sm font-semibold">Deals</h3>
                 {deals.map((d) => (
                   <div key={d.id} className="text-sm border rounded p-2 flex items-center justify-between">
-                    <span>{d.title}{d.value ? ` · $${Number(d.value).toLocaleString()}` : ""}</span>
+                    <span>
+                      {d.title}
+                      {d.value ? ` · $${Number(d.value).toLocaleString()}` : ""}
+                      {packageNameById(d.package_id) && (
+                        <span className="text-muted-foreground"> · {packageNameById(d.package_id)}</span>
+                      )}
+                    </span>
                     <Badge variant="outline">{d.stage}</Badge>
                   </div>
                 ))}
-                <div className="flex gap-2">
-                  <Input placeholder="Deal title" value={newDeal.title}
-                    onChange={(e) => setNewDeal({ ...newDeal, title: e.target.value })} />
-                  <Input type="number" placeholder="Value" className="w-32" value={newDeal.value}
-                    onChange={(e) => setNewDeal({ ...newDeal, value: e.target.value })} />
-                  <Button size="icon" variant="outline" onClick={async () => {
-                    if (!newDeal.title) return;
-                    await m.createDeal.mutateAsync({
-                      company_id: company.id, title: newDeal.title,
-                      value: newDeal.value ? Number(newDeal.value) : null as any,
-                    });
-                    setNewDeal({ title: "", value: "" });
-                  }}><Plus className="h-4 w-4" /></Button>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Deal title"
+                      value={newDeal.title}
+                      onChange={(e) => setNewDeal({ ...newDeal, title: e.target.value })}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Value"
+                      className="w-32"
+                      value={newDeal.value}
+                      onChange={(e) => setNewDeal({ ...newDeal, value: e.target.value })}
+                    />
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={async () => {
+                        if (!newDeal.title) return;
+                        await m.createDeal.mutateAsync({
+                          company_id: company.id,
+                          title: newDeal.title,
+                          value: newDeal.value ? Number(newDeal.value) : (null as any),
+                          package_id: newDeal.package_id ? (newDeal.package_id as any) : (null as any),
+                        });
+                        setNewDeal({ title: "", value: "", package_id: "" });
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Select
+                    value={newDeal.package_id || "__none"}
+                    onValueChange={(v) => {
+                      if (v === "__none") {
+                        setNewDeal({ ...newDeal, package_id: "" });
+                        return;
+                      }
+                      const pkg = catalogPackages.find((p) => p.id === v);
+                      setNewDeal({
+                        ...newDeal,
+                        package_id: v,
+                        // Pre-fill value from package one_time_price if value is empty.
+                        value: newDeal.value === "" && pkg ? String(pkg.one_time_price ?? "") : newDeal.value,
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Package (optional) — names what's being sold" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none">No package</SelectItem>
+                      {catalogPackages.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.tier ? `${p.tier} · ` : ""}{p.name}
+                          {p.one_time_price ? ` — $${p.one_time_price}` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </section>
 
