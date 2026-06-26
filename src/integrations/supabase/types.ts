@@ -1948,6 +1948,7 @@ export type Database = {
           id: string
           lost_at: string | null
           notes: string | null
+          package_id: string | null
           sort_order: number
           stage: Database["public"]["Enums"]["crm_deal_stage"]
           title: string
@@ -1967,6 +1968,7 @@ export type Database = {
           id?: string
           lost_at?: string | null
           notes?: string | null
+          package_id?: string | null
           sort_order?: number
           stage?: Database["public"]["Enums"]["crm_deal_stage"]
           title: string
@@ -1986,6 +1988,7 @@ export type Database = {
           id?: string
           lost_at?: string | null
           notes?: string | null
+          package_id?: string | null
           sort_order?: number
           stage?: Database["public"]["Enums"]["crm_deal_stage"]
           title?: string
@@ -1999,6 +2002,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "service_packages"
             referencedColumns: ["id"]
           },
         ]
@@ -7728,6 +7738,100 @@ export type Database = {
         }
         Relationships: []
       }
+      service_package_items: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          package_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          package_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          package_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_package_items_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "service_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_packages: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          fulfillment_bundle_id: string | null
+          id: string
+          is_active: boolean
+          monthly_price: number
+          name: string
+          one_time_price: number
+          price_note: string | null
+          primary_channel: string | null
+          sort_order: number
+          tier: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          fulfillment_bundle_id?: string | null
+          id?: string
+          is_active?: boolean
+          monthly_price?: number
+          name: string
+          one_time_price?: number
+          price_note?: string | null
+          primary_channel?: string | null
+          sort_order?: number
+          tier?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          fulfillment_bundle_id?: string | null
+          id?: string
+          is_active?: boolean
+          monthly_price?: number
+          name?: string
+          one_time_price?: number
+          price_note?: string | null
+          primary_channel?: string | null
+          sort_order?: number
+          tier?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_packages_fulfillment_bundle_id_fkey"
+            columns: ["fulfillment_bundle_id"]
+            isOneToOne: false
+            referencedRelation: "automation_bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shift_feedback: {
         Row: {
           bar_id: string
@@ -9647,6 +9751,69 @@ export type Database = {
           },
         ]
       }
+      venue_service_subscriptions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          ended_at: string | null
+          id: string
+          monthly_price_agreed: number | null
+          notes: string | null
+          one_time_price_agreed: number | null
+          package_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["service_subscription_status"]
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          ended_at?: string | null
+          id?: string
+          monthly_price_agreed?: number | null
+          notes?: string | null
+          one_time_price_agreed?: number | null
+          package_id: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["service_subscription_status"]
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          ended_at?: string | null
+          id?: string
+          monthly_price_agreed?: number | null
+          notes?: string | null
+          one_time_price_agreed?: number | null
+          package_id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["service_subscription_status"]
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_service_subscriptions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "service_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_service_subscriptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_weather_grid_cache: {
         Row: {
           forecast_url: string
@@ -11371,6 +11538,7 @@ export type Database = {
         | "manual_import"
         | "migration"
       sales_vs_forecast: "above" | "at" | "below"
+      service_subscription_status: "active" | "paused" | "ended"
       severity_level: "critical" | "high" | "medium" | "low"
       shift_rating: "great" | "good" | "okay" | "rough" | "disaster"
       shift_type_enum: "am" | "pm" | "night" | "double"
@@ -11747,6 +11915,7 @@ export const Constants = {
         "migration",
       ],
       sales_vs_forecast: ["above", "at", "below"],
+      service_subscription_status: ["active", "paused", "ended"],
       severity_level: ["critical", "high", "medium", "low"],
       shift_rating: ["great", "good", "okay", "rough", "disaster"],
       shift_type_enum: ["am", "pm", "night", "double"],

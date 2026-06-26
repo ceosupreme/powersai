@@ -30,7 +30,7 @@ export interface OnboardingStep {
   /** Where to send the user to actually configure this (link-out). */
   href?: (venueId: string) => string;
   /** Component embedded inline when present (passed { projectId, projectType }). */
-  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources' | 'automations';
+  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources' | 'automations' | 'subscriptions';
 }
 
 const exists = async (table: string, filter: (q: any) => any): Promise<boolean> => {
@@ -263,6 +263,17 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     inlineComponent: 'automations',
     detector: async ({ venueId }) =>
       exists('project_automation_enrollments', (q) => q.eq('project_id', venueId)),
+  },
+  {
+    key: 'service_subscriptions',
+    phase: 'full_config',
+    title: 'Current packages',
+    description:
+      'Assign the service packages this client is paying for. Multiple active allowed (core + add-ons).',
+    icon: Send,
+    inlineComponent: 'subscriptions',
+    detector: async ({ venueId }) =>
+      exists('venue_service_subscriptions', (q) => q.eq('venue_id', venueId).eq('status', 'active')),
   },
 ];
 

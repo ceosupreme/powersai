@@ -22,6 +22,7 @@ export type CrmDeal = {
   won_at: string | null; lost_at: string | null; notes: string | null;
   sort_order: number; created_by: string;
   archived: boolean; archived_at: string | null; archive_reason: string | null;
+  package_id: string | null;
 };
 export type CrmInteractionType = "call"|"email"|"meeting"|"note";
 export type CrmInteraction = {
