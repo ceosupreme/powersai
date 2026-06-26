@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Target, Bot, Mail, Star, ShieldCheck, Download, HelpCircle, Package } from 'lucide-react';
+import { Building2, Target, Bot, Mail, Star, ShieldCheck, Download, HelpCircle, Package, Package2 } from 'lucide-react';
 import { SettingsBarsTab } from './SettingsBarsTab';
 import { SettingsTargetsTab } from './SettingsTargetsTab';
 // Hidden from Settings UI (Phase C). SettingsSyncTab/SculptureUploadTab/ManualDataUploadTab/DataAuditTab
@@ -12,6 +12,7 @@ import { SettingsComplianceTab } from './SettingsComplianceTab';
 import { SettingsBackupTab } from './SettingsBackupTab';
 import { SettingsHelpTab } from './SettingsHelpTab';
 import { SettingsAutomationBundlesTab } from './SettingsAutomationBundlesTab';
+import { SettingsServiceCatalogTab } from './SettingsServiceCatalogTab';
 
 export const SettingsTab = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,6 +58,10 @@ export const SettingsTab = () => {
           <Package className="h-4 w-4" />
           <span className="hidden sm:inline">Automation Bundles</span>
         </TabsTrigger>
+        <TabsTrigger value="service-catalog" className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
+          <Package2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Service Catalog</span>
+        </TabsTrigger>
         <TabsTrigger value="backup" className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
           <Download className="h-4 w-4" />
           <span className="hidden sm:inline">Backup & Export</span>
@@ -74,6 +79,7 @@ export const SettingsTab = () => {
       <TabsContent value="google-ratings"><GoogleRatingOverrideCard /></TabsContent>
       <TabsContent value="compliance"><SettingsComplianceTab /></TabsContent>
       <TabsContent value="bundles"><SettingsAutomationBundlesTab /></TabsContent>
+      <TabsContent value="service-catalog"><SettingsServiceCatalogTab /></TabsContent>
       <TabsContent value="backup"><SettingsBackupTab /></TabsContent>
       <TabsContent value="help"><SettingsHelpTab /></TabsContent>
     </Tabs>
