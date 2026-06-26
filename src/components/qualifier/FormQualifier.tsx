@@ -12,10 +12,11 @@ import type { EffectiveQualifierField } from "@/lib/effectiveQualifierFields";
 interface Props {
   projectType: string;
   fields: EffectiveQualifierField[];
+  capturedForProjectId?: string | null;
   onSubmitted: (leadId: string, isReady: boolean) => void;
 }
 
-export function FormQualifier({ projectType, fields, onSubmitted }: Props) {
+export function FormQualifier({ projectType, fields, capturedForProjectId = null, onSubmitted }: Props) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -43,6 +44,7 @@ export function FormQualifier({ projectType, fields, onSubmitted }: Props) {
           transcript: [],
           conversation_channel: "form",
           route_to: "self",
+          captured_for_project_id: capturedForProjectId ?? null,
         },
       });
       if (error) throw error;

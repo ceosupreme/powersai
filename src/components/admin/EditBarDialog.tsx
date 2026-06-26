@@ -115,6 +115,40 @@ function deriveBarCode(name: string): string {
   return words.slice(0, 4).map((w) => w[0]).join('').toUpperCase();
 }
 
+/**
+ * Derive a URL-safe slug from a venue name for the public /q/:venueSlug
+ * qualifier page. Auto-stamped on save when the venue has no slug yet so
+ * every client gets a usable intake URL without a separate admin step.
+ */
+function deriveVenueSlug(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+/**
+ * Pick a slug that doesn't collide with an existing venue. Appends -2, -3 …
+ * until a free one is found. Bounded loop — never blocks save indefinitely.
+ */
+async function pickUniqueSlug(base: string, ignoreId?: string): Promise<string | null> {
+  if (!base) return null;
+  for (let i = 0; i < 25; i++) {
+    const candidate = i === 0 ? base : `${base}-${i + 1}`;
+    const { data } = await supabase
+      .from('venues')
+      .select('id')
+      .eq('slug', candidate)
+      .maybeSingle();
+    if (!data || (ignoreId && (data as any).id === ignoreId)) return candidate;
+  }
+  return null;
+}
+
 const defaultForm: FormData = {
   name: '',
   bar_code: '',
@@ -345,6 +379,14 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       };
       let newId: string | undefined;
       if (editingBar) {
+        // Backfill a slug if the existing venue doesn't have one yet so its
+        // /q/:venueSlug intake URL becomes usable without an extra step.
+        const existingSlug = (editingBar as any).slug as string | null | undefined;
+        if (!existingSlug) {
+          const base = deriveVenueSlug(payload.name);
+          const unique = await pickUniqueSlug(base, editingBar.id);
+          if (unique) payload.slug = unique;
+        }
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
         if (error) throw error;
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
@@ -352,6 +394,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       } else {
         // Carry the originating lead forward so the new client record references it.
         if (sourceLeadId) payload.source_lead_id = sourceLeadId;
+        // Stamp a unique public slug at creation so /q/:venueSlug works
+        // immediately for follow-up auto-fire.
+        const base = deriveVenueSlug(payload.name);
+        const unique = await pickUniqueSlug(base);
+        if (unique) payload.slug = unique;
         const { data: inserted, error } = await supabase
           .from('venues')
           .insert(payload as any)

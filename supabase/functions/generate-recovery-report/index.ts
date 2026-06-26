@@ -78,11 +78,11 @@ async function aggregateProject(
   const endIso = `${addDays(weekEnd, 1)}T00:00:00-08:00`;
   const caveats: string[] = [];
 
-  // ── Leads captured (linked via promoted_venue_id from Build B) ──
+  // ── Leads captured (linked via captured_for_project_id at intake) ──
   const { data: leadRows = [] } = await supabase
     .from("inbound_leads")
     .select("id, conversation_channel, created_at, is_ready, status, updated_at")
-    .eq("promoted_venue_id", projectId)
+    .eq("captured_for_project_id", projectId)
     .gte("created_at", startIso)
     .lt("created_at", endIso);
 

@@ -57,6 +57,7 @@ import WorkCaseStudy from "./pages/WorkCaseStudy";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
+import QualifyForVenue from "./pages/QualifyForVenue";
 import AutomationInbox from "./pages/AutomationInbox";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
@@ -93,6 +94,10 @@ const App = () => {
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
                 <Route path="/qualify/:slug" element={<QualifyLanding />} />
+                {/* Public per-client qualifier — resolves a venue by slug and
+                    stamps inbound leads with captured_for_project_id so the
+                    client's follow-up enrollment fires automatically. */}
+                <Route path="/q/:venueSlug" element={<QualifyForVenue />} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>

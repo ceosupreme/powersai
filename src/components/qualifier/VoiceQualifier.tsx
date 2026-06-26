@@ -13,10 +13,11 @@ import { toast } from "sonner";
 
 interface Props {
   projectType: string;
+  capturedForProjectId?: string | null;
   onSubmitted: (leadId: string, isReady: boolean) => void;
 }
 
-export function VoiceQualifier({ projectType, onSubmitted }: Props) {
+export function VoiceQualifier({ projectType, capturedForProjectId = null, onSubmitted }: Props) {
   const [autoStarted, setAutoStarted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -44,6 +45,7 @@ export function VoiceQualifier({ projectType, onSubmitted }: Props) {
           transcript,
           conversation_channel: "voice",
           route_to: "self",
+          captured_for_project_id: capturedForProjectId ?? null,
         },
       });
       if (error) throw error;

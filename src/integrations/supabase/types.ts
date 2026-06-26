@@ -4499,6 +4499,7 @@ export type Database = {
         Row: {
           automation_status: string | null
           business_name: string | null
+          captured_for_project_id: string | null
           conversation_channel: string | null
           created_at: string
           email: string
@@ -4523,6 +4524,7 @@ export type Database = {
         Insert: {
           automation_status?: string | null
           business_name?: string | null
+          captured_for_project_id?: string | null
           conversation_channel?: string | null
           created_at?: string
           email: string
@@ -4547,6 +4549,7 @@ export type Database = {
         Update: {
           automation_status?: string | null
           business_name?: string | null
+          captured_for_project_id?: string | null
           conversation_channel?: string | null
           created_at?: string
           email?: string
@@ -4569,6 +4572,13 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inbound_leads_captured_for_project_id_fkey"
+            columns: ["captured_for_project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inbound_leads_promoted_company_id_fkey"
             columns: ["promoted_company_id"]

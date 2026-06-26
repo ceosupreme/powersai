@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!lead) return json({ error: "lead_not_found" }, 404);
 
-  const projectId = (lead.project_id as string) ?? (lead.venue_id as string);
+  const projectId = (lead.captured_for_project_id as string | null) ?? null;
   if (!projectId) return json({ skipped: true, reason: "no_project_on_lead" });
 
   // Check enrollment.

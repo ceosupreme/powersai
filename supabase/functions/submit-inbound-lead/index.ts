@@ -23,6 +23,10 @@ const Body = z.object({
   })).optional().nullable(),
   conversation_channel: z.enum(["voice", "chat", "form", "phone"]).optional().nullable(),
   route_to: z.enum(["self", "operator", "client"]).optional().nullable(),
+  // When intake happened on a client-specific qualifier URL (/q/:venueSlug),
+  // this is the resolved venues.id so follow-up automation can fire against
+  // that client's enrollment. Null on the generic vertical route.
+  captured_for_project_id: z.string().uuid().optional().nullable(),
   // Honeypot — must be empty. Real users never see/fill this field.
   company_website: z.string().max(0).optional().nullable(),
 });
@@ -80,7 +84,7 @@ Deno.serve(async (req) => {
   const {
     name, business_name, email, phone, message,
     project_type, qualifier_data, is_ready, not_ready_reason,
-    transcript, conversation_channel, route_to,
+    transcript, conversation_channel, route_to, captured_for_project_id,
   } = parsed.data;
 
   // Either email or phone is required so we can actually contact the lead.
@@ -111,7 +115,12 @@ Deno.serve(async (req) => {
     transcript: transcript ?? [],
     conversation_channel: conversation_channel || null,
     route_to: route_to || "self",
-    source: project_type ? `qualifier:${project_type}` : "public_site",
+    captured_for_project_id: captured_for_project_id ?? null,
+    source: captured_for_project_id && project_type
+      ? `qualifier:${project_type}:client`
+      : project_type
+        ? `qualifier:${project_type}`
+        : "public_site",
     user_agent: userAgent,
   }).select("id").single();
 
