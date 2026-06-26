@@ -115,6 +115,40 @@ function deriveBarCode(name: string): string {
   return words.slice(0, 4).map((w) => w[0]).join('').toUpperCase();
 }
 
+/**
+ * Derive a URL-safe slug from a venue name for the public /q/:venueSlug
+ * qualifier page. Auto-stamped on save when the venue has no slug yet so
+ * every client gets a usable intake URL without a separate admin step.
+ */
+function deriveVenueSlug(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+/**
+ * Pick a slug that doesn't collide with an existing venue. Appends -2, -3 …
+ * until a free one is found. Bounded loop — never blocks save indefinitely.
+ */
+async function pickUniqueSlug(base: string, ignoreId?: string): Promise<string | null> {
+  if (!base) return null;
+  for (let i = 0; i < 25; i++) {
+    const candidate = i === 0 ? base : `${base}-${i + 1}`;
+    const { data } = await supabase
+      .from('venues')
+      .select('id')
+      .eq('slug', candidate)
+      .maybeSingle();
+    if (!data || (ignoreId && (data as any).id === ignoreId)) return candidate;
+  }
+  return null;
+}
+
 const defaultForm: FormData = {
   name: '',
   bar_code: '',
