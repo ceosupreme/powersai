@@ -379,6 +379,14 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       };
       let newId: string | undefined;
       if (editingBar) {
+        // Backfill a slug if the existing venue doesn't have one yet so its
+        // /q/:venueSlug intake URL becomes usable without an extra step.
+        const existingSlug = (editingBar as any).slug as string | null | undefined;
+        if (!existingSlug) {
+          const base = deriveVenueSlug(payload.name);
+          const unique = await pickUniqueSlug(base, editingBar.id);
+          if (unique) payload.slug = unique;
+        }
         const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
         if (error) throw error;
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
@@ -386,6 +394,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
       } else {
         // Carry the originating lead forward so the new client record references it.
         if (sourceLeadId) payload.source_lead_id = sourceLeadId;
+        // Stamp a unique public slug at creation so /q/:venueSlug works
+        // immediately for follow-up auto-fire.
+        const base = deriveVenueSlug(payload.name);
+        const unique = await pickUniqueSlug(base);
+        if (unique) payload.slug = unique;
         const { data: inserted, error } = await supabase
           .from('venues')
           .insert(payload as any)
