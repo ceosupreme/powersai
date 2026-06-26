@@ -9,12 +9,13 @@ import { toast } from "sonner";
 
 interface Props {
   projectType: string;
+  capturedForProjectId?: string | null;
   onSubmitted: (leadId: string, isReady: boolean) => void;
 }
 
 interface ChatTurn { role: "user" | "assistant"; content: string }
 
-export function ChatQualifier({ projectType, onSubmitted }: Props) {
+export function ChatQualifier({ projectType, capturedForProjectId = null, onSubmitted }: Props) {
   const [messages, setMessages] = useState<ChatTurn[]>([
     { role: "assistant", content: "Hi — I'm the intake assistant. What do you need help with today?" },
   ]);
@@ -51,6 +52,7 @@ export function ChatQualifier({ projectType, onSubmitted }: Props) {
             transcript,
             conversation_channel: "chat",
             route_to: "self",
+            captured_for_project_id: capturedForProjectId ?? null,
           },
         });
         if (subErr) throw subErr;
