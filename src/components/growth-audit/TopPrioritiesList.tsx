@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowRight, Flame, ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Flame, ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { severityTone, type ReadinessGate } from './scoreBands';
 import { useToast } from '@/hooks/use-toast';
 import type { Priority } from './deriveScores';
@@ -99,16 +98,6 @@ export const TopPrioritiesList = ({ items, gate }: { items: Priority[]; gate: Re
                 <Badge variant="outline" className="text-[10px] bg-emerald-500/15 text-emerald-600 border-emerald-500/30 shrink-0">
                   {p.upside}
                 </Badge>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span tabIndex={0}>
-                      <Button size="sm" variant="outline" disabled className="gap-1 opacity-70 cursor-not-allowed">
-                        View Action <ArrowRight className="w-3 h-3" />
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>Action Center ships in a later phase.</TooltipContent>
-                </Tooltip>
               </div>
 
               {showWarning && p.gateReason && (

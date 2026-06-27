@@ -11,11 +11,13 @@ import { TopPrioritiesList } from './TopPrioritiesList';
 import { QuickStatsStrip } from './QuickStatsStrip';
 import { useGrowthScores, useRefreshAudit } from './useGrowthScores';
 import { OnboardingChecklist } from './onboarding/OnboardingChecklist';
+import { useAuth } from '@/context/AuthContext';
 
 export const OverviewView = () => {
   const { selectedBar } = useApp();
   const [, setSearchParams] = useSearchParams();
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const venueId = selectedBar?.id ?? null;
   const { primary, categories, priorities, quickStats, isLoading } = useGrowthScores(venueId);
   const refresh = useRefreshAudit(venueId);
@@ -40,7 +42,7 @@ export const OverviewView = () => {
 
   return (
     <div className="space-y-6">
-      <OnboardingChecklist venueId={venueId} />
+      {isAdmin && <OnboardingChecklist venueId={venueId} />}
       {!isLoading && priorities.length === 0 && primary.growthScore === null && (
         <Card className="p-5 bg-card/30 border-dashed">
           <div className="text-sm font-semibold text-foreground">No audit data yet for this project</div>

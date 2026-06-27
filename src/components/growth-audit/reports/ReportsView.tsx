@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileBarChart, Plus, Printer, ArrowLeft, FileText, Sparkles } from 'lucide-react';
+import { FileBarChart, Plus, Printer, ArrowLeft, Sparkles } from 'lucide-react';
 import { ReportBuilderDialog } from './ReportBuilderDialog';
 import { ReportRenderer } from './ReportRenderer';
 import { captureSnapshot } from './snapshot';
@@ -12,12 +12,6 @@ import { useGrowthScores } from '../useGrowthScores';
 import { useFindings } from '../findings/useFindings';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useToast } from '@/hooks/use-toast';
-
-const DEMO_RECENTS: { id: string; type: string; venue: string; date: string }[] = [
-  { id: 'demo-1', type: 'Full Report', venue: 'The Local Tavern', date: 'May 6, 2026' },
-  { id: 'demo-2', type: 'Executive Summary', venue: 'The Local Tavern', date: 'Apr 22, 2026' },
-  { id: 'demo-3', type: 'Category Deep Dive · Local Search', venue: 'The Local Tavern', date: 'Apr 8, 2026' },
-];
 
 export const ReportsView = () => {
   const { selectedBar } = useApp();
@@ -85,27 +79,14 @@ export const ReportsView = () => {
       </Card>
 
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-foreground">Recent reports</h3>
-          <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-600 bg-amber-500/10">
-            Demo entries — not real archives
-          </Badge>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {DEMO_RECENTS.map(r => (
-            <Card key={r.id} className="p-4 opacity-70 border-dashed cursor-not-allowed">
-              <div className="flex items-start justify-between mb-2">
-                <FileText className="w-4 h-4 text-muted-foreground" />
-                <Badge variant="outline" className="text-[9px] uppercase border-amber-500/40 text-amber-600 bg-amber-500/10">
-                  Demo
-                </Badge>
-              </div>
-              <div className="text-sm font-medium text-foreground">{r.type}</div>
-              <div className="text-xs text-muted-foreground mt-1">{r.venue}</div>
-              <div className="text-[11px] text-muted-foreground mt-2">{r.date}</div>
-            </Card>
-          ))}
-        </div>
+        <h3 className="text-sm font-semibold text-foreground mb-3">Recent reports</h3>
+        <Card className="p-6 border-dashed bg-card/30 text-center">
+          <FileBarChart className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
+          <div className="text-sm text-foreground">No saved reports yet</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Saved reports will appear here once archiving ships.
+          </div>
+        </Card>
         <p className="text-[11px] text-muted-foreground mt-3 flex items-center gap-1">
           <FileBarChart className="w-3 h-3" />
           Saved report history will appear here once the first real report is generated and archived.
