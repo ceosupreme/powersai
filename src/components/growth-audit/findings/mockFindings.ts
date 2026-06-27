@@ -58,4 +58,3 @@ export type Finding = {
   signalKey?: string | null;
   metadata?: Record<string, unknown>;
 };
-  // 1. Soft Shift Opportunity — generic mid-week demand window
