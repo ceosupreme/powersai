@@ -1,80 +1,63 @@
+## Reality deltas found during recon (flag before building)
 
-# Feature A — Service Catalog (build plan)
-
-Builds against the recon. Two reality deltas worth flagging up front:
-
-- **Company → venue link EXISTS today.** `crm_companies.linked_project_id uuid REFERENCES venues(id) ON DELETE SET NULL` (indexed). Part 5 keeps your "deal names the package, no auto-assign" scope as requested, but `won_at + linked_project_id` would already let a later build wire this without new schema. Flagged, not built.
-- **All four bundle names match exactly.** Existing bundles: `Lead Catcher`, `Reactivation`, `Reviews Engine`, `Tier 2 — Missed Money Recovery`. Every Part-2 row that references a bundle will resolve; no nulls expected.
-
----
-
-## Part 1 — Schema (one migration)
-
-Single migration creates the enum + 3 tables + 1 column + RLS + indexes.
-
-- `CREATE TYPE service_subscription_status AS ENUM ('active','paused','ended');`
-- `service_packages` exactly as spec'd. `fulfillment_bundle_id uuid REFERENCES automation_bundles(id) ON DELETE SET NULL`. `updated_at` trigger via `handle_updated_at()`.
-- `service_package_items` exactly as spec'd. CASCADE on package delete.
-- `venue_service_subscriptions` exactly as spec'd; **no** uniqueness on `(venue_id, package_id)` or on `(venue_id) WHERE status='active'` — multiple active rows allowed.
-- `ALTER TABLE crm_deals ADD COLUMN package_id uuid REFERENCES service_packages(id) ON DELETE SET NULL;`
-- Indexes: `venue_service_subscriptions(venue_id)`, `service_package_items(package_id)`, `service_packages(fulfillment_bundle_id)`, `crm_deals(package_id)`.
-- GRANTs (required — public-schema rule): `service_packages` + `service_package_items` → `SELECT` to authenticated, `ALL` to service_role; `venue_service_subscriptions` → `SELECT,INSERT,UPDATE,DELETE` to authenticated + `ALL` to service_role.
-- RLS:
-  - `service_packages` / `service_package_items`: mirror `automation_bundles` — `SELECT USING(true)` for authenticated, `INSERT/UPDATE/DELETE USING(has_role(auth.uid(),'admin'))`.
-  - `venue_service_subscriptions`: mirror `venue_foundation_item_status` — `SELECT/INSERT/UPDATE/DELETE USING(user_can_access_project(venue_id))` (admins covered by `has_role` inside that function).
-
-No touch to `service_offers`, `/offers`, or `Offers.tsx`.
-
-## Part 2 — Seed
-
-Single `INSERT` of 17 `service_packages` rows + the `service_package_items` rows listed for the 10 Tier-1/Tier-2 packages. Bundle FKs resolved by name subquery `(SELECT id FROM automation_bundles WHERE name = '<exact>' LIMIT 1)`; rows with `(none)` set `fulfillment_bundle_id = NULL`. `sort_order` assigned per row position. Run via the data-insert tool (not the migration).
-
-Expected resolution (all 4 will hit):
-
-```text
-Lead Catcher Setup            → Lead Catcher
-Embedded Lead Catcher Widget  → Lead Catcher
-Never Miss a Lead             → Lead Catcher
-Reactivation Campaign         → Reactivation
-Customer Reactivation System  → Reactivation
-Review Engine                 → Reviews Engine
-Missed Money Recovery System  → Tier 2 — Missed Money Recovery
-```
-
-If any subquery returns NULL, the row still inserts (FK is nullable) and we report it.
-
-## Part 3 — Admin "Service Catalog" tab
-
-- New `src/components/admin/SettingsServiceCatalogTab.tsx`.
-- Wire as a new `<TabsTrigger value="service-catalog">` + `<TabsContent>` in `SettingsTab.tsx`, slotted next to the existing `bundles` tab. Icon: `Package2` or `Layers`.
-- New hooks file `src/hooks/useServicePackages.ts` (mirrors `useAutomationBundles.ts` shape: list with nested items, mutations for create/update/delete/reorder for both `service_packages` and `service_package_items`).
-- UI: groups list **by `tier`** (Tier 0 / 1 / 2 / 3 / 4). Each row → name, price summary (`price_note` shown verbatim), bundle badge, active toggle, edit drawer.
-- Edit drawer: name, tier, primary_channel (select), one_time_price, monthly_price, currency, price_note, description, `fulfillment_bundle_id` dropdown sourced from `useAutomationBundles({includeInactive:false})` with a "None" option, drag-reorderable line-items list (label + sort_order).
-
-## Part 4 — "Current Packages" panel on the project
-
-- New `src/components/services/VenueSubscriptionsPanel.tsx`.
-- Mounted in the **same project surface that already renders `AutomationEnrollmentPanel`** (Build A's `VenueOnboardingWizard`/project view), placed adjacent to it.
-- New hook `src/hooks/useVenueSubscriptions.ts`: list by `venue_id` ordered `status='active' first, started_at desc`; mutations: `assign`, `updatePrices`, `pause`, `resume`, `end` (sets `status='ended'` + `ended_at=now()`), `delete`.
-- Display: package name + tier badge + bundle badge, agreed one-time + monthly (formatted with currency), status pill, started date, notes (inline edit).
-- "Assign package" action: dialog → select from `is_active=true` packages → form pre-fills `one_time_price_agreed`/`monthly_price_agreed`/`currency` from the package, both editable → insert. Multiple active allowed; no client-side dedupe.
-- Per-row menu: Pause / Resume / End / Delete.
-
-## Part 5 — Deal → package
-
-- In `src/components/crm/CompanyDetail.tsx`, extend the inline deal quick-create row (currently `title + value`) with an optional Package `<Select>` populated from active `service_packages`. Selecting one auto-fills `title` (if blank) with the package name and `value` with `one_time_price` — both stay editable. Persists `package_id` on the new `crm_deals` row.
-- Also surface package in the existing deal display (small badge on each deal card) so the chosen package is visible.
-- Update `src/hooks/useCrm.ts` `useDeals`/`createDeal` to read/write `package_id`.
-- **Won-deal → auto-assign:** NOT wired this build. Honest scope respected even though `crm_companies.linked_project_id` would technically allow it — flagged above so you can choose to add it as a one-line follow-up later.
+- **DB already shows 0 seed rows AND 0 total rows in `growth_findings`** in the current Cloud DB. So the purge is effectively a no-op today, but the cleanup statement + the "no re-seed path" verification still ship so a fresh-clone or restore doesn't reintroduce them.
+- **Overview row IS real already.** `OverviewView.tsx` uses `useGrowthScores(venueId)` → `useFindings` (real `growth_findings`) → `deriveScores`. The "$18,400/mo" you saw on screen was coming from the **reports surface** (`snapshot.ts` deep-cloning `MOCK_PRIMARY`), not the Overview tiles. The earlier recon note that called the primary row mock was wrong; the recon note that called it real was right. Only one thing in the Overview is still hardcoded: `dataConfidence: 'Partial'` in `deriveScores.ts:~456`.
+- **`service_offers` has NO venue/project column** (it's a global catalog of *our* offers — same object as `/offers`). There is no way to scope `offersHasCheck` to the selected venue against `service_offers`. The check needs to be re-pointed at a venue-scoped table; `venue_service_subscriptions` (Feature A — the table that links a venue to a `service_packages` row) is the correct source for "this venue has an active service offer/package." Flagging because this changes the source table, not just the filter.
+- **`channel_products` also has no venue column.** Venue scope lives on `channel_product_channels.project_id`. `channelsHasCheck` becomes a join: count distinct channels for this venue via `channel_product_channels`.
 
 ---
 
-## Verification
+## Part 1 — Purge seed findings + prove nothing re-seeds
 
-- tsc clean; existing Offers/Service-Offers screen unchanged.
-- Migration applies; new RLS policies match the mirrored references.
-- Seed inserts 17 packages with 4 bundle FKs resolved; report any nulls.
-- Admin Service Catalog tab renders grouped by tier, CRUD works, bundle dropdown lists all active bundles.
-- On a project, Current Packages panel lists/assigns/pauses/ends subscriptions; multiple actives allowed.
-- New deal in CompanyDetail can attach a package, defaulting value from the package.
-- `service_offers` / `/offers` untouched; no policy or column change there.
+1. **Data cleanup (insert tool, DELETE):**
+   ```sql
+   DELETE FROM public.growth_findings WHERE signal_key LIKE 'seed:%';
+   ```
+   Same identifier the admin "Clean up demo" action in `FindingsView.tsx:101` already uses. Report rows-affected (currently 0 in this DB).
+2. **Re-seed audit (no code change expected; report findings):** Grep confirms the only seed writer is migration `20260513205029_…sql` (one-shot historical insert) — there is no trigger on `growth_findings`, no default, and `useCrm`/venue-creation paths never insert seed rows. `supabase/functions/_shared/findings.ts` `upsertFinding`/sweep paths explicitly skip `seed:%`. Nothing re-creates them. Report this in chat after build.
+3. **Defensive read filter:** Add a single source-of-truth filter `signal_key NOT LIKE 'seed:%'` to `useFindings` in `src/components/growth-audit/findings/useFindings.ts` so scorer, list, and snapshot all ignore stray seed rows even if one reappears. (FindingsView's "Hide demo" toggle stays — it's an admin-only operator affordance, but the default read is now clean.)
+
+## Part 2 — De-mock the Growth Audit display (real per-venue everywhere)
+
+1. **Drop "Mock data" badge.** `src/pages/GrowthAudit.tsx` — remove the `<Badge variant="outline" …>Mock data</Badge>` block (~lines 50–53).
+2. **Rewire `snapshot.ts` to real data.** Change `captureSnapshot` signature to `captureSnapshot(config, realData)` where `realData = { primary, categories, priorities, quickStats, findings, foundation? }` produced from `useGrowthScores(venueId)` + `useFoundationScores(venueId)` + real findings. Delete the `MOCK_PRIMARY / MOCK_CATEGORIES / MOCK_PRIORITIES / MOCK_QUICK_STATS / MOCK_FINDINGS` imports and the clone-of-mock body.
+3. **Wire the call site.** In `src/components/growth-audit/reports/ReportsView.tsx`, on "Generate" pull `useApp().selectedBar.id`, call `useGrowthScores(venueId)` (already exists in the app) plus `useFindings(venueId)` for the full real list (snapshot needs more than the top-5 priorities), and pass that bundle to `captureSnapshot(cfg, realData)`. Block "Generate" when no venue is selected (toast "Select a project first").
+4. **Keep the existing report types untouched.** `full / executive / category / custom` all keep rendering through `ReportRenderer` — they just receive real numbers instead of the karaoke fixtures. No Profit Leak preset, no visual changes, no new report type (per scope).
+5. **Delete the displayed-path mocks.** Remove `src/components/growth-audit/mockData.ts` and `src/components/growth-audit/findings/mockFindings.ts` once references are gone. Keep their **type exports** (`PrimaryMetrics`, `CategoryScore`, `Priority`, `QuickStats`, `Finding`, `FindingCategoryKey`, `CATEGORY_LABEL`) by moving them into sibling `types.ts` files (`mockData.ts` → `growth-audit/types.ts`, `findings/mockFindings.ts` → `findings/types.ts`) and re-pointing every importer (`useFindings`, `dbAdapter`, `deriveScores`, `useGrowthScores`, `ReportRenderer`, `ReportBuilderDialog`, `FindingCard`, `FindingDetail`, `TopPrioritiesList`, `CategoryScoreCard`, `PrimaryMetricsRow`, `reports/types.ts`, …). Type-only move; runtime untouched.
+6. **Real `dataConfidence`.** Replace the hardcoded `'Partial'` in `deriveScores.ts` `derivePrimaryMetrics` with a small derivation: count which of the 5 already-real data-source signals returned a snapshot (`gbpSnap`, `rep`, `web`, `mp`, `ai` — all already plumbed into `useGrowthScores`). Map `connected / 5`: `0 → 'Unavailable'`, `1–2 → 'Limited'`, `3–4 → 'Partial'`, `5 → 'Complete'`; update `dataConfidenceNote` to `"{n} of 5 data sources connected"`. Pass the same five into `derivePrimaryMetrics` (signature change, single call site in `useGrowthScores`). Small, real, no new queries.
+7. **Honest empty states.**
+   - `OverviewView`: when `findings.length === 0` and `lastRunAt == null`, render a clear "No audit run yet — click Refresh Now" panel above the tiles, with the tiles still showing real zeros (Growth Score `—`, Opportunity `$0 / mo` labeled "no findings", confidence from #6).
+   - `ReportRenderer`: when the real snapshot has no findings or no run, show "No findings detected yet — run the audit first" in the body sections instead of an empty page; do not fabricate priorities.
+   - `ReportsView`: keep the existing `DEMO_RECENTS` archive cards as-is — out of scope per your prior build note (next polish pass).
+
+## Part 3 — Scope the two Foundation checks per-venue
+
+In `supabase/functions/_shared/foundation-checks/offers.ts`:
+
+1. **`offersHasCheck`** — repoint from global `service_offers` (no venue link exists) to `venue_service_subscriptions` filtered by `venue_id = venueId` and `status = 'active'`:
+   ```ts
+   const { count } = await supabase
+     .from('venue_service_subscriptions')
+     .select('id', { count: 'exact', head: true })
+     .eq('venue_id', venueId)
+     .eq('status', 'active');
+   ```
+   Drop the `_venueId` underscore. (Flagged above: this is a source-table swap because `service_offers` is genuinely global.)
+2. **`channelsHasCheck`** — keep `channel_products` as the catalog but scope through `channel_product_channels.project_id`:
+   ```ts
+   const { count } = await supabase
+     .from('channel_product_channels')
+     .select('product_id', { count: 'exact', head: true })
+     .eq('project_id', venueId);
+   ```
+   Returns `satisfied` when this venue has ≥1 product attached to any channel, else `missing`. Drop the underscore.
+
+Both checks still register through `_shared/foundation-checks/index.ts`; no schema change, no migration.
+
+## Not in scope (per your list)
+Send adapters, capture_channel detector, followup-cadence-tick, recovery-report cron ref, marketing-site $48,210 showcase, Profit Leak Snapshot preset + visual redesign, Marketing Hub placeholders, dead-code cleanup, renames, the `growth_findings` engine itself.
+
+## Test path before handing back
+1. Pick a real venue with no findings → Overview shows empty-state, Reports → Generate renders a clean "no findings yet" report (no karaoke).
+2. Pick a venue with real analyzer findings (or insert one via the existing engine) → Overview tiles + Reports both reflect the same real numbers from `growth_findings`.
+3. Foundation Audit on two different venues → `has_service_offer` and `channel_coverage` give different results based on actual `venue_service_subscriptions` / `channel_product_channels` rows.
