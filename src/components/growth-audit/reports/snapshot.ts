@@ -1,5 +1,6 @@
-import { MOCK_CATEGORIES, MOCK_PRIMARY, MOCK_PRIORITIES, MOCK_QUICK_STATS } from '../mockData';
-import { MOCK_FINDINGS } from '../findings/mockFindings';
+import type { CategoryScore, PrimaryMetrics, Priority, QuickStats } from '../mockData';
+import type { Finding } from '../findings/mockFindings';
+import type { FoundationScoreResult } from '@/components/foundation-audit/deriveFoundationScores';
 import type { ReportConfig, ReportSnapshot } from './types';
 
 const METHODOLOGY = [
@@ -9,31 +10,35 @@ const METHODOLOGY = [
   'The Operational Readiness Gate guards traffic-driving recommendations: campaigns are paused while ops capacity is below threshold.',
 ];
 
-const DATA_SOURCES: ReportSnapshot['dataSources'] = [
-  { label: 'Toast (POS, KDS, item mix)', status: 'Connected' },
-  { label: '7shifts (schedule, labor)', status: 'Connected' },
-  { label: 'Google Business Profile', status: 'Partial' },
-  { label: 'Yelp Business API', status: 'Connected' },
-  { label: 'Review sentiment classifier', status: 'Connected' },
-  { label: 'BrightLocal rank tracker', status: 'Partial' },
-  { label: 'Asana marketing log', status: 'Connected' },
-  { label: 'Site audit + chat transcripts', status: 'Limited' as never },
-];
-
-/** Deep-clone the relevant mock state into an immutable snapshot. */
-export const captureSnapshot = (config: ReportConfig): ReportSnapshot => {
-  const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
-  return {
-    id: `rpt_${Date.now().toString(36)}`,
-    config,
-    generatedAt: new Date().toISOString(),
-    primary: clone(MOCK_PRIMARY),
-    // Strip non-serializable icon refs — re-attach in the renderer by key.
-    categories: MOCK_CATEGORIES.map(c => ({ ...c })),
-    priorities: clone(MOCK_PRIORITIES),
-    findings: clone(MOCK_FINDINGS),
-    quickStats: clone(MOCK_QUICK_STATS),
-    methodology: METHODOLOGY,
-    dataSources: DATA_SOURCES,
-  };
+export type CaptureSnapshotInput = {
+  primary: PrimaryMetrics;
+  categories: CategoryScore[];
+  priorities: Priority[];
+  quickStats: QuickStats;
+  findings: Finding[];
+  foundation?: FoundationScoreResult | null;
+  /** Per-venue data-source connection states, derived in the call site. */
+  dataSources?: ReportSnapshot['dataSources'];
 };
+
+/**
+ * Build an immutable snapshot from real per-venue Growth Audit state.
+ * Note: icon refs on categories are non-serializable but the renderer reads
+ * them by reference within the same session, so we keep them on the object.
+ */
+export const captureSnapshot = (
+  config: ReportConfig,
+  data: CaptureSnapshotInput,
+): ReportSnapshot => ({
+  id: `rpt_${Date.now().toString(36)}`,
+  config,
+  generatedAt: new Date().toISOString(),
+  primary: { ...data.primary },
+  categories: data.categories.map((c) => ({ ...c })),
+  priorities: data.priorities.map((p) => ({ ...p })),
+  findings: data.findings.map((f) => ({ ...f })),
+  quickStats: { ...data.quickStats },
+  foundation: data.foundation ?? null,
+  methodology: METHODOLOGY,
+  dataSources: data.dataSources ?? [],
+});
