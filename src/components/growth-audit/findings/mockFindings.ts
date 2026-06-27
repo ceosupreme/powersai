@@ -1,5 +1,10 @@
-import { computePriorityScore } from './findingScales';
-import { FINDING_TYPE_TEMPLATES, type FindingType } from './findingTypes';
+// NOTE: Despite the legacy filename, this module no longer contains mock
+// fixtures. The MOCK_FINDINGS array was removed when the Growth Audit was
+// wired end-to-end to real per-venue `growth_findings` rows. It now only
+// exports shared Finding-shape types + CATEGORY_LABEL. File kept named
+// `mockFindings.ts` to avoid a churn-only rename across ~20 importers.
+
+import type { FindingType } from './findingTypes';
 
 export type { FindingType } from './findingTypes';
 
@@ -53,32 +58,6 @@ export type Finding = {
   signalKey?: string | null;
   metadata?: Record<string, unknown>;
 };
-
-/**
- * Mock-finding factory.
- * - `category` defaults to the type's template category.
- * - `isTrafficDriving` defaults to the type's `defaultTrafficDriving`.
- *   Only override on a fixture when there is a concrete reason — otherwise
- *   we'd silently create type/flag mismatches.
- */
-type MkInput =
-  Omit<Finding, 'priorityScore' | 'category' | 'isTrafficDriving'>
-  & { category?: FindingCategoryKey; isTrafficDriving?: boolean };
-
-const mk = (base: MkInput): Finding => {
-  const tmpl = FINDING_TYPE_TEMPLATES[base.type];
-  return {
-    ...base,
-    category: base.category ?? tmpl.category,
-    isTrafficDriving: base.isTrafficDriving ?? tmpl.defaultTrafficDriving,
-    priorityScore: computePriorityScore(
-      base.revenueUpside, base.ease, base.confidence, base.operationalRisk,
-    ),
-  };
-};
-
-// ===== One mock finding per canonical type (10 total) =====
-export const MOCK_FINDINGS: Finding[] = [
   // 1. Soft Shift Opportunity — generic mid-week demand window
   mk({
     id: 'f1',
