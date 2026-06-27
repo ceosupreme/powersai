@@ -433,6 +433,13 @@ export function derivePrimaryMetrics(
   findings: Finding[],
   cats: CategoryScore[],
   lastRunIso: string | null | undefined,
+  sourcePresence?: {
+    gbp?: unknown | null;
+    reputation?: unknown | null;
+    website?: unknown | null;
+    mapPack?: unknown | null;
+    aiSearch?: unknown | null;
+  },
 ): PrimaryMetrics {
   // Ops Readiness Gate is currently neutralized — empty reason is the inert
   // sentinel that the UI uses to hide the tile/banner and that
@@ -448,13 +455,34 @@ export function derivePrimaryMetrics(
   const oppLvl = opportunityLevel(totalUpside);
   const growth = deriveGrowthScore(cats);
 
+  // Real data-confidence: count which of the 5 source signals returned data
+  // for this venue. Maps 0→Unavailable, 1-2→Limited, 3-4→Partial, 5→Complete.
+  let connected = 0;
+  let confidenceNote = 'Connection coverage shown in the Data Sources panel.';
+  let confidence: DataConfidence = 'Unavailable';
+  if (sourcePresence) {
+    const sigs = [
+      sourcePresence.gbp,
+      sourcePresence.reputation,
+      sourcePresence.website,
+      sourcePresence.mapPack,
+      sourcePresence.aiSearch,
+    ];
+    connected = sigs.reduce((s: number, v) => s + (v ? 1 : 0), 0);
+    confidence =
+      connected === 0 ? 'Unavailable' :
+      connected <= 2 ? 'Limited' :
+      connected <= 4 ? 'Partial' : 'Complete';
+    confidenceNote = `${connected} of 5 data sources connected`;
+  }
+
   return {
     growthScore: growth,
     growthTrend: 0,
     opportunityLevel: oppLvl,
     opportunityDollars: opportunityDollars(oppLvl),
-    dataConfidence: 'Partial',
-    dataConfidenceNote: 'Connection coverage shown in the Data Sources panel.',
+    dataConfidence: confidence,
+    dataConfidenceNote: confidenceNote,
     readiness: gate,
     readinessReason: reason,
     lastRunLabel: formatLastRun(lastRunIso),
