@@ -9,6 +9,7 @@ import { CATEGORY_LABEL, type FindingCategoryKey } from '../findings/mockFinding
 import type { ReportConfig, ReportType } from './types';
 
 const TYPE_OPTIONS: { value: ReportType; label: string; desc: string }[] = [
+  { value: 'profit_leak', label: 'Profit Leak Snapshot', desc: 'One-page snapshot for a live prospect walkthrough.' },
   { value: 'full', label: 'Full Report', desc: 'All 8 categories with full detail (~12 pages)' },
   { value: 'executive', label: 'Executive Summary', desc: 'Top findings + 30/60/90 plan (~3 pages)' },
   { value: 'category', label: 'Single Category Deep Dive', desc: 'One category, comprehensive' },
@@ -35,7 +36,7 @@ export const ReportBuilderDialog = ({
   onGenerate: (cfg: ReportConfig) => void;
   defaultVenueName: string;
 }) => {
-  const [type, setType] = useState<ReportType>('full');
+  const [type, setType] = useState<ReportType>('profit_leak');
   const [cats, setCats] = useState<FindingCategoryKey[]>(ALL_CATS);
   const [singleCat, setSingleCat] = useState<FindingCategoryKey>('revenue');
   const [start, setStart] = useState(daysAgoPT(30));
@@ -50,6 +51,7 @@ export const ReportBuilderDialog = ({
   const submit = () => {
     let categories: FindingCategoryKey[];
     if (type === 'full') categories = ALL_CATS;
+    else if (type === 'profit_leak') categories = [];
     else if (type === 'executive') categories = [];
     else if (type === 'category') categories = [singleCat];
     else categories = cats;

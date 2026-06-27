@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Sparkles, ArrowDown, ArrowRight, ArrowUp, Flag, Calendar, Database, ShieldAlert } from 'lucide-react';
+import { Sparkles, ArrowDown, ArrowRight, ArrowUp, Flag, Calendar, Database, ShieldAlert, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { confidenceTone, getScoreBand, readinessTone, severityTone } from '../scoreBands';
 import { CATEGORY_LABEL, type FindingCategoryKey } from '../findings/mockFindings';
 import type { ReportSnapshot } from './types';
@@ -18,40 +18,47 @@ const TrendChip = ({ n }: { n: number }) => {
 };
 
 const ReportTypeLabel: Record<ReportSnapshot['config']['type'], string> = {
+  profit_leak: 'Profit Leak Audit',
   full: 'Full Report',
   executive: 'Executive Summary',
   category: 'Category Deep Dive',
   custom: 'Custom Report',
 };
 
-// ───────────────────── Cover ─────────────────────
-const Cover = ({ snap }: { snap: ReportSnapshot }) => (
-  <section className="report-avoid-break relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-card p-10 min-h-[60vh] flex flex-col justify-between">
-    <div className="flex items-center gap-3">
-      <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-600">
-        <Sparkles className="w-6 h-6" />
+// ───────────────────── Cover (shared, upgraded report-surface treatment) ─
+const Cover = ({ snap }: { snap: ReportSnapshot }) => {
+  const label = ReportTypeLabel[snap.config.type];
+  const brandLine = snap.config.type === 'profit_leak'
+    ? 'Supreme Team Media · Profit Leak Audit'
+    : 'Supreme Team Media · Growth Audit';
+  return (
+    <section className="report-avoid-break relative overflow-hidden rounded-md report-card p-12 min-h-[58vh] flex flex-col justify-between">
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-md" style={{ background: 'hsl(var(--report-accent-soft))', color: 'hsl(var(--report-accent))' }}>
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <div className="report-eyebrow">{brandLine}</div>
       </div>
-      <div className="text-sm font-semibold tracking-wide text-foreground">Supreme Team Media · Growth Audit</div>
-    </div>
 
-    <div className="space-y-4">
-      <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 bg-emerald-500/10">
-        {ReportTypeLabel[snap.config.type]}
-      </Badge>
-      <h1 className="text-5xl font-bold tracking-tight text-foreground">{snap.config.venueName}</h1>
-      <p className="text-lg text-muted-foreground">
-        Growth Audit · {fmtDate(snap.config.dateRange.start)} – {fmtDate(snap.config.dateRange.end)}
-      </p>
-      {snap.config.preparedFor && (
-        <p className="text-sm text-muted-foreground">Prepared for <span className="text-foreground font-medium">{snap.config.preparedFor}</span></p>
-      )}
-    </div>
+      <div className="space-y-5">
+        <div className="report-eyebrow report-accent-text">{label}</div>
+        <h1 className="report-display text-6xl">{snap.config.venueName}</h1>
+        <p className="text-base report-ink-muted">
+          {fmtDate(snap.config.dateRange.start)} – {fmtDate(snap.config.dateRange.end)}
+        </p>
+        {snap.config.preparedFor && (
+          <p className="text-sm report-ink-muted">
+            Prepared for <span className="font-medium" style={{ color: 'hsl(var(--report-ink))' }}>{snap.config.preparedFor}</span>
+          </p>
+        )}
+      </div>
 
-    <div className="text-xs text-muted-foreground border-t border-border/50 pt-4">
-      Generated {fmtDate(snap.generatedAt)} · Snapshot {snap.id}
-    </div>
-  </section>
-);
+      <div className="text-[11px] report-ink-muted border-t report-rule pt-4">
+        Generated {fmtDate(snap.generatedAt)} · Snapshot {snap.id}
+      </div>
+    </section>
+  );
+};
 
 // ───────────────────── Executive Summary ─────────────────────
 const ExecSummary = ({ snap }: { snap: ReportSnapshot }) => {
@@ -292,6 +299,7 @@ const Appendix = ({ snap }: { snap: ReportSnapshot }) => (
 
 // ───────────────────── Renderer ─────────────────────
 export const ReportRenderer = ({ snap }: { snap: ReportSnapshot }) => {
+  if (snap.config.type === 'profit_leak') return <ProfitLeakReport snap={snap} />;
   const cats = snap.config.type === 'executive' ? [] : snap.config.categories;
   return (
     <div className="report-print-root space-y-10">
@@ -305,3 +313,191 @@ export const ReportRenderer = ({ snap }: { snap: ReportSnapshot }) => {
     </div>
   );
 };
+
+// ═════════════════════ Profit Leak Snapshot ═════════════════════
+
+const UpsideLabel: Record<number, string> = {
+  5: 'Very high upside',
+  4: 'High upside',
+  3: 'Moderate upside',
+  2: 'Modest upside',
+  1: 'Low upside',
+};
+
+const UpsideDots = ({ n }: { n: number }) => (
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map(i => (
+      <span
+        key={i}
+        className="w-1.5 h-4 rounded-sm"
+        style={{ background: i <= n ? 'hsl(var(--report-accent))' : 'hsl(var(--report-rule))' }}
+      />
+    ))}
+  </div>
+);
+
+const LeakCard = ({ rank, f }: { rank: number; f: ReportSnapshot['findings'][number] }) => {
+  const sevClass = `report-sev-${f.severity}`;
+  const hasDiag = !!f.diagnosis && f.diagnosis.trim().length > 0;
+  const hasFix = !!f.recommendedAction && f.recommendedAction.trim().length > 0;
+  return (
+    <article className="report-card report-avoid-break p-6 flex gap-5">
+      <div className={`report-sev-bar ${sevClass}`} />
+      <div className="flex-1 min-w-0 space-y-4">
+        <header className="flex items-start gap-4">
+          <div className="report-display text-3xl report-ink-muted w-10 shrink-0">{String(rank).padStart(2, '0')}</div>
+          <div className="flex-1 min-w-0">
+            <div className="report-eyebrow mb-1">{CATEGORY_LABEL[f.category]} · {f.severity} severity</div>
+            <h3 className="report-display text-2xl leading-tight">{f.title}</h3>
+          </div>
+          <div className="text-right shrink-0">
+            <UpsideDots n={f.revenueUpside} />
+            <div className="text-[10px] report-ink-muted mt-1 uppercase tracking-wider">{UpsideLabel[f.revenueUpside]}</div>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+          <div>
+            <div className="report-eyebrow report-alert-text mb-1.5 flex items-center gap-1.5">
+              <AlertTriangle className="w-3 h-3" /> The leak
+            </div>
+            {hasDiag ? (
+              <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--report-ink))' }}>{f.diagnosis}</p>
+            ) : (
+              <p className="text-sm italic report-ink-muted">No diagnosis available yet for this finding.</p>
+            )}
+          </div>
+          <div>
+            <div className="report-eyebrow report-accent-text mb-1.5 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3 h-3" /> The fix
+            </div>
+            {hasFix ? (
+              <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--report-ink))' }}>{f.recommendedAction}</p>
+            ) : (
+              <p className="text-sm italic report-ink-muted">No recommended action available yet for this finding.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const Headline = ({ snap }: { snap: ReportSnapshot }) => {
+  const band = getScoreBand(snap.primary.growthScore ?? 0);
+  const hasScore = typeof snap.primary.growthScore === 'number';
+  const hasOpp = !!snap.primary.opportunityDollars && snap.primary.opportunityDollars.trim().length > 0;
+  return (
+    <section className="report-avoid-break grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="report-card p-8">
+        <div className="report-eyebrow">Growth Score</div>
+        <div className="mt-3 flex items-baseline gap-3">
+          <div className="report-display text-7xl report-accent-text">{hasScore ? snap.primary.growthScore : '—'}</div>
+          <div className="report-display text-2xl report-ink-muted">/100</div>
+        </div>
+        <div className="mt-3 text-sm report-ink-muted">
+          {hasScore ? <>Band: <span className={band.text}>{band.label}</span></> : 'No audit data yet'}
+        </div>
+      </div>
+      <div className="report-card p-8" style={{ background: 'hsl(var(--report-accent-soft))' }}>
+        <div className="report-eyebrow report-accent-text">Revenue Opportunity / month</div>
+        <div className="mt-3 report-money text-7xl">{hasOpp ? snap.primary.opportunityDollars : '—'}</div>
+        <div className="mt-3 text-sm" style={{ color: 'hsl(var(--report-ink))' }}>
+          {hasOpp ? `${snap.primary.opportunityLevel} potential, recoverable through the leaks below.` : 'Run the audit to estimate recoverable monthly revenue.'}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const TopLeaks = ({ snap }: { snap: ReportSnapshot }) => {
+  const top5 = [...snap.findings].sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 5);
+  return (
+    <section className="report-page-break space-y-5">
+      <header className="space-y-1">
+        <div className="report-eyebrow">The top five profit leaks</div>
+        <h2 className="report-display text-4xl">Where the money is leaving the business</h2>
+      </header>
+      {top5.length === 0 ? (
+        <div className="report-card p-8 text-center">
+          <p className="text-sm italic report-ink-muted">
+            No active findings yet for this venue. Run the audit (Overview → Refresh Now) to populate this section.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {top5.map((f, i) => <LeakCard key={f.id} rank={i + 1} f={f} />)}
+        </div>
+      )}
+    </section>
+  );
+};
+
+const FoundationTile = ({ snap }: { snap: ReportSnapshot }) => {
+  const f = snap.foundation;
+  return (
+    <section className="report-avoid-break space-y-4">
+      <header className="space-y-1">
+        <div className="report-eyebrow">Foundation readiness</div>
+        <h2 className="report-display text-3xl">Can the business absorb the fixes?</h2>
+      </header>
+      {!f ? (
+        <div className="report-card p-8">
+          <p className="text-sm italic report-ink-muted">
+            No Foundation Audit run yet for this venue.
+          </p>
+        </div>
+      ) : (
+        <div className="report-card p-7 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <div className="report-eyebrow">Readiness</div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <div className="report-display text-5xl report-accent-text">{f.overall ?? '—'}</div>
+              <div className="report-display text-xl report-ink-muted">/100</div>
+            </div>
+            <div className="mt-3 h-1.5 rounded-full" style={{ background: 'hsl(var(--report-rule))' }}>
+              <div className="h-full rounded-full" style={{ width: `${f.overall ?? 0}%`, background: 'hsl(var(--report-accent))' }} />
+            </div>
+            <div className="mt-3 flex gap-2 text-[11px]">
+              <span className="px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--report-accent-soft))', color: 'hsl(var(--report-accent))' }}>
+                {f.totals.satisfied} satisfied
+              </span>
+              <span className="px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--report-alert-soft))', color: 'hsl(var(--report-alert))' }}>
+                {f.totals.missing} missing
+              </span>
+            </div>
+          </div>
+          <div className="md:col-span-2">
+            <div className="report-eyebrow mb-2">Top 3 recommended fixes</div>
+            {f.recommendedActions.length === 0 ? (
+              <p className="text-sm italic report-ink-muted">No outstanding foundation gaps — solid base to build on.</p>
+            ) : (
+              <ol className="space-y-2.5">
+                {f.recommendedActions.slice(0, 3).map((it, i) => (
+                  <li key={it.item_key} className="flex items-start gap-3 text-sm">
+                    <span className="report-display text-lg report-ink-muted w-5 shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium" style={{ color: 'hsl(var(--report-ink))' }}>{it.label}</div>
+                      <div className="text-[11px] report-ink-muted mt-0.5">{it.category_key}</div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
+const ProfitLeakReport = ({ snap }: { snap: ReportSnapshot }) => (
+  <div className="report-print-root report-surface px-6 md:px-12 py-10 space-y-12">
+    <div className="max-w-5xl mx-auto space-y-12">
+      <Cover snap={snap} />
+      <Headline snap={snap} />
+      <TopLeaks snap={snap} />
+      <FoundationTile snap={snap} />
+    </div>
+  </div>
+);

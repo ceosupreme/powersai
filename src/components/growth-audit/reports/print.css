@@ -41,4 +41,55 @@
   .shadow-sm, .shadow, .shadow-md, .shadow-lg {
     box-shadow: none !important;
   }
+  /* Profit Leak surface — force the warm-bone palette through to paper. */
+  .report-surface {
+    background: hsl(var(--report-bg)) !important;
+    color: hsl(var(--report-ink)) !important;
+  }
 }
+
+/* ── Profit Leak Snapshot surface (screen + print) ─────────────────────── */
+.report-surface {
+  background: hsl(var(--report-bg));
+  color: hsl(var(--report-ink));
+  font-feature-settings: "ss01", "cv11";
+}
+.report-surface .report-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: hsl(var(--report-ink-muted));
+}
+.report-surface .report-display {
+  font-family: 'DM Serif Display', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: hsl(var(--report-ink));
+}
+.report-surface .report-money {
+  font-family: 'DM Serif Display', serif;
+  color: hsl(var(--report-accent));
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.report-surface .report-card {
+  background: #fff;
+  border: 1px solid hsl(var(--report-rule));
+  border-radius: 6px;
+}
+.report-surface .report-rule {
+  border-color: hsl(var(--report-rule));
+}
+.report-surface .report-accent-text { color: hsl(var(--report-accent)); }
+.report-surface .report-alert-text { color: hsl(var(--report-alert)); }
+.report-surface .report-ink-muted { color: hsl(var(--report-ink-muted)); }
+.report-surface .report-sev-bar {
+  width: 4px;
+  border-radius: 2px;
+  align-self: stretch;
+}
+.report-surface .report-sev-Critical, .report-surface .report-sev-High { background: hsl(var(--report-alert)); }
+.report-surface .report-sev-Medium { background: hsl(38 92% 45%); }
+.report-surface .report-sev-Low { background: hsl(var(--report-accent)); }

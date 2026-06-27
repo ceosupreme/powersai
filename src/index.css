@@ -152,6 +152,20 @@
     --sidebar-border: 217 33% 22%;
     --sidebar-ring: 187 100% 42%;
   }
+
+  /* Profit Leak Snapshot — prospect-facing report surface.
+     Additive tokens used ONLY by `.report-surface`. Light/dark agnostic so
+     the printed/exported PDF reads the same regardless of operator theme. */
+  :root, .dark {
+    --report-bg: 39 30% 95%;        /* warm bone */
+    --report-ink: 220 25% 9%;       /* near-black ink */
+    --report-ink-muted: 220 14% 38%;
+    --report-accent: 162 60% 22%;   /* deep jewel green */
+    --report-accent-soft: 162 35% 92%;
+    --report-alert: 14 78% 48%;     /* rust */
+    --report-alert-soft: 14 70% 95%;
+    --report-rule: 30 18% 82%;
+  }
 }
 
 @layer base {
