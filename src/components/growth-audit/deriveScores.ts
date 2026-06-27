@@ -468,7 +468,7 @@ export function derivePrimaryMetrics(
       sourcePresence.mapPack,
       sourcePresence.aiSearch,
     ];
-    connected = sigs.reduce((s: number, v) => s + (v ? 1 : 0), 0);
+    connected = sigs.reduce<number>((s, v) => s + (v ? 1 : 0), 0);
     confidence =
       connected === 0 ? 'Unavailable' :
       connected <= 2 ? 'Limited' :
