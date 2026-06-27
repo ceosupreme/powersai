@@ -1,5 +1,6 @@
 import type { CategoryScore, PrimaryMetrics, Priority, QuickStats } from '../mockData';
 import type { Finding, FindingCategoryKey } from '../findings/mockFindings';
+import type { FoundationScoreResult } from '@/components/foundation-audit/deriveFoundationScores';
 
 export type ReportType = 'full' | 'executive' | 'category' | 'custom';
 
@@ -23,6 +24,8 @@ export type ReportSnapshot = {
   priorities: Priority[];
   findings: Finding[];
   quickStats: QuickStats;
+  /** Per-venue Foundation Audit result captured at generation time. */
+  foundation?: FoundationScoreResult | null;
   /** Static methodology + data sources captured at generation time */
   methodology: string[];
   dataSources: { label: string; status: 'Connected' | 'Partial' | 'Not connected' }[];

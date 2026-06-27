@@ -19,6 +19,7 @@ export function useFindings(venueId: string | null | undefined) {
         .from('growth_findings')
         .select('*')
         .eq('venue_id', venueId!)
+        .not('signal_key', 'like', 'seed:%')
         .order('priority_score', { ascending: false });
       if (error) throw error;
       return (data as GrowthFindingRow[]).map(dbFindingToFinding);

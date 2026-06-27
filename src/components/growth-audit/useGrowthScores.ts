@@ -74,7 +74,9 @@ export function useGrowthScores(venueId: string | null | undefined): GrowthScore
     const cats = deriveCategoryScores(list, gbpSnap, rep, web, mp, ai);
     return {
       categories: cats,
-      primary: derivePrimaryMetrics(list, cats, lastRunAt),
+      primary: derivePrimaryMetrics(list, cats, lastRunAt, {
+        gbp: gbpSnap, reputation: rep, website: web, mapPack: mp, aiSearch: ai,
+      }),
       priorities: deriveTopPriorities(list),
       quickStats: deriveQuickStats(list),
     };

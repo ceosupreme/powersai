@@ -7,6 +7,11 @@ import { ReportBuilderDialog } from './ReportBuilderDialog';
 import { ReportRenderer } from './ReportRenderer';
 import { captureSnapshot } from './snapshot';
 import type { ReportConfig, ReportSnapshot } from './types';
+import { useApp } from '@/context/AppContext';
+import { useGrowthScores } from '../useGrowthScores';
+import { useFindings } from '../findings/useFindings';
+import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
+import { useToast } from '@/hooks/use-toast';
 
 const DEMO_RECENTS: { id: string; type: string; venue: string; date: string }[] = [
   { id: 'demo-1', type: 'Full Report', venue: 'The Local Tavern', date: 'May 6, 2026' },
@@ -15,11 +20,28 @@ const DEMO_RECENTS: { id: string; type: string; venue: string; date: string }[] 
 ];
 
 export const ReportsView = () => {
+  const { selectedBar } = useApp();
+  const venueId = selectedBar?.id ?? null;
+  const { toast } = useToast();
+  const scores = useGrowthScores(venueId);
+  const allFindings = useFindings(venueId);
+  const foundation = useFoundationScores(venueId);
   const [builderOpen, setBuilderOpen] = useState(false);
   const [snapshot, setSnapshot] = useState<ReportSnapshot | null>(null);
 
   const handleGenerate = (cfg: ReportConfig) => {
-    setSnapshot(captureSnapshot(cfg));
+    if (!venueId) {
+      toast({ title: 'Select a project first', description: 'Pick a project in the header before generating a report.', variant: 'destructive' });
+      return;
+    }
+    setSnapshot(captureSnapshot(cfg, {
+      primary: scores.primary,
+      categories: scores.categories,
+      priorities: scores.priorities,
+      quickStats: scores.quickStats,
+      findings: allFindings.data ?? [],
+      foundation: foundation.result,
+    }));
     setBuilderOpen(false);
   };
 
@@ -56,7 +78,7 @@ export const ReportsView = () => {
               Capture a point-in-time snapshot of the Growth Audit — scores, findings, ops gate, and recommendations — formatted for owners, partners, or sales conversations.
             </p>
           </div>
-          <Button size="lg" onClick={() => setBuilderOpen(true)}>
+          <Button size="lg" onClick={() => setBuilderOpen(true)} disabled={!venueId}>
             <Plus className="w-4 h-4 mr-1" />Generate Report
           </Button>
         </div>
@@ -94,7 +116,7 @@ export const ReportsView = () => {
         open={builderOpen}
         onOpenChange={setBuilderOpen}
         onGenerate={handleGenerate}
-        defaultVenueName="The Local Tavern"
+        defaultVenueName={selectedBar?.bar_name ?? ''}
       />
     </div>
   );

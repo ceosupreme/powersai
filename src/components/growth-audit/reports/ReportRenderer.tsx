@@ -69,7 +69,7 @@ const ExecSummary = ({ snap }: { snap: ReportSnapshot }) => {
       <div className="grid grid-cols-4 gap-4 report-avoid-break">
         <Card className={`p-4 border ${band.border}`}>
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Growth Score</div>
-          <div className={`mt-1 text-4xl font-bold ${band.text}`}>{snap.primary.growthScore}</div>
+          <div className={`mt-1 text-4xl font-bold ${band.text}`}>{snap.primary.growthScore ?? '—'}</div>
           <div className="mt-1 text-xs text-muted-foreground">{band.label} · <TrendChip n={snap.primary.growthTrend} /> vs last audit</div>
         </Card>
         <Card className="p-4">
@@ -93,6 +93,11 @@ const ExecSummary = ({ snap }: { snap: ReportSnapshot }) => {
 
       <div className="report-avoid-break">
         <h3 className="text-sm font-semibold text-foreground mb-2">Top 5 Findings</h3>
+        {top5.length === 0 ? (
+          <Card className="p-4 text-sm text-muted-foreground italic">
+            No findings detected yet — run the audit (Overview → Refresh Now) to populate this report.
+          </Card>
+        ) : (
         <div className="space-y-2">
           {top5.map((f, i) => (
             <Card key={f.id} className="p-3 flex items-start gap-3">
@@ -107,6 +112,7 @@ const ExecSummary = ({ snap }: { snap: ReportSnapshot }) => {
             </Card>
           ))}
         </div>
+        )}
       </div>
     </section>
   );
@@ -134,7 +140,7 @@ const CategorySection = ({ snap, catKey }: { snap: ReportSnapshot; catKey: Findi
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="outline" className={confidenceTone(cat.confidence)}>{cat.confidence}</Badge>
-          <div className={`text-3xl font-bold ${band.text}`}>{cat.score}</div>
+          <div className={`text-3xl font-bold ${band.text}`}>{cat.score ?? '—'}</div>
           <TrendChip n={cat.trend} />
         </div>
       </header>
@@ -142,7 +148,7 @@ const CategorySection = ({ snap, catKey }: { snap: ReportSnapshot; catKey: Findi
       {/* Score bar */}
       <div className="report-avoid-break">
         <div className="h-2 rounded-full bg-muted overflow-hidden">
-          <div className={`h-full ${band.bg.replace('/15', '')}`} style={{ width: `${cat.score}%` }} />
+          <div className={`h-full ${band.bg.replace('/15', '')}`} style={{ width: `${cat.score ?? 0}%` }} />
         </div>
         <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
           <span>0</span><span>40 Weak</span><span>60 Moderate</span><span>80 Strong</span><span>100</span>

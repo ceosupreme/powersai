@@ -1,6 +1,5 @@
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { Sparkles, LayoutGrid, ListChecks, Lightbulb, Inbox, FileBarChart, History, Database, CalendarRange } from 'lucide-react';
 import { OverviewView } from '@/components/growth-audit/OverviewView';
@@ -46,12 +45,7 @@ const GrowthAudit = () => {
           <Sparkles className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-foreground">Growth Audit</h1>
-            <Badge variant="outline" className="text-[10px] uppercase tracking-wide border-emerald-500/40 text-emerald-600">
-              Mock data
-            </Badge>
-          </div>
+          <h1 className="text-2xl font-bold text-foreground">Growth Audit</h1>
           <p className="text-muted-foreground text-sm">
             Find growth opportunities and turn them into ready-to-execute campaigns.
           </p>
