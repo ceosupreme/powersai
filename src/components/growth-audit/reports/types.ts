@@ -2,7 +2,7 @@ import type { CategoryScore, PrimaryMetrics, Priority, QuickStats } from '../moc
 import type { Finding, FindingCategoryKey } from '../findings/mockFindings';
 import type { FoundationScoreResult } from '@/components/foundation-audit/deriveFoundationScores';
 
-export type ReportType = 'full' | 'executive' | 'category' | 'custom';
+export type ReportType = 'profit_leak' | 'full' | 'executive' | 'category' | 'custom';
 
 export type ReportConfig = {
   type: ReportType;
