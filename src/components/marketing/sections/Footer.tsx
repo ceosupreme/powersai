@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Container, MonoLabel } from "@/components/marketing/site/primitives";
+import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
 
 const links = [
   { href: "#lead-followup", label: "Systems" },
@@ -8,10 +9,11 @@ const links = [
 ];
 
 export function Footer() {
+  const { data: landers = [] } = usePublishedVerticalLanders();
   return (
     <footer className="section-dark relative border-t-2 border-[hsl(var(--gold)/0.5)]">
       <Container className="py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           <div>
             <p className="font-display text-lg text-[hsl(var(--bone))]">Supreme Team Media</p>
             <MonoLabel className="mt-1 block text-[0.62rem]" style={{ color: "hsl(var(--gold))" }}>
@@ -28,6 +30,28 @@ export function Footer() {
             <Link to="/work" className="transition-colors hover:text-[hsl(var(--gold))]">Work</Link>
             <Link to="/auth" className="transition-colors hover:text-[hsl(var(--gold))]">Log in</Link>
           </nav>
+
+          {landers.length > 0 ? (
+            <div>
+              <MonoLabel className="mb-3 block text-[0.6rem]" style={{ color: "hsl(var(--gold))" }}>
+                For your industry
+              </MonoLabel>
+              <ul className="space-y-1.5 text-[0.82rem]">
+                {landers.map((l) => (
+                  <li key={l.slug}>
+                    <Link
+                      to={`/for/${l.slug}`}
+                      className="text-[hsl(var(--bone)/0.75)] transition-colors hover:text-[hsl(var(--gold))]"
+                    >
+                      {l.display_name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div aria-hidden />
+          )}
 
           <div className="text-sm md:text-right">
             <a href="mailto:hello@supremeteammedia.com" className="text-[hsl(var(--bone))] transition-colors hover:text-[hsl(var(--gold))]">

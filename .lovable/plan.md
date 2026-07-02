@@ -1,112 +1,107 @@
-# Homepage Visual Overhaul — Design System v2
 
-Restyle the public marketing homepage (`/`, rendered by `src/pages/MarketingSite.tsx`) end-to-end against the new bone/green/rust/gold token system. Style-level + additive; no route, schema, wiring, or copy changes outside the 5 surgical edits.
+# Vertical Landing Pages — /for/:slug
 
-## Scope confirmation
+Additive build. No changes to existing routes, RLS, or internal pages. Everything below layers on top of the live marketing design system.
 
-- **In scope:** `src/pages/MarketingSite.tsx` + every file under `src/components/marketing/**` (Nav, Hero, HeroTriage, TechStack, all `showcase/*`, ChatMarquee, Proof, ConnectiveLayer, WhatIBuild, Process, Industries, FAQ, FinalCTA, Contact, Footer, `site/primitives.tsx`, `site/Reveal.tsx`), plus token additions to `src/index.css`.
-- **Out of scope:** internal app pages, `/work`, `/q/:slug`, Growth Audit reports, auth pages, RLS, edge functions.
-- **Wiring preserved:** Quick Triage (`HeroTriage.tsx`) internal logic untouched; Contact form submit path untouched; all anchor IDs kept (`#top #lead-followup #ops-dashboard #assistant #automations #proof #contact`); routes untouched.
+## Part 1 — Schema (single migration)
 
-## Step 1 — Fonts + tokens (`src/index.css`)
+New table `public.vertical_landing_pages` with columns as specified in the brief:
 
-- Add Google Fonts `<link rel="preconnect">` + `@import` for Bricolage Grotesque (800/700/600), Instrument Serif (400 italic), Instrument Sans (400/500), IBM Plex Mono (400/500). `display=swap`. Keep existing font @import (used by rest of app) — additive.
-- Under the existing `.stm-marketing` scope, add v2 tokens as **new** custom properties (do not delete legacy ones — other marketing utilities read them):
-  - `--bone:#F7F4EC`, `--bone-2:#EFEAE0`, `--surface:#FCFBF7`
-  - `--ink:#15140F`, `--ink-soft:#57544A`
-  - `--green:#0E5236`, `--green-deep:#0A3B27`, `--green-tint:#E7EFE9`
-  - `--rust:#B5431E`, `--rust-tint:#F6E3DA`, `--rust-light:#E07A4F` (for dark-band alerts)
-  - `--gold:#C9A24B`, `--gold-tint:#F3EAD6`
-  - `--line:#E4DFD2`
-- Remap the shadcn tokens **only within `.stm-marketing`** so `bg-background`, `text-foreground`, `border-border`, `bg-accent`, `text-accent-foreground` resolve to the new palette (background→bone, foreground→ink, accent→green, border→line). This lets existing className usage in the sections inherit the new palette without a full component rewrite.
-- Add utility classes in `@layer components` under `.stm-marketing`:
-  - `.font-display` → Bricolage Grotesque 800; `.font-serif-accent` → Instrument Serif italic; `.font-body` → Instrument Sans; `.font-mono-label` → IBM Plex Mono 12px uppercase 0.14em.
-  - `.eyebrow` (redefine): mono 12px, gold, preceded by `::before` 24px×1px gold rule.
-  - `.card-lift` → surface bg, 1px line border, rounded-2xl, transition; hover translateY(-3px) + shadow-lg + gold border.
-  - `.mockup-frame` → green-deep bg, rounded-2xl, inner ring `rgba(201,162,75,.25)`, shadow-2xl, browser-chrome top bar (3 dots + mono label slot).
-  - `.mockup-chip` → `rgba(247,244,236,.10)` bg, bone text.
-  - `.grain` (update): SVG noise data URL, ~2.5% opacity, fixed, pointer-events:none.
-  - `.radial-gold` / `.radial-green` washes for hero + case-study bands.
-  - `.marquee` keyframes for 30s auto-scroll (pausable on hover), `@media (prefers-reduced-motion: reduce)` disables all motion utilities (`reveal`, `marquee`, `.count-up`).
+- Identity: `id uuid pk`, `slug text unique not null`, `display_name text not null`, `status text check in ('draft','published') default 'draft'`, `sort_order int default 0`
+- Link to type system: `project_type_id uuid null references public.project_types(id)` — when set, page appends up to 2 leak-vector cards from that type (via existing `project_type_leak_vectors` + override resolver already used by `useEffectiveLeakVectors`)
+- Hero: `headline`, `headline_accent_word`, `accent_color text check in ('rust','gold','green') default 'rust'`, `subline`, `stat_value`, `stat_label`
+- Body: `leaks jsonb` (array of `{title,line,dollar_note}`), `faq jsonb` (array of `{q,a}`), `proof_line`
+- CTAs: `cta_primary_label`, `cta_primary_url`, `cta_secondary_label null`, `cta_secondary_url null`
+- SEO: `meta_title`, `meta_description`, `og_image_url null`
+- Timestamps + `update_updated_at_column` trigger
 
-## Step 2 — Shared primitives (`site/primitives.tsx`, `site/Reveal.tsx`, new `site/Marquee.tsx`, new `site/CountUp.tsx`, new `site/MockupFrame.tsx`)
+GRANTs (must be in the same migration):
+- `GRANT SELECT ON public.vertical_landing_pages TO anon, authenticated;` (public read of published rows)
+- `GRANT ALL ON public.vertical_landing_pages TO authenticated, service_role;` (admin writes gated by RLS)
 
-- `Eyebrow`: rewrite to mono + gold rule per token spec.
-- `Panel`: repoint to `.card-lift`.
-- New `MockupFrame({ label, tilt, children })` — reusable dark inset for every product mockup (assistant chat, insights panel, lead follow-up, automation flow, "AFTER" panel). Renders browser chrome + mono label like `STM/LEADS.INBOX`.
-- New `Marquee` (CSS-only, respects reduced-motion) — used by TechStack + hero footer strip.
-- New `CountUp` — IntersectionObserver-triggered numeric animation for hero stat strip + case-study stats.
-- `Reveal` kept; verify it disables when `prefers-reduced-motion: reduce` (add guard).
+RLS (mirrors `portfolio_items` public-read-published pattern):
+- `enable row level security`
+- Policy `"Public can read published landers"` FOR SELECT USING `status = 'published'`
+- Policy `"Admins can read all"` FOR SELECT USING `has_role(auth.uid(),'admin')`
+- Policy `"Admins can write"` FOR ALL USING/CHECK `has_role(auth.uid(),'admin')`
 
-## Step 3 — Section-by-section restyle
+Seed the 5 rows verbatim from the brief (plumbing-hvac, auto, carpet-cleaning, moving-hauling, bars-restaurants), all `status='published'`, sort_order 10/20/30/40/50. Seeded via a follow-up insert call after the migration is approved.
 
-**Global (`MarketingSite.tsx`)**: add site-wide `<div className="grain" />` overlay. Root gets `bg-bone text-ink font-body`. Alternate section backgrounds bone / bone-2.
+## Part 2 — Route + Page
 
-**Nav** (`site/Nav.tsx`): sticky, `bg-bone/85 backdrop-blur`, 1px line bottom. Items `whitespace-nowrap`. Consolidate to: **Systems** (`#lead-followup`) · **Proof** (`#proof`) · **Process** (`#process`) · **FAQ** (`#faq`) · **Contact** (`#contact`) + Log in text link + green pill "Book a call". Wordmark stays; subtitle shrinks to mono 10px. Verify each anchor id exists in the target section; add `id` if missing (Process, FAQ) — additive only.
+`src/pages/VerticalLanding.tsx` mounted at `/for/:slug` in `src/App.tsx` (public — no auth guard, wrapped in the same `.stm-marketing` shell + `Nav` + `Footer` used by `MarketingSite.tsx`).
 
-**Hero** (`sections/Hero.tsx`): display type + serif-accent — wrap "slipping" in `<span className="font-serif-accent text-[color:var(--rust)] relative">` with an inline SVG hand-drawn underline (rust stroke). Copy edits:
-- CTA "Book a free AI systems audit" → **"Get your free Profit Leak Audit"**.
-- Subline: append **" And the revenue leaking between them — recovered."** after "…connected."
-- Secondary CTA → underlined text-link with sliding arrow.
-- **Add stat strip** below CTAs: mono, rust numerals, ink labels: "1 missed call/day ≈ $108K/yr · 63% of leads buy from the first responder · <5s reply time" + footnote "industry estimates — your audit uses your numbers". Numerals use `CountUp`.
+Data: React Query fetches the row by `slug` where `status='published'`. 404 → `<Navigate to="/404" />`. When `project_type_id` is set, a second query pulls up to 2 effective leak vectors via the existing resolver (skips silently on empty/error).
 
-**HeroTriage** (`sections/HeroTriage.tsx`): visual only — `.card-lift` (surface, gold ring), mono header "STM/TRIAGE" + pulsing gold LIVE dot, options as full-width rows with green hover, OK button green pill. All state/handler logic preserved.
+SEO: sets `<title>`, `<meta name="description">`, `og:title`, `og:description`, `og:image` (falls back to sitewide) via the same imperative pattern already in `MarketingSite.tsx` (no new dep).
 
-**TechStack** (`sections/TechStack.tsx`): replace "BUILT WITH" label + logo grid with a mono `Marquee`: **"WORKS WITH YOUR STACK — Toast · Square · QuickBooks · Google Workspace · Calendly · Twilio · HubSpot · 7shifts · + 200 more"**.
+### Sections (top to bottom, tokens identical to homepage)
 
-**LeadFollowUpShowcase / InsightsShowcase / ConnectiveLayer ("Always-on")**: light stages (bone or bone-2). Product mockups wrapped in `MockupFrame`. "Always-on" mini-cards → `.card-lift`, mono timestamps gold, icon chips in green-tint circles. **Fix invisible text A:** any text currently rendered as `text-foreground` on a formerly-dark background is now legible because the section bg flips to bone.
+a) **HERO** — bone bg with radial gold-tint wash, grain overlay. Mono gold eyebrow `[DISPLAY_NAME] · PROFIT LEAK RECOVERY`. H1 in Bricolage 800 with `headline_accent_word` swapped for `<span class="font-serif-accent" style="color:var(--{accent_color})">` + inline SVG underline stroke in the accent color. Subline in `--ink-soft`. Stat chip: rust mono, `stat_value` in Bricolage-800 rust, `stat_label` under it, footnote "estimated — your audit uses your numbers". Primary CTA green pill → `cta_primary_url` (with `?src=for-[slug]` appended, see Part 3). Secondary CTA rendered only when `cta_secondary_url` is non-null: underlined text-link with sliding arrow.
 
-**AssistantShowcase** ("Custom AI Assistants"): light stage; headline + bullets in ink; bullets get gold square markers; chat mockup stays green-deep as `MockupFrame` inset. **Fix invisible text B:** headline moves from dark bg → ink on bone.
+b) **HOW YOUR MONEY LEAKS** — bone-2. Three `.card-lift` cards from `leaks[]`: title Bricolage-600, line body, `dollar_note` in rust mono. Appends up to 2 additional cards from effective leak vectors when present (name → title, benchmark line → line, empty dollar_note styled as `—`); zero if absent.
 
-**ContentShowcase** ("Marketing copy that sounds like you wrote it."): light stage; headline in ink with **"you" set in Instrument Serif italic, color green**. **Fix invisible text C:** this headline currently reads bone-on-bone / accent-on-accent and is invisible — will be ink on bone with the italic green "you", explicitly verified after restyle.
+c) **HOW IT GETS PLUGGED** — bone. Four-step row DETECT / DOLLARIZE / ASSIGN / VERIFY, gold dotted connector between mono phase badges, one line each. Kicker below in `--ink-soft`: "Nothing replaced. A human approves every send."
 
-**AutomationsShowcase**: light stage. Flow nodes (Trigger/Enrich/Decide/Action/Notify) become `mockup-chip` (bone/10 bg, bone text) inside a `MockupFrame`; connectors gold; run log text bone at **full opacity** (audit and remove every `opacity-*`/`text-*-foreground/70` inside dark mockups); timestamps gold. **Fix invisible text D:** run-log lines currently rendered at `opacity-40`/`opacity-60` will be forced to full-opacity bone.
+d) **PROOF BAND** — `--green-deep` bg, grain, gold radial wash (dark moment, matches the case-study band on homepage). `proof_line` in bone, any figures matching `/\$[\d,]+\/mo|\$[\d,]+K?/` wrapped gold via a small tokenizer. Row of three gold checks: "In production · Multi-location · Source-cited". Text link "See the work →" to `/work` in gold with arrow slide.
 
-**WhatIBuild** ("AI Systems I Build" → Bento): restructure grid to 6 cols. Featured (span 3) = "AI Lead Follow-Up Systems" + "AI Operations Dashboards" — each gets a tiny inline dark mockup strip. Remaining four span 2/2/2/2 on next rows (last spans balance to 6). Icons in green-tint circles, category chips gold-outline mono. Content strings untouched.
+e) **FAQ** — bone. Reuses `components/ui/accordion` (already used by homepage FAQ) styled with hairline dividers + gold `+`/`−` glyphs, from `faq[]`.
 
-**Process**: horizontal scroll-snap row on mobile, 5-across desktop. Gold connector line through mono phase badges 01–05. Card hover lifts with gold border. Add `id="process"` for nav anchor.
+f) **FINAL CTA** — bone-2. H2 "Let me run the free audit." body "Real money leaking → we talk. Nothing → I tell you straight, and you've lost nothing." Primary CTA repeated (same `?src=` handling).
 
-**Industries** ("Who this is for"): chip pills gold-outline, hover fills gold-tint; headline gets display treatment.
+Motion: reuses existing `Reveal`. No new deps. `prefers-reduced-motion: reduce` respected via the guards already in `src/index.css` under `.stm-marketing`.
 
-**Proof** (BarPulse case study) — **dark band #1**: green-deep with grain + green radial wash, gold eyebrow "CASE STUDY", bone body text. **Add stats row** (three big Bricolage-800 count-ups):
-- **8** venues (gold)
-- **$10K/mo** engagement (rust-light `#E07A4F`)
-- **LIVE** in production (gold, pulsing)
-Serif-accent "production" in gold. Checkmarks gold. Tag pills bone/10. Placeholder "more case studies coming soon" cards → bone/5 dashed-border, mono "IN FLIGHT" gold.
+## Part 3 — Personalization param (?biz + ?src)
 
-**FAQ**: shadcn `Accordion` (already available in `components/ui/accordion.tsx`) — hairline dividers, mono gold +/– toggle glyphs, smooth height. Add `id="faq"`.
+Read `useSearchParams()` for `biz`. Sanitization (documented here as promised):
 
-**FinalCTA + Contact**: split layout. Left: display headline + three mono reassurance lines (gold dots) — "Reply within 24h" / "15-minute first call" / "No obligation, ever". Right: elevated `.card-lift` form card, inputs with 1px line borders + green focus rings, labels mono 11px, Send = full-width green pill with arrow slide. Form submit handler untouched.
+- Trim, collapse internal whitespace to single space
+- Strip all HTML tags via `/<[^>]*>/g`
+- Strip control chars and any char not in `[\p{L}\p{N}\s&'.\-]` (Unicode letters, numbers, and common business-name punctuation)
+- Cap at 40 chars post-strip; empty result → treat as absent
 
-**Footer** — **dark band #2**: green-deep, gold 1px top rule, bone text, mono micro-links, add small line "Powered by Supreme Team OS". Existing links + email preserved.
+When present + non-empty:
+- Gold mono eyebrow ABOVE the H1: `A NOTE FOR [BIZ]` (rendered via `{biz}`, escaped by React — no `dangerouslySetInnerHTML`)
+- Stat chip caption changes to `what this looks like for [BIZ]` (replaces the "estimated — your audit uses your numbers" footnote)
 
-**ChatMarquee**: already a marquee — restyle chips to bone/10 with bone text on green-deep or gold-outline on bone (whichever section it sits between); no logic changes.
+When absent: render nothing extra; footnote stays as spec'd.
 
-## Step 4 — "Dark screen, light stage" verification checklist
+`?src=for-[slug]` appended to every primary CTA URL (hero + final). Implementation: URL parse `cta_primary_url`; if relative (`/#contact`) rewrite to `/?src=for-[slug]#contact`; if absolute, append `?src=` or `&src=` depending on existing query. Fragment-only links become `/?src=for-[slug]#…`. Secondary CTA gets no `src` (per brief — primary only).
 
-Only these two sections remain full-width dark: **Proof (BarPulse case study)** and **Footer**. Every other formerly-dark section is now light with dark `MockupFrame` insets.
+## Part 4 — Homepage wiring
 
-## Step 5 — Invisible-text fixes (explicit)
+Chip-link mapping confirmed (only where the chip label sensibly maps to a published lander):
 
-Confirming the four locations listed in the brief:
+- "Local service businesses" → `/for/plumbing-hvac`
+- "Hospitality & restaurants" → `/for/bars-restaurants`
+- "Real estate", "Fitness", "Coaches & creators", "Multi-location operators" → remain static text (no matching lander in the 5 seeded rows)
 
-1. **ContentShowcase "Marketing copy that sounds like you wrote it."** — headline rendered near-invisible on current bg. Fix: light stage, ink headline, "you" italic green.
-2. **AssistantShowcase headline + bullets** — currently muted on dark. Fix: light stage, ink text, gold bullet markers.
-3. **AutomationsShowcase run-log + flow-node labels** — muted via `opacity-*` on dark. Fix: full-opacity bone inside `MockupFrame`, gold timestamps.
-4. **InsightsShowcase source-chip text** (and any other dark-bg copy currently at reduced opacity) — Fix: audit every `opacity-*`/`/60`/`/70`/`text-muted-foreground` inside dark mockups, replace with full-opacity bone or gold per role.
+Implemented in `src/components/marketing/sections/Industries.tsx` by promoting matched chips from `<span>` to `<Link>` with the same visual class list; hover state adds `--gold-tint` (unchanged).
 
-I'll grep every `marketing/**` file for `opacity-[0-9]` and `/[567]0` classes inside dark mockups during the build and remove them.
+Footer (`src/components/marketing/sections/Footer.tsx`): new small mono column "FOR YOUR INDUSTRY", rendered data-driven from a `useVerticalLanders()` hook that selects `slug, display_name` from published rows ordered by `sort_order`. Column added as a fourth cell in the grid (grid becomes `md:grid-cols-4`), mono-labeled, gold hover to match existing link styling. Empty list → column hidden.
 
-## Step 6 — Motion
+## Part 5 — Admin tab "Vertical Landers"
 
-Reuse existing `Reveal` (already IntersectionObserver-based) for fade-up stagger. Add: `CountUp` (IO), `Marquee` (pure CSS keyframes), button arrow slide (Tailwind `group-hover:translate-x-[3px]`), logo/tech marquee 30s loop pausable on hover. Every animation gated by `@media (prefers-reduced-motion: reduce)`.
+New tab added to `src/pages/Admin.tsx` following the existing Work/Portfolio tab pattern (`portfolio_items` admin surface is the reference). Contents:
 
-## Guardrails restated
+- List view: table of rows with `slug`, `display_name`, `status` pill, `sort_order`, actions (edit, publish/draft toggle, "View page" link → `/for/[slug]` in new tab), "New lander" button.
+- Editor dialog: fields for every column. `leaks` and `faq` rendered as repeatable row editors (add/remove/reorder) with per-row inputs (`title/line/dollar_note` and `q/a`). `project_type_id` as a select populated from `project_types`. `accent_color` as a segmented control (rust/gold/green). `status` as segmented (draft/published).
+- All writes gated by `has_role(auth.uid(),'admin')` via RLS — no extra client-side guard beyond the existing Admin route protection.
 
-- No new heavy deps (fonts via Google `<link>`; motion via existing Reveal + CSS + tiny IO hooks).
-- No wiring, route, schema, or logic changes.
-- Copy verbatim except the 5 surgical edits.
-- `tsgo --noEmit` must stay clean.
-- Only `.stm-marketing`-scoped CSS changes leave the marketing surface; app pages unaffected.
+## Part 6 — Files touched (all additive)
+
+- Migration: creates `vertical_landing_pages` + GRANTs + RLS + updated_at trigger
+- Data insert (separate call, after migration approval): 5 seeded rows verbatim
+- New: `src/pages/VerticalLanding.tsx`
+- New: `src/hooks/useVerticalLander.ts`, `src/hooks/useVerticalLanders.ts`
+- New: `src/components/marketing/vertical/*` — Hero, LeaksGrid, Plugged, ProofBand, FaqBlock, FinalCta section components (self-contained, reuse `.card-lift`, `MockupFrame` not needed here, `Reveal`, `Container`, `Eyebrow`, `LiveDot`)
+- Edited: `src/App.tsx` (add `/for/:slug` route)
+- Edited: `src/components/marketing/sections/Industries.tsx` (chip → Link for 2 mappings)
+- Edited: `src/components/marketing/sections/Footer.tsx` (add For Your Industry column)
+- Edited: `src/pages/Admin.tsx` + new admin components under `src/components/admin/vertical-landers/`
+
+## Out of scope
+
+Existing routes, RLS, marketing homepage design tokens, `/qualify/*`, `/q/:venueSlug`, `/work` — untouched.
 
 Awaiting approval to build.
