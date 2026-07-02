@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, HelpCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const OPTIONS = [
   { key: "A", label: "Recover missed leads", target: "#lead-followup" },
@@ -17,12 +17,13 @@ export function HeroTriage() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-7 md:p-8 shadow-[0_1px_0_rgba(0,0,0,0.02),0_24px_60px_-40px_rgba(20,20,15,0.25)]">
-      <div className="flex items-center gap-2">
-        <HelpCircle size={14} className="text-accent" />
-        <span className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Quick triage
-        </span>
+    <div className="card-lift relative overflow-hidden p-7 md:p-8" style={{ boxShadow: "0 0 0 1px hsl(var(--gold) / 0.35), 0 24px 60px -40px hsl(var(--ink) / 0.25)" }}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2 w-2 rounded-full bg-[hsl(var(--gold))] live-dot" />
+          <span className="font-mono-label" style={{ fontSize: "0.62rem", color: "hsl(var(--gold))" }}>stm/triage</span>
+        </div>
+        <span className="font-mono-label" style={{ fontSize: "0.6rem", color: "hsl(var(--ink-soft))" }}>live</span>
       </div>
 
       <h3 className="font-display mt-5 text-2xl leading-tight tracking-tight text-foreground md:text-[1.7rem]">
@@ -81,7 +82,7 @@ export function HeroTriage() {
         </a>
       </div>
 
-      <div className="mt-6 grid grid-cols-3 gap-2 border-t border-border pt-4">
+      <div className="mt-6 grid grid-cols-3 gap-2 border-t border-[hsl(var(--line))] pt-4">
         {[
           { k: "Tools", v: "200+" },
           { k: "Reply time", v: "<5s" },

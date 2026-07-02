@@ -13,14 +13,14 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section className="section-light relative border-t border-border py-20 md:py-28">
+    <section id="faq" className="relative border-t border-[hsl(var(--line))] bg-[hsl(var(--bone-2))] py-20 md:py-28">
       <Container className="max-w-4xl">
         <SectionHeading eyebrow="FAQ" title="The questions owners actually ask" />
-        <Accordion type="single" collapsible className="mt-10 divide-y divide-border border-y border-border">
+        <Accordion type="single" collapsible className="mt-10 divide-y divide-[hsl(var(--line))] border-y border-[hsl(var(--line))]">
           {faqs.map((f, i) => (
             <AccordionItem key={f.q} value={`item-${i}`} className="border-0">
-              <AccordionTrigger className="font-display py-5 text-left text-[1.1rem] text-foreground hover:no-underline">{f.q}</AccordionTrigger>
-              <AccordionContent className="pb-6 text-[0.98rem] leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+              <AccordionTrigger className="font-display py-5 text-left text-[1.15rem] text-foreground hover:no-underline [&[data-state=open]>svg]:text-[hsl(var(--gold))]">{f.q}</AccordionTrigger>
+              <AccordionContent className="pb-6 text-[0.98rem] leading-relaxed text-[hsl(var(--ink-soft))]">{f.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
