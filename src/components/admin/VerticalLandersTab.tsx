@@ -64,7 +64,7 @@ export const VerticalLandersTab = () => {
   const remove = useDeleteVerticalLander();
   const [editing, setEditing] = useState<Draft | null>(null);
 
-  const openNew = () => setEditing({ ...emptyDraft(), sort_order: (items.at(-1)?.sort_order ?? 0) + 10 });
+  const openNew = () => setEditing({ ...emptyDraft(), sort_order: (items[items.length - 1]?.sort_order ?? 0) + 10 });
   const openEdit = (it: VerticalLandingPage) => setEditing({
     ...it,
     leaks: Array.isArray(it.leaks) ? it.leaks : [],
