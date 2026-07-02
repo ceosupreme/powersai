@@ -10013,6 +10013,95 @@ export type Database = {
           },
         ]
       }
+      vertical_landing_pages: {
+        Row: {
+          accent_color: string
+          created_at: string
+          cta_primary_label: string
+          cta_primary_url: string
+          cta_secondary_label: string | null
+          cta_secondary_url: string | null
+          display_name: string
+          faq: Json
+          headline: string
+          headline_accent_word: string
+          id: string
+          leaks: Json
+          meta_description: string
+          meta_title: string
+          og_image_url: string | null
+          project_type_id: string | null
+          proof_line: string
+          slug: string
+          sort_order: number
+          stat_label: string
+          stat_value: string
+          status: string
+          subline: string
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string
+          created_at?: string
+          cta_primary_label: string
+          cta_primary_url: string
+          cta_secondary_label?: string | null
+          cta_secondary_url?: string | null
+          display_name: string
+          faq?: Json
+          headline: string
+          headline_accent_word: string
+          id?: string
+          leaks?: Json
+          meta_description: string
+          meta_title: string
+          og_image_url?: string | null
+          project_type_id?: string | null
+          proof_line: string
+          slug: string
+          sort_order?: number
+          stat_label: string
+          stat_value: string
+          status?: string
+          subline: string
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string
+          created_at?: string
+          cta_primary_label?: string
+          cta_primary_url?: string
+          cta_secondary_label?: string | null
+          cta_secondary_url?: string | null
+          display_name?: string
+          faq?: Json
+          headline?: string
+          headline_accent_word?: string
+          id?: string
+          leaks?: Json
+          meta_description?: string
+          meta_title?: string
+          og_image_url?: string | null
+          project_type_id?: string | null
+          proof_line?: string
+          slug?: string
+          sort_order?: number
+          stat_label?: string
+          stat_value?: string
+          status?: string
+          subline?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vertical_landing_pages_project_type_id_fkey"
+            columns: ["project_type_id"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       voice_notes: {
         Row: {
           bar_id: string
