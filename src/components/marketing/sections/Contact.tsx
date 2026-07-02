@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Container, Panel, SectionHeading } from "@/components/marketing/site/primitives";
+import { Container } from "@/components/marketing/site/primitives";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Your name is required").max(200),
@@ -61,25 +61,41 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="relative border-t border-border py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[300px] max-w-3xl glow-ember opacity-60 blur-3xl" aria-hidden />
-      <Container className="relative max-w-4xl">
-        <SectionHeading
-          eyebrow="Start the conversation"
-          title="See what this could be worth to your business"
-          sub="Share a bit about your operation. I'll follow up to set up a call and walk you through the smallest first step that would move your numbers."
-        />
+    <section id="contact" className="relative overflow-hidden border-t border-[hsl(var(--line))] py-24 md:py-32">
+      <div aria-hidden className="radial-gold pointer-events-none absolute inset-x-0 top-0 h-[300px]" />
+      <Container className="relative">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <span className="eyebrow">Start the conversation</span>
+            <h2 className="font-display mt-5 text-balance text-foreground" style={{ fontSize: "clamp(2rem,4.5vw,3.4rem)", lineHeight: 1.05 }}>
+              See what this could be worth to your business
+            </h2>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-[hsl(var(--ink-soft))] md:text-lg">
+              Share a bit about your operation. I&apos;ll follow up to set up a call and walk you through the smallest first step that would move your numbers.
+            </p>
+            <ul className="mt-8 space-y-3">
+              {["Reply within 24h", "15-minute first call", "No obligation, ever"].map((l) => (
+                <li key={l} className="flex items-center gap-3">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--gold))]" />
+                  <span className="font-mono-label" style={{ color: "hsl(var(--ink-soft))" }}>{l}</span>
+                </li>
+              ))}
+            </ul>
+            <a href="mailto:hello@supremeteammedia.com" className="mt-8 inline-flex items-center gap-2 text-sm text-[hsl(var(--ink-soft))] transition-colors hover:text-foreground">
+              <Mail size={14} /> hello@supremeteammedia.com
+            </a>
+          </div>
 
-        <Panel className="mt-12 p-7 md:p-10">
+          <div className="card-lift p-7 md:p-9">
           {status === "success" ? (
             <div className="flex flex-col items-start gap-4 py-6">
-              <span className="inline-flex items-center justify-center rounded-full border border-accent/30 bg-accent/10 p-3 text-accent">
+              <span className="inline-flex items-center justify-center rounded-full border border-[hsl(var(--green)/0.3)] bg-[hsl(var(--green)/0.1)] p-3 text-[hsl(var(--green))]">
                 <Check size={20} />
               </span>
               <h3 className="font-display text-2xl text-foreground">
                 Thanks — I&apos;ll review this and follow up to set up a call.
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[hsl(var(--ink-soft))]">
                 In the meantime, feel free to email me directly at{" "}
                 <a href="mailto:hello@supremeteammedia.com" className="text-foreground underline-offset-4 hover:underline">
                   hello@supremeteammedia.com
@@ -105,25 +121,21 @@ export function Contact() {
               <FieldTextarea label="What do you want to improve?" name="message" placeholder="A few sentences about your operation, your tools, and what's slowing you down." required />
 
               {error && (
-                <p className="text-sm text-accent-soft" role="alert">{error}</p>
+                <p className="text-sm text-[hsl(var(--rust))]" role="alert">{error}</p>
               )}
 
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-                <a href="mailto:hello@supremeteammedia.com" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                  <Mail size={14} /> hello@supremeteammedia.com
-                </a>
-                <button
-                  type="submit"
-                  disabled={status === "submitting"}
-                  className="inline-flex items-center gap-2 rounded-sm bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
-                >
-                  {status === "submitting" ? "Sending…" : "Send"}
-                  <ArrowRight size={14} />
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={status === "submitting"}
+                className="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[hsl(var(--green))] px-6 py-3.5 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
+              >
+                {status === "submitting" ? "Sending…" : "Send"}
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+              </button>
             </form>
           )}
-        </Panel>
+          </div>
+        </div>
       </Container>
     </section>
   );
@@ -132,9 +144,9 @@ export function Contact() {
 function Field({ label, name, type = "text", placeholder, required }: { label: string; name: string; type?: string; placeholder?: string; required?: boolean; }) {
   return (
     <label className="block">
-      <span className="text-[0.8rem] font-medium text-foreground/85">{label}</span>
+      <span className="font-mono-label" style={{ fontSize: "0.7rem", color: "hsl(var(--ink-soft))" }}>{label}</span>
       <input type={type} name={name} required={required} placeholder={placeholder} maxLength={255}
-        className="mt-2 w-full rounded-md border border-border bg-background/40 px-4 py-3 text-[0.95rem] text-foreground placeholder:text-muted-foreground/60 focus:border-accent/60 focus:outline-none focus:ring-1 focus:ring-accent/40" />
+        className="mt-2 w-full rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--bone))] px-4 py-3 text-[0.95rem] text-foreground placeholder:text-[hsl(var(--ink-soft)/0.5)] focus:border-[hsl(var(--green))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--green)/0.2)]" />
     </label>
   );
 }
@@ -142,9 +154,9 @@ function Field({ label, name, type = "text", placeholder, required }: { label: s
 function FieldTextarea({ label, name, placeholder, required }: { label: string; name: string; placeholder?: string; required?: boolean; }) {
   return (
     <label className="block">
-      <span className="text-[0.8rem] font-medium text-foreground/85">{label}</span>
+      <span className="font-mono-label" style={{ fontSize: "0.7rem", color: "hsl(var(--ink-soft))" }}>{label}</span>
       <textarea name={name} required={required} rows={5} maxLength={4000} placeholder={placeholder}
-        className="mt-2 w-full resize-y rounded-md border border-border bg-background/40 px-4 py-3 text-[0.95rem] text-foreground placeholder:text-muted-foreground/60 focus:border-accent/60 focus:outline-none focus:ring-1 focus:ring-accent/40" />
+        className="mt-2 w-full resize-y rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--bone))] px-4 py-3 text-[0.95rem] text-foreground placeholder:text-[hsl(var(--ink-soft)/0.5)] focus:border-[hsl(var(--green))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--green)/0.2)]" />
     </label>
   );
 }

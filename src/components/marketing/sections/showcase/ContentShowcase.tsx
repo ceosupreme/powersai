@@ -40,7 +40,7 @@ export function ContentShowcase() {
       reverse
       alt
       eyebrow="AI Content & Media"
-      title={<>Marketing copy that sounds like you wrote it.</>}
+      title={<>Marketing copy that sounds like <span className="font-serif-accent" style={{ color: "hsl(var(--green))" }}>you</span> wrote it.</>}
       sub="Trained on your tone, your offers, and your last 6 months of winning posts — your AI drafts on-brand promos, emails, and captions in seconds, ready for approval."
       bullets={[
         "Voice-matched to your brand",

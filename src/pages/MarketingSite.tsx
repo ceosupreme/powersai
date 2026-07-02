@@ -63,9 +63,10 @@ export default function Marketing() {
   if (!isLoading && user) return <Navigate to="/portfolio" replace />;
 
   return (
-    <div className="stm-marketing dark relative min-h-screen">
+    <div className="stm-marketing relative min-h-screen">
+      <div aria-hidden className="grain fixed inset-0 z-0" />
       <Nav />
-      <main>
+      <main className="relative z-10">
         <Hero />
         <TechStack />
         <LeadFollowUpShowcase />

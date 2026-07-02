@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 const links = [
-  { href: "#lead-followup", label: "Lead Follow-Up" },
-  { href: "#ops-dashboard", label: "Dashboard" },
-  { href: "#assistant", label: "Assistant" },
-  { href: "#automations", label: "Automations" },
+  { href: "#lead-followup", label: "Systems" },
   { href: "#proof", label: "Proof" },
+  { href: "#process", label: "Process" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -27,48 +26,42 @@ export function Nav() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
-          ? "border-b border-border bg-background/70 backdrop-blur-xl"
+          ? "border-b border-border bg-[hsl(var(--bone)/0.85)] backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-6 px-6 md:px-10">
-        <a href="#top" className="flex flex-col leading-tight">
-          <span className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+        <a href="#top" className="flex flex-col leading-tight whitespace-nowrap">
+          <span className="font-display text-base tracking-tight text-foreground md:text-lg">
             Supreme Team Media
           </span>
-          <span className="hidden text-[0.62rem] font-medium uppercase tracking-[0.16em] text-muted-foreground md:block">
-            AI Systems &amp; Operational Intelligence Studio
+          <span className="font-mono-label hidden md:block" style={{ fontSize: "10px" }}>
+            AI Systems Studio
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="whitespace-nowrap text-sm text-foreground/80 transition-colors hover:text-foreground"
             >
               {l.label}
             </a>
           ))}
-          <Link
-            to="/work"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Work
-          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
           <Link
             to="/auth"
-            className="hidden text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground md:inline-block"
+            className="hidden whitespace-nowrap text-sm text-foreground/70 transition-colors hover:text-foreground md:inline-block"
           >
             Log in
           </Link>
           <a
             href="#contact"
-            className="hidden items-center rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 md:inline-flex"
+            className="hidden items-center whitespace-nowrap rounded-full bg-[hsl(var(--green))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-lg md:inline-flex"
           >
             Book a call
           </a>

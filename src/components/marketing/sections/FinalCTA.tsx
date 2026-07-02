@@ -3,23 +3,24 @@ import { Container } from "@/components/marketing/site/primitives";
 
 export function FinalCTA() {
   return (
-    <section className="relative border-t border-border py-24 md:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[360px] max-w-4xl glow-ember opacity-70 blur-3xl" aria-hidden />
+    <section className="relative overflow-hidden border-t border-[hsl(var(--line))] bg-[hsl(var(--bone-2))] py-24 md:py-28">
+      <div className="radial-gold pointer-events-none absolute inset-x-0 top-0 mx-auto h-[360px] max-w-4xl" aria-hidden />
       <Container className="relative max-w-4xl text-center">
         <span className="eyebrow justify-center">Next step</span>
-        <h2 className="font-display mt-5 text-balance text-3xl leading-[1.05] tracking-tight text-foreground md:text-5xl">
+        <h2 className="font-display mt-5 text-balance text-foreground" style={{ fontSize: "clamp(2rem,5vw,3.75rem)", lineHeight: 1.05 }}>
           Find the first AI system your business should build.
         </h2>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[hsl(var(--ink-soft))] md:text-lg">
           A 30-minute call. We map your tools, your bottlenecks, and the single highest-leverage system to build first. No pitch, no obligation.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          {/* TODO: wire to external scheduler when ready. For now, scrolls to contact form. */}
-          <a href="#contact" className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground shadow-[0_0_30px_-8px_hsl(217_91%_60%/0.7)] transition-opacity hover:opacity-90">
-            Book a Free AI Systems Audit <ArrowRight size={14} />
+          <a href="#contact" className="group inline-flex items-center gap-2 rounded-full bg-[hsl(var(--green))] px-7 py-4 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-xl">
+            Get your free Profit Leak Audit
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </a>
-          <a href="#proof" className="inline-flex items-center gap-2 rounded-md border border-border-strong px-6 py-3.5 text-sm font-medium text-foreground transition-colors hover:bg-panel">
+          <a href="#proof" className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline decoration-[hsl(var(--gold))] decoration-2 underline-offset-8">
             See the BarPulse case study
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </a>
         </div>
       </Container>
