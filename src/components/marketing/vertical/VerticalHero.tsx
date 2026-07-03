@@ -80,8 +80,13 @@ export function VerticalHero({
               <div className="font-mono-label mt-2" style={{ color: "hsl(var(--ink))" }}>
                 {page.stat_label}
               </div>
-              <p className="mt-3 text-[0.7rem] italic text-[hsl(var(--ink-soft))]">
-                {biz ? `what this looks like for ${biz}` : "estimated — your audit uses your numbers"}
+              {biz && (
+                <p className="mt-3 text-[0.7rem] italic text-[hsl(var(--ink-soft))]">
+                  what this looks like for {biz}
+                </p>
+              )}
+              <p className="mt-1 text-[0.7rem] italic text-[hsl(var(--ink-soft))]">
+                estimated — your audit uses your numbers
               </p>
             </div>
           </Reveal>
