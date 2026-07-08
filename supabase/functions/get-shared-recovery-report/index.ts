@@ -60,10 +60,10 @@ Deno.serve(async (req) => {
   if (report.project_id) {
     const { data: venue } = await supabase
       .from('venues')
-      .select('bar_name')
+      .select('name')
       .eq('id', report.project_id)
       .maybeSingle();
-    if (venue?.bar_name) displayName = venue.bar_name;
+    if (venue?.name) displayName = venue.name;
   }
 
   const curated = {
