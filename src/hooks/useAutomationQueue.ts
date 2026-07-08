@@ -19,6 +19,9 @@ export interface QueueItem {
   scheduled_for: string | null;
   reject_reason: string | null;
   send_result: Record<string, unknown> | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  flagged_for_operator: boolean;
   created_at: string;
 }
 
@@ -26,6 +29,7 @@ export interface QueueFilters {
   projectId?: string | null;
   automationKey?: AutomationKey | null;
   status?: QueueStatus | null;
+  flaggedOnly?: boolean;
 }
 
 export function useAutomationQueue(filters: QueueFilters = {}) {
@@ -40,6 +44,7 @@ export function useAutomationQueue(filters: QueueFilters = {}) {
       if (filters.projectId) q = q.eq("project_id", filters.projectId);
       if (filters.automationKey) q = q.eq("automation_key", filters.automationKey);
       if (filters.status) q = q.eq("status", filters.status);
+      if (filters.flaggedOnly) q = q.eq("flagged_for_operator", true);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as QueueItem[];
@@ -54,11 +59,13 @@ export function useQueueMutations() {
 
   const approve = useMutation({
     mutationFn: async (input: { id: string; editedBody?: string | null }) => {
+      const { data: { user } } = await (supabase as any).auth.getUser();
       const { error } = await (supabase as any)
         .from("automation_message_queue")
         .update({
           status: "approved",
           approved_at: new Date().toISOString(),
+          approved_by: user?.id ?? null,
           edited_body: input.editedBody ?? null,
         })
         .eq("id", input.id);
@@ -69,10 +76,27 @@ export function useQueueMutations() {
 
   const reject = useMutation({
     mutationFn: async (input: { id: string; reason?: string }) => {
+      const { data: { user } } = await (supabase as any).auth.getUser();
       const { error } = await (supabase as any)
         .from("automation_message_queue")
-        .update({ status: "rejected", reject_reason: input.reason ?? null })
+        .update({
+          status: "rejected",
+          reject_reason: input.reason ?? null,
+          approved_by: user?.id ?? null,
+          approved_at: new Date().toISOString(),
+        })
         .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  const flag = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any)
+        .from("automation_message_queue")
+        .update({ flagged_for_operator: true })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -100,5 +124,5 @@ export function useQueueMutations() {
     onSuccess: invalidate,
   });
 
-  return { approve, reject, reschedule, sendNow };
+  return { approve, reject, reschedule, sendNow, flag };
 }
