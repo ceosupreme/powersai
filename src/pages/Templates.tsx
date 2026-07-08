@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -151,7 +151,7 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
   );
 
   // Reset values when the template changes
-  useMemo(() => {
+  useEffect(() => {
     setValues({});
   }, [template?.id]);
 
