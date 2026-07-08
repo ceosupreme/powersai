@@ -224,6 +224,11 @@ const App = () => {
                     <AppLayout><AutomationInbox /></AppLayout>
                   </ProtectedRoute>
                 } />
+                <Route path="/approvals" element={
+                  <ProtectedRoute allowedRoles={['client']} pageKey="client_approvals">
+                    <AppLayout><ClientApprovals /></AppLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/automations/reactivation" element={
                   <ProtectedRoute>
                     <AppLayout><ReactivationCampaigns /></AppLayout>
