@@ -34,6 +34,8 @@ export interface RecoveryReport {
   sent_at: string | null;
   generated_at: string;
   updated_at: string;
+  share_token: string | null;
+  share_referral_footer: boolean;
 }
 
 export function useRecoveryReports(projectId: string | null) {
@@ -95,5 +97,46 @@ export function useRecoveryReportMutations() {
     onSuccess: invalidate,
   });
 
-  return { saveNarrative, markReviewed, markSent };
+  const createShareLink = useMutation({
+    mutationFn: async ({ id, referralFooter }: { id: string; referralFooter: boolean }) => {
+      // 32 bytes -> 43-char base64url token.
+      const bytes = new Uint8Array(32);
+      crypto.getRandomValues(bytes);
+      const b64 = btoa(String.fromCharCode(...bytes))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+      const { error } = await supabase
+        .from("recovery_reports")
+        .update({ share_token: b64, share_referral_footer: referralFooter })
+        .eq("id", id);
+      if (error) throw error;
+      return b64;
+    },
+    onSuccess: invalidate,
+  });
+
+  const revokeShareLink = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("recovery_reports")
+        .update({ share_token: null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  const setReferralFooter = useMutation({
+    mutationFn: async ({ id, referralFooter }: { id: string; referralFooter: boolean }) => {
+      const { error } = await supabase
+        .from("recovery_reports")
+        .update({ share_referral_footer: referralFooter })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  return { saveNarrative, markReviewed, markSent, createShareLink, revokeShareLink, setReferralFooter };
 }
