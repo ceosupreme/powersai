@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import {
   useAutomationEnrollments,
   useUpsertEnrollment,
@@ -54,6 +57,7 @@ const DEFS: Array<{
 export function AutomationEnrollmentPanel({ projectId }: Props) {
   const { data: enrollments = [], isLoading } = useAutomationEnrollments(projectId);
   const upsert = useUpsertEnrollment();
+  const { isAdmin } = useAuth();
   const byKey = useMemo(() => {
     const m: Record<string, typeof enrollments[number]> = {};
     for (const e of enrollments) m[e.automation_key] = e;
@@ -67,6 +71,7 @@ export function AutomationEnrollmentPanel({ projectId }: Props) {
         Send-channel is pluggable — defaults to a manual/log adapter that records what would have sent.
       </p>
       <ApplyBundleControl projectId={projectId} />
+      {isAdmin && <InviteClientApprover projectId={projectId} />}
       {DEFS.map((def) => {
         const e = byKey[def.key];
         return (
@@ -76,13 +81,14 @@ export function AutomationEnrollmentPanel({ projectId }: Props) {
             def={def}
             existing={e}
             saving={upsert.isPending}
-            onSave={async (enabled, config) => {
+            onSave={async (enabled, config, approval_mode) => {
               try {
                 await upsert.mutateAsync({
                   project_id: projectId,
                   automation_key: def.key,
                   enabled,
                   config,
+                  approval_mode,
                 });
                 toast.success(`${def.title} ${enabled ? "enabled" : "disabled"}`);
               } catch (err) {
@@ -103,13 +109,14 @@ function EnrollmentRow({
 }: {
   projectId: string;
   def: typeof DEFS[number];
-  existing?: { enabled: boolean; config: Record<string, unknown> };
+  existing?: { enabled: boolean; config: Record<string, unknown>; approval_mode?: 'operator' | 'client' };
   saving: boolean;
-  onSave: (enabled: boolean, config: Record<string, unknown>) => void;
+  onSave: (enabled: boolean, config: Record<string, unknown>, approval_mode: 'operator' | 'client') => void;
 }) {
   const [enabled, setEnabled] = useState(existing?.enabled ?? false);
   const initialConfig = existing?.config && Object.keys(existing.config).length ? existing.config : def.defaultConfig;
   const [configText, setConfigText] = useState(JSON.stringify(initialConfig, null, 2));
+  const [mode, setMode] = useState<'operator' | 'client'>(existing?.approval_mode ?? 'operator');
 
   return (
     <Card className="p-4 space-y-3">
@@ -122,6 +129,24 @@ function EnrollmentRow({
           <Label htmlFor={`enr-${def.key}`} className="text-xs">{enabled ? "On" : "Off"}</Label>
           <Switch id={`enr-${def.key}`} checked={enabled} onCheckedChange={setEnabled} />
         </div>
+      </div>
+      <div className="space-y-1">
+        <Label className="text-xs">Approval mode</Label>
+        <div className="inline-flex rounded-md border p-0.5">
+          <button
+            type="button"
+            className={`px-3 py-1 text-xs rounded ${mode === 'operator' ? 'bg-primary text-primary-foreground' : ''}`}
+            onClick={() => setMode('operator')}
+          >Operator QA</button>
+          <button
+            type="button"
+            className={`px-3 py-1 text-xs rounded ${mode === 'client' ? 'bg-primary text-primary-foreground' : ''}`}
+            onClick={() => setMode('client')}
+          >Client approves</button>
+        </div>
+        {mode === 'client' && (
+          <p className="text-[11px] text-muted-foreground">Drafts wait for your client's one-tap approval.</p>
+        )}
       </div>
       <div className="space-y-1">
         <Label className="text-xs">Config (JSON)</Label>
@@ -140,10 +165,57 @@ function EnrollmentRow({
             let parsed: Record<string, unknown>;
             try { parsed = JSON.parse(configText); }
             catch { toast.error("Config is not valid JSON"); return; }
-            onSave(enabled, parsed);
+            onSave(enabled, parsed, mode);
           }}
         >Save</Button>
       </div>
     </Card>
+  );
+}
+
+function InviteClientApprover({ projectId }: { projectId: string }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">Invite client approver</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Invite client approver</DialogTitle></DialogHeader>
+        <p className="text-sm text-muted-foreground">
+          They'll get an email invite. On first sign-in they land on /approvals and can see queue items for this project only.
+        </p>
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="client@example.com"
+        />
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button
+            disabled={sending || !email}
+            onClick={async () => {
+              setSending(true);
+              try {
+                const { error } = await (supabase as any).functions.invoke("invite-client-approver", {
+                  body: { project_id: projectId, email },
+                });
+                if (error) throw error;
+                toast.success("Invite sent");
+                setOpen(false);
+                setEmail("");
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : "Invite failed");
+              } finally {
+                setSending(false);
+              }
+            }}
+          >Send invite</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
