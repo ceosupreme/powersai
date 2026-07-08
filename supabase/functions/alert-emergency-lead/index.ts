@@ -132,23 +132,34 @@ Deno.serve(async (req) => {
     metadata: { kind: "emergency_lead_alert", lead_id, recipient_source: recipientSource },
   });
 
-  await sb.from("automation_send_log").insert({
-    project_id: projectId,
-    queue_id: null,
-    channel: preferredChannel,
-    adapter: result.provider,
-    to_address: to,
-    subject,
-    body,
-    ok: result.ok,
-    provider_message_id: result.provider_message_id ?? null,
-    error: result.error ?? null,
-    raw: {
-      kind: "emergency_lead_alert",
-      lead_id,
-      recipient_source: recipientSource,
-    },
-  });
+  // automation_send_log.project_id is NOT NULL, so we only persist the
+  // send log when the lead is linked to a project. Unattached alerts still
+  // dispatched — they're just observable via edge-function logs.
+  if (projectId) {
+    const { error: logErr } = await sb.from("automation_send_log").insert({
+      project_id: projectId,
+      queue_id: null,
+      automation_key: "emergency_lead_alert",
+      channel: preferredChannel,
+      adapter: result.provider,
+      to_address: to,
+      subject,
+      body,
+      ok: result.ok,
+      provider_message_id: result.provider_message_id ?? null,
+      error: result.error ?? null,
+      raw: {
+        kind: "emergency_lead_alert",
+        lead_id,
+        recipient_source: recipientSource,
+      },
+    });
+    if (logErr) console.error("[alert-emergency-lead] log insert failed:", logErr);
+  } else {
+    console.log("[alert-emergency-lead] no project link — send log skipped", {
+      lead_id, adapter: result.provider, ok: result.ok,
+    });
+  }
 
   return json({ ok: true, recipient_source: recipientSource, dispatched: result.ok });
 });
