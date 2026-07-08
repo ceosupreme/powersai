@@ -7350,6 +7350,67 @@ export type Database = {
           },
         ]
       }
+      proposals: {
+        Row: {
+          company_id: string | null
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          leak_stack_run_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          leak_stack_run_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          leak_stack_run_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_leak_stack_run_id_fkey"
+            columns: ["leak_stack_run_id"]
+            isOneToOne: false
+            referencedRelation: "leak_stack_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_audit_requests: {
         Row: {
           business_name: string
