@@ -12,6 +12,8 @@ export const routeConfig: Record<string, RouteConfig> = {
   '/growth-audit': { roles: ['owner'] },
   '/marketing-hub': { roles: ['owner'] },
 
+  // Leak Stack (owner-only)
+
   // Owner + GM routes
   '/weekly-review': { roles: ['owner', 'gm'] },
   '/insights': { roles: ['owner', 'gm'] },
