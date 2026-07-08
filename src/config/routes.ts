@@ -11,6 +11,7 @@ export const routeConfig: Record<string, RouteConfig> = {
   '/admin': { roles: ['owner'] },
   '/growth-audit': { roles: ['owner'] },
   '/marketing-hub': { roles: ['owner'] },
+  '/leak-stack': { roles: ['owner'] },
 
   // Owner + GM routes
   '/weekly-review': { roles: ['owner', 'gm'] },
