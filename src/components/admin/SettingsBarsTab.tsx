@@ -105,7 +105,7 @@ export const SettingsBarsTab = () => {
   return (
     <Card className="bg-card border-border">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-        <CardTitle className="text-base sm:text-lg font-semibold">Venues</CardTitle>
+        <CardTitle className="text-base sm:text-lg font-semibold">Projects</CardTitle>
         <Button onClick={() => openDialog()} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Add Project
         </Button>
@@ -128,7 +128,7 @@ export const SettingsBarsTab = () => {
               </TableHeader>
               <TableBody>
                 {bars.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground text-sm">No venues yet.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground text-sm">No projects yet.</TableCell></TableRow>
                 ) : bars.map(bar => (
                   <TableRow key={bar.id} className="hover:bg-muted/20">
                     <TableCell className="font-medium text-sm py-3">

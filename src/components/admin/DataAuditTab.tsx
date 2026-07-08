@@ -255,7 +255,7 @@ async function fetchActiveVenues(): Promise<ActiveVenue[]> {
     .order('name');
 
   if (error) throw error;
-  if (!data?.length) throw new Error('No venues found');
+  if (!data?.length) throw new Error('No projects found');
   return data as ActiveVenue[];
 }
 
@@ -573,8 +573,8 @@ export const DataAuditTab = () => {
       const failures: RecomputeFailure[] = [];
 
       setRecomputeProgress({ done: 0, total });
-      setStatusText(`Recomputing ${total} venue-weeks...`);
-      toast({ title: 'Recompute started', description: `Processing ${total} venue-weeks one at a time.` });
+      setStatusText(`Recomputing ${total} project-weeks...`);
+      toast({ title: 'Recompute started', description: `Processing ${total} project-weeks one at a time.` });
 
       let completed = 0;
       for (const weekStart of allMondays) {

@@ -90,7 +90,7 @@ export const SettingsComplianceTab = () => {
   const downloadCsv = () => {
     if (!rows.length) return;
     const headers = [
-      'Venue', 'No-clockout TE', 'No-clockout insights',
+      'Project', 'No-clockout TE', 'No-clockout insights',
       'Qualifying OT emp-weeks', 'OT insights',
       'Late meal insights', 'Missed meal insights', 'Multi-location insights',
       'Meal tracking gap', 'Long shifts (≥6h)', 'Long shifts w/o any break', 'Missed break flags',
@@ -122,7 +122,7 @@ export const SettingsComplianceTab = () => {
               Compliance Audit
             </CardTitle>
             <CardDescription>
-              Per-venue gap analysis. Red cells = raw signals exist but no insight fired.
+              Per-project gap analysis. Red cells = raw signals exist but no insight fired.
               Window: last {windowDays} days{meta ? ` (${meta.since} → ${meta.today})` : ''}.
             </CardDescription>
           </div>
@@ -155,7 +155,7 @@ export const SettingsComplianceTab = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/50 text-left text-xs text-muted-foreground">
-                  <th className="py-2 pr-3">Venue</th>
+                  <th className="py-2 pr-3">Project</th>
                   <th className="py-2 px-2 text-right">No-clock TE</th>
                   <th className="py-2 px-2 text-right">No-clock ins.</th>
                   <th className="py-2 px-2 text-right">OT emp-wks ≥4h</th>

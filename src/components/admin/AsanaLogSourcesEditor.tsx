@@ -68,7 +68,7 @@ export const AsanaLogSourcesEditor = ({ venueId }: Props) => {
 
   const addSource = () => {
     if (sources.filter(s => s.is_active).length >= 4) {
-      toast.error('Maximum of 4 active log sources per venue');
+      toast.error('Maximum of 4 active log sources per project');
       return;
     }
     setSources(prev => [

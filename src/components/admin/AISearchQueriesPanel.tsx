@@ -107,7 +107,7 @@ const SuggestDialog = ({
         <DialogHeader>
           <DialogTitle>AI search query suggestions · {venueName}</DialogTitle>
           <DialogDescription>
-            Real-sounding questions a customer might ask ChatGPT/Claude/Gemini. Pulled from this venue's GBP, keywords, and review themes.
+            Real-sounding questions a customer might ask ChatGPT/Claude/Gemini. Pulled from this project's GBP, keywords, and review themes.
           </DialogDescription>
         </DialogHeader>
         {loading ? (
@@ -357,7 +357,7 @@ export const AISearchQueriesPanel = () => {
             Track whether ChatGPT, Claude, Gemini, and Perplexity recommend each venue. Weekly cron + on-demand trigger (1h cooldown). Perplexity activates automatically when the API key is added.
           </p>
         </div>
-        <Input placeholder="Filter venues…" value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-xs" />
+        <Input placeholder="Filter projects…" value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-xs" />
       </div>
 
       <div className="space-y-3">

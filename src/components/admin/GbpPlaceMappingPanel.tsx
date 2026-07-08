@@ -217,11 +217,11 @@ export const GbpPlaceMappingPanel = () => {
         <div className="flex-1">
           <h3 className="text-base font-semibold text-foreground">GBP Place Mappings</h3>
           <p className="text-xs text-muted-foreground">
-            Map each venue to a Google Place ID. Unmapped venues fall back to manual snapshots.
+            Map each project to a Google Place ID. Unmapped projects fall back to manual snapshots.
           </p>
         </div>
         <Input
-          placeholder="Filter venues…"
+          placeholder="Filter projects…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-xs"
@@ -233,7 +233,7 @@ export const GbpPlaceMappingPanel = () => {
           <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> Loading mappings…
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-6 text-center">No venues match.</p>
+        <p className="text-sm text-muted-foreground py-6 text-center">No projects match.</p>
       ) : (
         <div className="space-y-3">
           {rows.map((b) => (

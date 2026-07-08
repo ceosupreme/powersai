@@ -164,7 +164,7 @@ export const SettingsSyncTab = () => {
       if (error) throw error;
       const msg = data?.total_insights != null
         ? `Weekly insights generated: ${data.total_insights} insights, ${data.total_actions} actions`
-        : `Weekly insights dispatched for ${data?.bars_dispatched || 0} venues`;
+        : `Weekly insights dispatched for ${data?.bars_dispatched || 0} projects`;
       toast.success(msg);
       setTimeout(fetchData, 3000);
     } catch (e: any) {
@@ -176,7 +176,7 @@ export const SettingsSyncTab = () => {
   };
 
   const triggerBulkRecompute = async () => {
-    if (!recomputeVenueId) { toast.error('Select a venue'); return; }
+    if (!recomputeVenueId) { toast.error('Select a project'); return; }
     setRecomputeRunning(true);
     setRecomputeProgress(null);
     const numWeeks = parseInt(recomputeWeeks) || 16;
@@ -200,7 +200,7 @@ export const SettingsSyncTab = () => {
         });
         setRecomputeProgress({ done: i + 1, total: weeks.length });
       }
-      toast.success(`Recomputed ${weeks.length} weeks for venue`);
+      toast.success(`Recomputed ${weeks.length} weeks for project`);
       setTimeout(fetchData, 2000);
     } catch (e: any) {
       toast.error('Recompute failed');
@@ -236,7 +236,7 @@ export const SettingsSyncTab = () => {
       if (vErr) throw vErr;
       const venueIds = (venueRows || []).map((v) => v.id);
       if (venueIds.length === 0) {
-        toast.error('No active venues');
+        toast.error('No active projects');
         return;
       }
 
@@ -286,7 +286,7 @@ export const SettingsSyncTab = () => {
       }
       await Promise.all(workers);
 
-      toast.success(`Red-score alerts backfill complete: ${totalInserted} inserted across ${jobs.length} venue-weeks`);
+      toast.success(`Red-score alerts backfill complete: ${totalInserted} inserted across ${jobs.length} project-weeks`);
       setTimeout(fetchData, 2000);
     } catch (e: any) {
       toast.error('Red-score backfill failed');
@@ -460,7 +460,7 @@ export const SettingsSyncTab = () => {
           <div className="flex flex-wrap items-center gap-2">
             <Select value={weeklyVenueId} onValueChange={setWeeklyVenueId}>
               <SelectTrigger className="w-[160px] h-8 text-xs">
-                <SelectValue placeholder="Select venue" />
+                <SelectValue placeholder="Select project" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Projects</SelectItem>
@@ -512,7 +512,7 @@ export const SettingsSyncTab = () => {
           <div className="flex flex-wrap items-center gap-2">
             <Select value={recomputeVenueId} onValueChange={setRecomputeVenueId}>
               <SelectTrigger className="w-[160px] h-8 text-xs">
-                <SelectValue placeholder="Select venue" />
+                <SelectValue placeholder="Select project" />
               </SelectTrigger>
               <SelectContent>
                 {venues.map(v => (
@@ -556,7 +556,7 @@ export const SettingsSyncTab = () => {
             <span className="text-sm font-semibold">Generate Red-Score Alerts</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            Backfill red-score alerts for all active venues across the selected number of past weeks. Runs deterministic Red Score triggers only — no AI, no token cost. Safe to re-run (deduped).
+            Backfill red-score alerts for all active projects across the selected number of past weeks. Runs deterministic Red Score triggers only — no AI, no token cost. Safe to re-run (deduped).
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={redAlertsWeeks} onValueChange={setRedAlertsWeeks}>

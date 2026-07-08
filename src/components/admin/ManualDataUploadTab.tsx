@@ -309,7 +309,7 @@ export const ManualDataUploadTab = () => {
   // === Manual entry handlers ===
   const handleManualSave = async () => {
     if (!manualVenue || !manualDate) {
-      toast({ title: 'Missing fields', description: 'Please select venue and date.', variant: 'destructive' });
+      toast({ title: 'Missing fields', description: 'Please select project and date.', variant: 'destructive' });
       return;
     }
     setSaving(true);
@@ -599,7 +599,7 @@ export const ManualDataUploadTab = () => {
 
       toast({
         title: 'Engage data uploaded',
-        description: `${matched.length} venues updated${unmatched.length > 0 ? `, ${unmatched.length} unmatched` : ''}.`,
+        description: `${matched.length} projects updated${unmatched.length > 0 ? `, ${unmatched.length} unmatched` : ''}.`,
       });
     } catch (err) {
       toast({ title: 'Upload failed', description: err instanceof Error ? err.message : 'Error', variant: 'destructive' });
@@ -644,9 +644,9 @@ export const ManualDataUploadTab = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Venue (required)</Label>
+                  <Label>Project (required)</Label>
                   <Select value={zipVenue} onValueChange={setZipVenue}>
-                    <SelectTrigger><SelectValue placeholder="Select venue" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
                     <SelectContent>
                       {venues.map(v => (
                         <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
@@ -799,9 +799,9 @@ export const ManualDataUploadTab = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Venue (required)</Label>
+                  <Label>Project (required)</Label>
                   <Select value={laborZipVenue} onValueChange={setLaborZipVenue}>
-                    <SelectTrigger><SelectValue placeholder="Select venue" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
                     <SelectContent>
                       {venues.map(v => (
                         <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
@@ -944,17 +944,17 @@ export const ManualDataUploadTab = () => {
                 <PenLine className="h-5 w-5 text-primary" />
                 Manual Data Entry
               </CardTitle>
-              <CardDescription>Enter or correct data for a single venue and date.</CardDescription>
+              <CardDescription>Enter or correct data for a single project and date.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Venue</Label>
+                  <Label>Project</Label>
                   <Select value={manualVenue} onValueChange={(v) => {
                     setManualVenue(v);
                     handleManualDateVenueChange(v, manualDate);
                   }}>
-                    <SelectTrigger><SelectValue placeholder="Select venue" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
                     <SelectContent>
                       {venues.map(v => (
                         <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
@@ -1012,7 +1012,7 @@ export const ManualDataUploadTab = () => {
                 Upload Engage CSV
               </CardTitle>
               <CardDescription>
-                Upload the 7shifts Enterprise Engage report CSV. Updates all venues at once for the selected week.
+                Upload the 7shifts Enterprise Engage report CSV. Updates all projects at once for the selected week.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1089,7 +1089,7 @@ export const ManualDataUploadTab = () => {
 
                   {engagePreview.some((r: any) => !r.matched) && (
                     <div className="text-xs text-amber-500 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
-                      ⚠ Unmatched locations will be skipped. Check venue names in Settings.
+                      ⚠ Unmatched locations will be skipped. Check project names in Settings.
                     </div>
                   )}
 
@@ -1100,7 +1100,7 @@ export const ManualDataUploadTab = () => {
                   >
                     {engageUploading
                       ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
-                      : `Import ${engagePreview.filter((r: any) => r.matched).length} Venues`}
+                      : `Import ${engagePreview.filter((r: any) => r.matched).length} Projects`}
                   </Button>
                 </div>
               )}
@@ -1111,7 +1111,7 @@ export const ManualDataUploadTab = () => {
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
                       <span className="font-medium text-foreground">
-                        {engageResult.matched} venues updated
+                        {engageResult.matched} projects updated
                       </span>
                     </div>
                     {engageResult.unmatched.length > 0 && (
@@ -1141,7 +1141,7 @@ export const ManualDataUploadTab = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Venue (optional — auto-detected from CSV)</Label>
+                  <Label>Project (optional — auto-detected from CSV)</Label>
                   <Select value={kdsVenue} onValueChange={setKdsVenue}>
                     <SelectTrigger><SelectValue placeholder="Auto-detect" /></SelectTrigger>
                     <SelectContent>

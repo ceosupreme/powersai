@@ -61,8 +61,8 @@ export const AutoApproveSettingsCard = () => {
         <>
           {/* Rule 1: Severity Thresholds */}
           <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            <h4 className="text-sm font-semibold text-foreground">Rule 1 — Severity by Venue Score</h4>
-            <p className="text-xs text-muted-foreground">Auto-approve low-risk actions when venue is performing well</p>
+            <h4 className="text-sm font-semibold text-foreground">Rule 1 — Severity by Project Score</h4>
+            <p className="text-xs text-muted-foreground">Auto-approve low-risk actions when project is performing well</p>
 
             <div className="space-y-4 mt-3">
               <div>
@@ -147,7 +147,7 @@ export const AutoApproveSettingsCard = () => {
                       onValueCommit={([v]) => handleSave({ repeat_matching: { ...config.repeat_matching, similarity_threshold: v } })}
                     />
                     <p className="text-xs text-muted-foreground mt-2">
-                      When an action title closely matches one you've manually approved before for the same venue and pillar, it will be auto-approved
+                      When an action title closely matches one you've manually approved before for the same project and pillar, it will be auto-approved
                     </p>
                   </CollapsibleContent>
                 </Collapsible>

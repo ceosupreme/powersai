@@ -430,7 +430,7 @@ export const BarsTab = () => {
                       placeholder="Leave blank to use global credentials"
                       className="bg-background border-border h-10 font-mono text-xs"
                     />
-                    <p className="text-xs text-muted-foreground">Only set these if this venue uses different Toast API credentials than the global default.</p>
+                    <p className="text-xs text-muted-foreground">Only set these if this project uses different Toast API credentials than the global default.</p>
                   </div>
                 </div>
 
@@ -449,7 +449,7 @@ export const BarsTab = () => {
                       placeholder="e.g. 280312"
                       className="bg-background border-border h-10 font-mono text-xs"
                     />
-                    <p className="text-xs text-muted-foreground">The numeric location ID from 7shifts for this venue</p>
+                    <p className="text-xs text-muted-foreground">The numeric location ID from 7shifts for this project</p>
                   </div>
                 </div>
               </div>
