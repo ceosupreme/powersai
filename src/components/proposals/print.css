@@ -53,6 +53,11 @@
   color: #B5431E;
   font-weight: 600;
 }
+.proposal-money-green {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: #0E5236;
+  font-weight: 600;
+}
 .proposal-rule { border-color: #E4DECF; }
 .proposal-card {
   background: #FFFDF7;

@@ -12,17 +12,34 @@ import {
 } from "@/hooks/useRecoveryReports";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
+import { Printer } from "lucide-react";
+import { RecoveryReportPrintHarness } from "@/components/recovery-report/RecoveryReportPrintHarness";
 
 export default function RecoveryReports() {
   const { selectedBar } = useApp();
   const projectId = selectedBar?.id ?? null;
   const { data: reports = [], isLoading } = useRecoveryReports(projectId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [brandedId, setBrandedId] = useState<string | null>(null);
 
   const selected = useMemo(
     () => reports.find((r) => r.id === selectedId) ?? reports[0] ?? null,
     [reports, selectedId],
   );
+  const branded = useMemo(
+    () => reports.find((r) => r.id === brandedId) ?? null,
+    [reports, brandedId],
+  );
+
+  if (branded) {
+    return (
+      <RecoveryReportPrintHarness
+        report={branded}
+        displayName={selectedBar?.bar_name ?? "your business"}
+        onBack={() => setBrandedId(null)}
+      />
+    );
+  }
 
   return (
     <div className="p-6 space-y-4">
@@ -71,7 +88,12 @@ export default function RecoveryReports() {
               </button>
             ))}
           </div>
-          {selected && <ReportDetail report={selected} />}
+          {selected && (
+            <ReportDetail
+              report={selected}
+              onViewBranded={() => setBrandedId(selected.id)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -83,7 +105,13 @@ function StatusBadge({ status }: { status: RecoveryReport["status"] }) {
   return <Badge variant={v as any}>{status}</Badge>;
 }
 
-function ReportDetail({ report }: { report: RecoveryReport }) {
+function ReportDetail({
+  report,
+  onViewBranded,
+}: {
+  report: RecoveryReport;
+  onViewBranded: () => void;
+}) {
   const { saveNarrative, markReviewed, markSent } = useRecoveryReportMutations();
   const [narrative, setNarrative] = useState(report.narrative ?? "");
   const m = report.metrics;
@@ -143,6 +171,9 @@ function ReportDetail({ report }: { report: RecoveryReport }) {
           }}
         />
         <div className="flex flex-wrap gap-2 justify-end">
+          <Button variant="outline" size="sm" onClick={onViewBranded}>
+            <Printer className="h-4 w-4 mr-1" /> View branded report
+          </Button>
           <Button variant="outline" size="sm" onClick={copy}>Copy for client</Button>
           {report.status === "draft" && (
             <Button size="sm" onClick={async () => {
