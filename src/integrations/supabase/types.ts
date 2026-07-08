@@ -4516,6 +4516,7 @@ export type Database = {
           conversation_channel: string | null
           created_at: string
           email: string
+          first_response_at: string | null
           id: string
           is_ready: boolean
           message: string | null
@@ -4532,6 +4533,8 @@ export type Database = {
           status: Database["public"]["Enums"]["inbound_lead_status"]
           transcript: Json
           updated_at: string
+          urgency_captured_at: string | null
+          urgency_class: string | null
           user_agent: string | null
         }
         Insert: {
@@ -4541,6 +4544,7 @@ export type Database = {
           conversation_channel?: string | null
           created_at?: string
           email: string
+          first_response_at?: string | null
           id?: string
           is_ready?: boolean
           message?: string | null
@@ -4557,6 +4561,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["inbound_lead_status"]
           transcript?: Json
           updated_at?: string
+          urgency_captured_at?: string | null
+          urgency_class?: string | null
           user_agent?: string | null
         }
         Update: {
@@ -4566,6 +4572,7 @@ export type Database = {
           conversation_channel?: string | null
           created_at?: string
           email?: string
+          first_response_at?: string | null
           id?: string
           is_ready?: boolean
           message?: string | null
@@ -4582,6 +4589,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["inbound_lead_status"]
           transcript?: Json
           updated_at?: string
+          urgency_captured_at?: string | null
+          urgency_class?: string | null
           user_agent?: string | null
         }
         Relationships: [
@@ -7075,6 +7084,7 @@ export type Database = {
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition: string | null
           updated_at: string
+          urgency_options: Json | null
         }
         Insert: {
           created_at?: string
@@ -7082,6 +7092,7 @@ export type Database = {
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
           updated_at?: string
+          urgency_options?: Json | null
         }
         Update: {
           created_at?: string
@@ -7089,6 +7100,7 @@ export type Database = {
           project_type?: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
           updated_at?: string
+          urgency_options?: Json | null
         }
         Relationships: []
       }
@@ -11590,7 +11602,11 @@ export type Database = {
         | "linkedin_dm"
         | "instagram_dm"
         | "review_reply"
-      automation_key: "followup_sequence" | "reactivation" | "review_request"
+      automation_key:
+        | "followup_sequence"
+        | "reactivation"
+        | "review_request"
+        | "emergency_lead_alert"
       automation_queue_status:
         | "pending_review"
         | "approved"
@@ -11966,7 +11982,12 @@ export const Constants = {
         "instagram_dm",
         "review_reply",
       ],
-      automation_key: ["followup_sequence", "reactivation", "review_request"],
+      automation_key: [
+        "followup_sequence",
+        "reactivation",
+        "review_request",
+        "emergency_lead_alert",
+      ],
       automation_queue_status: [
         "pending_review",
         "approved",

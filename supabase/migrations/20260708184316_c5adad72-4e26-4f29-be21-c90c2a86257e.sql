@@ -1,0 +1,1 @@
+ALTER TYPE public.automation_key ADD VALUE IF NOT EXISTS 'emergency_lead_alert';

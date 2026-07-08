@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
 export type InboundLeadStatus = "new" | "reviewed" | "promoted" | "archived";
+export type UrgencyClass = "emergency" | "same_day" | "routine" | "estimate" | "maintenance";
 export type InboundLead = {
   id: string;
   name: string;
@@ -16,6 +17,11 @@ export type InboundLead = {
   is_ready: boolean | null;
   conversation_channel: string | null;
   source: string | null;
+  urgency_class: UrgencyClass | null;
+  urgency_captured_at: string | null;
+  first_response_at: string | null;
+  captured_for_project_id: string | null;
+  phone: string | null;
   created_at: string;
 };
 
@@ -30,6 +36,58 @@ export function useInboundLeads(status: InboundLeadStatus = "new") {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as InboundLead[];
+    },
+  });
+}
+
+/**
+ * Project-scoped first-response stats, computed from ALL leads with an
+ * `urgency_captured_at` — never from whatever's on-screen. This is the
+ * number the "speed guarantee" pitches will reference; it can't shift
+ * based on which tab happens to be open.
+ *
+ * Pass `projectId=null` to compute across every lead the caller can read
+ * (RLS still applies).
+ */
+export function useInboundLeadResponseStats(projectId?: string | null) {
+  return useQuery({
+    queryKey: ["inbound_leads", "response_stats", projectId ?? "all"],
+    queryFn: async () => {
+      let q = supabase
+        .from("inbound_leads")
+        .select("urgency_class,urgency_captured_at,first_response_at")
+        .not("urgency_captured_at", "is", null);
+      if (projectId) q = q.eq("captured_for_project_id", projectId);
+      const { data, error } = await q;
+      if (error) throw error;
+
+      const rows = (data ?? []) as Array<{
+        urgency_class: UrgencyClass | null;
+        urgency_captured_at: string | null;
+        first_response_at: string | null;
+      }>;
+
+      const collect = (subset: typeof rows) => {
+        const durationsMs = subset
+          .filter((r) => r.first_response_at && r.urgency_captured_at)
+          .map((r) =>
+            new Date(r.first_response_at!).getTime() -
+            new Date(r.urgency_captured_at!).getTime(),
+          )
+          .filter((n) => Number.isFinite(n) && n >= 0);
+        const responded = durationsMs.length;
+        const pending = subset.length - responded;
+        const avgMs =
+          responded === 0
+            ? null
+            : Math.round(durationsMs.reduce((a, b) => a + b, 0) / responded);
+        return { total: subset.length, responded, pending, avgMs };
+      };
+
+      return {
+        all: collect(rows),
+        emergency: collect(rows.filter((r) => r.urgency_class === "emergency")),
+      };
     },
   });
 }
@@ -52,6 +110,19 @@ export function useInboundLeadMutations() {
   };
 
   return {
+    markResponded: useMutation({
+      // Idempotent: only stamps first_response_at when it is currently NULL,
+      // so a second click can never overwrite the first responder's time.
+      mutationFn: async (id: string) => {
+        const { error } = await supabase
+          .from("inbound_leads")
+          .update({ first_response_at: new Date().toISOString() })
+          .eq("id", id)
+          .is("first_response_at", null);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+    }),
     markReviewed: useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
