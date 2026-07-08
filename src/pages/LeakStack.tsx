@@ -6,15 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { RefreshCw, ChevronDown, Copy, ShieldAlert, TrendingDown, Loader2 } from 'lucide-react';
+import { RefreshCw, ChevronDown, Copy, ShieldAlert, TrendingDown, Loader2, Sparkles } from 'lucide-react';
 import { SOURCE_LABEL, SOURCE_TONE, formatDollars, buildHookSentence } from '@/lib/leakStackFormat';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { ProposalBuilderDialog } from '@/components/proposals/ProposalBuilderDialog';
 
 export default function LeakStack() {
   const { data: venues = [], isLoading: venuesLoading } = useVenues();
   const [venueId, setVenueId] = useState<string | null>(null);
   const effectiveVenueId = venueId ?? venues[0]?.id ?? null;
+  const { isAdmin } = useAuth();
+  const [proposalOpen, setProposalOpen] = useState(false);
+  const activeVenue = venues.find((v) => v.id === effectiveVenueId) ?? null;
 
   const { data: latest, isLoading: latestLoading } = useLatestLeakStackRun(effectiveVenueId);
   const { data: history = [] } = useLeakStackHistory(effectiveVenueId);
@@ -41,8 +46,28 @@ export default function LeakStack() {
             {run.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {latest ? 'Refresh' : 'Run'}
           </Button>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              disabled={!effectiveVenueId}
+              onClick={() => setProposalOpen(true)}
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" /> Generate proposal
+            </Button>
+          )}
         </div>
       </div>
+
+      {isAdmin && (
+        <ProposalBuilderDialog
+          open={proposalOpen}
+          onOpenChange={setProposalOpen}
+          companyId={null}
+          venueId={effectiveVenueId}
+          defaultProspectName={activeVenue?.name ?? ''}
+        />
+      )}
 
       {venuesLoading || latestLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>

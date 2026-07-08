@@ -7122,6 +7122,7 @@ export type Database = {
       project_type_qualifier_config: {
         Row: {
           created_at: string
+          operation_footprint_options: Json | null
           primary_channel: string | null
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition: string | null
@@ -7130,6 +7131,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          operation_footprint_options?: Json | null
           primary_channel?: string | null
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
@@ -7138,6 +7140,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          operation_footprint_options?: Json | null
           primary_channel?: string | null
           project_type?: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
@@ -7343,6 +7346,67 @@ export type Database = {
             columns: ["week_id"]
             isOneToOne: false
             referencedRelation: "weeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          company_id: string | null
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          leak_stack_run_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          leak_stack_run_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          leak_stack_run_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_leak_stack_run_id_fkey"
+            columns: ["leak_stack_run_id"]
+            isOneToOne: false
+            referencedRelation: "leak_stack_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
