@@ -1,107 +1,111 @@
 
-# Vertical Landing Pages — /for/:slug
+# Copy pass ×2 — plan
 
-Additive build. No changes to existing routes, RLS, or internal pages. Everything below layers on top of the live marketing design system.
+The full recon from my previous message is still in context, so I'll execute it exactly as inventoried. No logic, schema, routes, or identifiers change.
 
-## Part 1 — Schema (single migration)
+---
 
-New table `public.vertical_landing_pages` with columns as specified in the brief:
+## PART 1 — internal "venue" → "project" (display text only)
 
-- Identity: `id uuid pk`, `slug text unique not null`, `display_name text not null`, `status text check in ('draft','published') default 'draft'`, `sort_order int default 0`
-- Link to type system: `project_type_id uuid null references public.project_types(id)` — when set, page appends up to 2 leak-vector cards from that type (via existing `project_type_leak_vectors` + override resolver already used by `useEffectiveLeakVectors`)
-- Hero: `headline`, `headline_accent_word`, `accent_color text check in ('rust','gold','green') default 'rust'`, `subline`, `stat_value`, `stat_label`
-- Body: `leaks jsonb` (array of `{title,line,dollar_note}`), `faq jsonb` (array of `{q,a}`), `proof_line`
-- CTAs: `cta_primary_label`, `cta_primary_url`, `cta_secondary_label null`, `cta_secondary_url null`
-- SEO: `meta_title`, `meta_description`, `og_image_url null`
-- Timestamps + `update_updated_at_column` trigger
+Executed in the recon's sequence. Every edit is a string literal inside JSX text, `label`/`title`/`description`/`placeholder` props, toast/error messages, table headers, help-article bodies, or a UI-rendered CSV header. All hooks, types, table/column names, component names, prop names, layout keys, route anchors, and `src/integrations/supabase/types.ts` stay untouched.
 
-GRANTs (must be in the same migration):
-- `GRANT SELECT ON public.vertical_landing_pages TO anon, authenticated;` (public read of published rows)
-- `GRANT ALL ON public.vertical_landing_pages TO authenticated, service_role;` (admin writes gated by RLS)
+### Group A — Portfolio Get Started card
+- `src/components/portfolio/PortfolioGetStartedCard.tsx` — lines 31, 45, 69.
 
-RLS (mirrors `portfolio_items` public-read-published pattern):
-- `enable row level security`
-- Policy `"Public can read published landers"` FOR SELECT USING `status = 'published'`
-- Policy `"Admins can read all"` FOR SELECT USING `has_role(auth.uid(),'admin')`
-- Policy `"Admins can write"` FOR ALL USING/CHECK `has_role(auth.uid(),'admin')`
+### Group B — Onboarding wizard shell + live badge display strings
+- `src/components/onboarding/VenueOnboardingWizard.tsx` — audit dialog title/subtitle/step headers/CTA copy; rewrite venue→project in visible strings only. Component/hook/prop names (`VenueOnboardingWizard`, `venueId`, `VenueLiveBadge`, `useVenueOnboardingDetectors`, etc.) unchanged.
+- `src/components/onboarding/VenueLiveBadge.tsx` — badge text `"go-live"` currently contains no "venue" word; verify and leave.
 
-Seed the 5 rows verbatim from the brief (plumbing-hvac, auto, carpet-cleaning, moving-hauling, bars-restaurants), all `status='published'`, sort_order 10/20/30/40/50. Seeded via a follow-up insert call after the migration is approved.
+### Group C — Portfolio overview
+- `src/pages/PortfolioOverview.tsx` — lines 289, 303, 462, 522, 537, 583, 609, 636. `#venue-scorecards` anchor id stays.
 
-## Part 2 — Route + Page
+### Group D — Workspace / empty states
+- `src/pages/Workspace.tsx` — 76, 77. Line 149 KEEP (per §4.1 "client venue" as type name).
+- `src/pages/Logs.tsx` — 100, 102.
+- `src/pages/Employees.tsx` — 147.
+- `src/pages/EmployeeDetail.tsx` — 120.
 
-`src/pages/VerticalLanding.tsx` mounted at `/for/:slug` in `src/App.tsx` (public — no auth guard, wrapped in the same `.stm-marketing` shell + `Nav` + `Footer` used by `MarketingSite.tsx`).
+### Group E — Weekly Review copy
+- `src/pages/WeeklyReview.tsx` — 262.
+- `src/components/weekly-review/TaskPerformanceCard.tsx` — 97.
+- `src/components/weekly-review/EmployeePerformanceCard.tsx` — 129.
+- `src/components/weekly-review/MetricDetailContent.tsx` — 98.
 
-Data: React Query fetches the row by `slug` where `status='published'`. 404 → `<Navigate to="/404" />`. When `project_type_id` is set, a second query pulls up to 2 effective leak vectors via the existing resolver (skips silently on empty/error).
+### Group F — Insights
+- `src/pages/InsightsAudit.tsx` — 363 placeholder, 381 sort header label.
+- `src/pages/Insights.tsx` — 357 subhead string.
 
-SEO: sets `<title>`, `<meta name="description">`, `og:title`, `og:description`, `og:image` (falls back to sitewide) via the same imperative pattern already in `MarketingSite.tsx` (no new dep).
+### Group G — Growth Audit
+- `src/components/growth-audit/action-packs/ActionCenterView.tsx` — 76, 77.
+- `src/components/growth-audit/history/HistoryView.tsx` — 24, 25, 58.
+- `src/components/growth-audit/data-sources/DataSourcesView.tsx` — 96, 107.
+- `src/components/growth-audit/onboarding/OnboardingChecklist.tsx` — 30.
+- `src/components/growth-audit/reports/ReportBuilderDialog.tsx` — 78.
+- `src/components/growth-audit/findings/FindingDetail.tsx` — 273 (per §4.2, rewrite example to `"intentional trade-off"`).
 
-### Sections (top to bottom, tokens identical to homepage)
+### Group H — EditBarDialog display strings
+- `src/components/admin/EditBarDialog.tsx` — 336, 470, 473, 554, 559, 676, 723, 796, 854, 866, 871, 967, 1045 ("Venue ID" → "Project ID" per §4.4), 1082, 1084. Underlying values/IDs/table `venues` unchanged.
 
-a) **HERO** — bone bg with radial gold-tint wash, grain overlay. Mono gold eyebrow `[DISPLAY_NAME] · PROFIT LEAK RECOVERY`. H1 in Bricolage 800 with `headline_accent_word` swapped for `<span class="font-serif-accent" style="color:var(--{accent_color})">` + inline SVG underline stroke in the accent color. Subline in `--ink-soft`. Stat chip: rust mono, `stat_value` in Bricolage-800 rust, `stat_label` under it, footnote "estimated — your audit uses your numbers". Primary CTA green pill → `cta_primary_url` (with `?src=for-[slug]` appended, see Part 3). Secondary CTA rendered only when `cta_secondary_url` is non-null: underlined text-link with sliding arrow.
+### Group I — Admin settings, uploads, panels
+- `src/components/admin/SettingsBarsTab.tsx` — 108, 131.
+- `src/components/admin/ManualDataUploadTab.tsx` — 312, 602, 647, 649, 802, 804, 947, 952, 957, 1015, 1092, 1103, 1114, 1144.
+- `src/components/admin/WebsiteMappingPanel.tsx` — 250, 254, 266.
+- `src/components/admin/MapPackKeywordsPanel.tsx` — 138, 423, 427.
+- `src/components/admin/GbpPlaceMappingPanel.tsx` — 220, 224, 236.
+- `src/components/admin/AISearchQueriesPanel.tsx` — 110, 360.
+- `src/components/admin/SculptureSiteMappingPanel.tsx` — 117, 120.
+- `src/components/admin/AsanaLogSourcesEditor.tsx` — 71.
+- `src/components/admin/BarsTab.tsx` — 433, 452.
+- `src/components/admin/AutoApproveSettingsCard.tsx` — 64, 65, 150.
+- `src/components/admin/SettingsSyncTab.tsx` — 167, 203, 239, 289, 463, 515, 559.
+- `src/components/admin/SettingsComplianceTab.tsx` — 93 (CSV header, user-facing), 125, 158.
+- `src/components/admin/DataAuditTab.tsx` — 258, 576, 577.
+- Also `src/components/admin/SettingsBarsTab.tsx` toast at line 89 (`'Failed to load projects'` — already says projects; verify no change needed).
 
-b) **HOW YOUR MONEY LEAKS** — bone-2. Three `.card-lift` cards from `leaks[]`: title Bricolage-600, line body, `dollar_note` in rust mono. Appends up to 2 additional cards from effective leak vectors when present (name → title, benchmark line → line, empty dollar_note styled as `—`); zero if absent.
+### Group J — Portfolio detail tables
+- `src/components/portfolio/DailyFlashTable.tsx` — 57.
+- `src/components/portfolio/VenueComparisonTable.tsx` — 18 column label (component name stays).
 
-c) **HOW IT GETS PLUGGED** — bone. Four-step row DETECT / DOLLARIZE / ASSIGN / VERIFY, gold dotted connector between mono phase badges, one line each. Kicker below in `--ink-soft`: "Nothing replaced. A human approves every send."
+### Group L — Help articles
+- `src/config/helpArticles.ts` — rewrite venue→project in bodies at lines 22, 78, 286, 322, 326, 666 where "venue" is generic (KEEP the four "client venue" type-name references per §4.1). Line 317 `tags` array: replace `"venues"` with `"projects"`.
 
-d) **PROOF BAND** — `--green-deep` bg, grain, gold radial wash (dark moment, matches the case-study band on homepage). `proof_line` in bone, any figures matching `/\$[\d,]+\/mo|\$[\d,]+K?/` wrapped gold via a small tokenizer. Row of three gold checks: "In production · Multi-location · Source-cited". Text link "See the work →" to `/work` in gold with arrow slide.
+### Group M — Onboarding step titles/descriptions
+- `src/config/venueOnboardingSteps.ts` — audit every step entry's `title` and `description` display strings; rewrite venue→project. The `VENUE_ONBOARDING_STEPS` constant name, `venueId` field, `href` builders, and detector table names stay.
 
-e) **FAQ** — bone. Reuses `components/ui/accordion` (already used by homepage FAQ) styled with hairline dividers + gold `+`/`−` glyphs, from `faq[]`.
+### §4 hand cases (final)
+1. Workspace.tsx:149 & helpArticles.ts 22/286/322/326 — "client venue" KEPT.
+2. FindingDetail.tsx:273 — placeholder rewritten to use "intentional trade-off".
+3. `src/components/marketing/**` — OUT OF SCOPE (public copy + ProofBand regex preserved).
+4. EditBarDialog.tsx:1045 — "Venue ID" → "Project ID".
 
-f) **FINAL CTA** — bone-2. H2 "Let me run the free audit." body "Real money leaking → we talk. Nothing → I tell you straight, and you've lost nothing." Primary CTA repeated (same `?src=` handling).
+### Post-change verification
+Run `rg -n "[Vv]enue" src -g '*.tsx'` and confirm every surviving hit is one of:
+- A code identifier (component/hook/type/var/prop/table/column name)
+- Under `src/components/marketing/`
+- A kept "client venue" type reference
 
-Motion: reuses existing `Reveal`. No new deps. `prefers-reduced-motion: reduce` respected via the guards already in `src/index.css` under `.stm-marketing`.
+Any other survivor is listed in the summary, not silently edited.
 
-## Part 3 — Personalization param (?biz + ?src)
+---
 
-Read `useSearchParams()` for `biz`. Sanitization (documented here as promised):
+## PART 2 — homepage install language (three edits)
 
-- Trim, collapse internal whitespace to single space
-- Strip all HTML tags via `/<[^>]*>/g`
-- Strip control chars and any char not in `[\p{L}\p{N}\s&'.\-]` (Unicode letters, numbers, and common business-name punctuation)
-- Cap at 40 chars post-strip; empty result → treat as absent
+Only marketing changes permitted this turn. All other `src/components/marketing/**` files untouched.
 
-When present + non-empty:
-- Gold mono eyebrow ABOVE the H1: `A NOTE FOR [BIZ]` (rendered via `{biz}`, escaped by React — no `dangerouslySetInnerHTML`)
-- Stat chip caption changes to `what this looks like for [BIZ]` (replaces the "estimated — your audit uses your numbers" footnote)
+1. `src/components/marketing/sections/WhatIBuild.tsx` — eyebrow `"WHAT I BUILD"` → `"WHAT GETS INSTALLED"`; H2 → `"The systems I install."`; intro sentence ends `"…or stack them into a full operating system — installed, running, and proven in week one."`.
 
-When absent: render nothing extra; footnote stays as spec'd.
+2. `src/components/marketing/sections/FAQ.tsx` — append one item to the `faqs` array:
+   - Q: `"How fast is this really?"`
+   - A: `"Live in 48 hours or the setup fee comes back. You'll typically see the first caught lead inside week one."`
 
-`?src=for-[slug]` appended to every primary CTA URL (hero + final). Implementation: URL parse `cta_primary_url`; if relative (`/#contact`) rewrite to `/?src=for-[slug]#contact`; if absolute, append `?src=` or `&src=` depending on existing query. Fragment-only links become `/?src=for-[slug]#…`. Secondary CTA gets no `src` (per brief — primary only).
+3. No other marketing files change. `Proof.tsx`, `ProofBand.tsx`, and the `\d+-venue` regex remain intact.
 
-## Part 4 — Homepage wiring
+---
 
-Chip-link mapping confirmed (only where the chip label sensibly maps to a published lander):
+## Guardrails
+- Display strings only; zero behavior/logic/schema/route/identifier changes.
+- No edits to `src/integrations/supabase/types.ts`.
+- `tsgo --noEmit` must pass.
+- Post-run rg survivor list reported.
 
-- "Local service businesses" → `/for/plumbing-hvac`
-- "Hospitality & restaurants" → `/for/bars-restaurants`
-- "Real estate", "Fitness", "Coaches & creators", "Multi-location operators" → remain static text (no matching lander in the 5 seeded rows)
-
-Implemented in `src/components/marketing/sections/Industries.tsx` by promoting matched chips from `<span>` to `<Link>` with the same visual class list; hover state adds `--gold-tint` (unchanged).
-
-Footer (`src/components/marketing/sections/Footer.tsx`): new small mono column "FOR YOUR INDUSTRY", rendered data-driven from a `useVerticalLanders()` hook that selects `slug, display_name` from published rows ordered by `sort_order`. Column added as a fourth cell in the grid (grid becomes `md:grid-cols-4`), mono-labeled, gold hover to match existing link styling. Empty list → column hidden.
-
-## Part 5 — Admin tab "Vertical Landers"
-
-New tab added to `src/pages/Admin.tsx` following the existing Work/Portfolio tab pattern (`portfolio_items` admin surface is the reference). Contents:
-
-- List view: table of rows with `slug`, `display_name`, `status` pill, `sort_order`, actions (edit, publish/draft toggle, "View page" link → `/for/[slug]` in new tab), "New lander" button.
-- Editor dialog: fields for every column. `leaks` and `faq` rendered as repeatable row editors (add/remove/reorder) with per-row inputs (`title/line/dollar_note` and `q/a`). `project_type_id` as a select populated from `project_types`. `accent_color` as a segmented control (rust/gold/green). `status` as segmented (draft/published).
-- All writes gated by `has_role(auth.uid(),'admin')` via RLS — no extra client-side guard beyond the existing Admin route protection.
-
-## Part 6 — Files touched (all additive)
-
-- Migration: creates `vertical_landing_pages` + GRANTs + RLS + updated_at trigger
-- Data insert (separate call, after migration approval): 5 seeded rows verbatim
-- New: `src/pages/VerticalLanding.tsx`
-- New: `src/hooks/useVerticalLander.ts`, `src/hooks/useVerticalLanders.ts`
-- New: `src/components/marketing/vertical/*` — Hero, LeaksGrid, Plugged, ProofBand, FaqBlock, FinalCta section components (self-contained, reuse `.card-lift`, `MockupFrame` not needed here, `Reveal`, `Container`, `Eyebrow`, `LiveDot`)
-- Edited: `src/App.tsx` (add `/for/:slug` route)
-- Edited: `src/components/marketing/sections/Industries.tsx` (chip → Link for 2 mappings)
-- Edited: `src/components/marketing/sections/Footer.tsx` (add For Your Industry column)
-- Edited: `src/pages/Admin.tsx` + new admin components under `src/components/admin/vertical-landers/`
-
-## Out of scope
-
-Existing routes, RLS, marketing homepage design tokens, `/qualify/*`, `/q/:venueSlug`, `/work` — untouched.
-
-Awaiting approval to build.
+Awaiting go/no-go.
