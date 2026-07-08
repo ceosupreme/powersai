@@ -178,6 +178,11 @@ const App = () => {
                     <AppLayout><LeakStack /></AppLayout>
                   </ProtectedRoute>
                 } />
+                <Route path="/templates" element={
+                  <ProtectedRoute pageKey="outreach_templates">
+                    <AppLayout><Templates /></AppLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/foundation-audit" element={
                   <ProtectedRoute allowedRoles={['owner']} pageKey="foundation_audit">
                     <AppLayout><FoundationAudit /></AppLayout>
