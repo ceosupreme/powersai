@@ -7551,6 +7551,8 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           sent_at: string | null
+          share_referral_footer: boolean
+          share_token: string | null
           status: string
           updated_at: string
         }
@@ -7569,6 +7571,8 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           sent_at?: string | null
+          share_referral_footer?: boolean
+          share_token?: string | null
           status?: string
           updated_at?: string
         }
@@ -7587,6 +7591,8 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           sent_at?: string | null
+          share_referral_footer?: boolean
+          share_token?: string | null
           status?: string
           updated_at?: string
         }
