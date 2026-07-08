@@ -27,7 +27,7 @@ export const OnboardingChecklist = ({ venueId }: { venueId: string | null }) => 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="text-sm font-semibold text-foreground">
-              Finish venue setup ({state.missing.length} {state.missing.length === 1 ? 'item' : 'items'} left)
+              Finish project setup ({state.missing.length} {state.missing.length === 1 ? 'item' : 'items'} left)
             </div>
             <Button
               size="sm" variant="ghost" className="h-7 w-7 p-0"

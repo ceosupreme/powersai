@@ -93,7 +93,7 @@ export const DataSourcesView = () => {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-foreground">Local Search Visibility · GBP</h3>
-              <span className="text-xs text-muted-foreground">Per-venue connection</span>
+              <span className="text-xs text-muted-foreground">Per-project connection</span>
             </div>
             <GbpLiveExtras venueId={venueId} venueName={venueName} />
           </section>
@@ -104,7 +104,7 @@ export const DataSourcesView = () => {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-foreground">Website &amp; Conversion · Crawler</h3>
-              <span className="text-xs text-muted-foreground">Per-venue audit</span>
+              <span className="text-xs text-muted-foreground">Per-project audit</span>
             </div>
             <WebsiteLiveExtras venueId={venueId} venueName={venueName} />
           </section>

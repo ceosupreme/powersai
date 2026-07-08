@@ -75,7 +75,7 @@ export const ReportBuilderDialog = ({
         <div className="space-y-5 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Venue name</Label>
+              <Label className="text-xs">Project name</Label>
               <Input value={venueName} onChange={e => setVenueName(e.target.value)} className="mt-1" />
             </div>
             <div>

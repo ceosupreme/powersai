@@ -21,8 +21,8 @@ export const HistoryView = () => {
     return (
       <Card className="p-10 text-center bg-card/30 border-dashed">
         <Inbox className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-        <h2 className="text-lg font-semibold text-foreground">Select a venue</h2>
-        <p className="text-sm text-muted-foreground mt-1">Choose a venue to view its audit history.</p>
+        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
+        <p className="text-sm text-muted-foreground mt-1">Choose a project to view its audit history.</p>
       </Card>
     );
   }
@@ -55,7 +55,7 @@ export const HistoryView = () => {
         <Card className="p-10 text-center bg-card/30 border-dashed">
           <div className="text-sm font-medium text-foreground">No audit runs yet</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Trigger "Run Full Audit" from the Overview tab to record this venue's first snapshot.
+            Trigger "Run Full Audit" from the Overview tab to record this project's first snapshot.
           </p>
         </Card>
       ) : (
