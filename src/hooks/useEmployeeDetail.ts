@@ -52,7 +52,8 @@ export const useVenuesByIds = (ids: string[] | null | undefined) => {
       const { data, error } = await supabase
         .from('venues')
         .select('id, name')
-        .in('id', ids);
+        .in('id', ids)
+        .eq('is_prospect_shell', false);
       if (error) throw error;
       return data || [];
     },

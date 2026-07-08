@@ -14,7 +14,7 @@ export function FinalCTA() {
           A 30-minute call. We map your tools, your bottlenecks, and the single highest-leverage system to build first. No pitch, no obligation.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <a href="#contact" className="group inline-flex items-center gap-2 rounded-full bg-[hsl(var(--green))] px-7 py-4 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-xl">
+          <a href="/free-audit" className="group inline-flex items-center gap-2 rounded-full bg-[hsl(var(--green))] px-7 py-4 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-xl">
             Get your free Profit Leak Audit
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </a>

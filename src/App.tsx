@@ -24,6 +24,7 @@ import Admin from "./pages/Admin";
 import AdminSyncHealth from "./pages/AdminSyncHealth";
 import GrowthAudit from "./pages/GrowthAudit";
 import LeakStack from "./pages/LeakStack";
+import FreeAudit from "./pages/FreeAudit";
 import MarketingHub from "./pages/MarketingHub";
 import Tasks from "./pages/Tasks";
 import Logs from "./pages/Logs";
@@ -92,6 +93,7 @@ const App = () => {
                 {/* Public landing page — signed-out visitors see marketing,
                     signed-in users get redirected into the app (handled inside Marketing). */}
                 <Route path="/" element={<MarketingSite />} />
+                <Route path="/free-audit" element={<FreeAudit />} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />

@@ -37,7 +37,11 @@ Deno.serve(async (req) => {
     .from('venues')
     .select('id, name, address, google_place_id, gbp_place_mappings(place_id, manual_only)')
     .eq('is_active', true);
-  if (onlyVenueId) query = query.eq('id', onlyVenueId);
+  if (onlyVenueId) {
+    query = query.eq('id', onlyVenueId);
+  } else {
+    query = query.eq('is_prospect_shell', false);
+  }
   const { data: venues, error: vErr } = await query;
   if (vErr) {
     return new Response(JSON.stringify({ error: vErr.message }), {

@@ -17,4 +17,15 @@ export const ALL_FOUNDATION_CHECKS: FoundationCheck[] = [
   primaryContactCheck,
 ];
 
+// Foundation checks that can run against a cold prospect (only public signals:
+// GBP, website, reviews, social). Internal-data checks (brand.*, offers.has,
+// channels.has, contacts.primary) are excluded — they require data the
+// prospect hasn't given us yet.
+export const COLD_SAFE_FOUNDATION_IDS: ReadonlySet<string> = new Set([
+  'website.live', 'website.https', 'website.mobile', 'website.contact',
+  'gbp.mapped', 'gbp.hours', 'gbp.photos', 'gbp.nap',
+  'reviews.has', 'reviews.rating', 'reviews.volume',
+  'social.instagram', 'social.facebook', 'social.recent',
+]);
+
 export type { FoundationCheck };

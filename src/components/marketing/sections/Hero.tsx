@@ -59,7 +59,7 @@ export function Hero() {
               style={{ animationDelay: "360ms" }}
             >
               <a
-                href="#contact"
+                href="/free-audit"
                 className="group inline-flex items-center gap-2 rounded-full bg-[hsl(var(--green))] px-7 py-4 text-sm font-medium text-[hsl(var(--bone))] transition-all hover:-translate-y-0.5 hover:shadow-xl"
               >
                 Get your free Profit Leak Audit
