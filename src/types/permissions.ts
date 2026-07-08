@@ -129,4 +129,5 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/automations/recovery-reports': 'recovery_reports',
   '/foundation-audit': 'foundation_audit',
   '/leak-stack': 'leak_stack',
+  '/templates': 'outreach_templates',
 };
