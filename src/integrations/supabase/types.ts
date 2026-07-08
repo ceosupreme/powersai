@@ -11602,7 +11602,11 @@ export type Database = {
         | "linkedin_dm"
         | "instagram_dm"
         | "review_reply"
-      automation_key: "followup_sequence" | "reactivation" | "review_request"
+      automation_key:
+        | "followup_sequence"
+        | "reactivation"
+        | "review_request"
+        | "emergency_lead_alert"
       automation_queue_status:
         | "pending_review"
         | "approved"
@@ -11978,7 +11982,12 @@ export const Constants = {
         "instagram_dm",
         "review_reply",
       ],
-      automation_key: ["followup_sequence", "reactivation", "review_request"],
+      automation_key: [
+        "followup_sequence",
+        "reactivation",
+        "review_request",
+        "emergency_lead_alert",
+      ],
       automation_queue_status: [
         "pending_review",
         "approved",
