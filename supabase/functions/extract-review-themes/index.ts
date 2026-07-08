@@ -111,11 +111,19 @@ Deno.serve(async (req) => {
   const venueFilter = (body.venue_id as string | undefined) ?? null;
   const force = body.force === true;
 
-  // Pull venues to iterate.
-  const { data: venues, error: venueErr } = await supabase
+  // Pull venues to iterate. If a specific venue_id was passed (e.g. from the
+  // public-audit pipeline) we honor it even for prospect shells; otherwise
+  // shells are excluded so the cron fan-out never touches them.
+  let venuesQuery = supabase
     .from('venues')
     .select('id, name')
     .eq('is_active', true);
+  if (venueFilter) {
+    venuesQuery = venuesQuery.eq('id', venueFilter);
+  } else {
+    venuesQuery = venuesQuery.eq('is_prospect_shell', false);
+  }
+  const { data: venues, error: venueErr } = await venuesQuery;
   if (venueErr) {
     return new Response(JSON.stringify({ error: venueErr.message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

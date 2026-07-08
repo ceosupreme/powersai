@@ -33,4 +33,15 @@ export const ALL_ANALYZERS: AnalyzerModule[] = [
   operationalReadinessBlockerAnalyzer,
 ];
 
+// Analyzers that can run against a cold prospect. Toast/shift/event/
+// operational-readiness analyzers all require internal data and are excluded.
+export const COLD_SAFE_ANALYZER_IDS: ReadonlySet<string> = new Set([
+  'local_visibility_gap',
+  'map_pack_ranking_gap',
+  'ai_search_visibility_gap',
+  'reputation_risk',
+  'reputation_theme_opportunity',
+  'website_health',
+]);
+
 export type { AnalyzerModule, AnalyzerResult } from './types.ts';

@@ -21,11 +21,17 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const { data: adapters, error } = await admin
       .from('venue_execution_adapters')
-      .select('venue_id')
+      .select('venue_id, venues!inner(is_prospect_shell)')
       .eq('growth_audit_enabled', true);
     if (error) throw error;
 
-    const venueIds = Array.from(new Set((adapters ?? []).map(a => a.venue_id)));
+    // Exclude prospect shells — public-audit pipeline runs the growth audit
+    // exactly once per shell; recurring cron must never re-hit them.
+    const venueIds = Array.from(new Set(
+      (adapters ?? [])
+        .filter((a: any) => a.venues && a.venues.is_prospect_shell === false)
+        .map((a: any) => a.venue_id),
+    ));
     console.log(`[growth-audit-cron] ${venueIds.length} venues queued`);
 
     const results: any[] = [];

@@ -3,7 +3,7 @@
 // catches per-analyzer failures, persists a summary row in growth_audit_runs.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { ALL_ANALYZERS } from '../_shared/analyzers/index.ts';
+import { ALL_ANALYZERS, COLD_SAFE_ANALYZER_IDS } from '../_shared/analyzers/index.ts';
 import { setActorService } from '../_shared/findings.ts';
 
 const corsHeaders = {
@@ -24,10 +24,14 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { venue_id, triggered_by } = body ?? {};
+    const { venue_id, triggered_by, cold_only } = body ?? {};
     if (!venue_id || typeof venue_id !== 'string') {
       return json({ error: 'venue_id required' }, 400);
     }
+
+    const analyzers = cold_only
+      ? ALL_ANALYZERS.filter((a) => COLD_SAFE_ANALYZER_IDS.has(a.id))
+      : ALL_ANALYZERS;
 
     // 1) Open the run row.
     const { data: runRow, error: runErr } = await supabase
@@ -53,7 +57,7 @@ Deno.serve(async (req) => {
     //    but we still wrap defensively so one throw can't kill the loop.
     const perAnalyzer: Record<string, unknown> = {};
     let totalErrors = 0, totalSuccess = 0;
-    for (const analyzer of ALL_ANALYZERS) {
+    for (const analyzer of analyzers) {
       try {
         const r = await analyzer.run(supabase, venue_id);
         perAnalyzer[analyzer.id] = r;
@@ -77,7 +81,7 @@ Deno.serve(async (req) => {
       completed_at: new Date().toISOString(),
       duration_ms,
       summary,
-      notes: `${ALL_ANALYZERS.length} analyzers run; ${totalErrors} with errors`,
+      notes: `${analyzers.length} analyzers run${cold_only ? ' (cold_only)' : ''}; ${totalErrors} with errors`,
     }).eq('id', runId);
 
     return json({ ok: true, run_id: runId, status, duration_ms, summary });

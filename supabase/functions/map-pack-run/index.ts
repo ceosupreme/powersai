@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
     .select('id, name, lat, lng');
   const { data: allVenues, error: venueErr } = venueId
     ? await venueQuery.eq('id', venueId)
-    : await venueQuery.eq('is_active', true);
+    : await venueQuery.eq('is_active', true).eq('is_prospect_shell', false);
   if (venueErr) return json(500, { error: venueErr.message });
 
   const kwQuery = admin

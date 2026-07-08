@@ -4,7 +4,7 @@
 // and records the run in foundation_audit_runs.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { ALL_FOUNDATION_CHECKS } from '../_shared/foundation-checks/index.ts';
+import { ALL_FOUNDATION_CHECKS, COLD_SAFE_FOUNDATION_IDS } from '../_shared/foundation-checks/index.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,10 +31,14 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { venue_id, triggered_by } = body ?? {};
+    const { venue_id, triggered_by, cold_only } = body ?? {};
     if (!venue_id || typeof venue_id !== 'string') {
       return json({ error: 'venue_id required' }, 400);
     }
+
+    const checks = cold_only
+      ? ALL_FOUNDATION_CHECKS.filter((c) => COLD_SAFE_FOUNDATION_IDS.has(c.id))
+      : ALL_FOUNDATION_CHECKS;
 
     const { data: runRow, error: runErr } = await supabase
       .from('foundation_audit_runs')
@@ -60,7 +64,7 @@ Deno.serve(async (req) => {
     const perCheck: Record<string, unknown> = {};
     let inserted = 0, updated = 0, skipped = 0, errors = 0, totalSuccess = 0;
 
-    for (const check of ALL_FOUNDATION_CHECKS) {
+    for (const check of checks) {
       const cStart = Date.now();
       try {
         if (manualKeys.has(check.itemKey)) {
@@ -122,7 +126,7 @@ Deno.serve(async (req) => {
       skipped,
       errors,
       summary,
-      notes: `${ALL_FOUNDATION_CHECKS.length} checks ran; ${errors} with errors; ${skipped} skipped`,
+      notes: `${checks.length} checks ran${cold_only ? ' (cold_only)' : ''}; ${errors} with errors; ${skipped} skipped`,
     }).eq('id', runId);
 
     return json({ ok: true, run_id: runId, status, duration_ms, inserted, updated, skipped, errors, summary });

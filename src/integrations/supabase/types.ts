@@ -7293,6 +7293,74 @@ export type Database = {
           },
         ]
       }
+      public_audit_requests: {
+        Row: {
+          business_name: string
+          city: string
+          created_at: string
+          email: string | null
+          email_captured_at: string | null
+          full_result: Json | null
+          id: string
+          ip_hash: string | null
+          operation_footprint: string
+          place_id: string | null
+          redacted_result: Json | null
+          shell_venue_id: string | null
+          status: string
+          status_detail: string | null
+          token: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          business_name: string
+          city: string
+          created_at?: string
+          email?: string | null
+          email_captured_at?: string | null
+          full_result?: Json | null
+          id?: string
+          ip_hash?: string | null
+          operation_footprint: string
+          place_id?: string | null
+          redacted_result?: Json | null
+          shell_venue_id?: string | null
+          status?: string
+          status_detail?: string | null
+          token: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          business_name?: string
+          city?: string
+          created_at?: string
+          email?: string | null
+          email_captured_at?: string | null
+          full_result?: Json | null
+          id?: string
+          ip_hash?: string | null
+          operation_footprint?: string
+          place_id?: string | null
+          redacted_result?: Json | null
+          shell_venue_id?: string | null
+          status?: string
+          status_detail?: string | null
+          token?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_audit_requests_shell_venue_id_fkey"
+            columns: ["shell_venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reactivation_campaign_runs: {
         Row: {
           created_at: string
@@ -9950,6 +10018,7 @@ export type Database = {
           google_place_id: string | null
           id: string
           is_active: boolean | null
+          is_prospect_shell: boolean
           lat: number | null
           lng: number | null
           monetization_model: string | null
@@ -9999,6 +10068,7 @@ export type Database = {
           google_place_id?: string | null
           id?: string
           is_active?: boolean | null
+          is_prospect_shell?: boolean
           lat?: number | null
           lng?: number | null
           monetization_model?: string | null
@@ -10048,6 +10118,7 @@ export type Database = {
           google_place_id?: string | null
           id?: string
           is_active?: boolean | null
+          is_prospect_shell?: boolean
           lat?: number | null
           lng?: number | null
           monetization_model?: string | null

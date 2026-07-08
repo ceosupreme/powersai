@@ -8,6 +8,7 @@ export async function fetchVenues(): Promise<Venue[]> {
     .from('venues')
     .select('id, name, bar_code, city, owner_name, gm_name, is_active')
     .eq('is_active', true)
+    .eq('is_prospect_shell', false)
     .order('name');
   if (error) throw error;
   return (data || []) as unknown as Venue[];
