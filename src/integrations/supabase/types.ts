@@ -5605,6 +5605,56 @@ export type Database = {
           },
         ]
       }
+      leak_stack_runs: {
+        Row: {
+          computed_at: string
+          created_at: string
+          id: string
+          inputs_basis: Json
+          results: Json
+          top_leak_key: string | null
+          total_monthly_dollars: number
+          total_risk_exposure_dollars: number
+          triggered_by: string | null
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          computed_at?: string
+          created_at?: string
+          id?: string
+          inputs_basis?: Json
+          results?: Json
+          top_leak_key?: string | null
+          total_monthly_dollars?: number
+          total_risk_exposure_dollars?: number
+          triggered_by?: string | null
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          computed_at?: string
+          created_at?: string
+          id?: string
+          inputs_basis?: Json
+          results?: Json
+          top_leak_key?: string | null
+          total_monthly_dollars?: number
+          total_risk_exposure_dollars?: number
+          triggered_by?: string | null
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leak_stack_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       log_entries: {
         Row: {
           bar_id: string
@@ -6794,6 +6844,8 @@ export type Database = {
           id: string
           name: string
           project_id: string
+          risk_multiplier: number
+          risk_type: string
           severity: string
           sort_order: number
           updated_at: string
@@ -6806,6 +6858,8 @@ export type Database = {
           id?: string
           name: string
           project_id: string
+          risk_multiplier?: number
+          risk_type?: string
           severity?: string
           sort_order?: number
           updated_at?: string
@@ -6818,6 +6872,8 @@ export type Database = {
           id?: string
           name?: string
           project_id?: string
+          risk_multiplier?: number
+          risk_type?: string
           severity?: string
           sort_order?: number
           updated_at?: string
@@ -6976,6 +7032,8 @@ export type Database = {
           id: string
           name: string
           project_type: Database["public"]["Enums"]["project_type_enum"]
+          risk_multiplier: number
+          risk_type: string
           severity: string
           sort_order: number
           updated_at: string
@@ -6988,6 +7046,8 @@ export type Database = {
           id?: string
           name: string
           project_type: Database["public"]["Enums"]["project_type_enum"]
+          risk_multiplier?: number
+          risk_type?: string
           severity?: string
           sort_order?: number
           updated_at?: string
@@ -7000,6 +7060,8 @@ export type Database = {
           id?: string
           name?: string
           project_type?: Database["public"]["Enums"]["project_type_enum"]
+          risk_multiplier?: number
+          risk_type?: string
           severity?: string
           sort_order?: number
           updated_at?: string
@@ -7073,6 +7135,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          display_defaults: Json
           id: string
           is_vertical: boolean
           label: string
@@ -7083,6 +7146,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          display_defaults?: Json
           id: string
           is_vertical?: boolean
           label: string
@@ -7093,6 +7157,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          display_defaults?: Json
           id?: string
           is_vertical?: boolean
           label?: string
