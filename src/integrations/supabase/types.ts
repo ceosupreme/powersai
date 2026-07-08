@@ -7122,6 +7122,7 @@ export type Database = {
       project_type_qualifier_config: {
         Row: {
           created_at: string
+          operation_footprint_options: Json | null
           primary_channel: string | null
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition: string | null
@@ -7130,6 +7131,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          operation_footprint_options?: Json | null
           primary_channel?: string | null
           project_type: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
@@ -7138,6 +7140,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          operation_footprint_options?: Json | null
           primary_channel?: string | null
           project_type?: Database["public"]["Enums"]["project_type_enum"]
           ready_definition?: string | null
