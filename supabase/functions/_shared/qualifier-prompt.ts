@@ -30,6 +30,10 @@ export interface UrgencyOption {
   guidance: string;
 }
 
+// Same shape as UrgencyOption. Optional soft-ask surfaced in the prompt.
+// Passed back inside qualifier_data.operation_footprint (no tool-schema change).
+export type FootprintOption = { label: string; guidance: string };
+
 export interface QualifierContext {
   project_type: string;
   vertical_label: string;
@@ -37,6 +41,7 @@ export interface QualifierContext {
   ready_definition: string | null;
   primary_channel: string | null;
   urgency_options: Partial<Record<UrgencyClass, UrgencyOption>> | null;
+  operation_footprint_options: Record<string, FootprintOption> | null;
 }
 
 export async function loadQualifierContext(projectType: string): Promise<QualifierContext> {
@@ -52,7 +57,7 @@ export async function loadQualifierContext(projectType: string): Promise<Qualifi
       .eq("project_type", projectType)
       .order("sort_order", { ascending: true }),
     admin.from("project_type_qualifier_config")
-      .select("ready_definition,primary_channel,urgency_options")
+      .select("ready_definition,primary_channel,urgency_options,operation_footprint_options")
       .eq("project_type", projectType)
       .maybeSingle(),
     admin.from("project_types").select("label").eq("id", projectType).maybeSingle(),
@@ -73,6 +78,23 @@ export async function loadQualifierContext(projectType: string): Promise<Qualifi
     if (Object.keys(filtered).length > 0) urgency = filtered;
   }
 
+  // Footprint options: free-form keys (no DB CHECK). Filter to well-formed
+  // { label, guidance } shapes; missing/malformed → null (soft-ask disabled).
+  const rawFootprint = (cfg as any)?.operation_footprint_options ?? null;
+  let footprint: Record<string, FootprintOption> | null = null;
+  if (rawFootprint && typeof rawFootprint === "object") {
+    const filtered: Record<string, FootprintOption> = {};
+    for (const [k, v] of Object.entries(rawFootprint)) {
+      if (v && typeof v === "object" && typeof (v as any).label === "string") {
+        filtered[k] = {
+          label: (v as any).label,
+          guidance: String((v as any).guidance ?? ""),
+        };
+      }
+    }
+    if (Object.keys(filtered).length > 0) footprint = filtered;
+  }
+
   return {
     project_type: projectType,
     vertical_label: (pt as any)?.label ?? projectType,
@@ -80,6 +102,7 @@ export async function loadQualifierContext(projectType: string): Promise<Qualifi
     ready_definition: (cfg as any)?.ready_definition ?? null,
     primary_channel: (cfg as any)?.primary_channel ?? null,
     urgency_options: urgency,
+    operation_footprint_options: footprint,
   };
 }
 
@@ -103,6 +126,17 @@ If someone describes an emergency, do this FIRST before anything else:
 4. If it sounds life-threatening, say once: "If this is life-threatening, please call 911." Do NOT give any other safety advice or instructions.`
     : "";
 
+  const footprintBlock = ctx.operation_footprint_options
+    ? `
+
+Operation footprint (soft-ask, optional):
+If it comes up naturally, figure out roughly how big their operation is and include the matching key inside \`qualifier_data\` as \`operation_footprint\`. Never demand this — one gentle question at most. Options:
+${Object.entries(ctx.operation_footprint_options)
+  .map(([key, opt]) => `- ${key} — ${opt.label}: ${opt.guidance}`)
+  .join("\n")}
+If you're not sure or they didn't say, omit \`operation_footprint\` — the field is optional.`
+    : "";
+
   return `You are a friendly intake agent for a ${ctx.vertical_label} business. Your job is to have a short, natural conversation with someone who just reached out, find out what they need, and decide if they're a good fit to hand off to the team right now.
 
 Style rules:
@@ -110,7 +144,7 @@ Style rules:
 - Ask ONE thing at a time. Keep each turn to 1–2 sentences.
 - If they already told you something, don't ask it again.
 - It's fine to combine two short related questions ("What's a good name and phone number to reach you?").
-- If they sound urgent or upset, acknowledge that first.${urgencyBlock}
+- If they sound urgent or upset, acknowledge that first.${urgencyBlock}${footprintBlock}
 
 What you need to learn (you decide the order based on the conversation, but cover all of these before deciding):
 ${fieldList}
