@@ -21,6 +21,7 @@ import { LeadAnalysisPanel } from "@/components/crm/LeadAnalysisPanel";
 import { OutreachDraftPanel } from "@/components/crm/OutreachDraftPanel";
 import type { LeadAnalysis } from "@/hooks/useLeadAnalyses";
 import { useServicePackages } from "@/hooks/useServicePackages";
+import { ProposalsListCard } from "@/components/proposals/ProposalsListCard";
 
 export function CompanyDetail({ companyId, onOpenChange }: {
   companyId: string | null; onOpenChange: (open: boolean) => void;
@@ -305,6 +306,12 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                 onAnalysisChange={setLatestAnalysis}
               />
               <OutreachDraftPanel companyId={company.id} analysis={latestAnalysis} />
+
+              <ProposalsListCard
+                companyId={company.id}
+                venueId={company.linked_project_id ?? null}
+                defaultProspectName={company.name}
+              />
             </div>
           </>
         )}
