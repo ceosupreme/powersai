@@ -35,7 +35,7 @@ export default function RecoveryReports() {
     return (
       <RecoveryReportPrintHarness
         report={branded}
-        displayName={selectedBar?.name ?? "your business"}
+        displayName={selectedBar?.bar_name ?? "your business"}
         onBack={() => setBrandedId(null)}
       />
     );
