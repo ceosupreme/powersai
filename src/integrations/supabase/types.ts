@@ -6325,6 +6325,48 @@ export type Database = {
           },
         ]
       }
+      outreach_templates: {
+        Row: {
+          body: string
+          category: string
+          channel: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          subject: string | null
+          updated_at: string
+          vertical: string | null
+        }
+        Insert: {
+          body: string
+          category: string
+          channel: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          subject?: string | null
+          updated_at?: string
+          vertical?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          subject?: string | null
+          updated_at?: string
+          vertical?: string | null
+        }
+        Relationships: []
+      }
       period_config: {
         Row: {
           bar_id: string

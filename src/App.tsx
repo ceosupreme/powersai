@@ -25,6 +25,7 @@ import AdminSyncHealth from "./pages/AdminSyncHealth";
 import GrowthAudit from "./pages/GrowthAudit";
 import LeakStack from "./pages/LeakStack";
 import FreeAudit from "./pages/FreeAudit";
+import Templates from "./pages/Templates";
 import MarketingHub from "./pages/MarketingHub";
 import Tasks from "./pages/Tasks";
 import Logs from "./pages/Logs";
@@ -175,6 +176,11 @@ const App = () => {
                 <Route path="/leak-stack" element={
                   <ProtectedRoute allowedRoles={['owner']} pageKey="leak_stack">
                     <AppLayout><LeakStack /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/templates" element={
+                  <ProtectedRoute pageKey="outreach_templates">
+                    <AppLayout><Templates /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/foundation-audit" element={

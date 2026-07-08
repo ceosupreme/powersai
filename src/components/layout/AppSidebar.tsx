@@ -52,6 +52,7 @@ import {
   FileText,
   Sparkles,
   Zap,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -135,6 +136,7 @@ const navGroups: NavGroup[] = [
       { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks', pageKey: 'tasks' },
       { path: '/logs', label: 'Logs', icon: ClipboardList, pageKey: 'logs' },
       { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat', pageKey: 'chat' },
+      { path: '/templates', label: 'Outreach Templates', icon: MessageSquare, pageKey: 'outreach_templates' },
     ],
   },
   {
