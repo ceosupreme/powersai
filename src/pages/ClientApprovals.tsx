@@ -54,7 +54,7 @@ export default function ClientApprovals() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("venue_assignments" as any)
         .select("venue_id")
         .eq("user_id", user.id)
