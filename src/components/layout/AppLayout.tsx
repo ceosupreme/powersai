@@ -70,6 +70,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       return <VenueLeadershipLayout>{wrappedChildren}</VenueLeadershipLayout>;
     case 'shift-execution':
       return <ShiftExecutionLayout>{wrappedChildren}</ShiftExecutionLayout>;
+    case 'client':
+      return <ClientLayout>{wrappedChildren}</ClientLayout>;
     default:
       return <VenueLeadershipLayout>{wrappedChildren}</VenueLeadershipLayout>;
   }
