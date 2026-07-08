@@ -1,0 +1,94 @@
+/* Proposal print surface — bone / forest / rust / gold palette, print-safe. */
+@media print {
+  @page {
+    size: Letter;
+    margin: 0.55in 0.5in;
+  }
+  html, body { background: white !important; }
+  body * { visibility: hidden; }
+  .proposal-print-root, .proposal-print-root * { visibility: visible; }
+  .proposal-print-root {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #F7F4EC !important;
+  }
+  .proposal-no-print { display: none !important; }
+  .proposal-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .proposal-surface { background: #F7F4EC !important; }
+}
+
+.proposal-surface {
+  background: #F7F4EC;
+  color: #14202B;
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+}
+.proposal-display {
+  font-family: 'Bricolage Grotesque', 'DM Serif Display', serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #0E5236;
+}
+.proposal-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.proposal-eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #7B6F5A;
+}
+.proposal-money {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: #B5431E;
+  font-weight: 600;
+}
+.proposal-rule { border-color: #E4DECF; }
+.proposal-card {
+  background: #FFFDF7;
+  border: 1px solid #E4DECF;
+  border-radius: 4px;
+}
+.proposal-check { color: #C9A24B; }
+.proposal-forest { color: #0E5236; }
+.proposal-rust { color: #B5431E; }
+.proposal-gold { color: #C9A24B; }
+.proposal-ink-muted { color: #7B6F5A; }
+.proposal-manual-pill {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  padding: 1px 6px;
+  border: 1px solid #C9A24B;
+  border-radius: 999px;
+  color: #7B5A17;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.proposal-draft-watermark {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bricolage Grotesque', serif;
+  font-size: 14rem;
+  color: rgba(181, 67, 30, 0.06);
+  transform: rotate(-24deg);
+  letter-spacing: 0.4em;
+  z-index: 0;
+  user-select: none;
+}
