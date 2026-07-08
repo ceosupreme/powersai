@@ -27,9 +27,21 @@ const Body = z.object({
   // this is the resolved venues.id so follow-up automation can fire against
   // that client's enrollment. Null on the generic vertical route.
   captured_for_project_id: z.string().uuid().optional().nullable(),
+  // Urgency triage — strictly validated against the five canonical classes.
+  // Anything outside the enum (future vertical with custom keys, or a
+  // hallucinated tool arg) is silently dropped so the lead still saves;
+  // losing a label is fine, losing the lead is not.
+  urgency_class: z.unknown().optional().nullable(),
   // Honeypot — must be empty. Real users never see/fill this field.
   company_website: z.string().max(0).optional().nullable(),
 });
+
+const CANONICAL_URGENCY = new Set([
+  "emergency", "same_day", "routine", "estimate", "maintenance",
+]);
+function normalizeUrgency(v: unknown): string | null {
+  return typeof v === "string" && CANONICAL_URGENCY.has(v) ? v : null;
+}
 
 // NOTE: Best-effort, per-process rate limit. Edge functions are stateless and
 // can scale horizontally, so this counter resets across cold starts / instances.
@@ -85,7 +97,11 @@ Deno.serve(async (req) => {
     name, business_name, email, phone, message,
     project_type, qualifier_data, is_ready, not_ready_reason,
     transcript, conversation_channel, route_to, captured_for_project_id,
+    urgency_class: urgencyRaw,
   } = parsed.data;
+
+  const urgency_class = normalizeUrgency(urgencyRaw);
+  const urgency_captured_at = urgency_class ? new Date().toISOString() : null;
 
   // Either email or phone is required so we can actually contact the lead.
   if (!email && !phone) {
@@ -116,6 +132,8 @@ Deno.serve(async (req) => {
     conversation_channel: conversation_channel || null,
     route_to: route_to || "self",
     captured_for_project_id: captured_for_project_id ?? null,
+    urgency_class,
+    urgency_captured_at,
     source: captured_for_project_id && project_type
       ? `qualifier:${project_type}:client`
       : project_type
@@ -129,6 +147,22 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: "Could not save submission" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  // Emergency alert — fire-and-forget, never blocks the response.
+  if (urgency_class === "emergency" && inserted?.id) {
+    try {
+      fetch(`${supabaseUrl}/functions/v1/alert-emergency-lead`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+        body: JSON.stringify({ lead_id: inserted.id }),
+      }).catch((e) => console.error("[submit-inbound-lead] alert-emergency error", e));
+    } catch (e) {
+      console.error("[submit-inbound-lead] alert-emergency dispatch failed", e);
+    }
   }
 
   // Fire-and-forget Build C follow-up sequence enrollment. If the project for
