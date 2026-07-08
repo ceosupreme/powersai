@@ -95,7 +95,7 @@ export function MetricDetailContent({
       <div className="px-5 py-5 space-y-5 overflow-y-auto">
         {notApplicable ? (
           <div className="py-8 text-center text-sm text-muted-foreground">
-            Not applicable — this venue does not use a KDS workflow.
+            Not applicable — this project does not use a KDS workflow.
           </div>
         ) : stats.kdsEmpty ? (
           <div className="py-8 text-center text-sm text-muted-foreground">

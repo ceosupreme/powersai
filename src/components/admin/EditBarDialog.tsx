@@ -333,7 +333,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
 
   const searchGooglePlace = async () => {
     const query = [formData.name, formData.address].filter(Boolean).join(' ');
-    if (!query.trim()) { toast.error('Enter a venue name or address first'); return; }
+    if (!query.trim()) { toast.error('Enter a project name or address first'); return; }
     setSearchingPlace(true);
     setPlaceResults([]);
     try {
@@ -467,10 +467,10 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
         <DialogHeader className="px-6 pt-6 pb-3 border-b border-border">
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            {editingBar ? `Edit ${editingBar.name}` : 'Add New Venue'}
+            {editingBar ? `Edit ${editingBar.name}` : 'Add New Project'}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {editingBar ? 'Update venue details, integrations, and leadership.' : 'Configure a new venue location.'}
+            {editingBar ? 'Update project details, integrations, and leadership.' : 'Configure a new project.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -551,12 +551,12 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 <Card className="bg-muted/20 border-border">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" /> Venue Details
+                      <Building2 className="h-4 w-4 text-muted-foreground" /> Project Details
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="name">Venue Name <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="name">Project Name <span className="text-destructive">*</span></Label>
                       <Input id="name" value={formData.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Club Marina" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -673,7 +673,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                           Find
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground">Required for automatic Google rating sync. Auto-search uses venue name + address.</p>
+                      <p className="text-xs text-muted-foreground">Required for automatic Google rating sync. Auto-search uses project name + address.</p>
                     </div>
                     {placeResults.length > 0 && (
                       <div className="space-y-2">
@@ -720,7 +720,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 ) : (
                   <Card className="bg-muted/20 border-dashed border-border">
                     <CardContent className="py-4 text-xs text-muted-foreground text-center">
-                      Save the venue first to configure Asana log sources.
+                      Save the project first to configure Asana log sources.
                     </CardContent>
                   </Card>
                 )}
@@ -793,11 +793,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        <UserPlus className="h-4 w-4 text-muted-foreground" /> Venue Leadership
+                        <UserPlus className="h-4 w-4 text-muted-foreground" /> Project Leadership
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-xs text-muted-foreground mb-3">GMs and lead staff for this venue. These appear in insight assignment dropdowns.</p>
+                      <p className="text-xs text-muted-foreground mb-3">GMs and lead staff for this project. These appear in insight assignment dropdowns.</p>
                       {venueLeaders.length > 0 && (
                         <div className="space-y-2 mb-3">
                           {venueLeaders.map((leader) => (
@@ -851,7 +851,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 ) : (
                   <Card className="bg-muted/20 border-dashed border-border">
                     <CardContent className="py-4 text-xs text-muted-foreground text-center">
-                      Save the venue first to add leadership contacts.
+                      Save the project first to add leadership contacts.
                     </CardContent>
                   </Card>
                 )}
@@ -863,12 +863,12 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                   <Card className="bg-muted/20 border-border">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        <BookUser className="h-4 w-4 text-muted-foreground" /> Venue Contacts
+                        <BookUser className="h-4 w-4 text-muted-foreground" /> Project Contacts
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-xs text-muted-foreground mb-3">
-                        External vendors and service contacts this venue relies on — plumber, electrician, beverage rep, non-emergency lines, etc.
+                        External vendors and service contacts this project relies on — plumber, electrician, beverage rep, non-emergency lines, etc.
                       </p>
 
                       {venueContacts.length > 0 && (
@@ -964,7 +964,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                 ) : (
                   <Card className="bg-muted/20 border-dashed border-border">
                     <CardContent className="py-4 text-xs text-muted-foreground text-center">
-                      Save the venue first to add contacts.
+                      Save the project first to add contacts.
                     </CardContent>
                   </Card>
                 )}
@@ -1042,7 +1042,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                         <span>{editingBar.user_count ?? 0}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Venue ID</span>
+                        <span className="text-muted-foreground">Project ID</span>
                         <span className="font-mono">{editingBar.id}</span>
                       </div>
                     </CardContent>
@@ -1079,9 +1079,9 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       <CardTitle className="text-sm font-semibold text-destructive">Danger Zone</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-xs text-muted-foreground mb-3">Permanently delete this venue and unassign all users. This cannot be undone.</p>
+                      <p className="text-xs text-muted-foreground mb-3">Permanently delete this project and unassign all users. This cannot be undone.</p>
                       <Button type="button" variant="destructive" size="sm" onClick={handleDelete} className="gap-1.5">
-                        <Trash2 className="h-4 w-4" /> Delete Venue
+                        <Trash2 className="h-4 w-4" /> Delete Project
                       </Button>
                     </CardContent>
                   </Card>

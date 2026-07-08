@@ -15,7 +15,7 @@ type SortKey = 'name' | 'score' | 'grade' | 'weeklyRevenue' | 'laborScore' | 'op
 type SortDir = 'asc' | 'desc';
 
 const COLUMNS: { key: SortKey; label: string; hideOnMobile?: boolean }[] = [
-  { key: 'name', label: 'Venue' },
+  { key: 'name', label: 'Project' },
   { key: 'score', label: 'Score' },
   { key: 'grade', label: 'Grade', hideOnMobile: true },
   { key: 'weeklyRevenue', label: 'Revenue' },

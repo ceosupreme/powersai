@@ -259,7 +259,7 @@ const WeeklyReview = () => {
       {/* Low confidence banner */}
       {isLowConfidence && (
         <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-muted border border-border">
-          <span className="text-sm text-foreground">⚠️ <strong>Limited Data</strong> — This venue is missing POS sales data for this week. Scores are based only on scheduling, tasks, and reviews. Revenue and guest metrics may show as N/A.</span>
+          <span className="text-sm text-foreground">⚠️ <strong>Limited Data</strong> — This project is missing POS sales data for this week. Scores are based only on scheduling, tasks, and reviews. Revenue and guest metrics may show as N/A.</span>
         </div>
       )}
 

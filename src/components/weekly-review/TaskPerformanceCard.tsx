@@ -94,7 +94,7 @@ export const TaskPerformanceCard = ({
         <CheckSquare className="w-5 h-5 text-muted-foreground" />
         <span className="font-semibold text-sm text-foreground">Task Performance</span>
         <span className="text-xs text-muted-foreground">
-          — no GM Asana tasks tracked for this venue this week
+          — no GM Asana tasks tracked for this project this week
           {current.totalOutstanding != null && current.totalOutstanding > 0
             ? ` (${current.totalOutstanding} outstanding)`
             : current.openBacklog != null && current.openBacklog > 0

@@ -3,6 +3,7 @@ import { Container, SectionHeading } from "@/components/marketing/site/primitive
 
 const faqs = [
   { q: "What kind of businesses do you work with?", a: "Operations-heavy businesses where data is scattered across multiple tools — hospitality, multi-location operators, real estate, fitness, coaches and creators, and local service businesses. If your team uses several systems to get through the week, this is built for you." },
+  { q: "How fast is this really?", a: "Live in 48 hours or the setup fee comes back. You'll typically see the first caught lead inside week one." },
   { q: "Do I need to understand AI to work with you?", a: "No. The point is that you don't have to. I translate AI capability into clear systems that fit how your business already works. You stay focused on running the business." },
   { q: "Do you still build websites and marketing?", a: "Yes — when they plug into the larger system. A site that captures leads but doesn't connect to anything is the old way. I build sites and marketing engines that feed into the same source of truth as everything else." },
   { q: "What does an engagement look like?", a: "Three phases: discovery and architecture, build and integrate, then launch and improve. Most engagements continue on a retainer because operations keep changing. Smaller scopes — an audit, a single dashboard, one automation — are also a good place to start." },

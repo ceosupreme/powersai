@@ -114,10 +114,10 @@ export const SculptureSiteMappingPanel = () => {
             />
           </div>
           <div className="space-y-1 flex-1">
-            <label className="text-xs text-muted-foreground">Venue</label>
+            <label className="text-xs text-muted-foreground">Project</label>
             <Select value={newVenueId} onValueChange={setNewVenueId}>
               <SelectTrigger className="h-9 text-sm">
-                <SelectValue placeholder="Select venue" />
+                <SelectValue placeholder="Select project" />
               </SelectTrigger>
               <SelectContent>
                 {venues.map(v => (

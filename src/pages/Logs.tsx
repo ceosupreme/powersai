@@ -97,9 +97,9 @@ export default function Logs() {
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
             <ClipboardList className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-semibold text-foreground mb-2">No Venue Selected</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-2">No Project Selected</h2>
           <p className="text-muted-foreground max-w-sm mx-auto">
-            Please select a venue to access logs.
+            Please select a project to access logs.
           </p>
         </div>
       </div>

@@ -270,7 +270,7 @@ export const FindingDetail = ({ finding, gate, onClose, onUpdate }: Props) => {
           <Textarea
             value={dismissReason}
             onChange={(e) => setDismissReason(e.target.value)}
-            placeholder="e.g. Already addressed last quarter; data lag from Toast sync; intentional venue choice."
+            placeholder="e.g. Already addressed last quarter; data lag from Toast sync; intentional trade-off."
             rows={3}
           />
           <DialogFooter>

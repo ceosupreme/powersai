@@ -15,9 +15,9 @@ export function WhatIBuild() {
     <section id="what-i-build" className="relative border-t border-[hsl(var(--line))] py-20 md:py-28">
       <Container>
         <SectionHeading
-          eyebrow="What I build"
-          title="AI Systems I Build"
-          sub="Six surfaces that most often move the needle for operators running on too many tools. Pick one as a focused first step, or stack them into a full operating system."
+          eyebrow="What gets installed"
+          title="The systems I install."
+          sub="Six surfaces that most often move the needle for operators running on too many tools. Pick one as a focused first step, or stack them into a full operating system — installed, running, and proven in week one."
         />
 
         <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">

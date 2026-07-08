@@ -54,7 +54,7 @@ export function DailyFlashTable({ venues, yesterday, lastUpdated }: DailyFlashTa
             <table className="w-full">
               <thead>
                 <tr className="border-t border-b border-border bg-muted/50">
-                  <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Venue</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Project</th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Net Sales</th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">vs Target</th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Labor %</th>

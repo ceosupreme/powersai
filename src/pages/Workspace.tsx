@@ -73,8 +73,8 @@ const Workspace = () => {
   if (!selectedBar) {
     return (
       <Card className="p-10 text-center bg-card/30 border-dashed">
-        <h2 className="text-lg font-semibold text-foreground">Select a venue</h2>
-        <p className="text-sm text-muted-foreground mt-1">Pick a venue from the global header to see your workspace.</p>
+        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
+        <p className="text-sm text-muted-foreground mt-1">Pick a project from the global header to see your workspace.</p>
       </Card>
     );
   }

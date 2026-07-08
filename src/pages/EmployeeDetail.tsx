@@ -117,7 +117,7 @@ const EmployeeDetail = () => {
 
           {showVenueSwitcher && activeVenue && (
             <div className="min-w-[200px]">
-              <div className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Venue context</div>
+              <div className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Project context</div>
               <Select value={activeVenue} onValueChange={setActiveVenue}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>

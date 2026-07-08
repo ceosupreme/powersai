@@ -135,7 +135,7 @@ const SuggestDialog = ({
         <DialogHeader>
           <DialogTitle>AI keyword suggestions · {venueName}</DialogTitle>
           <DialogDescription>
-            Pulled from this venue's GBP categories and positive review themes. Select the ones to add.
+            Pulled from this project's GBP categories and positive review themes. Select the ones to add.
           </DialogDescription>
         </DialogHeader>
         {loading ? (
@@ -420,11 +420,11 @@ export const MapPackKeywordsPanel = () => {
         <div className="flex-1">
           <h3 className="text-base font-semibold text-foreground">Map Pack Keywords</h3>
           <p className="text-xs text-muted-foreground">
-            Track each venue's Google local search rank for high-intent keywords. Weekly cron + on-demand trigger (1h cooldown).
+            Track each project's Google local search rank for high-intent keywords. Weekly cron + on-demand trigger (1h cooldown).
           </p>
         </div>
         <Input
-          placeholder="Filter venues…"
+          placeholder="Filter projects…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-xs"
