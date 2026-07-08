@@ -66,6 +66,7 @@ import AutomationInbox from "./pages/AutomationInbox";
 import ClientApprovals from "./pages/ClientApprovals";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
+import PublicRecoveryReport from "./pages/PublicRecoveryReport";
 import FoundationAudit from "./pages/FoundationAudit";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
@@ -106,6 +107,8 @@ const App = () => {
                     stamps inbound leads with captured_for_project_id so the
                     client's follow-up enrollment fires automatically. */}
                 <Route path="/q/:venueSlug" element={<QualifyForVenue />} />
+                {/* Public shared Recovery Report — no auth, integrity-gated by the edge function. */}
+                <Route path="/r/:token" element={<PublicRecoveryReport />} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>
