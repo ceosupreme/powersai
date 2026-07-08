@@ -9,6 +9,7 @@ export interface AutomationEnrollment {
   automation_key: AutomationKey;
   enabled: boolean;
   config: Record<string, unknown>;
+  approval_mode: 'operator' | 'client';
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +37,7 @@ export function useUpsertEnrollment() {
       automation_key: AutomationKey;
       enabled: boolean;
       config?: Record<string, unknown>;
+      approval_mode?: 'operator' | 'client';
     }) => {
       const { error } = await (supabase as any)
         .from("project_automation_enrollments")
@@ -45,6 +47,7 @@ export function useUpsertEnrollment() {
             automation_key: input.automation_key,
             enabled: input.enabled,
             config: input.config ?? {},
+            ...(input.approval_mode ? { approval_mode: input.approval_mode } : {}),
           },
           { onConflict: "project_id,automation_key" },
         );

@@ -27,7 +27,8 @@ export type PageKey =
   | 'automation_inbox'
   | 'reactivation'
   | 'recovery_reports'
-  | 'foundation_audit';
+  | 'foundation_audit'
+  | 'client_approvals';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];

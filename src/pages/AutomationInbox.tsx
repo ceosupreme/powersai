@@ -12,7 +12,7 @@ import {
   type QueueItem,
   type QueueStatus,
 } from "@/hooks/useAutomationQueue";
-import type { AutomationKey } from "@/hooks/useAutomationEnrollments";
+import { type AutomationKey, useAutomationEnrollments } from "@/hooks/useAutomationEnrollments";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
 
@@ -27,12 +27,18 @@ export default function AutomationInbox() {
   const projectId = selectedBar?.id ?? null;
   const [automation, setAutomation] = useState<AutomationKey | "all">("all");
   const [status, setStatus] = useState<QueueStatus | "all">("pending_review");
+  const [flaggedOnly, setFlaggedOnly] = useState(false);
 
   const { data: items = [], isLoading } = useAutomationQueue({
     projectId,
     automationKey: automation === "all" ? null : automation,
     status: status === "all" ? null : status,
+    flaggedOnly,
   });
+  const { data: enrollments = [] } = useAutomationEnrollments(projectId);
+  const clientModeKeys = useMemo(() => new Set(
+    enrollments.filter((e) => e.approval_mode === "client").map((e) => e.automation_key),
+  ), [enrollments]);
 
   const counts = useMemo(() => ({
     pending_review: items.filter((i) => i.status === "pending_review").length,
@@ -61,6 +67,13 @@ export default function AutomationInbox() {
           <Badge variant="outline">Approved: {counts.approved}</Badge>
           <Badge variant="outline">Sent: {counts.sent}</Badge>
         </div>
+        <Button
+          variant={flaggedOnly ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFlaggedOnly((v) => !v)}
+        >
+          {flaggedOnly ? "Showing flagged" : "Flagged"}
+        </Button>
         <Select value={automation} onValueChange={(v) => setAutomation(v as AutomationKey | "all")}>
           <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -90,14 +103,16 @@ export default function AutomationInbox() {
         <Card className="p-8 text-center text-sm text-muted-foreground">No messages match these filters.</Card>
       ) : (
         <div className="space-y-3">
-          {items.map((item) => <QueueRow key={item.id} item={item} />)}
+          {items.map((item) => (
+            <QueueRow key={item.id} item={item} isClientMode={clientModeKeys.has(item.automation_key)} />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-function QueueRow({ item }: { item: QueueItem }) {
+function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boolean }) {
   const { approve, reject, sendNow } = useQueueMutations();
   const [body, setBody] = useState(item.edited_body ?? item.body);
   const recipient = item.recipient_snapshot as { name?: string; email?: string; phone?: string };
@@ -109,12 +124,20 @@ function QueueRow({ item }: { item: QueueItem }) {
         <div className="flex items-center gap-2 text-sm">
           <Badge>{AUTOMATION_LABELS[item.automation_key]}</Badge>
           <Badge variant="outline">{item.channel}</Badge>
+          {isClientMode && <Badge variant="secondary">CLIENT QUEUE</Badge>}
+          {item.flagged_for_operator && <Badge variant="destructive">Flagged</Badge>}
           <span className="font-medium">{recipient.name ?? "(unknown)"}</span>
           <span className="text-muted-foreground">→ {to}</span>
         </div>
         <div className="text-xs text-muted-foreground">
           {item.scheduled_for ? `Sends ${new Date(item.scheduled_for).toLocaleString()}` : "Send immediately"}
           {" · "}{item.status}
+          {item.approved_at && item.status === "approved" && isClientMode && (
+            <> · Approved by client · {new Date(item.approved_at).toLocaleString()}</>
+          )}
+          {item.approved_at && item.status === "rejected" && isClientMode && (
+            <> · Skipped by client · {new Date(item.approved_at).toLocaleString()}</>
+          )}
         </div>
       </div>
       {item.subject != null && (

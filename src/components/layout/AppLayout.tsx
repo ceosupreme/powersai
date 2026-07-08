@@ -6,6 +6,7 @@ import { usePreview } from '@/context/PreviewContext';
 import { PortfolioLayout } from './PortfolioLayout';
 import { VenueLeadershipLayout } from './VenueLeadershipLayout';
 import { ShiftExecutionLayout } from './ShiftExecutionLayout';
+import { ClientLayout } from './ClientLayout';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       return <VenueLeadershipLayout>{wrappedChildren}</VenueLeadershipLayout>;
     case 'shift-execution':
       return <ShiftExecutionLayout>{wrappedChildren}</ShiftExecutionLayout>;
+    case 'client':
+      return <ClientLayout>{wrappedChildren}</ClientLayout>;
     default:
       return <VenueLeadershipLayout>{wrappedChildren}</VenueLeadershipLayout>;
   }

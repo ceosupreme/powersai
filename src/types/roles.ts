@@ -1,6 +1,6 @@
-export type UserRole = 'owner' | 'gm' | 'lead' | 'foh' | 'boh';
+export type UserRole = 'owner' | 'gm' | 'lead' | 'foh' | 'boh' | 'client';
 
-export type LayoutType = 'portfolio' | 'venue-leadership' | 'shift-execution';
+export type LayoutType = 'portfolio' | 'venue-leadership' | 'shift-execution' | 'client';
 
 export interface UserVenueRole {
   id: string;
@@ -23,6 +23,7 @@ export const roleToLayout: Record<UserRole, LayoutType> = {
   lead: 'shift-execution',
   foh: 'shift-execution',
   boh: 'shift-execution',
+  client: 'client',
 };
 
 export const roleToHomeRoute: Record<UserRole, string> = {
@@ -31,6 +32,7 @@ export const roleToHomeRoute: Record<UserRole, string> = {
   lead: '/staff/shift',
   foh: '/staff/my-shift',
   boh: '/staff/my-shift',
+  client: '/approvals',
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {
@@ -39,6 +41,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   lead: 'Lead',
   foh: 'Producer',
   boh: 'Contributor',
+  client: 'Client',
 };
 
 export const ROLE_PRIORITY: Record<UserRole, number> = {
@@ -47,4 +50,5 @@ export const ROLE_PRIORITY: Record<UserRole, number> = {
   lead: 3,
   foh: 2,
   boh: 1,
+  client: 0,
 };

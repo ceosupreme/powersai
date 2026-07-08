@@ -740,6 +740,7 @@ export type Database = {
           created_by: string | null
           dedupe_key: string | null
           edited_body: string | null
+          flagged_for_operator: boolean
           id: string
           metadata: Json
           model: string | null
@@ -765,6 +766,7 @@ export type Database = {
           created_by?: string | null
           dedupe_key?: string | null
           edited_body?: string | null
+          flagged_for_operator?: boolean
           id?: string
           metadata?: Json
           model?: string | null
@@ -790,6 +792,7 @@ export type Database = {
           created_by?: string | null
           dedupe_key?: string | null
           edited_body?: string | null
+          flagged_for_operator?: boolean
           id?: string
           metadata?: Json
           model?: string | null
@@ -6549,6 +6552,7 @@ export type Database = {
       }
       project_automation_enrollments: {
         Row: {
+          approval_mode: string
           automation_key: Database["public"]["Enums"]["automation_key"]
           config: Json
           created_at: string
@@ -6559,6 +6563,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          approval_mode?: string
           automation_key: Database["public"]["Enums"]["automation_key"]
           config?: Json
           created_at?: string
@@ -6569,6 +6574,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          approval_mode?: string
           automation_key?: Database["public"]["Enums"]["automation_key"]
           config?: Json
           created_at?: string
@@ -11428,7 +11434,14 @@ export type Database = {
         | "coaching"
         | "recognition"
         | "other"
-      app_role: "admin" | "manager" | "staff" | "owner" | "gm" | "shift_lead"
+      app_role:
+        | "admin"
+        | "manager"
+        | "staff"
+        | "owner"
+        | "gm"
+        | "shift_lead"
+        | "client"
       approval_status:
         | "unreviewed"
         | "approved"
@@ -11794,7 +11807,15 @@ export const Constants = {
         "recognition",
         "other",
       ],
-      app_role: ["admin", "manager", "staff", "owner", "gm", "shift_lead"],
+      app_role: [
+        "admin",
+        "manager",
+        "staff",
+        "owner",
+        "gm",
+        "shift_lead",
+        "client",
+      ],
       approval_status: [
         "unreviewed",
         "approved",

@@ -62,6 +62,7 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             manager: { role: 'gm', layout: 'venue-leadership' },
             shift_lead: { role: 'lead', layout: 'shift-execution' },
             lead: { role: 'lead', layout: 'shift-execution' },
+            client: { role: 'client', layout: 'client' },
           };
           const mapped = legacyMap[legacyRole.role] || { role: 'foh' as UserRole, layout: 'shift-execution' as LayoutType };
           setCurrentRole(mapped.role);

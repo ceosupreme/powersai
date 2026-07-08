@@ -60,6 +60,7 @@ import QualifyLanding from "./pages/QualifyLanding";
 import QualifyForVenue from "./pages/QualifyForVenue";
 import VerticalLanding from "./pages/VerticalLanding";
 import AutomationInbox from "./pages/AutomationInbox";
+import ClientApprovals from "./pages/ClientApprovals";
 import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
 import FoundationAudit from "./pages/FoundationAudit";
@@ -221,6 +222,11 @@ const App = () => {
                 <Route path="/automations/inbox" element={
                   <ProtectedRoute>
                     <AppLayout><AutomationInbox /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/approvals" element={
+                  <ProtectedRoute allowedRoles={['client']} pageKey="client_approvals">
+                    <AppLayout><ClientApprovals /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/automations/reactivation" element={

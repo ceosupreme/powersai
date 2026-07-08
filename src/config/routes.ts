@@ -32,6 +32,9 @@ export const routeConfig: Record<string, RouteConfig> = {
   '/staff/tasks': { roles: ['lead', 'foh', 'boh'] },
   '/staff/chat': { roles: ['lead', 'foh', 'boh'] },
   '/staff/logs': { roles: ['lead', 'foh', 'boh'] },
+
+  // Client approver (only surface for the client role)
+  '/approvals': { roles: ['client'] },
 };
 
 /**
