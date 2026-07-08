@@ -360,7 +360,7 @@ const InsightsAudit = () => {
           </TabsList>
         </Tabs>
         <Input
-          placeholder="Filter by title, venue, person, or pillar"
+          placeholder="Filter by title, project, person, or pillar"
           className="max-w-sm"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -378,7 +378,7 @@ const InsightsAudit = () => {
               <TableHead>Title</TableHead>
               <TableHead>Pillar</TableHead>
               <TableHead>
-                <SortHeader label="Venue" columnKey="venue_name" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+                <SortHeader label="Project" columnKey="venue_name" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
               </TableHead>
               <TableHead>Status</TableHead>
               <TableHead>By</TableHead>

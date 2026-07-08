@@ -354,7 +354,7 @@ const Insights = () => {
             )}
           </div>
           <p className="text-muted-foreground text-sm">
-            AI-powered insights and actions{showVenueFilter ? ' across your venues' : ` for ${selectedBar?.bar_name || 'your bar'}`}
+            AI-powered insights and actions{showVenueFilter ? ' across your projects' : ` for ${selectedBar?.bar_name || 'your project'}`}
           </p>
         </div>
 

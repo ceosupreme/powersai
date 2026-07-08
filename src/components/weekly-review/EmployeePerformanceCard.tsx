@@ -126,7 +126,7 @@ export const EmployeePerformanceCard = ({ supabaseBarId, currentWeek, venueName 
         <Users className="w-5 h-5 text-muted-foreground" />
         <span className="font-semibold text-sm text-foreground">Team Performance</span>
         <span className="text-xs text-muted-foreground">
-          — no active employees tracked for this venue this week
+          — no active employees tracked for this project this week
         </span>
       </div>
     );

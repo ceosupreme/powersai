@@ -286,7 +286,7 @@ function RevenueByVenueSection({
       <CollapsibleTrigger className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
         <ChevronDown className="w-4 h-4" />
         <BarChart3 className="w-4 h-4" />
-        <span className="text-sm font-medium">Revenue by Venue {selectedWeekLabel ? `— ${selectedWeekLabel}` : ''}</span>
+        <span className="text-sm font-medium">Revenue by Project {selectedWeekLabel ? `— ${selectedWeekLabel}` : ''}</span>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-4">
         {isLoading ? (
@@ -300,7 +300,7 @@ function RevenueByVenueSection({
           <div className="bg-card border border-border rounded-lg p-4 md:p-5">
             <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
               <h2 className="text-lg font-semibold text-foreground">
-                Revenue by Venue {selectedWeekLabel ? `— ${selectedWeekLabel}` : ''}
+                Revenue by Project {selectedWeekLabel ? `— ${selectedWeekLabel}` : ''}
               </h2>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ export default function PortfolioOverview() {
     return (
       <OwnerBarDetail
         barId={selectedSingleBar.id}
-        barName={selectedSingleBar.bar_name || 'Venue'}
+        barName={selectedSingleBar.bar_name || 'Project'}
         onBack={() => setCurrentVenue(null)}
       />
     );
@@ -519,7 +519,7 @@ export default function PortfolioOverview() {
               }
             }}
           >
-            <p className="text-muted-foreground text-sm">Lowest Venue</p>
+            <p className="text-muted-foreground text-sm">Lowest Project</p>
             {lowestVenue ? (
               <>
                 <p className="text-lg font-bold text-foreground truncate">{lowestVenue.name}</p>
@@ -534,7 +534,7 @@ export default function PortfolioOverview() {
             ) : (
               <>
                 <p className="text-2xl font-bold text-muted-foreground">—</p>
-                <p className="text-xs text-muted-foreground">No scored venues</p>
+                <p className="text-xs text-muted-foreground">No scored projects</p>
               </>
             )}
           </div>
@@ -580,7 +580,7 @@ export default function PortfolioOverview() {
 
       <section id="venue-scorecards">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Venue Scorecards{selectedWeekLabel ? ` — ${selectedWeekLabel}` : ''}</h2>
+          <h2 className="text-lg font-semibold text-foreground">Project Scorecards{selectedWeekLabel ? ` — ${selectedWeekLabel}` : ''}</h2>
           <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'cards' | 'table')} size="sm" variant="outline">
             <ToggleGroupItem value="cards" aria-label="Cards view">
               <LayoutGrid className="w-4 h-4 mr-1" /> Cards
@@ -606,7 +606,7 @@ export default function PortfolioOverview() {
               <Collapsible>
                 <CollapsibleTrigger className="w-full bg-card border border-dashed border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                   <ChevronDown className="w-4 h-4" />
-                  <span>📋 {remainingPlaceholders.length} venues onboarding: {remainingPlaceholders.join(', ')}</span>
+                  <span>📋 {remainingPlaceholders.length} projects onboarding: {remainingPlaceholders.join(', ')}</span>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -633,7 +633,7 @@ export default function PortfolioOverview() {
                   <tr className="border-b border-border bg-muted/50">
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Rank</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">GM</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Venue</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Project</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Avg Score</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Trend</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">This Week</th>

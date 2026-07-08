@@ -28,7 +28,7 @@ export function PortfolioGetStartedCard() {
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-semibold text-foreground">
-            Welcome — let's get your first venue live
+            Welcome — let's get your first project live
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Your operator OS is ready. Pick a starting point below — you can
@@ -42,7 +42,7 @@ export function PortfolioGetStartedCard() {
               onClick={() => navigate("/admin?tab=projects")}
             >
               <Building2 className="h-4 w-4" />
-              Set up first venue
+              Set up first project
               <ArrowRight className="ml-auto h-3.5 w-3.5" />
             </Button>
             <Button
@@ -66,7 +66,7 @@ export function PortfolioGetStartedCard() {
           </div>
 
           <p className="mt-3 text-xs text-muted-foreground">
-            {liveVenueCount} of {venueCount || 0} venues live ·{" "}
+            {liveVenueCount} of {venueCount || 0} projects live ·{" "}
             {setupDone ? "Tour complete" : "Tour not started"} · Checklist{" "}
             {checklistCompletedCount} item{checklistCompletedCount === 1 ? "" : "s"} done
           </p>

@@ -144,7 +144,7 @@ const Employees = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Team</h1>
         </div>
         <p className="text-sm text-muted-foreground">
-          {selectedBar?.bar_name || selectedBar?.id || 'Select a venue'} · {filtered.length} of {employees.length}
+          {selectedBar?.bar_name || selectedBar?.id || 'Select a project'} · {filtered.length} of {employees.length}
         </p>
       </header>
 
