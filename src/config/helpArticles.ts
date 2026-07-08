@@ -314,7 +314,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
   {
     slug: "projects",
     title: "Projects & project types",
-    tags: ["projects", "pillars", "venues"],
+    tags: ["projects", "pillars"],
     summary: "Projects are the unit of work — clients, content channels, or internal initiatives.",
     sections: [
       {
