@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useEffect, useMemo, useState } from 'react';
 import { usePublicAudit, type AuditStatus, type OperationFootprint } from '@/hooks/usePublicAudit';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
@@ -27,6 +26,17 @@ function fmtMoney(n: number | null | undefined): string {
 }
 
 export default function FreeAudit() {
+  useEffect(() => {
+    const prev = document.title;
+    document.title = 'Free Profit Leak Audit — see what your business is losing';
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const prevDesc = meta?.getAttribute('content') ?? null;
+    if (meta) meta.setAttribute('content', 'Enter your business and city. In 30 seconds we live-read your Google profile, website, reviews, and map ranking, and put dollar figures on every leak.');
+    return () => {
+      document.title = prev;
+      if (meta && prevDesc != null) meta.setAttribute('content', prevDesc);
+    };
+  }, []);
   const audit = usePublicAudit();
   const [businessName, setBusinessName] = useState('');
   const [city, setCity] = useState('');
@@ -71,11 +81,6 @@ export default function FreeAudit() {
 
   return (
     <>
-      <Helmet>
-        <title>Free Profit Leak Audit — see what your business is losing</title>
-        <meta name="description" content="Enter your business and city. In 30 seconds we live-read your Google profile, website, reviews, and map ranking, and put dollar figures on every leak." />
-      </Helmet>
-
       <main className="min-h-screen bg-[hsl(var(--bone))] font-body text-[hsl(var(--ink))]">
         <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
           <header className="mb-10">
