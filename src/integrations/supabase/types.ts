@@ -11428,7 +11428,14 @@ export type Database = {
         | "coaching"
         | "recognition"
         | "other"
-      app_role: "admin" | "manager" | "staff" | "owner" | "gm" | "shift_lead"
+      app_role:
+        | "admin"
+        | "manager"
+        | "staff"
+        | "owner"
+        | "gm"
+        | "shift_lead"
+        | "client"
       approval_status:
         | "unreviewed"
         | "approved"
@@ -11794,7 +11801,15 @@ export const Constants = {
         "recognition",
         "other",
       ],
-      app_role: ["admin", "manager", "staff", "owner", "gm", "shift_lead"],
+      app_role: [
+        "admin",
+        "manager",
+        "staff",
+        "owner",
+        "gm",
+        "shift_lead",
+        "client",
+      ],
       approval_status: [
         "unreviewed",
         "approved",
