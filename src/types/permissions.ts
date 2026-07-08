@@ -29,7 +29,8 @@ export type PageKey =
   | 'recovery_reports'
   | 'foundation_audit'
   | 'leak_stack'
-  | 'client_approvals';
+  | 'client_approvals'
+  | 'outreach_templates';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -93,6 +94,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'recovery_reports', label: 'Recovery Reports', canDisable: true },
   { key: 'foundation_audit', label: 'Foundation Audit', canDisable: true },
   { key: 'leak_stack', label: 'Leak Stack', canDisable: true },
+  { key: 'outreach_templates', label: 'Outreach Templates', canDisable: true },
 ];
 
 // Map route paths to page keys
