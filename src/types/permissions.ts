@@ -28,6 +28,7 @@ export type PageKey =
   | 'reactivation'
   | 'recovery_reports'
   | 'foundation_audit'
+  | 'leak_stack'
   | 'client_approvals';
 
 // Roles that use the simplified staff portal layout
@@ -91,6 +92,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'reactivation', label: 'Reactivation', canDisable: true },
   { key: 'recovery_reports', label: 'Recovery Reports', canDisable: true },
   { key: 'foundation_audit', label: 'Foundation Audit', canDisable: true },
+  { key: 'leak_stack', label: 'Leak Stack', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -124,4 +126,5 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/automations/reactivation': 'reactivation',
   '/automations/recovery-reports': 'recovery_reports',
   '/foundation-audit': 'foundation_audit',
+  '/leak-stack': 'leak_stack',
 };
