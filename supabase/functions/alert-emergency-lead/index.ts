@@ -46,11 +46,12 @@ Deno.serve(async (req) => {
   }
 
   // Idempotency: bail if we've already logged an alert for this lead.
+  // Kind + lead_id are stashed in the `raw` jsonb column.
   const { data: existing } = await sb
     .from("automation_send_log")
     .select("id")
-    .filter("metadata->>kind", "eq", "emergency_lead_alert")
-    .filter("metadata->>lead_id", "eq", lead_id)
+    .filter("raw->>kind", "eq", "emergency_lead_alert")
+    .filter("raw->>lead_id", "eq", lead_id)
     .limit(1);
   if (existing && existing.length > 0) return json({ skipped: "already_sent" });
 
@@ -64,10 +65,15 @@ Deno.serve(async (req) => {
   if (projectId) {
     const { data: contacts } = await sb
       .from("venue_leadership_contacts")
-      .select("full_name,email,phone,role,is_active")
+      .select("display_name,role_type,is_primary,is_active,profile:profiles(email,phone,full_name)")
       .eq("venue_id", projectId)
       .eq("is_active", true);
-    const rows = (contacts ?? []) as Array<{ full_name: string | null; email: string | null; phone: string | null; role: string | null }>;
+    const rows = (contacts ?? []) as Array<{
+      display_name: string | null;
+      role_type: string | null;
+      is_primary: boolean | null;
+      profile: { email: string | null; phone: string | null; full_name: string | null } | null;
+    }>;
     if (rows.length > 0) {
       const rank = (r: string | null) => {
         const s = (r ?? "").toLowerCase();
@@ -76,9 +82,16 @@ Deno.serve(async (req) => {
         if (s.includes("manager")) return 2;
         return 3;
       };
-      rows.sort((a, b) => rank(a.role) - rank(b.role));
+      rows.sort((a, b) => {
+        if (!!b.is_primary !== !!a.is_primary) return b.is_primary ? 1 : -1;
+        return rank(a.role_type) - rank(b.role_type);
+      });
       const pick = rows[0];
-      recipient = { name: pick.full_name, email: pick.email, phone: pick.phone };
+      recipient = {
+        name: pick.display_name ?? pick.profile?.full_name ?? null,
+        email: pick.profile?.email ?? null,
+        phone: pick.profile?.phone ?? null,
+      };
       recipientSource = "venue_leadership_contacts";
     }
     // Optional: pull adapter config from the project's follow-up enrollment
@@ -123,15 +136,17 @@ Deno.serve(async (req) => {
     project_id: projectId,
     queue_id: null,
     channel: preferredChannel,
-    provider: result.provider,
+    adapter: result.provider,
+    to_address: to,
+    subject,
+    body,
+    ok: result.ok,
     provider_message_id: result.provider_message_id ?? null,
-    status: result.ok ? "sent" : "failed",
     error: result.error ?? null,
-    metadata: {
+    raw: {
       kind: "emergency_lead_alert",
       lead_id,
       recipient_source: recipientSource,
-      recipient_to: to,
     },
   });
 
