@@ -85,24 +85,33 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization') ?? '';
     if (!authHeader.startsWith('Bearer ')) return json({ error: 'unauthorized' }, 401);
+    const bearer = authHeader.slice('Bearer '.length).trim();
 
-    const userClient = createClient(SUPABASE_URL, ANON, { global: { headers: { Authorization: authHeader } } });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) return json({ error: 'unauthorized' }, 401);
-    const userId = userData.user.id;
+    // Server-to-server bypass: trusted callers (edge functions) may present the
+    // project service-role key. End users cannot obtain this value. Do NOT log it.
+    const isServiceRole = SERVICE_ROLE.length > 0 && bearer === SERVICE_ROLE;
+
+    let userId: string | null = null;
+    if (!isServiceRole) {
+      const userClient = createClient(SUPABASE_URL, ANON, { global: { headers: { Authorization: authHeader } } });
+      const { data: userData, error: userErr } = await userClient.auth.getUser();
+      if (userErr || !userData?.user) return json({ error: 'unauthorized' }, 401);
+      userId = userData.user.id;
+    }
 
     const { venue_id } = await req.json();
     if (!venue_id || typeof venue_id !== 'string') return json({ error: 'venue_id required' }, 400);
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-    // Access check
-    const { data: accessRow, error: accessErr } = await admin.rpc('user_can_access_project', { _project_id: venue_id });
-    if (accessErr) throw accessErr;
-    // If has_role signature differs, we still gate via RLS on insert. Fall back to explicit check via has_role/venue_assignments:
-    const canAccess = accessRow === true
-      || (await hasVenueAccess(admin, userId, venue_id));
-    if (!canAccess) return json({ error: 'forbidden' }, 403);
+    if (!isServiceRole) {
+      // Access check for real users only. Service-role callers are pre-trusted.
+      const { data: accessRow, error: accessErr } = await admin.rpc('user_can_access_project', { _project_id: venue_id });
+      if (accessErr) throw accessErr;
+      const canAccess = accessRow === true
+        || (userId ? await hasVenueAccess(admin, userId, venue_id) : false);
+      if (!canAccess) return json({ error: 'forbidden' }, 403);
+    }
 
     // Load venue (for timezone + per-venue overrides)
     const { data: venue } = await admin.from('venues').select('*').eq('id', venue_id).maybeSingle();
