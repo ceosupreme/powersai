@@ -81,7 +81,7 @@ export default function FreeAudit() {
 
   return (
     <>
-      <main className="min-h-screen bg-[hsl(var(--bone))] font-body text-[hsl(var(--ink))]">
+      <main className="stm-marketing min-h-screen bg-[hsl(var(--bone))] font-body text-[hsl(var(--ink))]">
         <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
           <header className="mb-10">
             <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--green))]/70">Free profit leak audit</p>
