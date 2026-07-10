@@ -5,8 +5,8 @@ const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Resolving your Google Business Profile' },
   { key: 'snapshotting', label: 'Scanning your website, reviews, and map ranking' },
   { key: 'auditing', label: 'Running foundation and growth checks' },
-  { key: 'ranking', label: 'Putting dollar figures on every leak' },
-  { key: 'complete', label: 'Ledger ready' },
+  { key: 'ranking', label: 'Putting dollar figures on what's slipping' },
+  { key: 'complete', label: 'Ready' },
 ];
 
 const ORDER: Record<AuditStatus, number> = {
@@ -28,10 +28,10 @@ function fmtMoney(n: number | null | undefined): string {
 export default function FreeAudit() {
   useEffect(() => {
     const prev = document.title;
-    document.title = 'Free Profit Leak Audit — see what your business is losing';
+    document.title = 'The free Missed Money Checkup — see what your business is losing';
     const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = meta?.getAttribute('content') ?? null;
-    if (meta) meta.setAttribute('content', 'Enter your business and city. In 30 seconds we live-read your Google profile, website, reviews, and map ranking, and put dollar figures on every leak.');
+    if (meta) meta.setAttribute('content', 'Two minutes. My system reads the public side of your business — your Google listing, your website, your reviews — and shows where leads, follow-up, and trust are slipping.');
     return () => {
       document.title = prev;
       if (meta && prevDesc != null) meta.setAttribute('content', prevDesc);
@@ -52,10 +52,10 @@ export default function FreeAudit() {
 
   const closingCta = useMemo(() => {
     if (footprint === 'multi_location') {
-      return 'This engine ran an 8-location group in production — multi-location is its home turf. Book 15 minutes.';
+      return 'This system ran an 8-location group in production — multi-location is its home turf. Book 15 minutes.';
     }
     if (footprint === 'solo_owner') {
-      return 'Starts at $49/mo — one engine, installed, catching every lead. Book 15 minutes.';
+      return 'Starts at $49/mo — one system, installed, catching every inquiry. Book 15 minutes.';
     }
     return "This took 2 minutes and I didn't touch your business. Imagine what the full system catches. Book 15 minutes.";
   }, [footprint]);
@@ -84,13 +84,12 @@ export default function FreeAudit() {
       <main className="stm-marketing min-h-screen bg-[hsl(var(--stm-bg))] font-body text-[hsl(var(--stm-ink))]">
         <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
           <header className="mb-10">
-            <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]/70">Free profit leak audit</p>
+            <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]/70">Free Missed Money Checkup</p>
             <h1 className="font-display text-4xl leading-[1.05] md:text-6xl">
-              Enter your business.<br />Watch the system read it.
+              The free Missed Money Checkup
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-[hsl(var(--stm-ink))]/70">
-              Google profile, website, reviews, map ranking — live-read, then ranked into a dollar-per-month leak ledger.
-              No install. No login. Two minutes.
+              Two minutes. My system reads the public side of your business — your Google listing, your website, your reviews — and shows where leads, follow-up, and trust are slipping, with an honest estimate of what it may be costing.
             </p>
           </header>
 
@@ -170,7 +169,7 @@ export default function FreeAudit() {
                   disabled={!canSubmit}
                   className="inline-flex items-center gap-2 rounded-full bg-[hsl(var(--stm-cobalt))] px-7 py-3.5 text-sm font-medium text-[hsl(var(--stm-bg))] transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60"
                 >
-                  {audit.submitting ? 'Starting…' : 'Run my free audit'}
+                  {audit.submitting ? 'Starting…' : "Show me what I'm missing"}
                 </button>
                 <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">~30 seconds</span>
               </div>
@@ -210,8 +209,8 @@ export default function FreeAudit() {
                       const last = lines[lines.length - 1] ?? '';
                       const cleaned = last.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '').replace(/^Pipeline failed:\s*/i, '');
                       return cleaned && !/degraded/i.test(cleaned)
-                        ? `We couldn't finish this audit — ${cleaned}. Your business wasn't touched.`
-                        : "We couldn't finish this audit. Your business wasn't touched.";
+                        ? `We couldn't finish this — ${cleaned}. Your business wasn't touched.`
+                        : "We couldn't finish this. Your business wasn't touched.";
                     })()}
                   </p>
                   <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -238,13 +237,13 @@ export default function FreeAudit() {
           {audit.redacted && !audit.full && (
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
-                <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Estimated revenue leak</p>
+                <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Money you're likely missing</p>
                 <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                   {fmtMoney(audit.redacted.total_monthly_dollars)}
                   <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
                 </p>
                 <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
-                  {audit.redacted.leak_count} distinct leak{audit.redacted.leak_count === 1 ? '' : 's'} detected.
+                  {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
                 </p>
                 {audit.redacted.top_leaks.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
@@ -265,7 +264,7 @@ export default function FreeAudit() {
                 <div className="space-y-2 blur-sm select-none pointer-events-none">
                   {Array.from({ length: Math.max(2, audit.redacted.leak_count - 3) }).map((_, i) => (
                     <div key={i} className="flex justify-between border-b border-[hsl(var(--stm-ink))]/10 pb-2">
-                      <span className="text-sm">Additional leak line item {i + 4}</span>
+                      <span className="text-sm">Additional gap line item {i + 4}</span>
                       <span className="font-mono text-sm">$X,XXX/mo</span>
                     </div>
                   ))}
@@ -274,8 +273,8 @@ export default function FreeAudit() {
 
               {/* Unlock */}
               <form onSubmit={onUnlock} className="rounded-2xl bg-[hsl(var(--stm-ink))] p-8 text-[hsl(var(--stm-bg))] shadow-lg md:p-10">
-                <h3 className="font-display text-3xl md:text-4xl">Unlock your full leak ledger</h3>
-                <p className="mt-2 text-[hsl(var(--stm-bg))]/70">Every leak, every dollar, every input source flag. Emailed to you and shown right here.</p>
+                <h3 className="font-display text-3xl md:text-4xl">See the full list.</h3>
+                <p className="mt-2 text-[hsl(var(--stm-bg))]/70">Every gap, every dollar, every source flag. Emailed to you and shown right here.</p>
                 <div className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
                   <input
                     type="text"
@@ -299,7 +298,7 @@ export default function FreeAudit() {
                     disabled={audit.unlocking || !email}
                     className="rounded-full bg-[hsl(var(--stm-warn))] px-6 py-2.5 text-sm font-medium text-[hsl(var(--stm-ink))] disabled:opacity-60"
                   >
-                    {audit.unlocking ? 'Unlocking…' : 'Show me every leak'}
+                    {audit.unlocking ? 'Unlocking…' : 'Show me the full list'}
                   </button>
                 </div>
               </form>
@@ -310,7 +309,7 @@ export default function FreeAudit() {
           {audit.full && (
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
-                <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Full ledger</p>
+                <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">The full list</p>
                 <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                   {fmtMoney(audit.full.total_monthly_dollars)}
                   <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo captured revenue</span>
