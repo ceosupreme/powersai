@@ -119,12 +119,13 @@ export function HeroTriage() {
         >
           OK <ArrowRight size={13} />
         </button>
-        <a
-          href="#contact"
+        <button
+          type="button"
+          onClick={() => { prefillContact(null); scrollWithHighlight("#contact"); }}
           className="text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
         >
           None of these → talk to a human
-        </a>
+        </button>
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-2 border-t border-[hsl(var(--line))] pt-4">
