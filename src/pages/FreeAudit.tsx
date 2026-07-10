@@ -5,7 +5,7 @@ const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Resolving your Google Business Profile' },
   { key: 'snapshotting', label: 'Scanning your website, reviews, and map ranking' },
   { key: 'auditing', label: 'Running foundation and growth checks' },
-  { key: 'ranking', label: 'Putting dollar figures on what's slipping' },
+  { key: 'ranking', label: "Putting dollar figures on what's slipping" },
   { key: 'complete', label: 'Ready' },
 ];
 
