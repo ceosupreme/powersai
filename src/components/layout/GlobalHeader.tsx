@@ -69,8 +69,8 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 md:h-16 flex items-center justify-between px-4 md:px-8 border-b border-border/50 bg-background/80 backdrop-blur-md shadow-sm">
-        <div className="flex items-center gap-2 md:gap-3">
+      <header className="sticky top-0 z-50 h-14 md:h-16 flex items-center justify-between gap-2 px-3 md:px-8 border-b border-border/50 bg-background/80 backdrop-blur-md shadow-sm">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
           {/* Back to Portfolio for owners drilling into a venue */}
           {currentRole === 'owner' && currentVenue && (
             <button
@@ -108,14 +108,14 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
               </SelectContent>
             </Select>
           ) : !forceHideVenueSelector && (showVenueSelector || currentRole === 'owner') && accessibleBars.length === 1 ? (
-            <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-primary" />
-              {accessibleBars[0].bar_name}
+            <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 min-w-0">
+              <Building2 className="w-4 h-4 text-primary shrink-0" />
+              <span className="truncate">{accessibleBars[0].bar_name}</span>
             </span>
           ) : !forceHideVenueSelector && !showVenueSelector && (currentVenue || selectedBar) ? (
-            <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-primary" />
-              {currentVenue?.name || selectedBar?.bar_name}
+            <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 min-w-0">
+              <Building2 className="w-4 h-4 text-primary shrink-0" />
+              <span className="truncate">{currentVenue?.name || selectedBar?.bar_name}</span>
             </span>
           ) : null}
 
@@ -126,7 +126,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-1 md:gap-3 shrink-0">
           {showDateSelector && (
             <Select
               value={selectedWeek?.id || ''}
