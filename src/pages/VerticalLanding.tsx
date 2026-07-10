@@ -78,7 +78,7 @@ export default function VerticalLanding() {
         <div aria-hidden className="grain fixed inset-0 z-0" />
         <Nav />
         <main className="relative z-10 flex min-h-[60vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[hsl(var(--gold))] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#465CFF] border-t-transparent" />
         </main>
         <Footer />
       </div>
