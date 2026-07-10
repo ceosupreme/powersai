@@ -41,7 +41,7 @@ export function QualifierShell({ projectType, brand, tagline, capturedForProject
   const fields = useMemo(() => fieldsQ.data ?? [], [fieldsQ.data]);
 
   return (
-    <div className="min-h-screen bg-[hsl(40,33%,96%)] text-foreground">
+    <div className="stm-marketing min-h-screen bg-[hsl(40,33%,96%)] text-foreground">
       <header className="border-b border-border/60">
         <div className="max-w-5xl mx-auto px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
