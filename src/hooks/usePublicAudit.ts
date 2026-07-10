@@ -64,6 +64,18 @@ export function usePublicAudit() {
 
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
+  function reset() {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    setToken(null);
+    setStatus(null);
+    setStatusDetail(null);
+    setRedacted(null);
+    setFull(null);
+    setError(null);
+    setSubmitting(false);
+    setUnlocking(false);
+  }
+
   async function pollOnce(t: string) {
     const { data, error: e } = await supabase.functions.invoke('public-audit-status', {
       body: { token: t },
@@ -121,5 +133,5 @@ export function usePublicAudit() {
     }
   }
 
-  return { token, status, statusDetail, redacted, full, error, submitting, unlocking, run, unlock };
+  return { token, status, statusDetail, redacted, full, error, submitting, unlocking, run, unlock, reset };
 }

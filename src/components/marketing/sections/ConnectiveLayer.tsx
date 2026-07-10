@@ -18,7 +18,7 @@ const fragmented = [
 
 export function ConnectiveLayer() {
   return (
-    <section className="relative border-t border-[hsl(var(--line))] bg-[hsl(var(--bone-2))] py-20 md:py-28">
+    <section id="whole-operation" className="relative border-t border-[hsl(var(--line))] bg-[hsl(var(--bone-2))] py-20 md:py-28">
       <Container>
         <SectionHeading
           eyebrow="What you get"
