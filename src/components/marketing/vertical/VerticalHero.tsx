@@ -4,9 +4,9 @@ import { Reveal } from "@/components/marketing/site/Reveal";
 import type { VerticalLandingPage, AccentColor } from "@/hooks/useVerticalLanders";
 
 const accentVar: Record<AccentColor, string> = {
-  rust: "hsl(var(--rust))",
-  gold: "hsl(var(--gold))",
-  green: "hsl(var(--green))",
+  rust: "#E15C4A",
+  gold: "#465CFF",
+  green: "#198A5A",
 };
 
 function renderHeadline(headline: string, accentWord: string, color: string) {

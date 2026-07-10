@@ -1,24 +1,16 @@
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Nav } from "@/components/marketing/site/Nav";
-import { Hero } from "@/components/marketing/sections/Hero";
-import { TechStack } from "@/components/marketing/sections/TechStack";
-import { LeadFollowUpShowcase } from "@/components/marketing/sections/showcase/LeadFollowUpShowcase";
-import { InsightsShowcase } from "@/components/marketing/sections/showcase/InsightsShowcase";
-import { ChatMarquee } from "@/components/marketing/sections/ChatMarquee";
-import { AssistantShowcase } from "@/components/marketing/sections/showcase/AssistantShowcase";
-import { AutomationsShowcase } from "@/components/marketing/sections/showcase/AutomationsShowcase";
-import { ContentShowcase } from "@/components/marketing/sections/showcase/ContentShowcase";
-import { Proof } from "@/components/marketing/sections/Proof";
-import { ConnectiveLayer } from "@/components/marketing/sections/ConnectiveLayer";
-import { WhatIBuild } from "@/components/marketing/sections/WhatIBuild";
-import { Process } from "@/components/marketing/sections/Process";
-import { Industries } from "@/components/marketing/sections/Industries";
-import { FAQ } from "@/components/marketing/sections/FAQ";
-import { FinalCTA } from "@/components/marketing/sections/FinalCTA";
-import { Contact } from "@/components/marketing/sections/Contact";
-import { Footer } from "@/components/marketing/sections/Footer";
+import { Nav } from "@/components/marketing/rebuild/Nav";
+import { Hero } from "@/components/marketing/rebuild/Hero";
+import { Problem } from "@/components/marketing/rebuild/Problem";
+import { Outcomes } from "@/components/marketing/rebuild/Outcomes";
+import { BarPulseProof } from "@/components/marketing/rebuild/BarPulseProof";
+import { Process } from "@/components/marketing/rebuild/Process";
+import { Founder } from "@/components/marketing/rebuild/Founder";
+import { FAQ } from "@/components/marketing/rebuild/FAQ";
+import { Contact } from "@/components/marketing/rebuild/Contact";
+import { Footer } from "@/components/marketing/rebuild/Footer";
 
 export default function Marketing() {
   const { user, isLoading } = useAuth();
@@ -64,24 +56,15 @@ export default function Marketing() {
 
   return (
     <div className="stm-marketing relative min-h-screen">
-      <div aria-hidden className="grain fixed inset-0 z-0" />
       <Nav />
       <main className="relative z-10">
         <Hero />
-        <TechStack />
-        <LeadFollowUpShowcase />
-        <InsightsShowcase />
-        <ChatMarquee />
-        <AssistantShowcase />
-        <AutomationsShowcase />
-        <ContentShowcase />
-        <Proof />
-        <ConnectiveLayer />
-        <WhatIBuild />
+        <Problem />
+        <Outcomes />
+        <BarPulseProof />
         <Process />
-        <Industries />
+        <Founder />
         <FAQ />
-        <FinalCTA />
         <Contact />
       </main>
       <Footer />
