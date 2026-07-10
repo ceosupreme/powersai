@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,27 @@ type Status = "idle" | "submitting" | "success" | "error";
 export function Contact() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem("stm.contact.prefill");
+      if (stored) {
+        setMessage(stored);
+        sessionStorage.removeItem("stm.contact.prefill");
+      }
+    } catch { /* ignore */ }
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail ?? "";
+      setMessage(detail);
+      try { sessionStorage.removeItem("stm.contact.prefill"); } catch { /* ignore */ }
+      // Focus after paint so the scroll lands first.
+      window.setTimeout(() => messageRef.current?.focus(), 400);
+    };
+    window.addEventListener("stm:contact-prefill", handler as EventListener);
+    return () => window.removeEventListener("stm:contact-prefill", handler as EventListener);
+  }, []);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,7 +139,15 @@ export function Contact() {
                 <Field label="Business name" name="business_name" placeholder="Optional" />
               </div>
               <Field label="Email" name="email" type="email" placeholder="you@company.com" required />
-              <FieldTextarea label="What do you want to improve?" name="message" placeholder="A few sentences about your operation, your tools, and what's slowing you down." required />
+              <FieldTextarea
+                label="What do you want to improve?"
+                name="message"
+                placeholder="A few sentences about your operation, your tools, and what's slowing you down."
+                required
+                value={message}
+                onChange={setMessage}
+                textareaRef={messageRef}
+              />
 
               {error && (
                 <p className="text-sm text-[hsl(var(--rust))]" role="alert">{error}</p>
@@ -151,11 +180,27 @@ function Field({ label, name, type = "text", placeholder, required }: { label: s
   );
 }
 
-function FieldTextarea({ label, name, placeholder, required }: { label: string; name: string; placeholder?: string; required?: boolean; }) {
+function FieldTextarea({ label, name, placeholder, required, value, onChange, textareaRef }: {
+  label: string;
+  name: string;
+  placeholder?: string;
+  required?: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  textareaRef?: React.Ref<HTMLTextAreaElement>;
+}) {
   return (
     <label className="block">
       <span className="font-mono-label" style={{ fontSize: "0.7rem", color: "hsl(var(--ink-soft))" }}>{label}</span>
-      <textarea name={name} required={required} rows={5} maxLength={4000} placeholder={placeholder}
+      <textarea
+        ref={textareaRef}
+        name={name}
+        required={required}
+        rows={5}
+        maxLength={4000}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="mt-2 w-full resize-y rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--bone))] px-4 py-3 text-[0.95rem] text-foreground placeholder:text-[hsl(var(--ink-soft)/0.5)] focus:border-[hsl(var(--green))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--green)/0.2)]" />
     </label>
   );
