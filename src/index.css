@@ -785,3 +785,16 @@
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
+
+/* Triage arrival highlight — brief gold ring fade on scrolled-to section */
+.stm-marketing [data-arrival-highlight="true"] {
+  animation: stm-arrival-ring 2s ease-out;
+}
+@keyframes stm-arrival-ring {
+  0%   { box-shadow: 0 0 0 0 hsl(var(--gold) / 0); }
+  15%  { box-shadow: 0 0 0 6px hsl(var(--gold) / 0.55), 0 0 60px 8px hsl(var(--gold) / 0.25); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--gold) / 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stm-marketing [data-arrival-highlight="true"] { animation: none; }
+}
