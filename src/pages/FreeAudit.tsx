@@ -203,7 +203,33 @@ export default function FreeAudit() {
                 <pre className="mt-5 max-h-40 overflow-auto whitespace-pre-wrap border-t border-[hsl(var(--bone))]/20 pt-3 text-xs opacity-70">{audit.statusDetail}</pre>
               )}
               {audit.status === 'failed' && (
-                <p className="mt-4 text-[hsl(var(--gold))]">Something went sideways. Refresh and try again — we didn't touch your business.</p>
+                <div className="mt-5 border-t border-[hsl(var(--bone))]/20 pt-4">
+                  <p className="text-[hsl(var(--gold))]">
+                    {(() => {
+                      const lines = (audit.statusDetail ?? '').trim().split('\n').filter(Boolean);
+                      const last = lines[lines.length - 1] ?? '';
+                      const cleaned = last.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '').replace(/^Pipeline failed:\s*/i, '');
+                      return cleaned && !/degraded/i.test(cleaned)
+                        ? `We couldn't finish this audit — ${cleaned}. Your business wasn't touched.`
+                        : "We couldn't finish this audit. Your business wasn't touched.";
+                    })()}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => audit.reset()}
+                      className="rounded-full bg-[hsl(var(--gold))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--ink))] transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Try again
+                    </button>
+                    <a
+                      href="/#contact"
+                      className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--bone))]/70 underline-offset-4 hover:underline"
+                    >
+                      Or talk to a human
+                    </a>
+                  </div>
+                </div>
               )}
             </div>
           )}
