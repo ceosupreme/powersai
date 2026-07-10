@@ -2,18 +2,63 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 const OPTIONS = [
-  { key: "A", label: "Recover missed leads", target: "#lead-followup" },
-  { key: "B", label: "See my whole business in one view", target: "#ops-dashboard" },
-  { key: "C", label: "Automate manual work", target: "#automations" },
+  {
+    key: "A",
+    label: "Recover missed leads",
+    target: "#lead-followup",
+    prefill: "I want to recover missed leads.",
+  },
+  {
+    key: "B",
+    label: "See my whole business in one view",
+    target: "#whole-operation",
+    prefill: "I want one live view of my whole business.",
+  },
+  {
+    key: "C",
+    label: "Automate manual work",
+    target: "#automations",
+    prefill: "I want to automate manual work.",
+  },
 ];
+
+function scrollWithHighlight(target: string) {
+  const el = document.querySelector<HTMLElement>(target);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.setAttribute("data-arrival-highlight", "true");
+  window.setTimeout(() => el.removeAttribute("data-arrival-highlight"), 2000);
+}
+
+function prefillContact(text: string | null) {
+  if (text) {
+    try { sessionStorage.setItem("stm.contact.prefill", text); } catch { /* ignore */ }
+  } else {
+    try { sessionStorage.removeItem("stm.contact.prefill"); } catch { /* ignore */ }
+  }
+  window.dispatchEvent(new CustomEvent("stm:contact-prefill", { detail: text ?? "" }));
+}
 
 export function HeroTriage() {
   const [picked, setPicked] = useState<string | null>(null);
 
   function go() {
-    const target = OPTIONS.find((o) => o.key === picked)?.target ?? "#contact";
-    const el = document.querySelector(target);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const opt = OPTIONS.find((o) => o.key === picked);
+    if (opt) {
+      // Selected an option: scroll to Contact with prefilled message.
+      prefillContact(opt.prefill);
+      scrollWithHighlight("#contact");
+    } else {
+      // No selection: plain scroll to contact, no prefill.
+      prefillContact(null);
+      scrollWithHighlight("#contact");
+    }
+  }
+
+  function pick(key: string) {
+    setPicked(key);
+    const opt = OPTIONS.find((o) => o.key === key);
+    if (opt) scrollWithHighlight(opt.target);
   }
 
   return (
@@ -37,9 +82,9 @@ export function HeroTriage() {
         {OPTIONS.map((o) => {
           const on = picked === o.key;
           return (
-            <button
+          <button
               key={o.key}
-              onClick={() => setPicked(o.key)}
+              onClick={() => pick(o.key)}
               className={
                 "w-full text-left flex items-center gap-3 rounded-md border px-3.5 py-3 transition-all duration-200 " +
                 (on
