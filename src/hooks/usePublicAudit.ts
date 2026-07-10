@@ -84,7 +84,12 @@ export function usePublicAudit() {
     setToken(null); setStatus(null); setStatusDetail(null);
     setRedacted(null); setFull(null);
     try {
-      const { data, error: e } = await supabase.functions.invoke('run-public-audit', { body: input });
+      const normalized = { ...input };
+      if (normalized.website_url) {
+        const trimmed = normalized.website_url.trim();
+        normalized.website_url = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      }
+      const { data, error: e } = await supabase.functions.invoke('run-public-audit', { body: normalized });
       if (e) throw new Error(e.message);
       const t = (data as { token: string }).token;
       setToken(t);

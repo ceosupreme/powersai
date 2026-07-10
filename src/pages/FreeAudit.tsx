@@ -123,13 +123,14 @@ export default function FreeAudit() {
                 <label className="block md:col-span-2">
                   <span className="mb-1.5 block font-mono text-xs uppercase tracking-wider text-[hsl(var(--ink))]/60">Website (optional)</span>
                   <input
-                    type="url"
+                    type="text"
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
                     className="w-full rounded-lg border border-[hsl(var(--ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--green))] focus:outline-none"
-                    placeholder="https://acmeplumbing.com"
+                    placeholder="acmeplumbing.com"
                     maxLength={500}
                   />
+                  <p className="mt-1.5 text-xs text-[hsl(var(--ink))]/50">Just the domain is fine — we’ll resolve the rest.</p>
                 </label>
                 <div className="md:col-span-2">
                   <span className="mb-2 block font-mono text-xs uppercase tracking-wider text-[hsl(var(--ink))]/60">Size of the operation *</span>
