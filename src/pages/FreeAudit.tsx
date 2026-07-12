@@ -25,6 +25,30 @@ function fmtMoney(n: number | null | undefined): string {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
 
+// Kept in sync with unlock-public-audit/index.ts EMAIL_RE.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// Owner-language "why this costs you" sentence, keyed by seeded vector name.
+const WHY_COPY: Record<string, string> = {
+  'Missed calls':
+    "Calls that ring out during business hours become someone else's booking within minutes.",
+  'Unsold estimates':
+    'Estimates you gave that never turned into a job — most of these can still be closed with one follow-up.',
+};
+
+function whyForLeak(name: string, fallbackBenchmark: string | null): string {
+  if (WHY_COPY[name]) return WHY_COPY[name];
+  // Generic owner-facing fallback — never expose the raw operator benchmark string.
+  return 'A gap between what you have today and what your best-run competitors do.';
+}
+
+function sourceLine(inputs: Array<{ source?: string; unresolved?: boolean }> | undefined): string {
+  const srcs = new Set((inputs ?? []).map((i) => i.source).filter(Boolean) as string[]);
+  if (srcs.has('signal')) return 'from a live read of your business';
+  if (srcs.has('override')) return 'from a live read of your business';
+  return 'estimated from industry baseline';
+}
+
 export default function FreeAudit() {
   useEffect(() => {
     const prev = document.title;
@@ -45,6 +69,8 @@ export default function FreeAudit() {
   const [honeypot, setHoneypot] = useState('');
   const [email, setEmail] = useState('');
   const [unlockName, setUnlockName] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
+  const emailValid = EMAIL_RE.test(email.trim());
 
   const canSubmit = businessName.trim().length > 0 && city.trim().length > 0 && !audit.submitting;
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
@@ -75,7 +101,10 @@ export default function FreeAudit() {
 
   async function onUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (!email) return;
+    if (!emailValid) {
+      setEmailTouched(true);
+      return;
+    }
     await audit.unlock(email.trim(), unlockName.trim() || undefined);
   }
 
