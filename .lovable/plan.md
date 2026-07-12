@@ -1,149 +1,148 @@
-# Homepage Rebuild — Full Pass (with guards)
 
-Additive rebuild. New section components live under `src/components/marketing/rebuild/`. `MarketingSite.tsx` unmounts the current sections and mounts the new ones. Zero deletions, zero schema/route changes — instant rollback by swapping the imports back.
+# GAUNTLET FIX 2 — checkup substance + public rendering + email gate
 
-## Preserved exactly
-- Supabase contact submission + success card (logic reused inside `rebuild/Contact.tsx`).
-- All routes (`/`, `/free-audit`, `/for/:slug`, `/approvals`, internal app).
-- `/free-audit` backend, theater timing, redaction, unlock (only copy strings + token references change).
-- Fix-1 prefill mechanic (`sessionStorage` key `stm.contact.prefill` + `stm:contact-prefill` CustomEvent) — moved into the new Contact triage picker; homepage triage widget removed.
-- Internal app + `/approvals` (out of scope — new tokens are additive under `.stm-marketing`, cannot leak).
-- Database schema (no migrations).
+## PART A — DOLLARIZATION DIAGNOSIS
 
-## Guard 1 — Print renderers keep Bricolage
+### A1. Seeded vectors for `home_services` (project_type_leak_vectors)
 
-`ProposalRenderer.tsx` (line 28) and `RecoveryReportRenderer.tsx` (line 34) already self-inject their own `<link>` to `Bricolage+Grotesque:wght@500;700`. Their `print.css` files reference `'Bricolage Grotesque'` for headings.
+| # | Name | Formula | Variables | Resolver layer today |
+|---|---|---|---|---|
+| 1 | Missed calls | `missed_calls * booking_rate * avg_ticket` | `missed_calls`, `booking_rate`, `avg_ticket` | **unresolved**, **unresolved**, vertical_default (500) |
+| 2 | Unsold estimates | `open_estimates * close_rate * avg_ticket` | `open_estimates`, `close_rate`, `avg_ticket` | **unresolved**, vertical_default (0.55), vertical_default (500) |
+| 3 | Lapsing memberships | `lapsing_members * monthly_value * 12` | `lapsing_members`, `monthly_value` | **unresolved**, **unresolved** |
 
-Path chosen: **keep the Bricolage line in `src/index.css` `@import`** exactly as-is. The marketing scope simply stops *referencing* it in `.stm-marketing .font-display`. Renderers are dual-covered (self-load + global import), so neither the /approvals PDF nor the recovery-report PDF can silently re-skin.
+**Current `project_types.home_services.display_defaults`:** `avg_ticket=500, close_rate=0.55, avg_job_low=300, avg_job_high=800, emergency_job_low=3000, emergency_job_high=8000` plus non-formula copy fields.
 
-## Guard 2 — New tokens are additive, legacy tokens untouched
+**Root cause of "$0 but 3 gaps":** every vector has ≥1 variable with no resolver AND no default → `resolveVar` returns `null` → engine records `unresolved:*`, sets `monthly_dollars = null`, contributes 0 to `total_monthly_dollars`. Result summary reports `leak_count=3` and `$0`.
 
-Legacy tokens keep their existing values under `.stm-marketing`:
-```
---bone --bone-2 --surface --ink --ink-soft
---green --green-deep --green-tint
---rust --rust-tint --rust-light
---gold --gold-tint --line
-```
-None of these get their VALUE changed. VerticalLanding's `bg-[hsl(var(--bone))]`, ProposalRenderer, RecoveryReportRenderer, and any legacy consumer continue to render exactly as before.
+### A2. "Lapsing memberships" verdict — **wrong seed**
+- Only one project_type is seeded (`home_services`); no cross-vertical contamination and no type mis-resolution on the shell (shell is created as `home_services` before vectors are read).
+- Memberships aren't a home-services baseline vector. **Action:** delete this seed row from `project_type_leak_vectors` for `home_services`. Do NOT invent membership defaults to keep it alive.
 
-New tokens live under new names in the `.stm-marketing` scope only:
-```
---stm-bg: 220 20% 97%;         /* #F7F8FA */
---stm-surface: 0 0% 100%;
---stm-ink: 225 14% 9%;         /* #101218 */
---stm-ink-soft: 220 8% 41%;    /* #5F6672 */
---stm-band-dark: 225 52% 8%;   /* #0A1020 */
---stm-cobalt: 231 100% 64%;    /* #465CFF */
---stm-cyan: 191 100% 67%;      /* #55D6FF */
---stm-cobalt-soft: 230 100% 96%;/* #E9EDFF */
---stm-ok: 152 68% 32%;         /* #198A5A */
---stm-warn: 36 72% 55%;        /* #E1A23A */
---stm-loss: 9 72% 59%;         /* #E15C4A */
-```
-Inside `.stm-marketing` I additionally *re-route* the shadcn semantic tokens (`--background`, `--foreground`, `--primary`, `--accent`, `--border`, etc.) to the new `--stm-*` values. Those semantic tokens are already re-routed today (to `--bone`, `--green`, `--rust`, etc.) — I'm swapping the destination, not renaming or deleting the semantic layer. Effect: the marketing surface picks up the new palette; the app surface (which never applies `.stm-marketing`) is unaffected.
+### A3. New `display_defaults` (conservative, benchmark-sourced) — for approval
 
-Rebuild components reference **only** `--stm-*` and the shadcn semantics (`--background`, `--foreground`, `--primary`, `--accent`, `--border`, `--muted-foreground`). Rebuild components do NOT reference `--bone/--green/--rust/--gold` directly — grep gate enforced pre-publish.
+Add these to `home_services.display_defaults` so every remaining formula variable resolves at `vertical_default` or better on a cold run:
 
-`/free-audit` copy pass swaps its inline `--bone/--green/--rust/--gold/--ink` references to the corresponding `--stm-*` names so the page inherits the new palette per spec.
+| Variable | Proposed default | Basis (conservative) |
+|---|---|---|
+| `missed_calls` | `18` /mo | Servicetitan/CallRail benchmarks — small home-services businesses miss ~15–30% of ~120 monthly calls; picking bottom quartile. |
+| `booking_rate` | `0.35` | Industry norm for missed-then-recovered calls is 30–50% — bottom of range. |
+| `open_estimates` | `12` /mo | Bottom-quartile pipeline for a 2–5 crew (roughly one estimate/business day, minus wins). |
+| `avg_ticket` | keep `500` | Already set; conservative mid for HVAC/plumbing/electrical average job. |
+| `close_rate` | keep `0.55` | Already set. |
 
-Vertical landers: `src/components/marketing/vertical/VerticalHero.tsx` `accentVar` map values swap to `#E15C4A` / `#198A5A` / `#465CFF`; loading spinner border color changes. Their page shell keeps its existing `bg-[hsl(var(--bone))]` (out of scope — no migration).
+After A2 removes "Lapsing memberships", `lapsing_members` and `monthly_value` are no longer referenced → nothing to default.
 
-## Final section order (top → bottom)
-1. Nav (rebuild) — light
-2. Hero (rebuild) — light, contains `#hero-flow` SVG animation
-3. Problem (rebuild) — light, `id="moments"`
-4. Outcomes (rebuild) — light, `id="outcomes"`
-5. BarPulseProof (rebuild) — DARK `#0A1020`, `id="barpulse"`
-6. Process (rebuild) — light, `id="process"`
-7. Founder (rebuild) — light, `id="founder"`
-8. FAQ (rebuild) — light
-9. Contact (rebuild) — DARK `#0A1020`, `id="contact"`, contains triage picker
-10. Footer (rebuild) — light
+**New invariant (enforced by convention, not schema):** a vector may not be seeded unless every one of its formula variables resolves at `vertical_default` or better. Documented in a code comment above the seed migration.
 
-## Typography ruling (single source)
+### A4. Cold-run rule (engine change in `compute-leak-stack`)
 
-Heading token is already centralized at `.stm-marketing .font-display` (index.css line 513). Reported: heading font IS tokenized in one place — fix the token, don't chase per-component instances. Body font is at `.stm-marketing` (line 505) and `.font-body` (line 524).
+Today: any unresolved var → whole vector returns `monthly_dollars = null` and `reason: unresolved:*` in the results array.
 
-Changes inside `.stm-marketing` only:
-- `.stm-marketing` body font → `"Instrument Sans", ui-sans-serif, system-ui, sans-serif` (unchanged — it already is Instrument Sans).
-- `.stm-marketing .font-display` → `"Inter Tight", ui-sans-serif, system-ui, sans-serif`, weights 700/800, `letter-spacing: -0.02em`.
-- `.stm-marketing .font-body` → unchanged.
-- `.stm-marketing .font-serif-accent` — left defined but unused by rebuild components (grep gate).
-- `.stm-marketing .font-mono-label` — left defined; rebuild references it only inside the single BarPulseProof product view for tiny authentic metadata.
-- `.stm-marketing .eyebrow` — restyled to small-caps sans, `letter-spacing: 0.06em`, `font-family: inherit`, prefixed with a 12px cobalt tick (existing `::before` retargeted from `hsl(var(--gold))` → `hsl(var(--stm-cobalt))`, width shortened).
+Change:
+- Vector still records `unresolved: true` internally (so `/leak-stack` operator view is unchanged).
+- Public rendering (Part B) never shows the raw `unresolved:*` string.
+- Unresolved-dollar vectors are **excluded** from `total_monthly_dollars` / `total_risk_exposure_dollars` (already true) and get a stable `render_state: 'priced_with_your_numbers'` flag added to each result so the client can pick copy without pattern-matching on the `reason` string. Vectors that compute normally get `render_state: 'estimated'`.
 
-Google Fonts: append a second `@import` line for Inter Tight (`?family=Inter+Tight:wght@600;700;800&display=swap`). Existing imports are untouched (Guard 1).
+No schema change required — `render_state` lives inside the existing `results` JSON.
 
-## Removed-from-render checklist (unmounted, files kept for rollback)
-- [x] Hero stat box (metric strip inside old `Hero.tsx`) — old Hero not imported.
-- [x] Hero triage card (`HeroTriage.tsx`) — mechanic ports to Contact.
-- [x] Six-systems / `WhatIBuild.tsx`.
-- [x] `LeadFollowUpShowcase`, `InsightsShowcase`, `AssistantShowcase`, `AutomationsShowcase`, `ContentShowcase`.
-- [x] `ConnectiveLayer.tsx` (Before/After panels + "whole operation" band).
-- [x] Old 5-phase / `Process.tsx` cards + 01–05 steps.
-- [x] `TechStack.tsx` "WORKS WITH YOUR STACK" marquee.
-- [x] `ChatMarquee.tsx`.
-- [x] `Industries.tsx`.
-- [x] `FinalCTA.tsx`.
-- [x] `Proof.tsx` — includes the "$10K/MO" counter, tag pills row, four "IN FLIGHT" cards, "Phone & social — coming soon".
-- [x] All serif-italic accents, gold-mono eyebrows, grain overlay div, and bone/green/rust/gold token usage on the rebuilt sections (enforced by grep gate on `rebuild/`).
-- [x] `<div className="grain fixed inset-0 z-0" />` removed from `MarketingSite.tsx`.
+## PART B — PUBLIC RENDERING (owner language)
 
-## Triage prefill rewiring
-`rebuild/Contact.tsx` includes the "Pick the one that stings" picker row above the form. Three buttons dispatch `CustomEvent("stm:contact-prefill", { detail: text })` and `sessionStorage.setItem("stm.contact.prefill", text)`. The controlled `message` textarea (already listening from Fix 1) fills instantly. No scroll behavior needed — picker sits beside the form. Homepage `HeroTriage` unmounted, so no orphan target hashes exist.
+Split rules: `/free-audit` (public) uses new owner-language rendering. `/leak-stack` (operator) is untouched.
 
-## Sections receiving custom graphics
-- **Hero (`#hero-flow`)** — built React/SVG component (`rebuild/HeroFlow.tsx`).
-  - Stage A: phone + web icons → three tool nodes (CRM / Schedule / Inbox), two dead-end paths ending in coral `NO REPLY` and `SEEN 3 DAYS LATE` chips.
-  - Stage B: single cobalt→cyan drawn path: `ANSWERED IN SECONDS → QUALIFIED → BOOKED → OWNER NOTIFIED` → green completion dot.
-  - IntersectionObserver triggers a scroll-in line-draw, slow A↔B loop; static Stage-B frame under `prefers-reduced-motion`.
-  - Mobile: same component, path recomposes vertically via CSS; labels ≥14px.
-- **Problem** — three inline SVG spot illustrations in the same line language (ringing phone at night, fading quote paper, late report page), ~180–220px wide.
-- **Outcomes** — three asymmetric scene tiles with drawn cobalt→cyan connected paths + green completion checks.
-- **Process** — one drawn cobalt path joining the three steps, echoing Hero.
-- **BarPulseProof** — one large faithful product view (single dark card, white text ≥16px) with exactly three enlarged cobalt-ringed callouts: `What changed` · `What needs attention` · `Where it came from`. No mock browser chrome, no dots.
+1. **Headline result copy** in `FreeAudit.tsx`:
+   - `total_monthly_dollars > 0` → keep current dollars headline + caveat footnote.
+   - `total_monthly_dollars == 0 && leak_count > 0` → render exactly: `"{n} gap{s} found — a 2-minute call with your numbers puts dollars on them"` plus the primary booking CTA (`/#contact`). Never render `$0`.
+   - `leak_count == 0` → "No gaps detected." (This is the only path that may print `$0` — as literal zero gaps, not a dollar amount.)
 
-## Reduced-motion behavior
-- Hero flow: static final frame (Stage B), no line-draw loop.
-- Reveal / process path draw / spot illustrations: no transform, opacity 1.
-- Enforced via `@media (prefers-reduced-motion: reduce)` inside the new keyframes block.
+2. **Strip internal taxonomy** from `/free-audit` full-result cards:
+   - Remove: HEADLINE / SUPPORTING chip, CAPTURED REVENUE / avoided-loss chip, raw `benchmark` string, `<details>Inputs & sources</details>` block, any `unresolved:*` text.
+   - Per card render: `leak.name`, one **plain-English "why this costs you"** sentence rewritten from the vector's benchmark (mapping table below), the dollar estimate OR the "Found — priced with your numbers" state (from `render_state`), and a single small **source line** shown only in unlocked view.
 
-## Copy handling
-Every string is typed verbatim from your prompt. Grep gates:
-- Banned: `leak`, `audit` (outside `/free-audit` URL literal), `source-cited`, `AI-native` — zero in `src/components/marketing/rebuild/**` and rebuilt `FreeAudit.tsx`.
-- Technical vocab (`dashboard`, `automation`, `workflow`, `integration`, `AI`) appears only inside the three tertiary labels under Outcomes.
+   Benchmark → owner sentence map (client-side, keyed by vector name):
+   - *Missed calls* → "Calls that ring out during business hours become someone else's booking within minutes."
+   - *Unsold estimates* → "Estimates you gave that never turned into a job — most of these can still be closed with one follow-up."
+   - *Lapsing memberships* → (removed in A2)
 
-## Files touched
+   Source-line rules (from `inputs_basis` — pick strongest source across the vector's inputs):
+   - any `signal` from `google_reviews`/`review_snapshots` → "from your public reviews"
+   - any `signal` from `gbp_snapshots` → "from your Google listing"
+   - all `vertical_default`/`fallback` → "estimated from industry baseline"
+   - any `override` or `signal` from `inbound_leads` → "from a live read of your business"
 
-Add:
-- `src/components/marketing/rebuild/Nav.tsx`
-- `src/components/marketing/rebuild/Hero.tsx`
-- `src/components/marketing/rebuild/HeroFlow.tsx`
-- `src/components/marketing/rebuild/Problem.tsx`
-- `src/components/marketing/rebuild/Outcomes.tsx`
-- `src/components/marketing/rebuild/BarPulseProof.tsx`
-- `src/components/marketing/rebuild/Process.tsx`
-- `src/components/marketing/rebuild/Founder.tsx`
-- `src/components/marketing/rebuild/FAQ.tsx`
-- `src/components/marketing/rebuild/Contact.tsx`
-- `src/components/marketing/rebuild/Footer.tsx`
-- `src/components/marketing/rebuild/icons/spot.tsx` (three spot illustrations)
+3. **Locked-row tease = real remaining count.**
+   - Replace `Math.max(2, leak_count - 3)` with `Math.max(0, leak_count - top_leaks.length)`.
+   - When zero, render nothing (no card).
+   - Delete the `"Additional gap line item {i+4}" / "$X,XXX/mo"` fake row markup entirely.
 
-Edit:
-- `src/pages/MarketingSite.tsx` — swap all section imports to `rebuild/*`, drop the `grain` overlay div.
-- `src/index.css` — add Inter Tight `@import` (Bricolage line kept, Guard 1); add `--stm-*` token block inside `.stm-marketing`; swap `.stm-marketing .font-display` family to Inter Tight; re-route existing shadcn semantic vars inside `.stm-marketing` from `--bone/--green/…` → `--stm-*`; retarget `.eyebrow` styling; keep all legacy token definitions and utility classes (`.font-serif-accent`, `.font-mono-label`, `.grain`, `.radial-gold`, etc.) intact for unmounted files and print renderers.
-- `src/components/marketing/vertical/VerticalHero.tsx` — `accentVar` hex remap + spinner border color to cobalt.
-- `src/pages/FreeAudit.tsx` — copy pass (H1, sub, button text, result headline pattern, unlock header, tab titles) + token pass (`--bone` → `--stm-bg`, `--green` → `--stm-cobalt`, `--rust` → `--stm-loss`, `--gold` → `--stm-warn`, `--ink` → `--stm-ink`).
+4. **Category-mismatch caveat reword** (both redacted and full views):
+   Replace current caveat with: *"We couldn't confirm your business category from Google yet, so these use general local-business benchmarks — your numbers will sharpen everything."* Emit from `run-public-audit` `resolveProjectType` when `path === 'default'` (single source of truth).
 
-Do not edit: `Contact.tsx` (old), `HeroTriage.tsx`, `Proof.tsx`, showcase files, `TechStack.tsx`, `ChatMarquee.tsx`, `WhatIBuild.tsx`, `Process.tsx` (old), `Industries.tsx`, `FinalCTA.tsx`, `ConnectiveLayer.tsx`, `Footer.tsx` (old), `ProposalRenderer.tsx`, `RecoveryReportRenderer.tsx`, both `print.css` files, `VerticalLanding.tsx` page shell.
+5. **CTA / token sweep on `/free-audit`:**
+   - Unlock submit button: `bg-[hsl(var(--stm-warn))]` → `bg-[hsl(var(--stm-cobalt))]` with `text-white` for contrast on the dark unlock card.
+   - Unlock inputs focus ring: `focus:border-[hsl(var(--stm-warn))]` → `focus:border-[hsl(var(--stm-cobalt))]`.
+   - "Try again" button in failure state: same swap (amber → cobalt).
+   - Grep the file for any remaining `stm-warn` used as a CTA vs. attention-only; keep amber only on the "we couldn't confirm your category" caveat and honeypot/attention states.
 
-## Gates before Publish
-- Removed checklist verified via `rg` against `MarketingSite.tsx` imports.
-- Banned-words grep across `rebuild/` and `FreeAudit.tsx` returns zero.
-- Legacy-token grep in `rebuild/`: `rg 'var\(--(bone|green|rust|gold|line|surface|ink-soft)\b' src/components/marketing/rebuild` returns zero.
-- Font grep in `rebuild/`: `rg 'Bricolage|Instrument Serif|IBM Plex Mono|font-serif-accent' src/components/marketing/rebuild` returns zero. `font-mono-label` allowed only in BarPulseProof.
-- Print-renderer sanity: `rg 'Bricolage' src/components/proposals src/components/recovery-report` still returns the self-load line + print.css usage (unchanged).
-- Hero graphic is inline SVG component, not `<img>`.
-- `tsgo` clean.
-- Playwright at 1280×800 + 390×844: nav anchors resolve, hero animation renders (or static under reduced motion), triage picker prefills textarea, `/free-audit` renders new copy + new tokens, vertical lander loads with cobalt spinner, `/approvals` proposal preview still renders in bone/green/rust/gold.
+## PART C — EMAIL GATE INTEGRITY
+
+### C1. Diagnosis — how "ab" unlocked
+Two independent gaps line up:
+- **Client:** input has `type="email" required maxLength=255` but the submit handler only checks `if (!email) return` — no format validation, and `required` is only enforced when the form fires a real `submit` event through the browser (a controlled `<form onSubmit>` bypasses the browser's built-in validity check because React calls the handler before the browser cancels invalid submits — and even when the browser does validate, `type=email` accepts `"ab"` as empty-string-ish; specifically `type=email` requires an `@` but 2-char strings without `@` should be rejected — the observed 2-char unlock means either the button was clicked while `required` was momentarily satisfied by whitespace, or the handler ran without validity checking).
+- **Server:** `unlock-public-audit` uses `z.string().trim().email().max(255)` on `email`. If Zod passed `"ab"`, then the client bypassed validation and the server ran an old build without this zod line — OR the value at unlock time was actually `"ab@x"` (5 chars, minimal RFC-valid), which `z.string().email()` DOES accept. **Working hypothesis:** the tested string was `a@b` (or similar) which passes both the browser and Zod's default lax email regex. The gate is not truly enforcing "real-looking business email".
+
+**Fix strategy:** tighten both sides with the same regex; do not rely on browser `required` alone.
+
+### C2. Client fixes (`FreeAudit.tsx` + `usePublicAudit.ts`)
+- Add pure regex validator `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/` (requires `.` in the domain with a ≥2-char TLD).
+- Trim value on change; compute `emailValid`; disable submit unless `emailValid`.
+- Show inline red helper text ("Enter a valid business email") on blur when invalid and non-empty.
+- Do not `await audit.unlock(...)` if `!emailValid`.
+- No change to `unlockName`/`phone` handling.
+
+### C3. Server fixes (`unlock-public-audit/index.ts`)
+- Replace `z.string().trim().email().max(255)` with:
+  ```
+  z.string().trim().toLowerCase().max(255).regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'invalid_email')
+  ```
+- On validation failure return 400 with `{ error: 'invalid_email' }` **before** any Supabase write. No `inbound_leads` insert, no `email_captured_at` stamp, no `full_result` return.
+- `email` stored in `public_audit_requests.email` and `inbound_leads.email` is the trimmed-lowercased value from Zod's transformed output.
+
+Client-side validation is UX; the server is the gate. Both use the identical regex string (copied verbatim, no shared package — edge functions can't import from `src/`).
+
+## PART D — CURRENT UNLOCK WRITE PATH (confirmed, no code)
+
+On a successful `POST /unlock-public-audit`:
+
+1. **Loads** `public_audit_requests` row by token (must be `status='complete'`; otherwise 409).
+2. **Inserts** one row into `public.inbound_leads` with:
+   - `name` = provided name OR local-part of email
+   - `business_name` = from audit request
+   - `email` = user-supplied
+   - `phone` = user-supplied or `null`
+   - `message` = `"Public leak audit unlocked. Estimated $<total>/mo across <n> leaks."`
+   - `conversation_channel` = `'public_audit'`
+   - `route_to` = `'self'`
+   - `is_ready` = `true`
+   - `source` = `'free-audit'`
+   - `qualifier_data` (jsonb) = `{ source, token, operation_footprint, redacted_summary, leak_count, top_leaks, project_type_resolution, place_id, city }`
+   - (`captured_for_project_id` stays NULL — shell venue is not persisted as a real project.)
+3. **Updates** the `public_audit_requests` row: sets `email` (lowercased/trimmed post-fix) and `email_captured_at = now()`. Nothing else on that row changes.
+4. **Returns** `{ full_result }` to the client, which flips FreeAudit into the full-result view.
+
+No CRM auto-promotion, no `crm_contacts`/`crm_deals` write, no email send. That's the pre-E1 surface.
+
+## Files changed (scope)
+
+- **DB migration** — remove Lapsing memberships row from `project_type_leak_vectors` for `home_services`; extend `project_types.home_services.display_defaults` with `missed_calls`, `booking_rate`, `open_estimates`. Add a comment on the seed statement documenting the "every var must resolve" invariant.
+- `supabase/functions/compute-leak-stack/index.ts` — add `render_state` to each result; no other math change.
+- `supabase/functions/unlock-public-audit/index.ts` — tighten email regex + lowercase + early 400.
+- `src/pages/FreeAudit.tsx` — new headline branching, taxonomy stripped from cards, plain-English + source-line rendering, locked rows use real remaining count (delete fake rows), reworded caveat pulled from `project_type_resolution.caveat` (server-side reworded), cobalt-not-amber CTA sweep, client email regex + disabled state + inline error.
+- `src/hooks/usePublicAudit.ts` — surface a typed 400 (`invalid_email`) so the UI can render a specific error.
+
+## Guardrails
+
+- No fabricated numbers — all new defaults are labeled estimates and rendered via the same source chip pipeline; unscored stays unscored internally.
+- Internal `/leak-stack` page renders `full_result` results verbatim including `severity`, `risk_type`, benchmark, and `inputs` — unchanged.
+- Theater, redaction, and dedupe mechanics untouched.
+- `tsc --noEmit` clean; no anon grants; no route changes.
