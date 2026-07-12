@@ -26,6 +26,7 @@ export interface LeakResult {
   risk_type: 'captured_revenue' | 'avoided_loss';
   monthly_dollars: number | null;
   reason?: string;
+  render_state?: 'estimated' | 'priced_with_your_numbers';
   inputs: Array<{ name: string; value?: number; source?: string; caveat?: string; unresolved?: boolean }>;
 }
 
@@ -123,7 +124,17 @@ export function usePublicAudit() {
       const { data, error: e } = await supabase.functions.invoke('unlock-public-audit', {
         body: { token, email, name, phone },
       });
-      if (e) throw new Error(e.message);
+      if (e) {
+        // Supabase functions client surfaces the response body under context.
+        const ctx: any = (e as any).context;
+        let msg = e.message || 'Failed to unlock';
+        try {
+          const parsed = ctx?.body ? JSON.parse(ctx.body) : ctx;
+          if (parsed?.error === 'invalid_email') msg = 'Enter a valid business email.';
+          else if (parsed?.details?.email?.length) msg = 'Enter a valid business email.';
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
       const payload = data as { full_result: FullResult };
       setFull(payload.full_result);
     } catch (err: any) {
