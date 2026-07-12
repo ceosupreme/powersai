@@ -25,6 +25,30 @@ function fmtMoney(n: number | null | undefined): string {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
 
+// Kept in sync with unlock-public-audit/index.ts EMAIL_RE.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// Owner-language "why this costs you" sentence, keyed by seeded vector name.
+const WHY_COPY: Record<string, string> = {
+  'Missed calls':
+    "Calls that ring out during business hours become someone else's booking within minutes.",
+  'Unsold estimates':
+    'Estimates you gave that never turned into a job — most of these can still be closed with one follow-up.',
+};
+
+function whyForLeak(name: string, fallbackBenchmark: string | null): string {
+  if (WHY_COPY[name]) return WHY_COPY[name];
+  // Generic owner-facing fallback — never expose the raw operator benchmark string.
+  return 'A gap between what you have today and what your best-run competitors do.';
+}
+
+function sourceLine(inputs: Array<{ source?: string; unresolved?: boolean }> | undefined): string {
+  const srcs = new Set((inputs ?? []).map((i) => i.source).filter(Boolean) as string[]);
+  if (srcs.has('signal')) return 'from a live read of your business';
+  if (srcs.has('override')) return 'from a live read of your business';
+  return 'estimated from industry baseline';
+}
+
 export default function FreeAudit() {
   useEffect(() => {
     const prev = document.title;
@@ -45,6 +69,8 @@ export default function FreeAudit() {
   const [honeypot, setHoneypot] = useState('');
   const [email, setEmail] = useState('');
   const [unlockName, setUnlockName] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
+  const emailValid = EMAIL_RE.test(email.trim());
 
   const canSubmit = businessName.trim().length > 0 && city.trim().length > 0 && !audit.submitting;
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
@@ -75,7 +101,10 @@ export default function FreeAudit() {
 
   async function onUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (!email) return;
+    if (!emailValid) {
+      setEmailTouched(true);
+      return;
+    }
     await audit.unlock(email.trim(), unlockName.trim() || undefined);
   }
 
@@ -217,7 +246,7 @@ export default function FreeAudit() {
                     <button
                       type="button"
                       onClick={() => audit.reset()}
-                      className="rounded-full bg-[hsl(var(--stm-warn))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--stm-ink))] transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="rounded-full bg-[hsl(var(--stm-cobalt))] px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
                     >
                       Try again
                     </button>
@@ -238,17 +267,40 @@ export default function FreeAudit() {
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Money you're likely missing</p>
-                <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
-                  {fmtMoney(audit.redacted.total_monthly_dollars)}
-                  <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
-                </p>
-                <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
-                  {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
-                </p>
+                {(audit.redacted.total_monthly_dollars ?? 0) > 0 ? (
+                  <>
+                    <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
+                      {fmtMoney(audit.redacted.total_monthly_dollars)}
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
+                    </p>
+                    <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
+                      {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
+                    </p>
+                  </>
+                ) : audit.redacted.leak_count > 0 ? (
+                  <>
+                    <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                      {audit.redacted.leak_count} gap{audit.redacted.leak_count === 1 ? '' : 's'} found
+                    </p>
+                    <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
+                      A 2-minute call with your numbers puts dollars on them.
+                    </p>
+                    <a
+                      href="/#contact"
+                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-3 text-sm font-medium text-white hover:-translate-y-0.5 hover:shadow-lg transition-all"
+                    >
+                      Book 15 minutes →
+                    </a>
+                  </>
+                ) : (
+                  <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                    No gaps detected.
+                  </p>
+                )}
                 {audit.redacted.top_leaks.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {audit.redacted.top_leaks.map((n) => (
-                      <span key={n} className="rounded-full border border-[hsl(var(--stm-warn))] bg-[hsl(var(--stm-warn))]/10 px-3 py-1 text-sm">{n}</span>
+                      <span key={n} className="rounded-full border border-[hsl(var(--stm-cobalt))]/30 bg-[hsl(var(--stm-cobalt))]/5 px-3 py-1 text-sm text-[hsl(var(--stm-ink))]">{n}</span>
                     ))}
                   </div>
                 )}
@@ -259,17 +311,19 @@ export default function FreeAudit() {
                 )}
               </div>
 
-              {/* Locked rows */}
-              <div className="rounded-2xl border border-dashed border-[hsl(var(--stm-ink))]/15 bg-white/50 p-6">
-                <div className="space-y-2 blur-sm select-none pointer-events-none">
-                  {Array.from({ length: Math.max(2, audit.redacted.leak_count - 3) }).map((_, i) => (
-                    <div key={i} className="flex justify-between border-b border-[hsl(var(--stm-ink))]/10 pb-2">
-                      <span className="text-sm">Additional gap line item {i + 4}</span>
-                      <span className="font-mono text-sm">$X,XXX/mo</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Locked rows — only render if there are real remaining leaks beyond the top-3 tease. */}
+              {(() => {
+                const remaining = Math.max(0, audit.redacted.leak_count - audit.redacted.top_leaks.length);
+                if (remaining === 0) return null;
+                return (
+                  <div className="rounded-2xl border border-dashed border-[hsl(var(--stm-ink))]/15 bg-white/50 p-6">
+                    <p className="mb-3 font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/50">
+                      + {remaining} more gap{remaining === 1 ? '' : 's'} in the full list
+                    </p>
+                    <div className="h-16 rounded bg-gradient-to-b from-[hsl(var(--stm-ink))]/5 to-transparent" aria-hidden="true" />
+                  </div>
+                );
+              })()}
 
               {/* Unlock */}
               <form onSubmit={onUnlock} className="rounded-2xl bg-[hsl(var(--stm-ink))] p-8 text-[hsl(var(--stm-bg))] shadow-lg md:p-10">
@@ -281,26 +335,39 @@ export default function FreeAudit() {
                     value={unlockName}
                     onChange={(e) => setUnlockName(e.target.value)}
                     placeholder="Name (optional)"
-                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-warn))] focus:outline-none"
+                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
                     maxLength={200}
                   />
                   <input
                     type="email"
                     required
+                    inputMode="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={() => setEmailTouched(true)}
                     placeholder="you@business.com"
-                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-warn))] focus:outline-none"
+                    className={`rounded-lg border bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:outline-none ${
+                      emailTouched && email && !emailValid
+                        ? 'border-[hsl(var(--stm-loss))] focus:border-[hsl(var(--stm-loss))]'
+                        : 'border-[hsl(var(--stm-bg))]/20 focus:border-[hsl(var(--stm-cobalt))]'
+                    }`}
                     maxLength={255}
                   />
                   <button
                     type="submit"
-                    disabled={audit.unlocking || !email}
-                    className="rounded-full bg-[hsl(var(--stm-warn))] px-6 py-2.5 text-sm font-medium text-[hsl(var(--stm-ink))] disabled:opacity-60"
+                    disabled={audit.unlocking || !emailValid}
+                    className="rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
                     {audit.unlocking ? 'Unlocking…' : 'Show me the full list'}
                   </button>
                 </div>
+                {emailTouched && email && !emailValid && (
+                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">Enter a valid business email.</p>
+                )}
+                {audit.error && (
+                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>
+                )}
               </form>
             </div>
           )}
@@ -310,13 +377,21 @@ export default function FreeAudit() {
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">The full list</p>
-                <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
-                  {fmtMoney(audit.full.total_monthly_dollars)}
-                  <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo captured revenue</span>
-                </p>
-                {audit.full.total_risk_exposure_dollars > 0 && (
-                  <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                    Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in avoided-loss risk exposure.
+                {audit.full.total_monthly_dollars > 0 ? (
+                  <>
+                    <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
+                      {fmtMoney(audit.full.total_monthly_dollars)}
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo estimated</span>
+                    </p>
+                    {audit.full.total_risk_exposure_dollars > 0 && (
+                      <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
+                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in exposure worth defending.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                    {audit.full.results.length} gap{audit.full.results.length === 1 ? '' : 's'} found — a 2-minute call with your numbers puts dollars on them.
                   </p>
                 )}
                 {audit.full.project_type_resolution?.path === 'default' && (
@@ -330,40 +405,27 @@ export default function FreeAudit() {
                 {audit.full.results.map((leak, i) => (
                   <li key={leak.name + i} className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-5 md:p-6">
                     <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${leak.severity === 'headline' ? 'bg-[hsl(var(--stm-loss))] text-[hsl(var(--stm-bg))]' : 'bg-[hsl(var(--stm-ink))]/10 text-[hsl(var(--stm-ink))]/70'}`}>
-                            {leak.severity}
-                          </span>
-                          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${leak.risk_type === 'avoided_loss' ? 'bg-[hsl(var(--stm-warn))]/20 text-[hsl(var(--stm-ink))]/70' : 'bg-[hsl(var(--stm-cobalt))]/10 text-[hsl(var(--stm-cobalt))]'}`}>
-                            {leak.risk_type === 'avoided_loss' ? 'avoided loss' : 'captured revenue'}
-                          </span>
-                        </div>
-                        <h4 className="mt-2 font-display text-xl">{leak.name}</h4>
-                        {leak.benchmark && (
-                          <p className="mt-1 text-sm text-[hsl(var(--stm-ink))]/60">{leak.benchmark}</p>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-display text-xl">{leak.name}</h4>
+                        <p className="mt-2 text-sm text-[hsl(var(--stm-ink))]/70">
+                          {whyForLeak(leak.name, leak.benchmark)}
+                        </p>
+                        <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-[hsl(var(--stm-ink))]/45">
+                          {sourceLine(leak.inputs)}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        {leak.render_state === 'priced_with_your_numbers' || leak.monthly_dollars == null ? (
+                          <p className="font-display text-base text-[hsl(var(--stm-ink))]/70 max-w-[10rem]">
+                            Found — priced with your numbers
+                          </p>
+                        ) : (
+                          <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50">/mo</span>
+                          </p>
                         )}
                       </div>
-                      <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                        {leak.monthly_dollars == null ? '—' : `${fmtMoney(leak.monthly_dollars)}/mo`}
-                      </p>
                     </div>
-                    {leak.reason && <p className="mt-3 text-sm text-[hsl(var(--stm-ink))]/70">{leak.reason}</p>}
-                    {leak.inputs?.length > 0 && (
-                      <details className="mt-3">
-                        <summary className="cursor-pointer font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/50">Inputs & sources</summary>
-                        <ul className="mt-2 space-y-1 text-xs">
-                          {leak.inputs.map((inp, j) => (
-                            <li key={j} className="flex flex-wrap gap-x-3 text-[hsl(var(--stm-ink))]/70">
-                              <span className="font-mono">{inp.name}</span>
-                              <span>= {inp.value ?? '—'}</span>
-                              <span className="font-mono text-[10px] uppercase text-[hsl(var(--stm-ink))]/40">{inp.source ?? 'unknown'}</span>
-                              {inp.caveat && <span className="w-full text-[hsl(var(--stm-ink))]/50">↳ {inp.caveat}</span>}
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    )}
                   </li>
                 ))}
               </ul>
