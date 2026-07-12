@@ -13,9 +13,14 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+// Email regex kept in sync with the client (src/pages/FreeAudit.tsx).
+// Requires local@domain.tld with a ≥2-char TLD. Server is the gate;
+// client-side check is UX only.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 const Body = z.object({
   token: z.string().trim().min(8).max(64),
-  email: z.string().trim().email().max(255),
+  email: z.string().trim().toLowerCase().max(255).regex(EMAIL_RE, 'invalid_email'),
   name: z.string().trim().max(200).optional().nullable(),
   phone: z.string().trim().max(40).optional().nullable(),
 });
