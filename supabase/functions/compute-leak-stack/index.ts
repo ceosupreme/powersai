@@ -257,13 +257,13 @@ Deno.serve(async (req) => {
         inputList.push({ name, ...r });
       }
       if (unresolvedVar) {
-        results.push({ name: v.name, severity: v.severity, benchmark: v.benchmark, risk_type: v.risk_type, monthly_dollars: null, reason: `unresolved:${unresolvedVar}`, inputs: inputList });
+        results.push({ name: v.name, severity: v.severity, benchmark: v.benchmark, risk_type: v.risk_type, monthly_dollars: null, reason: `unresolved:${unresolvedVar}`, render_state: 'priced_with_your_numbers', inputs: inputList });
         continue;
       }
       let raw: number;
       try { raw = evalFormula(v.dollarize_formula, varMap); }
       catch (e) {
-        results.push({ name: v.name, severity: v.severity, benchmark: v.benchmark, risk_type: v.risk_type, monthly_dollars: null, reason: `parse:${(e as Error).message}`, inputs: inputList });
+        results.push({ name: v.name, severity: v.severity, benchmark: v.benchmark, risk_type: v.risk_type, monthly_dollars: null, reason: `parse:${(e as Error).message}`, render_state: 'priced_with_your_numbers', inputs: inputList });
         continue;
       }
       const risk_type = v.risk_type || 'captured_revenue';
@@ -279,6 +279,7 @@ Deno.serve(async (req) => {
         risk_type,
         risk_multiplier: multiplier,
         monthly_dollars: dollars,
+        render_state: 'estimated',
         inputs: inputList,
       });
     }
