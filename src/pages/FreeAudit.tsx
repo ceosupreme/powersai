@@ -246,7 +246,7 @@ export default function FreeAudit() {
                     <button
                       type="button"
                       onClick={() => audit.reset()}
-                      className="rounded-full bg-[hsl(var(--stm-warn))] px-5 py-2.5 text-sm font-medium text-[hsl(var(--stm-ink))] transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="rounded-full bg-[hsl(var(--stm-cobalt))] px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
                     >
                       Try again
                     </button>
