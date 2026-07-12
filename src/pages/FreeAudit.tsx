@@ -267,17 +267,40 @@ export default function FreeAudit() {
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Money you're likely missing</p>
-                <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
-                  {fmtMoney(audit.redacted.total_monthly_dollars)}
-                  <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
-                </p>
-                <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
-                  {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
-                </p>
+                {(audit.redacted.total_monthly_dollars ?? 0) > 0 ? (
+                  <>
+                    <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
+                      {fmtMoney(audit.redacted.total_monthly_dollars)}
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
+                    </p>
+                    <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
+                      {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
+                    </p>
+                  </>
+                ) : audit.redacted.leak_count > 0 ? (
+                  <>
+                    <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                      {audit.redacted.leak_count} gap{audit.redacted.leak_count === 1 ? '' : 's'} found
+                    </p>
+                    <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
+                      A 2-minute call with your numbers puts dollars on them.
+                    </p>
+                    <a
+                      href="/#contact"
+                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-3 text-sm font-medium text-white hover:-translate-y-0.5 hover:shadow-lg transition-all"
+                    >
+                      Book 15 minutes →
+                    </a>
+                  </>
+                ) : (
+                  <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                    No gaps detected.
+                  </p>
+                )}
                 {audit.redacted.top_leaks.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {audit.redacted.top_leaks.map((n) => (
-                      <span key={n} className="rounded-full border border-[hsl(var(--stm-warn))] bg-[hsl(var(--stm-warn))]/10 px-3 py-1 text-sm">{n}</span>
+                      <span key={n} className="rounded-full border border-[hsl(var(--stm-cobalt))]/30 bg-[hsl(var(--stm-cobalt))]/5 px-3 py-1 text-sm text-[hsl(var(--stm-ink))]">{n}</span>
                     ))}
                   </div>
                 )}
@@ -288,17 +311,19 @@ export default function FreeAudit() {
                 )}
               </div>
 
-              {/* Locked rows */}
-              <div className="rounded-2xl border border-dashed border-[hsl(var(--stm-ink))]/15 bg-white/50 p-6">
-                <div className="space-y-2 blur-sm select-none pointer-events-none">
-                  {Array.from({ length: Math.max(2, audit.redacted.leak_count - 3) }).map((_, i) => (
-                    <div key={i} className="flex justify-between border-b border-[hsl(var(--stm-ink))]/10 pb-2">
-                      <span className="text-sm">Additional gap line item {i + 4}</span>
-                      <span className="font-mono text-sm">$X,XXX/mo</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Locked rows — only render if there are real remaining leaks beyond the top-3 tease. */}
+              {(() => {
+                const remaining = Math.max(0, audit.redacted.leak_count - audit.redacted.top_leaks.length);
+                if (remaining === 0) return null;
+                return (
+                  <div className="rounded-2xl border border-dashed border-[hsl(var(--stm-ink))]/15 bg-white/50 p-6">
+                    <p className="mb-3 font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/50">
+                      + {remaining} more gap{remaining === 1 ? '' : 's'} in the full list
+                    </p>
+                    <div className="h-16 rounded bg-gradient-to-b from-[hsl(var(--stm-ink))]/5 to-transparent" aria-hidden="true" />
+                  </div>
+                );
+              })()}
 
               {/* Unlock */}
               <form onSubmit={onUnlock} className="rounded-2xl bg-[hsl(var(--stm-ink))] p-8 text-[hsl(var(--stm-bg))] shadow-lg md:p-10">
@@ -310,26 +335,39 @@ export default function FreeAudit() {
                     value={unlockName}
                     onChange={(e) => setUnlockName(e.target.value)}
                     placeholder="Name (optional)"
-                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-warn))] focus:outline-none"
+                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
                     maxLength={200}
                   />
                   <input
                     type="email"
                     required
+                    inputMode="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={() => setEmailTouched(true)}
                     placeholder="you@business.com"
-                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-warn))] focus:outline-none"
+                    className={`rounded-lg border bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:outline-none ${
+                      emailTouched && email && !emailValid
+                        ? 'border-[hsl(var(--stm-loss))] focus:border-[hsl(var(--stm-loss))]'
+                        : 'border-[hsl(var(--stm-bg))]/20 focus:border-[hsl(var(--stm-cobalt))]'
+                    }`}
                     maxLength={255}
                   />
                   <button
                     type="submit"
-                    disabled={audit.unlocking || !email}
-                    className="rounded-full bg-[hsl(var(--stm-warn))] px-6 py-2.5 text-sm font-medium text-[hsl(var(--stm-ink))] disabled:opacity-60"
+                    disabled={audit.unlocking || !emailValid}
+                    className="rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
                     {audit.unlocking ? 'Unlocking…' : 'Show me the full list'}
                   </button>
                 </div>
+                {emailTouched && email && !emailValid && (
+                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">Enter a valid business email.</p>
+                )}
+                {audit.error && (
+                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>
+                )}
               </form>
             </div>
           )}
