@@ -79,7 +79,7 @@ function resolveProjectType(gbpTypes: string[] | null, gbpPrimary: string | null
     gbp_category: gbpPrimary,
     matched_key: 'home_services',
     path: 'default',
-    caveat: 'No home-services match on GBP category; using home_services baseline. Estimates may not reflect your vertical.',
+    caveat: "We couldn't confirm your business category from Google yet, so these use general local-business benchmarks — your numbers will sharpen everything.",
   };
 }
 
