@@ -377,13 +377,21 @@ export default function FreeAudit() {
             <div className="mt-2 space-y-8">
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">The full list</p>
-                <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
-                  {fmtMoney(audit.full.total_monthly_dollars)}
-                  <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo captured revenue</span>
-                </p>
-                {audit.full.total_risk_exposure_dollars > 0 && (
-                  <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                    Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in avoided-loss risk exposure.
+                {audit.full.total_monthly_dollars > 0 ? (
+                  <>
+                    <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
+                      {fmtMoney(audit.full.total_monthly_dollars)}
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo estimated</span>
+                    </p>
+                    {audit.full.total_risk_exposure_dollars > 0 && (
+                      <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
+                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in exposure worth defending.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
+                    {audit.full.results.length} gap{audit.full.results.length === 1 ? '' : 's'} found — a 2-minute call with your numbers puts dollars on them.
                   </p>
                 )}
                 {audit.full.project_type_resolution?.path === 'default' && (
@@ -397,40 +405,27 @@ export default function FreeAudit() {
                 {audit.full.results.map((leak, i) => (
                   <li key={leak.name + i} className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-5 md:p-6">
                     <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${leak.severity === 'headline' ? 'bg-[hsl(var(--stm-loss))] text-[hsl(var(--stm-bg))]' : 'bg-[hsl(var(--stm-ink))]/10 text-[hsl(var(--stm-ink))]/70'}`}>
-                            {leak.severity}
-                          </span>
-                          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${leak.risk_type === 'avoided_loss' ? 'bg-[hsl(var(--stm-warn))]/20 text-[hsl(var(--stm-ink))]/70' : 'bg-[hsl(var(--stm-cobalt))]/10 text-[hsl(var(--stm-cobalt))]'}`}>
-                            {leak.risk_type === 'avoided_loss' ? 'avoided loss' : 'captured revenue'}
-                          </span>
-                        </div>
-                        <h4 className="mt-2 font-display text-xl">{leak.name}</h4>
-                        {leak.benchmark && (
-                          <p className="mt-1 text-sm text-[hsl(var(--stm-ink))]/60">{leak.benchmark}</p>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-display text-xl">{leak.name}</h4>
+                        <p className="mt-2 text-sm text-[hsl(var(--stm-ink))]/70">
+                          {whyForLeak(leak.name, leak.benchmark)}
+                        </p>
+                        <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-[hsl(var(--stm-ink))]/45">
+                          {sourceLine(leak.inputs)}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        {leak.render_state === 'priced_with_your_numbers' || leak.monthly_dollars == null ? (
+                          <p className="font-display text-base text-[hsl(var(--stm-ink))]/70 max-w-[10rem]">
+                            Found — priced with your numbers
+                          </p>
+                        ) : (
+                          <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50">/mo</span>
+                          </p>
                         )}
                       </div>
-                      <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                        {leak.monthly_dollars == null ? '—' : `${fmtMoney(leak.monthly_dollars)}/mo`}
-                      </p>
                     </div>
-                    {leak.reason && <p className="mt-3 text-sm text-[hsl(var(--stm-ink))]/70">{leak.reason}</p>}
-                    {leak.inputs?.length > 0 && (
-                      <details className="mt-3">
-                        <summary className="cursor-pointer font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/50">Inputs & sources</summary>
-                        <ul className="mt-2 space-y-1 text-xs">
-                          {leak.inputs.map((inp, j) => (
-                            <li key={j} className="flex flex-wrap gap-x-3 text-[hsl(var(--stm-ink))]/70">
-                              <span className="font-mono">{inp.name}</span>
-                              <span>= {inp.value ?? '—'}</span>
-                              <span className="font-mono text-[10px] uppercase text-[hsl(var(--stm-ink))]/40">{inp.source ?? 'unknown'}</span>
-                              {inp.caveat && <span className="w-full text-[hsl(var(--stm-ink))]/50">↳ {inp.caveat}</span>}
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    )}
                   </li>
                 ))}
               </ul>
