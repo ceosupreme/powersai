@@ -3,7 +3,7 @@
 
 const PLACES_BASE = 'https://places.googleapis.com/v1/places';
 
-export type FetchScope = 'daily_basics' | 'weekly_full';
+export type FetchScope = 'daily_basics' | 'weekly_full' | 'public_lean';
 
 const FIELD_MASKS: Record<FetchScope, string> = {
   daily_basics: [
@@ -20,6 +20,25 @@ const FIELD_MASKS: Record<FetchScope, string> = {
     'types',
     'photos',
     'currentOpeningHours',
+    'regularOpeningHours',
+  ].join(','),
+  // Cost-disciplined mask for cold public-checkup runs. Only the fields
+  // the audits actually consume: identity, category, hours, engagement
+  // counters. No reviews[] (public sample is limited; caller skips
+  // theme extraction on this path).
+  public_lean: [
+    'id',
+    'displayName',
+    'formattedAddress',
+    'nationalPhoneNumber',
+    'rating',
+    'userRatingCount',
+    'businessStatus',
+    'websiteUri',
+    'primaryType',
+    'primaryTypeDisplayName',
+    'types',
+    'photos',
     'regularOpeningHours',
   ].join(','),
   weekly_full: [
