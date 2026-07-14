@@ -37,6 +37,7 @@ Deno.serve(async (req) => {
   }
   const onlyVenueId: string | undefined = body.venue_id;
   const stagger = body.no_stagger ? 0 : STAGGER_MS;
+  const sourceKind: string = typeof body.source_kind === 'string' ? body.source_kind : 'managed';
 
   // Load venues with a place_id. Source = mapping table first, fall back
   // to legacy venues.google_place_id for venues that haven't been migrated.
@@ -86,6 +87,7 @@ Deno.serve(async (req) => {
       if (!fetchRes.ok) {
         await supabase.from('gbp_snapshots').insert({
           venue_id: v.id, source: 'automated', scope: 'daily_basics',
+          source_kind: sourceKind,
           fetch_error: fetchRes.error?.slice(0, 500),
         });
         const { data: cur } = await supabase
@@ -115,6 +117,7 @@ Deno.serve(async (req) => {
         venue_id: v.id,
         source: 'automated',
         scope: 'daily_basics',
+        source_kind: sourceKind,
         ...fields,
         raw: fetchRes.data,
       });
