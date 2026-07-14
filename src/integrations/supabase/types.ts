@@ -3638,6 +3638,7 @@ export type Database = {
           service_area_set: boolean | null
           service_options: Json | null
           source: string
+          source_kind: string | null
           venue_id: string
           verified: boolean | null
           website: string | null
@@ -3674,6 +3675,7 @@ export type Database = {
           service_area_set?: boolean | null
           service_options?: Json | null
           source: string
+          source_kind?: string | null
           venue_id: string
           verified?: boolean | null
           website?: string | null
@@ -3710,6 +3712,7 @@ export type Database = {
           service_area_set?: boolean | null
           service_options?: Json | null
           source?: string
+          source_kind?: string | null
           venue_id?: string
           verified?: boolean | null
           website?: string | null
