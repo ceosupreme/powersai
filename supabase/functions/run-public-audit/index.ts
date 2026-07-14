@@ -186,10 +186,21 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     let placeId: string | null = null;
     let gbpPrimary: string | null = null;
     let gbpTypes: string[] | null = null;
+    let placesKeyActive = true;
     if (resolveRes.ok && typeof resolveRes.data === 'object' && resolveRes.data) {
       placeId = (resolveRes.data as any).place_id ?? null;
     } else {
-      await log(`GBP resolve failed: ${JSON.stringify((resolveRes.data as any)?.error ?? resolveRes.status).slice(0, 200)}`);
+      const errStr = String((resolveRes.data as any)?.error ?? '').toLowerCase();
+      const status = resolveRes.status;
+      if (errStr.includes('not configured') || status === 500 && errStr.includes('google_places_api_key')) {
+        placesKeyActive = false;
+        await log('Google Places lookup unavailable — using general local-business benchmarks. Your dollar figures will sharpen automatically once the key is active.');
+      } else if (status === 403 || errStr.includes('permission_denied')) {
+        placesKeyActive = false;
+        await log('Google Places API returned permission denied (403). Cold check will use general benchmarks; will sharpen once the key is enabled for Places API (New).');
+      } else {
+        await log(`GBP resolve failed: ${JSON.stringify((resolveRes.data as any)?.error ?? status).slice(0, 200)}`);
+      }
     }
 
     // Read gbp_snapshots for category, or fall back to Places category from
@@ -236,8 +247,20 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     // guess "<business_name> <city>" as a fallback.
     // Fire gbp-sync first (populates category + hours/photos/nap), then
     // the rest in parallel.
-    const gbpSync = await invoke('gbp-sync-weekly', { venue_id: shellVenueId, no_stagger: true }, { timeoutMs: 60_000 });
-    if (!gbpSync.ok) await log(`GBP sync degraded: HTTP ${gbpSync.status}`);
+    // Cold public runs: lean field mask (cost discipline) + provenance flag.
+    // Skip entirely when the Places key isn't active so we don't waste an
+    // edge-function round trip only to log another failure.
+    if (placesKeyActive && placeId) {
+      const gbpSync = await invoke('gbp-sync-weekly', {
+        venue_id: shellVenueId,
+        no_stagger: true,
+        source_kind: 'public_checkup',
+        scope_override: 'public_lean',
+      }, { timeoutMs: 60_000 });
+      if (!gbpSync.ok) await log(`GBP sync degraded: HTTP ${gbpSync.status}`);
+    } else if (!placeId) {
+      await log('Skipping GBP snapshot — no place_id resolved.');
+    }
 
     // Read the GBP snapshot for category info to power project-type mapping
     // and the map-pack keyword.
@@ -265,11 +288,15 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
 
     const mapKeyword = ((gbpPrimary || 'home services') + ' ' + input.city).trim();
 
+    // Review-sample honesty: public Place Details returns at most a handful
+    // of reviews. Skip theme extraction on cold runs — never present a
+    // 5-review sample as a full review analysis. Managed venues keep the
+    // normal path (they hit this fn from their own weekly flow, not here).
     const [webResolve, reviewRes, mapRes] = await Promise.allSettled([
       input.website_url
         ? invoke('website-resolve-url', { venue_id: shellVenueId, website_url: input.website_url }, { timeoutMs: 20_000 })
         : Promise.resolve({ ok: true, status: 200, data: { skipped: 'no website_url' } }),
-      invoke('extract-review-themes', { venue_id: shellVenueId }, { timeoutMs: 45_000 }),
+      Promise.resolve({ ok: true, status: 200, data: { skipped: 'cold_public_run_limited_sample' } }),
       // map-pack-run needs a keyword row; without one it silently does nothing.
       // Insert a one-shot active keyword scoped to this shell.
       (async () => {
@@ -289,9 +316,8 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     } else if (input.website_url) {
       await log('Website resolve failed — skipping crawl.');
     }
-    if (reviewRes.status === 'rejected' || (reviewRes.status === 'fulfilled' && !(reviewRes.value as any)?.ok)) {
-      await log('Review theme extraction degraded.');
-    }
+    // Note the intentional skip so the operator sees it in status_detail.
+    await log('Review themes: skipped on public run — sample from Google is too small (≤5 reviews) to analyze themes honestly.');
     if (mapRes.status === 'rejected' || (mapRes.status === 'fulfilled' && !(mapRes.value as any)?.ok)) {
       await log('Map-pack ranking check degraded.');
     }

@@ -2,7 +2,7 @@
 // service options). Runs Mondays 07:00 PT. Same fan-out pattern as daily.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { fetchPlace, buildSnapshotFields, type VenueRecord } from '../_shared/gbp-fetch.ts';
+import { fetchPlace, buildSnapshotFields, type VenueRecord, type FetchScope } from '../_shared/gbp-fetch.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,6 +32,14 @@ Deno.serve(async (req) => {
   }
   const onlyVenueId: string | undefined = body.venue_id;
   const stagger = body.no_stagger ? 0 : STAGGER_MS;
+  // Provenance flag stamped on every gbp_snapshots row this run inserts.
+  // Defaults to 'managed' so the existing cron path is unchanged.
+  const sourceKind: string = typeof body.source_kind === 'string' ? body.source_kind : 'managed';
+  // Optional: cold public runs pass 'public_lean' to trim the field mask.
+  const scope: FetchScope =
+    body.scope_override === 'public_lean' || body.scope_override === 'daily_basics'
+      ? body.scope_override
+      : 'weekly_full';
 
   let query = supabase
     .from('venues')
@@ -74,11 +82,12 @@ Deno.serve(async (req) => {
 
     try {
       const venueRec: VenueRecord = { id: v.id, name: v.name, address: v.address };
-      const fetchRes = await fetchPlace(placeId, 'weekly_full', apiKey);
+      const fetchRes = await fetchPlace(placeId, scope, apiKey);
 
       if (!fetchRes.ok) {
         await supabase.from('gbp_snapshots').insert({
-          venue_id: v.id, source: 'automated', scope: 'weekly_full',
+          venue_id: v.id, source: 'automated', scope,
+          source_kind: sourceKind,
           fetch_error: fetchRes.error?.slice(0, 500),
         });
         const { data: cur } = await supabase
@@ -101,11 +110,12 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const fields = buildSnapshotFields(fetchRes.data, 'weekly_full', venueRec);
+      const fields = buildSnapshotFields(fetchRes.data, scope, venueRec);
       const { error: insErr } = await supabase.from('gbp_snapshots').insert({
         venue_id: v.id,
         source: 'automated',
-        scope: 'weekly_full',
+        scope,
+        source_kind: sourceKind,
         ...fields,
         raw: fetchRes.data,
       });
