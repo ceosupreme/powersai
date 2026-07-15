@@ -11874,6 +11874,10 @@ export type Database = {
         | "app_build"
         | "service_offer"
         | "home_services"
+        | "auto"
+        | "carpet_cleaning"
+        | "moving_hauling"
+        | "bars_restaurants"
       promo_type:
         | "happy_hour"
         | "special"
@@ -12259,6 +12263,10 @@ export const Constants = {
         "app_build",
         "service_offer",
         "home_services",
+        "auto",
+        "carpet_cleaning",
+        "moving_hauling",
+        "bars_restaurants",
       ],
       promo_type: [
         "happy_hour",
