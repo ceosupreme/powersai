@@ -51,14 +51,43 @@ const Body = z.object({
   company_website: z.string().max(0).optional().nullable(),
 });
 
-// Map GBP primary type -> seeded project_type key. Currently only
-// 'home_services' has vectors + display_defaults, so anything not obviously
-// a home-services vertical falls back to it (with the caveat recorded).
-const HOME_SERVICES_HINTS = [
-  'plumber', 'electrician', 'hvac', 'roofer', 'roofing', 'contractor',
-  'landscaper', 'landscaping', 'handyman', 'home_service', 'cleaning',
-  'cleaning_service', 'pest_control', 'painter', 'carpenter', 'locksmith',
-  'general_contractor', 'moving_company', 'garage_door',
+// Map GBP primary type / secondary types -> seeded project_type key.
+// Ordered: first table match wins. Unmatched -> home_services + caveat.
+// Every listed key has leak vectors + display_defaults where every formula
+// variable resolves at vertical_default or better (Fix 2 invariant).
+const CATEGORY_MAP: { key: string; tokens: string[] }[] = [
+  {
+    key: 'auto',
+    tokens: [
+      'car_dealer', 'used_car_dealer', 'car_repair', 'auto_repair', 'auto_parts',
+      'tire_shop', 'car_wash', 'body_shop', 'auto_body', 'motorcycle_dealer',
+      'motorcycle_repair', 'transmission_shop',
+    ],
+  },
+  {
+    key: 'carpet_cleaning',
+    tokens: ['carpet_cleaning', 'carpet_cleaner', 'upholstery_cleaning', 'rug_cleaner'],
+  },
+  {
+    key: 'moving_hauling',
+    tokens: ['moving_company', 'mover', 'movers', 'hauling', 'junk_removal'],
+  },
+  {
+    key: 'bars_restaurants',
+    tokens: [
+      'bar', 'pub', 'night_club', 'nightclub', 'restaurant', 'cafe', 'coffee_shop',
+      'brewery', 'wine_bar', 'sports_bar', 'gastropub', 'meal_takeaway', 'meal_delivery',
+    ],
+  },
+  {
+    key: 'home_services',
+    tokens: [
+      'plumber', 'electrician', 'hvac', 'roofer', 'roofing', 'contractor',
+      'landscaper', 'landscaping', 'handyman', 'home_service', 'cleaning',
+      'cleaning_service', 'pest_control', 'painter', 'carpenter', 'locksmith',
+      'general_contractor', 'garage_door',
+    ],
+  },
 ];
 
 type ProjectTypeResolution = {
@@ -70,9 +99,11 @@ type ProjectTypeResolution = {
 
 function resolveProjectType(gbpTypes: string[] | null, gbpPrimary: string | null): ProjectTypeResolution {
   const bag = [gbpPrimary, ...(gbpTypes ?? [])].filter(Boolean).map(String).map((s) => s.toLowerCase());
-  for (const t of bag) {
-    if (HOME_SERVICES_HINTS.some((h) => t.includes(h))) {
-      return { gbp_category: gbpPrimary, matched_key: 'home_services', path: 'exact' };
+  for (const entry of CATEGORY_MAP) {
+    for (const token of entry.tokens) {
+      if (bag.some((t) => t.includes(token))) {
+        return { gbp_category: gbpPrimary, matched_key: entry.key, path: 'exact' };
+      }
     }
   }
   return {
