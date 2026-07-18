@@ -2,7 +2,7 @@
 // and send via the manual_log adapter. Deduped to one digest per project per day.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { resolveAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
+import { resolveAdapter, manualLogAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -77,10 +77,16 @@ Deno.serve(async (req) => {
       lines.join(" ") +
       `  Approving takes one tap: ${origin}/approvals`;
 
-    const adapter = resolveAdapter("email" as AutomationChannel, config);
+    // Digest has no per-recipient address today — resolve normally, but if
+    // we can't produce a recipient, force manual_log so we don't fail-fast
+    // in the real email adapter.
+    const digestRecipient: string | null = null; // TODO: wire owner email once contact model lands
+    const adapter = digestRecipient
+      ? resolveAdapter("email" as AutomationChannel, config)
+      : manualLogAdapter;
     const result = await adapter.send({
       channel: "email",
-      to: null,
+      to: digestRecipient,
       subject: `${n} message${n === 1 ? "" : "s"} waiting for your approval`,
       body,
       project_id: projectId,
