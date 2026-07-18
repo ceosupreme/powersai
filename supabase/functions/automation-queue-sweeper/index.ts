@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
     .eq("status", "sending")
     .not("send_attempted_at", "is", null)
     .lt("send_attempted_at", strandedCutoff)
-    .select("id, project_id, channel");
+    .select("id, project_id, channel, automation_key");
 
   if (strandedErr) {
     console.error("[sweeper] stranded reap failed:", strandedErr.message);
@@ -36,7 +36,8 @@ Deno.serve(async (req) => {
       queue_id: r.id,
       project_id: r.project_id,
       channel: r.channel,
-      provider: "unknown",
+      automation_key: r.automation_key,
+      adapter: "unknown",
       ok: false,
       error: "stranded",
     }));
