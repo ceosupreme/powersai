@@ -1,19 +1,18 @@
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
-import { Megaphone, LayoutGrid, CalendarDays, ListChecks, BarChart3 } from 'lucide-react';
+import { Megaphone, LayoutGrid, ListChecks } from 'lucide-react';
 import { useState } from 'react';
 import { OverviewView } from '@/components/marketing-hub/OverviewView';
 import { CampaignsView } from '@/components/marketing-hub/CampaignsView';
 import { CampaignDetail } from '@/components/marketing-hub/CampaignDetail';
-import { CalendarPlaceholder, ResultsPlaceholder } from '@/components/marketing-hub/Placeholders';
 
+// Calendar and Results tabs are intentionally omitted from this build —
+// they return once the content-machine registry lands. Rendering an empty
+// placeholder tab in the meantime would read as fake product surface.
 const SUBVIEWS = [
   { value: 'overview', label: 'Overview', icon: LayoutGrid },
-  { value: 'calendar', label: 'Calendar', icon: CalendarDays },
   { value: 'campaigns', label: 'Campaigns', icon: ListChecks },
-  { value: 'results', label: 'Results', icon: BarChart3 },
 ];
 
 const MarketingHub = () => {
@@ -46,12 +45,7 @@ const MarketingHub = () => {
           <Megaphone className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-foreground">Marketing Hub</h1>
-            <Badge variant="outline" className="text-[10px] uppercase tracking-wide border-indigo-500/40 text-indigo-600">
-              Mock data
-            </Badge>
-          </div>
+          <h1 className="text-2xl font-bold text-foreground">Marketing Hub</h1>
           <p className="text-muted-foreground text-sm">
             Plan, schedule, and measure every campaign — no matter where it originated.
           </p>
@@ -72,9 +66,7 @@ const MarketingHub = () => {
         </TabsList>
 
         <TabsContent value="overview"><OverviewView onOpen={openCampaign} /></TabsContent>
-        <TabsContent value="calendar"><CalendarPlaceholder /></TabsContent>
         <TabsContent value="campaigns"><CampaignsView onOpen={openCampaign} /></TabsContent>
-        <TabsContent value="results"><ResultsPlaceholder /></TabsContent>
       </Tabs>
 
       <CampaignDetail

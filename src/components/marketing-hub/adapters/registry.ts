@@ -7,8 +7,10 @@ import { queryClient } from '@/lib/queryClient';
 export type AdapterMode = 'live' | 'mock';
 
 const STORAGE_KEY = 'marketing-hub-adapter-mode';
+// Default to live writes: the operator cockpit should never assume a mock
+// adapter unless an admin explicitly opts in from the campaign detail panel.
 export const getAdapterMode = (): AdapterMode =>
-  (typeof window !== 'undefined' && (localStorage.getItem(STORAGE_KEY) as AdapterMode)) || 'mock';
+  (typeof window !== 'undefined' && (localStorage.getItem(STORAGE_KEY) as AdapterMode)) || 'live';
 export const setAdapterMode = (m: AdapterMode) => {
   if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, m);
 };
