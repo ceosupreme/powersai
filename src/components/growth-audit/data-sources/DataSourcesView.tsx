@@ -198,7 +198,7 @@ export const DataSourcesView = () => {
         {/* Connected & In-Use */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Connected &amp; In-Use</h3>
+            <h3 className="text-sm font-semibold text-foreground">Wired into this project</h3>
             <span className="text-xs text-muted-foreground">{inUse.length} sources</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -209,7 +209,7 @@ export const DataSourcesView = () => {
         {/* Available to Connect */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Available to Connect</h3>
+            <h3 className="text-sm font-semibold text-foreground">Additional integrations</h3>
             <span className="text-xs text-muted-foreground">{available.length} sources</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
