@@ -42,6 +42,12 @@ export type GbpStatus = {
   status: SourceStatus;
   lastSyncLabel: string | null;
   ageDays: number | null;
+  /** Provenance derived from gbp_snapshots.source_kind of the most recent row.
+   *  'managed' = a scheduled cron / manual entry writes for a linked venue.
+   *  'public_only' = only public checkup snapshots exist (lean Places call from
+   *  a prospect audit) — the platform does NOT have management access.
+   *  'none' = no snapshots yet. */
+  provenance: 'managed' | 'public_only' | 'none';
 };
 
 export const gbpStatusKey = (venueId: string | null | undefined) =>
@@ -85,7 +91,13 @@ export function deriveGbpStatus(
     status = 'Limited';
   }
 
-  return { mapping, snapshot, status, lastSyncLabel, ageDays };
+  const kind = (snapshot as any)?.source_kind as string | null | undefined;
+  const provenance: GbpStatus['provenance'] =
+    !snapshot ? 'none'
+    : kind === 'public_checkup' ? 'public_only'
+    : 'managed';
+
+  return { mapping, snapshot, status, lastSyncLabel, ageDays, provenance };
 }
 
 export function useGbpStatus(venueId: string | null | undefined) {
@@ -101,7 +113,7 @@ export function useGbpStatus(venueId: string | null | undefined) {
           .maybeSingle(),
         supabase
           .from('gbp_snapshots')
-          .select('id, captured_at, source, scope, fetch_error, primary_category, description, hours_complete, photo_count, last_photo_at, post_count, last_post_at, qa_unanswered, review_response_rate_30d, nap_match_name, nap_match_address, nap_match_phone')
+          .select('id, captured_at, source, scope, fetch_error, primary_category, description, hours_complete, photo_count, last_photo_at, post_count, last_post_at, qa_unanswered, review_response_rate_30d, nap_match_name, nap_match_address, nap_match_phone, source_kind')
           .eq('venue_id', venueId!)
           .order('captured_at', { ascending: false })
           .limit(1)
