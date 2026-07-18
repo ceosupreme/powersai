@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
       body,
       project_id: projectId,
       queue_id: "client_stale_digest",
-      metadata: { kind: "client_stale_digest", digest_date: today },
+      metadata: { kind: "client_stale_digest", digest_date: today, internal: true },
     });
 
     await sb.from("automation_send_log").insert({
