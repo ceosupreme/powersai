@@ -26,13 +26,8 @@ const recency = (iso: string | null | undefined): ConnectorRecency => {
   return { lastAt: iso, ageDays: (Date.now() - Date.parse(iso)) / DAY };
 };
 
-const latestOf = async (
-  table: 'sync_runs',
-  syncType: string,
-  venueId: string,
-): Promise<string | null> => {
-  const { data } = await supabase
-    .from(table)
+const latestSyncRun = async (syncType: string, venueId: string): Promise<string | null> => {
+  const q = (supabase.from('sync_runs') as any)
     .select('completed_at')
     .eq('bar_id', venueId)
     .eq('sync_type', syncType)
@@ -40,6 +35,7 @@ const latestOf = async (
     .order('completed_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+  const { data } = await q;
   return (data?.completed_at as string | null | undefined) ?? null;
 };
 
@@ -57,8 +53,8 @@ export function useConnectorStatuses(venueId: string | null | undefined) {
     queryFn: async (): Promise<ConnectorStatuses> => {
       const v = venueId!;
       const promises: Array<Promise<string | null>> = [
-        latestOf('sync_runs', 'toast', v),
-        latestOf('sync_runs', '7shifts', v),
+        latestSyncRun('toast', v),
+        latestSyncRun('7shifts', v),
         (supabase.from('venue_asana_sync_health').select('last_success_at').eq('venue_id', v).maybeSingle() as any)
           .then((r: any) => (r?.data?.last_success_at as string | null | undefined) ?? null),
         (supabase.from('google_reviews').select('created_at').eq('bar_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
