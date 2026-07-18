@@ -56,38 +56,23 @@ export function useConnectorStatuses(venueId: string | null | undefined) {
     staleTime: 60_000,
     queryFn: async (): Promise<ConnectorStatuses> => {
       const v = venueId!;
-      const [toast, seven, asanaHealth, gr, gm, lead, mgr, inv] = await Promise.all([
+      const promises: Array<Promise<string | null>> = [
         latestOf('sync_runs', 'toast', v),
         latestOf('sync_runs', '7shifts', v),
-        supabase
-          .from('venue_asana_sync_health')
-          .select('last_success_at')
-          .eq('venue_id', v)
-          .maybeSingle()
-          .then((r) => (r.data?.last_success_at as string | null | undefined) ?? null),
-        supabase
-          .from('google_reviews')
-          .select('created_at')
-          .eq('bar_id', v)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-          .then((r) => (r.data?.created_at as string | null | undefined) ?? null),
-        supabase.from('gm_logs').select('created_at').eq('bar_id', v)
-          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
-        supabase.from('lead_logs').select('created_at').eq('venue_id', v)
-          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
-        supabase.from('manager_logs').select('created_at').eq('venue_id', v)
-          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
-        supabase
-          .from('inventory_reports')
-          .select('created_at')
-          .eq('venue_id', v)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-          .then((r) => (r.data?.created_at as string | null | undefined) ?? null),
-      ]);
+        (supabase.from('venue_asana_sync_health').select('last_success_at').eq('venue_id', v).maybeSingle() as any)
+          .then((r: any) => (r?.data?.last_success_at as string | null | undefined) ?? null),
+        (supabase.from('google_reviews').select('created_at').eq('bar_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
+          .then(pickLatest),
+        (supabase.from('gm_logs').select('created_at').eq('bar_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
+          .then(pickLatest),
+        (supabase.from('lead_logs').select('created_at').eq('venue_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
+          .then(pickLatest),
+        (supabase.from('manager_logs').select('created_at').eq('venue_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
+          .then(pickLatest),
+        (supabase.from('inventory_reports').select('created_at').eq('venue_id', v).order('created_at', { ascending: false }).limit(1).maybeSingle() as any)
+          .then(pickLatest),
+      ];
+      const [toast, seven, asanaHealth, gr, gm, lead, mgr, inv] = await Promise.all(promises);
       const managerLogsLatest = [gm, lead, mgr]
         .filter(Boolean)
         .sort()
