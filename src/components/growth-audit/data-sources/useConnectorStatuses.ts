@@ -3,7 +3,8 @@
 // A source with zero rows renders "Never synced" — never "Connected".
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as _supabase } from '@/integrations/supabase/client';
+const supabase = _supabase as any;
 
 export type ConnectorRecency = {
   lastAt: string | null;
