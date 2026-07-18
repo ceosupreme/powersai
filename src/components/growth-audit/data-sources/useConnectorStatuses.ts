@@ -43,20 +43,8 @@ const latestOf = async (
   return (data?.completed_at as string | null | undefined) ?? null;
 };
 
-const latestCreated = async (
-  table: 'gm_logs' | 'lead_logs' | 'manager_logs',
-  venueId: string,
-  col: 'bar_id' | 'venue_id',
-): Promise<string | null> => {
-  const { data } = await supabase
-    .from(table)
-    .select('created_at')
-    .eq(col, venueId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return (data?.created_at as string | null | undefined) ?? null;
-};
+const pickLatest = (r: any): string | null =>
+  (r?.data?.created_at as string | null | undefined) ?? null;
 
 export const connectorStatusesKey = (venueId: string | null | undefined) =>
   ['growth-audit', 'connector-statuses', venueId ?? 'none'] as const;
@@ -85,9 +73,12 @@ export function useConnectorStatuses(venueId: string | null | undefined) {
           .limit(1)
           .maybeSingle()
           .then((r) => (r.data?.created_at as string | null | undefined) ?? null),
-        latestCreated('gm_logs', v, 'bar_id'),
-        latestCreated('lead_logs', v, 'venue_id'),
-        latestCreated('manager_logs', v, 'venue_id'),
+        supabase.from('gm_logs').select('created_at').eq('bar_id', v)
+          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
+        supabase.from('lead_logs').select('created_at').eq('venue_id', v)
+          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
+        supabase.from('manager_logs').select('created_at').eq('venue_id', v)
+          .order('created_at', { ascending: false }).limit(1).maybeSingle().then(pickLatest),
         supabase
           .from('inventory_reports')
           .select('created_at')
