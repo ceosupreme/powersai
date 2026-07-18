@@ -34,6 +34,7 @@ export type GbpSnapshot = {
   nap_match_name: boolean | null;
   nap_match_address: boolean | null;
   nap_match_phone: boolean | null;
+  source_kind?: string | null;
 };
 
 export type GbpStatus = {
