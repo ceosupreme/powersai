@@ -14,6 +14,7 @@ export type SourceStatus =
   | 'Partial'         // GBP-only: mapping without recent snapshot
   | 'Limited'         // GBP-only: fetch failing / older than 30d
   | 'Never Synced'    // scheduled: source is wired but has never produced a row
+  | 'Not Connected'   // GBP/website: mapping not established for this project
   | 'Not Wired'       // catalog entry with no integration in this build
   | 'Coming Soon';    // planned integration, no read/write path yet
 
