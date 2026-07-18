@@ -12,6 +12,40 @@ Deno.serve(async (req) => {
     { auth: { persistSession: false } },
   );
 
+  // --- Pass 1: reap stranded 'sending' rows -------------------------------
+  // Rows claimed >10min ago that never got a result written (function died
+  // between atomic claim and result write). Guarded by status='sending' +
+  // age condition so a live send finishing concurrently wins the race.
+  const strandedCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const strandedError = "stranded — delivery unconfirmed; verify before retry";
+  const { data: stranded, error: strandedErr } = await sb
+    .from("automation_message_queue")
+    .update({
+      status: "failed",
+      send_result: { ok: false, provider: "unknown", error: strandedError },
+    })
+    .eq("status", "sending")
+    .not("send_attempted_at", "is", null)
+    .lt("send_attempted_at", strandedCutoff)
+    .select("id, project_id, channel");
+
+  if (strandedErr) {
+    console.error("[sweeper] stranded reap failed:", strandedErr.message);
+  } else if (stranded && stranded.length > 0) {
+    const logRows = stranded.map((r: any) => ({
+      queue_id: r.id,
+      project_id: r.project_id,
+      channel: r.channel,
+      provider: "unknown",
+      ok: false,
+      error: "stranded",
+    }));
+    const { error: logErr } = await sb.from("automation_send_log").insert(logRows);
+    if (logErr) console.error("[sweeper] stranded log insert failed:", logErr.message);
+    console.log(`[sweeper] reaped ${stranded.length} stranded sending row(s)`);
+  }
+
+  // --- Pass 2: dispatch approved rows (existing behavior) -----------------
   const { data: rows, error } = await sb
     .from("automation_message_queue")
     .select("id")
@@ -42,7 +76,11 @@ Deno.serve(async (req) => {
     }
   }
 
-  return new Response(JSON.stringify({ swept: results.length, results }), {
+  return new Response(JSON.stringify({
+    stranded_reaped: stranded?.length ?? 0,
+    swept: results.length,
+    results,
+  }), {
     status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
