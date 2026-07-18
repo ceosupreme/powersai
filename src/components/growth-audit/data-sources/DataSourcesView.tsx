@@ -4,7 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Database, ShieldCheck, Info } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { MOCK_DATA_SOURCES, type DataSource } from './mockDataSources';
+import { DATA_SOURCE_CATALOG, type DataSource, type SourceStatus } from './mockDataSources';
 import { DataSourceCard } from './DataSourceCard';
 import { GbpLiveExtras } from './GbpLiveExtras';
 import { useGbpStatus } from './useGbpStatus';
@@ -12,6 +12,52 @@ import { WebsiteLiveExtras } from './WebsiteLiveExtras';
 import { useWebsiteStatus } from './useWebsiteStatus';
 import { MapPackLiveExtras } from './MapPackLiveExtras';
 import { AiSearchLiveExtras } from './AiSearchLiveExtras';
+import { useConnectorStatuses, type ConnectorRecency } from './useConnectorStatuses';
+
+// Recency copy: converts an ISO timestamp into a compact "3 days ago"-style
+// label. Kept local to the view because the connector hook only surfaces
+// the raw timestamp — the label vocabulary belongs to the display layer.
+const relTime = (iso: string): string => {
+  const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+  if (s < 60) return `${Math.round(s)}s ago`;
+  if (s < 3600) return `${Math.round(s / 60)}m ago`;
+  if (s < 86_400) return `${Math.round(s / 3600)}h ago`;
+  const days = Math.round(s / 86_400);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+};
+
+// Scheduled-cadence budget: at what age does a scheduled sync stop counting
+// as "Connected" and become "Stale"? Two days covers cron misses without
+// hiding a real outage.
+const SCHEDULED_STALE_DAYS = 2;
+// Manual/on-demand cadence has no cron promise, so we only flag Stale after
+// two weeks of silence. Anything fresher renders as Connected.
+const MANUAL_STALE_DAYS = 14;
+
+type Verdict = { status: SourceStatus; lastSync?: string; note?: string };
+
+const scheduledVerdict = (r: ConnectorRecency): Verdict => {
+  if (!r.lastAt || r.ageDays == null) {
+    return { status: 'Never Synced', note: 'No successful sync recorded for this project.' };
+  }
+  const stale = r.ageDays > SCHEDULED_STALE_DAYS;
+  return {
+    status: stale ? 'Stale' : 'Connected',
+    lastSync: relTime(r.lastAt),
+    note: stale ? 'Past its refresh cadence — check the sync job.' : undefined,
+  };
+};
+
+const manualVerdict = (r: ConnectorRecency, emptyNote: string): Verdict => {
+  if (!r.lastAt || r.ageDays == null) {
+    return { status: 'Never Synced', note: emptyNote };
+  }
+  const stale = r.ageDays > MANUAL_STALE_DAYS;
+  return {
+    status: stale ? 'Stale' : 'Connected',
+    lastSync: relTime(r.lastAt),
+  };
+};
 
 export const DataSourcesView = () => {
   const { selectedBar } = useApp();
@@ -19,14 +65,19 @@ export const DataSourcesView = () => {
   const venueName = selectedBar?.bar_name ?? '';
   const { data: gbp } = useGbpStatus(venueId);
   const { data: web } = useWebsiteStatus(venueId);
+  const { data: conn } = useConnectorStatuses(venueId);
 
-  const sources: DataSource[] = MOCK_DATA_SOURCES.map((s) => {
+  const sources: DataSource[] = DATA_SOURCE_CATALOG.map((s): DataSource => {
     if (s.id === 'gbp' && gbp) {
       const isConnected = gbp.status === 'Connected' || gbp.status === 'Partial';
+      const publicOnlyNote = gbp.provenance === 'public_only'
+        ? 'Public checkup snapshot only — no management access to this profile.'
+        : undefined;
       return {
         ...s,
         status: gbp.status,
         lastSync: gbp.lastSyncLabel ?? s.lastSync,
+        note: publicOnlyNote,
         group: isConnected ? 'in-use' : 'available',
         action: isConnected ? 'Configure' : (gbp.status === 'Limited' ? 'Reconnect' : 'Connect'),
       };
@@ -40,6 +91,18 @@ export const DataSourcesView = () => {
         group: isConnected ? 'in-use' : 'available',
         action: isConnected ? 'Configure' : (web.status === 'Limited' ? 'Reconnect' : 'Connect'),
       };
+    }
+    if (venueId && conn) {
+      let v: Verdict | null = null;
+      switch (s.id) {
+        case 'toast':          v = scheduledVerdict(conn.toast); break;
+        case '7shifts':        v = scheduledVerdict(conn.sevenshifts); break;
+        case 'asana':          v = scheduledVerdict(conn.asana); break;
+        case 'google_reviews': v = manualVerdict(conn.googleReviews, 'No reviews pulled for this project yet.'); break;
+        case 'manager_logs':   v = manualVerdict(conn.managerLogs, 'No manager entries submitted for this project yet.'); break;
+        case 'sculpture':      v = manualVerdict(conn.sculpture, 'No inventory uploads for this project yet.'); break;
+      }
+      if (v) return { ...s, status: v.status, lastSync: v.lastSync, note: v.note };
     }
     return s;
   });
