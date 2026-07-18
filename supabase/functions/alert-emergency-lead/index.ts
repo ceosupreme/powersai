@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
     body,
     project_id: projectId ?? "unassigned",
     queue_id: `emergency_lead_alert:${lead_id}`,
-    metadata: { kind: "emergency_lead_alert", lead_id, recipient_source: recipientSource },
+    metadata: { kind: "emergency_lead_alert", lead_id, recipient_source: recipientSource, internal: true },
   });
 
   // automation_send_log.project_id is NOT NULL, so we only persist the
