@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       body: claimed.edited_body ?? claimed.body,
       project_id: claimed.project_id,
       queue_id: claimed.id,
-      metadata: claimed.metadata ?? {},
+      metadata: { ...(claimed.metadata ?? {}), automation_key: claimed.automation_key },
     });
   } catch (e) {
     result = { ok: false, provider: adapter.name, error: String(e) };

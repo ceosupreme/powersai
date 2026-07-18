@@ -113,10 +113,14 @@ export default function AutomationInbox() {
 }
 
 function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boolean }) {
-  const { approve, reject, sendNow } = useQueueMutations();
+  const { approve, reject, sendNow, retry, suppressRecipient } = useQueueMutations();
   const [body, setBody] = useState(item.edited_body ?? item.body);
   const recipient = item.recipient_snapshot as { name?: string; email?: string; phone?: string };
   const to = recipient.email ?? recipient.phone ?? "(no contact)";
+  const failureError =
+    item.status === "failed"
+      ? String((item.send_result as any)?.error ?? "Unknown error")
+      : null;
 
   return (
     <Card className="p-4 space-y-3">
@@ -144,6 +148,12 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
         <div className="text-sm"><span className="text-muted-foreground">Subject:</span> {item.subject}</div>
       )}
       <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={6} className="text-sm" />
+      {failureError && (
+        <div className="rounded border border-destructive/40 bg-destructive/5 p-2 text-xs">
+          <span className="font-medium text-destructive">Failed:</span>{" "}
+          <span className="text-destructive/90">{failureError}</span>
+        </div>
+      )}
       {item.status === "pending_review" && (
         <div className="flex flex-wrap gap-2 justify-end">
           <Button variant="ghost" size="sm" onClick={async () => {
@@ -164,6 +174,26 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
             try { await sendNow.mutateAsync(item.id); toast.success("Send attempted"); }
             catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
           }}>Send now</Button>
+        </div>
+      )}
+      {item.status === "failed" && (
+        <div className="flex flex-wrap gap-2 justify-end">
+          {recipient.email && (
+            <Button variant="ghost" size="sm" onClick={async () => {
+              try {
+                await suppressRecipient.mutateAsync({
+                  project_id: item.project_id,
+                  email: recipient.email!,
+                  reason: "operator_suppressed",
+                });
+                toast.success("Recipient suppressed");
+              } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+            }}>Suppress recipient</Button>
+          )}
+          <Button size="sm" onClick={async () => {
+            try { await retry.mutateAsync(item.id); toast.success("Re-queued for sending"); }
+            catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+          }}>Retry</Button>
         </div>
       )}
     </Card>

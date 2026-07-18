@@ -9,7 +9,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
-import { resolveAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
+import { resolveAdapter, manualLogAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
 
 const Body = z.object({ lead_id: z.string().uuid() });
 
@@ -121,7 +121,9 @@ Deno.serve(async (req) => {
     `Summary: ${summary}\n` +
     `Respond fast — timer is running.`;
 
-  const adapter = resolveAdapter(preferredChannel, projectConfig);
+  // Fall back to manual_log if we have no recipient contact — real providers
+  // would just fail invalid_recipient; the log is still useful to the operator.
+  const adapter = to ? resolveAdapter(preferredChannel, projectConfig) : manualLogAdapter;
   const result = await adapter.send({
     channel: preferredChannel,
     to,
@@ -129,7 +131,7 @@ Deno.serve(async (req) => {
     body,
     project_id: projectId ?? "unassigned",
     queue_id: `emergency_lead_alert:${lead_id}`,
-    metadata: { kind: "emergency_lead_alert", lead_id, recipient_source: recipientSource },
+    metadata: { kind: "emergency_lead_alert", lead_id, recipient_source: recipientSource, internal: true },
   });
 
   // automation_send_log.project_id is NOT NULL, so we only persist the
