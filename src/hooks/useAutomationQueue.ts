@@ -124,5 +124,41 @@ export function useQueueMutations() {
     onSuccess: invalidate,
   });
 
-  return { approve, reject, reschedule, sendNow, flag };
+  const retry = useMutation({
+    mutationFn: async (id: string) => {
+      const { data: { user } } = await (supabase as any).auth.getUser();
+      const { error } = await (supabase as any)
+        .from("automation_message_queue")
+        .update({
+          status: "approved",
+          send_result: null,
+          approved_at: new Date().toISOString(),
+          approved_by: user?.id ?? null,
+        })
+        .eq("id", id)
+        .eq("status", "failed");
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  const suppressRecipient = useMutation({
+    mutationFn: async (input: { project_id: string; email: string; reason?: string }) => {
+      const { data: { user } } = await (supabase as any).auth.getUser();
+      const email = String(input.email ?? "").trim().toLowerCase();
+      if (!email) throw new Error("No recipient email");
+      const { error } = await (supabase as any)
+        .from("email_suppressions")
+        .insert({
+          project_id: input.project_id,
+          email,
+          reason: input.reason ?? "operator_suppressed",
+          created_by: user?.id ?? null,
+        });
+      if (error && !String(error.message).includes("duplicate")) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  return { approve, reject, reschedule, sendNow, flag, retry, suppressRecipient };
 }
