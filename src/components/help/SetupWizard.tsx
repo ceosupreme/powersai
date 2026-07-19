@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useHelpState } from "@/hooks/useHelpState";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 import { Sparkles, Folder, Palette, Inbox, Users, Compass, ArrowRight, Layers, ListChecks, Mic, ClipboardCheck, TrendingUp, Plug, Package, ShieldCheck, FileText } from "lucide-react";
 
 type Step = {
@@ -160,32 +161,86 @@ export function SetupWizard() {
   const {
     helpEnabled,
     setupDismissed,
+    setupSeenAt,
     isLoading,
     markSetupCompleted,
     markSetupSkipped,
+    markSetupSeen,
   } = useHelpState();
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(0);
+  const [open, setOpen] = useState(true);
+  const seenStampedRef = useRef(false);
 
-  // Only mount for signed-in users who haven't dismissed it. Honour global help toggle.
-  if (!user || isLoading || !helpEnabled || setupDismissed) return null;
+  // Auto-launch is restricted to a small allow-list so the tour never appears
+  // on top of a project-scoped surface the user navigated to intentionally.
+  const AUTO_LAUNCH_PATHS = new Set(["/", "/dashboard", "/portfolio"]);
+  const routeAllowsAutoLaunch = AUTO_LAUNCH_PATHS.has(location.pathname);
+
+  // Stamp seen exactly once the first time we auto-mount for this user, so a
+  // mid-tour refresh can never put the tour back on repeat.
+  useEffect(() => {
+    if (seenStampedRef.current) return;
+    if (!user || isLoading || !helpEnabled) return;
+    if (setupDismissed || setupSeenAt) return;
+    if (!routeAllowsAutoLaunch) return;
+    seenStampedRef.current = true;
+    markSetupSeen().catch(() => {
+      // Non-blocking: the local `open` state still gates re-mounts this session.
+    });
+  }, [user, isLoading, helpEnabled, setupDismissed, setupSeenAt, routeAllowsAutoLaunch, markSetupSeen]);
+
+  if (!user || isLoading || !helpEnabled) return null;
+  if (setupDismissed || setupSeenAt) return null;
+  if (!routeAllowsAutoLaunch) return null;
+  if (!open) return null;
 
   const s = STEPS[step];
   const Icon = s.icon;
   const isLast = step === STEPS.length - 1;
   const progress = ((step + 1) / STEPS.length) * 100;
 
+  const closeNow = () => setOpen(false);
+
+  // Dismiss = close immediately, then persist in the background. If the write
+  // fails, surface the error via toast — the dialog still closes.
+  const dismiss = () => {
+    closeNow();
+    markSetupSkipped().catch((err) => {
+      toast.error("Couldn't save tour state", {
+        description: err?.message ?? "We'll ask again next time you sign in.",
+      });
+    });
+  };
+
   const finish = () => {
-    markSetupCompleted();
-    navigate("/dashboard");
+    closeNow();
+    markSetupCompleted()
+      .then(() => {
+        toast.success("Getting started tour complete");
+        navigate("/dashboard");
+      })
+      .catch((err) => {
+        toast.error("Couldn't save tour completion", {
+          description: err?.message ?? "The tour will reopen next time — please try again.",
+        });
+      });
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) markSetupSkipped(); }}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={open} onOpenChange={(o) => { if (!o) dismiss(); }}>
+      <DialogContent
+        className="sm:max-w-lg"
+        aria-describedby="setup-wizard-eyebrow"
+      >
         <DialogHeader>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            Step {step + 1} of {STEPS.length}
+          <div
+            id="setup-wizard-eyebrow"
+            className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-wide text-muted-foreground"
+          >
+            <span>Getting started tour</span>
+            <span>Step {step + 1} of {STEPS.length}</span>
           </div>
           <DialogTitle className="flex items-center gap-2">
             <Icon className="h-5 w-5 text-primary" /> {s.title}
@@ -196,14 +251,14 @@ export function SetupWizard() {
         {s.actionHref && s.actionLabel && (
           <Button
             variant="secondary"
-            onClick={() => navigate(s.actionHref!)}
+            onClick={() => window.open(s.actionHref!, "_blank", "noopener,noreferrer")}
             className="w-full"
           >
             {s.actionLabel} <ArrowRight className="h-3 w-3" />
           </Button>
         )}
         <DialogFooter className="flex-row justify-between sm:justify-between gap-2">
-          <Button variant="ghost" size="sm" onClick={() => markSetupSkipped()}>
+          <Button variant="ghost" size="sm" onClick={dismiss}>
             Skip setup
           </Button>
           <div className="flex gap-2">

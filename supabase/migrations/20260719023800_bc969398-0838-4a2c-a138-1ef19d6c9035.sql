@@ -1,0 +1,1 @@
+ALTER TABLE public.user_help_state ADD COLUMN IF NOT EXISTS setup_seen_at timestamptz;

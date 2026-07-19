@@ -9284,6 +9284,7 @@ export type Database = {
           help_enabled: boolean
           last_backup_at: string | null
           setup_completed_at: string | null
+          setup_seen_at: string | null
           setup_skipped_at: string | null
           updated_at: string
           user_id: string
@@ -9294,6 +9295,7 @@ export type Database = {
           help_enabled?: boolean
           last_backup_at?: string | null
           setup_completed_at?: string | null
+          setup_seen_at?: string | null
           setup_skipped_at?: string | null
           updated_at?: string
           user_id: string
@@ -9304,6 +9306,7 @@ export type Database = {
           help_enabled?: boolean
           last_backup_at?: string | null
           setup_completed_at?: string | null
+          setup_seen_at?: string | null
           setup_skipped_at?: string | null
           updated_at?: string
           user_id?: string
