@@ -68,6 +68,7 @@ import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
 import PublicRecoveryReport from "./pages/PublicRecoveryReport";
 import FoundationAudit from "./pages/FoundationAudit";
+import ProjectHome from "./pages/ProjectHome";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
 
