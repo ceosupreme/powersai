@@ -54,7 +54,9 @@ Deno.serve(async (req) => {
   const { project_id, email } = parsed.data;
 
   const origin = req.headers.get("origin") ?? "";
-  const redirectTo = origin ? `${origin}/approvals` : undefined;
+  const redirectTo = origin
+    ? `${origin}/reset-password?next=/approvals`
+    : undefined;
 
   const { data: inviteData, error: inviteErr } = await sb.auth.admin.inviteUserByEmail(email, {
     data: { invited_role: "client", invited_project_id: project_id },
