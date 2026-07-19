@@ -331,12 +331,17 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       // map-pack-run needs a keyword row; without one it silently does nothing.
       // Insert a one-shot active keyword scoped to this shell.
       (async () => {
-        await admin.from('map_pack_keywords').insert({
+        const kwIns = await admin.from('map_pack_keywords').insert({
           venue_id: shellVenueId,
           keyword: mapKeyword,
-          priority: 1,
+          priority: 'high',
           is_active: true,
-        }).select('id').maybeSingle().catch(() => null);
+        }).select('id').maybeSingle();
+        if (kwIns.error) {
+          console.error(`[run-public-audit] map_pack_keywords insert failed: ${kwIns.error.message}`);
+        } else {
+          console.log(`[run-public-audit] map_pack_keywords inserted id=${kwIns.data?.id} kw="${mapKeyword}"`);
+        }
         return invoke('map-pack-run', { venue_id: shellVenueId, force: true, trigger_source: 'public_audit' }, { timeoutMs: 60_000 });
       })(),
     ]);
@@ -350,7 +355,11 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     // Note the intentional skip so the operator sees it in status_detail.
     await log('Review themes: skipped on public run — sample from Google is too small (≤5 reviews) to analyze themes honestly.');
     if (mapRes.status === 'rejected' || (mapRes.status === 'fulfilled' && !(mapRes.value as any)?.ok)) {
-      await log('Map-pack ranking check degraded.');
+      const detail = mapRes.status === 'rejected'
+        ? (mapRes.reason instanceof Error ? mapRes.reason.message : String(mapRes.reason))
+        : `HTTP ${(mapRes.value as any)?.status} ${JSON.stringify((mapRes.value as any)?.data)?.slice(0, 200)}`;
+      console.error(`[run-public-audit] map-pack degraded:`, detail);
+      await log(`Map-pack ranking check degraded. (${detail.slice(0, 220)})`);
     }
 
     // ── 4. Audits (parallel, cold_only) ───────────────────────────────────
