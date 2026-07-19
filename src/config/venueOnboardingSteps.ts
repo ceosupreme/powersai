@@ -50,7 +50,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Name, project code, timezone, and the project type (vertical).',
     icon: Building2,
     required: true,
-    href: (id) => `/admin?tab=projects&edit=${id}`,
+    href: () => `/admin?tab=settings&subtab=bars`,
     detector: async ({ venueId }) => {
       const { data } = await (supabase as any)
         .from('venues')
