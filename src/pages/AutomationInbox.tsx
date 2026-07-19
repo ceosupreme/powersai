@@ -146,6 +146,13 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
     item.status === "failed"
       ? String((item.send_result as any)?.error ?? "Unknown error")
       : null;
+  const label = deliveryLabel(item);
+  const statusClass =
+    label.tone === "success"
+      ? "text-emerald-600 font-medium"
+      : label.tone === "muted"
+      ? "text-muted-foreground italic"
+      : "";
 
   return (
     <Card className="p-4 space-y-3">
@@ -160,7 +167,10 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
         </div>
         <div className="text-xs text-muted-foreground">
           {item.scheduled_for ? `Sends ${new Date(item.scheduled_for).toLocaleString()}` : "Send immediately"}
-          {" · "}{item.status}
+          {" · "}<span className={statusClass}>{label.label}</span>
+          {label.providerMsgId && (
+            <span className="text-muted-foreground/80"> · msg {shortMsgId(label.providerMsgId)}</span>
+          )}
           {item.approved_at && item.status === "approved" && isClientMode && (
             <> · Approved by client · {new Date(item.approved_at).toLocaleString()}</>
           )}
