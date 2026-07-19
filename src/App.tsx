@@ -115,6 +115,11 @@ const App = () => {
                     <AppLayout><PortfolioOverview /></AppLayout>
                   </ProtectedRoute>
                 } />
+                <Route path="/project/:venueId" element={
+                  <ProtectedRoute allowedRoles={['owner']} pageKey="project_home">
+                    <AppLayout><ProjectHome /></AppLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <AppLayout><Dashboard /></AppLayout>
