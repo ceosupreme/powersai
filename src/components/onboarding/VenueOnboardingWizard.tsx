@@ -30,6 +30,7 @@ import { ProjectQualifierOverridesPanel } from '@/components/admin/ProjectQualif
 import { AsanaLogSourcesEditor } from '@/components/admin/AsanaLogSourcesEditor';
 import { AutomationEnrollmentPanel } from '@/components/automations/AutomationEnrollmentPanel';
 import { VenueSubscriptionsPanel } from '@/components/services/VenueSubscriptionsPanel';
+import { ProjectCaptureLinkCard } from '@/components/onboarding/ProjectCaptureLinkCard';
 
 interface Props {
   open: boolean;
@@ -86,7 +87,11 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId, defaultStep
     : undefined;
 
   const renderInline = (step: OnboardingStep) => {
-    if (!step.inlineComponent || !meta?.project_type) return null;
+    if (!step.inlineComponent) return null;
+    if (step.inlineComponent === 'capture_link') {
+      return <ProjectCaptureLinkCard venueId={venueId} bare />;
+    }
+    if (!meta?.project_type) return null;
     switch (step.inlineComponent) {
       case 'pillars':
         return <ProjectPillarOverridesPanel projectId={venueId} projectType={meta.project_type} />;
