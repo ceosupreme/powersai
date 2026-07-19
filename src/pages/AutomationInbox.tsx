@@ -15,6 +15,7 @@ import {
 import { type AutomationKey, useAutomationEnrollments } from "@/hooks/useAutomationEnrollments";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
+import { deliveryLabel, isRealDelivery, isLoggedOnly, shortMsgId } from "@/lib/automationSendLabel";
 
 const AUTOMATION_LABELS: Record<AutomationKey, string> = {
   followup_sequence: "Follow-up",
@@ -27,24 +28,35 @@ export default function AutomationInbox() {
   const projectId = selectedBar?.id ?? null;
   const [automation, setAutomation] = useState<AutomationKey | "all">("all");
   const [status, setStatus] = useState<QueueStatus | "all">("pending_review");
+  const [sentSubFilter, setSentSubFilter] = useState<"all" | "delivered" | "logged">("all");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
 
-  const { data: items = [], isLoading } = useAutomationQueue({
+  const { data: rawItems = [], isLoading } = useAutomationQueue({
     projectId,
     automationKey: automation === "all" ? null : automation,
     status: status === "all" ? null : status,
     flaggedOnly,
   });
+  const items = useMemo(() => {
+    if (status !== "sent" || sentSubFilter === "all") return rawItems;
+    return rawItems.filter((i) =>
+      sentSubFilter === "delivered" ? isRealDelivery(i) : isLoggedOnly(i),
+    );
+  }, [rawItems, status, sentSubFilter]);
   const { data: enrollments = [] } = useAutomationEnrollments(projectId);
   const clientModeKeys = useMemo(() => new Set(
     enrollments.filter((e) => e.approval_mode === "client").map((e) => e.automation_key),
   ), [enrollments]);
 
-  const counts = useMemo(() => ({
-    pending_review: items.filter((i) => i.status === "pending_review").length,
-    approved: items.filter((i) => i.status === "approved").length,
-    sent: items.filter((i) => i.status === "sent").length,
-  }), [items]);
+  const counts = useMemo(() => {
+    const src = rawItems;
+    return {
+      pending_review: src.filter((i) => i.status === "pending_review").length,
+      approved: src.filter((i) => i.status === "approved").length,
+      delivered: src.filter((i) => isRealDelivery(i)).length,
+      logged: src.filter((i) => isLoggedOnly(i)).length,
+    };
+  }, [rawItems]);
 
   return (
     <div className="p-6 space-y-4">
@@ -65,7 +77,10 @@ export default function AutomationInbox() {
         <div className="flex gap-2 text-xs text-muted-foreground">
           <Badge variant="outline">Pending: {counts.pending_review}</Badge>
           <Badge variant="outline">Approved: {counts.approved}</Badge>
-          <Badge variant="outline">Sent: {counts.sent}</Badge>
+          <Badge variant="outline">Delivered: {counts.delivered}</Badge>
+          <Badge variant="outline" className="text-muted-foreground">
+            Logged: {counts.logged}
+          </Badge>
         </div>
         <Button
           variant={flaggedOnly ? "default" : "outline"}
@@ -89,12 +104,22 @@ export default function AutomationInbox() {
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="pending_review">Pending review</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="sent">Sent</SelectItem>
+            <SelectItem value="sent">Sent / logged</SelectItem>
             <SelectItem value="failed">Failed</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>
             <SelectItem value="canceled">Canceled</SelectItem>
           </SelectContent>
         </Select>
+        {status === "sent" && (
+          <Select value={sentSubFilter} onValueChange={(v) => setSentSubFilter(v as any)}>
+            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All sent / logged</SelectItem>
+              <SelectItem value="delivered">Delivered only</SelectItem>
+              <SelectItem value="logged">Logged only</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {isLoading ? (
