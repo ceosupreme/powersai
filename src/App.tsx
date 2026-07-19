@@ -13,6 +13,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/queryClient";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import WeeklyReview from "./pages/WeeklyReview";
 import Sales from "./pages/Sales";
@@ -93,6 +94,7 @@ const App = () => {
               <Routes>
                 <Route path="/auth" element={<Login />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 {/* Public landing page — signed-out visitors see marketing,
                     signed-in users get redirected into the app (handled inside Marketing). */}
                 <Route path="/" element={<MarketingSite />} />
