@@ -35,6 +35,8 @@ interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   venueId: string;
+  /** Optional step key to open initially (used by "Continue setup" resume). */
+  defaultStepKey?: string;
 }
 
 interface VenueMeta {
@@ -56,7 +58,7 @@ function StatusPill({ status }: { status: OnboardingStatus }) {
   return <Badge variant="outline" className="text-[10px]">Not started</Badge>;
 }
 
-export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
+export function VenueOnboardingWizard({ open, onOpenChange, venueId, defaultStepKey }: Props) {
   const navigate = useNavigate();
   const [meta, setMeta] = useState<VenueMeta | null>(null);
 
@@ -77,6 +79,11 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
 
   const progress = useVenueOnboardingDetectors(venueId, meta?.project_type ?? null);
   const live = useVenueLiveStatus(progress.statusFor);
+
+  // If a resume step is requested, jump to its phase on first render.
+  const resumePhase = defaultStepKey
+    ? VENUE_ONBOARDING_STEPS.find((s) => s.key === defaultStepKey)?.phase
+    : undefined;
 
   const renderInline = (step: OnboardingStep) => {
     if (!step.inlineComponent || !meta?.project_type) return null;
@@ -124,8 +131,8 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
                   size="sm"
                   className="h-auto p-0 ml-1"
                   onClick={() => {
-                    onOpenChange(false);
-                    navigate(step.href!(venueId));
+                    // Never navigate the wizard away — open settings in a new tab.
+                    window.open(step.href!(venueId), '_blank', 'noopener,noreferrer');
                   }}
                 >
                   Open settings <ExternalLink className="h-3 w-3 ml-1" />
@@ -195,7 +202,7 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
               <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading client…
             </div>
           ) : (
-            <Tabs defaultValue={live.isLive ? 'full_config' : 'go_live'}>
+            <Tabs defaultValue={resumePhase ?? (live.isLive ? 'full_config' : 'go_live')}>
               <TabsList className="w-full justify-start overflow-x-auto no-scrollbar">
                 {PHASES.map((p) => (
                   <TabsTrigger key={p.key} value={p.key} className="text-xs sm:text-sm">
@@ -211,7 +218,11 @@ export function VenueOnboardingWizard({ open, onOpenChange, venueId }: Props) {
                     <Accordion
                       type="single"
                       collapsible
-                      defaultValue={steps.find((s) => progress.statusFor(s.key) !== 'complete')?.key}
+                      defaultValue={
+                        (defaultStepKey && steps.some((s) => s.key === defaultStepKey))
+                          ? defaultStepKey
+                          : steps.find((s) => progress.statusFor(s.key) !== 'complete')?.key
+                      }
                       className="space-y-2"
                     >
                       {steps.map(renderStep)}
