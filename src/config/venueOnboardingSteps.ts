@@ -30,7 +30,7 @@ export interface OnboardingStep {
   /** Where to send the user to actually configure this (link-out). */
   href?: (venueId: string) => string;
   /** Component embedded inline when present (passed { projectId, projectType }). */
-  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources' | 'automations' | 'subscriptions';
+  inlineComponent?: 'pillars' | 'leak_vectors' | 'qualifier' | 'asana_log_sources' | 'automations' | 'subscriptions' | 'capture_link';
 }
 
 const exists = async (table: string, filter: (q: any) => any): Promise<boolean> => {
@@ -88,9 +88,10 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     phase: 'go_live',
     title: 'Capture channel live',
     description:
-      'Open /qualify/<slug> for this vertical and test a lead end-to-end. The lead should land in your CRM Inbound.',
+      "Share your project's capture link. Test a submission end-to-end — it should appear in CRM › Inbound attributed to this project.",
     icon: Inbox,
     required: true,
+    inlineComponent: 'capture_link',
     href: () => `/crm?tab=inbound`,
     detector: async ({ venueId }) =>
       exists('inbound_leads', (q) =>
