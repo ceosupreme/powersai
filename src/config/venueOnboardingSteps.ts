@@ -135,7 +135,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Leadership & contacts',
     description: 'Add the owner, GM, and any vendor contacts for routing.',
     icon: Users,
-    href: (id) => `/admin?tab=projects&edit=${id}`,
+    href: () => `/admin?tab=settings&subtab=bars`,
     detector: async ({ venueId }) => {
       const a = await exists('venue_contacts', (q) => q.eq('venue_id', venueId));
       if (a) return true;
