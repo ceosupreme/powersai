@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,7 @@ function ResponseStatsCard({ projectId }: { projectId?: string | null }) {
 
 export function InboundLeadsPanel() {
   const [status, setStatus] = useState<InboundLeadStatus>("new");
+  const navigate = useNavigate();
   const leads = useInboundLeads(status);
   const m = useInboundLeadMutations();
   const proposalM = useLeadProposal();
@@ -148,8 +150,27 @@ export function InboundLeadsPanel() {
             const showTimer = isEmergency && lead.urgency_captured_at && !lead.first_response_at;
             const canMarkResponded =
               !!lead.urgency_captured_at && !lead.first_response_at;
+            const promotedTarget = lead.status === "promoted"
+              ? (lead.promoted_venue_id
+                  ? `/project/${lead.promoted_venue_id}`
+                  : lead.promoted_company_id
+                    ? `/crm?tab=companies&company=${lead.promoted_company_id}`
+                    : null)
+              : null;
             return (
-            <Card key={lead.id} className={cn(isEmergency && !lead.first_response_at && "border-l-4 border-l-orange-700")}>
+            <Card
+              key={lead.id}
+              className={cn(
+                isEmergency && !lead.first_response_at && "border-l-4 border-l-orange-700",
+                promotedTarget && "cursor-pointer hover:border-primary transition-colors",
+              )}
+              onClick={promotedTarget ? () => navigate(promotedTarget) : undefined}
+              role={promotedTarget ? "button" : undefined}
+              tabIndex={promotedTarget ? 0 : undefined}
+              onKeyDown={promotedTarget ? (e) => {
+                if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate(promotedTarget); }
+              } : undefined}
+            >
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
