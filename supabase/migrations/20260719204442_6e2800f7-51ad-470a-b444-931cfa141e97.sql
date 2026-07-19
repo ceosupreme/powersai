@@ -1,0 +1,1 @@
+UPDATE public.venues SET city = 'San Diego' WHERE id = '3a031700-fd6f-4278-8bbc-ea76e439e673' AND (city IS NULL OR city = '');
