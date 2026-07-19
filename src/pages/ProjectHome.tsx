@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { VenueOnboardingWizard } from '@/components/onboarding/VenueOnboardingWizard';
 import { VenueLiveBadge } from '@/components/onboarding/VenueLiveBadge';
+import { ProjectCaptureLinkCard } from '@/components/onboarding/ProjectCaptureLinkCard';
 import { useVenueOnboardingDetectors } from '@/hooks/useVenueOnboardingDetectors';
 import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
@@ -23,6 +24,7 @@ interface ProjectMeta {
   name: string;
   project_type: ProjectType | null;
   bar_code: string | null;
+  slug: string | null;
 }
 
 const QUICK_LINKS = [
@@ -51,7 +53,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code')
+      .select('id,name,project_type,bar_code,slug')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -152,6 +154,14 @@ export default function ProjectHome() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {canRunWizard && (
+        <ProjectCaptureLinkCard
+          venueId={meta.id}
+          venueSlug={meta.slug}
+          projectType={meta.project_type}
+        />
       )}
 
       {/* Quick links to project-scoped surfaces */}
