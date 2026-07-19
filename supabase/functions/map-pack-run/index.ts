@@ -141,11 +141,20 @@ Deno.serve(async (req) => {
 
   const venueId: string | null = typeof body.venue_id === 'string' ? body.venue_id : null;
   const keywordId: string | null = typeof body.keyword_id === 'string' ? body.keyword_id : null;
-  const triggerSource: string = body.trigger_source === 'cron' ? 'cron' : body.trigger_source === 'admin' ? 'admin' : 'manual';
+  const rawTrigger = typeof body.trigger_source === 'string' ? body.trigger_source : 'manual';
+  const triggerSource: string = ['cron', 'admin', 'manual', 'public_audit'].includes(rawTrigger)
+    ? rawTrigger
+    : 'manual';
 
-  // For manual/admin triggers, require admin auth
+  // Service-role triggers (cron, public_audit) require the service key; user triggers require admin auth.
   let userId: string | null = null;
-  if (triggerSource !== 'cron') {
+  if (triggerSource === 'cron' || triggerSource === 'public_audit') {
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token || token !== serviceKey) {
+      return json(401, { error: 'Service role required for this trigger_source' });
+    }
+  } else {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return json(401, { error: 'Missing bearer token' });
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {

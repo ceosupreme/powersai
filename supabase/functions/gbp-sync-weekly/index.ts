@@ -137,7 +137,9 @@ Deno.serve(async (req) => {
       }
       results.push({ venue: v.name, ok: true });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = e instanceof Error
+        ? e.message
+        : (e as any)?.message ?? (typeof e === 'object' ? JSON.stringify(e) : String(e));
       console.error(`[gbp-sync-weekly] ${v.name} failed:`, msg);
       if (runId) {
         await supabase.from('sync_runs')
