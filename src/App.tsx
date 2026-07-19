@@ -68,6 +68,7 @@ import ReactivationCampaigns from "./pages/ReactivationCampaigns";
 import RecoveryReports from "./pages/RecoveryReports";
 import PublicRecoveryReport from "./pages/PublicRecoveryReport";
 import FoundationAudit from "./pages/FoundationAudit";
+import ProjectHome from "./pages/ProjectHome";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
 
@@ -112,6 +113,11 @@ const App = () => {
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/project/:venueId" element={
+                  <ProtectedRoute allowedRoles={['owner']} pageKey="project_home">
+                    <AppLayout><ProjectHome /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/dashboard" element={

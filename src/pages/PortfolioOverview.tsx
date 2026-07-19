@@ -447,7 +447,7 @@ export default function PortfolioOverview() {
       setSelectedBar(matchingBar);
     }
     setCurrentVenue(venueId);
-    navigate('/weekly-review');
+    navigate(`/project/${venueId}`);
   }
 
   const remainingPlaceholders = useMemo(
