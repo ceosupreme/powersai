@@ -1,0 +1,1 @@
+UPDATE public.automation_message_queue SET status='approved', send_result=NULL, send_attempted_at=NULL WHERE id='200687f1-ab68-4f83-9847-5f2600b57437' AND status='failed';

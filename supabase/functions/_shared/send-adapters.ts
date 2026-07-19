@@ -132,13 +132,19 @@ export const resendEmailAdapter: SendAdapter = {
     if (!internal) {
       const { data: venue } = await sb
         .from("venues")
-        .select("bar_name, city")
+        .select("name, venue_name, city")
         .eq("id", input.project_id)
         .maybeSingle();
-      const name = (venue?.bar_name as string) ?? "";
-      const city = (venue?.city as string) ?? "";
+      if (!venue) {
+        return { ok: false, provider: "resend", error: "venue_not_found" };
+      }
+      const name = String((venue as any).name ?? (venue as any).venue_name ?? "").trim();
+      const city = String((venue as any).city ?? "").trim();
       if (!name) {
-        return { ok: false, provider: "resend", error: "missing_project_venue" };
+        return { ok: false, provider: "resend", error: "venue_missing_name" };
+      }
+      if (!city) {
+        return { ok: false, provider: "resend", error: "venue_missing_city" };
       }
       const loc = city ? `${name} · ${city}` : name;
       footer = `\n\n—\n${loc}\nReply to this email to opt out.`;

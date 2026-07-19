@@ -15,7 +15,7 @@ import {
 import { type AutomationKey, useAutomationEnrollments } from "@/hooks/useAutomationEnrollments";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
-import { deliveryLabel, isRealDelivery, isLoggedOnly, shortMsgId } from "@/lib/automationSendLabel";
+import { deliveryLabel, isRealDelivery, isLoggedOnly, shortMsgId, describeSendError } from "@/lib/automationSendLabel";
 
 const AUTOMATION_LABELS: Record<AutomationKey, string> = {
   followup_sequence: "Follow-up",
@@ -142,10 +142,11 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
   const [body, setBody] = useState(item.edited_body ?? item.body);
   const recipient = item.recipient_snapshot as { name?: string; email?: string; phone?: string };
   const to = recipient.email ?? recipient.phone ?? "(no contact)";
-  const failureError =
+  const failureCode =
     item.status === "failed"
-      ? String((item.send_result as any)?.error ?? "Unknown error")
+      ? String((item.send_result as any)?.error ?? "")
       : null;
+  const failureMessage = failureCode !== null ? describeSendError(failureCode) : null;
   const label = deliveryLabel(item);
   const statusClass =
     label.tone === "success"
@@ -183,10 +184,16 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
         <div className="text-sm"><span className="text-muted-foreground">Subject:</span> {item.subject}</div>
       )}
       <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={6} className="text-sm" />
-      {failureError && (
-        <div className="rounded border border-destructive/40 bg-destructive/5 p-2 text-xs">
+      {failureMessage && (
+        <div
+          className="rounded border border-destructive/40 bg-destructive/5 p-2 text-xs"
+          title={failureCode || undefined}
+        >
           <span className="font-medium text-destructive">Failed:</span>{" "}
-          <span className="text-destructive/90">{failureError}</span>
+          <span className="text-destructive/90">{failureMessage}</span>
+          {failureCode && failureCode !== failureMessage && (
+            <span className="ml-2 text-muted-foreground/70">({failureCode})</span>
+          )}
         </div>
       )}
       {item.status === "pending_review" && (
