@@ -98,14 +98,20 @@ Deno.serve(async (req) => {
       }, 409);
     }
     // Role-less or already a client — grant project access.
-    await sb.from("user_roles").upsert(
+    const roleUpsert = await sb.from("user_roles").upsert(
       { user_id: existingId, role: "client" },
       { onConflict: "user_id,role" },
     );
-    await sb.from("venue_assignments").upsert(
-      { user_id: existingId, venue_id: project_id },
+    if (roleUpsert.error) {
+      return json({ error: "grant_failed", message: roleUpsert.error.message }, 500);
+    }
+    const vaUpsert = await sb.from("venue_assignments").upsert(
+      { user_id: existingId, venue_id: project_id, role_at_venue: "client" },
       { onConflict: "user_id,venue_id" },
     );
+    if (vaUpsert.error) {
+      return json({ error: "grant_failed", message: vaUpsert.error.message }, 500);
+    }
     return json({
       ok: true,
       mode: "granted_existing",
@@ -132,16 +138,22 @@ Deno.serve(async (req) => {
   }
   const invitedId = inviteData.user.id;
 
-  // Grant access immediately — the handle_new_user trigger already stamped
-  // user_roles(client) on the auth.users insert, but we ensure it here too.
-  await sb.from("user_roles").upsert(
+  // Grant access immediately — handle_new_user trigger also stamps
+  // user_roles(client), but we ensure it here and check for errors.
+  const roleUpsert = await sb.from("user_roles").upsert(
     { user_id: invitedId, role: "client" },
     { onConflict: "user_id,role" },
   );
-  await sb.from("venue_assignments").upsert(
-    { user_id: invitedId, venue_id: project_id },
+  if (roleUpsert.error) {
+    return json({ error: "grant_failed", message: roleUpsert.error.message }, 500);
+  }
+  const vaUpsert = await sb.from("venue_assignments").upsert(
+    { user_id: invitedId, venue_id: project_id, role_at_venue: "client" },
     { onConflict: "user_id,venue_id" },
   );
+  if (vaUpsert.error) {
+    return json({ error: "grant_failed", message: vaUpsert.error.message }, 500);
+  }
 
   return json({ ok: true, mode: "invited", user_id: invitedId });
 });
