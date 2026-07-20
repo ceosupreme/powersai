@@ -177,6 +177,7 @@ function InviteClientApprover({ projectId }: { projectId: string }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -190,25 +191,62 @@ function InviteClientApprover({ projectId }: { projectId: string }) {
         <Input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setResult(null); }}
           placeholder="client@example.com"
         />
+        {result && (
+          <p
+            className={`text-sm rounded border p-2 ${
+              result.tone === "success"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "border-destructive/40 bg-destructive/10 text-destructive"
+            }`}
+          >
+            {result.text}
+          </p>
+        )}
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button
             disabled={sending || !email}
             onClick={async () => {
               setSending(true);
+              setResult(null);
               try {
-                const { error } = await (supabase as any).functions.invoke("invite-client-approver", {
-                  body: { project_id: projectId, email },
+                // Raw fetch so we can read the JSON body on non-2xx (supabase-js hides it).
+                const { data: sess } = await supabase.auth.getSession();
+                const accessToken = sess.session?.access_token ?? "";
+                const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-client-approver`;
+                const res = await fetch(url, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+                  },
+                  body: JSON.stringify({ project_id: projectId, email }),
                 });
-                if (error) throw error;
-                toast.success("Invite sent");
-                setOpen(false);
+                let body: any = null;
+                try { body = await res.json(); } catch { /* non-JSON */ }
+                if (!res.ok) {
+                  const msg = body?.message
+                    ?? (typeof body?.error === "string" ? body.error : null)
+                    ?? `Invite failed (HTTP ${res.status})`;
+                  setResult({ tone: "error", text: msg });
+                  return;
+                }
+                if (body?.mode === "granted_existing") {
+                  const msg = body.message ?? "Access granted.";
+                  setResult({ tone: "success", text: msg });
+                  toast.success("Access granted");
+                } else {
+                  setResult({ tone: "success", text: "Invite sent." });
+                  toast.success("Invite sent");
+                }
                 setEmail("");
               } catch (e) {
-                toast.error(e instanceof Error ? e.message : "Invite failed");
+                const msg = e instanceof Error ? e.message : "Invite failed";
+                setResult({ tone: "error", text: `Invite failed: ${msg}` });
               } finally {
                 setSending(false);
               }
