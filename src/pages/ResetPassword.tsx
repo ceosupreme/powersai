@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
-import { roleToHomeRoute } from '@/types/roles';
+import { getRoleHome } from '@/types/roles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +22,8 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { currentRole } = useRole();
+  const { currentRole, isLoading: roleLoading, refreshRoles } = useRole();
+  const pendingNavRef = useRef(false);
 
   const next = searchParams.get('next') || '';
 
@@ -79,16 +80,41 @@ const ResetPassword = () => {
     }
     setSubmitting(true);
     const { error: updErr } = await supabase.auth.updateUser({ password });
-    setSubmitting(false);
     if (updErr) {
+      setSubmitting(false);
       setError(updErr.message);
       return;
     }
     toast.success('Password set. Welcome in.');
-    // Prefer role-aware home; honor ?next= only as a hint, ProtectedRoute re-gates
-    const home = currentRole ? roleToHomeRoute[currentRole] : next || '/';
-    navigate(next || home, { replace: true });
+    // Re-fetch roles now that the user has finalized their account, then wait
+    // for RoleContext to settle before choosing a destination. Never race to
+    // ?next= — it can send a client into a role-gated page and dead-end them.
+    try { await refreshRoles(); } catch { /* fall through to polling */ }
+    pendingNavRef.current = true;
+    // useEffect below picks up currentRole and navigates.
   };
+
+  // Navigate once the role has settled after a successful password set.
+  // Falls back to /auth after ~2s if the role never resolves — never a
+  // role-gated page.
+  useEffect(() => {
+    if (!pendingNavRef.current) return;
+    if (roleLoading) return;
+    if (currentRole) {
+      pendingNavRef.current = false;
+      navigate(getRoleHome(currentRole), { replace: true });
+      return;
+    }
+    const timer = setTimeout(() => {
+      if (!pendingNavRef.current) return;
+      pendingNavRef.current = false;
+      navigate(getRoleHome(currentRole), { replace: true });
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [currentRole, roleLoading, navigate]);
+
+  // Silence the unused-var linter (kept for future ?next= handling if needed).
+  void next;
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">

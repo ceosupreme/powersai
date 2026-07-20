@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
-import { roleToHomeRoute } from '@/types/roles';
+import { getRoleHome } from '@/types/roles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,8 +48,7 @@ const Auth = () => {
   useEffect(() => {
     if (user && !isLoading && !roleLoading) {
       // Use role-appropriate home, or /dashboard as safe fallback
-      const destination = currentRole ? (roleToHomeRoute[currentRole] || '/dashboard') : '/dashboard';
-      navigate(destination, { replace: true });
+      navigate(getRoleHome(currentRole), { replace: true });
     }
   }, [user, isLoading, roleLoading, currentRole, navigate]);
 

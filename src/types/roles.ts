@@ -35,6 +35,18 @@ export const roleToHomeRoute: Record<UserRole, string> = {
   client: '/approvals',
 };
 
+/**
+ * Single source of truth for role → home route.
+ * Used by post-auth redirects, ProtectedRoute denial bounces, and the 404 fallback.
+ * Changing a role's home is a one-line edit here.
+ *
+ * Null/unknown role → '/auth' (never a role-gated app page; avoids silent dead-ends).
+ */
+export function getRoleHome(role: UserRole | null | undefined): string {
+  if (!role) return '/auth';
+  return roleToHomeRoute[role] ?? '/auth';
+}
+
 export const ROLE_LABELS: Record<UserRole, string> = {
   owner: 'Owner',
   gm: 'General Manager',

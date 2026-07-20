@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
-import { roleToHomeRoute } from '@/types/roles';
+import { getRoleHome } from '@/types/roles';
 import { Activity, ArrowLeft, Loader2 } from 'lucide-react';
 import LoginAuthCard from '@/components/login/LoginAuthCard';
 
@@ -13,7 +13,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user && !isLoading && !roleLoading) {
-      const home = currentRole ? roleToHomeRoute[currentRole] : '/';
+      const home = currentRole ? getRoleHome(currentRole) : '/';
       navigate(home, { replace: true });
     }
   }, [user, isLoading, roleLoading, currentRole, navigate]);
