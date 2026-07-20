@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
 import { usePreview } from '@/context/PreviewContext';
-import { UserRole, roleToHomeRoute } from '@/types/roles';
+import { UserRole, getRoleHome } from '@/types/roles';
 import { getAllowedRoles } from '@/config/routes';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
   const location = useLocation();
   const toastShownRef = useRef<string | null>(null);
   const [timedOut, setTimedOut] = useState(false);
+  const [roleSettleTimedOut, setRoleSettleTimedOut] = useState(false);
 
   useEffect(() => {
     if (isLoading || roleLoading) {
@@ -30,6 +31,18 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
       return () => clearTimeout(timer);
     }
   }, [isLoading, roleLoading]);
+
+  // Once auth+role loaders report done but currentRole is still null (fresh
+  // invite/session race between auth.users and user_roles), give the role a
+  // short settle window before treating "no role" as terminal.
+  useEffect(() => {
+    if (!isLoading && !roleLoading && user && !currentRole) {
+      setRoleSettleTimedOut(false);
+      const timer = setTimeout(() => setRoleSettleTimedOut(true), 1500);
+      return () => clearTimeout(timer);
+    }
+    setRoleSettleTimedOut(false);
+  }, [isLoading, roleLoading, user, currentRole]);
 
   if ((isLoading || roleLoading) && !timedOut) {
     return (
@@ -47,9 +60,19 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
+  // User is present but role hasn't populated yet — hold the loading state
+  // through the short settle window instead of racing to a hardcoded fallback.
+  if (!currentRole && !roleSettleTimedOut) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <LoadingState message="Loading..." />
+      </div>
+    );
+  }
+
   // Redirect to role-appropriate home on root/login
   if (currentRole && (location.pathname === '/' || location.pathname === '/login')) {
-    const homeRoute = roleToHomeRoute[currentRole];
+    const homeRoute = getRoleHome(currentRole);
     if (homeRoute && homeRoute !== location.pathname) {
       return <Navigate to={homeRoute} replace />;
     }
@@ -62,10 +85,15 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
 
   const effectiveRoles = allowedRoles || getAllowedRoles(location.pathname);
 
-  // Block users with no assigned role from role-gated routes
-  // Redirect to /dashboard instead of /auth to avoid infinite loop
-  if (!currentRole && effectiveRoles) {
-    return <Navigate to="/dashboard" replace />;
+  // Settle window elapsed and still no role — send to /auth with a toast,
+  // never to a role-gated app page (which is what caused the /dashboard
+  // dead-end for freshly-invited clients).
+  if (!currentRole) {
+    if (toastShownRef.current !== location.pathname) {
+      toastShownRef.current = location.pathname;
+      toast.error("Your account has no role assigned — contact your admin.");
+    }
+    return <Navigate to="/auth" replace />;
   }
 
   if (currentRole && effectiveRoles && !effectiveRoles.includes(currentRole)) {
@@ -74,7 +102,7 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
       toastShownRef.current = location.pathname;
       toast.error("You don't have access to this page");
     }
-    return <Navigate to={roleToHomeRoute[currentRole]} replace />;
+    return <Navigate to={getRoleHome(currentRole)} replace />;
   }
 
   // Per-page permission gate (admin already returned above)
@@ -83,8 +111,7 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
       toastShownRef.current = location.pathname;
       toast.error("You don't have access to this page");
     }
-    const home = currentRole ? roleToHomeRoute[currentRole] : '/dashboard';
-    return <Navigate to={home} replace />;
+    return <Navigate to={getRoleHome(currentRole)} replace />;
   }
 
   return <>{children}</>;
