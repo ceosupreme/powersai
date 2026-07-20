@@ -12,9 +12,11 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && !isLoading && !roleLoading) {
-      const home = currentRole ? getRoleHome(currentRole) : '/';
-      navigate(home, { replace: true });
+    // Only navigate when we actually know the role. When a signed-in user has
+    // no role, do NOT ping-pong them to '/' — ProtectedRoute owns the
+    // terminal no-role screen (with a Sign out action).
+    if (user && !isLoading && !roleLoading && currentRole) {
+      navigate(getRoleHome(currentRole), { replace: true });
     }
   }, [user, isLoading, roleLoading, currentRole, navigate]);
 
