@@ -8,6 +8,7 @@ import { getAllowedRoles } from '@/config/routes';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { toast } from 'sonner';
 import { PageKey } from '@/types/permissions';
+import { Button } from '@/components/ui/button';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -16,7 +17,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRouteProps) => {
-  const { user, isLoading, isAdmin, canAccessPage } = useAuth();
+  const { user, isLoading, isAdmin, canAccessPage, signOut } = useAuth();
   const { currentRole, isLoading: roleLoading } = useRole();
   const { isPreview } = usePreview();
   const location = useLocation();
@@ -85,15 +86,29 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
 
   const effectiveRoles = allowedRoles || getAllowedRoles(location.pathname);
 
-  // Settle window elapsed and still no role — send to /auth with a toast,
-  // never to a role-gated app page (which is what caused the /dashboard
-  // dead-end for freshly-invited clients).
+  // Settle window elapsed and still no role — render a terminal screen with
+  // a single Sign out action. Do NOT toast (was causing a re-fire storm) and
+  // do NOT redirect to /auth (which loops signed-in users right back here).
   if (!currentRole) {
-    if (toastShownRef.current !== location.pathname) {
-      toastShownRef.current = location.pathname;
-      toast.error("Your account has no role assigned — contact your admin.");
-    }
-    return <Navigate to="/auth" replace />;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-md text-center space-y-4">
+          <h1 className="text-xl font-semibold">No role assigned to this account</h1>
+          <p className="text-sm text-muted-foreground">
+            Your account is signed in but has no access role. Ask your admin to grant
+            you access, then sign in again.
+          </p>
+          <Button
+            onClick={async () => {
+              await signOut();
+              window.location.assign('/auth');
+            }}
+          >
+            Sign out
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   if (currentRole && effectiveRoles && !effectiveRoles.includes(currentRole)) {
