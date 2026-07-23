@@ -5,6 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQualifierConfig } from "@/hooks/useEffectiveQualifierFields";
+import type { ProjectType } from "@/lib/effectivePillars";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { EffectiveQualifierField } from "@/lib/effectiveQualifierFields";
@@ -21,12 +24,21 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [urgency, setUrgency] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const configQ = useQualifierConfig(projectType as ProjectType);
+  const urgencyOptions = (configQ.data?.urgency_options ?? null) as
+    | Record<string, { label: string; guidance: string }>
+    | null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || (!phone.trim() && !email.trim())) {
       toast.error("Name plus phone or email are required.");
+      return;
+    }
+    if (urgencyOptions && !urgency) {
+      toast.error("Please tell us how urgent this is.");
       return;
     }
     setSubmitting(true);
@@ -45,6 +57,7 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
           conversation_channel: "form",
           route_to: "self",
           captured_for_project_id: capturedForProjectId ?? null,
+          urgency_class: urgency || null,
         },
       });
       if (error) throw error;
@@ -75,6 +88,24 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
               <Input id="email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" />
             </div>
           </div>
+          {urgencyOptions && (
+            <div className="space-y-1">
+              <Label htmlFor="urgency">How urgent is this?</Label>
+              <Select value={urgency} onValueChange={setUrgency}>
+                <SelectTrigger id="urgency" className="h-11">
+                  <SelectValue placeholder="Pick the closest fit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(urgencyOptions).map(([key, opt]) => (
+                    <SelectItem key={key} value={key}>
+                      <span className="font-medium">{opt.label}</span>
+                      <span className="text-muted-foreground"> — {opt.guidance}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {fields.filter(f => f.field_key !== "contact").map((f) => (
             <div key={f.field_key} className="space-y-1">
               <Label htmlFor={f.field_key}>{f.field_label}</Label>
