@@ -78,6 +78,7 @@ export function useProposalMutations() {
       title: string;
       content: ProposalContent;
     }): Promise<ProposalRow> => {
+      await ensureLiveSession();
       const { data, error } = await (supabase as any)
         .from('proposals')
         .insert({ ...input, status: 'draft' })
@@ -91,6 +92,7 @@ export function useProposalMutations() {
 
   const patchContent = useMutation({
     mutationFn: async ({ id, content, title }: { id: string; content: ProposalContent; title?: string }) => {
+      await ensureLiveSession();
       const patch: any = { content };
       if (title !== undefined) patch.title = title;
       const { error } = await (supabase as any).from('proposals').update(patch).eq('id', id);
@@ -101,6 +103,7 @@ export function useProposalMutations() {
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: 'draft' | 'sent' }) => {
+      await ensureLiveSession();
       const { error } = await (supabase as any).from('proposals').update({ status }).eq('id', id);
       if (error) throw error;
     },
@@ -109,6 +112,7 @@ export function useProposalMutations() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
+      await ensureLiveSession();
       const { error } = await (supabase as any).from('proposals').delete().eq('id', id);
       if (error) throw error;
     },
