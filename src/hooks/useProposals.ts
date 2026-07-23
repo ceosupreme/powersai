@@ -9,6 +9,33 @@ export interface ProposalListFilter {
 
 const KEY = (f: ProposalListFilter) => ['proposals', f] as const;
 
+/**
+ * Preflight: guarantee a live user JWT before any RLS-checked write.
+ * `proposals` INSERT/UPDATE/DELETE policies all reduce to `has_role(auth.uid(),'admin')`.
+ * If the session has silently expired, PostgREST sends the request as anon and
+ * RLS returns 42501 with HTTP 401 — surfacing as "row-level security policy"
+ * even though the user IS admin. Refresh, or throw a typed error the UI can
+ * present clearly.
+ */
+async function ensureLiveSession(): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const s = data.session;
+  if (!s) {
+    const e: any = new Error('Your session expired. Sign in again to save.');
+    e.code = 'no_session';
+    throw e;
+  }
+  const expSec = s.expires_at ?? 0;
+  if (expSec * 1000 - Date.now() < 60_000) {
+    const { error } = await supabase.auth.refreshSession();
+    if (error) {
+      const e: any = new Error('Your session expired. Sign in again to save.');
+      e.code = 'no_session';
+      throw e;
+    }
+  }
+}
+
 function rowFromDb(r: any): ProposalRow {
   return {
     id: r.id,
