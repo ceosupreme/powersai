@@ -24,6 +24,7 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [details, setDetails] = useState("");
   const [urgency, setUrgency] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const configQ = useQualifierConfig(projectType as ProjectType);
@@ -37,23 +38,27 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
       toast.error("Name plus phone or email are required.");
       return;
     }
+    if (!details.trim()) {
+      toast.error("Please tell us what you need.");
+      return;
+    }
     if (urgencyOptions && !urgency) {
       toast.error("Please tell us how urgent this is.");
       return;
     }
     setSubmitting(true);
     try {
-      const qd: Record<string, string> = { ...values, contact: name };
+      const qd: Record<string, string> = { ...values, contact: name, details };
       if (phone) qd.phone = phone;
       if (email) qd.email = email;
       const { data, error } = await supabase.functions.invoke("submit-inbound-lead", {
         body: {
           name, email: email || null, phone: phone || null,
-          message: values["service_needed"] || values["job_type"] || null,
+          message: details,
           project_type: projectType,
           qualifier_data: qd,
           is_ready: false, // server can re-evaluate later; form path is conservative.
-          transcript: [],
+          transcript: [{ role: "user", text: details, at: new Date().toISOString() }],
           conversation_channel: "form",
           route_to: "self",
           captured_for_project_id: capturedForProjectId ?? null,
@@ -88,6 +93,17 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
               <Input id="email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" />
             </div>
           </div>
+          <div className="space-y-1">
+            <Label htmlFor="details">What do you need?</Label>
+            <Textarea
+              id="details"
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              rows={4}
+              required
+              placeholder="Describe the situation — what's happening, where, and any timing that matters."
+            />
+          </div>
           {urgencyOptions && (
             <div className="space-y-1">
               <Label htmlFor="urgency">How urgent is this?</Label>
@@ -106,7 +122,9 @@ export function FormQualifier({ projectType, fields, capturedForProjectId = null
               </Select>
             </div>
           )}
-          {fields.filter(f => f.field_key !== "contact").map((f) => (
+          {fields
+            .filter(f => f.field_key !== "contact" && f.field_key !== "job_type" && f.field_key !== "service_needed")
+            .map((f) => (
             <div key={f.field_key} className="space-y-1">
               <Label htmlFor={f.field_key}>{f.field_label}</Label>
               {f.field_type === "select" ? (
