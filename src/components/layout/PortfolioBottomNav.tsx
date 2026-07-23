@@ -16,7 +16,6 @@ const baseSecondaryItems = [
   { to: '/workspace', icon: Sunrise, label: 'Today' },
   { to: '/weekly-review', icon: CalendarCheck, label: 'Weekly' },
   { to: '/crm', icon: Briefcase, label: 'CRM' },
-  { to: '/crm?tab=inbound', icon: InboxIcon, label: 'Inbound' },
   { to: '/inbox', icon: InboxIcon, label: 'Capture' },
   { to: '/brand-kit', icon: Palette, label: 'Brand Vault' },
   { to: '/marketing-hub', icon: Megaphone, label: 'Marketing Hub' },
