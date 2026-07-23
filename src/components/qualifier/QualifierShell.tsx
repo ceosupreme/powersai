@@ -101,7 +101,7 @@ export function QualifierShell({ projectType, brand, tagline, capturedForProject
             />
           </TabsContent>
           <TabsContent value="form" className="mt-5">
-            {fieldsQ.isLoading ? (
+            {fieldsQ.isLoading || configQ.isLoading ? (
               <div className="text-center text-sm text-muted-foreground py-10">Loading…</div>
             ) : (
               <FormQualifier

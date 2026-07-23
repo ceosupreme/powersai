@@ -46,7 +46,6 @@ const secondaryNavItems = [
   { to: '/portfolio', icon: LayoutDashboard, label: 'Portfolio', pageKey: 'dashboard' as PageKey },
   { to: '/insights', icon: Lightbulb, label: 'Insights', pageKey: 'insights' as PageKey },
   { to: '/crm', icon: Briefcase, label: 'CRM', pageKey: 'dashboard' as PageKey },
-  { to: '/crm?tab=inbound', icon: InboxIcon, label: 'Inbound', pageKey: 'dashboard' as PageKey },
   { to: '/brand-kit', icon: Palette, label: 'Brand Vault', pageKey: 'dashboard' as PageKey },
   { to: '/marketing-hub', icon: Megaphone, label: 'Marketing Hub', pageKey: 'dashboard' as PageKey },
   { to: '/growth-audit', icon: Activity, label: 'Growth Audit', pageKey: 'dashboard' as PageKey },

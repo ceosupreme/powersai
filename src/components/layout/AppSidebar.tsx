@@ -103,7 +103,6 @@ const navGroups: NavGroup[] = [
     label: 'Clients & Leads',
     items: [
       { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'crm' },
-      { path: '/crm?tab=inbound', label: 'Inbound Leads', icon: InboxIcon, pageKey: 'crm' },
       { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
       { path: '/automations/inbox', label: 'Automation Inbox', icon: Zap, pageKey: 'automation_inbox' },
       { path: '/automations/reactivation', label: 'Reactivation', icon: Sparkles, pageKey: 'reactivation' },
