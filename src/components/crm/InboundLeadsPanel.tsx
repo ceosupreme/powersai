@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Inbox, ArrowRightCircle, Archive, Eye, Building2, Loader2, Siren, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -28,7 +29,7 @@ const URGENCY_LABEL: Record<UrgencyClass, string> = {
 function UrgencyBadge({ cls }: { cls: UrgencyClass }) {
   if (cls === "emergency") {
     return (
-      <Badge className="text-[10px] bg-orange-700 hover:bg-orange-700 text-white gap-1">
+      <Badge className="text-[10px] bg-[hsl(15,73%,42%)] hover:bg-[hsl(15,73%,42%)] text-white gap-1">
         <Siren className="h-3 w-3" /> EMERGENCY
       </Badge>
     );
@@ -36,6 +37,7 @@ function UrgencyBadge({ cls }: { cls: UrgencyClass }) {
   if (cls === "same_day") {
     return <Badge className="text-[10px] bg-amber-500 hover:bg-amber-500 text-white">Same day</Badge>;
   }
+  // routine / estimate / maintenance → neutral chip
   return <Badge variant="secondary" className="text-[10px]">{URGENCY_LABEL[cls]}</Badge>;
 }
 
@@ -57,11 +59,19 @@ function EmergencyTimer({ since }: { since: string }) {
   }, []);
   const ms = Date.now() - new Date(since).getTime();
   return (
-    <span className="text-xs font-mono text-orange-700 font-semibold">
+    <span className="text-xs font-mono text-[hsl(15,73%,42%)] font-semibold">
       {formatDuration(ms)} unresponded
     </span>
   );
 }
+
+const URGENCY_TRIAGE_OPTIONS: { value: UrgencyClass; label: string }[] = [
+  { value: "emergency", label: "Emergency" },
+  { value: "same_day", label: "Same day" },
+  { value: "routine", label: "Routine" },
+  { value: "estimate", label: "Estimate" },
+  { value: "maintenance", label: "Maintenance" },
+];
 
 function ResponseStatsCard({ projectId }: { projectId?: string | null }) {
   const { data } = useInboundLeadResponseStats(projectId);
@@ -150,6 +160,7 @@ export function InboundLeadsPanel() {
             const showTimer = isEmergency && lead.urgency_captured_at && !lead.first_response_at;
             const canMarkResponded =
               !!lead.urgency_captured_at && !lead.first_response_at;
+            const canTriage = !lead.urgency_class;
             const promotedTarget = lead.status === "promoted"
               ? (lead.promoted_venue_id
                   ? `/project/${lead.promoted_venue_id}`
@@ -161,7 +172,7 @@ export function InboundLeadsPanel() {
             <Card
               key={lead.id}
               className={cn(
-                isEmergency && !lead.first_response_at && "border-l-4 border-l-orange-700",
+                isEmergency && !lead.first_response_at && "border-l-4 border-l-[hsl(15,73%,42%)]",
                 promotedTarget && "cursor-pointer hover:border-primary transition-colors",
               )}
               onClick={promotedTarget ? () => navigate(promotedTarget) : undefined}
@@ -203,12 +214,38 @@ export function InboundLeadsPanel() {
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{lead.message}</p>
 
+                {canTriage && (
+                  <div
+                    className="flex items-center gap-2 pt-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span className="text-xs text-muted-foreground">Set urgency:</span>
+                    <Select
+                      onValueChange={(v) =>
+                        m.setUrgency.mutate({ id: lead.id, urgency: v as UrgencyClass })
+                      }
+                      disabled={m.setUrgency.isPending}
+                    >
+                      <SelectTrigger className="h-8 w-[160px] text-xs">
+                        <SelectValue placeholder="Pick urgency…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {URGENCY_TRIAGE_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value} className="text-xs">
+                            {o.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 {canMarkResponded && (
                   <div className="pt-1">
                     <Button
                       size="sm"
                       variant={isEmergency ? "default" : "outline"}
-                      className={cn(isEmergency && "bg-orange-700 hover:bg-orange-800")}
+                      className={cn(isEmergency && "bg-[hsl(15,73%,42%)] hover:bg-[hsl(15,73%,36%)]")}
                       onClick={() => m.markResponded.mutate(lead.id)}
                       disabled={m.markResponded.isPending}
                     >
