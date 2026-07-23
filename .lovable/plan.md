@@ -1,70 +1,76 @@
-## GAUNTLET FIX — GBP snapshot insert + map-pack public_audit trigger
+# Leak Stack $0 bug — revised plan (v2)
 
-### Confirmed root causes (from direct DB + code reads this pass)
+## Root cause (verified)
+- `test plumber` → `project_type='client'` → 0 rows in `project_type_leak_vectors` → `compute-leak-stack` writes an empty run → page shows silent $0 with no explanation.
+- `home_services` is under-seeded (2 of a planned 4 vectors) and it's what the demo runs point at.
 
-**Fix 1 — CHECK constraint, not a stringification-only issue.**
-- `gbp_snapshots_scope_check` currently allows only `('daily_basics','weekly_full','manual')` — plain CHECK, not a Postgres enum.
-- `run-public-audit` invokes `gbp-sync-weekly` with `scope_override: 'public_lean'` (line 289).
-- `gbp-sync-weekly` writes `scope: 'public_lean'` directly into `gbp_snapshots` (lines 89, 117), and `_shared/gbp-fetch.ts` already declares `FetchScope = 'daily_basics' | 'weekly_full' | 'public_lean'` with a real field mask for `public_lean`.
-- Result: every public-audit GBP snapshot insert throws `23514 new row for relation "gbp_snapshots" violates check constraint "gbp_snapshots_scope_check"`. The `throw insErr` in gbp-sync-weekly catches that PostgrestError and the catch's `String(e)` renders it as `"[object Object]"` in `sync_runs.error_message`.
-- `source_check` allows `('automated','manual')` — writer sends `'automated'`, so that CHECK is fine.
-- `source_kind` has no CHECK — free text, fine.
+## Fix
 
-**Fix 2 — trigger_source coercion.**
-- `run-public-audit` invokes `map-pack-run` with `trigger_source: 'public_audit'`.
-- `map-pack-run` line 144 coerces anything not in `('cron','admin')` to `'manual'`, then requires a user bearer with a valid `sub`. The service-role JWT has no `sub` → 401 → "Map-pack ranking check degraded" and zero rows in `map_pack_run_log` / `map_pack_snapshots`.
-- Explicit single-venue path (line 195-197): when `venue_id` is passed, the query is `venues.eq('id', venueId)` with NO `is_prospect_shell` filter — so single-venue `public_audit` calls against a prospect shell will fetch the venue correctly once auth passes.
+### 1. One migration — seed `client` (4 new) + top up `home_services` (2 new) + defaults
 
-### Changes
+Uses only variable names the resolver already knows (`missed_calls`, `booking_rate`, `avg_ticket`, `open_estimates`, `close_rate`, `slow_response_leads`, `leads_unresponded`, `first_responder_advantage`) so every input resolves via signal → override → vertical_default without adding new resolver cases.
 
-**A. Migration — extend `gbp_snapshots_scope_check`**
+**A. `project_type_leak_vectors` — new rows**
 
-Drop and recreate the CHECK to add `'public_lean'` (plain text CHECK, single migration):
+`client` (all 4 new; sort_order 10/20/30/40):
 
-```sql
-ALTER TABLE public.gbp_snapshots DROP CONSTRAINT gbp_snapshots_scope_check;
-ALTER TABLE public.gbp_snapshots ADD CONSTRAINT gbp_snapshots_scope_check
-  CHECK (scope = ANY (ARRAY['daily_basics','weekly_full','manual','public_lean']));
+| # | name | severity | risk_type | detect_signal | dollarize_formula | benchmark |
+|---|---|---|---|---|---|---|
+| 1 | Missed calls | headline | captured_revenue | inbound call without answer or callback within SLA | `missed_calls * booking_rate * avg_ticket` | < 5% missed during business hours |
+| 2 | Slow first response on inbound leads | headline | captured_revenue | first_response_at > 30 min after created_at | `slow_response_leads * first_responder_advantage * avg_ticket` | 50% of buyers pick the first responder |
+| 3 | Unresponded leads sitting in queue | supporting | captured_revenue | leads with automation_status NULL or 'pending' | `leads_unresponded * close_rate * avg_ticket` | Response inside 5 min converts 8× more |
+| 4 | Unresponded emergency leads | headline | avoided_loss (risk_multiplier 1.0) | urgency_class='emergency' with NULL first_response_at | `unresponded_emergencies * emergency_avg_ticket` | Every emergency without a callback is a job walking to a competitor |
+
+`home_services` (2 new; sort_order 30/40 to sit after existing 10/20):
+
+| # | name | severity | risk_type | detect_signal | dollarize_formula | benchmark |
+|---|---|---|---|---|---|---|
+| 3 | Slow first response on inbound leads | supporting | captured_revenue | first_response_at > 30 min after created_at | `slow_response_leads * first_responder_advantage * avg_ticket` | 50% of buyers pick the first responder |
+| 4 | Unresponded emergency jobs | headline | avoided_loss (risk_multiplier 1.0) | urgency_class='emergency' with NULL first_response_at | `unresponded_emergencies * emergency_avg_ticket` | After-hours emergencies are the highest-ticket jobs — and the biggest leak when they ring out |
+
+**B. `project_types.display_defaults` — every default value visible**
+
+`client` (currently `{}`) → set to:
+```json
+{
+  "avg_ticket": 400,
+  "booking_rate": 0.30,
+  "close_rate": 0.35,
+  "missed_calls": 12,
+  "slow_response_leads": 15,
+  "first_responder_advantage": 0.30,
+  "leads_unresponded": 8,
+  "unresponded_emergencies": 2,
+  "emergency_avg_ticket": 1200
+}
 ```
 
-Values added: `'public_lean'` (matches `FetchScope` union already used in code). No other CHECKs need touching.
-
-**B. `supabase/functions/gbp-sync-weekly/index.ts` — permanent error hygiene**
-
-Line 140-141 catch: replace `msg = e instanceof Error ? e.message : String(e)` with a richer serializer so PostgrestError / plain objects render usefully:
-
-```ts
-const msg = e instanceof Error
-  ? e.message
-  : (e as any)?.message ?? (typeof e === 'object' ? JSON.stringify(e) : String(e));
+`home_services` — merge in the two new keys needed by the added vectors, leave all existing keys unchanged:
+```json
+{
+  "slow_response_leads": 15,
+  "first_responder_advantage": 0.30,
+  "unresponded_emergencies": 3,
+  "emergency_avg_ticket": 5500
+}
 ```
+(Existing keys — `avg_ticket 500`, `close_rate 0.55`, `booking_rate 0.35`, `missed_calls 18`, `open_estimates 12`, `avg_job_low/high`, `emergency_job_low/high`, `pain_hook_copy`, `hero_stat_headline` — untouched. `emergency_avg_ticket 5500` sits mid-range of the existing `emergency_job_low 3000` / `emergency_job_high 8000` band.)
 
-Kept as permanent hygiene, not just a debugging aid. Applied only in this one catch — no other behavior changes in the file.
+Migration uses `ON CONFLICT (project_type, name) DO NOTHING` for vector inserts and `display_defaults || jsonb_build_object(...)` for the type update so it's idempotent and doesn't clobber future admin edits.
 
-**C. `supabase/functions/map-pack-run/index.ts` — first-class `public_audit` trigger source**
+### 2. Empty-state on `LeakStack.tsx` — operator-worded
 
-- Line 144 replace the two-way ternary with an explicit allow-list:
-  ```ts
-  const rawTrigger = typeof body.trigger_source === 'string' ? body.trigger_source : 'manual';
-  const triggerSource: string = ['cron','admin','manual','public_audit'].includes(rawTrigger)
-    ? rawTrigger : 'manual';
-  ```
-- Auth branch (line 148): treat `public_audit` like `cron` — no user bearer required, service-role only. Explicitly verify the incoming `Authorization: Bearer <SERVICE_ROLE>` matches `SUPABASE_SERVICE_ROLE_KEY` to prevent anon callers from spoofing the flag. If it doesn't match, return 401.
-- Rate limit (line 168): `public_audit` is exempt (same as `cron`). Manual admin retries stay rate-limited.
-- Provenance: rows in `map_pack_run_log` and `map_pack_snapshots.trigger_source` (via run log) will record the truthful value `'public_audit'` — we're not masquerading as `cron`.
-- Shell handling: single-venue path is unchanged and never applies the shell filter, so the prospect shell created by `run-public-audit` will resolve.
+When `latest.results.length === 0`, replace the current silent two-$0-cards render with:
 
-**No other files changed.** No schema changes beyond the one CHECK. No RLS changes. `pageKey` unaffected. Client display copy unaffected.
+> **This project's type (`<type>`) has no money-leak checks configured yet, so nothing can be estimated.** Configure them in **Admin → Project Types**.
 
-### Verification (I run these after build)
+No "vector" jargon on-screen (kept in code/DB). Existing "No leak stack run yet" case unchanged.
 
-1. Create a NEW business via `/free-audit` — not "harbor town pub" (its recent request would serve the cached degraded state inside the 7-day dedupe window). I'll use a distinct name + website so `run-public-audit` opens a fresh `public_audit_requests` row and prospect shell.
-2. Poll `public_audit_requests.status_detail` until `status='complete'`; then query:
-   - `sync_runs` for the new shell venue — expect the GBP row `status='completed'` with a real `records_created=1` (not `[object Object]`).
-   - `gbp_snapshots` for the shell — expect one row with `scope='public_lean'` and a populated `primary_category` / `raw`.
-   - `map_pack_run_log` for `trigger_source='public_audit'` and `map_pack_snapshots` for at least one keyword row (the one-shot keyword inserted by `run-public-audit`).
-3. Report back with the exact `sync_runs.status` + `error_message`, the snapshot row's `primary_category`, and the map-pack row count. If any stage still degrades, quote the real error surfaced by the hygiene fix and stop — no further speculative patches.
+## Verify
+Rerun compute-leak-stack for test plumber; quote new `total_monthly_dollars`, `total_risk_exposure_dollars`, `top_leak_key`, and the top-3 result rows with per-variable `source` flags (expect `vertical_default` across the board since this venue has no signals yet).
 
-### Guardrails (restated)
-
-- Additive; no route or pageKey changes; no fake trigger provenance; theater flow / redaction / unlock unchanged; tsc clean.
+## Guardrails
+- Additive; no resolver changes, no new variable cases.
+- No dollar-math in the renderer.
+- Migration idempotent (`ON CONFLICT DO NOTHING` + JSONB merge).
+- tsc clean.

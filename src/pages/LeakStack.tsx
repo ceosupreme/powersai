@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { ProposalBuilderDialog } from '@/components/proposals/ProposalBuilderDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export default function LeakStack() {
   const { data: venues = [], isLoading: venuesLoading } = useVenues();
@@ -27,6 +29,17 @@ export default function LeakStack() {
 
   const captured = useMemo(() => (latest?.results ?? []).filter(r => r.risk_type !== 'avoided_loss'), [latest]);
   const risk = useMemo(() => (latest?.results ?? []).filter(r => r.risk_type === 'avoided_loss'), [latest]);
+
+  const { data: projectType } = useQuery({
+    queryKey: ['venue-project-type', effectiveVenueId],
+    enabled: !!effectiveVenueId,
+    queryFn: async () => {
+      const { data } = await supabase.from('venues').select('project_type').eq('id', effectiveVenueId!).maybeSingle();
+      return (data as any)?.project_type ?? null;
+    },
+  });
+
+  const hasResults = (latest?.results?.length ?? 0) > 0;
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6 pb-24">
@@ -76,6 +89,15 @@ export default function LeakStack() {
           <CardContent className="py-12 text-center space-y-2">
             <p className="text-muted-foreground">No leak stack run yet for this project.</p>
             <p className="text-xs text-muted-foreground">Click Run to compute — estimates are shown per leak with input basis.</p>
+          </CardContent>
+        </Card>
+      ) : !hasResults ? (
+        <Card>
+          <CardContent className="py-12 text-center space-y-2">
+            <p className="text-sm">
+              This project's type{projectType ? <> (<span className="font-mono">{projectType}</span>)</> : ''} has no money-leak checks configured yet, so nothing can be estimated.
+            </p>
+            <p className="text-xs text-muted-foreground">Configure them in Admin → Project Types.</p>
           </CardContent>
         </Card>
       ) : (
