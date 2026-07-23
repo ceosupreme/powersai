@@ -15,6 +15,7 @@ import { VenueOnboardingWizard } from '@/components/onboarding/VenueOnboardingWi
 import { VenueLiveBadge } from '@/components/onboarding/VenueLiveBadge';
 import { ProjectCaptureLinkCard } from '@/components/onboarding/ProjectCaptureLinkCard';
 import { EmailDeliveryModeCard } from '@/components/onboarding/EmailDeliveryModeCard';
+import { ProposalsListCard } from '@/components/proposals/ProposalsListCard';
 import { useVenueOnboardingDetectors } from '@/hooks/useVenueOnboardingDetectors';
 import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
@@ -166,6 +167,14 @@ export default function ProjectHome() {
       )}
 
       {canRunWizard && <EmailDeliveryModeCard projectId={meta.id} />}
+
+      {canRunWizard && (
+        <ProposalsListCard
+          companyId={null}
+          venueId={meta.id}
+          defaultProspectName={meta.name}
+        />
+      )}
 
       {/* Quick links to project-scoped surfaces */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
