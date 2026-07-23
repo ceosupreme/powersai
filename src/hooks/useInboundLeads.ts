@@ -123,6 +123,23 @@ export function useInboundLeadMutations() {
       },
       onSuccess: inv,
     }),
+    setUrgency: useMutation({
+      // Operator-side triage for leads the intake path lost (e.g. form race
+      // that dropped urgency_class). Only stamps when currently NULL, so we
+      // never overwrite a validated intake-time classification.
+      mutationFn: async ({ id, urgency }: { id: string; urgency: UrgencyClass }) => {
+        const { error } = await supabase
+          .from("inbound_leads")
+          .update({
+            urgency_class: urgency,
+            urgency_captured_at: new Date().toISOString(),
+          })
+          .eq("id", id)
+          .is("urgency_class", null);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+    }),
     markReviewed: useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
