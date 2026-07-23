@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { ProposalBuilderDialog } from '@/components/proposals/ProposalBuilderDialog';
+import { ProposalsListCard } from '@/components/proposals/ProposalsListCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -21,6 +22,7 @@ export default function LeakStack() {
   const effectiveVenueId = venueId ?? venues[0]?.id ?? null;
   const { isAdmin } = useAuth();
   const [proposalOpen, setProposalOpen] = useState(false);
+  const [pendingPreviewId, setPendingPreviewId] = useState<string | null>(null);
   const activeVenue = venues.find((v) => v.id === effectiveVenueId) ?? null;
 
   const { data: latest, isLoading: latestLoading } = useLatestLeakStackRun(effectiveVenueId);
@@ -79,6 +81,7 @@ export default function LeakStack() {
           companyId={null}
           venueId={effectiveVenueId}
           defaultProspectName={activeVenue?.name ?? ''}
+          onCreated={(row) => setPendingPreviewId(row.id)}
         />
       )}
 
@@ -138,6 +141,16 @@ export default function LeakStack() {
               <h2 className="text-lg font-semibold flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-amber-500" /> Avoided-loss exposure</h2>
               {risk.map((r, i) => <LeakCard key={r.name + i} result={r} />)}
             </section>
+          )}
+
+          {effectiveVenueId && (
+            <ProposalsListCard
+              companyId={null}
+              venueId={effectiveVenueId}
+              defaultProspectName={activeVenue?.name ?? ''}
+              openPreviewId={pendingPreviewId}
+              onPreviewConsumed={() => setPendingPreviewId(null)}
+            />
           )}
         </>
       )}
