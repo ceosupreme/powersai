@@ -46,6 +46,7 @@ export async function fetchEffectiveQualifierFields(
 export interface QualifierConfig {
   ready_definition: string | null;
   primary_channel: QualifierChannel | null;
+  urgency_options: Record<string, { label: string; guidance: string }> | null;
 }
 
 /** Fetch the per-type qualifier config (ready_definition + primary_channel). */
@@ -54,7 +55,7 @@ export async function fetchQualifierConfig(
 ): Promise<QualifierConfig | null> {
   const { data } = await (supabase as any)
     .from('project_type_qualifier_config')
-    .select('ready_definition,primary_channel')
+    .select('ready_definition,primary_channel,urgency_options')
     .eq('project_type', projectType)
     .maybeSingle();
   return (data as QualifierConfig) ?? null;
