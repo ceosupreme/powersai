@@ -103,6 +103,18 @@ Deno.serve(async (req) => {
   const urgency_class = normalizeUrgency(urgencyRaw);
   const urgency_captured_at = urgency_class ? new Date().toISOString() : null;
 
+  // Silent-drop visibility: lead is still saved (guardrail stands), but any
+  // non-canonical urgency value now shows up in edge logs so classifier /
+  // config mismatches stop being invisible.
+  if (urgencyRaw != null && urgencyRaw !== "" && urgency_class === null) {
+    console.warn("[submit-inbound-lead] dropped non-canonical urgency", {
+      raw: urgencyRaw,
+      project_type: project_type ?? null,
+      conversation_channel: conversation_channel ?? null,
+      captured_for_project_id: captured_for_project_id ?? null,
+    });
+  }
+
   // Either email or phone is required so we can actually contact the lead.
   if (!email && !phone) {
     return new Response(JSON.stringify({ error: "Email or phone is required" }), {
