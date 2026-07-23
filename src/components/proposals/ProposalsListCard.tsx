@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sparkles, Printer, ArrowLeft, Send, Undo2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { useRole } from '@/context/RoleContext';
 import { useProposals, useProposalMutations } from '@/hooks/useProposals';
 import { useLatestLeakStackRun } from '@/hooks/useLeakStack';
 import { ProposalBuilderDialog } from './ProposalBuilderDialog';
@@ -15,23 +16,41 @@ export function ProposalsListCard({
   companyId,
   venueId,
   defaultProspectName,
+  openPreviewId,
+  onPreviewConsumed,
 }: {
   companyId: string | null;
   venueId: string | null;
   defaultProspectName: string;
+  /** When set, opens the preview dialog on the matching row once it loads. */
+  openPreviewId?: string | null;
+  onPreviewConsumed?: () => void;
 }) {
   const { isAdmin } = useAuth();
+  const { currentRole } = useRole();
   const proposalsQ = useProposals({ companyId, venueId });
   const { setStatus, remove } = useProposalMutations();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [preview, setPreview] = useState<ProposalRow | null>(null);
   const runQ = useLatestLeakStackRun(preview?.venue_id ?? venueId);
 
-  // Non-admins: RLS blocks writes and (for company-only rows) reads.
-  // Also hide the entire card unless there is something to show, so the surface
-  // isn't advertised to non-admins.
   const rows = proposalsQ.data ?? [];
-  if (!isAdmin && rows.length === 0) return null;
+
+  // Sales documents never render for the client role, regardless of what RLS
+  // returned. Only admin/owner surfaces show proposals — no incidental gating.
+  const canSeeProposals = isAdmin || currentRole === 'owner';
+
+  // Auto-open the preview when the parent asks (post-save flow from builder).
+  useEffect(() => {
+    if (!openPreviewId || !canSeeProposals) return;
+    const match = rows.find((r) => r.id === openPreviewId);
+    if (match) {
+      setPreview(match);
+      onPreviewConsumed?.();
+    }
+  }, [openPreviewId, rows, canSeeProposals, onPreviewConsumed]);
+
+  if (!canSeeProposals) return null;
 
   return (
     <section className="space-y-2">
