@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, Trash2, Sparkles } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Plus, Trash2, Sparkles, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLatestLeakStackRun } from '@/hooks/useLeakStack';
 import { useServicePackages } from '@/hooks/useServicePackages';
@@ -62,10 +63,14 @@ export function ProposalBuilderDialog({
   const [manualLeaks, setManualLeaks] = useState<ManualLeak[]>([]);
   const [packageId, setPackageId] = useState<string>('');
   const [priceDisplay, setPriceDisplay] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Sync prospect name to prop
   useEffect(() => {
-    if (open) setProspectName(defaultProspectName);
+    if (open) {
+      setProspectName(defaultProspectName);
+      setSubmitError(null);
+    }
   }, [open, defaultProspectName]);
 
   // Resolve footprint → default engines
@@ -120,6 +125,7 @@ export function ProposalBuilderDialog({
   const chosenPackage = useMemo(() => packages.find((p) => p.id === packageId) ?? null, [packages, packageId]);
 
   const submit = async () => {
+    setSubmitError(null);
     const content: ProposalContent = {
       intro_line: introLine.trim(),
       prospect_name: prospectName.trim() || defaultProspectName,
@@ -143,7 +149,17 @@ export function ProposalBuilderDialog({
       onCreated?.(row);
       onOpenChange(false);
     } catch (e: any) {
-      toast.error(e.message ?? 'Failed to save');
+      // Persistent inline error; keep dialog open, preserve all state.
+      const code = e?.code as string | undefined;
+      let msg: string;
+      if (code === 'no_session') {
+        msg = 'Your session expired. Sign in again, then save.';
+      } else if (code === '42501') {
+        msg = "You don't have permission to save proposals here. This action requires an admin role.";
+      } else {
+        msg = `Save failed: ${e?.message ?? 'Unknown error'}`;
+      }
+      setSubmitError(msg);
     }
   };
 
@@ -159,6 +175,12 @@ export function ProposalBuilderDialog({
         </DialogHeader>
 
         <div className="space-y-5 py-2">
+          {submitError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{submitError}</AlertDescription>
+            </Alert>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Prospect name (on document)</Label>
