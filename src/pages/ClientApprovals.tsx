@@ -163,6 +163,8 @@ function ApprovalCard({ item }: { item: QueueItem }) {
           size="lg"
           className="min-h-11"
           disabled={disabled}
+          title="Flag — ask us to review"
+          aria-label="Flag — ask us to review this message"
           onClick={async () => {
             try { await flag.mutateAsync(item.id); toast.success("Flagged for review"); }
             catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
@@ -175,6 +177,8 @@ function ApprovalCard({ item }: { item: QueueItem }) {
           size="lg"
           className="min-h-11"
           disabled={disabled}
+          title="Skip — don't send this one"
+          aria-label="Skip — don't send this message"
           onClick={async () => {
             try {
               await reject.mutateAsync({ id: item.id, reason: "client_skipped" });
@@ -185,7 +189,14 @@ function ApprovalCard({ item }: { item: QueueItem }) {
           <XIcon className="mr-2 h-4 w-4" /> Skip
         </Button>
         {!editing ? (
-          <Button variant="secondary" size="lg" className="min-h-11" onClick={() => setEditing(true)}>
+          <Button
+            variant="secondary"
+            size="lg"
+            className="min-h-11"
+            title="Edit — change wording first"
+            aria-label="Edit wording before approving"
+            onClick={() => setEditing(true)}
+          >
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </Button>
         ) : null}
@@ -193,6 +204,8 @@ function ApprovalCard({ item }: { item: QueueItem }) {
           size="lg"
           className="min-h-11"
           disabled={disabled}
+          title="Approve — send this message"
+          aria-label="Approve and send this message"
           onClick={async () => {
             try {
               await approve.mutateAsync({
