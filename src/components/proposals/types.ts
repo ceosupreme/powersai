@@ -21,12 +21,27 @@ export interface ManualLeak {
   monthly_dollars: number | null;
   note?: string;
   manual: true;
+  /** Optional. Manual leaks default to captured revenue if unset. */
+  risk_type?: 'captured_revenue' | 'avoided_loss';
+}
+
+/** Line item identifier persisted on a proposal. */
+export interface SelectedLeak {
+  /** Matches LeakStackResult.name — same display-string vocabulary that top_leak_key uses. */
+  name: string;
+  risk_type: 'captured_revenue' | 'avoided_loss';
 }
 
 export interface ProposalContent {
   intro_line: string;
   prospect_name: string;
-  selected_leak_keys: string[];
+  /**
+   * Legacy shape (pre-risk-split): array of display-name strings, all captured_revenue.
+   * Kept for backward-read of saved proposals. Do not write.
+   */
+  selected_leak_keys?: string[];
+  /** Current shape: name + risk_type per line item. */
+  selected_leaks?: SelectedLeak[];
   manual_leaks: ManualLeak[];
   engines_included: EngineKey[];
   package_id: string | null;
