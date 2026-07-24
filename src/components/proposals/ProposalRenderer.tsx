@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { SOURCE_LABEL } from '@/lib/leakStackFormat';
 import type { LeakStackResult, LeakStackRun } from '@/hooks/useLeakStack';
-import type { ProposalContent, ProposalRow } from './types';
+import type { ProposalContent, ProposalRow, SelectedLeak } from './types';
 import { ENGINE_LABEL } from './types';
 import './print.css';
 
@@ -30,9 +30,9 @@ function useProposalFonts() {
   }, []);
 }
 
-function summarizeInputsBasis(run: LeakStackRun | null | undefined, selectedKeys: string[]): string {
+function summarizeInputsBasis(run: LeakStackRun | null | undefined, selectedNames: string[]): string {
   if (!run) return '';
-  const selected = run.results.filter((r) => selectedKeys.includes(r.name));
+  const selected = run.results.filter((r) => selectedNames.includes(r.name));
   const sources = new Set<string>();
   for (const r of selected.length ? selected : run.results) {
     for (const inp of r.inputs) {
@@ -44,6 +44,25 @@ function summarizeInputsBasis(run: LeakStackRun | null | undefined, selectedKeys
   return `Estimates — basis: ${list.join(', ')}. A live install uses your numbers.`;
 }
 
+/**
+ * Normalize legacy `selected_leak_keys` (name strings) into the current
+ * `selected_leaks` shape. Legacy proposals predate the risk split — they
+ * are all captured_revenue. Confirmed: saved rows carry display-name
+ * strings that match `leak_stack_runs.results[].name` verbatim (same
+ * vocabulary `top_leak_key` uses).
+ */
+function resolveSelectedLeaks(content: ProposalContent): SelectedLeak[] {
+  if (content.selected_leaks && content.selected_leaks.length >= 0 && Array.isArray(content.selected_leaks)) {
+    return content.selected_leaks;
+  }
+  const legacy = content.selected_leak_keys ?? [];
+  return legacy.map((name) => ({ name, risk_type: 'captured_revenue' }));
+}
+
+function sumDollars(rows: { monthly_dollars: number | null }[]): number {
+  return rows.reduce((sum, r) => sum + (r.monthly_dollars ?? 0), 0);
+}
+
 function LeakLedger({
   content,
   run,
@@ -52,66 +71,120 @@ function LeakLedger({
   run: LeakStackRun | null | undefined;
 }) {
   const runResults = run?.results ?? [];
-  const chosen: LeakStackResult[] = runResults.filter((r) =>
-    content.selected_leak_keys.includes(r.name),
-  );
-  const captured = chosen.filter((r) => r.risk_type !== 'avoided_loss');
-  const avoided = chosen.filter((r) => r.risk_type === 'avoided_loss');
+  const selected = resolveSelectedLeaks(content);
+  const selectedNames = selected.map((s) => s.name);
+
+  // Join by display name — legacy strings ARE display names.
+  // Fall back to the selected record's risk_type if the run row is missing
+  // (defensive: run could have been re-computed and re-shaped).
+  const chosen: (LeakStackResult & { _risk: 'captured_revenue' | 'avoided_loss' })[] = selected
+    .map((s) => {
+      const row = runResults.find((r) => r.name === s.name);
+      if (!row) return null;
+      return { ...row, _risk: s.risk_type ?? row.risk_type };
+    })
+    .filter((x): x is LeakStackResult & { _risk: 'captured_revenue' | 'avoided_loss' } => !!x);
+
+  const captured = chosen.filter((r) => r._risk !== 'avoided_loss');
+  const avoided = chosen.filter((r) => r._risk === 'avoided_loss');
+
   const manual = content.manual_leaks ?? [];
-  const footnote = summarizeInputsBasis(run, content.selected_leak_keys);
+  const manualCaptured = manual.filter((m) => m.risk_type !== 'avoided_loss');
+  const manualAvoided = manual.filter((m) => m.risk_type === 'avoided_loss');
+
+  const capturedSubtotal = sumDollars(captured) + sumDollars(manualCaptured);
+  const avoidedSubtotal = sumDollars(avoided) + sumDollars(manualAvoided);
+  const hasAvoided = avoided.length > 0 || manualAvoided.length > 0;
+
+  const baseFootnote = summarizeInputsBasis(run, selectedNames);
+  const riskNote = hasAvoided
+    ? ' Risk exposure figures represent losses you avoid, not new revenue, and are kept separate on purpose.'
+    : '';
+  const footnote = baseFootnote + riskNote;
 
   return (
     <section className="proposal-avoid-break">
       <div className="proposal-eyebrow mb-2">The leak ledger</div>
-      <div className="proposal-card p-5 space-y-1">
-        {captured.length === 0 && manual.length === 0 && avoided.length === 0 && (
+      {captured.length === 0 && manualCaptured.length === 0 && !hasAvoided && (
+        <div className="proposal-card p-5">
           <div className="text-sm proposal-ink-muted italic">No leaks selected yet.</div>
-        )}
+        </div>
+      )}
 
-        {captured.map((r) => (
-          <div key={r.name} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2 last:border-0">
-            <div className="min-w-0">
-              <div className="text-base proposal-forest font-medium">{r.name}</div>
-              {r.benchmark && <div className="text-xs proposal-ink-muted">{r.benchmark}</div>}
+      {(captured.length > 0 || manualCaptured.length > 0) && (
+        <div className="proposal-card p-5 space-y-1">
+          <div className="proposal-eyebrow mb-1">Recoverable revenue</div>
+          {captured.map((r) => (
+            <div key={r.name} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2">
+              <div className="min-w-0">
+                <div className="text-base proposal-forest font-medium">{r.name}</div>
+                {r.benchmark && <div className="text-xs proposal-ink-muted">{r.benchmark}</div>}
+              </div>
+              <div className="proposal-money text-xl whitespace-nowrap">
+                {fmtMoney(r.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+              </div>
             </div>
-            <div className="proposal-money text-xl whitespace-nowrap">
-              {fmtMoney(r.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+          ))}
+          {manualCaptured.map((m, i) => (
+            <div key={`mc-${i}`} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2">
+              <div className="min-w-0">
+                <div className="text-base proposal-forest font-medium">
+                  {m.name}
+                  <span className="proposal-manual-pill">provided manually</span>
+                </div>
+                {m.note && <div className="text-xs proposal-ink-muted">{m.note}</div>}
+              </div>
+              <div className="proposal-money text-xl whitespace-nowrap">
+                {fmtMoney(m.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-baseline justify-between gap-4 pt-3">
+            <div className="proposal-eyebrow">Recoverable subtotal</div>
+            <div className="proposal-money text-2xl whitespace-nowrap">
+              {fmtMoney(capturedSubtotal)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
             </div>
           </div>
-        ))}
+        </div>
+      )}
 
-        {manual.map((m, i) => (
-          <div key={`m-${i}`} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2 last:border-0">
-            <div className="min-w-0">
-              <div className="text-base proposal-forest font-medium">
-                {m.name}
-                <span className="proposal-manual-pill">provided manually</span>
+      {hasAvoided && (
+        <div className="proposal-card p-5 space-y-1 mt-4" style={{ borderLeft: '4px solid #C9A24B' }}>
+          <div className="proposal-eyebrow mb-1">Risk exposure — losses you can avoid</div>
+          {avoided.map((r) => (
+            <div key={r.name} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2">
+              <div className="min-w-0">
+                <div className="text-base proposal-forest font-medium">{r.name}</div>
+                {r.benchmark && <div className="text-xs proposal-ink-muted">{r.benchmark}</div>}
               </div>
-              {m.note && <div className="text-xs proposal-ink-muted">{m.note}</div>}
+              <div className="proposal-money text-xl whitespace-nowrap">
+                {fmtMoney(r.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+              </div>
             </div>
-            <div className="proposal-money text-xl whitespace-nowrap">
-              {fmtMoney(m.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+          ))}
+          {manualAvoided.map((m, i) => (
+            <div key={`ma-${i}`} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2">
+              <div className="min-w-0">
+                <div className="text-base proposal-forest font-medium">
+                  {m.name}
+                  <span className="proposal-manual-pill">provided manually</span>
+                </div>
+                {m.note && <div className="text-xs proposal-ink-muted">{m.note}</div>}
+              </div>
+              <div className="proposal-money text-xl whitespace-nowrap">
+                {fmtMoney(m.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-baseline justify-between gap-4 pt-3">
+            <div className="proposal-eyebrow">Risk exposure subtotal</div>
+            <div className="proposal-money text-2xl whitespace-nowrap">
+              {fmtMoney(avoidedSubtotal)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
             </div>
           </div>
-        ))}
+        </div>
+      )}
 
-        {avoided.length > 0 && (
-          <>
-            <div className="proposal-eyebrow mt-4 mb-1">Avoided-loss exposure</div>
-            {avoided.map((r) => (
-              <div key={r.name} className="flex items-baseline justify-between gap-4 border-b proposal-rule py-2 last:border-0">
-                <div className="min-w-0">
-                  <div className="text-base proposal-forest font-medium">{r.name}</div>
-                  {r.benchmark && <div className="text-xs proposal-ink-muted">{r.benchmark}</div>}
-                </div>
-                <div className="proposal-money text-xl whitespace-nowrap">
-                  {fmtMoney(r.monthly_dollars)}<span className="proposal-ink-muted text-xs font-normal proposal-mono"> /mo</span>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
       {footnote && <div className="proposal-eyebrow mt-2 normal-case tracking-normal" style={{ letterSpacing: 0, textTransform: 'none' }}>{footnote}</div>}
     </section>
   );
