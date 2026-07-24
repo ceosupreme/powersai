@@ -3,6 +3,8 @@ export interface LaunchChecklistItem {
   title: string;
   description: string;
   link?: { to: string; label: string };
+  /** Optional inline widget key mounted next to the description. */
+  inline?: "apply_bundle";
 }
 
 export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
@@ -59,6 +61,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     title: "Apply an Automation Bundle to the project",
     description: "Bundles are a packaged set of automations (follow-up, reactivation, review requests). Apply one in Admin → Automation Bundles so AI starts drafting messages for this project.",
     link: { to: "/admin?tab=automation-bundles", label: "Open Automation Bundles" },
+    inline: "apply_bundle",
   },
   {
     key: "setup:review-automation-inbox",

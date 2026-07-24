@@ -5,9 +5,13 @@ import { Rocket, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LAUNCH_CHECKLIST } from "@/config/launchChecklist";
 import { useChecklist } from "@/hooks/useChecklist";
+import { ApplyBundleControl } from "@/components/automations/ApplyBundleControl";
+import { useApp } from "@/context/AppContext";
 
 export default function LaunchChecklist() {
   const { isComplete, toggle, isLoading } = useChecklist();
+  const { selectedBar } = useApp();
+  const projectId = selectedBar?.id ?? null;
   const total = LAUNCH_CHECKLIST.length;
   const done = LAUNCH_CHECKLIST.filter((i) => isComplete(i.key)).length;
   const pct = total === 0 ? 0 : Math.round((done / total) * 100);
@@ -51,6 +55,11 @@ export default function LaunchChecklist() {
                 <div className="flex-1 space-y-1">
                   <div className={`font-medium text-sm ${checked ? "line-through" : ""}`}>{item.title}</div>
                   <div className="text-sm text-muted-foreground">{item.description}</div>
+                  {item.inline === "apply_bundle" && projectId && (
+                    <div className="pt-2">
+                      <ApplyBundleControl projectId={projectId} />
+                    </div>
+                  )}
                   {item.link && (
                     <Button asChild variant="link" size="sm" className="h-auto p-0 text-xs">
                       <Link to={item.link.to}>

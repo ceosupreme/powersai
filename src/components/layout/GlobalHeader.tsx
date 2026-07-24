@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
@@ -20,7 +20,7 @@ import { NotificationPanel } from '@/components/staff/NotificationPanel';
 import { GlobalSearchModal } from '@/components/shared/GlobalSearchModal';
 import { useUnreadCounts } from '@/hooks/useUnreadCounts';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { QuickCaptureButton } from '@/components/inbox/QuickCaptureButton';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
@@ -29,6 +29,19 @@ interface GlobalHeaderProps {
   showDateSelector?: boolean;
   forceHideVenueSelector?: boolean;
 }
+
+// Only these routes actually consume selectedWeek. Everywhere else the
+// selector is dead UI, so keep it hidden to avoid the illusion of scope.
+const WEEK_SCOPED_EXACT = new Set<string>([
+  '/dashboard',
+  '/weekly-review',
+  '/guest-experience',
+  '/social',
+  '/marketing',
+  '/workspace',
+  '/portfolio',
+]);
+const WEEK_SCOPED_PREFIX = ['/pillar/'];
 
 const formatWeekLabel = (week: { week_start: string; week_end: string }) => {
   try {
@@ -44,11 +57,20 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
   const { accessibleBars, weeks, selectedBar, selectedWeek, setSelectedBar, setSelectedWeek } = useApp();
   const { profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { currentRole, currentVenue, setCurrentVenue } = useRole();
   const { totalUnread } = useUnreadCounts();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
+
+  const routeConsumesWeek = useMemo(
+    () =>
+      WEEK_SCOPED_EXACT.has(pathname) ||
+      WEEK_SCOPED_PREFIX.some((p) => pathname.startsWith(p)),
+    [pathname],
+  );
+  const shouldShowDateSelector = showDateSelector && routeConsumesWeek;
 
   // Cmd+K / Ctrl+K shortcut
   useEffect(() => {
@@ -127,7 +149,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
         </div>
 
         <div className="flex items-center gap-1 md:gap-3 shrink-0">
-          {showDateSelector && (
+          {shouldShowDateSelector && (
             <Select
               value={selectedWeek?.id || ''}
               onValueChange={(value) => {

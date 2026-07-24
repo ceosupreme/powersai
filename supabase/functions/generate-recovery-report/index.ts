@@ -254,7 +254,8 @@ RULES:
 - Activity counts are FACTS. State them plainly.
 - Dollar figures are ESTIMATES against the client's own averages. Always prefix with "est." and reference the basis.
 - NEVER say "we earned you", "we made you", or imply guaranteed revenue. Use "captured", "re-engaged", "at work", "in motion".
-- 3–5 sentences max. Plain language. No marketing fluff. No emojis.`;
+- 3–5 sentences max. Plain language. No marketing fluff. No emojis.
+- End every sentence with a period, exclamation, or question mark. Never end on an incomplete clause, a trailing conjunction (but, and, so, because, however), or an ellipsis. If a thought can't finish inside the sentence limit, cut it.`;
 
   const user = `Project: ${venueName}
 Week: ${weekStart} → ${weekEnd}
