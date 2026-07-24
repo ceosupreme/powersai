@@ -52,7 +52,9 @@ export function ProposalBuilderDialog({
   const run = runQ.data ?? null;
 
   const [prospectName, setProspectName] = useState(defaultProspectName);
-  const [introLine, setIntroLine] = useState('');
+  const [introLine, setIntroLine] = useState(
+    "After running your numbers, here's what we found — and what it's costing you.",
+  );
   const [nextStepLine, setNextStepLine] = useState(
     "Reply to this proposal and I'll open a 20-minute install kickoff.",
   );
