@@ -23,6 +23,7 @@ import {
   type ManualLeak,
   type ProposalContent,
   type ProposalRow,
+  type SelectedLeak,
 } from './types';
 import { formatDollars } from '@/lib/leakStackFormat';
 
@@ -61,7 +62,7 @@ export function ProposalBuilderDialog({
   const [footprint, setFootprint] = useState<FootprintKey | null>(null);
   const [footprintTouched, setFootprintTouched] = useState(false);
   const [engines, setEngines] = useState<EngineKey[]>(['acquisition']);
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [selectedLeaks, setSelectedLeaks] = useState<SelectedLeak[]>([]);
   const [manualLeaks, setManualLeaks] = useState<ManualLeak[]>([]);
   const [packageId, setPackageId] = useState<string>('');
   const [priceDisplay, setPriceDisplay] = useState('');
@@ -83,18 +84,15 @@ export function ProposalBuilderDialog({
     }
   }, [footprintQ.data, footprintTouched]);
 
-  // Preselect top 3 leaks (headline first, then $)
+  // Preload ALL rows from the run. Default checked when monthly_dollars > 0; unchecked at 0/null.
+  // Sort: headline first, then $ desc — avoided_loss included in the sort.
   useEffect(() => {
-    if (!run || selectedKeys.length > 0) return;
-    const captured = run.results.filter((r) => r.risk_type !== 'avoided_loss');
-    const sorted = [...captured].sort((a, b) => {
-      const ah = a.severity === 'headline' ? 1 : 0;
-      const bh = b.severity === 'headline' ? 1 : 0;
-      if (ah !== bh) return bh - ah;
-      return (b.monthly_dollars ?? 0) - (a.monthly_dollars ?? 0);
-    });
-    setSelectedKeys(sorted.slice(0, 3).map((r) => r.name));
-  }, [run, selectedKeys.length]);
+    if (!run || selectedLeaks.length > 0) return;
+    const preselected = run.results
+      .filter((r) => (r.monthly_dollars ?? 0) > 0)
+      .map<SelectedLeak>((r) => ({ name: r.name, risk_type: r.risk_type }));
+    setSelectedLeaks(preselected);
+  }, [run, selectedLeaks.length]);
 
   // Preselect package by footprint
   useEffect(() => {
@@ -112,8 +110,13 @@ export function ProposalBuilderDialog({
   const toggleEngine = (e: EngineKey) =>
     setEngines((cur) => (cur.includes(e) ? cur.filter((x) => x !== e) : [...cur, e]));
 
-  const toggleLeak = (name: string) =>
-    setSelectedKeys((cur) => (cur.includes(name) ? cur.filter((k) => k !== name) : [...cur, name]));
+  const isLeakSelected = (name: string) => selectedLeaks.some((l) => l.name === name);
+  const toggleLeak = (name: string, risk_type: 'captured_revenue' | 'avoided_loss') =>
+    setSelectedLeaks((cur) =>
+      cur.some((l) => l.name === name)
+        ? cur.filter((l) => l.name !== name)
+        : [...cur, { name, risk_type }],
+    );
 
   const addManual = () =>
     setManualLeaks((cur) => [...cur, { name: '', monthly_dollars: null, manual: true }]);
@@ -131,7 +134,7 @@ export function ProposalBuilderDialog({
     const content: ProposalContent = {
       intro_line: introLine.trim(),
       prospect_name: prospectName.trim() || defaultProspectName,
-      selected_leak_keys: selectedKeys,
+      selected_leaks: selectedLeaks,
       manual_leaks: manualLeaks.filter((m) => m.name.trim().length > 0),
       engines_included: engines,
       package_id: packageId || null,
@@ -165,7 +168,9 @@ export function ProposalBuilderDialog({
     }
   };
 
-  const captured = (run?.results ?? []).filter((r) => r.risk_type !== 'avoided_loss');
+  const allRows = run?.results ?? [];
+  const capturedRows = allRows.filter((r) => r.risk_type !== 'avoided_loss');
+  const avoidedRows = allRows.filter((r) => r.risk_type === 'avoided_loss');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -260,20 +265,60 @@ export function ProposalBuilderDialog({
                 No leak stack run for this project yet — using manual leaks only. Run a leak stack computation first for real numbers.
               </div>
             ) : (
-              <div className="space-y-1 max-h-60 overflow-y-auto pr-1">
-                {captured.map((r) => (
-                  <label key={r.name} className="flex items-center justify-between gap-2 p-2 rounded border border-border cursor-pointer">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Checkbox
-                        checked={selectedKeys.includes(r.name)}
-                        onCheckedChange={() => toggleLeak(r.name)}
-                      />
-                      <span className="text-sm truncate">{r.name}</span>
-                      {r.severity === 'headline' && <Badge variant="destructive" className="text-[9px]">headline</Badge>}
+              <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                    Recoverable revenue
+                  </div>
+                  <div className="space-y-1">
+                    {capturedRows.length === 0 && (
+                      <div className="text-[11px] italic text-muted-foreground px-1">
+                        No recoverable-revenue rows in this run.
+                      </div>
+                    )}
+                    {capturedRows.map((r) => (
+                      <label key={r.name} className="flex items-center justify-between gap-2 p-2 rounded border border-border cursor-pointer">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Checkbox
+                            checked={isLeakSelected(r.name)}
+                            onCheckedChange={() => toggleLeak(r.name, 'captured_revenue')}
+                          />
+                          <span className="text-sm truncate">{r.name}</span>
+                          {r.severity === 'headline' && <Badge variant="destructive" className="text-[9px]">headline</Badge>}
+                        </div>
+                        <span className="text-xs font-mono tabular-nums">{formatDollars(r.monthly_dollars)}/mo</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                {avoidedRows.length > 0 && (
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                      Risk exposure — losses you can avoid
                     </div>
-                    <span className="text-xs font-mono tabular-nums">{formatDollars(r.monthly_dollars)}/mo</span>
-                  </label>
-                ))}
+                    <div className="space-y-1">
+                      {avoidedRows.map((r) => (
+                        <label key={r.name} className="flex items-center justify-between gap-2 p-2 rounded border border-border cursor-pointer">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Checkbox
+                              checked={isLeakSelected(r.name)}
+                              onCheckedChange={() => toggleLeak(r.name, 'avoided_loss')}
+                            />
+                            <span className="text-sm truncate">{r.name}</span>
+                            <Badge
+                              variant="outline"
+                              className="text-[9px] border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                            >
+                              risk
+                            </Badge>
+                            {r.severity === 'headline' && <Badge variant="destructive" className="text-[9px]">headline</Badge>}
+                          </div>
+                          <span className="text-xs font-mono tabular-nums">{formatDollars(r.monthly_dollars)}/mo</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
