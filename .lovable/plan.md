@@ -1,76 +1,58 @@
-# Leak Stack $0 bug — revised plan (v2)
+## Diagnosis
 
-## Root cause (verified)
-- `test plumber` → `project_type='client'` → 0 rows in `project_type_leak_vectors` → `compute-leak-stack` writes an empty run → page shows silent $0 with no explanation.
-- `home_services` is under-seeded (2 of a planned 4 vectors) and it's what the demo runs point at.
+**Handler flow in `src/pages/ResetPassword.tsx` (`handleSubmit` + companion `useEffect`):**
+
+```ts
+const { error: updErr } = await supabase.auth.updateUser({ password });
+if (updErr) { setSubmitting(false); setError(...); return; }
+toast.success('Password set. Welcome in.');
+try { await refreshRoles(); } catch {}
+pendingNavRef.current = true;    // <-- ref, not state
+// then a separate useEffect is supposed to navigate when currentRole settles
+```
+
+The companion effect is keyed on `[currentRole, roleLoading, navigate]`. It only fires when one of those changes. But by the time the user submits the form on the reset screen, `RoleContext.loadRoles` has already run once for this session (the recovery link established the session on mount, and `RoleProvider`'s effect already resolved `currentRole` and set `isLoading=false`). So after `refreshRoles()`:
+
+- `currentRole` is the same value it already was → no change.
+- `roleLoading` goes true→false→true→false during `loadRoles`, but only if the state values actually differ per set call; in practice both start and end at `false` for an already-loaded role, so React bails on identical values.
+- Setting `pendingNavRef.current = true` does NOT trigger a re-render, so the effect never re-evaluates.
+
+Result: `submitting` stays `true` forever, the 2s fallback timer inside the effect is never scheduled, and no navigation fires. The password update itself resolved successfully (why sign-in with the new password works, and why "Back to sign in" lands them in-app — the recovery session is fully valid).
+
+**Auth event sequence actually observed:** recovery link → GoTrue exchanges the token, `onAuthStateChange` fires `SIGNED_IN` on mount (before submit), `getSession()` returns a valid session, `RoleProvider` loads role. On `updateUser`, GoTrue fires `USER_UPDATED` (and often another `TOKEN_REFRESHED`) — neither changes `currentRole`, so the gated effect is a dead-end.
+
+No console errors during repro; the promise resolves, nothing throws.
 
 ## Fix
 
-### 1. One migration — seed `client` (4 new) + top up `home_services` (2 new) + defaults
+Rewrite the post-save path in `ResetPassword.tsx` to navigate imperatively instead of via a ref-gated effect:
 
-Uses only variable names the resolver already knows (`missed_calls`, `booking_rate`, `avg_ticket`, `open_estimates`, `close_rate`, `slow_response_leads`, `leads_unresponded`, `first_responder_advantage`) so every input resolves via signal → override → vertical_default without adding new resolver cases.
+1. On `updateUser` success:
+   - `setSubmitting(false)` and flip a small local `saved` flag so the button briefly shows "Password set" (checkmark) instead of the spinner.
+   - Kick off `refreshRoles()` but do NOT await it as a gate. Use `Promise.race([refreshRoles(), timeout(1500)])` so a slow/no-op refresh can't stall UX.
+   - Read the freshest role from context (`currentRole` closure) OR re-read once via `supabase.from('user_venue_roles')…` fallback if `currentRole` is still null, then call `navigate(getRoleHome(role), { replace: true })`.
+   - Hard timeout guard: a `setTimeout(..., 5000)` scheduled the moment `updateUser` resolves that force-navigates to `getRoleHome(currentRole)` (client → `/approvals`, unknown → `/auth`) if we somehow haven't navigated yet. Cleared on unmount.
 
-**A. `project_type_leak_vectors` — new rows**
+2. On `updateUser` error: existing path — `setSubmitting(false)`, show `error`. No change.
 
-`client` (all 4 new; sort_order 10/20/30/40):
+3. Delete `pendingNavRef` and the companion `useEffect` that waited on `currentRole`/`roleLoading` — replaced by the imperative path above.
 
-| # | name | severity | risk_type | detect_signal | dollarize_formula | benchmark |
-|---|---|---|---|---|---|---|
-| 1 | Missed calls | headline | captured_revenue | inbound call without answer or callback within SLA | `missed_calls * booking_rate * avg_ticket` | < 5% missed during business hours |
-| 2 | Slow first response on inbound leads | headline | captured_revenue | first_response_at > 30 min after created_at | `slow_response_leads * first_responder_advantage * avg_ticket` | 50% of buyers pick the first responder |
-| 3 | Unresponded leads sitting in queue | supporting | captured_revenue | leads with automation_status NULL or 'pending' | `leads_unresponded * close_rate * avg_ticket` | Response inside 5 min converts 8× more |
-| 4 | Unresponded emergency leads | headline | avoided_loss (risk_multiplier 1.0) | urgency_class='emergency' with NULL first_response_at | `unresponded_emergencies * emergency_avg_ticket` | Every emergency without a callback is a job walking to a competitor |
+4. Keep `toast.success('Password set. Welcome in.')` for user feedback.
 
-`home_services` (2 new; sort_order 30/40 to sit after existing 10/20):
-
-| # | name | severity | risk_type | detect_signal | dollarize_formula | benchmark |
-|---|---|---|---|---|---|---|
-| 3 | Slow first response on inbound leads | supporting | captured_revenue | first_response_at > 30 min after created_at | `slow_response_leads * first_responder_advantage * avg_ticket` | 50% of buyers pick the first responder |
-| 4 | Unresponded emergency jobs | headline | avoided_loss (risk_multiplier 1.0) | urgency_class='emergency' with NULL first_response_at | `unresponded_emergencies * emergency_avg_ticket` | After-hours emergencies are the highest-ticket jobs — and the biggest leak when they ring out |
-
-**B. `project_types.display_defaults` — every default value visible**
-
-`client` (currently `{}`) → set to:
-```json
-{
-  "avg_ticket": 400,
-  "booking_rate": 0.30,
-  "close_rate": 0.35,
-  "missed_calls": 12,
-  "slow_response_leads": 15,
-  "first_responder_advantage": 0.30,
-  "leads_unresponded": 8,
-  "unresponded_emergencies": 2,
-  "emergency_avg_ticket": 1200
-}
-```
-
-`home_services` — merge in the two new keys needed by the added vectors, leave all existing keys unchanged:
-```json
-{
-  "slow_response_leads": 15,
-  "first_responder_advantage": 0.30,
-  "unresponded_emergencies": 3,
-  "emergency_avg_ticket": 5500
-}
-```
-(Existing keys — `avg_ticket 500`, `close_rate 0.55`, `booking_rate 0.35`, `missed_calls 18`, `open_estimates 12`, `avg_job_low/high`, `emergency_job_low/high`, `pain_hook_copy`, `hero_stat_headline` — untouched. `emergency_avg_ticket 5500` sits mid-range of the existing `emergency_job_low 3000` / `emergency_job_high 8000` band.)
-
-Migration uses `ON CONFLICT (project_type, name) DO NOTHING` for vector inserts and `display_defaults || jsonb_build_object(...)` for the type update so it's idempotent and doesn't clobber future admin edits.
-
-### 2. Empty-state on `LeakStack.tsx` — operator-worded
-
-When `latest.results.length === 0`, replace the current silent two-$0-cards render with:
-
-> **This project's type (`<type>`) has no money-leak checks configured yet, so nothing can be estimated.** Configure them in **Admin → Project Types**.
-
-No "vector" jargon on-screen (kept in code/DB). Existing "No leak stack run yet" case unchanged.
+No changes outside `src/pages/ResetPassword.tsx`. `getRoleHome` (shared helper) and `RoleContext.refreshRoles` untouched.
 
 ## Verify
-Rerun compute-leak-stack for test plumber; quote new `total_monthly_dollars`, `total_risk_exposure_dollars`, `top_leak_key`, and the top-3 result rows with per-variable `source` flags (expect `vertical_default` across the board since this venue has no signals yet).
+
+Full flow, phone-width viewport:
+1. `/auth` → "Forgot password" → enter email → toast confirms email sent.
+2. Click link in email → lands on `/reset-password` → "Verifying your link…" → password form.
+3. Enter new password + confirm → click Update → button shows brief "Password set" state → auto-redirect to role home (owner → `/portfolio`, gm → `/weekly-review`, client → `/approvals`, etc.) within 1-2s.
+4. Sign out, sign back in with new password → succeeds. Report each step's observed behavior with a screenshot.
+5. Error case: submit mismatched passwords → error text visible, spinner stopped, no navigation.
 
 ## Guardrails
-- Additive; no resolver changes, no new variable cases.
-- No dollar-math in the renderer.
-- Migration idempotent (`ON CONFLICT DO NOTHING` + JSONB merge).
+
+- Additive; no schema, no auth config, no shared context changes.
+- No infinite state in either branch (success or error).
+- 5s hard timeout ensures worst case is a redirect, never a stuck spinner.
 - tsc clean.
