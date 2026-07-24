@@ -1,41 +1,43 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, CheckSquare, ClipboardList, MessageCircle, Briefcase, Inbox as InboxIcon, Palette, Activity, Megaphone, HelpCircle, Rocket, Sunrise } from 'lucide-react';
+import { BarChart3, Lightbulb, Menu, Settings, LogOut, CalendarCheck, CheckSquare, ClipboardList, MessageCircle, Briefcase, Inbox as InboxIcon, Palette, Activity, Megaphone, HelpCircle, Rocket, Sunrise, Zap, FileText, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { PageKey } from '@/types/permissions';
 
 const primaryItems = [
   { to: '/portfolio', icon: BarChart3, label: 'Portfolio' },
   { to: '/insights', icon: Lightbulb, label: 'Insights' },
 ];
 
-// Agency-OS secondary set mirrors the sidebar groups
-const baseSecondaryItems = [
-  { to: '/workspace', icon: Sunrise, label: 'Today' },
-  { to: '/weekly-review', icon: CalendarCheck, label: 'Weekly' },
-  { to: '/crm', icon: Briefcase, label: 'CRM' },
-  { to: '/inbox', icon: InboxIcon, label: 'Capture' },
-  { to: '/brand-kit', icon: Palette, label: 'Brand Vault' },
-  { to: '/marketing-hub', icon: Megaphone, label: 'Marketing Hub' },
-  { to: '/growth-audit', icon: Activity, label: 'Growth Audit' },
-  { to: '/help', icon: HelpCircle, label: 'Help' },
-  { to: '/launch', icon: Rocket, label: 'Launch' },
-  { to: '/admin', icon: Settings, label: 'Settings' },
-];
-
-const adminSecondaryItems = [
-  { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
-  { to: '/logs', icon: ClipboardList, label: 'Logs' },
-  { to: '/chat', icon: MessageCircle, label: 'Chat' },
+// Agency-OS secondary set mirrors the sidebar groups; gated by role_page_defaults.
+const allSecondaryItems: { to: string; icon: typeof BarChart3; label: string; pageKey: PageKey }[] = [
+  { to: '/workspace', icon: Sunrise, label: 'Today', pageKey: 'dashboard' },
+  { to: '/weekly-review', icon: CalendarCheck, label: 'Weekly', pageKey: 'weekly_review' },
+  { to: '/crm', icon: Briefcase, label: 'CRM', pageKey: 'crm' },
+  { to: '/inbox', icon: InboxIcon, label: 'Capture', pageKey: 'capture_inbox' },
+  { to: '/automations/inbox', icon: Zap, label: 'Automation Inbox', pageKey: 'automation_inbox' },
+  { to: '/automations/recovery-reports', icon: FileText, label: 'Recovery Reports', pageKey: 'recovery_reports' },
+  { to: '/leak-stack', icon: Activity, label: 'Leak Stack', pageKey: 'leak_stack' },
+  { to: '/templates', icon: MessageSquare, label: 'Templates', pageKey: 'outreach_templates' },
+  { to: '/brand-kit', icon: Palette, label: 'Brand Vault', pageKey: 'brand_kit' },
+  { to: '/marketing-hub', icon: Megaphone, label: 'Marketing Hub', pageKey: 'marketing_hub' },
+  { to: '/growth-audit', icon: Activity, label: 'Growth Audit', pageKey: 'growth_audit' },
+  { to: '/tasks', icon: CheckSquare, label: 'Tasks', pageKey: 'tasks' },
+  { to: '/logs', icon: ClipboardList, label: 'Logs', pageKey: 'logs' },
+  { to: '/chat', icon: MessageCircle, label: 'Chat', pageKey: 'chat' },
+  { to: '/help', icon: HelpCircle, label: 'Help', pageKey: 'dashboard' },
+  { to: '/launch', icon: Rocket, label: 'Launch', pageKey: 'dashboard' },
+  { to: '/admin', icon: Settings, label: 'Settings', pageKey: 'dashboard' },
 ];
 
 export const PortfolioBottomNav = () => {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
-  const { isAdmin } = useAuth();
-  const secondaryItems = isAdmin ? [...baseSecondaryItems, ...adminSecondaryItems] : baseSecondaryItems;
+  const { canAccessPage } = useAuth();
+  const secondaryItems = useMemo(() => allSecondaryItems.filter((item) => canAccessPage(item.pageKey)), [canAccessPage]);
   const navItems = primaryItems;
 
   return (
