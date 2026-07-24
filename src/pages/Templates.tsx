@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -16,9 +15,9 @@ import { Copy, Search, Loader2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import {
   useOutreachTemplates,
-  TOKEN_HINTS,
   extractTokens,
   fillTokens,
+  getTokenMeta,
   type OutreachTemplate,
 } from "@/hooks/useOutreachTemplates";
 
@@ -157,13 +156,29 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
 
   if (!template) return null;
 
-  const filledSubject = fillTokens(template.subject, values);
-  const filledBody = fillTokens(template.body, values);
+  const unfilled = tokens.filter((t) => !(values[t] && values[t].trim().length > 0));
 
-  const copy = async (text: string, label: string) => {
+  // Copy variant: unfilled tokens become [human label] instead of raw {{token}},
+  // and a warning toast tells the operator to fix them before sending.
+  const humanizeUnfilled = (text: string | null | undefined) =>
+    (text ?? "").replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_, key: string) => {
+      const v = values[key];
+      if (v && v.length > 0) return v;
+      return `[${getTokenMeta(key).label.toLowerCase()}]`;
+    });
+
+  const copy = async (_ignored: string, label: string) => {
+    const source = label === "Subject" ? template.subject : template.body;
+    const text = humanizeUnfilled(source);
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied`);
+      if (unfilled.length > 0) {
+        toast.warning(
+          `${unfilled.length} blank${unfilled.length === 1 ? "" : "s"} copied — fill before sending`,
+        );
+      } else {
+        toast.success(`${label} copied`);
+      }
     } catch {
       toast.error("Copy failed");
     }
@@ -185,19 +200,28 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
           {tokens.length > 0 && (
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tokens</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {tokens.map((tok) => (
-                  <div key={tok} className="space-y-1">
-                    <Label className="text-xs font-mono">{`{{${tok}}}`}</Label>
-                    <Input
-                      value={values[tok] ?? ""}
-                      placeholder={TOKEN_HINTS[tok] ?? ""}
-                      onChange={(e) => setValues((p) => ({ ...p, [tok]: e.target.value }))}
-                      className="h-8"
-                    />
-                  </div>
-                ))}
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Fill in the blanks</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {tokens.map((tok) => {
+                  const meta = getTokenMeta(tok);
+                  return (
+                    <div key={tok} className="space-y-1">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <Label className="text-xs font-medium">{meta.label}</Label>
+                        <span className="text-[10px] font-mono text-muted-foreground/70">{`{{${tok}}}`}</span>
+                      </div>
+                      <Input
+                        value={values[tok] ?? ""}
+                        placeholder={meta.placeholder ?? ""}
+                        onChange={(e) => setValues((p) => ({ ...p, [tok]: e.target.value }))}
+                        className="h-8"
+                      />
+                      {meta.hint && (
+                        <p className="text-[10px] text-muted-foreground leading-snug">{meta.hint}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -205,27 +229,76 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
           {template.channel === "email" && template.subject && (
             <div className="space-y-1">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Subject preview</Label>
-              <Input readOnly value={filledSubject} className="h-8 bg-muted/40" />
+              <PreviewBlock text={template.subject} values={values} inline />
             </div>
           )}
 
           <div className="space-y-1">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Body preview</Label>
-            <Textarea readOnly value={filledBody} rows={8} className="bg-muted/40 font-mono text-xs" />
+            <PreviewBlock text={template.body} values={values} />
           </div>
         </div>
 
-        <DialogFooter className="gap-2 flex-wrap">
+        <DialogFooter className="gap-2 flex-wrap sm:items-center">
+          {unfilled.length > 0 && (
+            <p className="text-[11px] text-muted-foreground mr-auto">
+              {unfilled.length} blank{unfilled.length === 1 ? "" : "s"} left — copy will use [label] placeholders.
+            </p>
+          )}
           {template.channel === "email" && (
-            <Button variant="outline" onClick={() => copy(filledSubject, "Subject")} className="gap-1">
+            <Button variant="outline" onClick={() => copy("", "Subject")} className="gap-1">
               <Copy className="h-4 w-4" /> Copy subject
             </Button>
           )}
-          <Button onClick={() => copy(filledBody, "Body")} className="gap-1">
+          <Button onClick={() => copy("", "Body")} className="gap-1">
             <Copy className="h-4 w-4" /> Copy body
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PreviewBlock({
+  text,
+  values,
+  inline = false,
+}: { text: string | null | undefined; values: Record<string, string>; inline?: boolean }) {
+  if (!text) return null;
+  const parts: Array<{ kind: "text" | "chip" | "filled"; value: string }> = [];
+  const re = /\{\{\s*([^}]+?)\s*\}\}/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push({ kind: "text", value: text.slice(last, m.index) });
+    const key = m[1];
+    const v = values[key];
+    if (v && v.length > 0) parts.push({ kind: "filled", value: v });
+    else parts.push({ kind: "chip", value: getTokenMeta(key).label });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ kind: "text", value: text.slice(last) });
+
+  return (
+    <div
+      className={
+        inline
+          ? "min-h-8 rounded-md border bg-muted/40 px-3 py-1.5 text-xs whitespace-pre-wrap break-words"
+          : "min-h-[10rem] rounded-md border bg-muted/40 px-3 py-2 font-mono text-xs whitespace-pre-wrap break-words"
+      }
+    >
+      {parts.map((p, i) => {
+        if (p.kind === "text") return <span key={i}>{p.value}</span>;
+        if (p.kind === "filled") return <span key={i}>{p.value}</span>;
+        return (
+          <span
+            key={i}
+            className="inline-block rounded bg-primary/10 text-primary px-1 py-[1px] mx-[1px] font-sans text-[11px] align-baseline"
+          >
+            〈{p.value.toLowerCase()}〉
+          </span>
+        );
+      })}
+    </div>
   );
 }
