@@ -602,6 +602,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       </Select>
                       <p className="text-xs text-muted-foreground">
                         Drives which pillar template this project inherits. Changing this does not delete existing data.
+                        {editingBar && ' New type applies from the next leak stack run — past runs stay as computed.'}
                       </p>
                     </div>
                   </CardContent>
