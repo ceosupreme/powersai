@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -157,9 +156,6 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
 
   if (!template) return null;
 
-  const filledSubject = fillTokens(template.subject, values);
-  const filledBody = fillTokens(template.body, values);
-
   const unfilled = tokens.filter((t) => !(values[t] && values[t].trim().length > 0));
 
   // Copy variant: unfilled tokens become [human label] instead of raw {{token}},
@@ -250,11 +246,11 @@ function FillDialog({ template, onClose }: { template: OutreachTemplate | null; 
             </p>
           )}
           {template.channel === "email" && (
-            <Button variant="outline" onClick={() => copy(filledSubject, "Subject")} className="gap-1">
+            <Button variant="outline" onClick={() => copy("", "Subject")} className="gap-1">
               <Copy className="h-4 w-4" /> Copy subject
             </Button>
           )}
-          <Button onClick={() => copy(filledBody, "Body")} className="gap-1">
+          <Button onClick={() => copy("", "Body")} className="gap-1">
             <Copy className="h-4 w-4" /> Copy body
           </Button>
         </DialogFooter>
