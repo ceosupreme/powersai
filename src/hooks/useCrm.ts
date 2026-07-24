@@ -298,9 +298,10 @@ export function useCrmMutations() {
     graduateCompany: useMutation({
       mutationFn: async (company: CrmCompany) => {
         if (company.linked_project_id) return company.linked_project_id;
-        // NOTE: when project-type awareness lands, default project_type='client' here.
+        // Explicit safety-net default. Admins can flip project_type in the Edit dialog
+        // (Basic → Project Type); changing it only affects future leak_stack_runs.
         const { data: venue, error: vErr } = await supabase
-          .from("venues").insert({ name: company.name }).select("id").single();
+          .from("venues").insert({ name: company.name, project_type: "client" }).select("id").single();
         if (vErr) throw vErr;
         const { error: cErr } = await supabase.from("crm_companies")
           .update({ linked_project_id: venue.id, status: "active" }).eq("id", company.id);
