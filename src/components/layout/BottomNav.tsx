@@ -18,6 +18,9 @@ import {
   HelpCircle,
   Rocket,
   Settings,
+  MessageSquare,
+  Zap,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
