@@ -561,7 +561,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label htmlFor="bar_code">Bar Code <span className="text-destructive">*</span></Label>
+                        <Label htmlFor="bar_code">Project code <span className="text-destructive">*</span></Label>
                         <Input id="bar_code" value={formData.bar_code} onChange={e => set('bar_code', e.target.value)} placeholder="e.g. CM" className="font-mono" />
                       </div>
                       <div className="space-y-1.5">
