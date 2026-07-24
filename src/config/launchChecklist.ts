@@ -3,6 +3,8 @@ export interface LaunchChecklistItem {
   title: string;
   description: string;
   link?: { to: string; label: string };
+  /** Optional inline widget key mounted next to the description. */
+  inline?: "apply_bundle";
 }
 
 export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
