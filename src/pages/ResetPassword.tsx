@@ -7,7 +7,7 @@ import { getRoleHome } from '@/types/roles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Activity, ArrowLeft, Loader2 } from 'lucide-react';
+import { Activity, ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Mode = 'checking' | 'set-password' | 'invalid';
@@ -18,12 +18,20 @@ const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { currentRole, isLoading: roleLoading, refreshRoles } = useRole();
-  const pendingNavRef = useRef(false);
+  const { currentRole, refreshRoles } = useRole();
+  const navigatedRef = useRef(false);
+  const unmountedRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
 
   const next = searchParams.get('next') || '';
 
@@ -86,32 +94,55 @@ const ResetPassword = () => {
       return;
     }
     toast.success('Password set. Welcome in.');
-    // Re-fetch roles now that the user has finalized their account, then wait
-    // for RoleContext to settle before choosing a destination. Never race to
-    // ?next= — it can send a client into a role-gated page and dead-end them.
-    try { await refreshRoles(); } catch { /* fall through to polling */ }
-    pendingNavRef.current = true;
-    // useEffect below picks up currentRole and navigates.
-  };
+    setSubmitting(false);
+    setSaved(true);
 
-  // Navigate once the role has settled after a successful password set.
-  // Falls back to /auth after ~2s if the role never resolves — never a
-  // role-gated page.
-  useEffect(() => {
-    if (!pendingNavRef.current) return;
-    if (roleLoading) return;
-    if (currentRole) {
-      pendingNavRef.current = false;
+    // Hard 5s timeout guard — worst case we still redirect, never spin.
+    const hardTimer = setTimeout(() => {
+      if (navigatedRef.current || unmountedRef.current) return;
+      navigatedRef.current = true;
       navigate(getRoleHome(currentRole), { replace: true });
-      return;
+    }, 5000);
+
+    // Best-effort role refresh, capped at 1.5s so slow/no-op refresh can't stall UX.
+    const timeout = new Promise((r) => setTimeout(r, 1500));
+    try { await Promise.race([refreshRoles(), timeout]); } catch { /* ignore */ }
+
+    // Resolve the freshest role: prefer context, otherwise query directly.
+    let resolvedRole = currentRole;
+    if (!resolvedRole) {
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data: venueRoles } = await (supabase
+            .from('user_venue_roles' as any)
+            .select('role, venue_id')
+            .eq('user_id', authUser.id)) as { data: Array<{ role: string; venue_id: string | null }> | null };
+          if (venueRoles && venueRoles.length > 0) {
+            const priority: Record<string, number> = { owner: 5, gm: 4, lead: 3, foh: 2, boh: 1, client: 0 };
+            const sorted = [...venueRoles].sort((a, b) => (priority[b.role] ?? -1) - (priority[a.role] ?? -1));
+            resolvedRole = sorted[0].role as typeof currentRole;
+          } else {
+            const { data: legacy } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', authUser.id)
+              .maybeSingle();
+            const legacyMap: Record<string, typeof currentRole> = {
+              admin: 'owner', owner: 'owner', gm: 'gm', manager: 'gm',
+              shift_lead: 'lead', lead: 'lead', client: 'client',
+            };
+            if (legacy?.role && legacyMap[legacy.role]) resolvedRole = legacyMap[legacy.role];
+          }
+        }
+      } catch { /* ignore, fall through to getRoleHome(null) → /auth */ }
     }
-    const timer = setTimeout(() => {
-      if (!pendingNavRef.current) return;
-      pendingNavRef.current = false;
-      navigate(getRoleHome(currentRole), { replace: true });
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [currentRole, roleLoading, navigate]);
+
+    if (navigatedRef.current || unmountedRef.current) return;
+    clearTimeout(hardTimer);
+    navigatedRef.current = true;
+    navigate(getRoleHome(resolvedRole), { replace: true });
+  };
 
   // Silence the unused-var linter (kept for future ?next= handling if needed).
   void next;
@@ -198,11 +229,16 @@ const ResetPassword = () => {
 
               {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button type="submit" className="w-full h-12 rounded-xl" disabled={submitting}>
+              <Button type="submit" className="w-full h-12 rounded-xl" disabled={submitting || saved}>
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Saving…
+                  </>
+                ) : saved ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Password set — redirecting…
                   </>
                 ) : flowType === 'invite' ? (
                   'Set password & continue'
