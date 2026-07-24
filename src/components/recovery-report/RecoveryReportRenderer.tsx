@@ -145,12 +145,46 @@ function EstimatedValue({
   );
 }
 
+/**
+ * Trim trailing incomplete clauses from AI narratives.
+ *
+ * A '.' only ends a sentence if it is NOT between two digits AND is followed
+ * by whitespace or end-of-string. Prevents mid-number cuts like "$1.5K" or
+ * "0.025". Also strips dangling conjunctions (but/and/so/because/however)
+ * left behind after truncation.
+ */
+function sanitizeNarrative(raw: string): string {
+  const s = (raw ?? '').trim();
+  if (!s) return s;
+  const isDigit = (c: string | undefined) => !!c && c >= '0' && c <= '9';
+  const isSpace = (c: string | undefined) => c === undefined || /\s/.test(c);
+  const isTerm = (i: number): boolean => {
+    const c = s[i];
+    if (c === '!' || c === '?') return true;
+    if (c !== '.') return false;
+    if (isDigit(s[i - 1]) && isDigit(s[i + 1])) return false;
+    return isSpace(s[i + 1]);
+  };
+  let cut = s;
+  if (!isTerm(s.length - 1)) {
+    let i = s.length - 1;
+    while (i >= 0 && !isTerm(i)) i--;
+    if (i < 0) return s; // no valid terminator — leave as-is
+    cut = s.slice(0, i + 1);
+  }
+  return cut
+    .replace(/[\s,]+(but|and|so|because|however)[\s,]*([.!?])\s*$/i, '$2')
+    .trim();
+}
+
 function Narrative({ text }: { text: string }) {
+  const clean = sanitizeNarrative(text);
+  if (!clean) return null;
   return (
     <section className="proposal-avoid-break">
       <div className="proposal-eyebrow mb-2">What this looked like</div>
       <div className="proposal-card p-5">
-        <p className="text-base leading-relaxed whitespace-pre-wrap">{text}</p>
+        <p className="text-base leading-relaxed whitespace-pre-wrap">{clean}</p>
       </div>
     </section>
   );
