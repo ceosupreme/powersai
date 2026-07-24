@@ -6,11 +6,11 @@ import { Link } from "react-router-dom";
 import { LAUNCH_CHECKLIST } from "@/config/launchChecklist";
 import { useChecklist } from "@/hooks/useChecklist";
 import { ApplyBundleControl } from "@/components/automations/ApplyBundleControl";
-import { useAppContext } from "@/context/AppContext";
+import { useApp } from "@/context/AppContext";
 
 export default function LaunchChecklist() {
   const { isComplete, toggle, isLoading } = useChecklist();
-  const { selectedBar } = useAppContext();
+  const { selectedBar } = useApp();
   const projectId = selectedBar?.id ?? null;
   const total = LAUNCH_CHECKLIST.length;
   const done = LAUNCH_CHECKLIST.filter((i) => isComplete(i.key)).length;
