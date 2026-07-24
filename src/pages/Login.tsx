@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
 import { getRoleHome } from '@/types/roles';
-import { Activity, ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import LoginAuthCard from '@/components/login/LoginAuthCard';
 
 const Login = () => {
@@ -35,13 +35,10 @@ const Login = () => {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
       <Link
         to="/"
-        className="flex items-center gap-3 mb-8 group"
+        className="mb-8 group"
         aria-label="Supreme Team Media — back to home"
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 flex items-center justify-center transition-transform group-hover:scale-105">
-          <Activity className="w-6 h-6 text-white" />
-        </div>
-        <span className="text-xl font-semibold text-foreground tracking-tight">
+        <span className="text-2xl font-semibold tracking-tight text-primary transition-opacity group-hover:opacity-90">
           Supreme Team Media
         </span>
       </Link>
