@@ -59,6 +59,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     title: "Apply an Automation Bundle to the project",
     description: "Bundles are a packaged set of automations (follow-up, reactivation, review requests). Apply one in Admin → Automation Bundles so AI starts drafting messages for this project.",
     link: { to: "/admin?tab=automation-bundles", label: "Open Automation Bundles" },
+    inline: "apply_bundle",
   },
   {
     key: "setup:review-automation-inbox",
