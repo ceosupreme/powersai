@@ -315,27 +315,25 @@ const LoginAuthCard = () => {
           Continue with Google
         </Button>
 
-        {/* Toggle mode */}
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={toggleMode}
-            className="text-sm text-muted-foreground hover:text-white transition-colors"
-            disabled={isSubmitting}
-          >
-            {isLogin ? (
-              <>
-                Don't have an account?{' '}
-                <span className="text-primary font-medium">Sign up</span>
-              </>
-            ) : (
-              <>
-                Already have an account?{' '}
-                <span className="text-primary font-medium">Sign in</span>
-              </>
-            )}
-          </button>
-        </div>
+        {/*
+          Public sign-up link intentionally hidden: signUp creates role-less
+          accounts that dead-end at ProtectedRoute's no-role screen. Legit
+          users are invited via admin or invite-client-approver. The signUp
+          code path and /auth remain intact for admin/dev use.
+        */}
+        {!isLogin && (
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="text-sm text-muted-foreground hover:text-white transition-colors"
+              disabled={isSubmitting}
+            >
+              Already have an account?{' '}
+              <span className="text-primary font-medium">Sign in</span>
+            </button>
+          </div>
+        )}
 
       </div>
 
