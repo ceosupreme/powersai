@@ -1,7 +1,7 @@
 project_id = "llanezccussjtzzrbrtq"
 
 [functions.duplicate-project-type]
-verify_jwt = true
+verify_jwt = false
 
 [functions.delete-project-type]
-verify_jwt = true
+verify_jwt = false
