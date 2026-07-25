@@ -14,6 +14,7 @@ import { ProjectType } from '@/lib/effectivePillars';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
 import { SettingsLeakVectorsTab } from './SettingsLeakVectorsTab';
 import { SettingsQualifierFieldsTab } from './SettingsQualifierFieldsTab';
+import { ProjectTypesManagerCard } from './ProjectTypesManagerCard';
 import { HelpTip } from '@/components/help/HelpTip';
 import { HELP_KEYS } from '@/config/helpKeys';
 
@@ -114,6 +115,7 @@ export const SettingsPillarsTab = () => {
         public Lead Qualifier asks at <code>/qualify/&lt;vertical&gt;</code>. Edit here and the
         whole vertical updates. Per-project overrides live in Edit Project.
       </HelpTip>
+      <ProjectTypesManagerCard />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
