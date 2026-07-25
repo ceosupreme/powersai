@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
@@ -269,9 +269,8 @@ function ProjectTypesRows({
 }
 
 // Small internal hook — counts venues per project_type in one grouped read.
-import { useEffect, useState as useReactState } from 'react';
 function useCountsFetch(ids: string[]): [Record<string, number>, () => void] {
-  const [counts, setCounts] = useReactState<Record<string, number>>({});
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const key = ids.slice().sort().join(',');
   useEffect(() => {
     let cancelled = false;
