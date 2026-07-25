@@ -6552,7 +6552,7 @@ export type Database = {
           id: string
           pillar_key: string
           pillar_label: string
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           sort_order: number
           updated_at: string
           weight: number
@@ -6563,7 +6563,7 @@ export type Database = {
           id?: string
           pillar_key: string
           pillar_label: string
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           sort_order?: number
           updated_at?: string
           weight?: number
@@ -6574,12 +6574,20 @@ export type Database = {
           id?: string
           pillar_key?: string
           pillar_label?: string
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           sort_order?: number
           updated_at?: string
           weight?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_pillar_templates_project_type"
+            columns: ["project_type"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       portfolio_items: {
         Row: {
@@ -7120,7 +7128,7 @@ export type Database = {
           dollarize_formula: string | null
           id: string
           name: string
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           risk_multiplier: number
           risk_type: string
           severity: string
@@ -7134,7 +7142,7 @@ export type Database = {
           dollarize_formula?: string | null
           id?: string
           name: string
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           risk_multiplier?: number
           risk_type?: string
           severity?: string
@@ -7148,21 +7156,29 @@ export type Database = {
           dollarize_formula?: string | null
           id?: string
           name?: string
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           risk_multiplier?: number
           risk_type?: string
           severity?: string
           sort_order?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_project_type_leak_vectors_project_type"
+            columns: ["project_type"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_type_qualifier_config: {
         Row: {
           created_at: string
           operation_footprint_options: Json | null
           primary_channel: string | null
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           ready_definition: string | null
           updated_at: string
           urgency_options: Json | null
@@ -7171,7 +7187,7 @@ export type Database = {
           created_at?: string
           operation_footprint_options?: Json | null
           primary_channel?: string | null
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           ready_definition?: string | null
           updated_at?: string
           urgency_options?: Json | null
@@ -7180,12 +7196,20 @@ export type Database = {
           created_at?: string
           operation_footprint_options?: Json | null
           primary_channel?: string | null
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           ready_definition?: string | null
           updated_at?: string
           urgency_options?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_project_type_qualifier_config_project_type"
+            columns: ["project_type"]
+            isOneToOne: true
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_type_qualifier_fields: {
         Row: {
@@ -7196,7 +7220,7 @@ export type Database = {
           field_type: string
           id: string
           is_shared: boolean
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           sort_order: number
           updated_at: string
         }
@@ -7208,7 +7232,7 @@ export type Database = {
           field_type?: string
           id?: string
           is_shared?: boolean
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           sort_order?: number
           updated_at?: string
         }
@@ -7220,11 +7244,19 @@ export type Database = {
           field_type?: string
           id?: string
           is_shared?: boolean
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           sort_order?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_project_type_qualifier_fields_project_type"
+            columns: ["project_type"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_types: {
         Row: {
@@ -10182,7 +10214,7 @@ export type Database = {
           name: string
           niche: string | null
           owner_name: string | null
-          project_type: Database["public"]["Enums"]["project_type_enum"]
+          project_type: string
           seven_shifts_location_id: string | null
           sevenshifts_api_enabled: boolean
           slug: string | null
@@ -10232,7 +10264,7 @@ export type Database = {
           name: string
           niche?: string | null
           owner_name?: string | null
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
@@ -10282,7 +10314,7 @@ export type Database = {
           name?: string
           niche?: string | null
           owner_name?: string | null
-          project_type?: Database["public"]["Enums"]["project_type_enum"]
+          project_type?: string
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
           slug?: string | null
@@ -10303,6 +10335,13 @@ export type Database = {
           youtube_channel_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_venues_project_type"
+            columns: ["project_type"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "venues_source_lead_id_fkey"
             columns: ["source_lead_id"]
@@ -11897,17 +11936,6 @@ export type Database = {
         | "carousel"
         | "text"
         | "other"
-      project_type_enum:
-        | "client"
-        | "content_channel"
-        | "internal_brand"
-        | "app_build"
-        | "service_offer"
-        | "home_services"
-        | "auto"
-        | "carpet_cleaning"
-        | "moving_hauling"
-        | "bars_restaurants"
       promo_type:
         | "happy_hour"
         | "special"
@@ -12285,18 +12313,6 @@ export const Constants = {
         "carousel",
         "text",
         "other",
-      ],
-      project_type_enum: [
-        "client",
-        "content_channel",
-        "internal_brand",
-        "app_build",
-        "service_offer",
-        "home_services",
-        "auto",
-        "carpet_cleaning",
-        "moving_hauling",
-        "bars_restaurants",
       ],
       promo_type: [
         "happy_hour",

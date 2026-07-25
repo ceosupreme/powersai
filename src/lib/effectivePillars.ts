@@ -1,12 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export type ProjectType =
-  | 'client'
-  | 'content_channel'
-  | 'internal_brand'
-  | 'app_build'
-  | 'service_offer'
-  | 'home_services';
+/**
+ * Project type ids are now data-driven — the source of truth is the
+ * `project_types` table (see `useProjectTypes`). Admins can add/duplicate/
+ * remove types without a code change. `'client'` is the system-wide fallback
+ * used whenever an unknown id is encountered.
+ */
+export type ProjectType = string;
+
+/** System-default fallback id — never deleted, resolves generic behavior. */
+export const CLIENT_PROJECT_TYPE: ProjectType = 'client';
 
 export interface EffectivePillar {
   pillar_key: string;
