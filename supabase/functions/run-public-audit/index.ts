@@ -1,4 +1,20 @@
 // run-public-audit
+//
+// ── SHARED CHAIN — KEEP IN SYNC WITH checkup-prospect ─────────────────────
+// supabase/functions/checkup-prospect/index.ts orchestrates the SAME
+// downstream chain for cold mined prospects. If you change any shared step
+// here, change it there too.
+//   shared steps (both paths):
+//     1. create shell venue (venues.is_prospect_shell = true)
+//     2. attach a Google place to the shell (here: gbp-resolve-place;
+//        the miner already knows place_id and upserts gbp_place_mappings)
+//     3. gbp-sync-weekly
+//     4. compute-leak-stack  ← the leak numbers
+//   steps only THIS public path runs: website-resolve-url +
+//   website-crawl-dispatcher, map-pack-run, extract-review-themes,
+//   foundation-audit-refresh, growth-audit-refresh. See the header of
+//   checkup-prospect for why the internal batch path omits them.
+//
 // PUBLIC endpoint (verify_jwt=false). Anonymous prospects submit their
 // business + city; we insert a public_audit_requests row, return { token }
 // immediately, and kick the resolve → snapshot → audit → rank pipeline off

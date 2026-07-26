@@ -1,4 +1,4 @@
-import {
+import { Target,
   Sunrise,
   CalendarCheck,
   LayoutDashboard,
@@ -57,6 +57,7 @@ export const MORE_SECTIONS: MoreNavSection[] = [
       { to: '/templates', label: 'Templates', icon: MessageSquare, pageKey: 'outreach_templates' },
       { to: '/automations/recovery-reports', label: 'Recovery Reports', icon: FileText, pageKey: 'recovery_reports' },
       { to: '/leak-stack', label: 'Leak Stack', icon: Activity, pageKey: 'leak_stack' },
+      { to: '/prospects', label: 'Prospect Dock', icon: Target, pageKey: 'prospect_dock' },
     ],
   },
   {
