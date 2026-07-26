@@ -6302,6 +6302,59 @@ export type Database = {
           },
         ]
       }
+      miner_runs: {
+        Row: {
+          checked: number
+          city: string | null
+          created_at: string
+          error: string | null
+          finished_at: string | null
+          found: number
+          id: string
+          kept: number
+          niche: string | null
+          requested: number
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          checked?: number
+          city?: string | null
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          found?: number
+          id?: string
+          kept?: number
+          niche?: string | null
+          requested?: number
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          checked?: number
+          city?: string | null
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          found?: number
+          id?: string
+          kept?: number
+          niche?: string | null
+          requested?: number
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "miner_runs_niche_fkey"
+            columns: ["niche"]
+            isOneToOne: false
+            referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       online_reviews: {
         Row: {
           avg_rating: number | null
@@ -7477,6 +7530,106 @@ export type Database = {
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospects: {
+        Row: {
+          business_name: string
+          checked_at: string | null
+          city: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          leak_run_id: string | null
+          leak_total: number | null
+          miner_run_id: string | null
+          niche: string | null
+          phone: string | null
+          place_id: string | null
+          promoted_company_id: string | null
+          promoted_lead_id: string | null
+          rating: number | null
+          review_count: number | null
+          risk_total: number | null
+          shell_venue_id: string | null
+          snapshot: Json | null
+          source: string
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          business_name: string
+          checked_at?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          leak_run_id?: string | null
+          leak_total?: number | null
+          miner_run_id?: string | null
+          niche?: string | null
+          phone?: string | null
+          place_id?: string | null
+          promoted_company_id?: string | null
+          promoted_lead_id?: string | null
+          rating?: number | null
+          review_count?: number | null
+          risk_total?: number | null
+          shell_venue_id?: string | null
+          snapshot?: Json | null
+          source?: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          business_name?: string
+          checked_at?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          leak_run_id?: string | null
+          leak_total?: number | null
+          miner_run_id?: string | null
+          niche?: string | null
+          phone?: string | null
+          place_id?: string | null
+          promoted_company_id?: string | null
+          promoted_lead_id?: string | null
+          rating?: number | null
+          review_count?: number | null
+          risk_total?: number | null
+          shell_venue_id?: string | null
+          snapshot?: Json | null
+          source?: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospects_leak_run_id_fkey"
+            columns: ["leak_run_id"]
+            isOneToOne: false
+            referencedRelation: "leak_stack_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospects_miner_run_fk"
+            columns: ["miner_run_id"]
+            isOneToOne: false
+            referencedRelation: "miner_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospects_niche_fkey"
+            columns: ["niche"]
+            isOneToOne: false
+            referencedRelation: "project_types"
             referencedColumns: ["id"]
           },
         ]
