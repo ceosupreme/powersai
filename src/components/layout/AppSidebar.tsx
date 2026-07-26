@@ -114,6 +114,7 @@ const navGroups: NavGroup[] = [
     items: [
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
       { path: '/leak-stack', label: 'Leak Stack', icon: Activity, pageKey: 'leak_stack' },
+      { path: '/prospects', label: 'Prospect Dock', icon: Target, pageKey: 'prospect_dock' },
       { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },

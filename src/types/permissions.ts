@@ -29,6 +29,7 @@ export type PageKey =
   | 'recovery_reports'
   | 'foundation_audit'
   | 'leak_stack'
+  | 'prospect_dock'
   | 'client_approvals'
   | 'outreach_templates'
   | 'project_home';
@@ -95,6 +96,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'recovery_reports', label: 'Recovery Reports', canDisable: true },
   { key: 'foundation_audit', label: 'Foundation Audit', canDisable: true },
   { key: 'leak_stack', label: 'Leak Stack', canDisable: true },
+  { key: 'prospect_dock', label: 'Prospect Dock', canDisable: true },
   { key: 'outreach_templates', label: 'Outreach Templates', canDisable: true },
   { key: 'project_home', label: 'Project Home', canDisable: true },
 ];
@@ -131,5 +133,6 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/automations/recovery-reports': 'recovery_reports',
   '/foundation-audit': 'foundation_audit',
   '/leak-stack': 'leak_stack',
+  '/prospects': 'prospect_dock',
   '/templates': 'outreach_templates',
 };
