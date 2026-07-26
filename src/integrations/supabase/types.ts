@@ -4553,7 +4553,7 @@ export type Database = {
           captured_for_project_id: string | null
           conversation_channel: string | null
           created_at: string
-          email: string
+          email: string | null
           first_response_at: string | null
           id: string
           is_ready: boolean
@@ -4581,7 +4581,7 @@ export type Database = {
           captured_for_project_id?: string | null
           conversation_channel?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           first_response_at?: string | null
           id?: string
           is_ready?: boolean
@@ -4609,7 +4609,7 @@ export type Database = {
           captured_for_project_id?: string | null
           conversation_channel?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           first_response_at?: string | null
           id?: string
           is_ready?: boolean
