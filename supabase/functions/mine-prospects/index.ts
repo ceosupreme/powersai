@@ -167,19 +167,44 @@ Deno.serve(async (req) => {
         },
       };
 
-      const { data: up, error: upErr } = await admin
-        .from('prospects')
-        .upsert(row, { onConflict: 'place_id', ignoreDuplicates: false })
-        .select('id,status')
-        .maybeSingle();
-
-      if (upErr) {
-        console.error('[mine-prospects] upsert failed', upErr.message);
-        continue;
+      // Dedupe is a PARTIAL unique index (place_id WHERE place_id IS NOT NULL),
+      // which Postgres cannot infer as an ON CONFLICT arbiter from PostgREST's
+      // upsert. So: look up by place_id, then update or insert explicitly.
+      let existingId: string | null = null;
+      let existingStatus: string | null = null;
+      if (row.place_id) {
+        const { data: found } = await admin
+          .from('prospects')
+          .select('id,status')
+          .eq('place_id', row.place_id)
+          .maybeSingle();
+        existingId = (found?.id as string) ?? null;
+        existingStatus = (found?.status as string) ?? null;
       }
-      if (up?.id) {
+
+      if (existingId) {
+        const { error: updErr } = await admin
+          .from('prospects')
+          .update({ ...row, status: undefined })
+          .eq('id', existingId);
+        if (updErr) {
+          console.error('[mine-prospects] update failed', updErr.message);
+          continue;
+        }
         inserted += 1;
-        if (up.status === 'new') prospectIds.push(up.id as string);
+        if (existingStatus === 'new') prospectIds.push(existingId);
+      } else {
+        const { data: ins, error: insErr } = await admin
+          .from('prospects')
+          .insert(row)
+          .select('id')
+          .single();
+        if (insErr || !ins?.id) {
+          console.error('[mine-prospects] insert failed', insErr?.message);
+          continue;
+        }
+        inserted += 1;
+        prospectIds.push(ins.id as string);
       }
     }
 
