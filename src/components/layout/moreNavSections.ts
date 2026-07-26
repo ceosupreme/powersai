@@ -1,4 +1,4 @@
-import {
+import { Target,
   Sunrise,
   CalendarCheck,
   LayoutDashboard,
