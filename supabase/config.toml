@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.delete-project-type]
 verify_jwt = false
+
+[functions.mine-prospects]
+verify_jwt = false
+
+[functions.checkup-prospect]
+verify_jwt = false
+
+[functions.prospect-first-touch]
+verify_jwt = false
