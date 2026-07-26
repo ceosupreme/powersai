@@ -214,6 +214,15 @@ export function useProspectMutations() {
         if (leadErr) throw new Error(fnError(leadErr));
         const leadId = (leadRes as any)?.id ?? (leadRes as any)?.lead?.id ?? null;
 
+        // submit-inbound-lead derives `source` itself from project_type, so we
+        // stamp the miner provenance on the row afterwards. Verified: there is
+        // NO check constraint on inbound_leads.source (only conversation_channel,
+        // route_to and urgency_class are constrained), so 'prospect_miner' needs
+        // no migration.
+        if (leadId) {
+          await db.from('inbound_leads').update({ source: 'prospect_miner' }).eq('id', leadId);
+        }
+
         const { data: company, error: cErr } = await db
           .from('crm_companies')
           .insert({ name: p.business_name, status: 'prospect', created_by: userId })
