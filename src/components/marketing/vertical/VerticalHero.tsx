@@ -112,6 +112,16 @@ export function VerticalHero({
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </a>
               )}
+              {showVideoCta && !page.cta_secondary_url && (
+                <a
+                  href="#video"
+                  className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline decoration-[hsl(var(--gold))] decoration-2 underline-offset-8 hover:decoration-[hsl(var(--green))]"
+                >
+                  See it work
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </a>
+              )}
+
             </div>
           </Reveal>
         </div>
