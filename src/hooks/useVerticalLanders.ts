@@ -31,9 +31,22 @@ export interface VerticalLandingPage {
   meta_title: string;
   meta_description: string;
   og_image_url: string | null;
+  /** Additive section fields — all nullable; see JSON shape docs in useVerticalLander.ts */
+  family_key?: string | null;
+  video_url?: string | null;
+  leaks_heading?: string | null;
+  tour_features?: any | null;
+  included_features?: any | null;
+  how_it_works?: any | null;
+  live_in_line?: string | null;
+  math_config?: any | null;
+  free_check_line?: string | null;
+  price_block?: any | null;
+  guarantee_line?: string | null;
   created_at: string;
   updated_at: string;
 }
+
 
 const PUBLIC_KEY = ["vertical-landers", "published"] as const;
 const ADMIN_KEY = ["vertical-landers", "admin"] as const;
