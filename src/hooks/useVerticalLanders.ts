@@ -123,6 +123,60 @@ export function useDeleteVerticalLander() {
   });
 }
 
+const FAMILY_KEY = ["vertical-lander-families"] as const;
+
+export function useVerticalLanderFamilies() {
+  return useQuery({
+    queryKey: FAMILY_KEY,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("vertical_landing_families")
+        .select("*")
+        .order("family_key", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+}
+
+export function useUpsertVerticalLanderFamily() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: Record<string, any> & { family_key: string }) => {
+      const { data, error } = await (supabase as any)
+        .from("vertical_landing_families")
+        .upsert({ ...input, updated_at: new Date().toISOString() }, { onConflict: "family_key" })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: FAMILY_KEY });
+      toast.success("Family saved");
+    },
+    onError: (e: any) => toast.error(e.message ?? "Save failed"),
+  });
+}
+
+export function useDeleteVerticalLanderFamily() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (familyKey: string) => {
+      const { error } = await (supabase as any)
+        .from("vertical_landing_families")
+        .delete()
+        .eq("family_key", familyKey);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: FAMILY_KEY });
+      toast.success("Family deleted");
+    },
+    onError: (e: any) => toast.error(e.message ?? "Delete failed"),
+  });
+}
+
 export function slugifyLander(s: string): string {
   return s
     .toLowerCase()
