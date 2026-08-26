@@ -9,6 +9,8 @@ import { RolePageDefaults } from '@/components/admin/RolePageDefaults';
 import { SettingsPillarsTab } from '@/components/admin/SettingsPillarsTab';
 import { PortfolioItemsTab } from '@/components/admin/PortfolioItemsTab';
 import { VerticalLandersTab } from '@/components/admin/VerticalLandersTab';
+import { VerticalLanderFamiliesCard } from '@/components/admin/VerticalLanderFamiliesCard';
+
 
 const Admin = () => {
   const { isAdmin, isLoading } = useAuth();
