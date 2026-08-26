@@ -20,7 +20,7 @@ export function ProductTour({ features }: { features: TourFeature[] }) {
           {features.map((f, i) => (
             <Reveal key={`${f.title}-${i}`} delay={60 + i * 50}>
               <article className="flex h-full flex-col overflow-hidden rounded-xl border border-[hsl(var(--line))] bg-[hsl(var(--surface))]">
-                {f.image_url && (
+                {!!f.image_url?.trim() && (
                   <img
                     src={f.image_url}
                     alt={f.image_alt ?? f.title}
