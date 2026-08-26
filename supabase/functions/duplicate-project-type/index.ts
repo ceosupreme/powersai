@@ -100,8 +100,8 @@ BEGIN
   FROM public.pillar_templates WHERE project_type = ${quoteLit(source_id)};
 
   INSERT INTO public.project_type_leak_vectors
-    (project_type, name, detect_signal, dollarize_formula, benchmark, severity, sort_order)
-  SELECT ${quoteLit(new_id)}, name, detect_signal, dollarize_formula, benchmark, severity, sort_order
+    (project_type, name, detect_signal, dollarize_formula, benchmark, severity, sort_order, risk_type, risk_multiplier)
+  SELECT ${quoteLit(new_id)}, name, detect_signal, dollarize_formula, benchmark, severity, sort_order, risk_type, risk_multiplier
   FROM public.project_type_leak_vectors WHERE project_type = ${quoteLit(source_id)};
 
   INSERT INTO public.project_type_qualifier_fields
@@ -201,7 +201,7 @@ async function sequentialCopy(
       ),
       project_type_leak_vectors: await copyTable(
         'project_type_leak_vectors',
-        'name,detect_signal,dollarize_formula,benchmark,severity,sort_order',
+        'name,detect_signal,dollarize_formula,benchmark,severity,sort_order,risk_type,risk_multiplier',
       ),
       project_type_qualifier_fields: await copyTable(
         'project_type_qualifier_fields',
