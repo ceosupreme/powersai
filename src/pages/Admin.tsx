@@ -116,7 +116,9 @@ const Admin = () => {
 
           <TabsContent value="landers" className="space-y-4 animate-fade-in-up">
             <VerticalLandersTab />
+            <VerticalLanderFamiliesCard />
           </TabsContent>
+
         </Tabs>
       </div>
     </>
