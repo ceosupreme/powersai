@@ -278,7 +278,44 @@ export const VerticalLandersTab = () => {
                   <Label>Project type id (optional — pulls up to 2 extra leak vectors)</Label>
                   <Input value={editing.project_type_id ?? ""} onChange={(e) => setEditing({ ...editing, project_type_id: e.target.value || null })} />
                 </div>
+
+                <div>
+                  <Label>Family key (optional — inherits shared content)</Label>
+                  <Input value={(editing as any).family_key ?? ""} onChange={(e) => setEditing({ ...editing, family_key: e.target.value || null } as Draft)} />
+                </div>
+                <div>
+                  <Label>Video URL (optional — YouTube, Loom, or .mp4)</Label>
+                  <Input value={(editing as any).video_url ?? ""} onChange={(e) => setEditing({ ...editing, video_url: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Leaks heading override (optional)</Label>
+                  <Input value={(editing as any).leaks_heading ?? ""} onChange={(e) => setEditing({ ...editing, leaks_heading: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Live-in line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).live_in_line ?? ""} onChange={(e) => setEditing({ ...editing, live_in_line: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Free check line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).free_check_line ?? ""} onChange={(e) => setEditing({ ...editing, free_check_line: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Guarantee line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).guarantee_line ?? ""} onChange={(e) => setEditing({ ...editing, guarantee_line: e.target.value || null } as Draft)} />
+                </div>
+                {JSON_FIELDS.map((f) => (
+                  <div key={f} className="col-span-2">
+                    <Label className="capitalize">{f.replace(/_/g, " ")} (JSON — leave blank to inherit / omit)</Label>
+                    <Textarea
+                      rows={5}
+                      className="font-mono text-xs"
+                      value={rawJson[f] ?? ""}
+                      onChange={(e) => setRawJson({ ...rawJson, [f]: e.target.value })}
+                    />
+                  </div>
+                ))}
               </div>
+
 
               <div className="rounded-md border border-border p-3">
                 <div className="mb-2 flex items-center justify-between">
