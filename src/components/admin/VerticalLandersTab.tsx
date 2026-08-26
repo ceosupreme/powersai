@@ -68,20 +68,31 @@ export const VerticalLandersTab = () => {
   const upsert = useUpsertVerticalLander();
   const remove = useDeleteVerticalLander();
   const [editing, setEditing] = useState<Draft | null>(null);
+  const [rawJson, setRawJson] = useState<Record<string, string>>({});
 
-  const openNew = () => setEditing({ ...emptyDraft(), sort_order: (items[items.length - 1]?.sort_order ?? 0) + 10 });
-  const openEdit = (it: VerticalLandingPage) => setEditing({
-    ...it,
-    leaks: Array.isArray(it.leaks) ? it.leaks : [],
-    faq: Array.isArray(it.faq) ? it.faq : [],
-    cta_secondary_label: it.cta_secondary_label ?? "",
-    cta_secondary_url: it.cta_secondary_url ?? "",
-    og_image_url: it.og_image_url ?? "",
-  });
+  const seedRaw = (row: any) =>
+    setRawJson(Object.fromEntries(JSON_FIELDS.map((f) => [f, toJsonText(row?.[f])])));
+
+  const openNew = () => {
+    const d = { ...emptyDraft(), sort_order: (items[items.length - 1]?.sort_order ?? 0) + 10 };
+    setEditing(d);
+    seedRaw(d);
+  };
+  const openEdit = (it: VerticalLandingPage) => {
+    setEditing({
+      ...it,
+      leaks: Array.isArray(it.leaks) ? it.leaks : [],
+      faq: Array.isArray(it.faq) ? it.faq : [],
+      cta_secondary_label: it.cta_secondary_label ?? "",
+      cta_secondary_url: it.cta_secondary_url ?? "",
+      og_image_url: it.og_image_url ?? "",
+    });
+    seedRaw(it);
+  };
 
   const save = async () => {
     if (!editing) return;
-    const payload: Draft = {
+    const payload: Record<string, any> = {
       ...editing,
       slug: editing.slug.trim() || slugifyLander(editing.display_name),
       display_name: editing.display_name.trim(),
@@ -91,10 +102,16 @@ export const VerticalLandersTab = () => {
       leaks: editing.leaks.filter((l) => l.title.trim() || l.line.trim()),
       faq: editing.faq.filter((f) => f.q.trim() || f.a.trim()),
     };
+    for (const f of JSON_FIELDS) {
+      const txt = (rawJson[f] ?? "").trim();
+      if (!txt) { payload[f] = null; continue; }
+      try { payload[f] = JSON.parse(txt); } catch { toast.error(`Invalid JSON in ${f}`); return; }
+    }
     if (!payload.slug || !payload.display_name) return;
     await upsert.mutateAsync(payload as any);
     setEditing(null);
   };
+
 
   const setLeak = (i: number, patch: Partial<LeakCard>) => {
     if (!editing) return;
