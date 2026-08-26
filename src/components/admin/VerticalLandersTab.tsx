@@ -34,6 +34,11 @@ type Draft = Partial<VerticalLandingPage> & {
   faq: FaqEntry[];
 };
 
+/** Additive jsonb columns edited as raw JSON. Blank means null (inherit from family / omit section). */
+const JSON_FIELDS = ["tour_features", "included_features", "how_it_works", "math_config", "price_block"] as const;
+const toJsonText = (v: any) => (v == null ? "" : JSON.stringify(v, null, 2));
+
+
 const emptyDraft = (): Draft => ({
   slug: "",
   display_name: "",
