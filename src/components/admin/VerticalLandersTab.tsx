@@ -13,6 +13,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { Loader2, Plus, Trash2, Save, ExternalLink, Pencil } from "lucide-react";
+import { toast } from "sonner";
+
 import {
   useAdminVerticalLanders,
   useUpsertVerticalLander,
@@ -33,6 +35,11 @@ type Draft = Partial<VerticalLandingPage> & {
   leaks: LeakCard[];
   faq: FaqEntry[];
 };
+
+/** Additive jsonb columns edited as raw JSON. Blank means null (inherit from family / omit section). */
+const JSON_FIELDS = ["tour_features", "included_features", "how_it_works", "math_config", "price_block"] as const;
+const toJsonText = (v: any) => (v == null ? "" : JSON.stringify(v, null, 2));
+
 
 const emptyDraft = (): Draft => ({
   slug: "",
@@ -63,20 +70,31 @@ export const VerticalLandersTab = () => {
   const upsert = useUpsertVerticalLander();
   const remove = useDeleteVerticalLander();
   const [editing, setEditing] = useState<Draft | null>(null);
+  const [rawJson, setRawJson] = useState<Record<string, string>>({});
 
-  const openNew = () => setEditing({ ...emptyDraft(), sort_order: (items[items.length - 1]?.sort_order ?? 0) + 10 });
-  const openEdit = (it: VerticalLandingPage) => setEditing({
-    ...it,
-    leaks: Array.isArray(it.leaks) ? it.leaks : [],
-    faq: Array.isArray(it.faq) ? it.faq : [],
-    cta_secondary_label: it.cta_secondary_label ?? "",
-    cta_secondary_url: it.cta_secondary_url ?? "",
-    og_image_url: it.og_image_url ?? "",
-  });
+  const seedRaw = (row: any) =>
+    setRawJson(Object.fromEntries(JSON_FIELDS.map((f) => [f, toJsonText(row?.[f])])));
+
+  const openNew = () => {
+    const d = { ...emptyDraft(), sort_order: (items[items.length - 1]?.sort_order ?? 0) + 10 };
+    setEditing(d);
+    seedRaw(d);
+  };
+  const openEdit = (it: VerticalLandingPage) => {
+    setEditing({
+      ...it,
+      leaks: Array.isArray(it.leaks) ? it.leaks : [],
+      faq: Array.isArray(it.faq) ? it.faq : [],
+      cta_secondary_label: it.cta_secondary_label ?? "",
+      cta_secondary_url: it.cta_secondary_url ?? "",
+      og_image_url: it.og_image_url ?? "",
+    });
+    seedRaw(it);
+  };
 
   const save = async () => {
     if (!editing) return;
-    const payload: Draft = {
+    const payload: Record<string, any> = {
       ...editing,
       slug: editing.slug.trim() || slugifyLander(editing.display_name),
       display_name: editing.display_name.trim(),
@@ -86,10 +104,16 @@ export const VerticalLandersTab = () => {
       leaks: editing.leaks.filter((l) => l.title.trim() || l.line.trim()),
       faq: editing.faq.filter((f) => f.q.trim() || f.a.trim()),
     };
+    for (const f of JSON_FIELDS) {
+      const txt = (rawJson[f] ?? "").trim();
+      if (!txt) { payload[f] = null; continue; }
+      try { payload[f] = JSON.parse(txt); } catch { toast.error(`Invalid JSON in ${f}`); return; }
+    }
     if (!payload.slug || !payload.display_name) return;
     await upsert.mutateAsync(payload as any);
     setEditing(null);
   };
+
 
   const setLeak = (i: number, patch: Partial<LeakCard>) => {
     if (!editing) return;
@@ -278,7 +302,44 @@ export const VerticalLandersTab = () => {
                   <Label>Project type id (optional — pulls up to 2 extra leak vectors)</Label>
                   <Input value={editing.project_type_id ?? ""} onChange={(e) => setEditing({ ...editing, project_type_id: e.target.value || null })} />
                 </div>
+
+                <div>
+                  <Label>Family key (optional — inherits shared content)</Label>
+                  <Input value={(editing as any).family_key ?? ""} onChange={(e) => setEditing({ ...editing, family_key: e.target.value || null } as Draft)} />
+                </div>
+                <div>
+                  <Label>Video URL (optional — YouTube, Loom, or .mp4)</Label>
+                  <Input value={(editing as any).video_url ?? ""} onChange={(e) => setEditing({ ...editing, video_url: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Leaks heading override (optional)</Label>
+                  <Input value={(editing as any).leaks_heading ?? ""} onChange={(e) => setEditing({ ...editing, leaks_heading: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Live-in line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).live_in_line ?? ""} onChange={(e) => setEditing({ ...editing, live_in_line: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Free check line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).free_check_line ?? ""} onChange={(e) => setEditing({ ...editing, free_check_line: e.target.value || null } as Draft)} />
+                </div>
+                <div className="col-span-2">
+                  <Label>Guarantee line (optional)</Label>
+                  <Textarea rows={2} value={(editing as any).guarantee_line ?? ""} onChange={(e) => setEditing({ ...editing, guarantee_line: e.target.value || null } as Draft)} />
+                </div>
+                {JSON_FIELDS.map((f) => (
+                  <div key={f} className="col-span-2">
+                    <Label className="capitalize">{f.replace(/_/g, " ")} (JSON — leave blank to inherit / omit)</Label>
+                    <Textarea
+                      rows={5}
+                      className="font-mono text-xs"
+                      value={rawJson[f] ?? ""}
+                      onChange={(e) => setRawJson({ ...rawJson, [f]: e.target.value })}
+                    />
+                  </div>
+                ))}
               </div>
+
 
               <div className="rounded-md border border-border p-3">
                 <div className="mb-2 flex items-center justify-between">

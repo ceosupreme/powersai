@@ -2,13 +2,24 @@ import { useEffect, useMemo } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { Nav } from "@/components/marketing/site/Nav";
 import { Footer } from "@/components/marketing/sections/Footer";
-import { useVerticalLanderBySlug, useLanderExtraLeaks } from "@/hooks/useVerticalLander";
+import {
+  useVerticalLanderBySlug,
+  useLanderExtraLeaks,
+  useVerticalLanderFamily,
+  resolveLanderContent,
+} from "@/hooks/useVerticalLander";
 import { VerticalHero } from "@/components/marketing/vertical/VerticalHero";
 import { LeaksGrid } from "@/components/marketing/vertical/LeaksGrid";
 import { PluggedRow } from "@/components/marketing/vertical/PluggedRow";
 import { ProofBand } from "@/components/marketing/vertical/ProofBand";
 import { FaqBlock } from "@/components/marketing/vertical/FaqBlock";
 import { FinalCta } from "@/components/marketing/vertical/FinalCta";
+import { VideoBlock } from "@/components/marketing/vertical/VideoBlock";
+import { ProductTour } from "@/components/marketing/vertical/ProductTour";
+import { IncludedFeatures } from "@/components/marketing/vertical/IncludedFeatures";
+import { MathCalculator } from "@/components/marketing/vertical/MathCalculator";
+import { FreeCheckLine } from "@/components/marketing/vertical/FreeCheckLine";
+import { PricingBlock } from "@/components/marketing/vertical/PricingBlock";
 
 /** Sanitize the ?biz= query param. Trims, strips HTML, keeps letters/numbers/&'.- and caps at 40 chars. */
 export function sanitizeBiz(raw: string | null): string | null {
@@ -44,6 +55,8 @@ export default function VerticalLanding() {
   const [params] = useSearchParams();
   const biz = useMemo(() => sanitizeBiz(params.get("biz")), [params]);
   const { data: extraLeaks = [] } = useLanderExtraLeaks(page?.project_type_id);
+  const { data: family } = useVerticalLanderFamily((page as any)?.family_key);
+  const resolved = useMemo(() => resolveLanderContent(page, family), [page, family]);
 
   useEffect(() => {
     if (!page) return;
@@ -87,17 +100,35 @@ export default function VerticalLanding() {
 
   if (!page) return <Navigate to="/404" replace />;
 
+  const p = page as any;
+  const addSrc = (u: string) => withSrc(u, page.slug);
+  const videoUrl: string | null = p.video_url?.trim() ? p.video_url.trim() : null;
+  const priceBlock = p.price_block && Array.isArray(p.price_block.tiers) ? p.price_block : null;
+  const freeCheckLine: string | null = p.free_check_line?.trim() ? p.free_check_line.trim() : null;
+  const freeCheckHref = (() => {
+    const base = addSrc("/free-audit");
+    return biz ? `${base}&biz=${encodeURIComponent(biz)}` : base;
+  })();
+
   return (
     <div className="stm-marketing relative min-h-screen">
       <div aria-hidden className="grain fixed inset-0 z-0" />
       <Nav />
       <main className="relative z-10">
-        <VerticalHero page={page} biz={biz} withSrc={(u) => withSrc(u, page.slug)} />
-        <LeaksGrid leaks={page.leaks} extras={extraLeaks} />
-        <PluggedRow />
-        <ProofBand proofLine={page.proof_line} />
-        <FaqBlock faq={page.faq} />
-        <FinalCta page={page} withSrc={(u) => withSrc(u, page.slug)} />
+        <VerticalHero page={page} biz={biz} withSrc={addSrc} showVideoCta={!!videoUrl} />
+        {videoUrl && <VideoBlock url={videoUrl} title={`${page.display_name} — see it work`} />}
+        <LeaksGrid leaks={page.leaks} extras={extraLeaks} heading={p.leaks_heading} />
+        {resolved.tour_features && <ProductTour features={resolved.tour_features} />}
+        {resolved.included_features && <IncludedFeatures items={resolved.included_features} />}
+        <PluggedRow steps={resolved.how_it_works} liveInLine={resolved.live_in_line} />
+        {resolved.math_config && <MathCalculator config={resolved.math_config} />}
+        <ProofBand proofLine={resolved.proof_line ?? page.proof_line} />
+        {freeCheckLine && <FreeCheckLine line={freeCheckLine} href={freeCheckHref} />}
+        {priceBlock && (
+          <PricingBlock block={priceBlock} guaranteeLine={resolved.guarantee_line} withSrc={addSrc} />
+        )}
+        <FaqBlock faq={resolved.faq} />
+        <FinalCta page={page} withSrc={addSrc} />
       </main>
       <Footer />
     </div>

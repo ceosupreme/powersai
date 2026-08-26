@@ -34,12 +34,15 @@ export function VerticalHero({
   page,
   biz,
   withSrc,
+  showVideoCta = false,
 }: {
   page: VerticalLandingPage;
   biz: string | null;
   withSrc: (u: string) => string;
+  showVideoCta?: boolean;
 }) {
   const accent = accentVar[page.accent_color];
+
   return (
     <section className="relative overflow-hidden pb-20 pt-28 md:pb-28 md:pt-40">
       <div aria-hidden className="radial-gold pointer-events-none absolute inset-x-0 top-0 h-[520px]" />
@@ -109,6 +112,16 @@ export function VerticalHero({
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </a>
               )}
+              {showVideoCta && !page.cta_secondary_url && (
+                <a
+                  href="#video"
+                  className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline decoration-[hsl(var(--gold))] decoration-2 underline-offset-8 hover:decoration-[hsl(var(--green))]"
+                >
+                  See it work
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </a>
+              )}
+
             </div>
           </Reveal>
         </div>

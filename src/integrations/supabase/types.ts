@@ -10504,6 +10504,51 @@ export type Database = {
           },
         ]
       }
+      vertical_landing_families: {
+        Row: {
+          created_at: string
+          display_name: string
+          family_key: string
+          faq_base: Json | null
+          guarantee_line: string | null
+          how_it_works: Json | null
+          included_features: Json | null
+          live_in_line: string | null
+          math_config: Json | null
+          proof_line: string | null
+          tour_features: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          family_key: string
+          faq_base?: Json | null
+          guarantee_line?: string | null
+          how_it_works?: Json | null
+          included_features?: Json | null
+          live_in_line?: string | null
+          math_config?: Json | null
+          proof_line?: string | null
+          tour_features?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          family_key?: string
+          faq_base?: Json | null
+          guarantee_line?: string | null
+          how_it_works?: Json | null
+          included_features?: Json | null
+          live_in_line?: string | null
+          math_config?: Json | null
+          proof_line?: string | null
+          tour_features?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       vertical_landing_pages: {
         Row: {
           accent_color: string
@@ -10513,14 +10558,23 @@ export type Database = {
           cta_secondary_label: string | null
           cta_secondary_url: string | null
           display_name: string
+          family_key: string | null
           faq: Json
+          free_check_line: string | null
+          guarantee_line: string | null
           headline: string
           headline_accent_word: string
+          how_it_works: Json | null
           id: string
+          included_features: Json | null
           leaks: Json
+          leaks_heading: string | null
+          live_in_line: string | null
+          math_config: Json | null
           meta_description: string
           meta_title: string
           og_image_url: string | null
+          price_block: Json | null
           project_type_id: string | null
           proof_line: string
           slug: string
@@ -10529,7 +10583,9 @@ export type Database = {
           stat_value: string
           status: string
           subline: string
+          tour_features: Json | null
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           accent_color?: string
@@ -10539,14 +10595,23 @@ export type Database = {
           cta_secondary_label?: string | null
           cta_secondary_url?: string | null
           display_name: string
+          family_key?: string | null
           faq?: Json
+          free_check_line?: string | null
+          guarantee_line?: string | null
           headline: string
           headline_accent_word: string
+          how_it_works?: Json | null
           id?: string
+          included_features?: Json | null
           leaks?: Json
+          leaks_heading?: string | null
+          live_in_line?: string | null
+          math_config?: Json | null
           meta_description: string
           meta_title: string
           og_image_url?: string | null
+          price_block?: Json | null
           project_type_id?: string | null
           proof_line: string
           slug: string
@@ -10555,7 +10620,9 @@ export type Database = {
           stat_value: string
           status?: string
           subline: string
+          tour_features?: Json | null
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           accent_color?: string
@@ -10565,14 +10632,23 @@ export type Database = {
           cta_secondary_label?: string | null
           cta_secondary_url?: string | null
           display_name?: string
+          family_key?: string | null
           faq?: Json
+          free_check_line?: string | null
+          guarantee_line?: string | null
           headline?: string
           headline_accent_word?: string
+          how_it_works?: Json | null
           id?: string
+          included_features?: Json | null
           leaks?: Json
+          leaks_heading?: string | null
+          live_in_line?: string | null
+          math_config?: Json | null
           meta_description?: string
           meta_title?: string
           og_image_url?: string | null
+          price_block?: Json | null
           project_type_id?: string | null
           proof_line?: string
           slug?: string
@@ -10581,9 +10657,18 @@ export type Database = {
           stat_value?: string
           status?: string
           subline?: string
+          tour_features?: Json | null
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "vertical_landing_pages_family_key_fkey"
+            columns: ["family_key"]
+            isOneToOne: false
+            referencedRelation: "vertical_landing_families"
+            referencedColumns: ["family_key"]
+          },
           {
             foreignKeyName: "vertical_landing_pages_project_type_id_fkey"
             columns: ["project_type_id"]
