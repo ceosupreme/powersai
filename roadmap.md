@@ -2,7 +2,7 @@
 
 ## Public studio website (STM build pack)
 
-- [ ] Phase 1 — Foundation + homepage (in progress)
+- [x] Phase 1 — Foundation + homepage (in progress)
   - `.stm-studio` scoped tokens, isolated components under `src/components/marketing/studio`
   - Homepage sections in spec order; real `submit-inbound-lead` intake
   - Shared project-content adapter with per-entry `enabled` fallback flags
