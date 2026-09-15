@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
 import { Container } from "../primitives";
+import {
+  BuildIllustration,
+  ConnectIllustration,
+  DesignIllustration,
+  GrowIllustration,
+} from "./HeroCardIllustrations";
 
 const BOARD = [
-  { word: "DESIGN", capability: "Brand & creative", tone: "plate-tone-lilac" },
-  { word: "BUILD", capability: "Websites & apps", tone: "plate-tone-paper" },
-  { word: "GROW", capability: "Marketing & content", tone: "plate-tone-sand" },
-  { word: "CONNECT", capability: "AI & systems", tone: "plate-tone-green" },
+  { word: "DESIGN", capability: "Brand & creative", tone: "plate-tone-lilac", Illustration: DesignIllustration },
+  { word: "BUILD", capability: "Websites & apps", tone: "plate-tone-paper", Illustration: BuildIllustration },
+  { word: "GROW", capability: "Marketing & content", tone: "plate-tone-sand", Illustration: GrowIllustration },
+  { word: "CONNECT", capability: "AI & systems", tone: "plate-tone-green", Illustration: ConnectIllustration },
 ];
 
 export function Hero() {
@@ -49,6 +55,7 @@ export function Hero() {
                   >
                     {b.word}
                   </span>
+                  <b.Illustration className="mx-auto h-[54px] w-full max-w-[118px] opacity-85" />
                   <span className="text-[0.78rem] font-medium leading-snug opacity-80">{b.capability}</span>
                 </div>
               ))}
