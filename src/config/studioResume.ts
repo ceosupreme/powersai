@@ -8,7 +8,7 @@
  * external sandbox URL.
  */
 export const STUDIO_RESUME: { file: string | null; label: string; downloadName: string } = {
-  file: null,
+  file: "/sean-mayo-resume.pdf",
   label: "Download résumé",
   downloadName: "sean-mayo-resume.pdf",
 };
