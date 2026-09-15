@@ -12,7 +12,10 @@
   - `/work` filters with URL `?category=` state, zero-count categories hidden
   - `/work/:slug` full case detail; back link restores the filtered list
   - `/hire` page live; hire links enabled in header/footer
-- [ ] Phase 3 — Inquiry flow + metadata (build pack H–I)
+- [x] Phase 3 — Inquiry flow + metadata (build pack H–I)
+- [x] Phase 4 — Final frontend QA pass (all checks passed; no fixes required)
+- [ ] Proposed enhancement (not built): owner email notification for general site inquiries
+- [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
   - `conversation_channel=form`, `route_to=self`, structured `qualifier_data`,
