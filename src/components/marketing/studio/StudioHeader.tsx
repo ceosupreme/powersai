@@ -9,6 +9,7 @@ const LINKS = [
   { to: "/#services", label: "Capabilities" },
   { to: "/#process", label: "Process" },
   { to: "/#about", label: "About" },
+  { to: "/hire", label: "Hire" },
 ];
 
 export function StudioHeader() {

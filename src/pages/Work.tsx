@@ -1,19 +1,51 @@
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Container, Eyebrow, Lede } from "@/components/marketing/studio/primitives";
 import { ProjectPlate } from "@/components/marketing/studio/ProjectPlate";
+import { WorkFilters, type CategoryFilter } from "@/components/marketing/studio/WorkFilters";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { STUDIO_CATEGORIES, STUDIO_CATEGORY_LABEL, type StudioCategoryId } from "@/content/studioProjects";
+import { trackStudioEvent } from "@/lib/studioAnalytics";
+
+const VALID = new Set<string>(STUDIO_CATEGORIES.map((c) => c.id));
 
 export default function Work() {
   const { projects, isLoading, isError, isEmpty } = useStudioProjects();
+  const [params, setParams] = useSearchParams();
+
+  // Filter state lives in the URL, so it is shareable and browser
+  // back/forward restores the previous selection natively.
+  const raw = params.get("category") ?? "all";
+  const active: CategoryFilter = VALID.has(raw) ? (raw as StudioCategoryId) : "all";
+
+  const { available, counts, visible } = useMemo(() => {
+    const counts: Record<string, number> = {};
+    projects.forEach((p) => p.categories.forEach((c) => (counts[c] = (counts[c] ?? 0) + 1)));
+    const available = STUDIO_CATEGORIES.map((c) => c.id).filter((id) => (counts[id] ?? 0) > 0);
+    const visible = active === "all" ? projects : projects.filter((p) => p.categories.includes(active));
+    return { available, counts, visible };
+  }, [projects, active]);
+
+  const activeLabel = active === "all" ? "All disciplines" : STUDIO_CATEGORY_LABEL[active];
 
   useStudioHead({
-    title: "Work — Supreme Team Media",
+    title: active === "all" ? "Work — Supreme Team Media" : `${activeLabel} work — Supreme Team Media`,
     description:
       "Selected websites, creative projects, and business systems, each identifying Sean Mayo's role and whether it is client work, an owned brand, or a demonstration.",
-    path: "/work",
+    path: active === "all" ? "/work" : `/work?category=${active}`,
+    canonicalPath: "/work",
   });
+
+  const onChange = (next: CategoryFilter) => {
+    const nextParams = new URLSearchParams(params);
+    if (next === "all") nextParams.delete("category");
+    else nextParams.set("category", next);
+    setParams(nextParams); // pushes history, so Back returns to the previous filter
+    if (next !== "all") trackStudioEvent("service_selected", { category: next });
+  };
 
   return (
     <div className="stm-studio relative min-h-screen">
@@ -31,19 +63,37 @@ export default function Work() {
 
           {isError ? (
             <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
-              The project list couldn&apos;t be loaded right now. Please refresh, or email
-              hello@supremeteammedia.com.
+              The project list couldn&apos;t be loaded right now — this is a loading problem, not an empty portfolio.
+              Please refresh, or email hello@supremeteammedia.com.
             </p>
           ) : isLoading ? (
-            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">Loading projects…</p>
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
+              Loading projects…
+            </p>
           ) : isEmpty ? (
-            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">No projects are published yet.</p>
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
+              No projects are published yet.
+            </p>
           ) : (
-            <div className="mt-12 grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((p) => (
-                <ProjectPlate key={p.slug} project={p} />
-              ))}
-            </div>
+            <>
+              <WorkFilters
+                active={active}
+                available={available}
+                counts={counts}
+                total={projects.length}
+                onChange={onChange}
+              />
+
+              <p className="mt-5 text-[0.9rem] text-muted-foreground" role="status" aria-live="polite">
+                Showing {visible.length} {visible.length === 1 ? "project" : "projects"} — {activeLabel}.
+              </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 lg:grid-cols-3">
+                {visible.map((p) => (
+                  <ProjectPlate key={p.slug} project={p} />
+                ))}
+              </div>
+            </>
           )}
         </Container>
       </main>

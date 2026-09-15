@@ -2,14 +2,20 @@ import { useEffect } from "react";
 
 const SITE = "https://supremeteammedia.com";
 
-type Head = { title: string; description: string; path: string };
+type Head = {
+  title: string;
+  description: string;
+  path: string;
+  /** Self-referencing canonical when it differs from `path` (e.g. filtered lists). */
+  canonicalPath?: string;
+};
 
 /**
  * Per-route head for the public studio pages. Client-side only (classic Vite
  * SPA), so social crawlers still read the static index.html head; that static
  * head carries the sitewide studio positioning.
  */
-export function useStudioHead({ title, description, path }: Head) {
+export function useStudioHead({ title, description, path, canonicalPath }: Head) {
   useEffect(() => {
     const prevTitle = document.title;
     document.title = title;
@@ -34,10 +40,11 @@ export function useStudioHead({ title, description, path }: Head) {
     };
 
     const url = `${SITE}${path}`;
+    const canonicalUrl = `${SITE}${canonicalPath ?? path}`;
     setMeta("description", description);
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
-    setMeta("og:url", url, "property");
+    setMeta("og:url", canonicalUrl, "property");
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
 
@@ -50,7 +57,7 @@ export function useStudioHead({ title, description, path }: Head) {
       createdCanonical = true;
     }
     const prevHref = canonical.getAttribute("href");
-    canonical.setAttribute("href", url);
+    canonical.setAttribute("href", canonicalUrl);
     restores.push(() => {
       if (createdCanonical) canonical?.remove();
       else if (prevHref) canonical?.setAttribute("href", prevHref);
@@ -60,5 +67,5 @@ export function useStudioHead({ title, description, path }: Head) {
       document.title = prevTitle;
       restores.forEach((r) => r());
     };
-  }, [title, description, path]);
+  }, [title, description, path, canonicalPath]);
 }
