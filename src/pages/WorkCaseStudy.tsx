@@ -7,7 +7,7 @@ import { useStudioProject } from "@/hooks/useStudioProjects";
 import { getStudioMedia } from "@/config/studioMedia";
 import { STUDIO_CATEGORY_LABEL } from "@/content/studioProjects";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
-import { requestServiceIntent } from "@/components/marketing/studio/serviceIntent";
+import { requestServiceIntent, type ServiceId } from "@/components/marketing/studio/serviceIntent";
 
 export default function WorkCaseStudy() {
   const { slug } = useParams<{ slug: string }>();
@@ -107,7 +107,7 @@ export default function WorkCaseStudy() {
                 <p className="studio-display text-[1.25rem]">Want something like this?</p>
                 <Link
                   to="/#contact"
-                  onClick={() => requestServiceIntent(project.categories[0] as never)}
+                  onClick={() => requestServiceIntent(project.categories[0] as ServiceId)}
                   className="studio-btn studio-btn-primary mt-4"
                 >
                   Discuss a project
