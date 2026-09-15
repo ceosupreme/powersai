@@ -814,3 +814,191 @@
 @media (prefers-reduced-motion: reduce) {
   .stm-marketing [data-arrival-highlight="true"] { animation: none; }
 }
+
+/* ============================================================
+ * Supreme Team Media — PUBLIC STUDIO surface (`.stm-studio`).
+ * Editorial studio art direction: warm paper / ink / cobalt.
+ * Fully isolated from the internal app theme and from the older
+ * `.stm-marketing` scope. Nothing here leaks into the app.
+ * ============================================================ */
+.stm-studio {
+  --paper:        42 26% 95%;   /* #F5F3EE */
+  --surface:      0 0% 100%;    /* #FFFFFF */
+  --ink:          213 30% 13%;  /* #17202B */
+  --ink-muted:    213 10% 38%;  /* #58616C */
+  --rule:         51 9% 85%;    /* #DDDCD6 */
+  --cobalt:       231 61% 49%;  /* #3048C9 */
+  --cobalt-pale:  227 100% 96%; /* #E8EDFF */
+  --band:         219 39% 12%;  /* #121A29 */
+  --band-text:    43 27% 95%;   /* #F6F4EF */
+  --plate-lilac:  267 41% 91%;  /* #E8E0F2 */
+  --plate-sand:   38 53% 81%;   /* #E8D5B5 */
+  --plate-green:  164 47% 17%;  /* #173F34 */
+
+  /* shadcn semantic tokens routed to the studio palette (public scope only) */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --muted: var(--cobalt-pale);
+  --muted-foreground: var(--ink-muted);
+  --primary: var(--cobalt);
+  --primary-foreground: 0 0% 100%;
+  --secondary: var(--cobalt-pale);
+  --secondary-foreground: var(--ink);
+  --accent: var(--cobalt);
+  --accent-foreground: 0 0% 100%;
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--cobalt);
+
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: "Inter", "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+@media (min-width: 768px) {
+  .stm-studio { font-size: 18px; }
+}
+
+.stm-studio .studio-display {
+  font-family: "Inter Tight", "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+.stm-studio .studio-serif {
+  font-family: Georgia, "Instrument Serif", "DM Serif Display", serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.stm-studio .studio-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--cobalt));
+}
+.stm-studio .studio-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--ink-muted));
+}
+
+/* Container + section rhythm */
+.stm-studio .studio-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1200px;
+  padding-inline: 24px;
+}
+@media (min-width: 768px)  { .stm-studio .studio-container { padding-inline: 40px; } }
+@media (min-width: 1024px) { .stm-studio .studio-container { padding-inline: 56px; } }
+@media (min-width: 1280px) { .stm-studio .studio-container { padding-inline: 64px; } }
+
+.stm-studio .studio-section { padding-block: 64px; }
+@media (min-width: 768px) { .stm-studio .studio-section { padding-block: 96px; } }
+
+/* Anchor offset so the fixed header never covers a heading */
+.stm-studio [id] { scroll-margin-top: 88px; }
+
+/* Dark editorial band */
+.stm-studio .studio-band {
+  background-color: hsl(var(--band));
+  color: hsl(var(--band-text));
+  --foreground: var(--band-text);
+  --muted-foreground: 43 18% 78%;
+  --border: 43 14% 80% / 0.18;
+  --card: 219 34% 16%;
+  --card-foreground: var(--band-text);
+}
+
+/* Controls — 8px controls, 12px media plates, 44px min target */
+.stm-studio .studio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding-inline: 1.35rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.stm-studio .studio-btn-primary {
+  background-color: hsl(var(--cobalt));
+  color: #fff;
+}
+.stm-studio .studio-btn-primary:hover { background-color: hsl(var(--cobalt) / 0.9); }
+.stm-studio .studio-btn-outline {
+  border-color: hsl(var(--ink) / 0.25);
+  color: hsl(var(--ink));
+  background-color: transparent;
+}
+.stm-studio .studio-btn-outline:hover { border-color: hsl(var(--cobalt)); color: hsl(var(--cobalt)); }
+.stm-studio .studio-band .studio-btn-outline {
+  border-color: hsl(var(--band-text) / 0.4);
+  color: hsl(var(--band-text));
+}
+.stm-studio .studio-band .studio-btn-outline:hover {
+  border-color: hsl(var(--band-text));
+  background-color: hsl(var(--band-text) / 0.08);
+  color: hsl(var(--band-text));
+}
+.stm-studio a:focus-visible,
+.stm-studio button:focus-visible,
+.stm-studio input:focus-visible,
+.stm-studio textarea:focus-visible,
+.stm-studio [tabindex]:focus-visible {
+  outline: 2px solid hsl(var(--cobalt));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.stm-studio .studio-band a:focus-visible,
+.stm-studio .studio-band button:focus-visible {
+  outline-color: hsl(var(--band-text));
+}
+
+/* Editorial project plate — finished typographic surface when media is null */
+.stm-studio .studio-plate {
+  border-radius: 12px;
+  border: 1px solid hsl(var(--rule));
+  overflow: hidden;
+  background-color: hsl(var(--surface));
+}
+.stm-studio .studio-plate-face {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px;
+  min-height: 210px;
+  background-image:
+    linear-gradient(to right, hsl(var(--ink) / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--ink) / 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.stm-studio .plate-tone-lilac { background-color: hsl(var(--plate-lilac)); color: hsl(var(--ink)); }
+.stm-studio .plate-tone-sand  { background-color: hsl(var(--plate-sand));  color: hsl(var(--ink)); }
+.stm-studio .plate-tone-green { background-color: hsl(var(--plate-green)); color: hsl(var(--band-text)); }
+.stm-studio .plate-tone-paper { background-color: hsl(var(--cobalt-pale)); color: hsl(var(--ink)); }
+
+.stm-studio .studio-card-link { transition: transform .2s ease, border-color .2s ease; }
+.stm-studio .studio-card-link:hover { transform: translateY(-2px); border-color: hsl(var(--cobalt) / 0.5); }
+
+.stm-studio .studio-rule { border-top: 1px solid hsl(var(--rule)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .stm-studio *, .stm-studio *::before, .stm-studio *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+  .stm-studio .studio-card-link:hover { transform: none; }
+}
