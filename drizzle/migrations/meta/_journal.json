@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789500493835,
+      "tag": "0000_inbound_leads_owner_notify_columns",
+      "breakpoints": true
+    }
+  ]
+}
