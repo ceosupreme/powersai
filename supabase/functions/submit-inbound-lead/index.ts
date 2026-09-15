@@ -177,6 +177,23 @@ Deno.serve(async (req) => {
     }
   }
 
+  // Owner-only notification for general website inquiries (no client project).
+  // Fire-and-forget: a notification failure must never fail the save.
+  if (inserted?.id && !captured_for_project_id && (route_to ?? "self") === "self") {
+    try {
+      fetch(`${supabaseUrl}/functions/v1/notify-owner-inquiry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+        body: JSON.stringify({ lead_id: inserted.id }),
+      }).catch((e) => console.error("[submit-inbound-lead] owner notify error", e));
+    } catch (e) {
+      console.error("[submit-inbound-lead] owner notify dispatch failed", e);
+    }
+  }
+
   // Fire-and-forget Build C follow-up sequence enrollment. If the project for
   // this lead is enrolled in follow_up_sequence automation, enqueue drafts.
   // Errors here do NOT block the lead submission response.
