@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
 import { Container } from "./primitives";
 
-/**
- * NOTE: the /hire link is intentionally absent until the hiring page exists.
- * It gets enabled in the hiring-page phase — never render a dead link.
- */
+/** Every link here points at a real, implemented route — never a dead link. */
 export function StudioFooter() {
   return (
     <footer className="studio-band">

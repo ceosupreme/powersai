@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { getStudioMedia } from "@/config/studioMedia";
 import { STUDIO_CATEGORY_LABEL, type StudioProject } from "@/content/studioProjects";
@@ -19,10 +19,18 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
   const media = getStudioMedia(project.mediaKey);
   const src = project.imageUrl || media?.src || null;
   const tags = project.categories.map((c) => STUDIO_CATEGORY_LABEL[c] ?? c);
+  const location = useLocation();
+  // Remember the list (and its filter) so the case page can return to it.
+  const from = `${location.pathname}${location.search}`;
 
   return (
     <article className={cn("studio-plate studio-card-link flex flex-col", className)}>
-      <Link to={`/work/${project.slug}`} className="block" aria-label={`Explore project: ${project.title}`}>
+      <Link
+        to={`/work/${project.slug}`}
+        state={{ from }}
+        className="block"
+        aria-label={`Explore project: ${project.title}`}
+      >
         {src ? (
           <img
             src={src}
@@ -60,6 +68,7 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
         )}
         <Link
           to={`/work/${project.slug}`}
+          state={{ from }}
           className="mt-5 inline-flex items-center gap-1.5 self-start text-[0.9rem] font-medium text-[hsl(var(--cobalt))] hover:underline"
         >
           Explore project <ArrowUpRight size={15} />

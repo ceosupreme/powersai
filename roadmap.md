@@ -2,12 +2,27 @@
 
 ## Public studio website (STM build pack)
 
-- [x] Phase 1 — Foundation + homepage (in progress)
+- [x] Phase 1 — Foundation + homepage
   - `.stm-studio` scoped tokens, isolated components under `src/components/marketing/studio`
   - Homepage sections in spec order; real `submit-inbound-lead` intake
   - Shared project-content adapter with per-entry `enabled` fallback flags
-  - No `/hire` links rendered until the hiring phase
   - Service selection kept separate from message text; fields preserved on error
-- [ ] Phase 2 — Work index refinements (URL `?category=` filter state, full filtering)
-- [ ] Phase 3 — Inquiry form refinement (multi-select, budget/timing line)
-- [ ] Phase 4 — `/hire` page + enable hire links in footer/founder
+- [x] Phase 2 — Work pages + hiring page (build pack F–G)
+  - `useStudioProjects` consumes the retained `usePublishedPortfolioItems`
+  - `/work` filters with URL `?category=` state, zero-count categories hidden
+  - `/work/:slug` full case detail; back link restores the filtered list
+  - `/hire` page live; hire links enabled in header/footer
+- [ ] Phase 3 — Inquiry flow + metadata (build pack H–I)
+  - Rebuild the inquiry form: required name/email/note; optional company, service
+    multi-select, budget, timing; 4000-char server limit validated, never truncated
+  - `conversation_channel=form`, `route_to=self`, structured `qualifier_data`,
+    readable header in `message`; `project_type`/`captured_for_project_id` unset
+  - Preserve `stm:contact-prefill` / `stm.contact.prefill` compatibility without
+    ever erasing typed text; allowlisted intent/service values only
+  - Success only on `{ok:true,id}` with no invoke error; preserve input on failure;
+    handle offline, malformed responses, rate limits; honeypot is not a conversion
+  - Analytics hooks (service select, case open, first form interaction, confirmed
+    inquiry, hiring interest, real résumé download) via the no-op adapter;
+    report analytics as unconfigured
+  - Titles/descriptions/canonicals for homepage, work, cases, hire; root metadata
+  - Mocked contract tests first; live intake test only with owner approval

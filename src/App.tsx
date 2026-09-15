@@ -59,6 +59,7 @@ import Inbox from "./pages/Inbox";
 import MarketingSite from "./pages/MarketingSite";
 import Work from "./pages/Work";
 import WorkCaseStudy from "./pages/WorkCaseStudy";
+import Hire from "./pages/Hire";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
@@ -103,6 +104,8 @@ const App = () => {
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />
+                {/* Public hiring / individual-professional introduction page. */}
+                <Route path="/hire" element={<Hire />} />
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
                 <Route path="/qualify/:slug" element={<QualifyLanding />} />
                 {/* Public per-vertical landing pages, config-driven. */}
