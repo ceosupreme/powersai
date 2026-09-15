@@ -4561,6 +4561,9 @@ export type Database = {
           name: string
           not_ready_reason: string | null
           opted_out_at: string | null
+          owner_notified_at: string | null
+          owner_notify_attempted_at: string | null
+          owner_notify_error: string | null
           phone: string | null
           project_type: string | null
           promoted_company_id: string | null
@@ -4589,6 +4592,9 @@ export type Database = {
           name: string
           not_ready_reason?: string | null
           opted_out_at?: string | null
+          owner_notified_at?: string | null
+          owner_notify_attempted_at?: string | null
+          owner_notify_error?: string | null
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
@@ -4617,6 +4623,9 @@ export type Database = {
           name?: string
           not_ready_reason?: string | null
           opted_out_at?: string | null
+          owner_notified_at?: string | null
+          owner_notify_attempted_at?: string | null
+          owner_notify_error?: string | null
           phone?: string | null
           project_type?: string | null
           promoted_company_id?: string | null
