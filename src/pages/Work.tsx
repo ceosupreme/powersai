@@ -1,87 +1,53 @@
-import { useEffect, useMemo, useState } from "react";
-import { Nav } from "@/components/marketing/site/Nav";
-import { Footer } from "@/components/marketing/sections/Footer";
-import { Container, MonoLabel } from "@/components/marketing/site/primitives";
-import { PortfolioCard } from "@/components/marketing/work/PortfolioCard";
-import { usePublishedPortfolioItems } from "@/hooks/usePortfolioItems";
-import { cn } from "@/lib/utils";
-
-const ALL = "All";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Container, Eyebrow, Lede } from "@/components/marketing/studio/primitives";
+import { ProjectPlate } from "@/components/marketing/studio/ProjectPlate";
+import { useStudioProjects } from "@/hooks/useStudioProjects";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 
 export default function Work() {
-  const { data: items = [], isLoading } = usePublishedPortfolioItems();
-  const [active, setActive] = useState<string>(ALL);
+  const { projects, isLoading, isError, isEmpty } = useStudioProjects();
 
-  useEffect(() => {
-    const prev = document.title;
-    document.title = "Work — Supreme Team Media";
-    return () => { document.title = prev; };
-  }, []);
-
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((i) => set.add(i.category));
-    return [ALL, ...Array.from(set).sort()];
-  }, [items]);
-
-  const filtered = active === ALL ? items : items.filter((i) => i.category === active);
-  const featured = filtered.filter((i) => i.featured);
-  const regular = filtered.filter((i) => !i.featured);
+  useStudioHead({
+    title: "Work — Supreme Team Media",
+    description:
+      "Selected websites, creative projects, and business systems, each identifying Sean Mayo's role and whether it is client work, an owned brand, or a demonstration.",
+    path: "/work",
+  });
 
   return (
-    <div className="stm-marketing dark relative min-h-screen">
-      <Nav />
-      <main className="pt-28 pb-24">
+    <div className="stm-studio relative min-h-screen">
+      <StudioHeader />
+      <main className="pt-[112px] md:pt-[140px]">
         <Container>
-          <div className="mb-12 max-w-3xl">
-            <MonoLabel className="mb-3 block">Selected Work</MonoLabel>
-            <h1 className="font-display text-4xl tracking-tight text-foreground md:text-5xl">
-              Real systems shipped for real operators.
-            </h1>
-            <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              A mix of websites, AI systems, graphics, video, and case studies — what the studio has actually built.
-            </p>
-          </div>
+          <Eyebrow>Selected work</Eyebrow>
+          <h1 className="studio-display mt-4 text-balance" style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)" }}>
+            Work you can look at. Experience you can ask about.
+          </h1>
+          <Lede>
+            Explore selected websites, creative projects, and business systems. Each project identifies Sean&apos;s role
+            and whether it is client work, an owned brand, or a demonstration.
+          </Lede>
 
-          {categories.length > 1 && (
-            <div className="mb-10 flex flex-wrap gap-2">
-              {categories.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setActive(c)}
-                  className={cn(
-                    "rounded-sm border px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors",
-                    active === c
-                      ? "border-accent bg-accent text-accent-foreground"
-                      : "border-border bg-transparent text-muted-foreground hover:border-accent/40 hover:text-foreground",
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {isLoading ? (
-            <p className="py-16 text-center text-sm text-muted-foreground">Loading work…</p>
-          ) : filtered.length === 0 ? (
-            <p className="py-16 text-center text-sm text-muted-foreground">
-              Nothing here yet — new pieces ship every few weeks.
+          {isError ? (
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
+              The project list couldn&apos;t be loaded right now. Please refresh, or email
+              hello@supremeteammedia.com.
             </p>
+          ) : isLoading ? (
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">Loading projects…</p>
+          ) : isEmpty ? (
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">No projects are published yet.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featured.map((it) => (
-                <PortfolioCard key={it.id} item={it} featured />
-              ))}
-              {regular.map((it) => (
-                <PortfolioCard key={it.id} item={it} />
+            <div className="mt-12 grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 lg:grid-cols-3">
+              {projects.map((p) => (
+                <ProjectPlate key={p.slug} project={p} />
               ))}
             </div>
           )}
         </Container>
       </main>
-      <Footer />
+      <StudioFooter />
     </div>
   );
 }

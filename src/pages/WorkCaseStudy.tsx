@@ -1,83 +1,132 @@
-import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { Nav } from "@/components/marketing/site/Nav";
-import { Footer } from "@/components/marketing/sections/Footer";
-import { Container, MonoLabel } from "@/components/marketing/site/primitives";
-import { usePublishedPortfolioItemBySlug } from "@/hooks/usePortfolioItems";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Container } from "@/components/marketing/studio/primitives";
+import { useStudioProject } from "@/hooks/useStudioProjects";
+import { getStudioMedia } from "@/config/studioMedia";
+import { STUDIO_CATEGORY_LABEL } from "@/content/studioProjects";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { requestServiceIntent } from "@/components/marketing/studio/serviceIntent";
 
 export default function WorkCaseStudy() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: item, isLoading } = usePublishedPortfolioItemBySlug(slug);
+  const { project, isLoading, isError } = useStudioProject(slug);
 
-  useEffect(() => {
-    const prev = document.title;
-    if (item) document.title = `${item.title} — Supreme Team Media`;
-    return () => { document.title = prev; };
-  }, [item]);
+  useStudioHead({
+    title: project ? `${project.title} — Supreme Team Media` : "Project — Supreme Team Media",
+    description: project?.summary || "A selected Supreme Team Media project.",
+    path: `/work/${slug ?? ""}`,
+  });
+
+  const media = getStudioMedia(project?.mediaKey);
+  const src = project?.imageUrl || media?.src || null;
 
   return (
-    <div className="stm-marketing dark relative min-h-screen">
-      <Nav />
-      <main className="pt-28 pb-24">
+    <div className="stm-studio relative min-h-screen">
+      <StudioHeader />
+      <main className="pt-[112px] md:pt-[140px]">
         <Container>
           <Link
             to="/work"
-            className="mb-8 inline-flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex min-h-[44px] items-center gap-2 text-[0.9rem] text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-3 w-3" /> All work
+            <ArrowLeft size={14} /> All work
           </Link>
 
-          {isLoading ? (
-            <p className="py-16 text-center text-sm text-muted-foreground">Loading…</p>
-          ) : !item ? (
-            <p className="py-16 text-center text-sm text-muted-foreground">Case study not found.</p>
+          {isError ? (
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
+              This project couldn&apos;t be loaded right now. Please refresh, or email hello@supremeteammedia.com.
+            </p>
+          ) : isLoading ? (
+            <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">Loading…</p>
+          ) : !project ? (
+            <div className="py-20">
+              <h1 className="studio-display text-[2rem]">This project page isn&apos;t available.</h1>
+              <p className="mt-4 text-[0.98rem] text-muted-foreground">
+                The project you&apos;re looking for isn&apos;t published.{" "}
+                <Link to="/work" className="underline underline-offset-4">See the selected work</Link> instead.
+              </p>
+            </div>
           ) : (
-            <article className="mx-auto max-w-3xl">
-              <MonoLabel className="mb-3 block">{item.category}</MonoLabel>
-              <h1 className="font-display text-3xl tracking-tight text-foreground md:text-5xl">
-                {item.title}
+            <article className="mx-auto max-w-3xl pb-24">
+              <span className="studio-label mt-8 block">{project.classification}</span>
+              <h1 className="studio-display mt-4 text-balance" style={{ fontSize: "clamp(2rem, 4.4vw, 3.2rem)" }}>
+                {project.title}
               </h1>
-              {item.client_or_vertical && (
-                <p className="mt-2 font-mono text-xs uppercase tracking-[0.16em] text-accent">
-                  {item.client_or_vertical}
+              {project.summary && (
+                <p className="mt-6 text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
+                  {project.summary}
                 </p>
               )}
-              {item.description && (
-                <p className="mt-6 text-lg text-muted-foreground">{item.description}</p>
-              )}
+              <p className="studio-label mt-6">{project.categories.map((c) => STUDIO_CATEGORY_LABEL[c] ?? c).join(" · ")}</p>
 
-              {(item.image_url || item.thumbnail_url) && (
-                <div className="mt-10 overflow-hidden rounded-sm border border-border bg-panel/40">
+              {src ? (
+                <figure className="mt-10">
                   <img
-                    src={item.image_url || item.thumbnail_url || ""}
-                    alt={item.title}
-                    className="h-auto w-full"
+                    src={src}
+                    alt={media?.alt || project.title}
+                    width={media?.width}
+                    height={media?.height}
+                    loading="lazy"
+                    className="w-full rounded-xl border border-border"
+                    style={{ aspectRatio: media?.aspectRatio ?? "16 / 10", objectFit: media?.objectFit ?? "cover" }}
                   />
+                  {media?.disclosure && (
+                    <figcaption className="mt-2 text-[0.82rem] text-muted-foreground">{media.disclosure}</figcaption>
+                  )}
+                </figure>
+              ) : null}
+
+              <dl className="mt-12 space-y-8">
+                {project.role && <Row term="Role" desc={project.role} />}
+                {project.brief && <Row term="Brief" desc={project.brief} />}
+                {project.work && <Row term="Work" desc={project.work} />}
+                {project.demonstrates && <Row term="What this demonstrates" desc={project.demonstrates} />}
+                {project.statusNote && <Row term="Status" desc={project.statusNote} />}
+              </dl>
+
+              {project.bodyText && (
+                <div className="mt-12 whitespace-pre-wrap text-[1rem] leading-relaxed text-muted-foreground">
+                  {project.bodyText}
                 </div>
               )}
 
-              {item.external_url && (
+              {project.externalUrl && (
                 <a
-                  href={item.external_url}
+                  href={project.externalUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-6 inline-flex items-center gap-2 text-sm text-accent hover:opacity-80"
+                  className="studio-btn studio-btn-outline mt-10"
                 >
-                  View live <ExternalLink className="h-4 w-4" />
+                  View live <ExternalLink size={14} />
                 </a>
               )}
 
-              {item.case_study_body && (
-                <div className="mt-12 whitespace-pre-wrap text-base leading-relaxed text-muted-foreground">
-                  {item.case_study_body}
-                </div>
-              )}
+              <div className="mt-14 border-t border-border pt-8">
+                <p className="studio-display text-[1.25rem]">Want something like this?</p>
+                <Link
+                  to="/#contact"
+                  onClick={() => requestServiceIntent(project.categories[0] as never)}
+                  className="studio-btn studio-btn-primary mt-4"
+                >
+                  Discuss a project
+                </Link>
+              </div>
             </article>
           )}
         </Container>
       </main>
-      <Footer />
+      <StudioFooter />
+    </div>
+  );
+}
+
+function Row({ term, desc }: { term: string; desc: string }) {
+  return (
+    <div className="border-t border-border pt-5">
+      <dt className="studio-label">{term}</dt>
+      <dd className="mt-2 text-[1rem] leading-relaxed text-muted-foreground">{desc}</dd>
     </div>
   );
 }
