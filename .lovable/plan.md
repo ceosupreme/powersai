@@ -1,72 +1,58 @@
-# Supreme Team Media — Foundation and homepage plan
+# Phase 2 — Work pages, filters, and the hiring page
 
-## Goal
+Builds on the studio homepage from phase 1. Same paper/ink/cobalt art direction, same header and footer, no backend, auth, database, or deployment changes.
 
-Replace the signed-out homepage with the attached founder-led creative, marketing, and technology studio presentation while leaving the operating app, authentication, protected routes, backend, and integrations unchanged.
+## What you'll be able to do
 
-Pre-build checkpoint: Git revision `e1e3444113a784c4ac1f81a8bf220b84f1e19682` with a clean working tree. No production deployment.
+- Browse `/work` and filter by Websites & apps, Brand & creative, Marketing & growth, AI & systems, or All. The choice lives in the web address, so it can be shared and the browser back button restores it.
+- Open any project page and read its classification, short brief, Sean's role, work delivered, and what it demonstrates — with the approved wording exactly as supplied.
+- Visit a new public page at `/hire`: Sean's introduction for employers and contract work, with evidence across creative, marketing, and systems work, the advertising degree, 2002 start year, and the correct LinkedIn link.
+- On `/hire`, "Discuss a role or contract" jumps to the homepage contact form with hiring context already selected.
 
-## Build
+## Work index (`/work`)
 
-1. **Create an isolated public studio system**
-   - Add the new public components under `src/components/marketing/studio`.
-   - Add a `.stm-studio`-scoped warm-paper, ink, cobalt, pale-blue, dark-band, lilac, sand, and green token set without altering the internal app theme.
-   - Add shared layout, typography, buttons, focus states, reduced-motion behavior, anchor offsets, and finished no-image project plates.
-   - Add one media configuration module for later image replacement; no generated or stock imagery now.
+- Restyle with the existing studio header/footer and typography (already partly in place from phase 1; this phase adds filters and full case detail).
+- Filter row rendered as real buttons, keyboard reachable, 44px targets, with a screen-reader status line reporting how many projects are shown.
+- Filter state stored as `?category=websites-apps | brand-creative | marketing-growth | ai-systems`; anything unrecognised falls back to All. Back/forward restores the previous selection.
+- A category button only appears when at least one real project belongs to it. No filler projects are invented.
+- Distinct loading, load-failure, and genuinely-empty states. A failed load says so plainly instead of implying there is no work.
 
-2. **Replace the signed-out homepage in the exact specified sequence**
-   - Shared header and accessible mobile menu.
-   - Typographic hero with the exact `Stand out. / Get chosen. / Work smarter.` copy and DESIGN / BUILD / GROW / CONNECT composition.
-   - Compact scope strip.
-   - Selected work with four approved, accurately labeled project plates.
-   - Four numbered capability rows with contact preselection.
-   - Dark BarPulse historical-implementation feature.
-   - Three-step process and three engagement types.
-   - Sean Mayo founder section with a typographic nameplate.
-   - Six-item FAQ.
-   - Restyled project inquiry using the existing real submission handler.
-   - Shared footer with Work, capabilities, about, inquiry, hiring, free checkup, login, and the approved LinkedIn URL.
-   - Preserve aliases for `#proof`, `#how-we-help`, and `#how-it-starts`, alongside `#work`, `#services`, `#process`, `#about`, and `#contact`.
+## Case pages (`/work/:slug`)
 
-3. **Add the shared public project-content adapter**
-   - Continue querying only `portfolio_items` rows where `status = 'published'`.
-   - Merge those rows with only the four approved editorial summaries: `sylina-renae`, `coastal-beauties`, `barpulse`, and `ritual-command`.
-   - Prefer an existing published canonical slug, deduplicate by canonical slug, and apply the brief’s corrected historical / owned-brand / sample-data classifications in public presentation only.
-   - Route every homepage plate to a real `/work/:slug` page. Do not seed or rewrite database records and do not expose draft/private work.
-   - The current published query returns zero rows, so the four approved summaries will be the initial public set.
+- Each case shows: name, classification/status, brief, Sean's role, work delivered, what it demonstrates, status note, and a media plate.
+- Approved labels stay exactly as briefed: Sylina Renae — website project; Coastal Beauties — owned brand / historical work; BarPulse — historical eight-venue client implementation; Ritual Command Center — demonstration using labelled sample data. No present-tense "8 venues live" claims, no invented metrics or testimonials, no venue or staff names.
+- Case body text from the content system keeps rendering as safe text, never raw HTML.
+- "Visit website" or demo buttons appear only where an approved, configured destination exists. Today none is configured, so no external buttons render and each case stays fully usable without one.
+- Unknown slug shows the real not-found page (already in place) with a link back to all work.
+- Back link returns to `/work` preserving the filter you came from.
 
-4. **Provide the minimum shared work-page presentation required by this phase**
-   - Move `/work` and `/work/:slug` onto the same `.stm-studio` header, footer, content adapter, media config, and editorial visual language.
-   - Ensure the four approved cases have usable detail pages with their exact supplied brief, role, work, demonstration, and status content.
-   - Keep safe text rendering, approved external URLs only, and a proper not-found state for unknown slugs.
-   - Full URL-backed filtering and expanded work-index refinements remain for the later work-page prompt.
+## Hiring page (`/hire`)
 
-5. **Preserve and harden the real inquiry path**
-   - Reuse `submit-inbound-lead`; no fake success, backend change, migration, or new function.
-   - Keep required name/email/message, optional business name, honeypot, validation, field preservation, and duplicate-submit blocking.
-   - Submit general inquiries with no invented `project_type` or `captured_for_project_id`; use accepted `qualifier_data`, `conversation_channel: 'form'`, and `route_to: 'self'` where needed.
-   - Treat success as confirmed only when there is no invocation error and the response contains `ok === true` plus an ID.
-   - Adapt the section copy and appearance now; the expanded multi-select and budget/timing refinement stays with Prompt 3.
+New route, public, same shell. Content:
 
-6. **SEO and route safety**
-   - Preserve the homepage’s existing signed-in redirect to `/portfolio`.
-   - Keep `/portfolio` internal and leave all protected and existing public routes unchanged.
-   - Update root title, description, canonical, Open Graph text, and Twitter text to the supplied studio positioning; remove reliance on a nonexistent/new image asset.
-   - Add route-specific metadata handling for the public work pages without changing internal access.
-   - The `/hire` page itself is not built in this foundation prompt; its dedicated implementation remains for the later hiring-page prompt. Until then, avoid introducing a broken primary navigation path.
+- Title: "Sean Mayo — Strategy, creative work, and hands-on implementation."
+- The supplied intro and the "for employers and teams" context line.
+- Evidence grid drawing on the same project data: BarPulse (systems), Coastal Beauties (brand and marketing), Sylina Renae (web), Ritual (prototyping) — each with its accurate label, linking to its case page.
+- Credentials: Bachelor's degree in Advertising, The Art Institute of California; Supreme Team Media founded 2002; LinkedIn profile link.
+- Primary button: "Discuss a role or contract" → `/?intent=hiring#contact` (the form already reads that and preselects hiring context).
+- Résumé: no approved PDF exists in the project, so the page shows "Request résumé" opening an email to ceosupreme@gmail.com with a suitable subject. A download button appears only if a real approved PDF is later added. No dead download, no external sandbox link.
+- No personal financial, medical, or family content; no "all roles accepted" framing.
+- Footer and header links to `/hire` are enabled in this phase (they were withheld in phase 1).
 
-7. **Verification**
-   - Run the production build and TypeScript check.
-   - Test signed-out `/` at 375, 390, 768, and 1440px for layout, overflow, readable text, anchor offsets, keyboard focus, and mobile-menu Escape/focus behavior.
-   - Verify the four homepage project links and unknown-case not-found behavior.
-   - Smoke-test `/free-audit`, `/for/:slug`, `/qualify/:slug`, `/q/:venueSlug`, `/r/:token`, `/login`, and the signed-in homepage redirect without changing their behavior.
-   - Perform one controlled real inquiry only if an owner-approved test submission is appropriate; otherwise verify validation and the request contract without creating a record, and report that limitation plainly.
-   - Report changed files, checkpoint revision, preview behavior, and actual blockers. Do not publish.
+## Technical notes
 
-## Confirmed implementation facts
+- One shared adapter: `src/hooks/useStudioProjects.ts` is refactored to consume the retained `usePublishedPortfolioItems` / `usePublishedPortfolioItemBySlug` hooks rather than its own duplicate query, keeping published-only behaviour and the separate error/empty signalling. Homepage, work index, case pages, and `/hire` all read through it.
+- Editorial fallbacks in `src/content/studioProjects.ts` merge only when the matching published slug is absent; published canonical slugs win; per-entry `enabled` flags remain. No seeds, no migrations, no draft/private queries, no admin overwrites.
+- Filters use `useSearchParams` so history integration is native.
+- New files: `src/pages/Hire.tsx`, `src/components/marketing/studio/WorkFilters.tsx`, `src/components/marketing/studio/CaseDetail.tsx`, and a small no-op analytics adapter `src/lib/studioAnalytics.ts` (events: service_selected, project_opened, inquiry_started, inquiry_submitted, hiring_interest, resume_download) that sends nothing anywhere and records no names, emails, or message text — tracking is documented as inactive because no analytics destination is installed.
+- Edited: `src/App.tsx` (add `/hire`), `src/pages/Work.tsx`, `src/pages/WorkCaseStudy.tsx`, `src/hooks/useStudioProjects.ts`, `StudioHeader.tsx` / `StudioFooter.tsx` (enable `/hire`), `index.html` untouched apart from nothing — per-route titles handled by the existing head helper.
+- Routes after this phase: `/`, `/work`, `/work/:slug`, `/hire`. All internal app routes, `/free-audit`, vertical, qualifier, and report routes untouched.
 
-- `/` currently renders `src/pages/MarketingSite.tsx` and redirects authenticated users to `/portfolio`.
-- `/work` and `/work/:slug` already exist; `/portfolio` is a separate protected owner route.
-- Public work hooks already constrain reads to `status = 'published'`; the current published result is empty.
-- `submit-inbound-lead` accepts the current contact fields plus optional `qualifier_data`, `conversation_channel`, and `route_to`; successful inserts return `{ ok: true, id }`.
-- No existing visitor analytics destination was found, so this phase will not install or claim analytics tracking.
+## Assets
+
+- Required: none. Every case renders a finished typographic scope plate.
+- Optional, addable later: project screenshots and the founder portrait via the single media registry `src/config/studioMedia.ts`; approved external project URLs; an approved résumé PDF; a social share image.
+
+## Verification before reporting
+
+Browser checks at 375, 390, 768, 1440px: homepage work links, each category deep link plus back/forward, case pages and back navigation, unknown slug, `/hire` buttons and mailto fallback, mobile menu on every route, `/free-audit` still loading. Production build and type check. No deployment.
