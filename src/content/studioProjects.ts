@@ -3,7 +3,7 @@
  *
  * Two sources, one shape:
  *   1. Published `portfolio_items` rows (CMS, status='published' only).
- *   2. The four explicitly approved editorial starter summaries below.
+ *   2. The seven explicitly approved live-project editorial summaries below.
  *
  * Rules encoded here:
  * - Deduplicate by canonical slug; a published CMS row always wins.
@@ -67,95 +67,166 @@ interface EditorialCase extends Omit<StudioProject, "source"> {
    * rendered even if the CMS row is later unpublished — that is intentional.
    */
   enabled: boolean;
-  /** Homepage ordering: website + creative first, technical after. */
+  /** Public ordering for fallback-only projects. */
   order: number;
 }
+
+export const HOMEPAGE_WORK_ORDER = [
+  "kario-voss",
+  "big-paws-club",
+  "supreme-wellness-club",
+  "coastal-beauties",
+  "barpulse",
+  "allmighty-supreme",
+] as const;
 
 export const EDITORIAL_CASES: EditorialCase[] = [
   {
     enabled: true,
     order: 1,
-    slug: "sylina-renae",
-    title: "Sylina Renae — Artist website",
-    classification: "Website project",
-    categories: ["websites-apps"],
-    summary: "An artist's online presence, designed and implemented as a responsive website.",
-    role: "Website design and implementation.",
-    brief: "Give an artist a dedicated web presence beyond social profiles.",
-    work: "Design and implementation of a responsive artist website with a contact path.",
+    slug: "allmighty-supreme",
+    title: "AllMighty Supreme — Personal brand website",
+    classification: "Personal brand website",
+    categories: ["websites-apps", "brand-creative"],
+    summary:
+      "A personal brand and portfolio experience built to present creative work, systems, and professional range in one place.",
+    role: "Strategy, creative direction, copy, interface design, and implementation.",
+    brief: "Create a flexible home for Sean's work, ideas, systems, and professional portfolio.",
+    work: "Brand direction, portfolio architecture, responsive interface design, content structure, and implementation.",
     demonstrates:
-      "Visual presentation, responsive web delivery, and translating a personal brand into a usable site.",
-    statusNote:
-      "Completed website project. Public-domain availability is checked separately; do not promise that the domain remains live today.",
-    mediaKey: "work-sylina-renae",
+      "Personal-brand strategy, editorial web design, portfolio UX, and translating a broad body of work into a clear digital experience.",
+    statusNote: "Live website.",
+    mediaKey: "work-allmighty-supreme",
     imageUrl: null,
-    externalUrl: null,
+    externalUrl: "https://allmightysupreme.com",
     bodyText: null,
     plateTone: "lilac",
   },
   {
     enabled: true,
     order: 2,
-    slug: "coastal-beauties",
-    title: "Coastal Beauties — Brand, content & events",
-    classification: "Owned brand / historical work",
-    categories: ["brand-creative", "marketing-growth"],
+    slug: "big-paws-club",
+    title: "Big Paws Club — Editorial & lifestyle brand website",
+    classification: "Editorial & lifestyle brand website",
+    categories: ["websites-apps", "brand-creative", "marketing-growth"],
     summary:
-      "A lifestyle and events brand built through creative direction, promotion, partnerships, and audience development.",
-    role: "Founder, brand development, marketing and event promotion.",
-    brief: "Build and promote an independent lifestyle and events brand.",
-    work: "Brand direction, promotional creative, campaigns and hospitality partnerships.",
-    demonstrates:
-      "How identity and marketing can work together across a brand and its experiences.",
-    statusNote:
-      "Sean's own brand, founded in 2008; historical experience. Not an external client, not a currently running event schedule.",
-    mediaKey: "work-coastal-beauties",
+      "A content-rich large-dog brand experience combining practical guides, editorial structure, audience-building paths, and future product/shop experiences.",
+    role: "Brand strategy, content architecture, UX, creative direction, and implementation.",
+    brief: "Build a useful, distinctive destination for people living with large and giant dogs.",
+    work: "Brand identity direction, responsive site design, editorial system, navigation, guide structure, signup paths, and implementation.",
+    demonstrates: "Niche-brand strategy, editorial UX, content design, audience development, and web execution.",
+    statusNote: "Live website.",
+    mediaKey: "work-big-paws-club",
     imageUrl: null,
-    externalUrl: null,
+    externalUrl: "https://bigpawsclub.com",
     bodyText: null,
     plateTone: "sand",
   },
   {
     enabled: true,
     order: 3,
-    slug: "barpulse",
-    title: "BarPulse — Hospitality operating system",
-    classification: "Historical client implementation",
-    categories: ["ai-systems", "websites-apps"],
+    slug: "supreme-wellness-club",
+    title: "Supreme Wellness Club — Wellness brand website",
+    classification: "Wellness brand website",
+    categories: ["websites-apps", "brand-creative", "marketing-growth"],
     summary:
-      "Built and deployed for an eight-venue hospitality group, connecting operating information, management workflows, and AI-assisted reporting.",
-    role: "Discovery, application build, integrations, owner-specific scoring, and weekly refinement.",
+      "A wellness-focused digital experience combining education, guided paths, and a premium lifestyle presentation.",
+    role: "Brand direction, content architecture, UX, design, and implementation.",
     brief:
-      "Connect scattered operating information and help leadership review what needed attention across venues.",
-    work:
-      "Integrated Toast, 7shifts and Asana in the historical engagement; configured scoring, reporting and insights around ownership priorities.",
+      "Turn a broad wellness concept into a clear, approachable digital destination with useful paths for visitors.",
+    work: "Responsive site design, content organization, guided pathways, visual system, and implementation.",
     demonstrates:
-      "Business discovery, integration, AI implementation, management workflows and stakeholder iteration.",
-    statusNote:
-      "Historical eight-venue implementation. Not a claim that all eight venues are currently live, paying, or running daily.",
-    mediaKey: "work-barpulse",
+      "Brand strategy, information architecture, wellness-content presentation, and polished responsive web delivery.",
+    statusNote: "Live website.",
+    mediaKey: "work-supreme-wellness-club",
     imageUrl: null,
-    externalUrl: null,
+    externalUrl: "https://supremewellnessclub.com",
     bodyText: null,
     plateTone: "green",
   },
   {
     enabled: true,
     order: 4,
-    slug: "ritual-command",
-    title: "Ritual Command Center — A workflow made tangible",
-    classification: "Interactive demonstration / sample data",
+    slug: "barpulse",
+    title: "BarPulse — Hospitality operations platform",
+    classification: "Hospitality operations platform",
     categories: ["ai-systems", "websites-apps"],
     summary:
-      "A five-screen barbershop management demonstration that turns an operating idea into an experience someone can explore.",
-    role: "Workflow design, interface and rapid prototyping.",
-    brief: "Make a barbershop operating concept concrete before a full implementation.",
-    work: "A five-screen dashboard demonstration, built in one afternoon and checked on a phone.",
-    demonstrates: "Rapid prototyping, workflow communication and mobile-first interface thinking.",
-    statusNote: "Demonstration using labeled sample data. Not a paid live client system.",
-    mediaKey: "work-ritual-command",
+      "A hospitality operating system connecting operational information, management workflows, scorecards, tasks, and AI-assisted insights.",
+    role:
+      "Discovery, application build, integrations, workflow design, scoring logic, reporting, and iterative refinement.",
+    brief:
+      "Give hospitality leadership one clearer operating view across sales, labor, tasks, guest experience, and growth opportunities.",
+    work:
+      "Application design and development, workflow architecture, integrations, management dashboards, reporting, task systems, and AI-assisted insights.",
+    demonstrates:
+      "Business discovery, systems thinking, AI implementation, integrations, product design, and operational workflow development.",
+    statusNote:
+      "Live product site; historical eight-venue client implementation is part of the case history, but this does not imply all eight venues are currently active clients.",
+    mediaKey: "work-barpulse",
     imageUrl: null,
-    externalUrl: null,
+    externalUrl: "https://barpulsehq.com",
+    bodyText: null,
+    plateTone: "paper",
+  },
+  {
+    enabled: true,
+    order: 5,
+    slug: "kario-voss",
+    title: "Kario Voss — Artist website",
+    classification: "Artist website",
+    categories: ["websites-apps", "brand-creative"],
+    summary:
+      "A mobile-first artist site bringing music, visuals, press materials, and identity into one focused digital experience.",
+    role: "Creative direction, information architecture, interface design, and implementation.",
+    brief:
+      "Give an artist a distinctive digital home that feels like the brand while making music, visuals, and press material easy to explore.",
+    work: "Responsive single-page design, content system, media sections, press-kit structure, gallery treatment, and implementation.",
+    demonstrates: "Artist-brand translation, visual web design, media-rich UX, and mobile-first delivery.",
+    statusNote: "Live website.",
+    mediaKey: "work-kario-voss",
+    imageUrl: null,
+    externalUrl: "https://kariovoss.com",
+    bodyText: null,
+    plateTone: "lilac",
+  },
+  {
+    enabled: true,
+    order: 6,
+    slug: "coastal-beauties",
+    title: "Coastal Beauties — Lifestyle & creator-culture website",
+    classification: "Lifestyle & creator-culture website",
+    categories: ["websites-apps", "brand-creative", "marketing-growth"],
+    summary:
+      "A Southern California lifestyle and creator-culture destination combining editorial storytelling, brand identity, content, and audience growth.",
+    role: "Brand direction, creative direction, content strategy, marketing, UX, and implementation.",
+    brief: "Evolve an established lifestyle brand into a modern editorial and creator-culture destination.",
+    work: "Brand presentation, responsive site design, editorial structure, blog/content experience, email capture, and marketing architecture.",
+    demonstrates: "Brand evolution, editorial design, audience strategy, content systems, and web execution.",
+    statusNote: "Live website.",
+    mediaKey: "work-coastal-beauties",
+    imageUrl: null,
+    externalUrl: "https://coastalbeauties.com",
+    bodyText: null,
+    plateTone: "sand",
+  },
+  {
+    enabled: true,
+    order: 7,
+    slug: "sylina-renae",
+    title: "Sylina Renae — Artist website",
+    classification: "Artist website",
+    categories: ["websites-apps", "brand-creative"],
+    summary:
+      "A cinematic artist website presenting music, dance, modeling, media, and booking paths in one responsive experience.",
+    role: "Website design, interface direction, content structure, and implementation.",
+    brief: "Give an artist a dedicated web presence beyond social profiles and scattered media links.",
+    work: "Responsive artist website, media sections, show information, biography, press, booking/contact paths, and implementation.",
+    demonstrates: "Visual presentation, artist-brand translation, responsive design, and media-rich web delivery.",
+    statusNote: "Live website.",
+    mediaKey: "work-sylina-renae",
+    imageUrl: null,
+    externalUrl: "https://sylinarenea.com",
     bodyText: null,
     plateTone: "paper",
   },
@@ -224,8 +295,8 @@ export function mergeProjects(cms: StudioProject[]): StudioProject[] {
   });
   const cmsOrder = new Map(cms.map((p, i) => [p.slug, i]));
   return Array.from(bySlug.values()).sort((a, b) => {
-    const ai = cmsOrder.has(a.slug) ? cmsOrder.get(a.slug)! : 1000;
-    const bi = cmsOrder.has(b.slug) ? cmsOrder.get(b.slug)! : 1000;
+    const ai = cmsOrder.get(a.slug) ?? 1000;
+    const bi = cmsOrder.get(b.slug) ?? 1000;
     return ai - bi;
   });
 }

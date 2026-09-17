@@ -39,7 +39,11 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
             height={media?.height}
             loading="lazy"
             className="w-full"
-            style={{ aspectRatio: media?.aspectRatio ?? "16 / 10", objectFit: media?.objectFit ?? "cover" }}
+            style={{
+              aspectRatio: media?.aspectRatio ?? "16 / 10",
+              objectFit: media?.objectFit ?? "cover",
+              objectPosition: media?.objectPosition ?? "center",
+            }}
           />
         ) : (
           <div className={cn("studio-plate-face", TONE_CLASS[project.plateTone])}>

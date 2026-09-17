@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { Container, Eyebrow, Lede, SectionTitle } from "../primitives";
 import { ProjectPlate } from "../ProjectPlate";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
+import { HOMEPAGE_WORK_ORDER } from "@/content/studioProjects";
 
 export function SelectedWork() {
   const { projects, isLoading, isError, isEmpty } = useStudioProjects();
-  const shown = projects.slice(0, 4);
+  const shown = HOMEPAGE_WORK_ORDER.map((slug) => projects.find((p) => p.slug === slug)).filter((p) => Boolean(p));
 
   return (
     <section id="work" className="studio-section">
@@ -30,7 +31,7 @@ export function SelectedWork() {
             No projects are published yet.
           </p>
         ) : (
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {shown.map((p) => (
               <ProjectPlate key={p.slug} project={p} />
             ))}

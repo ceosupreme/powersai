@@ -34,7 +34,7 @@ export default function Work() {
   useStudioHead({
     title: active === "all" ? "Work — Supreme Team Media" : `${activeLabel} work — Supreme Team Media`,
     description:
-      "Selected websites, creative projects, and business systems, each identifying Sean Mayo's role and whether it is client work, an owned brand, or a demonstration.",
+      "Selected live websites, creative projects, and business systems, each identifying the type of work and Sean Mayo's contribution.",
     path: active === "all" ? "/work" : `/work?category=${active}`,
     canonicalPath: "/work",
   });
@@ -57,8 +57,8 @@ export default function Work() {
             Work you can look at. Experience you can ask about.
           </h1>
           <Lede>
-            Explore selected websites, creative projects, and business systems. Each project identifies Sean&apos;s role
-            and whether it is client work, an owned brand, or a demonstration.
+            Explore selected live websites, creative projects, and business systems. Each project identifies the type
+            of work and Sean&apos;s contribution.
           </Lede>
 
           {isError ? (
