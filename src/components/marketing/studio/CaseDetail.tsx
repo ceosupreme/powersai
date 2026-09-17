@@ -38,7 +38,11 @@ export function CaseDetail({ project }: { project: StudioProject }) {
             height={media?.height}
             loading="lazy"
             className="w-full rounded-xl border border-border"
-            style={{ aspectRatio: media?.aspectRatio ?? "16 / 10", objectFit: media?.objectFit ?? "cover" }}
+            style={{
+              aspectRatio: media?.aspectRatio ?? "16 / 10",
+              objectFit: media?.objectFit ?? "cover",
+              objectPosition: media?.objectPosition ?? "center",
+            }}
           />
           {media?.disclosure && (
             <figcaption className="mt-2 text-[0.82rem] text-muted-foreground">{media.disclosure}</figcaption>
@@ -74,7 +78,7 @@ export function CaseDetail({ project }: { project: StudioProject }) {
 
       {project.externalUrl && (
         <a href={project.externalUrl} target="_blank" rel="noreferrer" className="studio-btn studio-btn-outline mt-10">
-          Visit website <ExternalLink size={14} />
+          Visit site <ExternalLink size={14} />
         </a>
       )}
 
