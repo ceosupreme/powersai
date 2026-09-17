@@ -1,9 +1,10 @@
+import { Link } from "react-router-dom";
 import { Container, Eyebrow, SectionTitle } from "../primitives";
 
 /**
  * No portrait is supplied, so the visual is a compact typographic nameplate —
- * not an empty image rectangle. The /hire link is intentionally omitted until
- * that page exists.
+ * not an empty image rectangle. The /hire route is a secondary professional
+ * path, deliberately kept out of the primary company navigation.
  */
 export function Founder() {
   return (
@@ -24,6 +25,14 @@ export function Founder() {
             </p>
             <p className="studio-label mt-7">
               Bachelor&apos;s degree in Advertising · The Art Institute of California
+            </p>
+            <p className="mt-4 text-[0.9rem]">
+              <Link
+                to="/hire"
+                className="inline-flex min-h-[24px] items-center gap-1.5 text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+              >
+                Hiring Sean? <span aria-hidden>&rarr;</span>
+              </Link>
             </p>
           </div>
 

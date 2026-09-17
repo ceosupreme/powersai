@@ -11,7 +11,7 @@
   - `useStudioProjects` consumes the retained `usePublishedPortfolioItems`
   - `/work` filters with URL `?category=` state, zero-count categories hidden
   - `/work/:slug` full case detail; back link restores the filtered list
-  - `/hire` page live; hire links enabled in header/footer
+  - `/hire` page live; reached from the founder section and footer, not the primary header nav
 - [x] Phase 3 — Inquiry flow + metadata (build pack H–I)
 - [x] Phase 4 — Final frontend QA pass (all checks passed; no fixes required)
 - [x] Owner email notification for general site inquiries

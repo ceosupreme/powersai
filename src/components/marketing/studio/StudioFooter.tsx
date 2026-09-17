@@ -18,6 +18,7 @@ export function StudioFooter() {
             <Link to="/#about" className="hover:underline">About</Link>
             <Link to="/#contact" className="hover:underline">Discuss a project</Link>
             <Link to="/free-audit" className="hover:underline">Free business checkup</Link>
+            <Link to="/hire" className="hover:underline">Hiring Sean?</Link>
             <Link to="/login" className="hover:underline">Client login</Link>
             <a
               href="https://www.linkedin.com/in/sean-mayo-3055aa287/"
