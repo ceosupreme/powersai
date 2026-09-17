@@ -15,7 +15,7 @@
 - [x] Phase 3 — Inquiry flow + metadata (build pack H–I)
 - [x] Phase 4 — Final frontend QA pass (all checks passed; no fixes required)
 - [x] Owner email notification for general site inquiries
-- [ ] Public studio showcase enhancements
+- [x] Public studio showcase enhancements
   - Refined live-project cards with browser frames, visible actions, status, and category chips
   - Accessible four-lane interactive studio map with real case links and contact intent
   - BarPulse screenshot and clearly labeled historical integration flow
