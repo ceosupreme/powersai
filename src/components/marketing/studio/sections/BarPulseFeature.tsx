@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
+import { getStudioMedia } from "@/config/studioMedia";
+import { BrowserFrame } from "../BrowserFrame";
 import { Container } from "../primitives";
 import { requestServiceIntent } from "../serviceIntent";
 
 const LABELS = ["Operating visibility", "Team workflows", "AI-assisted insights"];
 
 export function BarPulseFeature() {
+  const media = getStudioMedia("work-barpulse");
+
   return (
     <section id="barpulse" className="studio-band studio-section">
       <Container>
@@ -52,24 +56,45 @@ export function BarPulseFeature() {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="rounded-xl border border-[hsl(var(--band-text)/0.2)] p-6">
-              <p className="studio-label" style={{ color: "hsl(var(--band-text) / 0.6)" }}>
-                Engagement shape
+            {media?.src && (
+              <BrowserFrame className="studio-browser-frame-dark">
+                <img
+                  src={media.src}
+                  alt={media.alt}
+                  width={media.width}
+                  height={media.height}
+                  loading="lazy"
+                  className="size-full"
+                  style={{
+                    aspectRatio: media.aspectRatio,
+                    objectFit: media.objectFit,
+                    objectPosition: media.objectPosition ?? "center",
+                  }}
+                />
+              </BrowserFrame>
+            )}
+
+            <div className="mt-5 rounded-lg border border-[hsl(var(--band-text)/0.2)] p-5">
+              <p className="studio-label" style={{ color: "hsl(var(--band-text) / 0.65)" }}>
+                Historical integration example
               </p>
-              <ul className="mt-4 space-y-4 text-[0.95rem]">
-                <li>
-                  <span className="studio-display block text-[1.05rem]">Discovery</span>
-                  <span className="text-muted-foreground">What ownership needed to review each week.</span>
-                </li>
-                <li>
-                  <span className="studio-display block text-[1.05rem]">Integration</span>
-                  <span className="text-muted-foreground">Toast, 7shifts and Asana connected into one picture.</span>
-                </li>
-                <li>
-                  <span className="studio-display block text-[1.05rem]">Refinement</span>
-                  <span className="text-muted-foreground">Scoring and reporting tuned with ownership over time.</span>
-                </li>
-              </ul>
+              <div className="studio-system-flow mt-5" aria-label="Toast POS, 7shifts, and Asana flowed into BarPulse, then into briefs, tasks, and insights">
+                <div className="studio-system-sources">
+                  <span>Toast POS</span><span>7shifts</span><span>Asana</span>
+                </div>
+                <span className="studio-system-arrow" aria-hidden>→</span>
+                <strong>BarPulse</strong>
+                <span className="studio-system-arrow" aria-hidden>→</span>
+                <div className="studio-system-outputs">
+                  <span>Brief</span><span>Tasks</span><span>Insights</span>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[hsl(var(--band-text)/0.16)] pt-5">
+                <div><span className="studio-display block text-[0.88rem]">Discovery</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Weekly review needs</span></div>
+                <div><span className="studio-display block text-[0.88rem]">Integration</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">One operating picture</span></div>
+                <div><span className="studio-display block text-[0.88rem]">Refinement</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Scoring and reporting</span></div>
+              </div>
             </div>
           </div>
         </div>

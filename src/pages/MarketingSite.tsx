@@ -6,12 +6,14 @@ import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
+import { InteractiveStudioMap } from "@/components/marketing/studio/sections/InteractiveStudioMap";
 import { BarPulseFeature } from "@/components/marketing/studio/sections/BarPulseFeature";
 import { ProcessSection } from "@/components/marketing/studio/sections/ProcessSection";
 import { Founder } from "@/components/marketing/studio/sections/Founder";
 import { FAQ } from "@/components/marketing/studio/sections/FAQ";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
 
 export default function MarketingSite() {
   const { user, isLoading } = useAuth();
@@ -40,13 +42,14 @@ export default function MarketingSite() {
       <main>
         <Hero />
         <ScopeStrip />
-        <SelectedWork />
-        <Capabilities />
-        <BarPulseFeature />
-        <ProcessSection />
-        <Founder />
-        <FAQ />
-        <Inquiry />
+        <StudioReveal><SelectedWork /></StudioReveal>
+        <StudioReveal><Capabilities /></StudioReveal>
+        <StudioReveal><InteractiveStudioMap /></StudioReveal>
+        <StudioReveal><BarPulseFeature /></StudioReveal>
+        <StudioReveal><ProcessSection /></StudioReveal>
+        <StudioReveal><Founder /></StudioReveal>
+        <StudioReveal><FAQ /></StudioReveal>
+        <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />
     </div>

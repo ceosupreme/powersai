@@ -15,6 +15,11 @@
 - [x] Phase 3 — Inquiry flow + metadata (build pack H–I)
 - [x] Phase 4 — Final frontend QA pass (all checks passed; no fixes required)
 - [x] Owner email notification for general site inquiries
+- [x] Public studio showcase enhancements
+  - Refined live-project cards with browser frames, visible actions, status, and category chips
+  - Accessible four-lane interactive studio map with real case links and contact intent
+  - BarPulse screenshot and clearly labeled historical integration flow
+  - Restrained, reduced-motion-safe reveal treatment and responsive browser verification
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
