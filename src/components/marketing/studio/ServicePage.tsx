@@ -9,6 +9,7 @@ import { StudioReveal } from "./StudioReveal";
 import { ProjectPlate } from "./ProjectPlate";
 import { Container, Eyebrow, SectionTitle } from "./primitives";
 import { useStudioHead } from "./useStudioHead";
+import { ServiceExplainerVisual, ServiceHeroVisual, ServiceMediaBand } from "./ServiceVisuals";
 
 export type ServicePageContent = {
   eyebrow: string;
@@ -71,9 +72,18 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
                 </div>
               </div>
             </div>
-            <div className="service-hero-rule mt-14 md:mt-20" aria-hidden />
+            <div className="mt-14 md:mt-20">
+              <ServiceHeroVisual tone={content.tone} />
+            </div>
+            <div className="service-hero-rule mt-8" aria-hidden />
           </Container>
         </section>
+
+        <StudioReveal>
+          <section className="service-visual-explainer-wrap">
+            <Container><ServiceExplainerVisual tone={content.tone} /></Container>
+          </section>
+        </StudioReveal>
 
         <StudioReveal>
           <section className="studio-section">
@@ -134,6 +144,16 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
                   </li>
                 ))}
               </ul>
+            </Container>
+          </section>
+        </StudioReveal>
+
+        <StudioReveal>
+          <section className="service-media-section studio-section">
+            <Container>
+              <Eyebrow>In practice</Eyebrow>
+              <SectionTitle>{mediaBandTitle(content.tone)}</SectionTitle>
+              <ServiceMediaBand tone={content.tone} />
             </Container>
           </section>
         </StudioReveal>
@@ -237,6 +257,13 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
       <StudioFooter />
     </div>
   );
+}
+
+function mediaBandTitle(tone: ServicePageContent["tone"]): string {
+  if (tone === "brand") return "A system becomes real through its applications.";
+  if (tone === "marketing") return "Message, destination, and follow-through belong together.";
+  if (tone === "systems") return "Turn scattered steps into one useful operating view.";
+  return "Design the experience to hold together at every size.";
 }
 
 function categoryForTone(tone: ServicePageContent["tone"]): StudioCategoryId {

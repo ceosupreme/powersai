@@ -15,6 +15,7 @@ export function PublishingVisual() {
           <path d="M94 294V128c0-17-13-30-30-30" />
           <path d="M112 135h43M112 154h29M112 239h48" />
           <rect x="112" y="177" width="48" height="43" rx="3" />
+          <path d="M74 82h88l20 16H64l10-16Z" />
         </g>
 
         <g className="publishing-visual-phone">
@@ -29,6 +30,12 @@ export function PublishingVisual() {
           <rect x="392" y="128" width="88" height="62" rx="3" />
           <path d="M392 211h70M392 229h52" />
           <rect x="392" y="249" width="54" height="14" rx="7" />
+          <path d="M480 128v62M392 199h88" />
+        </g>
+        <path className="publishing-visual-path" d="M106 330h345" />
+        <g className="publishing-visual-steps">
+          <circle cx="106" cy="330" r="7"/><circle cx="220" cy="330" r="7"/><circle cx="334" cy="330" r="7"/><circle cx="451" cy="330" r="7"/>
+          <text x="106" y="358" textAnchor="middle">PREPARE</text><text x="220" y="358" textAnchor="middle">PACKAGE</text><text x="334" y="358" textAnchor="middle">PUBLISH</text><text x="451" y="358" textAnchor="middle">LAUNCH</text>
         </g>
       </g>
     </svg>

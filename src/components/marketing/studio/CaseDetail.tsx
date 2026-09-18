@@ -101,7 +101,7 @@ export function CaseDetail({ project }: { project: StudioProject }) {
           <Container>
             <p className="studio-eyebrow">Visual study</p>
             <h2 className="studio-display mt-5 max-w-4xl text-balance">One real experience, viewed at different scales.</h2>
-            <div className="case-study-wide mt-12">
+            <div className="case-study-wide case-scroll-study mt-12">
               <BrowserFrame><img src={src} alt={`${project.title} full website view`} className="size-full" style={{ objectFit: "cover", objectPosition: "top center" }} /></BrowserFrame>
             </div>
             <div className="case-device-study mt-8">

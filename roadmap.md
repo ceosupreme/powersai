@@ -32,7 +32,7 @@
   - Reorder the homepage around proof, buyer problems, services, systems proof, trust, and inquiry
   - Add tailored Websites, Brand, Marketing, and AI Systems sales pages
   - Reconcile Publishing with the shared service-page experience and verify public routes
-- [ ] Public studio sitewide media, graphics, and motion pass
+- [x] Public studio sitewide media, graphics, and motion pass
   - Add real-project media reel, visual service entry points, unique service hero/explainer/media bands
   - Enrich Publishing, Founder, Inquiry, Hire, and selective case-study media while preserving behavior
   - Verify responsive, reduced-motion, keyboard, local-media, and route behavior without live submission
