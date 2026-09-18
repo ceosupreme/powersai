@@ -119,6 +119,8 @@ export function Inquiry() {
     } else if (intent === "agency") {
       setShowContext(true);
       setServices((prev) => (prev.includes("agency-collaboration") ? prev : [...prev, "agency-collaboration"]));
+    } else if (intent === "publishing") {
+      setServices((prev) => (prev.includes("publishing-launch") ? prev : [...prev, "publishing-launch"]));
     }
   }, []);
 
