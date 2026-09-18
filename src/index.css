@@ -1336,5 +1336,7 @@
   .stm-studio .studio-reveal-visible {
     transform: none;
   }
+  .stm-studio .studio-reel-window img,
+  .stm-studio .case-scroll-study .studio-browser-viewport img { animation: none !important; transform: none !important; }
   .stm-studio .studio-reveal { opacity: 1; }
 }
