@@ -234,23 +234,28 @@ export function Inquiry() {
   return (
     <section id="contact" className="studio-band studio-section">
       <Container>
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-20">
           <div className="lg:col-span-5">
             <Eyebrow style={{ color: "hsl(var(--band-text) / 0.75)" }}>Let&apos;s make the next thing happen</Eyebrow>
-            <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.9rem)" }}>
+            <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
               What are you looking to create, improve, or simplify?
             </h2>
-            <p className="mt-6 text-[1.0625rem] leading-relaxed text-muted-foreground">
+            <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
               Tell me a little about the project, where things stand, and what you want to accomplish. I&apos;ll review
               your note and reply with a useful next step.
             </p>
-            <a href="mailto:hello@supremeteammedia.com" className="mt-7 inline-block text-[0.95rem] hover:underline">
+            <ol className="mt-10 space-y-5 border-t border-[hsl(var(--band-text)/0.2)] pt-7">
+              {["I review what you sent.", "I reply with the most useful next step.", "If there’s a fit, we define scope, responsibilities, and timing."].map((step, index) => (
+                <li key={step} className="flex gap-4 text-[1rem] leading-relaxed text-muted-foreground"><span className="studio-display text-[hsl(var(--band-text))]">0{index + 1}</span><span>{step}</span></li>
+              ))}
+            </ol>
+            <a href="mailto:hello@supremeteammedia.com" className="mt-8 inline-block text-[1rem] hover:underline">
               hello@supremeteammedia.com
             </a>
           </div>
 
           <div className="lg:col-span-7">
-            <div className="rounded-xl bg-[hsl(var(--surface))] p-6 text-[hsl(var(--ink))] md:p-9">
+            <div className="studio-inquiry-card rounded-xl bg-[hsl(var(--surface))] p-6 text-[hsl(var(--ink))] md:p-10">
               {status === "success" ? (
                 <div className="py-6" role="status">
                   <span className="inline-flex items-center justify-center rounded-full bg-[hsl(var(--cobalt-pale))] p-3 text-[hsl(var(--cobalt))]">
@@ -293,7 +298,7 @@ export function Inquiry() {
                   />
 
                   <fieldset className="border-0 p-0">
-                    <legend className="studio-label">What can I help with? (optional)</legend>
+                    <legend className="studio-label text-[0.82rem]">What can I help with? (optional)</legend>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {[...SERVICE_OPTIONS, ...(showContext ? CONTEXT_OPTIONS : [])].map((o) => {
                         const on = services.includes(o.id);
@@ -303,7 +308,7 @@ export function Inquiry() {
                             type="button"
                             aria-pressed={on}
                             onClick={() => toggleService(o.id)}
-                            className={`min-h-[44px] rounded-lg border px-3.5 text-[0.9rem] ${
+                            className={`min-h-[48px] rounded-lg border px-4 text-[0.95rem] ${
                               on
                                 ? "border-[hsl(var(--cobalt))] bg-[hsl(var(--cobalt-pale))] text-[hsl(var(--cobalt))]"
                                 : "border-[hsl(var(--rule))] text-[hsl(var(--ink))]"
@@ -334,7 +339,7 @@ export function Inquiry() {
                         setMessage(e.target.value);
                       }}
                       placeholder="Where things stand and what you want to accomplish."
-                      className="mt-2 w-full resize-y rounded-lg border border-[hsl(var(--rule))] bg-white px-4 py-3 text-[0.98rem]"
+                      className="mt-2 w-full resize-y rounded-lg border border-[hsl(var(--rule))] bg-white px-4 py-3.5 text-[1rem]"
                     />
                     <span
                       id="inquiry-message-count"

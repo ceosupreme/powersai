@@ -80,7 +80,7 @@ export default function Publishing() {
             <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
               <div className="lg:col-span-7">
                 <Eyebrow>Publishing &amp; Launch</Eyebrow>
-                <h1 className="studio-display mt-4 max-w-4xl text-balance text-[2.4rem] leading-[1.02] md:text-[3.5rem] lg:text-[4rem]">
+                <h1 className="studio-display mt-5 max-w-4xl text-balance text-[3rem] leading-[1.02] md:text-[4.5rem] lg:text-[5.25rem]">
                   Turn finished work into something people can buy, download, and use.
                 </h1>
                 <Lede>
@@ -94,7 +94,7 @@ export default function Publishing() {
                   <a href="#publishing-tracks" className="studio-btn studio-btn-outline">See what&apos;s included</a>
                 </div>
               </div>
-              <div className="mx-auto w-full max-w-[520px] lg:col-span-5" aria-hidden="true">
+              <div className="publishing-visual-wrap mx-auto w-full max-w-[620px] lg:col-span-5" aria-hidden="true">
                 <PublishingVisual />
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function Publishing() {
             <Container>
               <Eyebrow>Publishing tracks</Eyebrow>
               <SectionTitle>Different formats. One release mindset.</SectionTitle>
-              <div className="mt-12 grid gap-6 lg:grid-cols-2">
+              <div className="mt-14 grid gap-8 lg:grid-cols-2">
                 <Track title="Books & publications" headline="From manuscript to release-ready package." items={BOOKS}>
                   Specialist services such as deep editing, illustration, photography, or audio can be scoped separately.
                 </Track>

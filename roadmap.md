@@ -23,6 +23,10 @@
 - [x] Publishing & Launch public service page
   - Add `/publishing`, shared navigation/footer entry points, and homepage capability callout
   - Add publishing contact intent and verify responsive navigation, page anchors, and public-route smoke checks
+- [x] Public studio editorial art-direction pass
+  - Image-led project mosaic, larger type, art-directed hero and capability surfaces
+  - Premium case-study storytelling, visual studies, facts rail, and next-project navigation
+  - Visual hiring proof, richer publishing/contact presentation, responsive and accessible QA
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated

@@ -13,11 +13,11 @@ export function BarPulseFeature() {
     <section id="barpulse" className="studio-band studio-section">
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-5">
             <span className="studio-eyebrow block" style={{ color: "hsl(var(--band-text) / 0.75)" }}>
               Featured system · BarPulse
             </span>
-            <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2rem, 3.6vw, 3.1rem)" }}>
+            <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
               Built for the work behind the business.
             </h2>
             <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
@@ -55,7 +55,7 @@ export function BarPulseFeature() {
             </div>
           </div>
 
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-7">
             {media?.src && (
               <BrowserFrame className="studio-browser-frame-dark">
                 <img

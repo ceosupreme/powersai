@@ -26,8 +26,8 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
   const from = `${location.pathname}${location.search}`;
 
   return (
-    <article className={cn("studio-plate studio-card-link group flex flex-col", className)}>
-      <div className="relative bg-[hsl(var(--paper))] p-3 pb-0">
+    <article className={cn("studio-project-card studio-card-link group flex flex-col overflow-hidden", className)}>
+      <div className="relative bg-[hsl(var(--paper))] p-3 pb-0 md:p-4 md:pb-0">
         {isLive && (
           <span className="absolute right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full border border-border bg-[hsl(var(--surface)/0.94)] px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-foreground shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden /> Live
@@ -71,22 +71,17 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
         </Link>
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col p-6 md:p-8">
         <div className="mb-4 flex flex-wrap gap-1.5">
           {tags.map((tag) => (
-            <span key={tag} className="rounded-full border border-border px-2.5 py-1 text-[0.66rem] font-medium text-muted-foreground">
+            <span key={tag} className="rounded-full border border-border px-3 py-1.5 text-[0.78rem] font-medium text-muted-foreground">
               {tag}
             </span>
           ))}
         </div>
-        <h3 className="studio-display text-[1.2rem] leading-snug">{project.title}</h3>
+        <h3 className="studio-display text-[1.55rem] leading-[1.08] md:text-[1.8rem]">{project.title}</h3>
         {project.summary && (
-          <p className="mt-3 text-[0.95rem] leading-relaxed text-muted-foreground">{project.summary}</p>
-        )}
-        {project.role && (
-          <p className="mt-3 text-[0.85rem] text-muted-foreground">
-            <span className="studio-label">Role</span> {project.role}
-          </p>
+          <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-muted-foreground">{project.summary}</p>
         )}
         <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-5">
           <Link

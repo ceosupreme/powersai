@@ -17,7 +17,7 @@ export function SectionTitle({ className, children }: PropsWithChildren<{ classN
   return (
     <h2
       className={cn("studio-display mt-4 text-balance", className)}
-      style={{ fontSize: "clamp(2rem, 3.6vw, 3.25rem)" }}
+      style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
     >
       {children}
     </h2>
@@ -26,7 +26,7 @@ export function SectionTitle({ className, children }: PropsWithChildren<{ classN
 
 export function Lede({ className, children }: PropsWithChildren<{ className?: string }>) {
   return (
-    <p className={cn("mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg", className)}>
+    <p className={cn("mt-6 max-w-3xl text-[1.1rem] leading-relaxed text-muted-foreground md:text-[1.3rem]", className)}>
       {children}
     </p>
   );

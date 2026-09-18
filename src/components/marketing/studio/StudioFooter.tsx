@@ -5,14 +5,14 @@ import { Container } from "./primitives";
 export function StudioFooter() {
   return (
     <footer className="studio-band">
-      <Container className="py-14">
+      <Container className="py-16 md:py-20">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div>
-            <p className="studio-display text-xl">Supreme Team Media</p>
-            <p className="mt-2 text-sm text-muted-foreground">Creative. Marketing. Technology.</p>
+            <p className="studio-display text-2xl">Supreme Team Media</p>
+            <p className="mt-3 text-[1rem] text-muted-foreground">Creative. Marketing. Technology.</p>
           </div>
 
-          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-3 text-[0.95rem] sm:grid-cols-3">
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-4 text-[1rem] sm:grid-cols-3">
             <Link to="/work" className="hover:underline">Work</Link>
             <Link to="/#services" className="hover:underline">Capabilities</Link>
             <Link to="/publishing" className="hover:underline">Publishing &amp; Launch</Link>

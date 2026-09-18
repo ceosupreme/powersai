@@ -31,9 +31,9 @@ export function SelectedWork() {
             No projects are published yet.
           </p>
         ) : (
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {shown.map((p) => (
-              <ProjectPlate key={p.slug} project={p} />
+          <div className="studio-work-mosaic mt-14 grid grid-cols-1 gap-7 lg:grid-cols-12">
+            {shown.map((p, index) => (
+              <ProjectPlate key={p.slug} project={p} className={`studio-work-item studio-work-item-${index + 1}`} />
             ))}
           </div>
         )}
