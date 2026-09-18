@@ -937,6 +937,10 @@
   color: #fff;
 }
 .stm-studio .studio-btn-primary:hover { background-color: hsl(var(--cobalt) / 0.9); }
+.stm-studio .studio-header-cta { display: none; }
+@media (min-width: 1024px) {
+  .stm-studio .studio-header-cta { display: inline-flex; }
+}
 .stm-studio .studio-btn-outline {
   border-color: hsl(var(--ink) / 0.25);
   color: hsl(var(--ink));
@@ -1101,6 +1105,22 @@
 }
 .stm-studio .studio-system-arrow { animation: studio-flow-pulse 2.6s ease-in-out infinite; }
 .stm-studio .studio-system-arrow:nth-of-type(2) { animation-delay: .45s; }
+
+/* Publishing hero: a quiet editorial workflow illustration, never product UI. */
+.stm-studio .publishing-visual-book,
+.stm-studio .publishing-visual-phone,
+.stm-studio .publishing-visual-listing {
+  stroke: hsl(var(--ink));
+  stroke-width: 2;
+}
+.stm-studio .publishing-visual-book { fill: hsl(var(--plate-sand) / 0.7); }
+.stm-studio .publishing-visual-phone { fill: hsl(var(--cobalt-pale)); }
+.stm-studio .publishing-visual-listing { fill: hsl(var(--surface)); }
+.stm-studio .publishing-visual-path {
+  stroke: hsl(var(--cobalt));
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
 
 /* Major-section reveal, intentionally limited to opacity and a short vertical move. */
 .stm-studio .studio-reveal {

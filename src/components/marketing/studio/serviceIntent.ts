@@ -10,6 +10,7 @@ export type ServiceId =
   | "brand-creative"
   | "marketing-growth"
   | "ai-systems"
+  | "publishing-launch"
   | "not-sure"
   | "agency-collaboration"
   | "hiring-contract";
@@ -19,6 +20,7 @@ export const SERVICE_OPTIONS: { id: ServiceId; label: string }[] = [
   { id: "brand-creative", label: "Brand or design" },
   { id: "marketing-growth", label: "Marketing or content" },
   { id: "ai-systems", label: "AI or business systems" },
+  { id: "publishing-launch", label: "Publishing / launch" },
   { id: "not-sure", label: "Not sure yet" },
 ];
 

@@ -88,6 +88,29 @@ export function Capabilities() {
           ))}
         </div>
 
+        <div className="mt-8 grid gap-6 border-y border-[hsl(var(--cobalt)/0.28)] bg-[hsl(var(--cobalt-pale))] px-6 py-8 md:grid-cols-12 md:gap-10 md:px-8">
+          <div className="md:col-span-4">
+            <span className="studio-eyebrow">Publishing &amp; Launch</span>
+            <p className="studio-label mt-4">Books · Apps · Digital products</p>
+          </div>
+          <div className="md:col-span-8">
+            <h3 className="studio-display text-[1.35rem] leading-snug md:text-[1.65rem]">
+              Take finished work all the way to release.
+            </h3>
+            <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-muted-foreground">
+              Books, apps, and digital products need packaging, store-ready assets, clear listings, submission support,
+              and a launch path. Publishing combines the studio&apos;s creative, technical, and marketing capabilities
+              around the release.
+            </p>
+            <Link
+              to="/publishing"
+              className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 text-[0.95rem] font-medium text-[hsl(var(--cobalt))] hover:underline"
+            >
+              Explore publishing <ArrowRight size={15} />
+            </Link>
+          </div>
+        </div>
+
         <p className="mt-8 text-[0.92rem] text-muted-foreground">
           <Link to="/free-audit" className="underline underline-offset-4 hover:text-foreground">
             Start with a free business checkup

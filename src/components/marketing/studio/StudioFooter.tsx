@@ -15,6 +15,7 @@ export function StudioFooter() {
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-3 text-[0.95rem] sm:grid-cols-3">
             <Link to="/work" className="hover:underline">Work</Link>
             <Link to="/#services" className="hover:underline">Capabilities</Link>
+            <Link to="/publishing" className="hover:underline">Publishing &amp; Launch</Link>
             <Link to="/#about" className="hover:underline">About</Link>
             <Link to="/#contact" className="hover:underline">Discuss a project</Link>
             <Link to="/free-audit" className="hover:underline">Free business checkup</Link>
