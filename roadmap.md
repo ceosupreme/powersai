@@ -20,6 +20,9 @@
   - Accessible four-lane interactive studio map with real case links and contact intent
   - BarPulse screenshot and clearly labeled historical integration flow
   - Restrained, reduced-motion-safe reveal treatment and responsive browser verification
+- [ ] Publishing & Launch public service page
+  - Add `/publishing`, shared navigation/footer entry points, and homepage capability callout
+  - Add publishing contact intent and verify responsive navigation, page anchors, and public-route smoke checks
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
