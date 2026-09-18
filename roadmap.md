@@ -27,6 +27,11 @@
   - Image-led project mosaic, larger type, art-directed hero and capability surfaces
   - Premium case-study storytelling, visual studies, facts rail, and next-project navigation
   - Visual hiring proof, richer publishing/contact presentation, responsive and accessible QA
+- [ ] Public studio buyer-journey and service pages
+  - Restructure public navigation around Work, Services, About, and Start a project
+  - Reorder the homepage around proof, buyer problems, services, systems proof, trust, and inquiry
+  - Add tailored Websites, Brand, Marketing, and AI Systems sales pages
+  - Reconcile Publishing with the shared service-page experience and verify public routes
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
