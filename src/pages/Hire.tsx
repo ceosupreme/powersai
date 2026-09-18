@@ -107,7 +107,7 @@ export default function Hire() {
               const media = getStudioMedia(project.mediaKey);
               const src = project.imageUrl || media?.src;
               if (!src) return null;
-              return <BrowserFrame key={project.slug} className={`hire-proof-frame hire-proof-frame-${index + 1}`}><img src={src} alt={`${project.title} website`} className="size-full object-cover object-top" /></BrowserFrame>;
+               return <BrowserFrame key={project.slug} className={`hire-proof-frame hire-proof-frame-${index + 1}`}><img src={src} alt={`${project.title} website`} loading={index === 0 ? "eager" : "lazy"} className="size-full object-cover object-top" /></BrowserFrame>;
             })}
           </div>
           </div>

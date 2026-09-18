@@ -13,6 +13,7 @@ import { Founder } from "@/components/marketing/studio/sections/Founder";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
+import { StudioMediaReel } from "@/components/marketing/studio/sections/StudioMediaReel";
 
 export default function MarketingSite() {
   const { user, isLoading } = useAuth();
@@ -41,6 +42,7 @@ export default function MarketingSite() {
       <main>
         <Hero />
         <StudioReveal><SelectedWork /></StudioReveal>
+        <StudioReveal><StudioMediaReel /></StudioReveal>
         <ScopeStrip />
         <StudioReveal><BuyerChooser /></StudioReveal>
         <StudioReveal><Capabilities /></StudioReveal>

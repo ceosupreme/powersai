@@ -102,6 +102,19 @@ export default function Publishing() {
         </section>
 
         <StudioReveal>
+          <section className="publishing-release-visual studio-section studio-band">
+            <Container>
+              <Eyebrow style={{ color: "hsl(var(--band-text) / 0.72)" }}>Release path</Eyebrow>
+              <SectionTitle>Prepare the work. Package the release. Publish with care. Launch with purpose.</SectionTitle>
+              <div className="publishing-release-path mt-12" aria-label="Prepare, Package, Publish, Launch">
+                {PROCESS.map((step, index) => <div key={step.title}><span>0{index + 1}</span><strong className="studio-display">{step.title}</strong>{index < PROCESS.length - 1 && <i aria-hidden="true">→</i>}</div>)}
+              </div>
+              <div className="publishing-media-strip mt-12" aria-hidden="true"><div className="release-book"><span>BOOK</span></div><div className="release-app"><span>APP</span></div><div className="release-listing"><span>LISTING</span></div><div className="release-landing"><span>LANDING PAGE</span></div></div>
+            </Container>
+          </section>
+        </StudioReveal>
+
+        <StudioReveal>
           <section id="publishing-tracks" className="studio-section border-y border-border bg-[hsl(var(--surface))]">
             <Container>
               <Eyebrow>Publishing tracks</Eyebrow>

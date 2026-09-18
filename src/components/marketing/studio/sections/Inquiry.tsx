@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Container, Eyebrow } from "../primitives";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
+import { ProjectMontage } from "../ServiceVisuals";
 import {
   CONTEXT_OPTIONS,
   SERVICE_INTENT_EVENT,
@@ -260,6 +261,7 @@ export function Inquiry() {
             <a href="mailto:hello@supremeteammedia.com" className="mt-8 inline-block text-[1rem] hover:underline">
               hello@supremeteammedia.com
             </a>
+            <ProjectMontage className="studio-contact-montage mt-10" />
           </div>
 
           <div className="lg:col-span-7">

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Container, Eyebrow, SectionTitle } from "../primitives";
+import { ProjectMontage } from "../ServiceVisuals";
 
 /**
  * No portrait is supplied, so the visual is a compact typographic nameplate —
@@ -36,17 +37,7 @@ export function Founder() {
             </p>
           </div>
 
-          <div className="lg:col-span-5">
-            <div className="rounded-xl border border-border p-8">
-              <span className="studio-display block leading-none" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)" }}>
-                Sean
-                <br />
-                Mayo
-              </span>
-              <span className="studio-label mt-5 block">Founder · Supreme Team Media</span>
-              <span className="mt-2 block text-[0.9rem] text-muted-foreground">San Diego · Since 2002</span>
-            </div>
-          </div>
+          <div className="lg:col-span-5"><ProjectMontage /></div>
         </div>
       </Container>
     </section>
