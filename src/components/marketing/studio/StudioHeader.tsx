@@ -44,8 +44,8 @@ export function StudioHeader() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors",
-        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.95)] backdrop-blur" : "border-b border-transparent",
+        "fixed inset-x-0 top-0 z-50 transition-all",
+        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.95)] shadow-sm backdrop-blur" : "border-b border-transparent",
       )}
     >
       <Container className="flex h-[72px] items-center justify-between gap-6">
@@ -55,7 +55,7 @@ export function StudioHeader() {
 
         <nav aria-label="Primary" className="hidden items-center gap-5 lg:flex xl:gap-8">
           {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="text-[0.95rem] text-foreground/80 hover:text-foreground">
+            <Link key={l.to} to={l.to} className="text-[1rem] text-foreground/80 hover:text-foreground">
               {l.label}
             </Link>
           ))}

@@ -60,21 +60,21 @@ export function Capabilities() {
         <SectionTitle>Creative on the outside. Capable underneath.</SectionTitle>
         <Lede>Hire the studio for one discipline or connect several around the same goal.</Lede>
 
-        <div className="mt-12">
+        <div className="mt-14 grid gap-6 lg:grid-cols-2">
           {ROWS.map((r, i) => (
             <div
               key={r.n}
-              className={`grid grid-cols-1 gap-6 border-border py-9 md:grid-cols-12 md:gap-10 ${i === 0 ? "border-t" : "border-t"}`}
+              className={`studio-capability-panel plate-tone-${["paper", "lilac", "sand", "green"][i]} flex min-h-[430px] flex-col justify-between p-7 md:p-9`}
             >
-              <div className="md:col-span-3">
+              <div>
                 <span className="studio-display block text-[2rem] text-[hsl(var(--cobalt))] md:text-[2.5rem]">
                   {r.n}
                 </span>
-                <h3 className="studio-display mt-2 text-[1.15rem] leading-snug">{r.title}</h3>
+                <h3 className="studio-display mt-3 text-[1.55rem] leading-snug">{r.title}</h3>
               </div>
-              <div className="md:col-span-9">
-                <p className="studio-display text-[1.25rem] leading-snug md:text-[1.6rem]">{r.headline}</p>
-                <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-muted-foreground">{r.body}</p>
+              <div className="mt-12">
+                <p className="studio-display text-[1.45rem] leading-snug md:text-[1.8rem]">{r.headline}</p>
+                <p className="mt-5 max-w-2xl text-[1.05rem] leading-relaxed opacity-80">{r.body}</p>
                 <p className="studio-label mt-5">{r.deliverables}</p>
                 <a
                   href="#contact"

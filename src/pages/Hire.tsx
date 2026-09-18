@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, ExternalLink, Mail } from "lucide-react";
+import { ExternalLink, Mail } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Container, Eyebrow, Lede } from "@/components/marketing/studio/primitives";
@@ -7,11 +7,14 @@ import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { STUDIO_RESUME, RESUME_REQUEST_MAILTO } from "@/config/studioResume";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
+import { getStudioMedia } from "@/config/studioMedia";
+import { BrowserFrame } from "@/components/marketing/studio/BrowserFrame";
+import { ProjectPlate } from "@/components/marketing/studio/ProjectPlate";
 
 const LINKEDIN = "https://www.linkedin.com/in/sean-mayo-3055aa287/";
 
 /** Evidence order: creative, marketing and systems work — not an AI-only identity. */
-const EVIDENCE_SLUGS = ["sylina-renae", "coastal-beauties", "barpulse", "ritual-command"];
+const EVIDENCE_SLUGS = ["kario-voss", "barpulse", "big-paws-club", "coastal-beauties"];
 
 const EXPERIENCE = [
   {
@@ -51,8 +54,10 @@ export default function Hire() {
       <StudioHeader />
       <main className="pt-[112px] md:pt-[140px]">
         <Container>
+          <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-7">
           <Eyebrow>For employers and teams</Eyebrow>
-          <h1 className="studio-display mt-4 max-w-4xl text-balance" style={{ fontSize: "clamp(2.1rem, 4.4vw, 3.4rem)" }}>
+          <h1 className="studio-display mt-5 max-w-4xl text-balance" style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}>
             Sean Mayo — Strategy, creative work, and hands-on implementation.
           </h1>
           <Lede>
@@ -60,7 +65,7 @@ export default function Hire() {
             and AI-assisted business systems. I turn business needs into work people can use—and collaborate directly
             with the people responsible for it.
           </Lede>
-          <p className="mt-4 max-w-2xl text-[0.95rem] text-muted-foreground">
+          <p className="mt-5 max-w-2xl text-[1.05rem] text-muted-foreground">
             For employers and teams considering Sean for an individual role, contract, or embedded project.
           </p>
 
@@ -96,6 +101,16 @@ export default function Hire() {
               LinkedIn profile <ExternalLink className="inline" size={13} />
             </a>
           </div>
+          </div>
+          <div className="hire-proof-stack lg:col-span-5" aria-label="Selected project proof">
+            {evidence.slice(0, 3).map((project, index) => {
+              const media = getStudioMedia(project.mediaKey);
+              const src = project.imageUrl || media?.src;
+              if (!src) return null;
+              return <BrowserFrame key={project.slug} className={`hire-proof-frame hire-proof-frame-${index + 1}`}><img src={src} alt={`${project.title} website`} className="size-full object-cover object-top" /></BrowserFrame>;
+            })}
+          </div>
+          </div>
         </Container>
 
         {/* Experience across disciplines */}
@@ -104,11 +119,11 @@ export default function Hire() {
             <h2 className="studio-display text-balance" style={{ fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>
               What I bring to a team.
             </h2>
-            <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-              {EXPERIENCE.map((e) => (
-                <div key={e.label} className="border-t border-border pt-5">
-                  <h3 className="studio-label">{e.label}</h3>
-                  <p className="mt-3 text-[0.98rem] leading-relaxed text-muted-foreground">{e.body}</p>
+            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {EXPERIENCE.map((e, index) => (
+                <div key={e.label} className={`studio-experience-panel plate-tone-${["lilac", "sand", "paper", "green"][index]} p-7 md:p-9`}>
+                  <h3 className="studio-display text-[1.55rem]">{e.label}</h3>
+                  <p className="mt-5 text-[1.05rem] leading-relaxed opacity-80">{e.body}</p>
                 </div>
               ))}
             </div>
@@ -127,26 +142,11 @@ export default function Hire() {
               demonstration built with sample data.
             </p>
 
-            <ul className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
               {evidence.map((p) => (
-                <li key={p.slug} className="rounded-xl border border-border bg-[hsl(var(--surface))] p-6">
-                  <span className="studio-label">{p.classification}</span>
-                  <h3 className="studio-display mt-3 text-[1.15rem] leading-snug">{p.title}</h3>
-                  <p className="mt-3 text-[0.95rem] leading-relaxed text-muted-foreground">{p.summary}</p>
-                  {p.role && (
-                    <p className="mt-3 text-[0.85rem] text-muted-foreground">
-                      <span className="studio-label">Role</span> {p.role}
-                    </p>
-                  )}
-                  <Link
-                    to={`/work/${p.slug}`}
-                    className="mt-5 inline-flex items-center gap-1.5 text-[0.9rem] font-medium text-[hsl(var(--cobalt))] hover:underline"
-                  >
-                    Read the case <ArrowUpRight size={15} />
-                  </Link>
-                </li>
+                <ProjectPlate key={p.slug} project={p} />
               ))}
-              <li className="rounded-xl border border-border bg-[hsl(var(--surface))] p-6">
+              <article className="studio-project-card bg-[hsl(var(--band))] p-8 text-[hsl(var(--band-text))]">
                 <span className="studio-label">Owned internal platform</span>
                 <h3 className="studio-display mt-3 text-[1.15rem] leading-snug">
                   STM OS — Supreme Team Media&apos;s own operating platform
@@ -162,8 +162,8 @@ export default function Hire() {
                 <p className="mt-3 text-[0.85rem] text-muted-foreground">
                   Internal software, not a client deployment or a product for sale.
                 </p>
-              </li>
-            </ul>
+              </article>
+            </div>
           </Container>
         </section>
 

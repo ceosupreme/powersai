@@ -16,9 +16,9 @@ const BOARD = [
 
 export function Hero() {
   return (
-    <section id="top" className="pb-16 pt-[112px] md:pb-24 md:pt-[152px]">
+    <section id="top" className="studio-hero overflow-hidden pb-16 pt-[112px] md:pb-24 md:pt-[144px]">
       <Container>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-7">
             <span className="studio-eyebrow block">Creative · Marketing · Technology</span>
             <h1 className="studio-display mt-6 text-balance" style={{ fontSize: "clamp(3rem, 6.2vw, 5.4rem)" }}>
@@ -28,11 +28,11 @@ export function Hero() {
               <br />
               <span className="studio-serif">Work smarter.</span>
             </h1>
-            <p className="mt-7 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
+            <p className="mt-8 max-w-xl text-[1.1rem] leading-relaxed text-muted-foreground md:text-[1.25rem]">
               Websites, branding, digital marketing, and AI-powered systems. Supreme Team Media brings strategic
               thinking and hands-on execution to what your business needs next.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <a href="#work" className="studio-btn studio-btn-primary">Explore the work</a>
               <a href="#contact" className="studio-btn studio-btn-outline">Discuss a project</a>
             </div>
@@ -43,11 +43,11 @@ export function Hero() {
 
           {/* Typographic studio board — brand artwork, not a product screenshot. */}
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-2 gap-3">
-              {BOARD.map((b) => (
+            <div className="studio-hero-board grid grid-cols-2 gap-3 md:gap-4">
+              {BOARD.map((b, index) => (
                 <div
                   key={b.word}
-                  className={`studio-plate ${b.tone} flex min-h-[132px] flex-col justify-between p-4 md:min-h-[150px]`}
+                  className={`studio-hero-tile studio-hero-tile-${index + 1} ${b.tone} flex min-h-[160px] flex-col justify-between p-5 md:min-h-[190px]`}
                 >
                   <span
                     className="studio-display leading-none"
@@ -55,8 +55,8 @@ export function Hero() {
                   >
                     {b.word}
                   </span>
-                  <b.Illustration className="mx-auto h-[54px] w-full max-w-[118px] opacity-85" />
-                  <span className="text-[0.78rem] font-medium leading-snug opacity-80">{b.capability}</span>
+                  <b.Illustration className="ml-auto h-[70px] w-full max-w-[150px] opacity-90 md:h-[86px]" />
+                  <span className="text-[0.88rem] font-medium leading-snug opacity-80">{b.capability}</span>
                 </div>
               ))}
             </div>
@@ -72,12 +72,13 @@ export function Hero() {
 
 export function ScopeStrip() {
   return (
-    <section className="studio-rule border-b border-border bg-[hsl(var(--surface))] py-8 md:py-10">
+    <section className="studio-scope-bridge studio-band py-10 md:py-14">
       <Container>
-        <div className="flex flex-col gap-3 md:flex-row md:items-baseline md:justify-between md:gap-10">
-          <p className="studio-display text-balance text-[1.15rem] leading-snug md:text-[1.5rem]">
-            A new website. A sharper brand. A better campaign. A system that saves steps.
-          </p>
+        <p className="studio-display text-balance text-[1.45rem] leading-snug md:text-[2.1rem]">
+          Websites <span aria-hidden>·</span> Brands <span aria-hidden>·</span> Campaigns <span aria-hidden>·</span> Systems <span aria-hidden>·</span> Publishing
+        </p>
+        <div className="mt-5 flex flex-col gap-3 border-t border-[hsl(var(--band-text)/0.2)] pt-5 md:flex-row md:items-baseline md:justify-between md:gap-10">
+          <p className="text-[1rem] text-muted-foreground md:max-w-2xl">A new website. A sharper brand. A better campaign. A system that saves steps.</p>
           <p className="text-[0.95rem] text-muted-foreground md:max-w-xs md:text-right">
             Start with the project you need. Connect the pieces when it makes sense.
           </p>

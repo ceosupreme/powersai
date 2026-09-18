@@ -53,7 +53,7 @@ export default function Work() {
       <main className="pt-[112px] md:pt-[140px]">
         <Container>
           <Eyebrow>Selected work</Eyebrow>
-          <h1 className="studio-display mt-4 text-balance" style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)" }}>
+          <h1 className="studio-display mt-5 max-w-5xl text-balance" style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)" }}>
             Work you can look at. Experience you can ask about.
           </h1>
           <Lede>
@@ -88,9 +88,9 @@ export default function Work() {
                 Showing {visible.length} {visible.length === 1 ? "project" : "projects"} — {activeLabel}.
               </p>
 
-              <div className="mt-8 grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-10 grid grid-cols-1 gap-8 pb-24 lg:grid-cols-2">
                 {visible.map((p) => (
-                  <ProjectPlate key={p.slug} project={p} />
+                  <ProjectPlate key={p.slug} project={p} className={p.slug === "barpulse" ? "lg:col-span-2" : undefined} />
                 ))}
               </div>
             </>

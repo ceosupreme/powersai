@@ -883,7 +883,7 @@
   color: hsl(var(--cobalt));
 }
 .stm-studio .studio-label {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -901,8 +901,8 @@
 @media (min-width: 1024px) { .stm-studio .studio-container { padding-inline: 56px; } }
 @media (min-width: 1280px) { .stm-studio .studio-container { padding-inline: 64px; } }
 
-.stm-studio .studio-section { padding-block: 64px; }
-@media (min-width: 768px) { .stm-studio .studio-section { padding-block: 96px; } }
+.stm-studio .studio-section { padding-block: 76px; }
+@media (min-width: 768px) { .stm-studio .studio-section { padding-block: 120px; } }
 
 /* Anchor offset so the fixed header never covers a heading */
 .stm-studio [id] { scroll-margin-top: 88px; }
@@ -977,6 +977,75 @@
   overflow: hidden;
   background-color: hsl(var(--surface));
 }
+.stm-studio .studio-project-card {
+  border: 1px solid hsl(var(--rule));
+  border-radius: 8px;
+  background: hsl(var(--surface));
+}
+.stm-studio .studio-work-item { grid-column: span 12; }
+@media (min-width: 1024px) {
+  .stm-studio .studio-work-item-1 { grid-column: span 7; }
+  .stm-studio .studio-work-item-2 { grid-column: span 5; margin-top: 88px; }
+  .stm-studio .studio-work-item-3 { grid-column: span 5; }
+  .stm-studio .studio-work-item-4 { grid-column: span 7; margin-top: 64px; }
+  .stm-studio .studio-work-item-5 { grid-column: span 12; }
+  .stm-studio .studio-work-item-6 { grid-column: 4 / span 7; }
+  .stm-studio .studio-work-item-5 .studio-browser-viewport { aspect-ratio: 2.15 / 1; }
+}
+
+/* Hero capability board: asymmetry, depth and controlled response. */
+.stm-studio .studio-hero-tile {
+  border: 1px solid hsl(var(--ink) / .1);
+  border-radius: 8px;
+  box-shadow: 0 15px 35px hsl(var(--ink) / .08);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.stm-studio .studio-hero-tile-2 { transform: translateY(18px) rotate(1deg); }
+.stm-studio .studio-hero-tile-3 { transform: translateY(-8px) rotate(-1deg); }
+.stm-studio .studio-hero-tile:hover { transform: translateY(-4px) rotate(0); box-shadow: 0 22px 45px hsl(var(--ink) / .14); }
+.stm-studio .studio-scope-bridge { border-bottom: 1px solid hsl(var(--band-text) / .14); }
+
+/* Editorial capability blocks. */
+.stm-studio .studio-capability-panel,
+.stm-studio .studio-experience-panel {
+  border: 1px solid hsl(var(--ink) / .1);
+  border-radius: 8px;
+}
+
+/* Premium case-study system. */
+.stm-studio .case-hero { padding-bottom: 72px; overflow: hidden; }
+.stm-studio .case-hero h1 { font-size: clamp(3rem, 7vw, 6rem); max-width: 16ch; }
+.stm-studio .case-summary { font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.55; }
+.stm-studio .case-status { display: inline-flex; align-items: center; min-height: 30px; border: 1px solid currentColor; border-radius: 999px; padding: 0 10px; font-size: .76rem; font-weight: 650; text-transform: uppercase; }
+.stm-studio .case-hero-media { width: min(1360px, calc(100vw - 32px)); margin-inline: auto; }
+.stm-studio .case-hero-media .studio-browser-viewport { aspect-ratio: 16 / 8.6; }
+.stm-studio .case-facts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; border-bottom: 1px solid hsl(var(--rule)); padding-block: 32px; }
+.stm-studio .case-brief { font-size: clamp(2.25rem, 5vw, 4.6rem); line-height: 1.08; }
+.stm-studio .case-study h2 { font-size: clamp(2.4rem, 4.5vw, 4rem); }
+.stm-studio .case-scope-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.stm-studio .case-scope-list li { border: 1px solid hsl(var(--rule)); border-radius: 999px; padding: 10px 14px; font-size: .92rem; }
+.stm-studio .case-visual-study { background: hsl(var(--cobalt-pale)); }
+.stm-studio .case-study-wide .studio-browser-viewport { aspect-ratio: 16 / 8; }
+.stm-studio .case-device-study { display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, 24%); align-items: end; gap: 22px; }
+.stm-studio .case-desktop-crop .studio-browser-viewport { aspect-ratio: 16 / 8; }
+.stm-studio .case-phone-frame { overflow: hidden; aspect-ratio: 9 / 17; border: 8px solid hsl(var(--ink)); border-radius: 26px; background: hsl(var(--surface)); box-shadow: 0 18px 40px hsl(var(--ink) / .18); }
+.stm-studio .case-demonstrates { font-size: clamp(2.4rem, 5vw, 4.8rem); line-height: 1.08; }
+.stm-studio .case-next { overflow: hidden; border: 1px solid hsl(var(--rule)); border-radius: 8px; background: hsl(var(--surface)); }
+.stm-studio .case-next-media { overflow: hidden; aspect-ratio: 16 / 7; background: hsl(var(--paper)); }
+@media (min-width: 768px) { .stm-studio .case-facts { grid-template-columns: 1.25fr 1fr 1.25fr .65fr; padding-block: 42px; } }
+@media (max-width: 639px) { .stm-studio .case-device-study { grid-template-columns: minmax(0,1fr) 105px; gap: 10px; } }
+
+/* Hiring proof uses only current, real project images. */
+.stm-studio .hire-proof-stack { position: relative; min-height: 430px; }
+.stm-studio .hire-proof-frame { position: absolute; width: 82%; }
+.stm-studio .hire-proof-frame-1 { top: 0; left: 0; transform: rotate(-2deg); }
+.stm-studio .hire-proof-frame-2 { top: 118px; right: 0; transform: rotate(2deg); }
+.stm-studio .hire-proof-frame-3 { top: 250px; left: 8%; width: 68%; transform: rotate(-1deg); }
+.stm-studio .hire-proof-frame .studio-browser-viewport { aspect-ratio: 16 / 8; }
+.stm-studio .studio-inquiry-card { box-shadow: 0 28px 70px hsl(var(--ink) / .24); }
+.stm-studio .publishing-visual-wrap { border: 1px solid hsl(var(--rule)); border-radius: 8px; background: hsl(var(--surface)); padding: 18px; box-shadow: 0 24px 60px hsl(var(--ink) / .1); }
+@media (max-width: 1023px) { .stm-studio .hire-proof-stack { min-height: 390px; max-width: 680px; margin-inline: auto; width: 100%; } }
+@media (max-width: 520px) { .stm-studio .hire-proof-stack { min-height: 300px; } .stm-studio .hire-proof-frame-2 { top: 82px; } .stm-studio .hire-proof-frame-3 { top: 170px; } }
 .stm-studio .studio-plate-face {
   position: relative;
   display: flex;
@@ -1138,6 +1207,10 @@
     transition-duration: .001ms !important;
   }
   .stm-studio .studio-card-link:hover { transform: none; }
+  .stm-studio .studio-hero-tile,
+  .stm-studio .studio-hero-tile-2,
+  .stm-studio .studio-hero-tile-3,
+  .stm-studio .studio-hero-tile:hover { transform: none; }
   .stm-studio .studio-project-image,
   .stm-studio .studio-card-link:hover .studio-project-image,
   .stm-studio .studio-card-link:focus-within .studio-project-image,
