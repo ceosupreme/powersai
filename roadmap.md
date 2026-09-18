@@ -32,6 +32,10 @@
   - Reorder the homepage around proof, buyer problems, services, systems proof, trust, and inquiry
   - Add tailored Websites, Brand, Marketing, and AI Systems sales pages
   - Reconcile Publishing with the shared service-page experience and verify public routes
+- [ ] Public studio sitewide media, graphics, and motion pass
+  - Add real-project media reel, visual service entry points, unique service hero/explainer/media bands
+  - Enrich Publishing, Founder, Inquiry, Hire, and selective case-study media while preserving behavior
+  - Verify responsive, reduced-motion, keyboard, local-media, and route behavior without live submission
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
