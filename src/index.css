@@ -937,6 +937,10 @@
   color: #fff;
 }
 .stm-studio .studio-btn-primary:hover { background-color: hsl(var(--cobalt) / 0.9); }
+.stm-studio .studio-header-cta { display: none; }
+@media (min-width: 1024px) {
+  .stm-studio .studio-header-cta { display: inline-flex; }
+}
 .stm-studio .studio-btn-outline {
   border-color: hsl(var(--ink) / 0.25);
   color: hsl(var(--ink));

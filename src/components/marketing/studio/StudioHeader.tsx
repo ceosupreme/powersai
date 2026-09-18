@@ -62,7 +62,7 @@ export function StudioHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link to="/#contact" className="studio-btn studio-btn-primary !hidden lg:!inline-flex">
+          <Link to="/#contact" className="studio-btn studio-btn-primary studio-header-cta">
             Discuss a project
           </Link>
           <button
