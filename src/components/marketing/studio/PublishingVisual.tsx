@@ -2,8 +2,8 @@ export function PublishingVisual() {
   return (
     <svg
       viewBox="0 0 560 390"
-      role="img"
-      aria-label="A book, mobile app, and release listing connected as one publishing workflow"
+      aria-hidden="true"
+      focusable="false"
       className="h-auto w-full"
     >
       <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
