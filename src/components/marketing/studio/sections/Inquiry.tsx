@@ -121,6 +121,14 @@ export function Inquiry() {
       setServices((prev) => (prev.includes("agency-collaboration") ? prev : [...prev, "agency-collaboration"]));
     } else if (intent === "publishing") {
       setServices((prev) => (prev.includes("publishing-launch") ? prev : [...prev, "publishing-launch"]));
+    } else if (intent === "websites") {
+      setServices((prev) => (prev.includes("websites-apps") ? prev : [...prev, "websites-apps"]));
+    } else if (intent === "brand") {
+      setServices((prev) => (prev.includes("brand-creative") ? prev : [...prev, "brand-creative"]));
+    } else if (intent === "marketing") {
+      setServices((prev) => (prev.includes("marketing-growth") ? prev : [...prev, "marketing-growth"]));
+    } else if (intent === "ai-systems") {
+      setServices((prev) => (prev.includes("ai-systems") ? prev : [...prev, "ai-systems"]));
     }
   }, []);
 
