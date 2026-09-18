@@ -61,6 +61,10 @@ import Work from "./pages/Work";
 import WorkCaseStudy from "./pages/WorkCaseStudy";
 import Hire from "./pages/Hire";
 import Publishing from "./pages/Publishing";
+import WebsiteServices from "./pages/WebsiteServices";
+import BrandServices from "./pages/BrandServices";
+import MarketingServices from "./pages/MarketingServices";
+import AISystemsServices from "./pages/AISystemsServices";
 import HelpCenter from "./pages/HelpCenter";
 import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
@@ -109,6 +113,10 @@ const App = () => {
                 <Route path="/hire" element={<Hire />} />
                 {/* Public Publishing & Launch packaged-service page. */}
                 <Route path="/publishing" element={<Publishing />} />
+                <Route path="/services/websites" element={<WebsiteServices />} />
+                <Route path="/services/brand" element={<BrandServices />} />
+                <Route path="/services/marketing" element={<MarketingServices />} />
+                <Route path="/services/ai-systems" element={<AISystemsServices />} />
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
                 <Route path="/qualify/:slug" element={<QualifyLanding />} />
                 {/* Public per-vertical landing pages, config-driven. */}

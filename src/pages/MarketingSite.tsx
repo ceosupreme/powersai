@@ -6,11 +6,10 @@ import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
-import { InteractiveStudioMap } from "@/components/marketing/studio/sections/InteractiveStudioMap";
+import { BuyerChooser } from "@/components/marketing/studio/sections/BuyerChooser";
 import { BarPulseFeature } from "@/components/marketing/studio/sections/BarPulseFeature";
-import { ProcessSection } from "@/components/marketing/studio/sections/ProcessSection";
+import { WhySupremeTeam } from "@/components/marketing/studio/sections/WhySupremeTeam";
 import { Founder } from "@/components/marketing/studio/sections/Founder";
-import { FAQ } from "@/components/marketing/studio/sections/FAQ";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
@@ -41,14 +40,13 @@ export default function MarketingSite() {
       <StudioHeader />
       <main>
         <Hero />
-        <ScopeStrip />
         <StudioReveal><SelectedWork /></StudioReveal>
+        <ScopeStrip />
+        <StudioReveal><BuyerChooser /></StudioReveal>
         <StudioReveal><Capabilities /></StudioReveal>
-        <StudioReveal><InteractiveStudioMap /></StudioReveal>
         <StudioReveal><BarPulseFeature /></StudioReveal>
-        <StudioReveal><ProcessSection /></StudioReveal>
+        <StudioReveal><WhySupremeTeam /></StudioReveal>
         <StudioReveal><Founder /></StudioReveal>
-        <StudioReveal><FAQ /></StudioReveal>
         <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />
