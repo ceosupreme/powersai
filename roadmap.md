@@ -36,6 +36,10 @@
   - Add real-project media reel, visual service entry points, unique service hero/explainer/media bands
   - Enrich Publishing, Founder, Inquiry, Hire, and selective case-study media while preserving behavior
   - Verify responsive, reduced-motion, keyboard, local-media, and route behavior without live submission
+- [ ] Public studio sitewide copywriting pass
+  - Rewrite buyer-facing homepage, service, publishing, work, case-study, hiring, contact, and footer copy
+  - Strengthen messaging and copywriting across Websites, Brand, and Marketing without adding a new service
+  - Verify public routes, responsive layouts, and service-intent behavior without live submission
 - [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
