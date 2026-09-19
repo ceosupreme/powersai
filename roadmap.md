@@ -56,8 +56,14 @@
   - Mocked contract tests first; live intake test only with owner approval
 
 ## Flagship vertical acquisition front ends
-- [ ] Add explicit HVAC, automotive, real estate, legal, and med spa routes before the generic vertical route
-- [ ] Build distinct research-informed pages, diagnostics, sample workflows, proof, FAQ, and safe CTA attribution
-- [ ] Add reusable vertical inquiry and extend main inquiry source attribution without backend changes
-- [ ] Add Industries index and footer navigation
-- [ ] Verify responsive, keyboard, reduced-motion, zoom, mocked intake, metadata, and route regressions
+- [x] Add explicit HVAC, automotive, real estate, legal, and med spa routes before the generic vertical route
+- [x] Build distinct research-informed pages, diagnostics, sample workflows, proof, FAQ, and safe CTA attribution
+- [x] Add reusable vertical inquiry and extend main inquiry source attribution without backend changes
+- [x] Add Industries index and footer navigation
+- [x] Verify responsive, keyboard, reduced-motion, zoom, mocked intake, metadata, and route regressions
+
+## Hospitality flagship expansion
+- [ ] Add distinct Bars & Restaurants and Pizza Shops acquisition pages with attributed inquiry paths
+- [ ] Route `/for/bars-restaurants` into the restaurant flagship while preserving the legacy database row
+- [ ] Expand `/industries` and footer to seven industries
+- [ ] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission

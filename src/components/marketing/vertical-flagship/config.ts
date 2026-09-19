@@ -1,4 +1,4 @@
-export type VerticalSlug = "hvac" | "auto" | "real-estate" | "legal" | "medspa";
+export type VerticalSlug = "hvac" | "auto" | "real-estate" | "legal" | "medspa" | "restaurants" | "pizza";
 export type FocusKey = "brand" | "website" | "visibility" | "ads" | "leads" | "retention" | "systems";
 
 export type VerticalConfig = {
@@ -18,6 +18,10 @@ export type VerticalConfig = {
   failures: { title: string; body: string }[];
   workflow: string[];
   workflowBySegment?: Record<string, string[]>;
+  stagesBySegment?: Record<string, { title: string; summary: string; items: string[] }[]>;
+  heroProofPath?: string;
+  heroProofLabel?: string;
+  tertiaryLabel?: string;
   scope: string[];
   faqs: { q: string; a: string }[];
   safety?: string;
@@ -25,7 +29,7 @@ export type VerticalConfig = {
   proofSlugs: string[];
 };
 
-export const FLAGSHIP_SLUGS: VerticalSlug[] = ["hvac", "auto", "real-estate", "legal", "medspa"];
+export const FLAGSHIP_SLUGS: VerticalSlug[] = ["hvac", "auto", "real-estate", "legal", "medspa", "restaurants", "pizza"];
 
 export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
   hvac: {
@@ -172,6 +176,106 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { q: "Do you guarantee cases or search rankings?", a: "No. Case outcomes, retained matters, and rankings cannot be guaranteed. The work focuses on strategy, presentation, demand, intake, follow-up, and useful measurement." },
       { q: "Do you perform conflict checks?", a: "No. Conflict procedures remain governed by the firm and its approved legal software. Any handoff must respect those systems." },
       { q: "How do you handle attorney-advertising requirements?", a: "Requirements vary. The firm approves final claims, disclaimers, targeting, and campaign language before release." },
+    ],
+  },
+  restaurants: {
+    slug: "restaurants", name: "Bars & restaurants", eyebrow: "Hospitality growth, from discovery to regulars",
+    title: "Get discovered. Fill more seats. Turn more guests into regulars.",
+    description: "Brand, website, local search, paid media, reservations and direct ordering, events, guest marketing, reputation, and business systems—built around how your venue actually earns.",
+    metaTitle: "Restaurant & Bar Marketing, Websites & Growth Systems | Supreme Team Media",
+    metaDescription: "Branding, restaurant websites, local search, paid media, reservations/direct ordering, events, guest marketing, loyalty, reporting and systems for restaurants, bars and hospitality groups.",
+    primaryLabel: "Show me where I’d start", secondaryLabel: "See the hospitality system",
+    heroProofPath: "/work/barpulse", heroProofLabel: "See the hospitality system", tertiaryLabel: "Run the free hospitality check",
+    segmentLabel: "What kind of hospitality business?", segments: [{ id: "restaurant", label: "Restaurant" }, { id: "nightlife", label: "Bar / Nightlife" }, { id: "group", label: "Multi-location group" }],
+    needs: [
+      { id: "brand-site-menu", label: "Our brand, site, or menu doesn’t sell the experience", detail: "Sharpen the identity, message, menu experience, creative direction, and path to action." },
+      { id: "reservations-orders", label: "We need more reservations or direct orders", detail: "Improve discovery, conversion, reservation, waitlist, and direct-order paths." },
+      { id: "events", label: "We need more event or private-party business", detail: "Present packages clearly and capture catering, event, table, or private-dining demand." },
+      { id: "visibility", label: "We need better local search, ads, or social", detail: "Connect local visibility, paid demand, content, and event promotion." },
+      { id: "retention", label: "We need to bring guests back more often", detail: "Build useful list growth, loyalty, review, referral, and win-back programs." },
+      { id: "systems", label: "We need better reporting and operations across tools", detail: "Connect approved data, manager workflows, campaign measurement, and owner visibility." },
+      { id: "whole-system", label: "We need the whole growth system", detail: "Plan the full journey from discovery through conversion, retention, and operations." },
+    ],
+    stages: [
+      { title: "Get discovered", summary: "Show up when locals and visitors decide where to go.", items: ["Google Business Profile and local SEO", "SEO/AEO/GEO restaurant content", "Website and menu discoverability", "Paid search, social, and event promotion"] },
+      { title: "Get chosen", summary: "Make the experience easy to understand and want.", items: ["Brand, identity, messaging, and copy", "Website and menu experience", "Creative, photography, and video direction", "Reviews, reservations, ordering, and events"] },
+      { title: "Fill tables, orders, and events", summary: "Turn demand into a clear next step.", items: ["Reservation and direct-order conversion", "Private dining, events, and catering capture", "Slow-night and seasonal campaigns", "Remarketing and follow-up workflows"] },
+      { title: "Build regulars", summary: "Create more reasons for guests to return.", items: ["Guest CRM and first-party list growth", "Email, SMS, push, and loyalty strategy", "VIP, birthday, review, and referral programs", "Win-back and reactivation"] },
+      { title: "Run smarter", summary: "Give managers and owners a clearer operating view.", items: ["Reporting and attribution", "POS, reservation, and guest-data connections", "Manager workflows and campaign calendars", "AI-assisted insights where useful"] },
+    ],
+    stagesBySegment: {
+      nightlife: [
+        { title: "Own local nightlife discovery", summary: "Make recurring programming and the venue experience easy to find.", items: ["Nightlife search and local visibility", "Event and recurring-program promotion", "Paid social and campaign creative", "Content calendar and venue messaging"] },
+        { title: "Turn interest into a plan", summary: "Make every night, table, and private event easier to choose.", items: ["Event-led website experience", "Guest list and table inquiry paths", "Cabana and private-event presentation", "Late-night inquiry handling where appropriate"] },
+        { title: "Fill the room", summary: "Connect programming to measurable demand.", items: ["Repeat-event promotion", "Retargeting and seasonal campaigns", "Inquiry routing and follow-up", "Social creative and offer testing"] },
+        { title: "Build the guest list", summary: "Keep the relationship after the night ends.", items: ["Guest CRM and list growth", "VIP and loyalty strategy", "Email, SMS, and win-back", "Review and referral programs"] },
+        { title: "Run smarter", summary: "Coordinate marketing and operations around the calendar.", items: ["Event and campaign measurement", "Manager workflows", "Approved system connections", "Owner reporting"] },
+      ],
+      group: [
+        { title: "Make every location findable", summary: "Build group strength without flattening local relevance.", items: ["Group brand architecture", "Location pages and local search", "Venue-specific content", "Coordinated paid media"] },
+        { title: "Make each venue easy to choose", summary: "Clarify the right menu, experience, and action by location.", items: ["Location-aware website journeys", "Menus, reservations, ordering, and events", "Campaign creative and messaging", "Reputation by venue"] },
+        { title: "Coordinate demand", summary: "Run campaigns across the group without losing local control.", items: ["Campaign calendar and routing", "Cross-location remarketing", "Private-event and catering capture", "Venue-level conversion paths"] },
+        { title: "Build shared guest value", summary: "Use approved first-party data with a clear location strategy.", items: ["Cross-location guest marketing", "Loyalty and lifecycle strategy", "List growth and reactivation", "Review and referral programs"] },
+        { title: "See the group clearly", summary: "Standardize what should be shared and preserve what should stay local.", items: ["Venue scorecards and reporting", "Standard manager workflows", "Campaign coordination", "System integration and owner visibility"] },
+      ],
+    },
+    failures: [
+      { title: "The venue looks better in person than online", body: "The brand, menu, creative, reviews, and reservation or ordering path should sell the same experience guests receive." },
+      { title: "A slow night has no campaign behind it", body: "A practical calendar can connect events, offers, content, paid media, and guest follow-up to the nights that need demand." },
+      { title: "Guest data stays trapped in separate tools", body: "A first-party strategy can clarify what is available, what can connect, and how to bring guests back without overpromising integrations." },
+    ],
+    workflow: ["Google, social, or event", "Site, menu, reservation, or order", "Visit, order, or inquiry", "Guest profile or list", "Follow-up, loyalty, or win-back", "Owner and manager reporting"],
+    workflowBySegment: {
+      restaurant: ["Google, social, or event", "Site, menu, reservation, or order", "Visit, order, or event inquiry", "Guest profile or list", "Follow-up, loyalty, or win-back", "Owner and manager reporting"],
+      nightlife: ["Nightlife search, social, or event", "Event, guest-list, or table page", "Visit, table, or private-event inquiry", "Guest list or CRM", "Repeat-event promotion or VIP follow-up", "Manager reporting"],
+      group: ["Search, campaign, or social", "Venue or location routing", "Local reservation, order, or inquiry", "Cross-location guest profile", "Location-aware loyalty or win-back", "Group and venue reporting"],
+    },
+    scope: ["Brand and identity", "Website, menu, and copy", "Local search and content", "Paid media and social", "Reservations and direct ordering", "Events and catering", "Guest CRM and loyalty", "Reputation", "Reporting and systems"],
+    proofSlugs: ["barpulse", "big-paws-club", "kario-voss"],
+    safety: "Reservation, ordering, POS, guest-data, loyalty, and messaging connections depend on the venue’s current platforms, permissions, accounts, and vendor requirements. Compatibility is confirmed before any integration is recommended.",
+    faqs: [
+      { q: "Do you replace our POS, reservation, or ordering platform?", a: "Not by default. We map the current guest journey and operating stack first, then confirm what should stay, improve, connect, or change." },
+      { q: "Can you support one venue and a multi-location group?", a: "Yes. A single venue can focus on its clearest demand or retention gap. A group can add brand architecture, location-level search, campaign coordination, shared guest strategy, and standardized reporting." },
+      { q: "Do you guarantee reservations, orders, or event bookings?", a: "No. Guest decisions and platform performance cannot be guaranteed. The work improves the strategy, creative, visibility, conversion paths, follow-up, and measurement around them." },
+    ],
+  },
+  pizza: {
+    slug: "pizza", name: "Pizza shops", eyebrow: "Growth systems for independent pizzerias",
+    title: "Win the local search. Own more orders. Turn first-time customers into regulars.",
+    description: "Brand, website, local visibility, direct ordering, ads, phone and online conversion, loyalty, catering, repeat-order marketing, and business systems—built for independent pizza shops.",
+    metaTitle: "Pizza Shop Marketing, Websites & Direct-Order Growth | Supreme Team Media",
+    metaDescription: "Branding, pizza websites, local SEO, paid media, direct-order customer journeys, loyalty, repeat-order marketing, catering and business systems for independent pizzerias.",
+    primaryLabel: "Show me where I’d start", secondaryLabel: "Run the free pizza check",
+    needs: [
+      { id: "visibility", label: "We need more local discovery or Google visibility", detail: "Strengthen local search, neighborhood pages, reviews, content, and paid demand." },
+      { id: "website", label: "Our website or menu makes ordering harder", detail: "Create a faster mobile journey with clearer menu, pickup, delivery, and order paths." },
+      { id: "direct-relationship", label: "Too many customers live on third-party platforms", detail: "Build a stronger direct path and first-party customer relationship where it makes sense." },
+      { id: "retention", label: "We need more repeat orders or loyalty", detail: "Plan reorder, loyalty, win-back, review, referral, and local-community campaigns." },
+      { id: "phone-orders", label: "We need better phone-order or inquiry handling", detail: "Map how calls, orders, questions, and follow-up should move through the shop." },
+      { id: "catering", label: "We need more catering or large orders", detail: "Present packages clearly and create a better path for local businesses, schools, and teams." },
+      { id: "ads", label: "We need better ads, social, or content", detail: "Connect local offers, creative, landing pages, seasonal moments, and measurement." },
+      { id: "whole-system", label: "We need the whole growth system", detail: "Plan discovery, ordering, customer ownership, repeat business, and shop visibility together." },
+    ],
+    stages: [
+      { title: "Be the shop they find", summary: "Win useful local visibility when pizza intent is highest.", items: ["Google Business Profile and local SEO", "Pizza-near-me and neighborhood pages", "Website/menu SEO and AEO", "Reviews, local content, and paid media"] },
+      { title: "Make ordering easy", summary: "Remove friction from menu to pickup, delivery, or catering.", items: ["Mobile-first website and menu architecture", "Direct online and phone-order paths", "Pickup and delivery presentation", "Catering, large orders, offers, and bundles"] },
+      { title: "Own more of the relationship", summary: "Build a direct customer path around the technology that works.", items: ["First-party list growth", "Loyalty and direct-order messaging", "Review and referral requests", "Community and local marketing"] },
+      { title: "Keep regulars coming back", summary: "Give customers a relevant reason to reorder.", items: ["Reorder reminders and win-back", "Family, weekday, and game-day offers", "Catering and event outreach", "Seasonal and birthday campaigns"] },
+      { title: "Run the shop smarter", summary: "Connect marketing activity to clearer decisions.", items: ["POS, ordering, and CRM connections where feasible", "Campaign and order attribution", "Menu and content workflows", "Multi-location visibility and appropriate automation"] },
+    ],
+    failures: [
+      { title: "Local intent lands on a slow, confusing menu", body: "The mobile experience should make the right location, menu, pickup, delivery, and order path obvious." },
+      { title: "The marketplace owns the next order", body: "Third-party reach can remain useful while the brand, direct path, customer list, and loyalty program build a relationship the shop controls." },
+      { title: "Catering is hidden behind the regular menu", body: "A dedicated large-order path can explain packages, timing, service area, and the next step for businesses, schools, teams, and events." },
+    ],
+    workflow: ["Google or social", "Local landing page and menu", "Direct order or phone", "Pickup or delivery", "Customer list and loyalty", "Reorder or win-back", "Review or referral"],
+    scope: ["Brand and messaging", "Website and menu", "Local SEO and content", "Paid media and social", "Direct-order journey", "Phone-order workflow", "Loyalty and retention", "Catering", "Reporting and systems"],
+    proofSlugs: ["big-paws-club", "barpulse", "kario-voss"],
+    safety: "Already have ordering or POS software you like? Keep it. We can improve the brand, website, demand generation, customer journey, and retention around it—or confirm what can be connected before recommending a change. New platform options depend on existing accounts, access, and provider requirements.",
+    faqs: [
+      { q: "Do we have to replace Slice, Owner.com, Toast, Square, Clover, or our current ordering system?", a: "No. If the current platform works, the engagement can strengthen the brand, website, local demand, customer journey, and retention around it. Any connection or replacement is recommended only after compatibility and requirements are confirmed." },
+      { q: "Can you help us build more direct orders?", a: "We can improve the direct-order journey, local visibility, menu experience, campaign messaging, customer list, and repeat-order strategy. We do not promise a specific order mix or claim integrations before they are verified." },
+      { q: "Can the work support multiple locations?", a: "Yes. Scope can include location pages, local visibility, location-aware ordering paths, coordinated campaigns, shared customer strategy, and multi-location reporting." },
     ],
   },
   medspa: {
