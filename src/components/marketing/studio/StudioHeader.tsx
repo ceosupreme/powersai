@@ -79,12 +79,12 @@ export function StudioHeader() {
       )}
     >
       <Container className="flex h-[76px] items-center justify-between gap-6">
-        <Link to="/" className="studio-display text-[1.05rem] leading-none tracking-tight md:text-[1.15rem]">
+        <Link to="/" className="studio-display inline-flex min-h-11 items-center text-[1.05rem] leading-none tracking-tight md:text-[1.15rem]">
           Supreme Team Media
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex xl:gap-9">
-          <Link to="/work" className="text-[1rem] text-foreground/80 hover:text-foreground">Work</Link>
+          <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">Work</Link>
           <div className="relative">
             <Button ref={servicesButtonRef} type="button" variant="ghost" aria-expanded={servicesOpen} aria-controls="studio-services-menu"
               onClick={() => setServicesOpen((value) => !value)}
@@ -104,7 +104,7 @@ export function StudioHeader() {
               </div>
             )}
           </div>
-          <Link to="/#about" className="text-[1rem] text-foreground/80 hover:text-foreground">About</Link>
+          <Link to="/#about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">About</Link>
         </nav>
 
         <div className="flex items-center gap-3">
