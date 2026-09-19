@@ -66,4 +66,4 @@
 - [x] Add distinct Bars & Restaurants and Pizza Shops acquisition pages with attributed inquiry paths
 - [x] Route `/for/bars-restaurants` into the restaurant flagship while preserving the legacy database row
 - [x] Expand `/industries` and footer to seven industries
-- [ ] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission
+- [x] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission
