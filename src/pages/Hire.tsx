@@ -43,7 +43,7 @@ export default function Hire() {
   const evidence = EVIDENCE_SLUGS.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as typeof projects;
 
   useStudioHead({
-    title: "Hire Sean Mayo — Strategy, creative work, and hands-on implementation",
+    title: "Hire Sean Mayo — Strategy, creative work, and hands-on execution",
     description:
       "Sean Mayo, founder of Supreme Team Media since 2002: marketing, sales, hospitality, websites and AI-assisted business systems. For employers and teams considering an individual role, contract, or embedded project.",
     path: "/hire",
@@ -58,12 +58,12 @@ export default function Hire() {
           <div className="lg:col-span-7">
           <Eyebrow>For employers and teams</Eyebrow>
           <h1 className="studio-display mt-5 max-w-4xl text-balance" style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}>
-            Sean Mayo — Strategy, creative work, and hands-on implementation.
+             Sean Mayo — Strategy, creative thinking, and hands-on execution.
           </h1>
           <Lede>
-            Founder of Supreme Team Media since 2002, with experience across marketing, sales, hospitality, websites,
-            and AI-assisted business systems. I turn business needs into work people can use—and collaborate directly
-            with the people responsible for it.
+             Founder of Supreme Team Media since 2002, with experience across marketing, sales, hospitality, websites,
+             and AI-assisted business systems. I connect strategy with execution, take ownership of the work, and stay
+             close enough to the business to make sound decisions quickly.
           </Lede>
           <p className="mt-5 max-w-2xl text-[1.05rem] text-muted-foreground">
             For employers and teams considering Sean for an individual role, contract, or embedded project.
@@ -117,7 +117,7 @@ export default function Hire() {
         <section className="studio-section">
           <Container>
             <h2 className="studio-display text-balance" style={{ fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>
-              What I bring to a team.
+               What I can help a team do.
             </h2>
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
               {EXPERIENCE.map((e, index) => (
@@ -135,10 +135,10 @@ export default function Hire() {
           <Container>
             <Eyebrow>Evidence</Eyebrow>
             <h2 className="studio-display mt-4 text-balance" style={{ fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>
-              Work you can read about and ask about.
+               Real projects, with the role and decisions made clear.
             </h2>
             <p className="mt-5 max-w-2xl text-[0.98rem] text-muted-foreground">
-              Each example states what it actually is: client work, an owned brand, a historical engagement, or a
+               Each example is labeled for what it is: client work, an owned brand, a historical engagement, or a
               demonstration built with sample data.
             </p>
 
@@ -189,9 +189,8 @@ export default function Hire() {
               <div className="border-t border-border pt-5">
                 <dt className="studio-label">Ways to work together</dt>
                 <dd className="mt-2 text-[0.98rem] text-muted-foreground">
-                  An individual role, a contract engagement, or an embedded project alongside an existing team. This
-                  page is Sean&apos;s own professional introduction — not an arrangement for an agency to perform the
-                  role.
+                   An individual role, a contract engagement, or an embedded project alongside an existing team. This
+                   is Sean&apos;s direct professional introduction for a role—not an agency pitch.
                 </dd>
               </div>
             </dl>

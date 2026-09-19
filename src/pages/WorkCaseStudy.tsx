@@ -53,9 +53,9 @@ export default function WorkCaseStudy() {
             </p></Container>
           ) : !project ? (
             <Container><div className="py-20">
-              <h1 className="studio-display text-[2rem]">This project page isn&apos;t available.</h1>
+               <h1 className="studio-display text-[2rem]">This project isn&apos;t available.</h1>
               <p className="mt-4 text-[0.98rem] text-muted-foreground">
-                The project you&apos;re looking for isn&apos;t published.{" "}
+                 The project you&apos;re looking for isn&apos;t on the site right now.{" "}
                 <Link to="/work" className="underline underline-offset-4">
                   See the selected work
                 </Link>{" "}
