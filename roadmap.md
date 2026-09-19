@@ -63,7 +63,7 @@
 - [x] Verify responsive, keyboard, reduced-motion, zoom, mocked intake, metadata, and route regressions
 
 ## Hospitality flagship expansion
-- [ ] Add distinct Bars & Restaurants and Pizza Shops acquisition pages with attributed inquiry paths
-- [ ] Route `/for/bars-restaurants` into the restaurant flagship while preserving the legacy database row
-- [ ] Expand `/industries` and footer to seven industries
+- [x] Add distinct Bars & Restaurants and Pizza Shops acquisition pages with attributed inquiry paths
+- [x] Route `/for/bars-restaurants` into the restaurant flagship while preserving the legacy database row
+- [x] Expand `/industries` and footer to seven industries
 - [ ] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission
