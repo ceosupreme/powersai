@@ -40,7 +40,7 @@
   - Rewrite buyer-facing homepage, service, publishing, work, case-study, hiring, contact, and footer copy
   - Strengthen messaging and copywriting across Websites, Brand, and Marketing without adding a new service
   - Verify public routes, responsive layouts, and service-intent behavior without live submission
-- [ ] Pre-existing, out of redesign scope: /for/hvac horizontal overflow on phones
+- [x] Pre-existing HVAC overflow superseded by the new flagship route
   - Rebuild the inquiry form: required name/email/note; optional company, service
     multi-select, budget, timing; 4000-char server limit validated, never truncated
   - `conversation_channel=form`, `route_to=self`, structured `qualifier_data`,
@@ -54,3 +54,10 @@
     report analytics as unconfigured
   - Titles/descriptions/canonicals for homepage, work, cases, hire; root metadata
   - Mocked contract tests first; live intake test only with owner approval
+
+## Flagship vertical acquisition front ends
+- [ ] Add explicit HVAC, automotive, real estate, legal, and med spa routes before the generic vertical route
+- [ ] Build distinct research-informed pages, diagnostics, sample workflows, proof, FAQ, and safe CTA attribution
+- [ ] Add reusable vertical inquiry and extend main inquiry source attribution without backend changes
+- [ ] Add Industries index and footer navigation
+- [ ] Verify responsive, keyboard, reduced-motion, zoom, mocked intake, metadata, and route regressions

@@ -21,7 +21,13 @@ export function StudioHeader() {
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const servicesButtonRef = useRef<HTMLButtonElement | null>(null);
   const servicesPanelRef = useRef<HTMLDivElement | null>(null);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const verticalSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa)$/)?.[1];
+  const sourceParams = new URLSearchParams(search);
+  const biz = sourceParams.get("biz");
+  const attributedContact = verticalSlug
+    ? `/?src=for-${verticalSlug}${biz ? `&biz=${encodeURIComponent(biz)}` : ""}#contact`
+    : "/#contact";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -73,12 +79,12 @@ export function StudioHeader() {
       )}
     >
       <Container className="flex h-[76px] items-center justify-between gap-6">
-        <Link to="/" className="studio-display text-[1.05rem] leading-none tracking-tight md:text-[1.15rem]">
+        <Link to="/" className="studio-display inline-flex min-h-11 items-center text-[1.05rem] leading-none tracking-tight md:text-[1.15rem]">
           Supreme Team Media
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex xl:gap-9">
-          <Link to="/work" className="text-[1rem] text-foreground/80 hover:text-foreground">Work</Link>
+          <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">Work</Link>
           <div className="relative">
             <Button ref={servicesButtonRef} type="button" variant="ghost" aria-expanded={servicesOpen} aria-controls="studio-services-menu"
               onClick={() => setServicesOpen((value) => !value)}
@@ -98,11 +104,11 @@ export function StudioHeader() {
               </div>
             )}
           </div>
-          <Link to="/#about" className="text-[1rem] text-foreground/80 hover:text-foreground">About</Link>
+          <Link to="/#about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">About</Link>
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link to="/#contact" className="studio-btn studio-btn-primary studio-header-cta">
+          <Link to={attributedContact} className="studio-btn studio-btn-primary studio-header-cta">
             Start a project
           </Link>
           <Button
@@ -137,7 +143,7 @@ export function StudioHeader() {
             ))}
             <Link to="/#about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">About</Link>
             <Link
-              to="/#contact"
+              to={attributedContact}
               onClick={() => setOpen(false)}
               className="studio-btn studio-btn-primary mt-3 w-full"
             >
