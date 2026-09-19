@@ -254,7 +254,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { id: "phone-orders", label: "We need better phone-order or inquiry handling", detail: "Map how calls, orders, questions, and follow-up should move through the shop." },
       { id: "catering", label: "We need more catering or large orders", detail: "Present packages clearly and create a better path for local businesses, schools, and teams." },
       { id: "ads", label: "We need better ads, social, or content", detail: "Connect local offers, creative, landing pages, seasonal moments, and measurement." },
-      { id: "whole-system", label: "We need the whole growth system", detail: "Plan discovery, ordering, customer ownership, repeat business, and shop visibility together." },
+      { id: "systems", label: "We need the whole growth system", detail: "Plan discovery, ordering, customer ownership, repeat business, and shop visibility together." },
     ],
     stages: [
       { title: "Be the shop they find", summary: "Win useful local visibility when pizza intent is highest.", items: ["Google Business Profile and local SEO", "Pizza-near-me and neighborhood pages", "Website/menu SEO and AEO", "Reviews, local content, and paid media"] },

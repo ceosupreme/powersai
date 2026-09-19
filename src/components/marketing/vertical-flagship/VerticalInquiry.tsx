@@ -64,8 +64,10 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz }: { c
     const payload = result.data as { ok?: unknown; id?: unknown } | null;
     if (result.error || payload?.ok !== true || typeof payload.id !== "string" || !payload.id) {
       setStatus("error");
-      const message = String((result.error as { message?: string } | null)?.message ?? "");
-      setError(/429|too many/i.test(message) ? "Please wait a minute before trying again." : "Your inquiry was not saved. Please try again or email hello@supremeteammedia.com.");
+      const invokeError = result.error as { message?: string; context?: { status?: number } } | null;
+      const message = String(invokeError?.message ?? "");
+      const rateLimited = invokeError?.context?.status === 429 || /429|too many/i.test(message);
+      setError(rateLimited ? "Please wait a minute before trying again." : "Your inquiry was not saved. Please try again or email hello@supremeteammedia.com.");
       return;
     }
     setStatus("success");
