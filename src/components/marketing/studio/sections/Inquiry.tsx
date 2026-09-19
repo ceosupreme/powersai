@@ -63,6 +63,8 @@ export function Inquiry() {
   const [message, setMessage] = useState("");
   const [budget, setBudget] = useState("");
   const [timing, setTiming] = useState("");
+  const sourceParam = new URLSearchParams(window.location.search).get("src");
+  const sourceVertical = sourceParam?.match(/^for-(hvac|auto|real-estate|legal|medspa)$/)?.[1] ?? null;
 
   const startedRef = useRef(false);
   const convertedRef = useRef(false);
@@ -207,6 +209,8 @@ export function Inquiry() {
             services,
             budget_range: budget || null,
             timing: timing || null,
+            source_vertical: sourceVertical,
+            source_path: sourceVertical ? `/for/${sourceVertical}` : null,
           },
           company_website: "",
         },
