@@ -90,7 +90,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
             <Container>
               <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
                 <div className="lg:col-span-5">
-                  <Eyebrow>When this is worth fixing</Eyebrow>
+                  <Eyebrow>What may be holding you back</Eyebrow>
                   <SectionTitle>{content.problemTitle}</SectionTitle>
                 </div>
                 <div className="divide-y divide-border lg:col-span-7">
@@ -114,7 +114,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
             <Container>
               <div className="grid gap-12 lg:grid-cols-12">
                 <div className="lg:col-span-5">
-                  <Eyebrow style={{ color: "hsl(var(--band-text) / 0.72)" }}>What changes</Eyebrow>
+                  <Eyebrow style={{ color: "hsl(var(--band-text) / 0.72)" }}>What better looks like</Eyebrow>
                   <h2 className="studio-display mt-4 text-balance text-[2.6rem] leading-[1.05] md:text-[4.2rem]">{content.outcomesTitle}</h2>
                   <p className="mt-6 text-[1.08rem] leading-relaxed text-muted-foreground">{content.outcomesIntro}</p>
                 </div>
@@ -134,7 +134,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         <StudioReveal>
           <section className="studio-section bg-[hsl(var(--surface))]">
             <Container>
-              <Eyebrow>Scope</Eyebrow>
+               <Eyebrow>What we can help with</Eyebrow>
               <SectionTitle>{content.capabilitiesTitle}</SectionTitle>
               <ul className="service-capability-list mt-12 grid gap-x-10 md:grid-cols-2">
                 {content.capabilities.map((item, index) => (
@@ -151,7 +151,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         <StudioReveal>
           <section className="service-media-section studio-section">
             <Container>
-              <Eyebrow>In practice</Eyebrow>
+               <Eyebrow>Built for real use</Eyebrow>
               <SectionTitle>{mediaBandTitle(content.tone)}</SectionTitle>
               <ServiceMediaBand tone={content.tone} />
             </Container>
@@ -161,12 +161,12 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         <StudioReveal>
           <section id="service-work" className="studio-section">
             <Container>
-              <Eyebrow>Relevant work</Eyebrow>
-              <SectionTitle>Proof close to the offer.</SectionTitle>
+               <Eyebrow>Related work</Eyebrow>
+               <SectionTitle>See this kind of thinking in the work.</SectionTitle>
               {isError ? (
-                <p className="mt-8 text-muted-foreground">Project proof could not be loaded. Visit the full work archive instead.</p>
+                <p className="mt-8 text-muted-foreground">The projects could not be loaded. You can still browse the full work page.</p>
               ) : isLoading ? (
-                <p className="mt-8 text-muted-foreground" role="status">Loading project proof…</p>
+                <p className="mt-8 text-muted-foreground" role="status">Loading projects…</p>
               ) : (
                 <div className="service-proof-grid mt-12 grid gap-7 lg:grid-cols-12">
                   {proof.slice(0, 3).map((project, index) => (
@@ -184,8 +184,8 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         <StudioReveal>
           <section className="studio-section border-y border-border bg-[hsl(var(--cobalt-pale))]">
             <Container>
-              <Eyebrow>How the engagement works</Eyebrow>
-              <SectionTitle>Clear decisions. Visible progress. Useful delivery.</SectionTitle>
+               <Eyebrow>How we work</Eyebrow>
+               <SectionTitle>A clear path from the first conversation to launch.</SectionTitle>
               <ol className="mt-12 grid gap-8 md:grid-cols-3">
                 {content.process.map((step, index) => (
                   <li key={step.title} className="border-t-2 border-primary pt-5">
@@ -204,7 +204,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
             <Container>
               <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
                 <div className="lg:col-span-7">
-                  <Eyebrow>Connected capabilities</Eyebrow>
+                   <Eyebrow>Related services</Eyebrow>
                   <SectionTitle>{content.connectedTitle}</SectionTitle>
                   <p className="mt-6 max-w-3xl text-[1.08rem] leading-relaxed text-muted-foreground">{content.connectedBody}</p>
                 </div>
@@ -223,8 +223,8 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         <StudioReveal>
           <section className="studio-section bg-[hsl(var(--surface))]">
             <Container>
-              <Eyebrow>Questions</Eyebrow>
-              <SectionTitle>Useful answers before we start.</SectionTitle>
+               <Eyebrow>Common questions</Eyebrow>
+               <SectionTitle>What you may want to know before we talk.</SectionTitle>
               <Accordion type="single" collapsible className="mt-10 max-w-4xl">
                 {content.faqs.map((item, index) => (
                   <AccordionItem key={item.q} value={`service-${index}`}>
@@ -260,10 +260,10 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
 }
 
 function mediaBandTitle(tone: ServicePageContent["tone"]): string {
-  if (tone === "brand") return "A system becomes real through its applications.";
-  if (tone === "marketing") return "Message, destination, and follow-through belong together.";
-  if (tone === "systems") return "Turn scattered steps into one useful operating view.";
-  return "Design the experience to hold together at every size.";
+  if (tone === "brand") return "Keep the brand recognizable wherever people meet it.";
+  if (tone === "marketing") return "Make the message, landing page, and follow-up feel like one conversation.";
+  if (tone === "systems") return "Spend less time chasing information across separate tools.";
+  return "Give every visitor a clear experience, on every screen.";
 }
 
 function categoryForTone(tone: ServicePageContent["tone"]): StudioCategoryId {

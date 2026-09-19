@@ -9,7 +9,7 @@ export function StudioFooter() {
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="studio-display text-2xl">Supreme Team Media</p>
-            <p className="mt-3 text-[1rem] text-muted-foreground">Creative. Marketing. Technology.</p>
+            <p className="mt-3 max-w-sm text-[1rem] text-muted-foreground">Brands, websites, campaigns, and systems built around the business problem.</p>
           </div>
 
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-4 text-[1rem] sm:grid-cols-3">

@@ -29,10 +29,10 @@ const APPS = [
 ];
 
 const PROCESS = [
-  { n: "1", title: "Prepare", body: "Clarify the format, audience, source material, required accounts, and finish condition." },
+  { n: "1", title: "Prepare", body: "Confirm the format, audience, source material, required accounts, and what must be ready for release." },
   { n: "2", title: "Package", body: "Design and format the release, then create the listing, store, and marketing assets." },
-  { n: "3", title: "Publish", body: "Support submission to the agreed platforms and ordinary release requirements." },
-  { n: "4", title: "Launch", body: "Connect the release to a landing page, email or social campaign, and ongoing support or measurement as scoped." },
+  { n: "3", title: "Publish", body: "Prepare and support submission to the agreed platforms, with fewer loose ends at review." },
+  { n: "4", title: "Launch", body: "Give the release a clear path through a landing page, email, social campaign, or other agreed support." },
 ];
 
 const INCLUDED = [
@@ -118,7 +118,7 @@ export default function Publishing() {
           <section id="publishing-tracks" className="studio-section border-y border-border bg-[hsl(var(--surface))]">
             <Container>
               <Eyebrow>Publishing tracks</Eyebrow>
-              <SectionTitle>Different formats. One release mindset.</SectionTitle>
+              <SectionTitle>Get the format-specific details right.</SectionTitle>
               <div className="mt-14 grid gap-8 lg:grid-cols-2">
                 <Track title="Books & publications" headline="From manuscript to release-ready package." items={BOOKS}>
                   Specialist services such as deep editing, illustration, photography, or audio can be scoped separately.
@@ -131,7 +131,7 @@ export default function Publishing() {
                 <p className="studio-label">Digital publications &amp; other releases</p>
                 <p className="mt-3 max-w-3xl text-[1rem] leading-relaxed text-muted-foreground">
                   Guides, reports, workbooks, downloadable products, interactive publications, and other digital releases
-                  can use the same release-minded approach.
+                   can be packaged, listed, and launched with the same attention to detail.
                 </p>
               </div>
             </Container>
@@ -165,7 +165,7 @@ export default function Publishing() {
               <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
                 <div className="lg:col-span-5">
                   <Eyebrow>What can be included</Eyebrow>
-                  <SectionTitle>The scope follows the project.</SectionTitle>
+                   <SectionTitle>Bring in the support your release actually needs.</SectionTitle>
                   <p className="mt-5 text-[1rem] leading-relaxed text-muted-foreground">
                     A book, app, or digital release can be a focused engagement or connect to a broader brand, website,
                     marketing, or systems project.
@@ -187,9 +187,9 @@ export default function Publishing() {
         <StudioReveal>
           <section className="studio-band studio-section">
             <Container>
-              <Eyebrow style={{ color: "hsl(var(--band-text) / 0.72)" }}>Why this fits STM</Eyebrow>
+               <Eyebrow style={{ color: "hsl(var(--band-text) / 0.72)" }}>One coordinated release</Eyebrow>
               <h2 className="studio-display mt-4 max-w-4xl text-balance text-[2rem] md:text-[3rem]">
-                Publishing sits where creative, technical, and marketing work meet.
+                 The product, presentation, submission, and launch should support one another.
               </h2>
               <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
                 {DISCIPLINES.map((item) => (
@@ -206,8 +206,8 @@ export default function Publishing() {
         <StudioReveal>
           <section className="studio-section">
             <Container>
-              <Eyebrow>Questions</Eyebrow>
-              <SectionTitle>Before the release work begins.</SectionTitle>
+               <Eyebrow>Common questions</Eyebrow>
+               <SectionTitle>What to know before we prepare your release.</SectionTitle>
               <Accordion type="single" collapsible className="mt-10 max-w-3xl">
                 {FAQS.map((item, index) => (
                   <AccordionItem key={item.q} value={`publishing-${index}`} className="border-border">
@@ -227,8 +227,8 @@ export default function Publishing() {
         <StudioReveal>
           <section className="studio-section border-t border-border bg-[hsl(var(--surface))]">
             <Container>
-              <Eyebrow>Start a release</Eyebrow>
-              <SectionTitle>What are you trying to release?</SectionTitle>
+               <Eyebrow>Talk about your release</Eyebrow>
+               <SectionTitle>What are you ready to bring to market?</SectionTitle>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {["Book or publication", "App or digital product", "Something else"].map((label) => (
                   <Link key={label} to="/?intent=publishing#contact" className="studio-btn studio-btn-outline">

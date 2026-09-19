@@ -66,9 +66,9 @@ export function ScopeStrip() {
           Websites <span aria-hidden>·</span> Brands <span aria-hidden>·</span> Campaigns <span aria-hidden>·</span> Systems <span aria-hidden>·</span> Publishing
         </p>
         <div className="mt-5 flex flex-col gap-3 border-t border-[hsl(var(--band-text)/0.2)] pt-5 md:flex-row md:items-baseline md:justify-between md:gap-10">
-          <p className="text-[1rem] text-muted-foreground md:max-w-2xl">A new website. A sharper brand. A better campaign. A system that saves steps.</p>
+          <p className="text-[1rem] text-muted-foreground md:max-w-2xl">A clearer website. A stronger brand. Marketing with a reason to act. Systems that save your team time.</p>
           <p className="text-[0.95rem] text-muted-foreground md:max-w-xs md:text-right">
-            Start with the project you need. Connect the pieces when it makes sense.
+             Start with the problem in front of you. Bring the rest together when the business needs it.
           </p>
         </div>
       </Container>

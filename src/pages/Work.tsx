@@ -29,7 +29,7 @@ export default function Work() {
     return { available, counts, visible };
   }, [projects, active]);
 
-  const activeLabel = active === "all" ? "All disciplines" : STUDIO_CATEGORY_LABEL[active];
+  const activeLabel = active === "all" ? "All work" : STUDIO_CATEGORY_LABEL[active];
 
   useStudioHead({
     title: active === "all" ? "Work — Supreme Team Media" : `${activeLabel} work — Supreme Team Media`,
@@ -54,17 +54,16 @@ export default function Work() {
         <Container>
           <Eyebrow>Selected work</Eyebrow>
           <h1 className="studio-display mt-5 max-w-5xl text-balance" style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)" }}>
-            Work you can look at. Experience you can ask about.
+             Selected work, with the thinking behind it.
           </h1>
           <Lede>
-            Explore selected live websites, creative projects, and business systems. Each project identifies the type
-            of work and Sean&apos;s contribution.
+             Explore live websites, creative projects, and business systems. Each case explains the business need,
+             Sean&apos;s role, and what was built.
           </Lede>
 
           {isError ? (
             <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
-              The project list couldn&apos;t be loaded right now — this is a loading problem, not an empty portfolio.
-              Please refresh, or email hello@supremeteammedia.com.
+               Something went wrong loading the projects. Please refresh, or email hello@supremeteammedia.com.
             </p>
           ) : isLoading ? (
             <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
@@ -85,7 +84,7 @@ export default function Work() {
               />
 
               <p className="mt-5 text-[0.9rem] text-muted-foreground" role="status" aria-live="polite">
-                Showing {visible.length} {visible.length === 1 ? "project" : "projects"} — {activeLabel}.
+                 {visible.length} {visible.length === 1 ? "project" : "projects"} in {activeLabel}.
               </p>
 
               <div className="mt-10 grid grid-cols-1 gap-8 pb-24 lg:grid-cols-2">
