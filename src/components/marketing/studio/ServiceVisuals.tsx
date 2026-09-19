@@ -61,7 +61,7 @@ export function ServiceHeroVisual({ tone }: { tone: ServiceVisualTone }) {
 
 const FLOW: Record<ServiceVisualTone, { eyebrow: string; title: string; steps: string[] }> = {
   websites: { eyebrow: "Customer path", title: "From visit to useful next step", steps: ["Arrival", "Understand", "Trust", "Act"] },
-  brand: { eyebrow: "Brand application", title: "One brand system, many surfaces", steps: ["Identity", "Website", "Campaign", "Presentation", "Content"] },
+  brand: { eyebrow: "Where the brand works", title: "One clear identity across every customer touchpoint", steps: ["Identity", "Website", "Campaign", "Presentation", "Content"] },
   marketing: { eyebrow: "Marketing path", title: "A connected route from attention to response", steps: ["Attention", "Relevance", "Proof", "Action", "Follow-up"] },
   systems: { eyebrow: "Operating model", title: "Connect the work before adding complexity", steps: ["Sources / tools", "Connected workflow", "Reporting", "Tasks", "Insights"] },
 };
@@ -85,13 +85,13 @@ export function ServiceMediaBand({ tone }: { tone: ServiceVisualTone }) {
       <BrowserFrame className="responsive-desktop"><ProjectImage mediaKey={MEDIA.bigPaws} /></BrowserFrame>
       <BrowserFrame className="responsive-tablet"><ProjectImage mediaKey={MEDIA.bigPaws} className="object-top" /></BrowserFrame>
       <div className="studio-device-phone responsive-phone"><ProjectImage mediaKey={MEDIA.bigPaws} /></div>
-      <p className="media-caption">One real project. Hierarchy designed to hold across screen sizes.</p>
+       <p className="media-caption">A clear customer path across desktop, tablet, and mobile.</p>
     </div>
   );
   if (tone === "brand") return (
     <div className="service-media-band brand-editorial-spread" aria-label="Editorial spread of real brand-led web projects">
       <div className="brand-spread-large"><ProjectImage mediaKey={MEDIA.kario} /></div>
-      <div className="brand-spread-copy" aria-hidden="true"><span className="studio-label">SYSTEM / APPLICATION</span><strong className="studio-display">A visual language built for use.</strong></div>
+       <div className="brand-spread-copy" aria-hidden="true"><span className="studio-label">VOICE / IDENTITY / USE</span><strong className="studio-display">Stay recognizable wherever customers meet you.</strong></div>
       <div className="brand-spread-small"><ProjectImage mediaKey={MEDIA.coastal} /></div>
       <div className="brand-spread-stripe" aria-hidden="true" />
     </div>
@@ -107,7 +107,7 @@ export function ServiceMediaBand({ tone }: { tone: ServiceVisualTone }) {
     <div className="service-media-band systems-media-band" aria-label="Real BarPulse interface and a conceptual comparison between scattered steps and a connected operating view">
       <BrowserFrame className="studio-browser-frame-dark systems-media-screen"><ProjectImage mediaKey={MEDIA.barpulse} /></BrowserFrame>
       <div className="systems-compare"><div><span className="studio-label">Scattered steps</span><p>Separate tools<br />Manual handoffs<br />Fragmented review</p></div><span aria-hidden="true">→</span><div><span className="studio-label">Connected operating view</span><p>Agreed sources<br />Defined workflow<br />Useful outputs</p></div></div>
-      <p className="media-caption">Conceptual process view based on the historical BarPulse case—not a claim about current client data.</p>
+       <p className="media-caption">BarPulse shows how agreed sources can support a clearer management view. Historical example; no current client data shown.</p>
     </div>
   );
 }

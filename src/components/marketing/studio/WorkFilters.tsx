@@ -36,8 +36,8 @@ export function WorkFilters({
 
   return (
     <div className="mt-10">
-      <h2 className="studio-label">Filter by discipline</h2>
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter projects by discipline">
+      <h2 className="studio-label">Filter the work</h2>
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter projects by service">
         {options.map((o) => {
           const on = o.id === active;
           return (

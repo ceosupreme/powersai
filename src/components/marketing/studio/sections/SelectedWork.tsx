@@ -15,9 +15,9 @@ export function SelectedWork() {
       <span id="proof" aria-hidden className="block h-0" />
       <Container>
         <Eyebrow>Selected work</Eyebrow>
-        <SectionTitle>Real work, doing a real job.</SectionTitle>
+        <SectionTitle>Built to solve something.</SectionTitle>
         <Lede>
-          Start with the proof: a working operations platform, distinctive brand experiences, and live websites built around clear audiences.
+          From customer-facing brands to behind-the-scenes systems, every project starts with a business problem and ends with something people can use.
         </Lede>
 
         {isError ? (
@@ -40,7 +40,7 @@ export function SelectedWork() {
         )}
 
         <Link to="/work" className="studio-btn studio-btn-outline mt-10">
-          View all work
+          See all work
         </Link>
       </Container>
     </section>

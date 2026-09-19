@@ -89,7 +89,7 @@ export function ProjectPlate({ project, className }: { project: StudioProject; c
             state={{ from }}
             className="inline-flex min-h-11 items-center gap-1.5 text-[0.9rem] font-medium text-primary hover:underline"
           >
-            View case <ArrowRight size={15} />
+             See how we solved it <ArrowRight size={15} />
           </Link>
           {project.externalUrl && (
             <a

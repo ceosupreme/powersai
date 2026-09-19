@@ -43,7 +43,7 @@ export function CaseDetail({ project }: { project: StudioProject }) {
                 </a>
               )}
               <Link to="/#contact" onClick={() => requestServiceIntent(project.categories[0] as ServiceId)} className="studio-btn studio-btn-outline">
-                Discuss a project
+                 Discuss a similar project
               </Link>
             </div>
           </div>
@@ -99,8 +99,8 @@ export function CaseDetail({ project }: { project: StudioProject }) {
       {src && (
         <section className="studio-section case-visual-study">
           <Container>
-            <p className="studio-eyebrow">Visual study</p>
-            <h2 className="studio-display mt-5 max-w-4xl text-balance">One real experience, viewed at different scales.</h2>
+             <p className="studio-eyebrow">The experience</p>
+             <h2 className="studio-display mt-5 max-w-4xl text-balance">Built to stay clear from the first screen to the next step.</h2>
             <div className="case-study-wide case-scroll-study mt-12">
               <BrowserFrame><img src={src} alt={`${project.title} full website view`} className="size-full" style={{ objectFit: "cover", objectPosition: "top center" }} /></BrowserFrame>
             </div>
@@ -116,7 +116,7 @@ export function CaseDetail({ project }: { project: StudioProject }) {
       {project.demonstrates && (
         <section className="studio-band studio-section">
           <Container>
-            <p className="studio-eyebrow text-[hsl(var(--band-text)/0.72)]">What this demonstrates</p>
+             <p className="studio-eyebrow text-[hsl(var(--band-text)/0.72)]">Why it matters</p>
             <p className="case-demonstrates studio-display mt-7 max-w-5xl text-balance">{project.demonstrates}</p>
           </Container>
         </section>

@@ -13,33 +13,33 @@ const ROWS: {
 }[] = [
   {
     title: "Websites & digital products",
-    headline: "Make the right first impression—and give people a clear next step.",
-    body: "Business and brand websites, campaign landing pages, online storefronts, web apps, and interface design. New builds or improvements to an existing experience.",
-    cta: "Explore websites",
+    headline: "Help people understand your business, trust it, and take the next step.",
+    body: "Strategy, website and landing-page copy, UX, design, and development for business sites, campaigns, stores, and digital products.",
+    cta: "See website services",
     to: "/services/websites",
     tone: "websites",
   },
   {
     title: "Brand & creative",
-    headline: "Give your business a look people recognize.",
-    body: "Brand identity, graphic design, presentation materials, campaign visuals, and content assets that work together across the places your business shows up.",
-    cta: "Explore brand & creative",
+    headline: "Make your business easier to recognize, remember, and choose.",
+    body: "Positioning, voice, message architecture, identity, and creative assets that keep the brand clear wherever customers meet it.",
+    cta: "See brand services",
     to: "/services/brand",
     tone: "brand",
   },
   {
     title: "Marketing & growth",
-    headline: "Connect what you offer with the people who need it.",
-    body: "Positioning, advertising, landing-page strategy, email and social content, launch campaigns, and event promotion—with a clear purpose and scope.",
-    cta: "Explore marketing & growth",
+    headline: "Give the right people a clear reason to pay attention and respond.",
+    body: "Campaign strategy and messaging, landing-page copy, email, social and content copy, launch support, and advertising creative.",
+    cta: "See marketing services",
     to: "/services/marketing",
     tone: "marketing",
   },
   {
     title: "AI & business systems",
     headline: "Make the work behind the business easier to run.",
-    body: "Custom dashboards, internal tools, CRM workflows, reporting, integrations, and AI-assisted processes. Configure the right connections rather than force every business into the same setup.",
-    cta: "Explore AI & systems",
+    body: "Connect tools, data, and workflows so your team spends less time chasing information, copying updates, and checking routine work.",
+    cta: "See systems services",
     to: "/services/ai-systems",
     tone: "systems",
   },
@@ -52,8 +52,8 @@ export function Capabilities() {
       <span id="how-we-help" aria-hidden className="block h-0" />
       <Container>
         <Eyebrow>Services</Eyebrow>
-        <SectionTitle>Start with the outcome. Bring in the disciplines it needs.</SectionTitle>
-        <Lede>Five ways into the studio, each built around a clear business job rather than a menu of disconnected deliverables.</Lede>
+        <SectionTitle>What do you need to make better?</SectionTitle>
+        <Lede>Start with the problem. We&apos;ll bring the right mix of strategy, creative, marketing, copy, and technology to solve it.</Lede>
 
         <div className="mt-14 divide-y divide-border border-y border-border">
           {ROWS.map((r, i) => (
@@ -89,15 +89,14 @@ export function Capabilities() {
               Take finished work all the way to release.
             </h3>
             <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-[hsl(var(--band-text)/0.76)]">
-              Books, apps, and digital products need packaging, store-ready assets, clear listings, submission support,
-              and a launch path. Publishing combines the studio&apos;s creative, technical, and marketing capabilities
-              around the release.
+              Move from finished manuscript or product to a professional release with production, store-ready assets,
+              clear listing copy, submission support, and a practical launch plan.
             </p>
             <Link
               to="/publishing"
               className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 text-[0.95rem] font-medium text-[hsl(var(--band-text))] hover:underline"
             >
-              Explore publishing <ArrowRight size={15} />
+              See publishing services <ArrowRight size={15} />
             </Link>
           </div>
         </div>

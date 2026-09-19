@@ -245,16 +245,16 @@ export function Inquiry() {
       <Container>
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-20">
           <div className="lg:col-span-5">
-            <Eyebrow style={{ color: "hsl(var(--band-text) / 0.75)" }}>Let&apos;s make the next thing happen</Eyebrow>
+            <Eyebrow style={{ color: "hsl(var(--band-text) / 0.75)" }}>Start a conversation</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-              What are you looking to create, improve, or simplify?
+              What would you like to make work better?
             </h2>
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
-              Tell me a little about the project, where things stand, and what you want to accomplish. I&apos;ll review
-              your note and reply with a useful next step.
+              Share what is happening now, what needs to change, and what success would look like. I&apos;ll review your
+              note and reply with a practical next step.
             </p>
             <ol className="mt-10 space-y-5 border-t border-[hsl(var(--band-text)/0.2)] pt-7">
-              {["I review what you sent.", "I reply with the most useful next step.", "If there’s a fit, we define scope, responsibilities, and timing."].map((step, index) => (
+              {["I review your goals and current situation.", "I reply with questions or a recommended next step.", "If there’s a fit, we agree on scope, responsibilities, and timing."].map((step, index) => (
                 <li key={step} className="flex gap-4 text-[1rem] leading-relaxed text-muted-foreground"><span className="studio-display text-[hsl(var(--band-text))]">0{index + 1}</span><span>{step}</span></li>
               ))}
             </ol>
@@ -330,7 +330,7 @@ export function Inquiry() {
                       })}
                     </div>
                     <p className="mt-2 text-[0.82rem] text-[hsl(var(--ink-muted))]">
-                      Choosing a service never changes what you&apos;ve typed below.
+                      Choose as many as apply, or leave this blank if you are not sure yet.
                     </p>
                   </fieldset>
 
@@ -402,7 +402,7 @@ export function Inquiry() {
                   </button>
 
                   <p className="text-[0.88rem] text-[hsl(var(--ink-muted))]">
-                    A clear next step. No obligation to proceed.
+                    No pressure. Just a clear reply about what makes sense next.
                   </p>
                   <p className="text-[0.82rem] text-[hsl(var(--ink-muted))]">
                     Please leave out passwords, customer records, and other sensitive information.
