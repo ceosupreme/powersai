@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import { Container, Eyebrow, SectionTitle } from "../primitives";
 
 const PROBLEMS = [
-  { label: "My website isn’t doing its job.", diagnosis: "Visitors may not understand the offer, trust the presentation, or see a useful next step.", tackle: "Clarify the message, structure the journey, improve the responsive experience, and build the right conversion path.", proof: "Big Paws Club · Kario Voss", to: "/services/websites", cta: "Explore websites" },
-  { label: "My brand looks inconsistent or forgettable.", diagnosis: "The business can be strong while its visual language and message make it harder to recognize or remember.", tackle: "Shape the positioning, creative direction, visual system, and the real applications customers see.", proof: "Kario Voss · Coastal Beauties", to: "/services/brand", cta: "Explore brand & creative" },
-  { label: "I need more of the right people to find and choose us.", diagnosis: "More content alone will not fix a scattered message or a campaign with nowhere useful to lead.", tackle: "Connect positioning, campaign creative, landing paths, email, social, and launch support around a defined audience and action.", proof: "Big Paws Club · Supreme Wellness Club", to: "/services/marketing", cta: "Explore marketing & growth" },
-  { label: "Too much of the business is manual.", diagnosis: "Information, follow-up, and decisions often get trapped across separate tools and repeated handoffs.", tackle: "Map the process, connect the right systems, and add automation or AI only where it improves the operation.", proof: "BarPulse", to: "/services/ai-systems", cta: "Explore AI & systems" },
-  { label: "I’m launching something.", diagnosis: "A finished book, app, or digital product still needs packaging, platform-ready assets, submission support, and a launch path.", tackle: "Coordinate production, presentation, listings, submission support, landing pages, and launch creative around the release.", proof: "Books · Apps · Digital products", to: "/publishing", cta: "Explore publishing & launch" },
+  { label: "My website isn’t doing its job.", diagnosis: "People may be leaving before they understand what you offer, why they should trust you, or what to do next.", tackle: "Sharpen the positioning and copy, simplify the path, strengthen the mobile experience, and make the next step obvious.", proof: "Big Paws Club · Kario Voss", to: "/services/websites", cta: "See website services" },
+  { label: "My brand looks inconsistent or forgettable.", diagnosis: "A strong business can still be overlooked when its message and visual identity do not give people something clear to remember.", tackle: "Clarify the position, voice, key messages, and visual system—then carry them into the places customers actually see.", proof: "Kario Voss · Coastal Beauties", to: "/services/brand", cta: "See brand services" },
+  { label: "I need more of the right people to find and choose us.", diagnosis: "More content will not fix a weak message or a campaign that leads people nowhere useful.", tackle: "Build a clearer campaign message, landing path, email and social content, and next step around the audience you need to reach.", proof: "Big Paws Club · Supreme Wellness Club", to: "/services/marketing", cta: "See marketing services" },
+  { label: "Too much of the business is manual.", diagnosis: "Your team may be spending too much time chasing information, copying updates, and remembering what should happen next.", tackle: "Map the process, connect the right tools, and use automation or AI only where it makes the operation easier to run.", proof: "BarPulse", to: "/services/ai-systems", cta: "See systems services" },
+  { label: "I’m launching something.", diagnosis: "A finished book, app, or digital product still needs professional packaging, clear listings, platform preparation, and a launch plan.", tackle: "Bring production, presentation, store assets, submission support, landing pages, and launch creative into one coordinated release.", proof: "Books · Apps · Digital products", to: "/publishing", cta: "See publishing services" },
 ] as const;
 
 export function BuyerChooser() {
@@ -33,8 +33,8 @@ export function BuyerChooser() {
   return (
     <section id="chooser" className="studio-section bg-[hsl(var(--surface))]">
       <Container>
-        <Eyebrow>Start with what is not working</Eyebrow>
-        <SectionTitle>What needs to work better?</SectionTitle>
+        <Eyebrow>Start with the problem</Eyebrow>
+        <SectionTitle>What is getting in the way?</SectionTitle>
         <div className="buyer-chooser mt-12 grid gap-8 lg:grid-cols-12 lg:gap-14">
           <div role="tablist" aria-label="Choose a business problem" className="divide-y divide-border border-y border-border lg:col-span-5">
             {PROBLEMS.map((item, index) => (
@@ -48,11 +48,11 @@ export function BuyerChooser() {
           </div>
           <div key={active.label} id={`buyer-panel-${activeIndex}`} role="tabpanel" aria-labelledby={`buyer-tab-${activeIndex}`} tabIndex={0}
             className="buyer-chooser-panel lg:col-span-7">
-            <p className="studio-label">What may be happening</p>
+            <p className="studio-label">What may be going wrong</p>
             <p className="studio-display mt-4 text-[1.8rem] leading-tight md:text-[2.45rem]">{active.diagnosis}</p>
             <div className="mt-8 grid gap-6 border-t border-border pt-7 md:grid-cols-2">
-              <div><p className="studio-label">What STM would tackle</p><p className="mt-3 text-[1rem] leading-relaxed text-muted-foreground">{active.tackle}</p></div>
-              <div><p className="studio-label">Relevant proof</p><p className="mt-3 text-[1rem] leading-relaxed">{active.proof}</p></div>
+              <div><p className="studio-label">How we can help</p><p className="mt-3 text-[1rem] leading-relaxed text-muted-foreground">{active.tackle}</p></div>
+              <div><p className="studio-label">Related work</p><p className="mt-3 text-[1rem] leading-relaxed">{active.proof}</p></div>
             </div>
             <Link to={active.to} className="studio-btn studio-btn-primary mt-9">{active.cta} <ArrowRight size={15} /></Link>
           </div>

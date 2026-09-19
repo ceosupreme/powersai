@@ -13,16 +13,16 @@ export function Founder() {
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <Eyebrow>The person behind the work</Eyebrow>
-            <SectionTitle>Marketing roots. Technical reach.</SectionTitle>
+            <Eyebrow>About Sean Mayo</Eyebrow>
+            <SectionTitle>Business judgment, creative range, and hands-on execution.</SectionTitle>
             <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
-              I&apos;m Sean Mayo, founder of Supreme Team Media. Since 2002, the company has connected creative work
-              with the practical needs of running and growing a business. Today, that includes websites, branding,
-              marketing, and custom AI-powered systems.
+              I&apos;m Sean Mayo, founder of Supreme Team Media. Since 2002, I&apos;ve helped connect the way a business
+              presents itself with the way it attracts customers and gets work done. Today, that includes websites,
+              branding, marketing, copy, and custom business systems.
             </p>
             <p className="mt-4 max-w-xl text-[1rem] leading-relaxed text-muted-foreground">
-              You work directly with me on strategy and implementation. I use modern tools to move quickly, while
-              keeping the scope, decisions, and finished work clear.
+              You work directly with me from the first decision through implementation. Modern tools help me move
+              quickly, but the business goal—not the tool—drives the work.
             </p>
             <p className="studio-label mt-7">
               Bachelor&apos;s degree in Advertising · The Art Institute of California

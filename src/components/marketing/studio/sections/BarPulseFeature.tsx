@@ -15,14 +15,14 @@ export function BarPulseFeature() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <span className="studio-eyebrow block" style={{ color: "hsl(var(--band-text) / 0.75)" }}>
-              Featured system · BarPulse
+              BarPulse · Business systems
             </span>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-              Built for the work behind the business.
+               Make the operation easier to see—and easier to run.
             </h2>
             <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
-              For an eight-venue hospitality group, Sean built BarPulse to connect operating information, customize
-              scorecards and reporting, and make management workflows easier to review.
+               For an eight-venue hospitality group, Sean built BarPulse to bring operating information into a clearer
+               management view, with custom scorecards, reporting, and workflows.
             </p>
             <p className="mt-4 max-w-xl text-[0.98rem] leading-relaxed text-muted-foreground">
               The engagement included integrations with Toast, 7shifts and Asana, plus weekly reviews and refinements
@@ -43,7 +43,7 @@ export function BarPulseFeature() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/work/barpulse" className="studio-btn studio-btn-primary">
-                Explore the BarPulse project
+                See how BarPulse was built
               </Link>
               <a
                 href="#contact"
@@ -76,7 +76,7 @@ export function BarPulseFeature() {
 
             <div className="mt-5 rounded-lg border border-[hsl(var(--band-text)/0.2)] p-5">
               <p className="studio-label" style={{ color: "hsl(var(--band-text) / 0.65)" }}>
-                Historical integration example
+                 How the systems connected
               </p>
               <div className="studio-system-flow mt-5" aria-label="Toast POS, 7shifts, and Asana flowed into BarPulse, then into briefs, tasks, and insights">
                 <div className="studio-system-sources">
@@ -91,9 +91,9 @@ export function BarPulseFeature() {
               </div>
 
               <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[hsl(var(--band-text)/0.16)] pt-5">
-                <div><span className="studio-display block text-[0.88rem]">Discovery</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Weekly review needs</span></div>
-                <div><span className="studio-display block text-[0.88rem]">Integration</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">One operating picture</span></div>
-                <div><span className="studio-display block text-[0.88rem]">Refinement</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Scoring and reporting</span></div>
+                <div><span className="studio-display block text-[0.88rem]">Review</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Define what ownership needs to see</span></div>
+                <div><span className="studio-display block text-[0.88rem]">Connect</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Bring agreed sources together</span></div>
+                <div><span className="studio-display block text-[0.88rem]">Improve</span><span className="mt-1 block text-[0.72rem] leading-snug text-muted-foreground">Refine scoring and reporting</span></div>
               </div>
             </div>
           </div>

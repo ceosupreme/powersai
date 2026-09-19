@@ -84,11 +84,10 @@ export function InteractiveStudioMap() {
   return (
     <section id="studio-map" className="studio-section">
       <Container>
-        <Eyebrow>Interactive studio map</Eyebrow>
-        <SectionTitle>Pick the problem. See how I&apos;d attack it.</SectionTitle>
+        <Eyebrow>How we can help</Eyebrow>
+        <SectionTitle>Choose the problem closest to yours.</SectionTitle>
         <Lede>
-          Different jobs need different combinations of strategy, creative work, implementation, and systems thinking.
-          Choose a lane to see the shape of the work.
+          See what the work could involve, what you would receive, and which projects are most relevant.
         </Lede>
 
         <div className="mt-10 grid grid-cols-2 gap-2 md:grid-cols-4" role="tablist" aria-label="Choose a service lane">
@@ -126,12 +125,12 @@ export function InteractiveStudioMap() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3">
             <div className="p-6 md:p-8">
-              <p className="studio-label">Starting point</p>
+              <p className="studio-label">What you may be facing</p>
               <p className="studio-display mt-4 text-[1.25rem] leading-snug">“{active.startingPoint}”</p>
             </div>
-            <MapList title="What I do" items={active.actions} />
+            <MapList title="How I can help" items={active.actions} />
             <div className="border-t border-border p-6 md:border-l md:border-t-0 md:p-8">
-              <MapListContent title="What ships" items={active.ships} />
+               <MapListContent title="What you could receive" items={active.ships} />
               <p className="studio-label mt-7">Related work</p>
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
                 {active.related.map((project) => (
