@@ -28,7 +28,7 @@ const empty = {
   funnel_stage: "core",
   lead_magnet: "",
   sales_page_url: "",
-  status: "draft",
+  status: "idea",
   monthly_sales: "",
   notes: "",
 };
@@ -131,7 +131,7 @@ export function ProductDialog({ open, onOpenChange, product }: Props) {
               <Select value={form.status} onValueChange={(v) => set("status", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {PRODUCT_STATUSES.map((s) => (
+                  {[...new Set([...PRODUCT_STATUSES, ...(form.status ? [form.status] : [])])].map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
                 </SelectContent>

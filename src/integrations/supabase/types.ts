@@ -6994,6 +6994,115 @@ export type Database = {
         }
         Relationships: []
       }
+      project_kpi_values: {
+        Row: {
+          actual: number | null
+          created_at: string | null
+          id: string
+          kpi_key: string
+          note: string | null
+          pillar_key: string
+          project_id: string
+          score: number | null
+          updated_at: string | null
+          updated_by: string | null
+          week_start: string
+        }
+        Insert: {
+          actual?: number | null
+          created_at?: string | null
+          id?: string
+          kpi_key: string
+          note?: string | null
+          pillar_key: string
+          project_id: string
+          score?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          week_start: string
+        }
+        Update: {
+          actual?: number | null
+          created_at?: string | null
+          id?: string
+          kpi_key?: string
+          note?: string | null
+          pillar_key?: string
+          project_id?: string
+          score?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_kpi_values_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_kpis: {
+        Row: {
+          created_at: string | null
+          direction: string
+          id: string
+          is_active: boolean
+          kpi_key: string
+          kpi_label: string
+          pillar_key: string
+          project_id: string
+          sort_order: number
+          source: string
+          target: number | null
+          unit: string | null
+          updated_at: string | null
+          weight: number
+        }
+        Insert: {
+          created_at?: string | null
+          direction?: string
+          id?: string
+          is_active?: boolean
+          kpi_key: string
+          kpi_label: string
+          pillar_key: string
+          project_id: string
+          sort_order?: number
+          source?: string
+          target?: number | null
+          unit?: string | null
+          updated_at?: string | null
+          weight?: number
+        }
+        Update: {
+          created_at?: string | null
+          direction?: string
+          id?: string
+          is_active?: boolean
+          kpi_key?: string
+          kpi_label?: string
+          pillar_key?: string
+          project_id?: string
+          sort_order?: number
+          source?: string
+          target?: number | null
+          unit?: string | null
+          updated_at?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_kpis_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_leak_vector_overrides: {
         Row: {
           benchmark: string | null

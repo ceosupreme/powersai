@@ -130,7 +130,18 @@ export function useChannelProductMutations() {
 }
 
 export const FUNNEL_STAGES = ["lead_magnet", "tripwire", "core", "upsell", "continuity"] as const;
-export const PRODUCT_STATUSES = ["draft", "live", "paused", "retired"] as const;
+export const PRODUCT_STATUSES = [
+  "idea",
+  "scored",
+  "brief",
+  "drafting",
+  "needs cover",
+  "proof ordered",
+  "ready to upload",
+  "live",
+  "twin listed",
+  "cut",
+] as const;
 
 export function useContentChannels() {
   return useQuery({
@@ -143,6 +154,34 @@ export function useContentChannels() {
         .order("bar_name");
       if (error) throw error;
       return (data ?? []) as any;
+    },
+  });
+}
+/** All product→project links with project names, for the Brands column. */
+export function useAllProductBrands() {
+  return useQuery({
+    queryKey: ["channel-products", "brands"],
+    queryFn: async (): Promise<Record<string, { id: string; name: string }[]>> => {
+      const { data: links, error } = await supabase
+        .from("channel_product_channels" as any)
+        .select("product_id, project_id");
+      if (error) throw error;
+      const rows = (links ?? []) as any[];
+      const projectIds = [...new Set(rows.map((r) => r.project_id).filter(Boolean))];
+      let nameById = new Map<string, string>();
+      if (projectIds.length) {
+        const { data: venues } = await supabase
+          .from("venues")
+          .select("id,name")
+          .in("id", projectIds);
+        nameById = new Map(((venues ?? []) as any[]).map((v) => [v.id, v.name]));
+      }
+      const out: Record<string, { id: string; name: string }[]> = {};
+      for (const r of rows) {
+        const entry = { id: r.project_id as string, name: nameById.get(r.project_id) ?? "Unknown" };
+        out[r.product_id] = [...(out[r.product_id] ?? []), entry];
+      }
+      return out;
     },
   });
 }
