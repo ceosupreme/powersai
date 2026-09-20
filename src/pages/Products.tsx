@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ChannelProduct,
   useChannelProducts,
   useChannelProductMutations,
+  useAllProductBrands,
+  PRODUCT_STATUSES,
 } from "@/hooks/useChannelProducts";
 import { ProductDialog } from "@/components/products/ProductDialog";
 import { formatUSD } from "@/hooks/useChannelRevenue";
@@ -14,11 +18,53 @@ import { toast } from "sonner";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
 
+const ALL = "__all__";
+
 export default function ProductsPage() {
   const { data: items = [], isLoading } = useChannelProducts();
+  const { data: brandsByProduct = {} } = useAllProductBrands();
   const { remove } = useChannelProductMutations();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ChannelProduct | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const brandFilter = searchParams.get("project") || ALL;
+  const [statusFilter, setStatusFilter] = useState<string>(ALL);
+
+  // Distinct brands across all links, for the filter options
+  const brandOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const list of Object.values(brandsByProduct)) {
+      for (const b of list) map.set(b.id, b.name);
+    }
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  }, [brandsByProduct]);
+
+  const statusOptions = useMemo(() => {
+    const set = new Set<string>(PRODUCT_STATUSES as readonly string[]);
+    for (const p of items) if (p.status) set.add(p.status);
+    return [...set];
+  }, [items]);
+
+  const filtered = useMemo(
+    () =>
+      items.filter((p) => {
+        if (statusFilter !== ALL && (p.status ?? "") !== statusFilter) return false;
+        if (brandFilter !== ALL) {
+          const brands = brandsByProduct[p.id] ?? [];
+          if (!brands.some((b) => b.id === brandFilter)) return false;
+        }
+        return true;
+      }),
+    [items, statusFilter, brandFilter, brandsByProduct],
+  );
+
+  const setBrandFilter = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === ALL) next.delete("project");
+    else next.set("project", value);
+    setSearchParams(next, { replace: true });
+  };
 
   const onDelete = async (id: string) => {
     if (!confirm("Delete this product? Linked content items and revenue entries will keep their data but lose the product link.")) return;
@@ -48,11 +94,37 @@ export default function ProductsPage() {
         revenue back to the catalog entry.
       </HelpTip>
 
+      <div className="flex flex-wrap gap-3">
+        <div className="min-w-[180px]">
+          <Select value={brandFilter} onValueChange={setBrandFilter}>
+            <SelectTrigger><SelectValue placeholder="All brands" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All brands</SelectItem>
+              {brandOptions.map(([id, name]) => (
+                <SelectItem key={id} value={id}>{name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="min-w-[180px]">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger><SelectValue placeholder="All statuses" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All statuses</SelectItem>
+              {statusOptions.map((s) => (
+                <SelectItem key={s} value={s}>{s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Brands</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Status</TableHead>
@@ -63,13 +135,18 @@ export default function ProductsPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
-            ) : items.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
+            ) : filtered.length === 0 ? (
+              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
             ) : (
-              items.map((p) => (
+              filtered.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {(brandsByProduct[p.id] ?? []).length === 0
+                      ? "—"
+                      : (brandsByProduct[p.id] ?? []).map((b) => b.name).join(", ")}
+                  </TableCell>
                   <TableCell>{p.price != null ? formatUSD(p.price) : "—"}</TableCell>
                   <TableCell>{p.funnel_stage || "—"}</TableCell>
                   <TableCell>{p.status ? <Badge variant="outline">{p.status}</Badge> : "—"}</TableCell>

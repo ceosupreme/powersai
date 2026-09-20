@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   ArrowRight, Settings, ClipboardCheck, TrendingUp, Inbox, FileText, Palette,
-  Loader2, PlayCircle,
+  Loader2, PlayCircle, ChevronDown,
 } from 'lucide-react';
 import { VenueOnboardingWizard } from '@/components/onboarding/VenueOnboardingWizard';
 import { VenueLiveBadge } from '@/components/onboarding/VenueLiveBadge';
@@ -18,8 +19,13 @@ import { EmailDeliveryModeCard } from '@/components/onboarding/EmailDeliveryMode
 import { ProposalsListCard } from '@/components/proposals/ProposalsListCard';
 import { useVenueOnboardingDetectors } from '@/hooks/useVenueOnboardingDetectors';
 import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
+import { useEffectivePillars } from '@/hooks/useEffectivePillars';
+import { useEnsureCurrentWeek, currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
+import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import type { ProjectType } from '@/lib/effectivePillars';
+
 
 interface ProjectMeta {
   id: string;
@@ -69,6 +75,18 @@ export default function ProjectHome() {
   const progress = useVenueOnboardingDetectors(venueId ?? null, meta?.project_type ?? null);
   const live = useVenueLiveStatus(progress.statusFor);
 
+  // Non-client projects get the one-glance view; client projects are untouched.
+  const isNonClient = !!meta && (meta.project_type ?? CLIENT_PROJECT_TYPE) !== CLIENT_PROJECT_TYPE;
+  const { data: pillars = [] } = useEffectivePillars(
+    isNonClient ? venueId : null,
+    meta?.project_type ?? undefined,
+  );
+  const weekStart = useMemo(() => currentWeekRange().week_start, []);
+  useEnsureCurrentWeek(venueId ?? null, isNonClient);
+  const [setupOpen, setSetupOpen] = useState(false);
+
+
+
   const resumeStepKey = useMemo(() => {
     const required = VENUE_ONBOARDING_STEPS.filter(
       (s) => s.required && (s.phase === 'identity' || s.phase === 'go_live'),
@@ -106,35 +124,8 @@ export default function ProjectHome() {
     ? 100
     : Math.round((live.requiredDone / live.requiredTotal) * 100);
 
-  return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-foreground truncate">{meta.name}</h1>
-            {meta.project_type && (
-              <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-                {meta.project_type.replace(/_/g, ' ')}
-              </Badge>
-            )}
-          </div>
-          <div className="pt-2">
-            <VenueLiveBadge
-              isLive={live.isLive}
-              phase3Pct={live.phase3Pct}
-              requiredDone={live.requiredDone}
-              requiredTotal={live.requiredTotal}
-            />
-          </div>
-        </div>
-        {canRunWizard && (
-          <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
-            <Settings className="h-4 w-4 mr-1" /> Setup wizard
-          </Button>
-        )}
-      </div>
-
+  const setupBlocks = (
+    <>
       {/* Continue setup (only rendered for roles that can actually run the wizard) */}
       {canRunWizard && setupIncomplete && (
         <Card className="border-primary/40 bg-primary/5">
@@ -198,6 +189,63 @@ export default function ProjectHome() {
           );
         })}
       </div>
+    </>
+  );
+
+  return (
+
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold text-foreground truncate">{meta.name}</h1>
+            {meta.project_type && (
+              <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                {meta.project_type.replace(/_/g, ' ')}
+              </Badge>
+            )}
+          </div>
+          <div className="pt-2">
+            <VenueLiveBadge
+              isLive={live.isLive}
+              phase3Pct={live.phase3Pct}
+              requiredDone={live.requiredDone}
+              requiredTotal={live.requiredTotal}
+            />
+          </div>
+        </div>
+        {canRunWizard && (
+          <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
+            <Settings className="h-4 w-4 mr-1" /> Setup wizard
+          </Button>
+        )}
+      </div>
+
+      {/* One-glance project view (non-client projects only) */}
+      {isNonClient && venueId && pillars.length > 0 && (
+        <NonClientPillarsDashboard
+          projectId={venueId}
+          weekStart={weekStart}
+          pillars={pillars}
+          canEdit={canRunWizard}
+        />
+      )}
+
+      {isNonClient ? (
+        <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="w-full justify-between">
+              <span>Setup</span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
+        </Collapsible>
+      ) : (
+        setupBlocks
+      )}
+
 
       {canRunWizard && wizardOpen && venueId && (
         <VenueOnboardingWizard

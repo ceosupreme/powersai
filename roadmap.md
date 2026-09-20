@@ -67,3 +67,11 @@
 - [x] Route `/for/bars-restaurants` into the restaurant flagship while preserving the legacy database row
 - [x] Expand `/industries` and footer to seven industries
 - [x] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission
+
+## Non-client project KPI layer (Sept 2026)
+- [x] project_kpis + project_kpi_values tables with project-member RLS
+- [x] KPI scoring utility + pillar score sync into project_pillar_scores
+- [x] Expandable KPI list on pillar tiles
+- [x] One-glance project view (actions, insights, products, content, revenue, trend)
+- [x] Current-week creation for non-client projects
+- [x] Products brands column + brand/status filters, 10-option status select
