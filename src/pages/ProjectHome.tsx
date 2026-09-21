@@ -208,6 +208,47 @@ export default function ProjectHome() {
               </Badge>
             )}
           </div>
+          {isNonClient && (
+            <div className="pt-2 space-y-1">
+              <div className="flex items-start gap-2 flex-wrap">
+                <span className="text-[11px] uppercase tracking-wide text-muted-foreground pt-0.5">
+                  Ultimate goal
+                </span>
+                {goalEditing ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      className="h-8 w-[260px] sm:w-[340px]"
+                      autoFocus
+                      value={goalDraft}
+                      onChange={(e) => setGoalDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveGoal();
+                        if (e.key === 'Escape') setGoalEditing(false);
+                      }}
+                      aria-label="Ultimate goal"
+                      placeholder="What winning looks like for this project"
+                    />
+                    <Button size="sm" className="h-8" onClick={saveGoal}>Save</Button>
+                    <Button size="sm" variant="ghost" className="h-8" onClick={() => setGoalEditing(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={!isAdmin}
+                    onClick={() => { setGoalDraft(meta.north_star ?? ''); setGoalEditing(true); }}
+                    className="text-sm text-foreground text-left hover:underline disabled:hover:no-underline disabled:cursor-default"
+                  >
+                    {meta.north_star || (isAdmin ? 'Set the ultimate goal' : 'Not set yet')}
+                  </button>
+                )}
+              </div>
+              {meta.monetization_model && (
+                <p className="text-xs text-muted-foreground">{meta.monetization_model}</p>
+              )}
+            </div>
+          )}
           <div className="pt-2">
             <VenueLiveBadge
               isLive={live.isLive}
