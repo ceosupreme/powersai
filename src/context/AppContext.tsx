@@ -25,6 +25,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'barpulse_selectedBar';
+/** Sentinel stored when the user explicitly picked "All projects". */
+export const ALL_PROJECTS = '__all_projects__';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const auth = useAuth();
@@ -37,6 +39,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedBarState(bar);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bar));
+    } catch {}
+  };
+
+  // "All projects": remember that nothing is selected so the restore effect
+  // below doesn't quietly pick the first project again.
+  const clearSelectedBar = () => {
+    setSelectedBarState(null);
+    try {
+      localStorage.setItem(STORAGE_KEY, ALL_PROJECTS);
     } catch {}
   };
 
