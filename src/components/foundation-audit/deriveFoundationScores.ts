@@ -33,6 +33,10 @@ export interface FoundationItemView {
   is_manual_only: boolean;
   severity: 'low' | 'medium' | 'high' | 'critical';
   recommended_fix: string | null;
+  est_dollars_90d: number | null;
+  confidence: number | null;
+  leverage: number | null;
+  est_hours: number | null;
   status: FoundationStatus;
   evidence_url: string | null;
   notes: string | null;
