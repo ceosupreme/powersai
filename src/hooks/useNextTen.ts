@@ -43,14 +43,20 @@ async function buildForProject(
   const products: NextTenRow[] = [];
   const kpis: NextTenRow[] = [];
 
-  // (a)+(b) action items
+  // (a)+(b) action items — rows may be keyed on bar_id or venue_id
   const { data: actions } = await supabase
     .from('action_items')
     .select('id,title,due_date,approval_status,status,created_at')
-    .eq('bar_id', projectId)
+    .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`)
     .neq('status', 'Done');
 
-  const openActions = (actions ?? []).filter((a: any) => a.approval_status !== 'Rejected');
+  const seenActionIds = new Set<string>();
+  const openActions = (actions ?? []).filter((a: any) => {
+    if (a.approval_status === 'Rejected') return false;
+    if (seenActionIds.has(a.id)) return false;
+    seenActionIds.add(a.id);
+    return true;
+  });
   openActions
     .filter((a: any) => a.approval_status === 'Approved')
     .sort((a: any, b: any) => (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999'))

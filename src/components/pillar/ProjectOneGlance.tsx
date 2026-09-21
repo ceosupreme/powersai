@@ -11,6 +11,8 @@ import { useInsightApproval } from '@/hooks/useInsightApproval';
 import { useContentItems } from '@/hooks/useContentItems';
 import { useChannelRevenue, formatUSD } from '@/hooks/useChannelRevenue';
 import { useProjectPillarScoreTrend } from '@/hooks/useProjectPillarScoreTrend';
+import { useAllProductListings } from '@/hooks/useProductListings';
+import { MoneyLanesSection } from './MoneyLanesSection';
 import { EffectivePillar } from '@/lib/effectivePillars';
 import { sortByPriority } from '@/lib/utils';
 
@@ -128,6 +130,7 @@ const InsightsSection = ({ projectId }: { projectId: string }) => {
 /* ── Products by stage ───────────────────────────────────────────── */
 
 const ProductsSection = ({ projectId }: { projectId: string }) => {
+  const { data: listingsByProduct = {} } = useAllProductListings();
   const { data = [] } = useQuery({
     queryKey: ['project-products', projectId],
     enabled: !!projectId,
@@ -150,10 +153,12 @@ const ProductsSection = ({ projectId }: { projectId: string }) => {
     const map = new Map<string, string[]>();
     for (const p of data as any[]) {
       const key = p.status || 'unset';
-      map.set(key, [...(map.get(key) ?? []), p.name]);
+      const listed = (listingsByProduct[p.id] ?? []).filter((l) => l.status === 'listed').length;
+      const label = listed > 0 ? `${p.name} (${listed} listed)` : p.name;
+      map.set(key, [...(map.get(key) ?? []), label]);
     }
     return [...map.entries()];
-  }, [data]);
+  }, [data, listingsByProduct]);
 
   return (
     <SectionShell title="Products by stage" to={`/products?project=${projectId}`}>
@@ -286,12 +291,16 @@ const ScoreTrendSection = ({
 export const ProjectOneGlance = ({
   projectId,
   pillars,
+  canEdit = false,
 }: {
   projectId: string;
   pillars: EffectivePillar[];
+  /** Money lanes editing is limited to admins and owners. */
+  canEdit?: boolean;
 }) => (
   <div className="space-y-4">
     <ActionPlanSection projectId={projectId} />
+    <MoneyLanesSection projectId={projectId} canEdit={canEdit} />
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <InsightsSection projectId={projectId} />
       <ProductsSection projectId={projectId} />

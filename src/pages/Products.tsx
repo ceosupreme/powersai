@@ -13,6 +13,7 @@ import {
   PRODUCT_STATUSES,
 } from "@/hooks/useChannelProducts";
 import { ProductDialog } from "@/components/products/ProductDialog";
+import { OUTLETS, useAllProductListings } from "@/hooks/useProductListings";
 import { formatUSD } from "@/hooks/useChannelRevenue";
 import { toast } from "sonner";
 import { HelpTip } from "@/components/help/HelpTip";
@@ -23,6 +24,7 @@ const ALL = "__all__";
 export default function ProductsPage() {
   const { data: items = [], isLoading } = useChannelProducts();
   const { data: brandsByProduct = {} } = useAllProductBrands();
+  const { data: listingsByProduct = {} } = useAllProductListings();
   const { remove } = useChannelProductMutations();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ChannelProduct | null>(null);
@@ -30,6 +32,7 @@ export default function ProductsPage() {
 
   const brandFilter = searchParams.get("project") || ALL;
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
+  const [outletFilter, setOutletFilter] = useState<string>(ALL);
 
   // Distinct brands across all links, for the filter options
   const brandOptions = useMemo(() => {
@@ -54,9 +57,13 @@ export default function ProductsPage() {
           const brands = brandsByProduct[p.id] ?? [];
           if (!brands.some((b) => b.id === brandFilter)) return false;
         }
+        if (outletFilter !== ALL) {
+          const listings = listingsByProduct[p.id] ?? [];
+          if (!listings.some((l) => l.outlet === outletFilter)) return false;
+        }
         return true;
       }),
-    [items, statusFilter, brandFilter, brandsByProduct],
+    [items, statusFilter, brandFilter, brandsByProduct, outletFilter, listingsByProduct],
   );
 
   const setBrandFilter = (value: string) => {
@@ -117,6 +124,17 @@ export default function ProductsPage() {
             </SelectContent>
           </Select>
         </div>
+        <div className="min-w-[180px]">
+          <Select value={outletFilter} onValueChange={setOutletFilter}>
+            <SelectTrigger><SelectValue placeholder="All outlets" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All outlets</SelectItem>
+              {OUTLETS.map((o) => (
+                <SelectItem key={o} value={o}>{o}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="rounded-lg border">
@@ -125,6 +143,7 @@ export default function ProductsPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Brands</TableHead>
+              <TableHead>Outlets</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Status</TableHead>
@@ -135,9 +154,9 @@ export default function ProductsPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
             ) : (
               filtered.map((p) => (
                 <TableRow key={p.id}>
@@ -146,6 +165,24 @@ export default function ProductsPage() {
                     {(brandsByProduct[p.id] ?? []).length === 0
                       ? "—"
                       : (brandsByProduct[p.id] ?? []).map((b) => b.name).join(", ")}
+                  </TableCell>
+                  <TableCell>
+                    {(listingsByProduct[p.id] ?? []).length === 0 ? (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {(listingsByProduct[p.id] ?? []).map((l) => (
+                          <Badge
+                            key={l.id}
+                            variant={l.status === "listed" ? "default" : "outline"}
+                            className="text-[10px]"
+                            title={`${l.outlet} · ${l.status}`}
+                          >
+                            {l.outlet}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>{p.price != null ? formatUSD(p.price) : "—"}</TableCell>
                   <TableCell>{p.funnel_stage || "—"}</TableCell>

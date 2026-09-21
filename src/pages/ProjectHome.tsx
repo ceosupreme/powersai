@@ -22,6 +22,9 @@ import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
 import { useEffectivePillars } from '@/hooks/useEffectivePillars';
 import { useEnsureCurrentWeek, currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
+import { NextTenSection } from '@/components/pillar/NextTenSection';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
 import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import type { ProjectType } from '@/lib/effectivePillars';
@@ -33,6 +36,8 @@ interface ProjectMeta {
   project_type: ProjectType | null;
   bar_code: string | null;
   slug: string | null;
+  north_star: string | null;
+  monetization_model: string | null;
 }
 
 const QUICK_LINKS = [
@@ -61,7 +66,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug')
+      .select('id,name,project_type,bar_code,slug,north_star,monetization_model')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -84,6 +89,25 @@ export default function ProjectHome() {
   const weekStart = useMemo(() => currentWeekRange().week_start, []);
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
   const [setupOpen, setSetupOpen] = useState(false);
+
+  // "Ultimate goal" inline edit (admins only)
+  const [goalEditing, setGoalEditing] = useState(false);
+  const [goalDraft, setGoalDraft] = useState('');
+  const saveGoal = async () => {
+    if (!venueId) return;
+    const next = goalDraft.trim() || null;
+    const { error } = await supabase
+      .from('venues')
+      .update({ north_star: next } as any)
+      .eq('id', venueId);
+    if (error) {
+      toast.error(error.message ?? 'Could not save the goal');
+      return;
+    }
+    setMeta((m) => (m ? { ...m, north_star: next } : m));
+    setGoalEditing(false);
+    toast.success('Ultimate goal saved');
+  };
 
 
 
@@ -206,6 +230,47 @@ export default function ProjectHome() {
               </Badge>
             )}
           </div>
+          {isNonClient && (
+            <div className="pt-2 space-y-1">
+              <div className="flex items-start gap-2 flex-wrap">
+                <span className="text-[11px] uppercase tracking-wide text-muted-foreground pt-0.5">
+                  Ultimate goal
+                </span>
+                {goalEditing ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      className="h-8 w-[260px] sm:w-[340px]"
+                      autoFocus
+                      value={goalDraft}
+                      onChange={(e) => setGoalDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveGoal();
+                        if (e.key === 'Escape') setGoalEditing(false);
+                      }}
+                      aria-label="Ultimate goal"
+                      placeholder="What winning looks like for this project"
+                    />
+                    <Button size="sm" className="h-8" onClick={saveGoal}>Save</Button>
+                    <Button size="sm" variant="ghost" className="h-8" onClick={() => setGoalEditing(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={!isAdmin}
+                    onClick={() => { setGoalDraft(meta.north_star ?? ''); setGoalEditing(true); }}
+                    className="text-sm text-foreground text-left hover:underline disabled:hover:no-underline disabled:cursor-default"
+                  >
+                    {meta.north_star || (isAdmin ? 'Set the ultimate goal' : 'Not set yet')}
+                  </button>
+                )}
+              </div>
+              {meta.monetization_model && (
+                <p className="text-xs text-muted-foreground">{meta.monetization_model}</p>
+              )}
+            </div>
+          )}
           <div className="pt-2">
             <VenueLiveBadge
               isLive={live.isLive}
@@ -221,6 +286,11 @@ export default function ProjectHome() {
           </Button>
         )}
       </div>
+
+      {/* Next 10 — ranked, directly under the header (non-client projects only) */}
+      {isNonClient && venueId && (
+        <NextTenSection projectId={venueId} projectName={meta.name} />
+      )}
 
       {/* One-glance project view (non-client projects only) */}
       {isNonClient && venueId && pillars.length > 0 && (
