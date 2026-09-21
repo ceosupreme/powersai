@@ -14,7 +14,16 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { usePortfolioData, PortfolioVenue, GMRanking } from '@/hooks/usePortfolioData';
+import {
+  usePortfolioData,
+  useProjectDirectory,
+  useNonClientPortfolio,
+  PortfolioVenue,
+  GMRanking,
+  type PortfolioGroup,
+  type ProjectDirectoryRow,
+} from '@/hooks/usePortfolioData';
+import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
 import { useRole } from '@/context/RoleContext';
 import { useApp } from '@/context/AppContext';
 import { getGradeFromScore, getGradeColor } from '@/utils/scoring';
@@ -157,31 +166,6 @@ function PortfolioSkeleton() {
         {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-56" />)}
       </div>
       <Skeleton className="h-64 w-full" />
-    </div>
-  );
-}
-
-const PLACEHOLDER_VENUES = [
-  'Aero Club', 'Club Marina', 'Hearth House',
-  'Sycamore Den', 'The Hills', 'Waterfront Bar & Grill', 'Werewolf'
-];
-
-function ComingSoonVenueCard({ name }: { name: string }) {
-  return (
-    <div className="bg-card border border-dashed border-border rounded-lg p-4 opacity-50">
-      <h3 className="font-semibold text-foreground mb-3 truncate">{name}</h3>
-      <div className="flex items-baseline gap-2 mb-2">
-        <span className="text-sm italic text-muted-foreground">Coming Soon</span>
-      </div>
-      <div className="mb-3">
-        <span className="text-lg text-muted-foreground">--</span>
-      </div>
-      <div className="flex gap-1 mb-3">
-        <PillarMiniBar label="R" score={null} />
-        <PillarMiniBar label="L" score={null} />
-        <PillarMiniBar label="O" score={null} />
-        <PillarMiniBar label="G" score={null} />
-      </div>
     </div>
   );
 }
@@ -369,6 +353,41 @@ export default function PortfolioOverview() {
   const { accessibleBars, setSelectedBar, selectedWeek } = useApp();
   const { venues, gmRankings, isLoading } = usePortfolioData();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [group, setGroup] = useState<PortfolioGroup>('brands');
+  const { data: directory = [] } = useProjectDirectory();
+
+  const groupRows = useMemo<ProjectDirectoryRow[]>(
+    () => directory.filter((row) => row.group === group),
+    [directory, group],
+  );
+  const nonClientRows = group === 'clients' ? [] : groupRows;
+  const { data: nonClientCards = [], isLoading: nonClientLoading } =
+    useNonClientPortfolio(nonClientRows);
+
+  const activeCards = useMemo(
+    () => nonClientCards.filter((c) => c.focusStatus !== 'parked'),
+    [nonClientCards],
+  );
+  const parkedCards = useMemo(
+    () => nonClientCards.filter((c) => c.focusStatus === 'parked'),
+    [nonClientCards],
+  );
+  const monthRevenueRows = useMemo(
+    () =>
+      [...nonClientCards]
+        .filter((c) => c.monthRevenue != null)
+        .sort((a, b) => (b.monthRevenue ?? 0) - (a.monthRevenue ?? 0)),
+    [nonClientCards],
+  );
+
+  const clientVenues = useMemo(() => {
+    const clientIds = new Set(directory.filter((r) => r.group === 'clients').map((r) => r.id));
+    // Before the directory resolves, keep the canonical client list unchanged.
+    if (clientIds.size === 0) return venues;
+    return venues.filter((v) => clientIds.has(v.id));
+  }, [directory, venues]);
+
+  const showClientBlocks = group === 'clients';
 
   const selectedSingleBar = useMemo(() => {
     if (currentVenue) {
@@ -450,10 +469,13 @@ export default function PortfolioOverview() {
     navigate(`/project/${venueId}`);
   }
 
-  const remainingPlaceholders = useMemo(
-    () => PLACEHOLDER_VENUES.filter((name) => !venues.some((venue) => venue.name.toLowerCase() === name.toLowerCase())),
-    [venues]
-  );
+  function handleProjectDrillIn(projectId: string) {
+    const matchingBar = accessibleBars.find((bar) => bar.id === projectId);
+    if (matchingBar) {
+      setSelectedBar(matchingBar);
+    }
+    navigate(`/project/${projectId}`);
+  }
 
   if (selectedSingleBar) {
     return (
