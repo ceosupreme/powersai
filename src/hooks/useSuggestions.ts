@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useHelpState } from "@/hooks/useHelpState";
+import { CLIENT_PROJECT_TYPE } from "@/lib/effectivePillars";
 
 export type Suggestion = {
   /** Stable per-instance key for dismissal. */
@@ -272,7 +273,7 @@ export function useSuggestions() {
         fieldCountByType.set(r.project_type, (fieldCountByType.get(r.project_type) ?? 0) + 1);
       }
       const flaggedTypes = new Set<string>();
-      for (const p of projects) {
+      for (const p of clientProjects) {
         if (!p.project_type) continue;
         if ((fieldCountByType.get(p.project_type) ?? 0) > 0) continue;
         if (flaggedTypes.has(p.project_type)) continue;
