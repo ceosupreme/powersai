@@ -1,4 +1,4 @@
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/context/AppContext';
 import { useProjectType } from '@/hooks/useEffectivePillars';
 import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 
