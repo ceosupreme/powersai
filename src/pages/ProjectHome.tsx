@@ -33,6 +33,8 @@ interface ProjectMeta {
   project_type: ProjectType | null;
   bar_code: string | null;
   slug: string | null;
+  north_star: string | null;
+  monetization_model: string | null;
 }
 
 const QUICK_LINKS = [
@@ -61,7 +63,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug')
+      .select('id,name,project_type,bar_code,slug,north_star,monetization_model')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
