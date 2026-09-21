@@ -39,6 +39,7 @@ interface ProjectMeta {
   slug: string | null;
   north_star: string | null;
   monetization_model: string | null;
+  focus_status: string | null;
 }
 
 const QUICK_LINKS = [
