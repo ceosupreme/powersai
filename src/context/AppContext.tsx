@@ -155,6 +155,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!selectedBar) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === ALL_PROJECTS) return;
         if (saved) {
           const parsed = JSON.parse(saved) as Bar;
           if (accessibleBars.find(b => b.id === parsed.id)) {
@@ -197,6 +198,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         selectedBar,
         selectedWeek,
         setSelectedBar,
+        clearSelectedBar,
         setSelectedWeek,
         isLoading,
         error,
