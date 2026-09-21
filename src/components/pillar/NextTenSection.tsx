@@ -165,6 +165,9 @@ export const NextTenSection = ({
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground">{row.step}</p>
+                    {row.note && (
+                      <p className="text-[11px] text-muted-foreground">{row.note}</p>
+                    )}
                     {kpiOpen === row.key && (
                       <div className="flex items-center gap-2 mt-2">
                         <Input
