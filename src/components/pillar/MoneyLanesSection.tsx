@@ -8,6 +8,7 @@ import { ChevronDown } from 'lucide-react';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
 import type { FoundationItemView, FoundationStatus } from '@/components/foundation-audit/deriveFoundationScores';
+import { laneScore } from '@/lib/effectiveFoundation';
 import { cn } from '@/lib/utils';
 
 const SEV_RANK: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
