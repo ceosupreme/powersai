@@ -154,9 +154,9 @@ export default function ProductsPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">Loading…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">No products yet.</TableCell></TableRow>
             ) : (
               filtered.map((p) => (
                 <TableRow key={p.id}>
@@ -165,6 +165,24 @@ export default function ProductsPage() {
                     {(brandsByProduct[p.id] ?? []).length === 0
                       ? "—"
                       : (brandsByProduct[p.id] ?? []).map((b) => b.name).join(", ")}
+                  </TableCell>
+                  <TableCell>
+                    {(listingsByProduct[p.id] ?? []).length === 0 ? (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {(listingsByProduct[p.id] ?? []).map((l) => (
+                          <Badge
+                            key={l.id}
+                            variant={l.status === "listed" ? "default" : "outline"}
+                            className="text-[10px]"
+                            title={`${l.outlet} · ${l.status}`}
+                          >
+                            {l.outlet}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>{p.price != null ? formatUSD(p.price) : "—"}</TableCell>
                   <TableCell>{p.funnel_stage || "—"}</TableCell>
