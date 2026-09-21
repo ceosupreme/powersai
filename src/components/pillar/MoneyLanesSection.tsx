@@ -52,6 +52,7 @@ function LaneRow({
           <p className="text-xs text-muted-foreground">
             {lane.recommended_fix || lane.description || 'No first step recorded yet.'}
           </p>
+          <LaneNumbers lane={lane} />
         </div>
         <Badge variant="outline" className={cn('text-[10px] capitalize shrink-0', SEV_TONE[lane.severity])}>
           {lane.severity}
@@ -102,6 +103,7 @@ export const MoneyLanesSection = ({
     const sorted = [...all].sort(
       (a, b) =>
         (SEV_RANK[a.severity] ?? 9) - (SEV_RANK[b.severity] ?? 9) ||
+        (laneScore(b) ?? -1) - (laneScore(a) ?? -1) ||
         (STATUS_RANK[a.status] ?? 9) - (STATUS_RANK[b.status] ?? 9) ||
         a.label.localeCompare(b.label),
     );
