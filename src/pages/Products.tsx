@@ -30,6 +30,7 @@ export default function ProductsPage() {
 
   const brandFilter = searchParams.get("project") || ALL;
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
+  const [outletFilter, setOutletFilter] = useState<string>(ALL);
 
   // Distinct brands across all links, for the filter options
   const brandOptions = useMemo(() => {
@@ -54,9 +55,13 @@ export default function ProductsPage() {
           const brands = brandsByProduct[p.id] ?? [];
           if (!brands.some((b) => b.id === brandFilter)) return false;
         }
+        if (outletFilter !== ALL) {
+          const listings = listingsByProduct[p.id] ?? [];
+          if (!listings.some((l) => l.outlet === outletFilter)) return false;
+        }
         return true;
       }),
-    [items, statusFilter, brandFilter, brandsByProduct],
+    [items, statusFilter, brandFilter, brandsByProduct, outletFilter, listingsByProduct],
   );
 
   const setBrandFilter = (value: string) => {
