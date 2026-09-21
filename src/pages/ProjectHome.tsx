@@ -22,6 +22,9 @@ import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
 import { useEffectivePillars } from '@/hooks/useEffectivePillars';
 import { useEnsureCurrentWeek, currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
+import { NextTenSection } from '@/components/pillar/NextTenSection';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
 import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import type { ProjectType } from '@/lib/effectivePillars';
@@ -86,6 +89,25 @@ export default function ProjectHome() {
   const weekStart = useMemo(() => currentWeekRange().week_start, []);
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
   const [setupOpen, setSetupOpen] = useState(false);
+
+  // "Ultimate goal" inline edit (admins only)
+  const [goalEditing, setGoalEditing] = useState(false);
+  const [goalDraft, setGoalDraft] = useState('');
+  const saveGoal = async () => {
+    if (!venueId) return;
+    const next = goalDraft.trim() || null;
+    const { error } = await supabase
+      .from('venues')
+      .update({ north_star: next } as any)
+      .eq('id', venueId);
+    if (error) {
+      toast.error(error.message ?? 'Could not save the goal');
+      return;
+    }
+    setMeta((m) => (m ? { ...m, north_star: next } : m));
+    setGoalEditing(false);
+    toast.success('Ultimate goal saved');
+  };
 
 
 
