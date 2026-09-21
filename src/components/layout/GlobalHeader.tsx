@@ -54,7 +54,15 @@ const formatWeekLabel = (week: { week_start: string; week_end: string }) => {
 };
 
 export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = true, forceHideVenueSelector = false }: GlobalHeaderProps) => {
-  const { accessibleBars, weeks, selectedBar, selectedWeek, setSelectedBar, setSelectedWeek } = useApp();
+  const {
+    accessibleBars,
+    weeks,
+    selectedBar,
+    selectedWeek,
+    setSelectedBar,
+    clearSelectedBar,
+    setSelectedWeek,
+  } = useApp();
   const { profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
