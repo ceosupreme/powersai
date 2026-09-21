@@ -86,7 +86,7 @@ async function buildForProject(
       }),
     );
 
-  // (c) Money Lanes — critical then high, status missing or partial
+  // (c) Money Lanes — critical then high, lanes that are not on yet (missing)
   const { data: venue } = await supabase
     .from('venues')
     .select('project_type')
@@ -107,13 +107,15 @@ async function buildForProject(
     items
       .filter((i) => {
         const st = statusByKey.get(i.item_key) ?? 'missing';
-        return (
-          (st === 'missing' || st === 'partial') &&
-          (i.severity === 'critical' || i.severity === 'high')
-        );
+        return st === 'missing' && (i.severity === 'critical' || i.severity === 'high');
       })
-      .sort((a, b) => (sevRank[a.severity] ?? 9) - (sevRank[b.severity] ?? 9))
-      .forEach((i) =>
+      .sort(
+        (a, b) =>
+          (sevRank[a.severity] ?? 9) - (sevRank[b.severity] ?? 9) ||
+          (laneScore(b) ?? -1) - (laneScore(a) ?? -1),
+      )
+      .forEach((i) => {
+        const score = laneScore(i);
         lanes.push({
           key: `lane-${projectId}-${i.item_key}`,
           source: 'Lane',
@@ -121,8 +123,9 @@ async function buildForProject(
           projectId,
           projectName,
           refId: i.item_key,
-        }),
-      );
+          note: score == null ? undefined : `about $${Math.round(score).toLocaleString()}/hr`,
+        });
+      });
   }
 
   // (d) linked products mid-production
