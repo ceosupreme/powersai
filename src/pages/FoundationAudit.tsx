@@ -4,6 +4,7 @@ import { ShieldCheck, LayoutGrid, ListChecks, AlertCircle } from 'lucide-react';
 import { FoundationOverview } from '@/components/foundation-audit/FoundationOverview';
 import { FoundationCategoriesView } from '@/components/foundation-audit/FoundationCategoriesView';
 import { FoundationGapsView } from '@/components/foundation-audit/FoundationGapsView';
+import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 
 const SUBVIEWS = [
   { value: 'overview', label: 'Overview', icon: LayoutGrid },
@@ -14,6 +15,7 @@ const SUBVIEWS = [
 const FoundationAudit = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const subTab = searchParams.get('subtab') || 'overview';
+  const foundationLabel = useFoundationLabel();
   const setSubTab = (v: string) => setSearchParams({ subtab: v });
 
   return (

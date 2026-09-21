@@ -171,6 +171,7 @@ export const AppSidebar = () => {
   const { canAccessPage, profile, role, isAdmin } = useAuth();
   const { isPreview, previewRole, setPreviewRole } = usePreview();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const foundationLabel = useFoundationLabel();
 
   // Filter groups + items based on page permissions; drop empty groups.
   const filteredGroups = useMemo(
