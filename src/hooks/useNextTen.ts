@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchEffectiveFoundationItems } from '@/lib/effectiveFoundation';
+import { fetchEffectiveFoundationItems, laneScore } from '@/lib/effectiveFoundation';
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
 import { foundationStatusKey } from '@/components/foundation-audit/useFoundationScores';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
@@ -19,6 +19,8 @@ export interface NextTenRow {
   pillarKey?: string;
   kpiKey?: string;
   productStatus?: string;
+  /** Small supporting text, e.g. a lane's value per hour. */
+  note?: string;
 }
 
 const PRODUCT_ADVANCE_FROM = ['needs cover', 'proof ordered', 'ready to upload'];
