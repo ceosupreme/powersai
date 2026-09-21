@@ -114,7 +114,7 @@ const Workspace = () => {
   const [newCampaignOpen, setNewCampaignOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
 
-  if (!selectedBar) {
+  if (!selectedBar || new URLSearchParams(window.location.search).get('all') === '1') {
     return (
       <div className="space-y-5">
         <div className="flex items-center gap-3 border-l-4 border-l-primary/70 pl-4">
