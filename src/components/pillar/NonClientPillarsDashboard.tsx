@@ -133,7 +133,9 @@ export const NonClientPillarsDashboard = ({
         })}
       </div>
 
-      {showOneGlance && <ProjectOneGlance projectId={projectId} pillars={pillars} />}
+      {showOneGlance && (
+        <ProjectOneGlance projectId={projectId} pillars={pillars} canEdit={canEdit} />
+      )}
     </div>
   );
 };

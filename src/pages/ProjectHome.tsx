@@ -222,6 +222,11 @@ export default function ProjectHome() {
         )}
       </div>
 
+      {/* Next 10 — ranked, directly under the header (non-client projects only) */}
+      {isNonClient && venueId && (
+        <NextTenSection projectId={venueId} projectName={meta.name} />
+      )}
+
       {/* One-glance project view (non-client projects only) */}
       {isNonClient && venueId && pillars.length > 0 && (
         <NonClientPillarsDashboard
