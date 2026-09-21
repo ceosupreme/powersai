@@ -220,8 +220,13 @@ export function useNextTenAcrossProjects(
       );
       const order: NextTenSource[] = ['Action', 'Lane', 'Product', 'KPI'];
       const flat = lists.flat();
-      // Keep the per-project ranking, interleaved by source tier.
-      const ranked = order.flatMap((src) => flat.filter((r) => r.source === src));
+      // Keep the per-project ranking, interleaved by source tier. Lane rows are
+      // ranked across projects by their score, highest first.
+      const ranked = order.flatMap((src) => {
+        const rows = flat.filter((r) => r.source === src);
+        if (src !== 'Lane') return rows;
+        return rows.sort((a, b) => (b.laneValue ?? -1) - (a.laneValue ?? -1));
+      });
       return ranked.slice(0, 10);
     },
   });
