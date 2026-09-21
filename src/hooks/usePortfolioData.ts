@@ -3,6 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useApp } from '@/context/AppContext';
 import { getGradeFromScore } from '@/utils/scoring';
 import { useQuery } from '@tanstack/react-query';
+import { fetchEffectivePillars } from '@/lib/effectivePillars';
+import {
+  fetchEffectiveFoundationCategories,
+  fetchEffectiveFoundationItems,
+} from '@/lib/effectiveFoundation';
+import { deriveFoundationScores } from '@/components/foundation-audit/deriveFoundationScores';
+import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
 
 export interface PortfolioVenue {
   id: string;
@@ -252,4 +259,211 @@ export function usePortfolioData() {
   const isLoading = appLoading || tasksLoading || scorecardsLoading;
 
   return { venues, gmRankings, isLoading };
+}
+
+// ---------------------------------------------------------------------------
+// Non-client ("My brands" / "Prospects") portfolio layer.
+// The canonical client scorecard path above is untouched.
+// ---------------------------------------------------------------------------
+
+/** Project types that belong to the owner's own brands rather than clients. */
+export const MY_BRAND_TYPES = [
+  'internal_brand',
+  'content_channel',
+  'app_build',
+  'service_offer',
+] as const;
+
+export type PortfolioGroup = 'brands' | 'clients' | 'prospects';
+
+export interface ProjectDirectoryRow {
+  id: string;
+  name: string;
+  project_type: string | null;
+  is_prospect_shell: boolean;
+  focus_status: string;
+  group: PortfolioGroup;
+}
+
+export function projectGroup(row: {
+  project_type: string | null;
+  is_prospect_shell: boolean | null;
+}): PortfolioGroup {
+  if (row.is_prospect_shell) return 'prospects';
+  if (row.project_type && (MY_BRAND_TYPES as readonly string[]).includes(row.project_type)) {
+    return 'brands';
+  }
+  return 'clients';
+}
+
+/** venues metadata for every accessible project (type, prospect flag, focus). */
+export function useProjectDirectory() {
+  const { accessibleBars, isLoading: appLoading } = useApp();
+  const ids = useMemo(() => accessibleBars.map((b) => b.id), [accessibleBars]);
+
+  const query = useQuery({
+    queryKey: ['project-directory', ids],
+    enabled: ids.length > 0,
+    staleTime: 60_000,
+    queryFn: async (): Promise<ProjectDirectoryRow[]> => {
+      const { data, error } = await supabase
+        .from('venues')
+        .select('id,name,project_type,is_prospect_shell,focus_status')
+        .in('id', ids);
+      if (error) throw error;
+      return ((data ?? []) as any[])
+        .map((v) => ({
+          id: v.id as string,
+          name: (v.name as string) ?? 'Project',
+          project_type: (v.project_type as string) ?? null,
+          is_prospect_shell: !!v.is_prospect_shell,
+          focus_status: (v.focus_status as string) ?? 'active',
+          group: projectGroup(v),
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    },
+  });
+
+  return { ...query, isLoading: appLoading || query.isLoading };
+}
+
+export interface NonClientPillarBar {
+  key: string;
+  label: string;
+  short: string;
+  score: number | null;
+}
+
+export interface NonClientCardData {
+  id: string;
+  name: string;
+  focusStatus: string;
+  overall: number | null;
+  overallWoW: number | null;
+  pillars: NonClientPillarBar[];
+  monthRevenue: number | null;
+  potential: number | null;
+}
+
+/** First letters of each word in a pillar label — "Brand Presence" -> "BP". */
+function pillarInitials(label: string) {
+  return (
+    label
+      .split(/[\s/&-]+/)
+      .filter(Boolean)
+      .map((w) => w[0]!.toUpperCase())
+      .join('')
+      .slice(0, 3) || '?'
+  );
+}
+
+function weightedOverall(
+  pillars: { weight: number; score: number | null }[],
+): number | null {
+  const tracked = pillars.filter((p) => p.score != null);
+  if (tracked.length === 0) return null;
+  let totalW = tracked.reduce((s, p) => s + (p.weight ?? 0), 0);
+  if (totalW <= 0) totalW = tracked.length;
+  const num = tracked.reduce(
+    (s, p) => s + (p.score as number) * ((p.weight ?? 0) > 0 ? p.weight : 1),
+    0,
+  );
+  return Math.round(num / totalW);
+}
+
+function monthStartISO(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+/**
+ * Card data for non-client projects: weighted current-week overall from
+ * project_pillar_scores over the project's effective pillars, week-over-week
+ * change, this month's channel_revenue, and the Money Lanes Potential percent.
+ */
+export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
+  const weekStart = currentWeekRange().week_start;
+  const priorWeekStart = useMemo(() => {
+    const [y, m, d] = weekStart.split('-').map(Number);
+    const dt = new Date(y, m - 1, d - 7);
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+  }, [weekStart]);
+  const monthStart = monthStartISO();
+  const ids = projects.map((p) => p.id).join(',');
+
+  return useQuery({
+    queryKey: ['non-client-portfolio', ids, weekStart, monthStart],
+    enabled: projects.length > 0,
+    staleTime: 60_000,
+    queryFn: async (): Promise<NonClientCardData[]> =>
+      Promise.all(
+        projects.map(async (p) => {
+          const type = p.project_type ?? 'client';
+          const [pillars, scoresRes, revenueRes, categories, items, statusesRes] =
+            await Promise.all([
+              fetchEffectivePillars(p.id, type),
+              supabase
+                .from('project_pillar_scores')
+                .select('pillar_key,score,week_start')
+                .eq('project_id', p.id)
+                .in('week_start', [weekStart, priorWeekStart]),
+              supabase
+                .from('channel_revenue')
+                .select('amount')
+                .eq('project_id', p.id)
+                .eq('period_month', monthStart),
+              fetchEffectiveFoundationCategories(p.id, type),
+              fetchEffectiveFoundationItems(p.id, type),
+              supabase
+                .from('venue_foundation_item_status')
+                .select('item_key,status,evidence_url,notes,source,detected_at,updated_at')
+                .eq('venue_id', p.id),
+            ]);
+
+          const rows = (scoresRes.data ?? []) as any[];
+          const scoreFor = (pillarKey: string, ws: string) => {
+            const row = rows.find((r) => r.pillar_key === pillarKey && r.week_start === ws);
+            return row?.score == null ? null : Number(row.score);
+          };
+
+          const bars: NonClientPillarBar[] = pillars.map((pl) => ({
+            key: pl.pillar_key,
+            label: pl.pillar_label,
+            short: pillarInitials(pl.pillar_label),
+            score: scoreFor(pl.pillar_key, weekStart),
+          }));
+
+          const overall = weightedOverall(
+            pillars.map((pl) => ({ weight: pl.weight, score: scoreFor(pl.pillar_key, weekStart) })),
+          );
+          const priorOverall = weightedOverall(
+            pillars.map((pl) => ({
+              weight: pl.weight,
+              score: scoreFor(pl.pillar_key, priorWeekStart),
+            })),
+          );
+
+          const revenueRows = (revenueRes.data ?? []) as any[];
+          const monthRevenue = revenueRows.length
+            ? revenueRows.reduce((s, r) => s + Number(r.amount ?? 0), 0)
+            : null;
+
+          const foundation = deriveFoundationScores(
+            categories,
+            items,
+            (statusesRes.data ?? []) as any[],
+          );
+
+          return {
+            id: p.id,
+            name: p.name,
+            focusStatus: p.focus_status,
+            overall,
+            overallWoW: overall != null && priorOverall != null ? overall - priorOverall : null,
+            pillars: bars,
+            monthRevenue,
+            potential: foundation.overall,
+          };
+        }),
+      ),
+  });
 }
