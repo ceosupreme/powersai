@@ -15,6 +15,13 @@
       "when": 1789932724754,
       "tag": "0001_create_project_kpis",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789950453431,
+      "tag": "0002_project_listings_north_star_kpi_trigger",
+      "breakpoints": true
     }
   ]
 }

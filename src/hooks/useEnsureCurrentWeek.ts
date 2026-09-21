@@ -25,8 +25,21 @@ export function currentWeekRange(base = new Date()) {
   return {
     week_start: iso(monday),
     week_end: iso(sunday),
+    /** Bare ISO week label, e.g. 2026-W39. Table-wide unique, so never insert this alone. */
+    iso_week: `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`,
+    /** Legacy alias kept for existing read-only call sites. */
     week_id: `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`,
   };
+}
+
+/**
+ * `weeks.week_id` is unique across the whole table, so a non-client project
+ * cannot reuse the bare ISO week label. Suffix it with the project slug
+ * (or the first 8 chars of the project id when there is no slug).
+ */
+export function projectWeekId(isoWeek: string, slug: string | null, projectId: string) {
+  const suffix = (slug && slug.trim()) || projectId.slice(0, 8);
+  return `${isoWeek}-${suffix}`;
 }
 
 /**
@@ -40,19 +53,32 @@ export function useEnsureCurrentWeek(projectId: string | null | undefined, enabl
 
   useEffect(() => {
     if (!enabled || !projectId) return;
-    const { week_start, week_end, week_id } = currentWeekRange();
+    const { week_start, week_end, iso_week } = currentWeekRange();
     const marker = `${projectId}:${week_start}`;
     if (attempted.current === marker) return;
     attempted.current = marker;
 
     (async () => {
-      const { data: existing } = await supabase
+      // Existence is keyed on (bar_id, week_start) — the unique pair for a project week.
+      const { data: existing, error: readError } = await supabase
         .from('weeks')
         .select('id')
         .eq('bar_id', projectId)
         .eq('week_start', week_start)
         .maybeSingle();
+      if (readError) {
+        console.warn('[useEnsureCurrentWeek] lookup failed', readError.message);
+        return;
+      }
       if (existing) return;
+
+      const { data: venue } = await supabase
+        .from('venues')
+        .select('slug')
+        .eq('id', projectId)
+        .maybeSingle();
+
+      const week_id = projectWeekId(iso_week, venue?.slug ?? null, projectId);
 
       const { error } = await supabase.from('weeks').insert({
         bar_id: projectId,
@@ -63,8 +89,19 @@ export function useEnsureCurrentWeek(projectId: string | null | undefined, enabl
         is_locked: false,
       });
       if (error) {
-        // Unique-violation races are fine; anything else is logged only.
-        if (error.code !== '23505') console.warn('[useEnsureCurrentWeek]', error.message);
+        // A duplicate on (bar_id, week_start) means a parallel render won the race.
+        const isProjectWeekDuplicate =
+          error.code === '23505' && /bar_id/.test(error.message ?? '');
+        if (!isProjectWeekDuplicate) {
+          console.error('[useEnsureCurrentWeek] insert failed', {
+            projectId,
+            week_id,
+            week_start,
+            code: error.code,
+            message: error.message,
+            details: (error as any).details,
+          });
+        }
         return;
       }
       qc.invalidateQueries({ queryKey: ['all-weeks'] });

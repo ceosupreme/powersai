@@ -35,6 +35,7 @@ export type Database = {
           auto_approved: boolean
           bar_id: string
           completed_at: string | null
+          completed_by: string | null
           completion_notes: string | null
           created_at: string
           created_at_manual: string | null
@@ -92,6 +93,7 @@ export type Database = {
           auto_approved?: boolean
           bar_id: string
           completed_at?: string | null
+          completed_by?: string | null
           completion_notes?: string | null
           created_at?: string
           created_at_manual?: string | null
@@ -149,6 +151,7 @@ export type Database = {
           auto_approved?: boolean
           bar_id?: string
           completed_at?: string | null
+          completed_by?: string | null
           completion_notes?: string | null
           created_at?: string
           created_at_manual?: string | null
@@ -6711,6 +6714,56 @@ export type Database = {
         }
         Relationships: []
       }
+      product_listings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          listed_at: string | null
+          notes: string | null
+          outlet: string
+          price: number | null
+          product_id: string
+          status: string
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          listed_at?: string | null
+          notes?: string | null
+          outlet: string
+          price?: number | null
+          product_id: string
+          status?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          listed_at?: string | null
+          notes?: string | null
+          outlet?: string
+          price?: number | null
+          product_id?: string
+          status?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_listings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "channel_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           asana_gid: string | null
@@ -10484,6 +10537,7 @@ export type Database = {
           monetization_model: string | null
           name: string
           niche: string | null
+          north_star: string | null
           owner_name: string | null
           project_type: string
           seven_shifts_location_id: string | null
@@ -10534,6 +10588,7 @@ export type Database = {
           monetization_model?: string | null
           name: string
           niche?: string | null
+          north_star?: string | null
           owner_name?: string | null
           project_type?: string
           seven_shifts_location_id?: string | null
@@ -10584,6 +10639,7 @@ export type Database = {
           monetization_model?: string | null
           name?: string
           niche?: string | null
+          north_star?: string | null
           owner_name?: string | null
           project_type?: string
           seven_shifts_location_id?: string | null
