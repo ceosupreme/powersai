@@ -34,6 +34,22 @@ const CONTROLS: { label: string; status: FoundationStatus }[] = [
   { label: 'Not applicable', status: 'not_applicable' },
 ];
 
+const money = (n: number) =>
+  `$${Math.round(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+/** The four ranking inputs plus the resulting score, in small text. */
+function LaneNumbers({ lane }: { lane: FoundationItemView }) {
+  const score = laneScore(lane);
+  const parts: string[] = [];
+  if (lane.est_dollars_90d != null) parts.push(`${money(lane.est_dollars_90d)} in 90 days`);
+  if (lane.confidence != null) parts.push(`confidence ${lane.confidence}`);
+  if (lane.leverage != null) parts.push(`leverage ${lane.leverage}`);
+  if (lane.est_hours != null) parts.push(`${lane.est_hours}h of work`);
+  if (score != null) parts.push(`score ${money(score)}/hr`);
+  if (parts.length === 0) return null;
+  return <p className="text-[11px] text-muted-foreground/80 mt-0.5">{parts.join(' · ')}</p>;
+}
+
 function LaneRow({
   lane,
   projectId,
