@@ -156,6 +156,16 @@ export function ProductDialog({ open, onOpenChange, product }: Props) {
             <Label>Notes</Label>
             <Textarea rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} />
           </div>
+          {product ? (
+            <OutletsEditor productId={product.id} />
+          ) : (
+            <div>
+              <Label>Outlets</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Save the product first, then reopen it to add outlet listings.
+              </p>
+            </div>
+          )}
           <div>
             <Label>Channels promoting this product</Label>
             <div className="mt-2 rounded-md border p-3 max-h-48 overflow-y-auto space-y-2">
