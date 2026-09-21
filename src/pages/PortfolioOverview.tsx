@@ -502,6 +502,19 @@ export default function PortfolioOverview() {
         )}
       </div>
 
+      <ToggleGroup
+        type="single"
+        value={group}
+        onValueChange={(value) => value && setGroup(value as PortfolioGroup)}
+        size="sm"
+        variant="outline"
+        className="justify-start flex-wrap"
+      >
+        <ToggleGroupItem value="brands" aria-label="My brands">My brands</ToggleGroupItem>
+        <ToggleGroupItem value="clients" aria-label="Clients">Clients</ToggleGroupItem>
+        <ToggleGroupItem value="prospects" aria-label="Prospects">Prospects</ToggleGroupItem>
+      </ToggleGroup>
+
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
@@ -561,6 +574,7 @@ export default function PortfolioOverview() {
             )}
           </div>
 
+          {showClientBlocks && (
           <div>
             <p className="text-muted-foreground text-sm">Data Confidence</p>
             <p
@@ -580,6 +594,7 @@ export default function PortfolioOverview() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </div>
 
@@ -601,51 +616,104 @@ export default function PortfolioOverview() {
       </section>
 
       <section id="venue-scorecards">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Project Scorecards{selectedWeekLabel ? ` — ${selectedWeekLabel}` : ''}</h2>
-          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'cards' | 'table')} size="sm" variant="outline">
-            <ToggleGroupItem value="cards" aria-label="Cards view">
-              <LayoutGrid className="w-4 h-4 mr-1" /> Cards
-            </ToggleGroupItem>
-            <ToggleGroupItem value="table" aria-label="Table view">
-              <Table2 className="w-4 h-4 mr-1" /> Table
-            </ToggleGroupItem>
-          </ToggleGroup>
+        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
+          <h2 className="text-lg font-semibold text-foreground">
+            {group === 'brands' ? 'My Brands' : group === 'prospects' ? 'Prospects' : 'Project Scorecards'}
+            {selectedWeekLabel ? ` — ${selectedWeekLabel}` : ''}
+          </h2>
+          {showClientBlocks && (
+            <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'cards' | 'table')} size="sm" variant="outline">
+              <ToggleGroupItem value="cards" aria-label="Cards view">
+                <LayoutGrid className="w-4 h-4 mr-1" /> Cards
+              </ToggleGroupItem>
+              <ToggleGroupItem value="table" aria-label="Table view">
+                <Table2 className="w-4 h-4 mr-1" /> Table
+              </ToggleGroupItem>
+            </ToggleGroup>
+          )}
         </div>
 
-        {viewMode === 'cards' ? (
-          <div className="space-y-4">
+        {!showClientBlocks ? (
+          nonClientLoading && nonClientCards.length === 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {venues.map((venue) => (
-                <VenueScorecard
-                  key={venue.id}
-                  venue={venue}
-                  onClick={() => handleVenueDrillIn(venue.id)}
-                />
-              ))}
+              {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-56" />)}
             </div>
-            {remainingPlaceholders.length > 0 && (
-              <Collapsible>
-                <CollapsibleTrigger className="w-full bg-card border border-dashed border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  <ChevronDown className="w-4 h-4" />
-                  <span>📋 {remainingPlaceholders.length} projects onboarding: {remainingPlaceholders.join(', ')}</span>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {remainingPlaceholders.map((name) => (
-                      <ComingSoonVenueCard key={name} name={name} />
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
+          ) : nonClientCards.length === 0 ? (
+            <div className="bg-card border border-dashed border-border rounded-lg p-8 text-center text-sm text-muted-foreground">
+              {group === 'brands'
+                ? 'No own-brand projects yet.'
+                : 'No prospect projects yet.'}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {activeCards.map((card) => (
+                  <BrandProjectCard
+                    key={card.id}
+                    data={card}
+                    onClick={() => handleProjectDrillIn(card.id)}
+                  />
+                ))}
+              </div>
+              {parkedCards.length > 0 && (
+                <Collapsible>
+                  <CollapsibleTrigger className="w-full bg-card border border-dashed border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <ChevronDown className="w-4 h-4" />
+                    <span>Parked ({parkedCards.length})</span>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {parkedCards.map((card) => (
+                        <BrandProjectCard
+                          key={card.id}
+                          data={card}
+                          onClick={() => handleProjectDrillIn(card.id)}
+                        />
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+            </div>
+          )
+        ) : viewMode === 'cards' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {clientVenues.map((venue) => (
+              <VenueScorecard
+                key={venue.id}
+                venue={venue}
+                onClick={() => handleVenueDrillIn(venue.id)}
+              />
+            ))}
           </div>
         ) : (
-          <VenueComparisonTable venues={venues} onVenueClick={handleVenueDrillIn} />
+          <VenueComparisonTable venues={clientVenues} onVenueClick={handleVenueDrillIn} />
         )}
       </section>
 
-      {gmRankings.length > 0 && (
+      {group === 'brands' && (
+        <section>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Revenue this month by project</h2>
+          <div className="bg-card border border-border rounded-lg divide-y divide-border">
+            {monthRevenueRows.length === 0 ? (
+              <p className="p-4 text-sm text-muted-foreground">
+                No revenue recorded for this month yet.
+              </p>
+            ) : (
+              monthRevenueRows.map((row) => (
+                <div key={row.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                  <span className="text-sm text-foreground truncate">{row.name}</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {formatCurrency(row.monthRevenue ?? 0)}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      )}
+
+      {showClientBlocks && gmRankings.length > 0 && (
         <section>
           <h2 className="text-lg font-semibold text-foreground mb-4">GM Performance{selectedWeekLabel ? ` — Week of ${selectedWeekLabel.split('–')[0].trim()}` : ' (12-Week Rolling)'}</h2>
           <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -705,7 +773,12 @@ export default function PortfolioOverview() {
         </section>
       )}
 
-      <RevenueByVenueSection bars={accessibleBars.map((bar) => ({ id: bar.id, bar_name: bar.bar_name }))} selectedWeekLabel={selectedWeekLabel} />
+      {showClientBlocks && (
+        <RevenueByVenueSection
+          bars={accessibleBars.map((bar) => ({ id: bar.id, bar_name: bar.bar_name }))}
+          selectedWeekLabel={selectedWeekLabel}
+        />
+      )}
     </div>
   );
 }
