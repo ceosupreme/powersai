@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { MORE_SECTIONS, type MoreNavSection } from './moreNavSections';
+import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 
 interface MoreSheetProps {
   open: boolean;
@@ -24,6 +25,7 @@ interface MoreSheetProps {
 export const MoreSheet = ({ open, onOpenChange, trigger, excludeRoutes = [] }: MoreSheetProps) => {
   const location = useLocation();
   const { canAccessPage, isAdmin } = useAuth();
+  const foundationLabel = useFoundationLabel();
 
   const filteredSections = useMemo<MoreNavSection[]>(() => {
     const excluded = new Set(excludeRoutes);
@@ -79,7 +81,7 @@ export const MoreSheet = ({ open, onOpenChange, trigger, excludeRoutes = [] }: M
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-[11px] font-medium leading-tight break-words">
-                        {item.label}
+                        {item.to.split('?')[0] === '/foundation-audit' ? foundationLabel : item.label}
                       </span>
                     </NavLink>
                   );

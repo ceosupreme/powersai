@@ -56,6 +56,7 @@ import {
   Target,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -170,6 +171,7 @@ export const AppSidebar = () => {
   const { canAccessPage, profile, role, isAdmin } = useAuth();
   const { isPreview, previewRole, setPreviewRole } = usePreview();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const foundationLabel = useFoundationLabel();
 
   // Filter groups + items based on page permissions; drop empty groups.
   const filteredGroups = useMemo(
@@ -259,6 +261,7 @@ export const AppSidebar = () => {
               <SidebarMenu>
                 {group.items.map((item) => {
                   const [pathOnly] = item.path.split('?');
+                  const itemLabel = pathOnly === '/foundation-audit' ? foundationLabel : item.label;
                   const isActive = location.pathname === pathOnly;
                   const Icon = item.icon;
                   const badgeCount =
@@ -269,7 +272,7 @@ export const AppSidebar = () => {
                       : 0;
                   return (
                     <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                      <SidebarMenuButton asChild isActive={isActive} tooltip={itemLabel}>
                         <Link
                           to={item.path}
                           className={cn(
@@ -293,7 +296,7 @@ export const AppSidebar = () => {
                             )}
                           </div>
                           {!isCollapsed && (
-                            <span className="font-medium flex-1">{item.label}</span>
+                            <span className="font-medium flex-1">{itemLabel}</span>
                           )}
                           {!isCollapsed && item.hasBadge && (
                             <CountBadge count={badgeCount} className="ml-auto" />

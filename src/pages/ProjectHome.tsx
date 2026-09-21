@@ -6,6 +6,7 @@ import { useRole } from '@/context/RoleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -38,6 +39,7 @@ interface ProjectMeta {
   slug: string | null;
   north_star: string | null;
   monetization_model: string | null;
+  focus_status: string | null;
 }
 
 const QUICK_LINKS = [
@@ -66,7 +68,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug,north_star,monetization_model')
+      .select('id,name,project_type,bar_code,slug,north_star,monetization_model,focus_status')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -93,6 +95,20 @@ export default function ProjectHome() {
   // "Ultimate goal" inline edit (admins only)
   const [goalEditing, setGoalEditing] = useState(false);
   const [goalDraft, setGoalDraft] = useState('');
+  const setFocusStatus = async (next: 'active' | 'parked') => {
+    if (!venueId) return;
+    const { error } = await supabase
+      .from('venues')
+      .update({ focus_status: next } as any)
+      .eq('id', venueId);
+    if (error) {
+      toast.error(error.message ?? 'Could not change the status');
+      return;
+    }
+    setMeta((m) => (m ? { ...m, focus_status: next } : m));
+    toast.success(next === 'active' ? 'Marked active' : 'Parked for now');
+  };
+
   const saveGoal = async () => {
     if (!venueId) return;
     const next = goalDraft.trim() || null;
@@ -228,6 +244,24 @@ export default function ProjectHome() {
               <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
                 {meta.project_type.replace(/_/g, ' ')}
               </Badge>
+            )}
+            {isNonClient && isAdmin && (
+              <ToggleGroup
+                type="single"
+                size="sm"
+                variant="outline"
+                value={meta.focus_status === 'parked' ? 'parked' : 'active'}
+                onValueChange={(value) => {
+                  if (value === 'active' || value === 'parked') setFocusStatus(value);
+                }}
+                aria-label="Project focus"
+              >
+                <ToggleGroupItem value="active" className="h-7 px-2 text-xs">Active</ToggleGroupItem>
+                <ToggleGroupItem value="parked" className="h-7 px-2 text-xs">Parked</ToggleGroupItem>
+              </ToggleGroup>
+            )}
+            {isNonClient && !isAdmin && meta.focus_status === 'parked' && (
+              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">Parked</Badge>
             )}
           </div>
           {isNonClient && (

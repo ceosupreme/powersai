@@ -10527,6 +10527,7 @@ export type Database = {
           current_secret_shop_cleanliness_pct: number | null
           current_secret_shop_date: string | null
           current_secret_shop_score_pct: number | null
+          focus_status: string
           gm_name: string | null
           google_place_id: string | null
           id: string
@@ -10578,6 +10579,7 @@ export type Database = {
           current_secret_shop_cleanliness_pct?: number | null
           current_secret_shop_date?: string | null
           current_secret_shop_score_pct?: number | null
+          focus_status?: string
           gm_name?: string | null
           google_place_id?: string | null
           id?: string
@@ -10629,6 +10631,7 @@ export type Database = {
           current_secret_shop_cleanliness_pct?: number | null
           current_secret_shop_date?: string | null
           current_secret_shop_score_pct?: number | null
+          focus_status?: string
           gm_name?: string | null
           google_place_id?: string | null
           id?: string

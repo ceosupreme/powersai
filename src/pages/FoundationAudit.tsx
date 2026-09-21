@@ -4,6 +4,7 @@ import { ShieldCheck, LayoutGrid, ListChecks, AlertCircle } from 'lucide-react';
 import { FoundationOverview } from '@/components/foundation-audit/FoundationOverview';
 import { FoundationCategoriesView } from '@/components/foundation-audit/FoundationCategoriesView';
 import { FoundationGapsView } from '@/components/foundation-audit/FoundationGapsView';
+import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 
 const SUBVIEWS = [
   { value: 'overview', label: 'Overview', icon: LayoutGrid },
@@ -14,6 +15,7 @@ const SUBVIEWS = [
 const FoundationAudit = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const subTab = searchParams.get('subtab') || 'overview';
+  const foundationLabel = useFoundationLabel();
   const setSubTab = (v: string) => setSearchParams({ subtab: v });
 
   return (
@@ -23,7 +25,7 @@ const FoundationAudit = () => {
           <ShieldCheck className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">Foundation Audit</h1>
+          <h1 className="text-2xl font-bold text-foreground">{foundationLabel}</h1>
           <p className="text-muted-foreground text-sm">
             Per-project readiness score across legal, brand, web, Google, reviews, social, offers, and collateral.
           </p>

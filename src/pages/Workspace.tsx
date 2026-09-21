@@ -28,6 +28,18 @@ import { UpcomingOpportunitiesWidget } from '@/components/growth-audit/context/U
 import { HelpTip } from '@/components/help/HelpTip';
 import { SuggestionsPanel } from '@/components/help/SuggestionsPanel';
 import { HELP_KEYS } from '@/config/helpKeys';
+import {
+  useProjectDirectory,
+  useNonClientPortfolio,
+  weightedPillarOverall,
+} from '@/hooks/usePortfolioData';
+import { useProjectType, useEffectivePillars } from '@/hooks/useEffectivePillars';
+import { useProjectPillarScores } from '@/hooks/useProjectPillarScores';
+import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
+import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
+import { AllProjectsNextTen } from '@/components/workspace/AllProjectsNextTen';
+import { WaitingOnMe } from '@/components/workspace/WaitingOnMe';
 
 const fmtScore = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toString());
 
@@ -66,16 +78,69 @@ const Workspace = () => {
   const { campaigns } = useCampaignStore();
   const refresh = useRefreshAudit(venueId);
 
+  // Non-client project layer (own brands) — the client path below is untouched.
+  const { data: directory = [] } = useProjectDirectory();
+  const myActiveBrands = useMemo(
+    () =>
+      directory
+        .filter((row) => row.group === 'brands' && row.focus_status !== 'parked')
+        .map((row) => ({ id: row.id, name: row.name })),
+    [directory],
+  );
+  const projectType = useProjectType(venueId);
+  const isNonClient = !!projectType.data && projectType.data !== CLIENT_PROJECT_TYPE;
+  const projectWeekStart = useMemo(() => currentWeekRange().week_start, []);
+  const { data: effectivePillars = [] } = useEffectivePillars(
+    isNonClient ? venueId : null,
+    projectType.data ?? undefined,
+  );
+  const { data: pillarScoreRows = [] } = useProjectPillarScores(
+    isNonClient ? venueId : null,
+    isNonClient ? projectWeekStart : null,
+  );
+  const foundation = useFoundationScores(isNonClient ? venueId : null);
+  const projectOverall = useMemo(() => {
+    if (!isNonClient) return null;
+    return weightedPillarOverall(
+      effectivePillars.map((p) => {
+        const row = pillarScoreRows.find((r) => r.pillar_key === p.pillar_key);
+        return { weight: p.weight, score: row?.score == null ? null : Number(row.score) };
+      }),
+    );
+  }, [isNonClient, effectivePillars, pillarScoreRows]);
+  const projectPotential = foundation.result?.overall ?? null;
+
   // Local UI state
   const [newCampaignOpen, setNewCampaignOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
 
   if (!selectedBar) {
     return (
-      <Card className="p-10 text-center bg-card/30 border-dashed">
-        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
-        <p className="text-sm text-muted-foreground mt-1">Pick a project from the global header to see your workspace.</p>
-      </Card>
+      <div className="space-y-5">
+        <div className="flex items-center gap-3 border-l-4 border-l-primary/70 pl-4">
+          <div className="p-2.5 rounded-xl bg-primary/15 text-primary">
+            <Sunrise className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-foreground">Today</h1>
+            <p className="text-xs text-muted-foreground">
+              Across your active projects · pick a project in the header for its full workspace
+            </p>
+          </div>
+        </div>
+
+        {myActiveBrands.length === 0 ? (
+          <Card className="p-10 text-center bg-card/30 border-dashed">
+            <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
+            <p className="text-sm text-muted-foreground mt-1">Pick a project from the global header to see your workspace.</p>
+          </Card>
+        ) : (
+          <>
+            <AllProjectsNextTen projects={myActiveBrands} />
+            <WaitingOnMe projects={myActiveBrands} />
+          </>
+        )}
+      </div>
     );
   }
 
@@ -153,26 +218,42 @@ const Workspace = () => {
 
       {/* Header strip — 4 tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Tile
-          icon={Activity} label="Operational score"
-          value={fmtScore(opsScore)}
-          hint={opsGrade ? `Grade ${opsGrade}` : 'Awaiting weekly scorecard'}
-        />
+        {isNonClient ? (
+          <Tile
+            icon={Activity} label="Project score"
+            value={fmtScore(projectOverall)}
+            hint="Weighted across this project's pillars"
+          />
+        ) : (
+          <Tile
+            icon={Activity} label="Operational score"
+            value={fmtScore(opsScore)}
+            hint={opsGrade ? `Grade ${opsGrade}` : 'Awaiting weekly scorecard'}
+          />
+        )}
         <Tile
           icon={TrendingUp} label="Growth score"
           value={growthLoading ? '…' : growthScore === null ? '—' : String(growthScore)}
           accent={growthBand.text}
           hint={primary.opportunityLevel + ' opportunity'}
         />
-        <Tile
-          icon={ShieldAlert} label="Ops Readiness"
-          value={primary.readiness}
-          footer={
-            <div className="mt-1">
-              <GateBadge state={computeGateState(true, primary.readiness)} />
-            </div>
-          }
-        />
+        {isNonClient ? (
+          <Tile
+            icon={ShieldAlert} label="Potential"
+            value={projectPotential == null ? '—' : `${projectPotential}%`}
+            hint="How much of the earning setup is live"
+          />
+        ) : (
+          <Tile
+            icon={ShieldAlert} label="Ops Readiness"
+            value={primary.readiness}
+            footer={
+              <div className="mt-1">
+                <GateBadge state={computeGateState(true, primary.readiness)} />
+              </div>
+            }
+          />
+        )}
         <Tile
           icon={Megaphone} label="Active campaigns"
           value={`${live.length} live`}
