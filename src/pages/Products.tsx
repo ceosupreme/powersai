@@ -124,6 +124,17 @@ export default function ProductsPage() {
             </SelectContent>
           </Select>
         </div>
+        <div className="min-w-[180px]">
+          <Select value={outletFilter} onValueChange={setOutletFilter}>
+            <SelectTrigger><SelectValue placeholder="All outlets" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All outlets</SelectItem>
+              {OUTLETS.map((o) => (
+                <SelectItem key={o} value={o}>{o}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="rounded-lg border">
@@ -132,6 +143,7 @@ export default function ProductsPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Brands</TableHead>
+              <TableHead>Outlets</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Status</TableHead>
