@@ -14,6 +14,8 @@ interface AppContextType {
   selectedBar: Bar | null;
   selectedWeek: Week | null;
   setSelectedBar: (bar: Bar) => void;
+  /** Clear the selection so cross-project ("All projects") views show. */
+  clearSelectedBar: () => void;
   setSelectedWeek: (week: Week) => void;
   isLoading: boolean;
   error: string | null;
