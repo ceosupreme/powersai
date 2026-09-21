@@ -357,7 +357,7 @@ function pillarInitials(label: string) {
   );
 }
 
-function weightedOverall(
+export function weightedPillarOverall(
   pillars: { weight: number; score: number | null }[],
 ): number | null {
   const tracked = pillars.filter((p) => p.score != null);
@@ -432,10 +432,10 @@ export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
             score: scoreFor(pl.pillar_key, weekStart),
           }));
 
-          const overall = weightedOverall(
+          const overall = weightedPillarOverall(
             pillars.map((pl) => ({ weight: pl.weight, score: scoreFor(pl.pillar_key, weekStart) })),
           );
-          const priorOverall = weightedOverall(
+          const priorOverall = weightedPillarOverall(
             pillars.map((pl) => ({
               weight: pl.weight,
               score: scoreFor(pl.pillar_key, priorWeekStart),
