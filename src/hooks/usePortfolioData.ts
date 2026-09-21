@@ -312,6 +312,8 @@ export function useProjectDirectory() {
         .in('id', ids);
       if (error) throw error;
       return ((data ?? []) as any[])
+        // Switched-off projects stay out of every cross-project list and count.
+        .filter((v) => v.is_active !== false)
         .map((v) => ({
           id: v.id as string,
           name: (v.name as string) ?? 'Project',
