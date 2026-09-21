@@ -81,6 +81,13 @@ export default function ProjectHome() {
     return () => { cancelled = true; };
   }, [venueId]);
 
+  // Opening a project page makes it the selected project everywhere else.
+  useEffect(() => {
+    if (!venueId || selectedBar?.id === venueId) return;
+    const bar = accessibleBars.find((b) => b.id === venueId);
+    if (bar) setSelectedBar(bar);
+  }, [venueId, accessibleBars, selectedBar?.id]);
+
   const progress = useVenueOnboardingDetectors(venueId ?? null, meta?.project_type ?? null);
   const live = useVenueLiveStatus(progress.statusFor);
 
