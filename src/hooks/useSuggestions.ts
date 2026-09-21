@@ -409,7 +409,7 @@ export function useSuggestions() {
       if (enrollmentsRes.status === "fulfilled") {
         const rows = ((enrollmentsRes.value.data ?? []) as unknown) as { project_id: string; enabled: boolean }[];
         const enrolledProjects = new Set(rows.filter((r) => r.enabled).map((r) => r.project_id));
-        for (const p of projects) {
+        for (const p of clientProjects) {
           if (enrolledProjects.has(p.id)) continue;
           out.push({
             dismissKey: `sugg:no-automation-bundle:${p.id}`,
@@ -436,7 +436,7 @@ export function useSuggestions() {
           }
         }
         for (const [pid, r] of latestByProject) {
-          const proj = projects.find((p) => p.id === pid);
+          const proj = clientProjects.find((p) => p.id === pid);
           if (!proj) continue;
           const verb = r.status === "draft" ? "Review" : "Send";
           out.push({
