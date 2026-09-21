@@ -118,6 +118,10 @@ export function useSuggestions() {
         name: string;
         project_type: string | null;
       }[];
+      /** Client-only suggestion types don't apply to my own brands. */
+      const isClientProject = (p: { project_type: string | null }) =>
+        (p.project_type ?? CLIENT_PROJECT_TYPE) === CLIENT_PROJECT_TYPE;
+      const clientProjects = projects.filter(isClientProject);
       const pillarScores = (pillarScoresRes.data ?? []) as { project_id: string; week_start: string }[];
       const openFindings = (openFindingsRes.data ?? []) as { venue_id: string }[];
       const contentItems = (contentItemsRes.data ?? []) as { project_id: string }[];
