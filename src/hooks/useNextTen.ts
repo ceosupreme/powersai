@@ -21,6 +21,8 @@ export interface NextTenRow {
   productStatus?: string;
   /** Small supporting text, e.g. a lane's value per hour. */
   note?: string;
+  /** Lane ranking score (dollars per hour) when all four numbers exist. */
+  laneValue?: number | null;
 }
 
 const PRODUCT_ADVANCE_FROM = ['needs cover', 'proof ordered', 'ready to upload'];
@@ -124,6 +126,7 @@ async function buildForProject(
           projectName,
           refId: i.item_key,
           note: score == null ? undefined : `about $${Math.round(score).toLocaleString()}/hr`,
+          laneValue: score,
         });
       });
   }
