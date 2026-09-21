@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
+import { useApp } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +56,7 @@ export default function ProjectHome() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const { currentRole } = useRole();
+  const { accessibleBars, selectedBar, setSelectedBar } = useApp();
   const [meta, setMeta] = useState<ProjectMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [wizardOpen, setWizardOpen] = useState(false);
