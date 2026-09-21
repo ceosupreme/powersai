@@ -308,10 +308,12 @@ export function useProjectDirectory() {
     queryFn: async (): Promise<ProjectDirectoryRow[]> => {
       const { data, error } = await supabase
         .from('venues')
-        .select('id,name,project_type,is_prospect_shell,focus_status')
+        .select('id,name,project_type,is_prospect_shell,focus_status,is_active')
         .in('id', ids);
       if (error) throw error;
       return ((data ?? []) as any[])
+        // Switched-off projects stay out of every cross-project list and count.
+        .filter((v) => v.is_active !== false)
         .map((v) => ({
           id: v.id as string,
           name: (v.name as string) ?? 'Project',

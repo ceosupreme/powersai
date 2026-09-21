@@ -3557,13 +3557,17 @@ export type Database = {
       foundation_item_templates: {
         Row: {
           category_key: string
+          confidence: number | null
           created_at: string
           description: string | null
           detection_signal: string
+          est_dollars_90d: number | null
+          est_hours: number | null
           id: string
           is_manual_only: boolean
           item_key: string
           label: string
+          leverage: number | null
           project_type: string
           recommended_fix: string | null
           severity: string
@@ -3572,13 +3576,17 @@ export type Database = {
         }
         Insert: {
           category_key: string
+          confidence?: number | null
           created_at?: string
           description?: string | null
           detection_signal?: string
+          est_dollars_90d?: number | null
+          est_hours?: number | null
           id?: string
           is_manual_only?: boolean
           item_key: string
           label: string
+          leverage?: number | null
           project_type: string
           recommended_fix?: string | null
           severity?: string
@@ -3587,13 +3595,17 @@ export type Database = {
         }
         Update: {
           category_key?: string
+          confidence?: number | null
           created_at?: string
           description?: string | null
           detection_signal?: string
+          est_dollars_90d?: number | null
+          est_hours?: number | null
           id?: string
           is_manual_only?: boolean
           item_key?: string
           label?: string
+          leverage?: number | null
           project_type?: string
           recommended_fix?: string | null
           severity?: string
@@ -6999,14 +7011,18 @@ export type Database = {
       project_foundation_item_overrides: {
         Row: {
           category_key: string
+          confidence: number | null
           created_at: string
           description: string | null
           detection_signal: string
+          est_dollars_90d: number | null
+          est_hours: number | null
           id: string
           is_hidden: boolean
           is_manual_only: boolean
           item_key: string
           label: string
+          leverage: number | null
           project_id: string
           recommended_fix: string | null
           severity: string
@@ -7015,14 +7031,18 @@ export type Database = {
         }
         Insert: {
           category_key: string
+          confidence?: number | null
           created_at?: string
           description?: string | null
           detection_signal?: string
+          est_dollars_90d?: number | null
+          est_hours?: number | null
           id?: string
           is_hidden?: boolean
           is_manual_only?: boolean
           item_key: string
           label: string
+          leverage?: number | null
           project_id: string
           recommended_fix?: string | null
           severity?: string
@@ -7031,14 +7051,18 @@ export type Database = {
         }
         Update: {
           category_key?: string
+          confidence?: number | null
           created_at?: string
           description?: string | null
           detection_signal?: string
+          est_dollars_90d?: number | null
+          est_hours?: number | null
           id?: string
           is_hidden?: boolean
           is_manual_only?: boolean
           item_key?: string
           label?: string
+          leverage?: number | null
           project_id?: string
           recommended_fix?: string | null
           severity?: string

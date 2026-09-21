@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useApp } from '@/context/AppContext';
+import { useApp, ALL_PROJECTS } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,7 +54,15 @@ const formatWeekLabel = (week: { week_start: string; week_end: string }) => {
 };
 
 export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = true, forceHideVenueSelector = false }: GlobalHeaderProps) => {
-  const { accessibleBars, weeks, selectedBar, selectedWeek, setSelectedBar, setSelectedWeek } = useApp();
+  const {
+    accessibleBars,
+    weeks,
+    selectedBar,
+    selectedWeek,
+    setSelectedBar,
+    clearSelectedBar,
+    setSelectedWeek,
+  } = useApp();
   const { profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -109,8 +117,12 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
         {/* Venue Selector - always show for owners (unless force-hidden), otherwise based on prop */}
           {!forceHideVenueSelector && (showVenueSelector || currentRole === 'owner') && accessibleBars.length > 1 ? (
             <Select
-              value={selectedBar?.id || ''}
+              value={selectedBar?.id || ALL_PROJECTS}
               onValueChange={(value) => {
+                if (value === ALL_PROJECTS) {
+                  clearSelectedBar();
+                  return;
+                }
                 const bar = accessibleBars.find((b) => b.id === value);
                 if (bar) setSelectedBar(bar);
               }}
@@ -122,6 +134,9 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
                 </div>
               </SelectTrigger>
               <SelectContent className="bg-card/95 backdrop-blur-md border-border/50 rounded-xl shadow-xl">
+                <SelectItem value={ALL_PROJECTS} className="cursor-pointer hover:bg-primary/10 rounded-lg my-0.5">
+                  All projects
+                </SelectItem>
                 {accessibleBars.map((bar) => (
                   <SelectItem key={bar.id} value={bar.id} className="cursor-pointer hover:bg-primary/10 rounded-lg my-0.5">
                     {bar.bar_name}

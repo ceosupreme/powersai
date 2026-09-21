@@ -47,13 +47,20 @@ export function useProspects() {
   return useQuery({
     queryKey: ['prospects'],
     queryFn: async (): Promise<Prospect[]> => {
-      const { data, error } = await db
-        .from('prospects')
-        .select('*')
-        .order('leak_total', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false });
+      const [{ data, error }, offRes] = await Promise.all([
+        db
+          .from('prospects')
+          .select('*')
+          .order('leak_total', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false }),
+        db.from('venues').select('id').eq('is_active', false),
+      ]);
       if (error) throw error;
-      return (data ?? []) as Prospect[];
+      // Prospects attached to a switched-off project stay out of every list.
+      const off = new Set(((offRes.data ?? []) as { id: string }[]).map((v) => v.id));
+      return ((data ?? []) as Prospect[]).filter(
+        (p) => !p.shell_venue_id || !off.has(p.shell_venue_id),
+      );
     },
   });
 }

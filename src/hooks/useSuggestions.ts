@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useHelpState } from "@/hooks/useHelpState";
+import { CLIENT_PROJECT_TYPE } from "@/lib/effectivePillars";
 
 export type Suggestion = {
   /** Stable per-instance key for dismissal. */
@@ -90,7 +91,12 @@ export function useSuggestions() {
         channelRevenueRes,
         qualifierFieldsRes,
       ] = await Promise.all([
-        supabase.from("venues").select("id, name, project_type").eq("is_active", true),
+        supabase
+          .from("venues")
+          .select("id, name, project_type, is_prospect_shell, focus_status")
+          .eq("is_active", true)
+          .eq("is_prospect_shell", false)
+          .eq("focus_status", "active"),
         supabase
           .from("inbound_leads")
           .select("id", { count: "exact", head: true })
@@ -113,6 +119,10 @@ export function useSuggestions() {
         name: string;
         project_type: string | null;
       }[];
+      /** Client-only suggestion types don't apply to my own brands. */
+      const isClientProject = (p: { project_type: string | null }) =>
+        (p.project_type ?? CLIENT_PROJECT_TYPE) === CLIENT_PROJECT_TYPE;
+      const clientProjects = projects.filter(isClientProject);
       const pillarScores = (pillarScoresRes.data ?? []) as { project_id: string; week_start: string }[];
       const openFindings = (openFindingsRes.data ?? []) as { venue_id: string }[];
       const contentItems = (contentItemsRes.data ?? []) as { project_id: string }[];
@@ -263,7 +273,7 @@ export function useSuggestions() {
         fieldCountByType.set(r.project_type, (fieldCountByType.get(r.project_type) ?? 0) + 1);
       }
       const flaggedTypes = new Set<string>();
-      for (const p of projects) {
+      for (const p of clientProjects) {
         if (!p.project_type) continue;
         if ((fieldCountByType.get(p.project_type) ?? 0) > 0) continue;
         if (flaggedTypes.has(p.project_type)) continue;
@@ -399,7 +409,7 @@ export function useSuggestions() {
       if (enrollmentsRes.status === "fulfilled") {
         const rows = ((enrollmentsRes.value.data ?? []) as unknown) as { project_id: string; enabled: boolean }[];
         const enrolledProjects = new Set(rows.filter((r) => r.enabled).map((r) => r.project_id));
-        for (const p of projects) {
+        for (const p of clientProjects) {
           if (enrolledProjects.has(p.id)) continue;
           out.push({
             dismissKey: `sugg:no-automation-bundle:${p.id}`,
@@ -426,7 +436,7 @@ export function useSuggestions() {
           }
         }
         for (const [pid, r] of latestByProject) {
-          const proj = projects.find((p) => p.id === pid);
+          const proj = clientProjects.find((p) => p.id === pid);
           if (!proj) continue;
           const verb = r.status === "draft" ? "Review" : "Send";
           out.push({

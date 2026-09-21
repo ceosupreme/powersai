@@ -8,6 +8,7 @@ import { ChevronDown } from 'lucide-react';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
 import type { FoundationItemView, FoundationStatus } from '@/components/foundation-audit/deriveFoundationScores';
+import { laneScore } from '@/lib/effectiveFoundation';
 import { cn } from '@/lib/utils';
 
 const SEV_RANK: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -33,6 +34,22 @@ const CONTROLS: { label: string; status: FoundationStatus }[] = [
   { label: 'Not applicable', status: 'not_applicable' },
 ];
 
+const money = (n: number) =>
+  `$${Math.round(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+/** The four ranking inputs plus the resulting score, in small text. */
+function LaneNumbers({ lane }: { lane: FoundationItemView }) {
+  const score = laneScore(lane);
+  const parts: string[] = [];
+  if (lane.est_dollars_90d != null) parts.push(`${money(lane.est_dollars_90d)} in 90 days`);
+  if (lane.confidence != null) parts.push(`confidence ${lane.confidence}`);
+  if (lane.leverage != null) parts.push(`leverage ${lane.leverage}`);
+  if (lane.est_hours != null) parts.push(`${lane.est_hours}h of work`);
+  if (score != null) parts.push(`score ${money(score)}/hr`);
+  if (parts.length === 0) return null;
+  return <p className="text-[11px] text-muted-foreground/80 mt-0.5">{parts.join(' · ')}</p>;
+}
+
 function LaneRow({
   lane,
   projectId,
@@ -51,6 +68,7 @@ function LaneRow({
           <p className="text-xs text-muted-foreground">
             {lane.recommended_fix || lane.description || 'No first step recorded yet.'}
           </p>
+          <LaneNumbers lane={lane} />
         </div>
         <Badge variant="outline" className={cn('text-[10px] capitalize shrink-0', SEV_TONE[lane.severity])}>
           {lane.severity}
@@ -101,6 +119,7 @@ export const MoneyLanesSection = ({
     const sorted = [...all].sort(
       (a, b) =>
         (SEV_RANK[a.severity] ?? 9) - (SEV_RANK[b.severity] ?? 9) ||
+        (laneScore(b) ?? -1) - (laneScore(a) ?? -1) ||
         (STATUS_RANK[a.status] ?? 9) - (STATUS_RANK[b.status] ?? 9) ||
         a.label.localeCompare(b.label),
     );

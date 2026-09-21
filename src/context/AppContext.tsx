@@ -14,6 +14,8 @@ interface AppContextType {
   selectedBar: Bar | null;
   selectedWeek: Week | null;
   setSelectedBar: (bar: Bar) => void;
+  /** Clear the selection so cross-project ("All projects") views show. */
+  clearSelectedBar: () => void;
   setSelectedWeek: (week: Week) => void;
   isLoading: boolean;
   error: string | null;
@@ -23,6 +25,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'barpulse_selectedBar';
+/** Sentinel stored when the user explicitly picked "All projects". */
+export const ALL_PROJECTS = '__all_projects__';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const auth = useAuth();
@@ -35,6 +39,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedBarState(bar);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bar));
+    } catch {}
+  };
+
+  // "All projects": remember that nothing is selected so the restore effect
+  // below doesn't quietly pick the first project again.
+  const clearSelectedBar = () => {
+    setSelectedBarState(null);
+    try {
+      localStorage.setItem(STORAGE_KEY, ALL_PROJECTS);
     } catch {}
   };
 
@@ -142,6 +155,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!selectedBar) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === ALL_PROJECTS) return;
         if (saved) {
           const parsed = JSON.parse(saved) as Bar;
           if (accessibleBars.find(b => b.id === parsed.id)) {
@@ -184,6 +198,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         selectedBar,
         selectedWeek,
         setSelectedBar,
+        clearSelectedBar,
         setSelectedWeek,
         isLoading,
         error,

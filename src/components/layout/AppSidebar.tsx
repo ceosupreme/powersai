@@ -95,6 +95,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Workspace',
     items: [
+      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
       { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
       { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
       { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },

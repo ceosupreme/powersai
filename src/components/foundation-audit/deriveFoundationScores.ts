@@ -33,6 +33,10 @@ export interface FoundationItemView {
   is_manual_only: boolean;
   severity: 'low' | 'medium' | 'high' | 'critical';
   recommended_fix: string | null;
+  est_dollars_90d: number | null;
+  confidence: number | null;
+  leverage: number | null;
+  est_hours: number | null;
   status: FoundationStatus;
   evidence_url: string | null;
   notes: string | null;
@@ -108,6 +112,10 @@ export function deriveFoundationScores(
         is_manual_only: i.is_manual_only,
         severity: i.severity,
         recommended_fix: i.recommended_fix,
+        est_dollars_90d: i.est_dollars_90d ?? null,
+        confidence: i.confidence ?? null,
+        leverage: i.leverage ?? null,
+        est_hours: i.est_hours ?? null,
         status,
         evidence_url: s?.evidence_url ?? null,
         notes: s?.notes ?? null,
