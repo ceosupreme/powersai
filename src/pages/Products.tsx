@@ -13,6 +13,7 @@ import {
   PRODUCT_STATUSES,
 } from "@/hooks/useChannelProducts";
 import { ProductDialog } from "@/components/products/ProductDialog";
+import { OUTLETS, useAllProductListings } from "@/hooks/useProductListings";
 import { formatUSD } from "@/hooks/useChannelRevenue";
 import { toast } from "sonner";
 import { HelpTip } from "@/components/help/HelpTip";
@@ -23,6 +24,7 @@ const ALL = "__all__";
 export default function ProductsPage() {
   const { data: items = [], isLoading } = useChannelProducts();
   const { data: brandsByProduct = {} } = useAllProductBrands();
+  const { data: listingsByProduct = {} } = useAllProductListings();
   const { remove } = useChannelProductMutations();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ChannelProduct | null>(null);
