@@ -90,7 +90,12 @@ export function useSuggestions() {
         channelRevenueRes,
         qualifierFieldsRes,
       ] = await Promise.all([
-        supabase.from("venues").select("id, name, project_type").eq("is_active", true),
+        supabase
+          .from("venues")
+          .select("id, name, project_type, is_prospect_shell, focus_status")
+          .eq("is_active", true)
+          .eq("is_prospect_shell", false)
+          .eq("focus_status", "active"),
         supabase
           .from("inbound_leads")
           .select("id", { count: "exact", head: true })
