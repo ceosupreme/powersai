@@ -1,35 +1,32 @@
-# Publishing & Launch public service page
+# Get you signed in again
 
-## Goal
-Add a public `/publishing` service page and entry points that position publishing as a packaged combination of the existing DESIGN / BUILD / GROW / CONNECT disciplines, without altering the four-lane hero or Interactive Studio Map.
+## What's happening
 
-## What will change
+Sign-in itself is working. Every attempt this morning came back as "invalid login credentials", which means the email and password pair didn't match — nothing in the app is broken.
 
-### Navigation and homepage entry point
-- Add **Publishing** after Capabilities and before Process in the shared desktop/mobile navigation, switching the desktop navigation breakpoint to `lg` if required to preserve readable labels and touch targets.
-- Add **Publishing & Launch** to the footer while keeping **Hiring Sean?** out of the primary navigation.
-- Add a distinct, unnumbered Publishing & Launch feature below the four existing capability rows with the supplied headline, body, format line, and `/publishing` link.
+Your accounts are healthy:
 
-### Publishing page
-- Add `/publishing` inside the existing public studio shell with matching header, footer, typography, tokens, spacing, focus treatment, and reduced-motion-safe reveal behavior.
-- Build the supplied hero and an original decorative inline SVG/CSS composition showing a book/eBook, app screen, and release listing connected together; it will be non-interactive and accessibility-hidden.
-- Add the two main publishing tracks, smaller digital-publications track, four-step process, inclusion list, four-discipline explanation, six-item FAQ, and three-option final action area using the supplied factual copy and caveats.
-- Link the primary and final actions to `/?intent=publishing#contact`; keep the secondary hero action anchored to `#publishing-tracks`.
+- ceosupreme@gmail.com — confirmed, admin, last signed in Aug 26
+- mightysupremeteam@gmail.com — confirmed, last signed in Jul 24
+- coastalbeauties@gmail.com — confirmed
 
-### Contact integration and metadata
-- Extend the existing allowlisted service model with `publishing-launch`, labeled **Publishing / launch**, before **Not sure yet**.
-- Treat `?intent=publishing` as a safe preselection only; it will not alter or erase the visitor’s project note.
-- Keep the current `qualifier_data.services`, general-site routing, save behavior, and owner notification flow unchanged.
-- Set the supplied title, description, and self-referencing canonical for `/publishing`.
+Two lookalike accounts exist but were never confirmed and have never been used: ceosupreme@live.com and mightysupremeteam@gmail.ciom (the domain has a typo). If you were typing one of those, that alone explains the failures.
 
-## Technical details
-- Add one focused page component and one decorative publishing illustration component under the existing studio scope.
-- Reuse existing public primitives, Accordion, StudioReveal, navigation, footer, service-intent utilities, and route-head helper.
-- Add only local studio presentation styles if the new visual needs them; no packages, backend changes, schema changes, analytics, or internal-app edits.
-- Update the roadmap only to track this requested addition.
+## The fix
 
-## Verification
-- Run the TypeScript check and production build.
-- Browser-check `/publishing` at 375, 390, 768, 900, 1024, and 1440px.
-- Verify desktop/mobile navigation breakpoint behavior, menu focus and Escape, both page anchors, publishing contact preselection, visible focus, reduced motion, semantic heading order, and no horizontal overflow.
-- Smoke-check `/`, `/work`, `/hire`, and `/free-audit`; do not submit the live inquiry form and do not publish.
+1. Set a fresh password directly on ceosupreme@gmail.com and give it to you here in chat.
+2. You sign in with it at the login page.
+3. Change it right away to something only you know.
+
+No email is involved, so nothing can get stuck in spam or hit a sending limit. If you'd rather I reset one of the other accounts instead, say which one.
+
+## Technical detail
+
+- Single update to the auth user row for ceosupreme@gmail.com, setting the password hash via `crypt(..., gen_salt('bf'))`. Confirmation timestamp, id, and role assignment stay unchanged.
+- No schema migration, no RLS change, no source file edits.
+- Afterwards I verify the account still reads as confirmed with the admin role.
+
+## Not in scope
+
+- Deleting the two unused lookalike accounts (can be cleaned up separately).
+- Any change to the login page, auth context, or reset-password page.
