@@ -23,7 +23,7 @@ const FoundationAudit = () => {
           <ShieldCheck className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">Foundation Audit</h1>
+          <h1 className="text-2xl font-bold text-foreground">{foundationLabel}</h1>
           <p className="text-muted-foreground text-sm">
             Per-project readiness score across legal, brand, web, Google, reviews, social, offers, and collateral.
           </p>

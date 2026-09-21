@@ -79,7 +79,7 @@ export const MoreSheet = ({ open, onOpenChange, trigger, excludeRoutes = [] }: M
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-[11px] font-medium leading-tight break-words">
-                        {item.label}
+                        {item.path.split('?')[0] === '/foundation-audit' ? foundationLabel : item.label}
                       </span>
                     </NavLink>
                   );
