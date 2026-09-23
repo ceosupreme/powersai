@@ -33,6 +33,7 @@ export default function BrandKit() {
   const { kitQuery, kitId, ensureKit, colors, taglines, hashtags, links, assets } =
     useBrandKitData(projectId, { includeArchived: showArchived });
   const saveKit = useSaveKit(projectId);
+  const saveContentMode = useSaveContentMode(projectId);
   const archiveM = useBrandKitArchive();
   const linkCounts = useBrandKitLinkCounts(kitId);
   const [dialogOpen, setDialogOpen] = useState(false);
