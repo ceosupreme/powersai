@@ -45,12 +45,16 @@ export interface BrandProject {
   id: string; name: string; project_type: string | null;
   focus_status: string | null; ownership: string | null;
   content_mode: ContentMode;
+  content_pillars: string[];
+  mix_targets: Record<string, number> | null;
 }
 
 export interface BoardItem {
   id: string; project_id: string; title: string; format: string | null;
   stage: string; family_id: string | null; purpose: string | null;
   founder_minutes: number | null; due_date: string | null;
+  idea_score: number | null; quality_score: number | null; quality_fails: string[] | null;
+  purpose_type: string | null; approved_at: string | null; created_at: string;
   family: ContentFamily | null;
   placements: ContentPlacement[];
 }
@@ -71,15 +75,18 @@ export function useBrandProjects() {
       );
       if (rows.length === 0) return [];
       const { data: kits, error: kitErr } = await T("brand_kits")
-        .select("project_id,content_mode")
+        .select("project_id,content_mode,content_pillars,mix_targets")
         .in("project_id", rows.map((r: any) => r.id));
       if (kitErr) throw kitErr;
       const modeBy = new Map<string, ContentMode>();
-      (kits ?? []).forEach((k: any) => modeBy.set(k.project_id, (k.content_mode ?? "baseline") as ContentMode));
+      const kitBy = new Map<string, any>();
+      (kits ?? []).forEach((k: any) => { modeBy.set(k.project_id, (k.content_mode ?? "baseline") as ContentMode); kitBy.set(k.project_id, k); });
       return rows.map((v: any) => ({
         id: v.id, name: v.name, project_type: v.project_type,
         focus_status: v.focus_status, ownership: v.ownership,
         content_mode: modeBy.get(v.id) ?? "baseline",
+        content_pillars: kitBy.get(v.id)?.content_pillars ?? [],
+        mix_targets: kitBy.get(v.id)?.mix_targets ?? null,
       }));
     },
   });
@@ -93,7 +100,7 @@ export function useProductionBoardItems(projectIds: string[]) {
     enabled: projectIds.length > 0,
     queryFn: async (): Promise<BoardItem[]> => {
       const { data: items, error } = await T("content_items")
-        .select("id,project_id,title,format,stage,family_id,purpose,founder_minutes,due_date")
+        .select("id,project_id,title,format,stage,family_id,purpose,founder_minutes,due_date,idea_score,quality_score,quality_fails,purpose_type,approved_at,created_at")
         .in("project_id", projectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -181,5 +188,25 @@ export function useContentSourceTrace(sourceId: string | null) {
         entity_status: string | null; parent_id: string | null;
       }[];
     },
+  });
+}
+
+export const PURPOSE_TYPES = ["teach", "entertain", "story", "community", "proof", "offer"] as const;
+
+export function canApprove(it: { quality_score: number | null; quality_fails: string[] | null }) {
+  return (it.quality_score ?? 0) >= 80 && (it.quality_fails ?? []).length === 0;
+}
+
+export function useApproveItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data: u } = await supabase.auth.getUser();
+      const { error } = await T("content_items")
+        .update({ approved_at: new Date().toISOString(), approved_by: u.user?.id ?? null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["production-board-items"] }),
   });
 }
