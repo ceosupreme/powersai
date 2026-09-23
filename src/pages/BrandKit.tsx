@@ -17,6 +17,10 @@ import { AssetUploader } from '@/components/brand-kit/AssetUploader';
 import { ArchiveOrDeleteDialog, type LinkedLine } from '@/components/shared/ArchiveOrDeleteDialog';
 import { HelpTip } from '@/components/help/HelpTip';
 import { HELP_KEYS } from '@/config/helpKeys';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  useSaveContentMode, CONTENT_MODES, CONTENT_MODE_LABELS, type ContentMode,
+} from '@/hooks/useContentProduction';
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(text).then(() => toast.success('Copied'));
@@ -29,6 +33,7 @@ export default function BrandKit() {
   const { kitQuery, kitId, ensureKit, colors, taglines, hashtags, links, assets } =
     useBrandKitData(projectId, { includeArchived: showArchived });
   const saveKit = useSaveKit(projectId);
+  const saveContentMode = useSaveContentMode(projectId);
   const archiveM = useBrandKitArchive();
   const linkCounts = useBrandKitLinkCounts(kitId);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -118,6 +123,31 @@ export default function BrandKit() {
           }}
         />
       )}
+
+      {/* Content mode */}
+      <Card className="bg-card text-card-foreground border-border">
+        <CardHeader><CardTitle>Content mode</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          <Select
+            value={(kitQuery.data as any)?.content_mode ?? 'baseline'}
+            onValueChange={(v) => saveContentMode.mutate(v as ContentMode)}
+            disabled={!projectId || saveContentMode.isPending}
+          >
+            <SelectTrigger className="w-full sm:w-[220px]" aria-label="Content mode">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CONTENT_MODES.map((m) => (
+                <SelectItem key={m} value={m}>{CONTENT_MODE_LABELS[m]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground">
+            Growth gets full weekly production. Baseline runs evergreen work on the clock. Parked
+            gets none.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Voice & bios */}
       <Card>

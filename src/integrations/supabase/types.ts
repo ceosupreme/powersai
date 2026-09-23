@@ -932,42 +932,93 @@ export type Database = {
       brand_kit_assets: {
         Row: {
           asset_type: string | null
+          content_hash: string | null
           created_at: string
+          description: string | null
+          duration_seconds: number | null
           file_name: string
           file_size: number | null
+          focal_region: Json | null
+          generation_details: Json | null
           id: string
+          is_clean_master: boolean
           kit_id: string
           mime_type: string | null
+          original_height: number | null
+          original_width: number | null
+          permitted_project_ids: string[] | null
+          permitted_uses: string[] | null
+          provenance: string | null
+          search_tsv: unknown
+          source_id: string | null
           storage_path: string
+          tags: string[] | null
+          transcript: string | null
           updated_at: string
           uploaded_at: string
           uploaded_by: string | null
+          usage_log: Json | null
+          variants: Json | null
         }
         Insert: {
           asset_type?: string | null
+          content_hash?: string | null
           created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
           file_name: string
           file_size?: number | null
+          focal_region?: Json | null
+          generation_details?: Json | null
           id?: string
+          is_clean_master?: boolean
           kit_id: string
           mime_type?: string | null
+          original_height?: number | null
+          original_width?: number | null
+          permitted_project_ids?: string[] | null
+          permitted_uses?: string[] | null
+          provenance?: string | null
+          search_tsv?: unknown
+          source_id?: string | null
           storage_path: string
+          tags?: string[] | null
+          transcript?: string | null
           updated_at?: string
           uploaded_at?: string
           uploaded_by?: string | null
+          usage_log?: Json | null
+          variants?: Json | null
         }
         Update: {
           asset_type?: string | null
+          content_hash?: string | null
           created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
           file_name?: string
           file_size?: number | null
+          focal_region?: Json | null
+          generation_details?: Json | null
           id?: string
+          is_clean_master?: boolean
           kit_id?: string
           mime_type?: string | null
+          original_height?: number | null
+          original_width?: number | null
+          permitted_project_ids?: string[] | null
+          permitted_uses?: string[] | null
+          provenance?: string | null
+          search_tsv?: unknown
+          source_id?: string | null
           storage_path?: string
+          tags?: string[] | null
+          transcript?: string | null
           updated_at?: string
           uploaded_at?: string
           uploaded_by?: string | null
+          usage_log?: Json | null
+          variants?: Json | null
         }
         Relationships: [
           {
@@ -975,6 +1026,13 @@ export type Database = {
             columns: ["kit_id"]
             isOneToOne: false
             referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_kit_assets_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -1145,6 +1203,7 @@ export type Database = {
           bio_long: string | null
           bio_short: string | null
           brand_voice: string | null
+          content_mode: string
           created_at: string
           created_by: string | null
           do_notes: string | null
@@ -1162,6 +1221,7 @@ export type Database = {
           bio_long?: string | null
           bio_short?: string | null
           brand_voice?: string | null
+          content_mode?: string
           created_at?: string
           created_by?: string | null
           do_notes?: string | null
@@ -1179,6 +1239,7 @@ export type Database = {
           bio_long?: string | null
           bio_short?: string | null
           brand_voice?: string | null
+          content_mode?: string
           created_at?: string
           created_by?: string | null
           do_notes?: string | null
@@ -1592,15 +1653,66 @@ export type Database = {
           },
         ]
       }
+      content_families: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          purpose: string | null
+          source_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          purpose?: string | null
+          source_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          purpose?: string | null
+          source_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_families_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_families_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_items: {
         Row: {
           affiliate_link: string | null
+          approved_version: number | null
           automation_fired_at: string | null
           created_at: string
           created_by: string | null
           cta: string | null
           due_date: string | null
+          family_id: string | null
           format: string | null
+          founder_minutes: number | null
           hook: string | null
           id: string
           is_monetized: boolean
@@ -1610,6 +1722,8 @@ export type Database = {
           product_id: string | null
           project_id: string
           published_at: string | null
+          purpose: string | null
+          recipe_version: string | null
           scheduled_at: string | null
           stage: string
           title: string
@@ -1617,12 +1731,15 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          approved_version?: number | null
           automation_fired_at?: string | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
           due_date?: string | null
+          family_id?: string | null
           format?: string | null
+          founder_minutes?: number | null
           hook?: string | null
           id?: string
           is_monetized?: boolean
@@ -1632,6 +1749,8 @@ export type Database = {
           product_id?: string | null
           project_id: string
           published_at?: string | null
+          purpose?: string | null
+          recipe_version?: string | null
           scheduled_at?: string | null
           stage?: string
           title: string
@@ -1639,12 +1758,15 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          approved_version?: number | null
           automation_fired_at?: string | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
           due_date?: string | null
+          family_id?: string | null
           format?: string | null
+          founder_minutes?: number | null
           hook?: string | null
           id?: string
           is_monetized?: boolean
@@ -1654,12 +1776,21 @@ export type Database = {
           product_id?: string | null
           project_id?: string
           published_at?: string | null
+          purpose?: string | null
+          recipe_version?: string | null
           scheduled_at?: string | null
           stage?: string
           title?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "content_items_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "content_families"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "content_items_product_id_fkey"
             columns: ["product_id"]
@@ -1669,6 +1800,132 @@ export type Database = {
           },
           {
             foreignKeyName: "content_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_placements: {
+        Row: {
+          account_label: string | null
+          channel: string
+          content_item_id: string
+          created_at: string
+          failure_reason: string | null
+          id: string
+          idempotency_key: string | null
+          live_url: string | null
+          platform_post_id: string | null
+          project_id: string
+          receipt: Json | null
+          scheduled_for: string | null
+          status: string
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          account_label?: string | null
+          channel?: string
+          content_item_id: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          idempotency_key?: string | null
+          live_url?: string | null
+          platform_post_id?: string | null
+          project_id: string
+          receipt?: Json | null
+          scheduled_for?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          account_label?: string | null
+          channel?: string
+          content_item_id?: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          idempotency_key?: string | null
+          live_url?: string | null
+          platform_post_id?: string | null
+          project_id?: string
+          receipt?: Json | null
+          scheduled_for?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_placements_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_placements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_sources: {
+        Row: {
+          created_at: string
+          id: string
+          parent_source_id: string | null
+          project_id: string
+          source_type: string
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          url: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parent_source_id?: string | null
+          project_id: string
+          source_type?: string
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parent_source_id?: string | null
+          project_id?: string
+          source_type?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_sources_parent_source_id_fkey"
+            columns: ["parent_source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_sources_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "venues"
@@ -10564,6 +10821,7 @@ export type Database = {
           niche: string | null
           north_star: string | null
           owner_name: string | null
+          ownership: string
           project_type: string
           seven_shifts_location_id: string | null
           sevenshifts_api_enabled: boolean
@@ -10616,6 +10874,7 @@ export type Database = {
           niche?: string | null
           north_star?: string | null
           owner_name?: string | null
+          ownership?: string
           project_type?: string
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
@@ -10668,6 +10927,7 @@ export type Database = {
           niche?: string | null
           north_star?: string | null
           owner_name?: string | null
+          ownership?: string
           project_type?: string
           seven_shifts_location_id?: string | null
           sevenshifts_api_enabled?: boolean
@@ -12171,6 +12431,16 @@ export type Database = {
       toast_submit_lock: {
         Args: { p_key: number; p_spacing_ms: number }
         Returns: undefined
+      }
+      trace_content_source: {
+        Args: { _source_id: string }
+        Returns: {
+          entity_id: string
+          entity_kind: string
+          entity_label: string
+          entity_status: string
+          parent_id: string
+        }[]
       }
       user_can_access_kit: { Args: { _kit_id: string }; Returns: boolean }
       user_can_access_page: {

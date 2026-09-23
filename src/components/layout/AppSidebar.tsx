@@ -121,6 +121,7 @@ const navGroups: NavGroup[] = [
       { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
+      { path: '/production-board', label: 'Production Board', icon: Film, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
     ],
   },
