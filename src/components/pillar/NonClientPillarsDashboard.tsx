@@ -93,7 +93,7 @@ export const NonClientPillarsDashboard = ({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl p-5 bg-[#1e293b] border border-[#334155]">
+      <div className="rounded-xl p-5 bg-card border border-border text-card-foreground">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
