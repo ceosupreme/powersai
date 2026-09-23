@@ -41,6 +41,7 @@ interface ProjectMeta {
   north_star: string | null;
   monetization_model: string | null;
   focus_status: string | null;
+  ownership: string | null;
 }
 
 const QUICK_LINKS = [
@@ -70,7 +71,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug,north_star,monetization_model,focus_status')
+      .select('id,name,project_type,bar_code,slug,north_star,monetization_model,focus_status,ownership')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -116,6 +117,20 @@ export default function ProjectHome() {
     }
     setMeta((m) => (m ? { ...m, focus_status: next } : m));
     toast.success(next === 'active' ? 'Marked active' : 'Parked for now');
+  };
+
+  const setOwnership = async (next: string) => {
+    if (!venueId) return;
+    const { error } = await supabase
+      .from('venues')
+      .update({ ownership: next } as any)
+      .eq('id', venueId);
+    if (error) {
+      toast.error(error.message ?? 'Could not change who owns this');
+      return;
+    }
+    setMeta((m) => (m ? { ...m, ownership: next } : m));
+    toast.success('Saved');
   };
 
   const saveGoal = async () => {
@@ -268,6 +283,23 @@ export default function ProjectHome() {
                 <ToggleGroupItem value="active" className="h-7 px-2 text-xs">Active</ToggleGroupItem>
                 <ToggleGroupItem value="parked" className="h-7 px-2 text-xs">Parked</ToggleGroupItem>
               </ToggleGroup>
+            )}
+            {isNonClient && isAdmin && (
+              <Select
+                value={meta.ownership ?? 'owned'}
+                onValueChange={(v) => setOwnership(v)}
+              >
+                <SelectTrigger className="h-7 w-[120px] text-xs" aria-label="Ownership">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OWNERSHIP_OPTIONS.map((o) => (
+                    <SelectItem key={o} value={o} className="text-xs">
+                      {OWNERSHIP_LABELS[o]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
             {isNonClient && !isAdmin && meta.focus_status === 'parked' && (
               <Badge variant="outline" className="text-[10px] uppercase tracking-wide">Parked</Badge>
