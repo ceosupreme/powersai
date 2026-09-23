@@ -50,6 +50,7 @@ import RolePreview from "./pages/RolePreview";
 import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
 import ContentPipeline from "./pages/ContentPipeline";
+import ProductionBoard from "./pages/ProductionBoard";
 import ChannelRevenue from "./pages/ChannelRevenue";
 import AffiliatePrograms from "./pages/AffiliatePrograms";
 import Products from "./pages/Products";
@@ -244,6 +245,11 @@ const App = () => {
                 <Route path="/content" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ContentPipeline /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/production-board" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><ProductionBoard /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/revenue" element={
