@@ -297,19 +297,39 @@ export default function ProductionBoard() {
                                 </TooltipProvider>
                               );
                             })()}
-                            {next !== it.stage && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full justify-between"
-                                onClick={() => move(it)}
-                              >
-                                <span className="text-xs">
-                                  Move to next step — {STAGE_LABELS[next]}
-                                </span>
-                                <ArrowRight className="h-3 w-3" />
-                              </Button>
-                            )}
+                            {next !== it.stage && (() => {
+                              const locked =
+                                !it.approved_at && (next === "scheduled" || next === "published");
+                              const btn = (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full justify-between"
+                                  disabled={locked}
+                                  onClick={() => move(it)}
+                                >
+                                  <span className="text-xs">
+                                    {locked
+                                      ? "Approve first to schedule"
+                                      : `Move to next step — ${STAGE_LABELS[next]}`}
+                                  </span>
+                                  <ArrowRight className="h-3 w-3" />
+                                </Button>
+                              );
+                              return locked ? (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span tabIndex={0} className="block">{btn}</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Not approved yet — an item must be approved before it can move
+                                      into Scheduled or Published.
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ) : btn;
+                            })()}
                           </CardContent>
                         </Card>
                       );
