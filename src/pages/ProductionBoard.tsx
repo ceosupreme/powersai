@@ -322,7 +322,7 @@ export default function ProductionBoard() {
                                     <TooltipTrigger asChild>
                                       <span tabIndex={0} className="block">{btn}</span>
                                     </TooltipTrigger>
-                                    <TooltipContent>
+                                    <TooltipContent className="max-w-[86vw] text-xs">
                                       Not approved yet — an item must be approved before it can move
                                       into Scheduled or Published.
                                     </TooltipContent>
