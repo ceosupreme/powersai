@@ -622,6 +622,80 @@ export type Database = {
           },
         ]
       }
+      audience_pains: {
+        Row: {
+          answered_by: string[]
+          created_at: string
+          first_seen: string | null
+          gap: number | null
+          id: string
+          intensity: number | null
+          intensity_reasons: string[]
+          last_seen: string | null
+          notes: string | null
+          pain_score: number | null
+          pain_text: string
+          pillar: string | null
+          product_flag: boolean
+          project_id: string
+          search_presence: number | null
+          source_count: number
+          source_links: string[]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answered_by?: string[]
+          created_at?: string
+          first_seen?: string | null
+          gap?: number | null
+          id?: string
+          intensity?: number | null
+          intensity_reasons?: string[]
+          last_seen?: string | null
+          notes?: string | null
+          pain_score?: number | null
+          pain_text: string
+          pillar?: string | null
+          product_flag?: boolean
+          project_id: string
+          search_presence?: number | null
+          source_count?: number
+          source_links?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answered_by?: string[]
+          created_at?: string
+          first_seen?: string | null
+          gap?: number | null
+          id?: string
+          intensity?: number | null
+          intensity_reasons?: string[]
+          last_seen?: string | null
+          notes?: string | null
+          pain_score?: number | null
+          pain_text?: string
+          pillar?: string | null
+          product_flag?: boolean
+          project_id?: string
+          search_presence?: number | null
+          source_count?: number
+          source_links?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_pains_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auto_approve_log: {
         Row: {
           action_item_id: string
@@ -1204,11 +1278,13 @@ export type Database = {
           bio_short: string | null
           brand_voice: string | null
           content_mode: string
+          content_pillars: string[]
           created_at: string
           created_by: string | null
           do_notes: string | null
           dont_notes: string | null
           id: string
+          mix_targets: Json | null
           primary_font: string | null
           project_id: string
           secondary_font: string | null
@@ -1222,11 +1298,13 @@ export type Database = {
           bio_short?: string | null
           brand_voice?: string | null
           content_mode?: string
+          content_pillars?: string[]
           created_at?: string
           created_by?: string | null
           do_notes?: string | null
           dont_notes?: string | null
           id?: string
+          mix_targets?: Json | null
           primary_font?: string | null
           project_id: string
           secondary_font?: string | null
@@ -1240,11 +1318,13 @@ export type Database = {
           bio_short?: string | null
           brand_voice?: string | null
           content_mode?: string
+          content_pillars?: string[]
           created_at?: string
           created_by?: string | null
           do_notes?: string | null
           dont_notes?: string | null
           id?: string
+          mix_targets?: Json | null
           primary_font?: string | null
           project_id?: string
           secondary_font?: string | null
@@ -1704,8 +1784,11 @@ export type Database = {
       content_items: {
         Row: {
           affiliate_link: string | null
+          approved_at: string | null
+          approved_by: string | null
           approved_version: number | null
           automation_fired_at: string | null
+          brief: Json | null
           created_at: string
           created_by: string | null
           cta: string | null
@@ -1715,6 +1798,8 @@ export type Database = {
           founder_minutes: number | null
           hook: string | null
           id: string
+          idea_evidence: Json | null
+          idea_score: number | null
           is_monetized: boolean
           is_repurposed: boolean
           performance: Json | null
@@ -1723,6 +1808,10 @@ export type Database = {
           project_id: string
           published_at: string | null
           purpose: string | null
+          purpose_type: string | null
+          quality_fails: string[]
+          quality_notes: string | null
+          quality_score: number | null
           recipe_version: string | null
           scheduled_at: string | null
           stage: string
@@ -1731,8 +1820,11 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           approved_version?: number | null
           automation_fired_at?: string | null
+          brief?: Json | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
@@ -1742,6 +1834,8 @@ export type Database = {
           founder_minutes?: number | null
           hook?: string | null
           id?: string
+          idea_evidence?: Json | null
+          idea_score?: number | null
           is_monetized?: boolean
           is_repurposed?: boolean
           performance?: Json | null
@@ -1750,6 +1844,10 @@ export type Database = {
           project_id: string
           published_at?: string | null
           purpose?: string | null
+          purpose_type?: string | null
+          quality_fails?: string[]
+          quality_notes?: string | null
+          quality_score?: number | null
           recipe_version?: string | null
           scheduled_at?: string | null
           stage?: string
@@ -1758,8 +1856,11 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           approved_version?: number | null
           automation_fired_at?: string | null
+          brief?: Json | null
           created_at?: string
           created_by?: string | null
           cta?: string | null
@@ -1769,6 +1870,8 @@ export type Database = {
           founder_minutes?: number | null
           hook?: string | null
           id?: string
+          idea_evidence?: Json | null
+          idea_score?: number | null
           is_monetized?: boolean
           is_repurposed?: boolean
           performance?: Json | null
@@ -1777,6 +1880,10 @@ export type Database = {
           project_id?: string
           published_at?: string | null
           purpose?: string | null
+          purpose_type?: string | null
+          quality_fails?: string[]
+          quality_notes?: string | null
+          quality_score?: number | null
           recipe_version?: string | null
           scheduled_at?: string | null
           stage?: string

@@ -51,6 +51,7 @@ import Workspace from "./pages/Workspace";
 import BrandKit from "./pages/BrandKit";
 import ContentPipeline from "./pages/ContentPipeline";
 import ProductionBoard from "./pages/ProductionBoard";
+import AnswerBank from "./pages/AnswerBank";
 import ChannelRevenue from "./pages/ChannelRevenue";
 import AffiliatePrograms from "./pages/AffiliatePrograms";
 import Products from "./pages/Products";
@@ -250,6 +251,11 @@ const App = () => {
                 <Route path="/production-board" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ProductionBoard /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/answer-bank" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><AnswerBank /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/revenue" element={
