@@ -12420,6 +12420,8 @@ export type Database = {
         | "yelp"
         | "x"
         | "other"
+        | "youtube"
+        | "pinterest"
       staff_context: "foh" | "boh"
       staffing_level: "overstaffed" | "adequate" | "understaffed" | "critical"
       task_priority: "Critical" | "High" | "Medium" | "Low"
@@ -12802,6 +12804,8 @@ export const Constants = {
         "yelp",
         "x",
         "other",
+        "youtube",
+        "pinterest",
       ],
       staff_context: ["foh", "boh"],
       staffing_level: ["overstaffed", "adequate", "understaffed", "critical"],
