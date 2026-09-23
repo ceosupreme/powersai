@@ -88,7 +88,7 @@ export const ManualPillarCard = ({
   return (
     <div
       className={cn(
-        'block rounded-xl p-5 bg-[#1e293b] border border-[#334155]',
+        'block rounded-xl p-5 bg-card border border-border text-card-foreground',
       )}
     >
       <div className="flex items-center justify-between mb-3">
@@ -243,7 +243,7 @@ const KpiRow = ({
   const unit = kpi.unit ? ` ${kpi.unit}` : '';
 
   return (
-    <div className="flex items-center gap-2 text-xs border-t border-[#334155] pt-2">
+    <div className="flex items-center gap-2 text-xs border-t border-border pt-2">
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate">{kpi.kpi_label}</p>
         <p className="text-muted-foreground">
