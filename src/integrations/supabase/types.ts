@@ -9153,6 +9153,60 @@ export type Database = {
           },
         ]
       }
+      site_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          label: string | null
+          path: string
+          referrer: string | null
+          session_id: string | null
+          src: string | null
+          vertical: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          label?: string | null
+          path: string
+          referrer?: string | null
+          session_id?: string | null
+          src?: string | null
+          vertical?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          label?: string | null
+          path?: string
+          referrer?: string | null
+          session_id?: string | null
+          src?: string | null
+          vertical?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       social_media_posts: {
         Row: {
           boost_spend: number | null
