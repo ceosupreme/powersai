@@ -46,6 +46,16 @@ interface ProjectMeta {
   ownership: string | null;
 }
 
+const STM_PROJECT_ID = '34cb1836-6ead-4478-915c-0a9dc552a554';
+
+type WebsiteStats = {
+  pageViews: number;
+  ctaClicks: number;
+  callRequests: number;
+  inquiries: Record<string, number>;
+  firstResponseRate: number | null;
+};
+
 const QUICK_LINKS = [
   { to: '/weekly-review',              label: 'Weekly Review',      icon: ClipboardCheck, desc: 'Grade this week across pillars.' },
   { to: '/growth-audit',               label: 'Growth Audit',       icon: TrendingUp,     desc: 'Where can this project grow.' },
@@ -63,6 +73,7 @@ export default function ProjectHome() {
   const [meta, setMeta] = useState<ProjectMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [websiteStats, setWebsiteStats] = useState<WebsiteStats | null>(null);
 
   // Only admins and owners can operate the setup wizard.
   const canRunWizard = isAdmin || currentRole === 'owner';
@@ -81,6 +92,46 @@ export default function ProjectHome() {
         setMeta((data as ProjectMeta) ?? null);
         setLoading(false);
       });
+    return () => { cancelled = true; };
+  }, [venueId]);
+
+  useEffect(() => {
+    if (venueId !== STM_PROJECT_ID) {
+      setWebsiteStats(null);
+      return;
+    }
+    let cancelled = false;
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    Promise.all([
+      supabase.from('site_events').select('event_type').gte('created_at', since),
+      supabase.from('inbound_leads').select('email,first_response_at,qualifier_data').is('captured_for_project_id', null).gte('created_at', since),
+    ]).then(([eventsResult, leadsResult]) => {
+      if (cancelled) return;
+      if (eventsResult.error || leadsResult.error) {
+        console.error('[project-home] website stats failed', eventsResult.error ?? leadsResult.error);
+        return;
+      }
+      const events = eventsResult.data ?? [];
+      const inquiries: Record<string, number> = {};
+      let emailLeads = 0;
+      let responded = 0;
+      for (const lead of leadsResult.data ?? []) {
+        const qualifier = (lead.qualifier_data ?? {}) as Record<string, unknown>;
+        const vertical = typeof qualifier.source_vertical === 'string' && qualifier.source_vertical ? qualifier.source_vertical : 'other';
+        inquiries[vertical] = (inquiries[vertical] ?? 0) + 1;
+        if (lead.email) {
+          emailLeads += 1;
+          if (lead.first_response_at) responded += 1;
+        }
+      }
+      setWebsiteStats({
+        pageViews: events.filter((event) => event.event_type === 'page_view').length,
+        ctaClicks: events.filter((event) => event.event_type === 'cta_click').length,
+        callRequests: events.filter((event) => event.event_type === 'call_request').length,
+        inquiries,
+        firstResponseRate: emailLeads ? Math.round((responded / emailLeads) * 100) : null,
+      });
+    });
     return () => { cancelled = true; };
   }, [venueId]);
 
@@ -365,6 +416,35 @@ export default function ProjectHome() {
       </div>
 
       {/* Next 10 — ranked, directly under the header (non-client projects only) */}
+      {venueId === STM_PROJECT_ID && websiteStats && (
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-base">Website, last 7 days</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                ['Page views', websiteStats.pageViews],
+                ['CTA clicks', websiteStats.ctaClicks],
+                ['Call requests', websiteStats.callRequests],
+                ['First-response rate', websiteStats.firstResponseRate == null ? '—' : `${websiteStats.firstResponseRate}%`],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-md border border-border p-3">
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-xl font-semibold text-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Inquiries by industry</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {Object.keys(websiteStats.inquiries).length ? Object.entries(websiteStats.inquiries).sort(([a], [b]) => a.localeCompare(b)).map(([vertical, count]) => (
+                  <Badge key={vertical} variant="secondary">{vertical.replace(/-/g, ' ')}: {count}</Badge>
+                )) : <span className="text-sm text-muted-foreground">—</span>}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {isNonClient && venueId && (
         <NextTenSection projectId={venueId} projectName={meta.name} />
       )}
