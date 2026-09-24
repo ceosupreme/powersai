@@ -4925,6 +4925,71 @@ export type Database = {
           },
         ]
       }
+      inbound_emails: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          forwarded_at: string | null
+          forwarded_error: string | null
+          from_email: string | null
+          from_name: string | null
+          html_body: string | null
+          id: string
+          lead_id: string | null
+          raw: Json | null
+          read_at: string | null
+          received_at: string | null
+          resend_email_id: string | null
+          subject: string | null
+          text_body: string | null
+          to_email: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          forwarded_at?: string | null
+          forwarded_error?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          html_body?: string | null
+          id?: string
+          lead_id?: string | null
+          raw?: Json | null
+          read_at?: string | null
+          received_at?: string | null
+          resend_email_id?: string | null
+          subject?: string | null
+          text_body?: string | null
+          to_email?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          forwarded_at?: string | null
+          forwarded_error?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          html_body?: string | null
+          id?: string
+          lead_id?: string | null
+          raw?: Json | null
+          read_at?: string | null
+          received_at?: string | null
+          resend_email_id?: string | null
+          subject?: string | null
+          text_body?: string | null
+          to_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_emails_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inbound_leads: {
         Row: {
           automation_status: string | null

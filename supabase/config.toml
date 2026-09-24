@@ -14,3 +14,5 @@ verify_jwt = false
 
 [functions.prospect-first-touch]
 verify_jwt = false
+[functions.resend-inbound-webhook]
+verify_jwt = false

@@ -14,6 +14,7 @@ import {
 import { useIntegrationDisabled } from "@/hooks/useIntegrationDisabled";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
+import { InboundEmailList } from "@/components/inbox/InboundEmailList";
 
 const TYPES: CaptureType[] = ["task","idea","note","brand_asset","crm_lead","content_idea"];
 
@@ -114,8 +115,8 @@ function ItemRow({ item }: { item: CaptureItem }) {
 }
 
 export default function Inbox() {
-  const [status, setStatus] = useState<CaptureStatus>("inbox");
-  const items = useCaptureItems(status);
+  const [status, setStatus] = useState<CaptureStatus | "email">("inbox");
+  const items = useCaptureItems(status === "email" ? "inbox" : status);
 
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto pb-24 space-y-4">
@@ -129,21 +130,28 @@ export default function Inbox() {
         </div>
       </header>
 
-      <Tabs value={status} onValueChange={(v) => setStatus(v as CaptureStatus)}>
+      <Tabs value={status} onValueChange={(v) => setStatus(v as CaptureStatus | "email")}>
         <TabsList>
           <TabsTrigger value="inbox">Inbox</TabsTrigger>
           <TabsTrigger value="routed">Routed</TabsTrigger>
           <TabsTrigger value="archived">Archived</TabsTrigger>
+          <TabsTrigger value="email">Email</TabsTrigger>
         </TabsList>
-        <HelpTip helpKey={HELP_KEYS.captureSuggest} title="AI suggests, you accept" className="mt-3">
-          When an item lands here, the AI proposes a type and project — exactly once per item. Nothing files automatically. Click Accept to take the suggestion, or pick your own type + project and click Route.
-        </HelpTip>
-        <TabsContent value={status} className="mt-3 space-y-2">
-          {(items.data ?? []).length === 0 && (
-            <div className="text-sm text-muted-foreground">Nothing here.</div>
-          )}
-          {(items.data ?? []).map((it) => <ItemRow key={it.id} item={it} />)}
-        </TabsContent>
+        {status === "email" ? (
+          <TabsContent value="email" className="mt-3"><InboundEmailList /></TabsContent>
+        ) : (
+          <>
+            <HelpTip helpKey={HELP_KEYS.captureSuggest} title="AI suggests, you accept" className="mt-3">
+              When an item lands here, the AI proposes a type and project — exactly once per item. Nothing files automatically. Click Accept to take the suggestion, or pick your own type + project and click Route.
+            </HelpTip>
+            <TabsContent value={status} className="mt-3 space-y-2">
+              {(items.data ?? []).length === 0 && (
+                <div className="text-sm text-muted-foreground">Nothing here.</div>
+              )}
+              {(items.data ?? []).map((it) => <ItemRow key={it.id} item={it} />)}
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );

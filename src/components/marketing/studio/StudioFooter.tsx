@@ -36,7 +36,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/hire" className="inline-flex min-h-11 items-center hover:underline">{es ? "¿Quieres contratar a Sean?" : "Hiring Sean?"}</Link>
             <Link to="/login" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acceso para clientes" : "Client login"}</Link>
             <a
-              href="https://www.linkedin.com/in/sean-mayo-3055aa287/"
+              href="https://www.linkedin.com/in/supremepowers"
               target="_blank"
               rel="noreferrer"
               className="inline-flex min-h-11 items-center hover:underline"

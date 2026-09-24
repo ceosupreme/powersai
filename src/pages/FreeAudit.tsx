@@ -281,7 +281,7 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.redacted.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">per month you're likely missing</span>
                     </p>
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
@@ -386,11 +386,11 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.full.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/ month</span>
                     </p>
                     {audit.full.total_risk_exposure_dollars > 0 && (
                       <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)} in estimated exposure worth defending.
+                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)} per month in estimated exposure worth defending.
                       </p>
                     )}
                   </>
@@ -426,7 +426,7 @@ export default function FreeAudit() {
                           </p>
                         ) : (
                           <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> estimated impact</span>
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> per month, estimated</span>
                           </p>
                         )}
                       </div>
@@ -459,7 +459,7 @@ export default function FreeAudit() {
               )}
 
               <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">
-                <p className="font-display text-2xl md:text-3xl leading-snug">Get a scoped recommendation</p>
+                <p className="font-display text-2xl md:text-3xl leading-snug">Want this fixed?</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
                   <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get a scoped recommendation</Link>
                   <BookingCta src={src} biz={businessName} className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />

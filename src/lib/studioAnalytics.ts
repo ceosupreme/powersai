@@ -37,7 +37,8 @@ export function trackSiteEvent(event: SiteEvent): void {
     if (event.src && !SAFE.test(event.src)) return;
     const params = new URLSearchParams(window.location.search);
     const src = event.src ?? params.get("src");
-    const derivedVertical = src?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
+    const pathVertical = window.location.pathname.match(/^\/for\/([a-z0-9-]{2,40})\/?$/)?.[1] ?? null;
+    const derivedVertical = src ? (src.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null) : pathVertical;
     void supabase.from("site_events").insert({
       event_type: event.event_type,
       label: event.label ?? null,
