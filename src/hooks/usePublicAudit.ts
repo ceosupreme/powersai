@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { trackSiteEvent } from '@/lib/studioAnalytics';
 
 export type OperationFootprint =
   | 'solo_owner' | 'small_crew_2_5' | 'crew_6_plus' | 'multi_location';
@@ -52,6 +53,11 @@ export interface RunInput {
   company_website?: string; // honeypot
 }
 
+export interface AuditContext {
+  src?: string | null;
+  sourceVertical?: string | null;
+}
+
 export function usePublicAudit() {
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<AuditStatus | null>(null);
@@ -91,7 +97,7 @@ export function usePublicAudit() {
     }
   }
 
-  async function run(input: RunInput) {
+  async function run(input: RunInput, context: AuditContext = {}) {
     setSubmitting(true);
     setError(null);
     setToken(null); setStatus(null); setStatusDetail(null);
@@ -104,6 +110,7 @@ export function usePublicAudit() {
       }
       const { data, error: e } = await supabase.functions.invoke('run-public-audit', { body: normalized });
       if (e) throw new Error(e.message);
+      trackSiteEvent({ event_type: 'audit_start', label: 'free_audit', vertical: context.sourceVertical ?? undefined, src: context.src ?? undefined });
       const t = (data as { token: string }).token;
       setToken(t);
       setStatus('queued');
