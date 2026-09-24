@@ -11,7 +11,7 @@ import { getStudioMedia } from "@/config/studioMedia";
 import { BrowserFrame } from "@/components/marketing/studio/BrowserFrame";
 import { ProjectPlate } from "@/components/marketing/studio/ProjectPlate";
 
-const LINKEDIN = "https://www.linkedin.com/in/sean-mayo-3055aa287/";
+const LINKEDIN = "https://www.linkedin.com/in/supremepowers";
 
 /** Evidence order: creative, marketing and systems work — not an AI-only identity. */
 const EVIDENCE_SLUGS = ["kario-voss", "barpulse", "big-paws-club", "coastal-beauties"];
