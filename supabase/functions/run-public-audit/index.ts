@@ -331,14 +331,27 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     }
 
     // ── 2b. project_type resolution + shell UPDATE (before audits) ────────
-    const ptRes = resolveProjectType(gbpTypes, gbpPrimary);
+    // The visitor's page industry (source_vertical) wins over GBP guessing.
+    const VERTICAL_TYPE: Record<string, { key: string; label: string }> = {
+      hvac: { key: 'hvac', label: 'HVAC' },
+      plumbing: { key: 'plumbing', label: 'Plumber' },
+      'plumbing-hvac': { key: 'plumbing', label: 'Plumber' },
+      restaurants: { key: 'bars_restaurants', label: 'Restaurant' },
+      'bars-restaurants': { key: 'bars_restaurants', label: 'Restaurant' },
+      pizza: { key: 'bars_restaurants', label: 'Pizza' },
+      tacos: { key: 'bars_restaurants', label: 'Tacos' },
+      auto: { key: 'auto', label: 'Auto repair' },
+    };
+    const sv = (input.context?.source_vertical ?? '').toLowerCase().trim();
+    const vHit = sv ? VERTICAL_TYPE[sv] : undefined;
+    const ptRes: ProjectTypeResolution & { rule?: string; source_vertical?: string | null } = vHit
+      ? { gbp_category: gbpPrimary, matched_key: vHit.key, path: 'exact', rule: `source_vertical:${sv}`, source_vertical: sv }
+      : { ...resolveProjectType(gbpTypes, gbpPrimary), rule: 'gbp_category', source_vertical: sv || null };
     if (ptRes.matched_key !== 'home_services') {
-      // Only remap if we ever add more seeded verticals; guarded here for
-      // future-proofing. Currently always resolves to 'home_services'.
       await admin.from('venues').update({ project_type: ptRes.matched_key as any }).eq('id', shellVenueId);
     }
 
-    const mapKeyword = ((gbpPrimary || 'home services') + ' ' + input.city).trim();
+    const mapKeyword = ((vHit?.label || gbpPrimary || 'home services') + ' ' + input.city).trim();
 
     // Review-sample honesty: public Place Details returns at most a handful
     // of reviews. Skip theme extraction on cold runs — never present a
