@@ -84,6 +84,7 @@ import ProjectHome from "./pages/ProjectHome";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
 import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics";
+import ThankYou from "./pages/ThankYou";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -112,6 +113,7 @@ const App = () => {
                     signed-in users get redirected into the app (handled inside Marketing). */}
                 <Route path="/" element={<MarketingSite />} />
                 <Route path="/free-audit" element={<FreeAudit />} />
+                <Route path="/thank-you" element={<ThankYou />} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />

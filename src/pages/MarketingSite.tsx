@@ -14,6 +14,7 @@ import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
 import { StudioMediaReel } from "@/components/marketing/studio/sections/StudioMediaReel";
+import { OfferSection } from "@/components/marketing/offer/OfferSection";
 
 export default function MarketingSite() {
   const { user, isLoading } = useAuth();
@@ -46,6 +47,7 @@ export default function MarketingSite() {
         <ScopeStrip />
         <StudioReveal><BuyerChooser /></StudioReveal>
         <StudioReveal><Capabilities /></StudioReveal>
+        <StudioReveal><OfferSection source="home" /></StudioReveal>
         <StudioReveal><BarPulseFeature /></StudioReveal>
         <StudioReveal><WhySupremeTeam /></StudioReveal>
         <StudioReveal><Founder /></StudioReveal>
