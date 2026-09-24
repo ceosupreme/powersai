@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
+import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { Container, Eyebrow } from "../primitives";
-import { trackStudioEvent } from "@/lib/studioAnalytics";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { ProjectMontage } from "../ServiceVisuals";
 import {
   CONTEXT_OPTIONS,
@@ -59,12 +61,17 @@ export function Inquiry() {
   // Controlled fields so nothing is lost on an error re-render.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [businessName, setBusinessName] = useState("");
+  const params = new URLSearchParams(window.location.search);
+  const initialBiz = sanitizeBiz(params.get("biz")) ?? "";
+  const [businessName, setBusinessName] = useState(initialBiz);
   const [message, setMessage] = useState("");
   const [budget, setBudget] = useState("");
   const [timing, setTiming] = useState("");
-  const sourceParam = new URLSearchParams(window.location.search).get("src");
-  const sourceVertical = sourceParam?.match(/^for-(hvac|auto|real-estate|legal|medspa)$/)?.[1] ?? null;
+  const sourceParam = params.get("src");
+  const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
+  const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "publishing"]);
+  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : "studio_home_inquiry";
+  const callRequested = params.get("call_requested") === "1";
 
   const startedRef = useRef(false);
   const convertedRef = useRef(false);
@@ -73,7 +80,7 @@ export function Inquiry() {
   const noteStarted = () => {
     if (startedRef.current) return;
     startedRef.current = true;
-    trackStudioEvent("inquiry_started", { id: "studio_home_inquiry" });
+    // Intentionally not recorded: only conversion-safe site events are stored.
   };
 
   // Capability CTA → preselect a service only.
@@ -138,7 +145,6 @@ export function Inquiry() {
   const toggleService = (id: ServiceId) => {
     noteStarted();
     setServices((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
-    trackStudioEvent("service_selected", { category: id });
   };
 
   /** Readable context header for the existing inbox view. */
@@ -205,12 +211,15 @@ export function Inquiry() {
           conversation_channel: "form",
           route_to: "self",
           qualifier_data: {
-            site_section: "studio_home_inquiry",
+            site_section: siteSection,
             services,
             budget_range: budget || null,
             timing: timing || null,
             source_vertical: sourceVertical,
-            source_path: sourceVertical ? `/for/${sourceVertical}` : null,
+            source_path: window.location.pathname,
+            src: sourceParam,
+            biz: initialBiz || null,
+            call_requested: callRequested,
           },
           company_website: "",
         },
@@ -231,7 +240,7 @@ export function Inquiry() {
         setError("That's a few submissions in a row. Please wait a minute and send again.");
       } else {
         setError(
-          "Your note wasn't saved, so nothing has reached me yet. Please try again, or email hello@supremeteammedia.com.",
+          `Your note wasn't saved, so nothing has reached me yet. Please try again, or email ${CONTACT_EMAIL}.`,
         );
       }
       return;
@@ -239,7 +248,7 @@ export function Inquiry() {
 
     if (!convertedRef.current) {
       convertedRef.current = true;
-      trackStudioEvent("inquiry_submitted", { id: "studio_home_inquiry" });
+      trackSiteEvent({ event_type: "form_success", label: "main_inquiry", vertical: sourceVertical ?? undefined, src: sourceParam ?? undefined });
     }
     setStatus("success");
   };
@@ -262,8 +271,8 @@ export function Inquiry() {
                 <li key={step} className="flex gap-4 text-[1rem] leading-relaxed text-muted-foreground"><span className="studio-display text-[hsl(var(--band-text))]">0{index + 1}</span><span>{step}</span></li>
               ))}
             </ol>
-            <a href="mailto:hello@supremeteammedia.com" className="mt-8 inline-block text-[1rem] hover:underline">
-              hello@supremeteammedia.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-8 inline-block text-[1rem] hover:underline">
+              {CONTACT_EMAIL}
             </a>
             <ProjectMontage className="studio-contact-montage mt-10" />
           </div>
@@ -279,7 +288,7 @@ export function Inquiry() {
                     Thanks—your note is in. Sean will review it and reply by email.
                   </h3>
                   <p className="mt-3 text-[0.95rem] text-[hsl(var(--ink-muted))]">
-                    Your inquiry is saved. If you don&apos;t hear back, email hello@supremeteammedia.com directly.
+                    Your inquiry is saved. If you don&apos;t hear back, email {CONTACT_EMAIL} directly.
                   </p>
                 </div>
               ) : (

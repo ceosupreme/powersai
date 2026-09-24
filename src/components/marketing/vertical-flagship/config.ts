@@ -200,7 +200,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { title: "Get discovered", summary: "Show up when locals and visitors decide where to go.", items: ["Google Business Profile and local SEO", "SEO/AEO/GEO restaurant content", "Website and menu discoverability", "Paid search, social, and event promotion"] },
       { title: "Get chosen", summary: "Make the experience easy to understand and want.", items: ["Brand, identity, messaging, and copy", "Website and menu experience", "Creative, photography, and video direction", "Reviews, reservations, ordering, and events"] },
       { title: "Fill tables, orders, and events", summary: "Turn demand into a clear next step.", items: ["Reservation and direct-order conversion", "Private dining, events, and catering capture", "Slow-night and seasonal campaigns", "Remarketing and follow-up workflows"] },
-      { title: "Build regulars", summary: "Create more reasons for guests to return.", items: ["Guest CRM and first-party list growth", "Email, SMS, push, and loyalty strategy", "VIP, birthday, review, and referral programs", "Win-back and reactivation"] },
+      { title: "Build regulars", summary: "Create more reasons for guests to return.", items: ["Guest CRM and first-party list growth", "Email and loyalty strategy", "VIP, birthday, review, and referral programs", "Win-back and reactivation"] },
       { title: "Run smarter", summary: "Give managers and owners a clearer operating view.", items: ["Reporting and attribution", "POS, reservation, and guest-data connections", "Manager workflows and campaign calendars", "AI-assisted insights where useful"] },
     ],
     stagesBySegment: {
@@ -208,7 +208,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
         { title: "Own local nightlife discovery", summary: "Make recurring programming and the venue experience easy to find.", items: ["Nightlife search and local visibility", "Event and recurring-program promotion", "Paid social and campaign creative", "Content calendar and venue messaging"] },
         { title: "Turn interest into a plan", summary: "Make every night, table, and private event easier to choose.", items: ["Event-led website experience", "Guest list and table inquiry paths", "Cabana and private-event presentation", "Late-night inquiry handling where appropriate"] },
         { title: "Fill the room", summary: "Connect programming to measurable demand.", items: ["Repeat-event promotion", "Retargeting and seasonal campaigns", "Inquiry routing and follow-up", "Social creative and offer testing"] },
-        { title: "Build the guest list", summary: "Keep the relationship after the night ends.", items: ["Guest CRM and list growth", "VIP and loyalty strategy", "Email, SMS, and win-back", "Review and referral programs"] },
+        { title: "Build the guest list", summary: "Keep the relationship after the night ends.", items: ["Guest CRM and list growth", "VIP and loyalty strategy", "Email and win-back", "Review and referral programs"] },
         { title: "Run smarter", summary: "Coordinate marketing and operations around the calendar.", items: ["Event and campaign measurement", "Manager workflows", "Approved system connections", "Owner reporting"] },
       ],
       group: [
@@ -299,7 +299,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { title: "Own the local search", summary: "Win useful neighborhood discovery when taco intent is highest.", items: ["Google Business Profile and Maps", "Tacos-near-me and neighborhood search", "Search- and AI-readable menu/location pages", "Reviews, local paid search, social, and multi-location pages"] },
       { title: "Make it easy to order", summary: "Remove friction from craving to pickup, delivery, or a large order.", items: ["Mobile-first website and readable menu", "Direct online-order path where supported", "Click-to-call and phone-order path", "Pickup, delivery, hours, location, catering, combos, and specials"] },
       { title: "Look as good online as the food", summary: "Make the digital presence carry the shop’s real character.", items: ["Brand identity and menu design", "Food and content creative direction", "Social, TikTok, and Reels strategy", "Natural English/Spanish messaging and social proof"] },
-      { title: "Turn first orders into regulars", summary: "Give customers relevant reasons to come back.", items: ["Loyalty and consented customer lists", "Email/SMS, reorder, and win-back", "Birthday, family, game-day, review, and referral offers", "Community promotions and catering follow-up"] },
+      { title: "Turn first orders into regulars", summary: "Give customers relevant reasons to come back.", items: ["Loyalty and consented customer lists", "Email, reorder, and win-back", "Birthday, family, game-day, review, and referral offers", "Community promotions and catering follow-up"] },
       { title: "Run the shop smarter", summary: "Connect demand and customer activity to clearer decisions.", items: ["Existing POS/order/CRM connections where feasible", "Marketing and order attribution", "Review monitoring and customer-list workflows", "Phone/order automation, multi-location visibility, and staff support where in scope"] },
     ],
     failures: [
@@ -328,7 +328,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { id: "brand", label: "Our brand/site doesn’t match the experience", detail: "Align the identity, treatment positioning, visual content, and digital experience." },
       { id: "leads", label: "We need more qualified consultations", detail: "Connect discovery, campaign messaging, treatment pages, and booking paths." },
       { id: "ads", label: "Ads generate interest but follow-up is weak", detail: "Improve landing pages, capture, routing, nurture, and consultation handoff." },
-      { id: "retention", label: "We need more repeat visits / memberships", detail: "Build relevant reminders, memberships, email/SMS, reviews, referrals, and reactivation." },
+      { id: "retention", label: "We need more repeat visits / memberships", detail: "Build relevant reminders, memberships, email, reviews, referrals, and reactivation." },
       { id: "visibility", label: "We’re launching or opening a new location", detail: "Coordinate brand, local visibility, content, campaigns, website, and launch paths." },
       { id: "systems", label: "We need the whole growth system", detail: "Map the experience from discovery through booking, retention, and reporting." },
     ],
@@ -336,7 +336,7 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { title: "Create desire", summary: "Make the marketing feel as considered as the experience.", items: ["Brand and identity", "Treatment positioning and messaging", "Visual creative and content", "Consented before/after presentation", "Social presence"] },
       { title: "Get discovered", summary: "Meet local interest with relevant, credible content.", items: ["Local SEO and Google Business Profile", "Treatment and service pages", "Google and appropriate paid media", "Content and launch campaigns"] },
       { title: "Turn interest into bookings", summary: "Give qualified interest a clear path to consultation.", items: ["Conversion website and landing pages", "Online booking path", "Lead capture and follow-up", "CRM routing and nurture", "Appropriate next-step communication"] },
-      { title: "Keep patients coming back", summary: "Support the relationship beyond one appointment.", items: ["Membership and loyalty marketing", "Treatment reminders", "Email and SMS campaigns", "Reactivation", "Reviews, referrals, and reporting"] },
+      { title: "Keep patients coming back", summary: "Support the relationship beyond one appointment.", items: ["Membership and loyalty marketing", "Treatment reminders", "Email campaigns", "Reactivation", "Reviews, referrals, and reporting"] },
     ],
     failures: [
       { title: "The digital experience feels cheaper than the practice", body: "The brand, treatment presentation, content, and booking path should reinforce the same level of care." },

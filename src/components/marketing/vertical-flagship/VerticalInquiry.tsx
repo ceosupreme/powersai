@@ -4,6 +4,8 @@ import { Check } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 import type { VerticalConfig } from "./config";
 
 const schema = z.object({
@@ -71,14 +73,15 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
       const invokeError = result.error as { message?: string; context?: { status?: number } } | null;
       const message = String(invokeError?.message ?? "");
       const rateLimited = invokeError?.context?.status === 429 || /429|too many/i.test(message);
-      setError(rateLimited ? (language === "es" ? "Espera un minuto antes de intentarlo de nuevo." : "Please wait a minute before trying again.") : (language === "es" ? "No se guardó tu consulta. Inténtalo de nuevo o escribe a hello@supremeteammedia.com." : "Your inquiry was not saved. Please try again or email hello@supremeteammedia.com."));
+      setError(rateLimited ? (language === "es" ? "Espera un minuto antes de intentarlo de nuevo." : "Please wait a minute before trying again.") : (language === "es" ? `No se guardó tu consulta. Inténtalo de nuevo o escribe a ${CONTACT_EMAIL}.` : `Your inquiry was not saved. Please try again or email ${CONTACT_EMAIL}.`));
       return;
     }
+    trackSiteEvent({ event_type: "form_success", label: "vertical_inquiry", vertical: config.slug, src: `for-${config.slug}` });
     setStatus("success");
   };
 
   const es = language === "es";
-  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>{es ? "Gracias—guardamos tu consulta." : "Thanks—your inquiry is saved."}</h3><p>{es ? "Sean la revisará y responderá por email con un siguiente paso práctico." : "Sean will review it and reply by email with a practical next step."}</p></div>;
+  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>{es ? "Gracias, guardamos tu consulta." : "Thanks, your inquiry is saved."}</h3><p>{es ? "Una confirmación va en camino a tu correo y Sean responderá personalmente dentro de un día hábil." : "A confirmation is on its way to your inbox and Sean will reply within one business day."}</p></div>;
 
   return (
     <form className="vertical-inquiry-form" onSubmit={onSubmit} noValidate>
@@ -92,7 +95,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
       <label><span>{es ? "Nota opcional" : "Optional note"}</span><textarea rows={5} maxLength={3000} value={note} onChange={(event) => setNote(event.target.value)} placeholder={es ? "¿Qué está pasando ahora y qué te gustaría mejorar?" : "What is happening now, and what would you like to improve?"} /></label>
       {error && <p className="vertical-form-error" role="alert">{error}</p>}
       <Button type="submit" disabled={status === "submitting"} className="studio-btn studio-btn-primary w-full">{status === "submitting" ? (es ? "Enviando…" : "Sending…") : (es ? "Envía mis prioridades" : "Send my priorities")}</Button>
-      <p className="vertical-form-note">{es ? "Sin respuestas automáticas ni inscripciones. Tus datos llegan a Supreme Team Media para una respuesta directa." : "No auto-reply or enrollment. Your details go to Supreme Team Media for a direct response."}</p>
+      <p className="vertical-form-note">{es ? "Recibirás una confirmación en cuanto llegue y una respuesta personal de Sean dentro de un día hábil." : "You will get a confirmation the moment this lands, and a personal reply from Sean within one business day."}</p>
     </form>
   );
 }
