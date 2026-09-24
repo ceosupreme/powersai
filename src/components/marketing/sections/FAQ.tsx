@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Container, SectionHeading } from "@/components/marketing/site/primitives";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 const faqs = [
   { q: "What kind of businesses do you work with?", a: "Operations-heavy businesses where data is scattered across multiple tools — hospitality, multi-location operators, real estate, fitness, coaches and creators, and local service businesses. If your team uses several systems to get through the week, this is built for you." },
@@ -9,7 +10,7 @@ const faqs = [
   { q: "What does an engagement look like?", a: "Three phases: discovery and architecture, build and integrate, then launch and improve. Most engagements continue on a retainer because operations keep changing. Smaller scopes — an audit, a single dashboard, one automation — are also a good place to start." },
   { q: "Do you build custom AI tools?", a: "Yes. Internal assistants, intake bots, knowledge bots, custom GPTs, and AI workflows that read your real data and return plain-English answers with sources." },
   { q: "How much does it cost?", a: "It depends on scope. A focused audit or single automation is a small commitment. A full operational platform is a larger one. I scope honestly after a discovery call — no surprise invoices." },
-  { q: "How do we get started?", a: "Send a short note through the form below or email hello@supremeteammedia.com. We'll set up a call, walk through your current setup, and figure out the right first step." },
+  { q: "How do we get started?", a: `Send a short note through the form below or email ${CONTACT_EMAIL}. We'll set up a call, walk through your current setup, and figure out the right first step.` },
 ];
 
 export function FAQ() {

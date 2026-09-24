@@ -43,9 +43,9 @@ export default function Hire() {
   const evidence = EVIDENCE_SLUGS.map((s) => projects.find((p) => p.slug === s)).filter(Boolean) as typeof projects;
 
   useStudioHead({
-    title: "Hire Sean Mayo — Strategy, creative work, and hands-on execution",
+    title: "Hire Sean Powers — Strategy, creative work, and hands-on execution",
     description:
-      "Sean Mayo, founder of Supreme Team Media since 2002: marketing, sales, hospitality, websites and AI-assisted business systems. For employers and teams considering an individual role, contract, or embedded project.",
+      "Sean Powers, founder of Supreme Team Media since 2002: marketing, sales, hospitality, websites and AI-assisted business systems. For employers and teams considering an individual role, contract, or embedded project.",
     path: "/hire",
   });
 
@@ -58,7 +58,7 @@ export default function Hire() {
           <div className="lg:col-span-7">
           <Eyebrow>For employers and teams</Eyebrow>
           <h1 className="studio-display mt-5 max-w-4xl text-balance" style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}>
-             Sean Mayo — Strategy, creative thinking, and hands-on execution.
+             Sean Powers — Strategy, creative thinking, and hands-on execution.
           </h1>
           <Lede>
              Founder of Supreme Team Media since 2002, with experience across marketing, sales, hospitality, websites,

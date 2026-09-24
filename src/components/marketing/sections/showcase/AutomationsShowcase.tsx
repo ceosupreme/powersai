@@ -7,7 +7,7 @@ const NODES = [
   { icon: Webhook, label: "Trigger", sub: "New lead" },
   { icon: Database, label: "Enrich", sub: "CRM lookup" },
   { icon: GitBranch, label: "Decide", sub: "Score > 70" },
-  { icon: Send, label: "Action", sub: "SMS + book" },
+  { icon: Send, label: "Action", sub: "Email + book" },
   { icon: Bell, label: "Notify", sub: "Owner ping" },
 ];
 
@@ -73,7 +73,7 @@ export function AutomationsShowcase() {
             <div><span className="text-accent">▸</span> 09:42:11 · Trigger · POST /lead · ok</div>
             <div><span className="text-accent">▸</span> 09:42:11 · Enrich · matched contact #4821</div>
             <div><span className="text-accent">▸</span> 09:42:12 · Decide · score 84 → continue</div>
-            <div><span className="text-accent">▸</span> 09:42:12 · Action · SMS sent · hold booked</div>
+            <div><span className="text-accent">▸</span> 09:42:12 · Action · Email sent · hold booked</div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/marketing/site/primitives";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 export function FreeCheckLine({
   line,
@@ -15,6 +16,7 @@ export function FreeCheckLine({
           <p className="text-[1rem] leading-relaxed text-foreground">{line}</p>
           <a
             href={href}
+            onClick={() => trackSiteEvent({ event_type: "cta_click", label: "run_free_check" })}
             className="group inline-flex shrink-0 items-center gap-2 text-sm font-medium text-foreground underline decoration-[hsl(var(--gold))] decoration-2 underline-offset-8 hover:decoration-[hsl(var(--green))]"
           >
             Run the free check

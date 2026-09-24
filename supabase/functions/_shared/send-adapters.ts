@@ -10,6 +10,8 @@ export interface SendInput {
   channel: AutomationChannel;
   to: string | null;
   subject?: string | null;
+  from?: string;
+  reply_to?: string;
   body: string;
   project_id: string;
   queue_id: string;
@@ -150,7 +152,7 @@ export const resendEmailAdapter: SendAdapter = {
       footer = `\n\n—\n${loc}\nReply to this email to opt out.`;
     }
 
-    const from = resolveFrom(enrConfig);
+    const from = input.from ?? resolveFrom(enrConfig);
     const subject = deriveSubject(input);
     const text = `${input.body}${footer}`;
 
@@ -162,7 +164,7 @@ export const resendEmailAdapter: SendAdapter = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({ from, to, subject, text }),
+        body: JSON.stringify({ from, to, subject, text, ...(input.reply_to ? { reply_to: input.reply_to } : {}) }),
       });
     } catch (e) {
       return { ok: false, provider: "resend", error: `network: ${String(e)}` };

@@ -83,6 +83,7 @@ import FoundationAudit from "./pages/FoundationAudit";
 import ProjectHome from "./pages/ProjectHome";
 import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
+import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -102,6 +103,7 @@ const App = () => {
             <BrowserRouter>
               <SetupWizard />
               <ThemeSync />
+              <PublicSiteAnalytics />
               <Routes>
                 <Route path="/auth" element={<Login />} />
                 <Route path="/login" element={<Login />} />

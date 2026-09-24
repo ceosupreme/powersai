@@ -12,7 +12,7 @@ const CONVOS: Convo[] = [
   ]},
   { q: "Re-write our Saturday promo.", a: [
     "Draft: \"Locals' Saturday — half-priced bottles til 7. Walk in or grab a 7:30 table.\"",
-    "Tone matches your last 6 winning posts. Want SMS + IG variants?",
+    "Tone matches your last 6 winning posts. Want email + IG variants?",
   ]},
   { q: "Summarize last month's reviews.", a: [
     "82 reviews, avg 4.6. Up from 4.4.",
@@ -21,7 +21,7 @@ const CONVOS: Convo[] = [
   ]},
   { q: "Draft a follow-up to inactive leads.", a: [
     "Pulled 47 leads with no reply >14d.",
-    "Drafted 3 SMS variants by source. Routing to your inbox for approval.",
+    "Drafted 3 email variants by source. Routing to your inbox for approval.",
   ]},
 ];
 
@@ -51,7 +51,7 @@ export function AssistantShowcase() {
       bullets={[
         "Grounded in your real documents",
         "Routes to a human when confidence drops",
-        "Web, SMS, Slack, or embedded in your site",
+        "Web, email, Slack, or embedded in your site",
       ]}
     >
       <div className="grid grid-cols-12 gap-4">

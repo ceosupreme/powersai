@@ -82,9 +82,9 @@
 - [x] Current-week creation for non-client projects
 - [x] Products brands column + brand/status filters, 10-option status select
 ## PASS A — public sales-path repair
-- [ ] Regenerate database types for existing site_settings and site_events
-- [ ] Repair public identity, contact email, pricing, booking, attribution, audit context, and copy
-- [ ] Add prospect acknowledgment email and safe dispatch
-- [ ] Activate privacy-safe public analytics
-- [ ] Add STM-only seven-day website visibility card
-- [ ] Verify types, build, functions, and public/mobile flows without live sends or publishing
+- [x] Regenerate database types for existing site_settings and site_events
+- [x] Repair public identity, contact email, pricing, booking, attribution, audit context, and copy
+- [x] Add prospect acknowledgment email and safe dispatch
+- [x] Activate privacy-safe public analytics
+- [x] Add STM-only seven-day website visibility card
+- [x] Verify types, build, functions, and public/mobile flows without live sends or publishing

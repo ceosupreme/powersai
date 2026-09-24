@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { getStudioMedia } from "@/config/studioMedia";
 import { BrowserFrame } from "../BrowserFrame";
 import { Container } from "../primitives";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 const HERO_WORK = [
   { slug: "barpulse", title: "BarPulse", mediaKey: "work-barpulse", className: "studio-hero-proof-1" },
@@ -28,8 +29,8 @@ export function Hero() {
               attract customers and run better behind the scenes.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link to="/work" className="studio-btn studio-btn-primary">See the work</Link>
-              <a href="#contact" className="studio-btn studio-btn-outline">Start a project</a>
+              <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="studio-btn studio-btn-primary">See the work</Link>
+              <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="studio-btn studio-btn-outline">Start a project</a>
             </div>
             <p className="mt-7 text-[0.9rem] text-muted-foreground">
               Founder-led since 2002. Based in San Diego. Available for remote projects.

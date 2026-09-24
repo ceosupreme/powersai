@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePublicAudit, type AuditStatus, type OperationFootprint } from '@/hooks/usePublicAudit';
+import { Link } from 'react-router-dom';
+import { BookingCta } from '@/components/marketing/BookingCta';
+import { sanitizeBiz } from '@/pages/VerticalLanding';
+import { trackSiteEvent } from '@/lib/studioAnalytics';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Resolving your Google Business Profile' },
@@ -62,7 +66,11 @@ export default function FreeAudit() {
     };
   }, []);
   const audit = usePublicAudit();
-  const [businessName, setBusinessName] = useState('');
+  const search = new URLSearchParams(window.location.search);
+  const initialBiz = sanitizeBiz(search.get('biz')) ?? '';
+  const src = search.get('src');
+  const sourceVertical = src?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
+  const [businessName, setBusinessName] = useState(initialBiz);
   const [city, setCity] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [footprint, setFootprint] = useState<OperationFootprint>('small_crew_2_5');
@@ -76,15 +84,17 @@ export default function FreeAudit() {
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
   const currentStageIdx = audit.status ? ORDER[audit.status] : -1;
 
-  const closingCta = useMemo(() => {
-    if (footprint === 'multi_location') {
-      return 'This system ran an 8-location group in production — multi-location is its home turf. Book 15 minutes.';
-    }
-    if (footprint === 'solo_owner') {
-      return 'Starts at $49/mo — one system, installed, catching every inquiry. Book 15 minutes.';
-    }
-    return "This took 2 minutes and I didn't touch your business. Imagine what the full system catches. Book 15 minutes.";
-  }, [footprint]);
+  const completionLogged = useRef(false);
+  const contextQuery = new URLSearchParams();
+  if (src) contextQuery.set('src', src);
+  if (businessName.trim()) contextQuery.set('biz', businessName.trim());
+  const recommendationHref = `/?${contextQuery.toString()}#contact`;
+
+  useEffect(() => {
+    if (audit.status !== 'complete' || completionLogged.current) return;
+    completionLogged.current = true;
+    trackSiteEvent({ event_type: 'audit_complete', label: 'free_audit', vertical: sourceVertical ?? undefined, src: src ?? undefined });
+  }, [audit.status, sourceVertical, src]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,7 +106,7 @@ export default function FreeAudit() {
       website_url: websiteUrl.trim() || undefined,
       operation_footprint: footprint,
       company_website: honeypot,
-    });
+    }, { src, sourceVertical, biz: businessName.trim() });
   }
 
   async function onUnlock(e: React.FormEvent) {
@@ -250,12 +260,12 @@ export default function FreeAudit() {
                     >
                       Try again
                     </button>
-                    <a
-                      href="/#contact"
+                    <Link
+                      to={recommendationHref}
                       className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--stm-bg))]/70 underline-offset-4 hover:underline"
                     >
                       Or talk to a human
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -271,7 +281,7 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.redacted.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
                     </p>
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
@@ -285,12 +295,7 @@ export default function FreeAudit() {
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       A 2-minute call with your numbers puts dollars on them.
                     </p>
-                    <a
-                      href="/#contact"
-                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-3 text-sm font-medium text-white hover:-translate-y-0.5 hover:shadow-lg transition-all"
-                    >
-                      Book 15 minutes →
-                    </a>
+                    <div className="mt-6"><BookingCta src={src} biz={businessName} /></div>
                   </>
                 ) : (
                   <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
@@ -381,11 +386,11 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.full.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo estimated</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
                     </p>
                     {audit.full.total_risk_exposure_dollars > 0 && (
                       <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in exposure worth defending.
+                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)} in estimated exposure worth defending.
                       </p>
                     )}
                   </>
@@ -421,7 +426,7 @@ export default function FreeAudit() {
                           </p>
                         ) : (
                           <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50">/mo</span>
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> estimated impact</span>
                           </p>
                         )}
                       </div>
@@ -453,13 +458,13 @@ export default function FreeAudit() {
                 </div>
               )}
 
-              <a
-                href="mailto:hello@supremeteam.media?subject=Book%2015%20minutes"
-                className="mt-4 block rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12"
-              >
-                <p className="font-display text-2xl md:text-3xl leading-snug">{closingCta}</p>
-                <span className="mt-4 inline-block rounded-full bg-[hsl(var(--stm-bg))] px-6 py-2 text-sm font-medium text-[hsl(var(--stm-cobalt))]">Book 15 minutes →</span>
-              </a>
+              <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">
+                <p className="font-display text-2xl md:text-3xl leading-snug">Get a scoped recommendation</p>
+                <div className="mt-5 flex flex-wrap justify-center gap-3">
+                  <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get a scoped recommendation</Link>
+                  <BookingCta src={src} biz={businessName} className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />
+                </div>
+              </div>
             </div>
           )}
 

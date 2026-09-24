@@ -189,6 +189,11 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({ lead_id: inserted.id }),
       }).catch((e) => console.error("[submit-inbound-lead] owner notify error", e));
+      fetch(`${supabaseUrl}/functions/v1/send-prospect-acknowledgment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
+        body: JSON.stringify({ lead_id: inserted.id }),
+      }).catch((e) => console.error("[submit-inbound-lead] acknowledgment error", e));
     } catch (e) {
       console.error("[submit-inbound-lead] owner notify dispatch failed", e);
     }

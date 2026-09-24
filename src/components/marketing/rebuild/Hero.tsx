@@ -12,7 +12,7 @@ export function Hero() {
             className="font-display mt-6 text-balance text-foreground"
             style={{ fontSize: "clamp(2.5rem,6vw,4.5rem)", lineHeight: 1.03, letterSpacing: "-0.03em" }}
           >
-            Stop losing money to missed calls, quiet quotes, and follow-ups that never happen.
+            Stop losing money to unanswered inquiries, quiet quotes, and follow-ups that never happen.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
             Most of that money slips through the gaps between the tools you already pay for — phones, website, CRM, scheduling, books. We connect those gaps so every inquiry gets answered in seconds, quiet quotes get chased, and you see what needs attention before it gets expensive — without giving anyone another system to live in.

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Container, Eyebrow, Lede, SectionTitle } from "../primitives";
 import { ProjectPlate } from "../ProjectPlate";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 const BUYER_PROOF_ORDER = ["barpulse", "big-paws-club", "kario-voss", "supreme-wellness-club"];
 
@@ -22,8 +23,8 @@ export function SelectedWork() {
 
         {isError ? (
           <p className="mt-10 text-[0.95rem] text-muted-foreground" role="status">
-            The project list couldn&apos;t be loaded right now. Please refresh, or email
-            hello@supremeteammedia.com and Sean will send examples directly.
+            The project list couldn&apos;t be loaded right now. Please refresh, or email{" "}
+            {CONTACT_EMAIL} and Sean will send examples directly.
           </p>
         ) : isLoading ? (
           <p className="mt-10 text-[0.95rem] text-muted-foreground" role="status">Loading projects…</p>

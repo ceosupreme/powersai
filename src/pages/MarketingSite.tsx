@@ -22,7 +22,7 @@ export default function MarketingSite() {
   useStudioHead({
     title: "Supreme Team Media | Websites, Branding, Marketing & AI Systems",
     description:
-      "Founder-led websites, branding, digital marketing and custom AI business systems. Explore Sean Mayo's work and discuss your next project with Supreme Team Media.",
+      "Founder-led websites, branding, digital marketing and custom AI business systems. Explore Sean Powers' work and discuss your next project with Supreme Team Media.",
     path: "/",
   });
 

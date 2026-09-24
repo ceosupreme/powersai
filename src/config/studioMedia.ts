@@ -108,7 +108,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "founder-portrait": {
     src: null,
-    alt: "Sean Mayo",
+    alt: "Sean Powers",
     aspectRatio: "3 / 4",
     width: 900,
     height: 1200,

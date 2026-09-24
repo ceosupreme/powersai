@@ -41,7 +41,7 @@ export function Proof() {
         <div className="mt-10 grid grid-cols-3 gap-6 border-y border-[hsl(var(--gold)/0.2)] py-8">
           {[
             { n: "8", k: "venues", color: "hsl(var(--gold))", pulse: false },
-            { n: "$10K/mo", k: "engagement", color: "hsl(var(--rust-light))", pulse: false },
+            { n: "Scoped", k: "engagement", color: "hsl(var(--rust-light))", pulse: false },
             { n: "LIVE", k: "in production", color: "hsl(var(--gold))", pulse: true },
           ].map((s) => (
             <div key={s.k}>

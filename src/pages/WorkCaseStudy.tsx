@@ -8,6 +8,7 @@ import { CaseDetail } from "@/components/marketing/studio/CaseDetail";
 import { useStudioProject } from "@/hooks/useStudioProjects";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 export default function WorkCaseStudy() {
   const { slug } = useParams<{ slug: string }>();
@@ -45,7 +46,7 @@ export default function WorkCaseStudy() {
         </Container>
           {isError ? (
             <Container><p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
-              This project couldn&apos;t be loaded right now. Please refresh, or email hello@supremeteammedia.com.
+              This project couldn&apos;t be loaded right now. Please refresh, or email {CONTACT_EMAIL}.
             </p></Container>
           ) : isLoading ? (
             <Container><p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
