@@ -1,3 +1,5 @@
+import { CONTACT_EMAIL } from "@/lib/siteContact";
+
 /**
  * Résumé availability for /hire.
  *
@@ -14,7 +16,7 @@ export const STUDIO_RESUME: { file: string | null; label: string; downloadName: 
 };
 
 export const RESUME_REQUEST_MAILTO =
-  "mailto:hello@supremeteammedia.com" +
+  `mailto:${CONTACT_EMAIL}` +
   "?subject=" +
   encodeURIComponent("Résumé request — Sean Powers") +
   "&body=" +

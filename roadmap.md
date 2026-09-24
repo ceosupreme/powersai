@@ -87,4 +87,4 @@
 - [x] Add prospect acknowledgment email and safe dispatch
 - [x] Activate privacy-safe public analytics
 - [x] Add STM-only seven-day website visibility card
-- [ ] Verify types, build, functions, and public/mobile flows without live sends or publishing
+- [x] Verify types, build, functions, and public/mobile flows without live sends or publishing
