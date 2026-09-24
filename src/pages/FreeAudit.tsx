@@ -106,7 +106,7 @@ export default function FreeAudit() {
       website_url: websiteUrl.trim() || undefined,
       operation_footprint: footprint,
       company_website: honeypot,
-    }, { src, sourceVertical });
+    }, { src, sourceVertical, biz: businessName.trim() });
   }
 
   async function onUnlock(e: React.FormEvent) {

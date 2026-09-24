@@ -63,6 +63,11 @@ const Body = z.object({
   city: z.string().trim().min(1).max(120),
   website_url: z.string().trim().max(500).optional().nullable(),
   operation_footprint: z.enum(['solo_owner', 'small_crew_2_5', 'crew_6_plus', 'multi_location']),
+  context: z.object({
+    src: z.string().trim().max(80).nullable().optional(),
+    source_vertical: z.string().trim().max(40).nullable().optional(),
+    biz: z.string().trim().max(200).nullable().optional(),
+  }).optional(),
   // Honeypot — must be empty.
   company_website: z.string().max(0).optional().nullable(),
 });
@@ -436,6 +441,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
           }
         : null,
       duration_ms: Date.now() - startedAt,
+      request_context: input.context ?? null,
     };
 
     const redacted_result = {
@@ -443,6 +449,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       leak_count: results.length,
       top_leaks: topThree,
       project_type_resolution: ptRes,
+      request_context: input.context ?? null,
     };
 
     await log(`Complete: ${results.length} leaks ranked.`);
@@ -516,6 +523,7 @@ Deno.serve(async (req) => {
       city: parsed.data.city,
       website_url: parsed.data.website_url ?? null,
       operation_footprint: parsed.data.operation_footprint,
+      full_result: { request_context: parsed.data.context ?? null },
       status: 'queued',
       ip_hash,
     })

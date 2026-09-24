@@ -56,6 +56,7 @@ export interface RunInput {
 export interface AuditContext {
   src?: string | null;
   sourceVertical?: string | null;
+  biz?: string | null;
 }
 
 export function usePublicAudit() {
@@ -108,7 +109,10 @@ export function usePublicAudit() {
         const trimmed = normalized.website_url.trim();
         normalized.website_url = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
       }
-      const { data, error: e } = await supabase.functions.invoke('run-public-audit', { body: normalized });
+      const { data, error: e } = await supabase.functions.invoke('run-public-audit', { body: {
+        ...normalized,
+        context: { src: context.src ?? null, source_vertical: context.sourceVertical ?? null, biz: context.biz ?? input.business_name },
+      } });
       if (e) throw new Error(e.message);
       trackSiteEvent({ event_type: 'audit_start', label: 'free_audit', vertical: context.sourceVertical ?? undefined, src: context.src ?? undefined });
       const t = (data as { token: string }).token;
