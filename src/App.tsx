@@ -133,6 +133,8 @@ const App = () => {
                 <Route path="/for/restaurants" element={<FlagshipVertical slug="restaurants" />} />
                 <Route path="/for/bars-restaurants" element={<FlagshipVertical slug="restaurants" />} />
                 <Route path="/for/pizza" element={<FlagshipVertical slug="pizza" />} />
+                <Route path="/for/tacos" element={<FlagshipVertical slug="tacos" />} />
+                <Route path="/for/taquerias" element={<FlagshipVertical slug="tacos" />} />
                 {/* All other public vertical pages retain the legacy config-driven renderer. */}
                 <Route path="/for/:slug" element={<VerticalLanding />} />
                 {/* Public per-client qualifier — resolves a venue by slug and

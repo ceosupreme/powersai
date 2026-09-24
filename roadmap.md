@@ -68,6 +68,12 @@
 - [x] Expand `/industries` and footer to seven industries
 - [x] Verify responsive, accessibility, attribution, mocked inquiry, and route regressions without live submission
 
+## Taco Shops / Taquerías flagship
+- [x] Add bilingual `/for/tacos` experience and `/for/taquerias` alias
+- [x] Preserve business, focus, attribution, and inquiry state across EN / ES switching
+- [x] Expand Industries and footer to eight verticals
+- [x] Verify responsive, accessibility, metadata, links, mocked inquiry, and existing-route regressions without publishing
+
 ## Non-client project KPI layer (Sept 2026)
 - [x] project_kpis + project_kpi_values tables with project-member RLS
 - [x] KPI scoring utility + pillar score sync into project_pillar_scores

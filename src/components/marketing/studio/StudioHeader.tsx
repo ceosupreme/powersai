@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Container } from "./primitives";
 
 const SERVICES = [
-  { to: "/services/websites", label: "Websites & digital products", note: "Credible sites, landing pages, commerce, and web apps" },
-  { to: "/services/brand", label: "Brand & creative", note: "Positioning, identity, systems, and campaign creative" },
-  { to: "/services/marketing", label: "Marketing & growth", note: "Campaigns, content, launches, and audience paths" },
-  { to: "/services/ai-systems", label: "AI & business systems", note: "Dashboards, workflows, integrations, and automation" },
-  { to: "/publishing", label: "Publishing & launch", note: "Books, apps, and digital products ready for release" },
+  { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Credible sites, landing pages, commerce, and web apps", noteEs: "Sitios confiables, páginas de campaña, comercio y aplicaciones web" },
+  { to: "/services/brand", label: "Brand & creative", labelEs: "Marca y creatividad", note: "Positioning, identity, systems, and campaign creative", noteEs: "Posicionamiento, identidad, sistemas y creatividad para campañas" },
+  { to: "/services/marketing", label: "Marketing & growth", labelEs: "Marketing y crecimiento", note: "Campaigns, content, launches, and audience paths", noteEs: "Campañas, contenido, lanzamientos y recorridos de audiencia" },
+  { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Dashboards, workflows, integrations, and automation", noteEs: "Paneles, flujos de trabajo, integraciones y automatización" },
+  { to: "/publishing", label: "Publishing & launch", labelEs: "Publicación y lanzamiento", note: "Books, apps, and digital products ready for release", noteEs: "Libros, aplicaciones y productos digitales listos para salir" },
 ];
 
-export function StudioHeader() {
+export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -22,13 +22,16 @@ export function StudioHeader() {
   const servicesButtonRef = useRef<HTMLButtonElement | null>(null);
   const servicesPanelRef = useRef<HTMLDivElement | null>(null);
   const { pathname, search } = useLocation();
-  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza)$/)?.[1];
-  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug;
+  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza|tacos|taquerias)$/)?.[1];
+  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug === "taquerias" ? "tacos" : routeSlug;
   const sourceParams = new URLSearchParams(search);
   const biz = sourceParams.get("biz");
   const attributedContact = verticalSlug
     ? `/?src=for-${verticalSlug}${biz ? `&biz=${encodeURIComponent(biz)}` : ""}#contact`
     : "/#contact";
+  const labels = language === "es"
+    ? { work: "Trabajo", services: "Servicios", about: "Acerca de", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú" }
+    : { work: "Work", services: "Services", about: "About", start: "Start a project", open: "Open menu", close: "Close menu" };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -85,39 +88,39 @@ export function StudioHeader() {
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex xl:gap-9">
-          <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">Work</Link>
+          <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.work}</Link>
           <div className="relative">
             <Button ref={servicesButtonRef} type="button" variant="ghost" aria-expanded={servicesOpen} aria-controls="studio-services-menu"
               onClick={() => setServicesOpen((value) => !value)}
               className="h-11 gap-1.5 px-1 text-[1rem] font-normal text-foreground/80 hover:bg-transparent hover:text-foreground">
-              Services <ChevronDown size={15} className={cn("transition-transform", servicesOpen && "rotate-180")} />
+              {labels.services} <ChevronDown size={15} className={cn("transition-transform", servicesOpen && "rotate-180")} />
             </Button>
             {servicesOpen && (
               <div id="studio-services-menu" ref={servicesPanelRef} className="studio-services-menu absolute left-1/2 top-[calc(100%+12px)] w-[680px] -translate-x-1/2 border border-border bg-[hsl(var(--paper))] p-3 shadow-xl">
                 <div className="grid grid-cols-2 gap-1">
                   {SERVICES.map((service, index) => (
                     <Link key={service.to} to={service.to} onClick={() => setServicesOpen(false)} className={cn("group min-h-[92px] border-b border-border p-4 hover:bg-[hsl(var(--surface))]", index === SERVICES.length - 1 && "col-span-2")}>
-                      <span className="studio-display block text-[1.02rem] group-hover:text-primary">{service.label}</span>
-                      <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{service.note}</span>
+                      <span className="studio-display block text-[1.02rem] group-hover:text-primary">{language === "es" ? service.labelEs : service.label}</span>
+                      <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{language === "es" ? service.noteEs : service.note}</span>
                     </Link>
                   ))}
                 </div>
               </div>
             )}
           </div>
-          <Link to="/#about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">About</Link>
+          <Link to="/#about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.about}</Link>
         </nav>
 
         <div className="flex items-center gap-3">
           <Link to={attributedContact} className="studio-btn studio-btn-primary studio-header-cta">
-            Start a project
+            {labels.start}
           </Link>
           <Button
             ref={toggleRef}
             type="button"
             aria-expanded={open}
             aria-controls="studio-mobile-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? labels.close : labels.open}
             onClick={() => setOpen((v) => !v)}
             variant="outline"
             size="icon"
@@ -135,20 +138,20 @@ export function StudioHeader() {
           className="border-t border-border bg-[hsl(var(--paper))] lg:hidden"
         >
           <Container className="flex flex-col py-3">
-            <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">Work</Link>
-            <p className="studio-label px-2 pb-2 pt-5">Services</p>
+            <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.work}</Link>
+            <p className="studio-label px-2 pb-2 pt-5">{labels.services}</p>
             {SERVICES.map((service) => (
               <Link key={service.to} to={service.to} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.98rem]">
-                {service.label}
+                {language === "es" ? service.labelEs : service.label}
               </Link>
             ))}
-            <Link to="/#about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">About</Link>
+            <Link to="/#about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
             <Link
               to={attributedContact}
               onClick={() => setOpen(false)}
               className="studio-btn studio-btn-primary mt-3 w-full"
             >
-              Start a project
+              {labels.start}
             </Link>
           </Container>
         </div>
