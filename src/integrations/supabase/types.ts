@@ -9189,6 +9189,80 @@ export type Database = {
         }
         Relationships: []
       }
+      site_orders: {
+        Row: {
+          amount_cents: number | null
+          business_name: string | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          id: string
+          lead_id: string | null
+          mode: string | null
+          name: string | null
+          product_key: string
+          raw: Json | null
+          source_vertical: string | null
+          src: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          business_name?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          lead_id?: string | null
+          mode?: string | null
+          name?: string | null
+          product_key: string
+          raw?: Json | null
+          source_vertical?: string | null
+          src?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number | null
+          business_name?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          lead_id?: string | null
+          mode?: string | null
+          name?: string | null
+          product_key?: string
+          raw?: Json | null
+          source_vertical?: string | null
+          src?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_orders_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           key: string
