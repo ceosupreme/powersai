@@ -49,13 +49,13 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
           <p className="studio-label mb-4" style={{ color: "hsl(var(--band-text) / 0.62)" }}>{es ? "Industrias" : "Industries"}</p>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
             <Link to="/for/hvac" className="inline-flex min-h-11 min-w-11 items-center hover:underline">HVAC</Link>
-            <Link to="/for/auto" className="inline-flex min-h-11 items-center hover:underline">Automotive</Link>
-            <Link to="/for/real-estate" className="inline-flex min-h-11 items-center hover:underline">Real estate</Link>
+            <Link to="/for/auto" className="inline-flex min-h-11 items-center hover:underline">{es ? "Automotriz" : "Automotive"}</Link>
+            <Link to="/for/real-estate" className="inline-flex min-h-11 items-center hover:underline">{es ? "Bienes raíces" : "Real estate"}</Link>
             <Link to="/for/legal" className="inline-flex min-h-11 min-w-11 items-center hover:underline">Legal</Link>
-            <Link to="/for/medspa" className="inline-flex min-h-11 items-center hover:underline">Med spa</Link>
-            <Link to="/for/restaurants" className="inline-flex min-h-11 items-center hover:underline">Bars &amp; restaurants</Link>
-            <Link to="/for/pizza" className="inline-flex min-h-11 items-center hover:underline">Pizza shops</Link>
-            <Link to="/for/tacos" className="inline-flex min-h-11 items-center hover:underline">Taco shops / Taquerías</Link>
+            <Link to="/for/medspa" className="inline-flex min-h-11 items-center hover:underline">{es ? "Spa médico" : "Med spa"}</Link>
+            <Link to="/for/restaurants" className="inline-flex min-h-11 items-center hover:underline">{es ? "Bares y restaurantes" : "Bars & restaurants"}</Link>
+            <Link to="/for/pizza" className="inline-flex min-h-11 items-center hover:underline">{es ? "Pizzerías" : "Pizza shops"}</Link>
+            <Link to="/for/tacos" className="inline-flex min-h-11 items-center hover:underline">{es ? "Taquerías / restaurantes de tacos" : "Taco shops / Taquerías"}</Link>
           </div>
         </nav>
 

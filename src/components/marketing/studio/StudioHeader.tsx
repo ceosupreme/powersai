@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Container } from "./primitives";
 
 const SERVICES = [
-  { to: "/services/websites", label: "Websites & digital products", note: "Credible sites, landing pages, commerce, and web apps" },
-  { to: "/services/brand", label: "Brand & creative", note: "Positioning, identity, systems, and campaign creative" },
-  { to: "/services/marketing", label: "Marketing & growth", note: "Campaigns, content, launches, and audience paths" },
-  { to: "/services/ai-systems", label: "AI & business systems", note: "Dashboards, workflows, integrations, and automation" },
-  { to: "/publishing", label: "Publishing & launch", note: "Books, apps, and digital products ready for release" },
+  { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Credible sites, landing pages, commerce, and web apps", noteEs: "Sitios confiables, páginas de campaña, comercio y aplicaciones web" },
+  { to: "/services/brand", label: "Brand & creative", labelEs: "Marca y creatividad", note: "Positioning, identity, systems, and campaign creative", noteEs: "Posicionamiento, identidad, sistemas y creatividad para campañas" },
+  { to: "/services/marketing", label: "Marketing & growth", labelEs: "Marketing y crecimiento", note: "Campaigns, content, launches, and audience paths", noteEs: "Campañas, contenido, lanzamientos y recorridos de audiencia" },
+  { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Dashboards, workflows, integrations, and automation", noteEs: "Paneles, flujos de trabajo, integraciones y automatización" },
+  { to: "/publishing", label: "Publishing & launch", labelEs: "Publicación y lanzamiento", note: "Books, apps, and digital products ready for release", noteEs: "Libros, aplicaciones y productos digitales listos para salir" },
 ];
 
 export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
@@ -100,8 +100,8 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
                 <div className="grid grid-cols-2 gap-1">
                   {SERVICES.map((service, index) => (
                     <Link key={service.to} to={service.to} onClick={() => setServicesOpen(false)} className={cn("group min-h-[92px] border-b border-border p-4 hover:bg-[hsl(var(--surface))]", index === SERVICES.length - 1 && "col-span-2")}>
-                      <span className="studio-display block text-[1.02rem] group-hover:text-primary">{service.label}</span>
-                      <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{service.note}</span>
+                      <span className="studio-display block text-[1.02rem] group-hover:text-primary">{language === "es" ? service.labelEs : service.label}</span>
+                      <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{language === "es" ? service.noteEs : service.note}</span>
                     </Link>
                   ))}
                 </div>
@@ -142,7 +142,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             <p className="studio-label px-2 pb-2 pt-5">{labels.services}</p>
             {SERVICES.map((service) => (
               <Link key={service.to} to={service.to} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.98rem]">
-                {service.label}
+                {language === "es" ? service.labelEs : service.label}
               </Link>
             ))}
             <Link to="/#about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
