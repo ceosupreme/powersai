@@ -88,3 +88,9 @@
 - [x] Activate privacy-safe public analytics
 - [x] Add STM-only seven-day website visibility card
 - [x] Verify types, build, functions, and public/mobile flows without live sends or publishing
+
+## PASS B — buyable website offer
+- [ ] Resolve Connect Stripe test-key validation failure
+- [ ] Add checkout creation and payment verification
+- [ ] Add public thank-you page and buyable offer sections
+- [ ] Add STM order totals to HQ and test idempotency with a test purchase
