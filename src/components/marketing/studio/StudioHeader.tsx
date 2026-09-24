@@ -22,8 +22,8 @@ export function StudioHeader() {
   const servicesButtonRef = useRef<HTMLButtonElement | null>(null);
   const servicesPanelRef = useRef<HTMLDivElement | null>(null);
   const { pathname, search } = useLocation();
-  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza)$/)?.[1];
-  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug;
+  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza|tacos|taquerias)$/)?.[1];
+  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug === "taquerias" ? "tacos" : routeSlug;
   const sourceParams = new URLSearchParams(search);
   const biz = sourceParams.get("biz");
   const attributedContact = verticalSlug

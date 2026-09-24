@@ -4,8 +4,8 @@ import { Container } from "./primitives";
 /** Every link here points at a real, implemented route — never a dead link. */
 export function StudioFooter() {
   const { pathname, search } = useLocation();
-  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza)$/)?.[1];
-  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug;
+  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza|tacos|taquerias)$/)?.[1];
+  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug === "taquerias" ? "tacos" : routeSlug;
   const params = new URLSearchParams(search);
   const biz = params.get("biz");
   const source = verticalSlug ? `?src=for-${verticalSlug}${biz ? `&biz=${encodeURIComponent(biz)}` : ""}` : "";
@@ -54,6 +54,7 @@ export function StudioFooter() {
             <Link to="/for/medspa" className="inline-flex min-h-11 items-center hover:underline">Med spa</Link>
             <Link to="/for/restaurants" className="inline-flex min-h-11 items-center hover:underline">Bars &amp; restaurants</Link>
             <Link to="/for/pizza" className="inline-flex min-h-11 items-center hover:underline">Pizza shops</Link>
+            <Link to="/for/tacos" className="inline-flex min-h-11 items-center hover:underline">Taco shops / Taquerías</Link>
           </div>
         </nav>
 

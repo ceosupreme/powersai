@@ -1,4 +1,4 @@
-export type VerticalSlug = "hvac" | "auto" | "real-estate" | "legal" | "medspa" | "restaurants" | "pizza";
+export type VerticalSlug = "hvac" | "auto" | "real-estate" | "legal" | "medspa" | "restaurants" | "pizza" | "tacos";
 export type FocusKey = "brand" | "website" | "visibility" | "ads" | "leads" | "retention" | "systems";
 
 export type VerticalConfig = {
@@ -29,7 +29,7 @@ export type VerticalConfig = {
   proofSlugs: string[];
 };
 
-export const FLAGSHIP_SLUGS: VerticalSlug[] = ["hvac", "auto", "real-estate", "legal", "medspa", "restaurants", "pizza"];
+export const FLAGSHIP_SLUGS: VerticalSlug[] = ["hvac", "auto", "real-estate", "legal", "medspa", "restaurants", "pizza", "tacos"];
 
 export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
   hvac: {
@@ -276,6 +276,45 @@ export const VERTICALS: Record<VerticalSlug, VerticalConfig> = {
       { q: "Do we have to replace Slice, Owner.com, Toast, Square, Clover, or our current ordering system?", a: "No. If the current platform works, the engagement can strengthen the brand, website, local demand, customer journey, and retention around it. Any connection or replacement is recommended only after compatibility and requirements are confirmed." },
       { q: "Can you help us build more direct orders?", a: "We can improve the direct-order journey, local visibility, menu experience, campaign messaging, customer list, and repeat-order strategy. We do not promise a specific order mix or claim integrations before they are verified." },
       { q: "Can the work support multiple locations?", a: "Yes. Scope can include location pages, local visibility, location-aware ordering paths, coordinated campaigns, shared customer strategy, and multi-location reporting." },
+    ],
+  },
+  tacos: {
+    slug: "tacos", name: "Taco Shops / Taquerías", eyebrow: "Local growth for taco shops and taquerías",
+    title: "Be the taco shop people find, crave, and order from again.",
+    description: "Brand, website, Google visibility, ordering paths, social content, reviews, loyalty, catering, and customer follow-up—built for neighborhood taquerías and taco shops.",
+    metaTitle: "Taco Shop Marketing, Websites & Local Growth | Supreme Team Media",
+    metaDescription: "Branding, websites, Google visibility, ordering paths, social content, loyalty, catering, reviews and growth systems for taco shops and taquerías.",
+    primaryLabel: "Show me where I’d start", secondaryLabel: "Run the free taco-shop check",
+    needs: [
+      { id: "visibility", label: "We need more Google/Maps visibility", detail: "Improve Maps, local search, reviews, neighborhood discovery, and paid demand." },
+      { id: "website", label: "Our website/menu makes ordering harder than it should", detail: "Create a fast mobile path through the menu, location, hours, and ordering choices." },
+      { id: "direct-relationship", label: "We depend too much on third-party apps", detail: "Strengthen direct paths and customer relationships without assuming a platform replacement." },
+      { id: "ads", label: "We need better social/content", detail: "Build useful creative direction for social, Reels, TikTok, offers, and neighborhood moments." },
+      { id: "retention", label: "We need more repeat orders and loyalty", detail: "Plan consented loyalty, reorder, win-back, review, referral, and community campaigns." },
+      { id: "catering", label: "We need more catering / large orders", detail: "Give businesses, schools, teams, and parties a clear large-order path." },
+      { id: "leads", label: "We need better phone/order follow-up", detail: "Clarify how calls, orders, questions, and catering inquiries move through the shop." },
+      { id: "systems", label: "We need the whole growth system", detail: "Connect discovery, ordering, retention, reporting, and shop workflows." },
+    ],
+    stages: [
+      { title: "Own the local search", summary: "Win useful neighborhood discovery when taco intent is highest.", items: ["Google Business Profile and Maps", "Tacos-near-me and neighborhood search", "Search- and AI-readable menu/location pages", "Reviews, local paid search, social, and multi-location pages"] },
+      { title: "Make it easy to order", summary: "Remove friction from craving to pickup, delivery, or a large order.", items: ["Mobile-first website and readable menu", "Direct online-order path where supported", "Click-to-call and phone-order path", "Pickup, delivery, hours, location, catering, combos, and specials"] },
+      { title: "Look as good online as the food", summary: "Make the digital presence carry the shop’s real character.", items: ["Brand identity and menu design", "Food and content creative direction", "Social, TikTok, and Reels strategy", "Natural English/Spanish messaging and social proof"] },
+      { title: "Turn first orders into regulars", summary: "Give customers relevant reasons to come back.", items: ["Loyalty and consented customer lists", "Email/SMS, reorder, and win-back", "Birthday, family, game-day, review, and referral offers", "Community promotions and catering follow-up"] },
+      { title: "Run the shop smarter", summary: "Connect demand and customer activity to clearer decisions.", items: ["Existing POS/order/CRM connections where feasible", "Marketing and order attribution", "Review monitoring and customer-list workflows", "Phone/order automation, multi-location visibility, and staff support where in scope"] },
+    ],
+    failures: [
+      { title: "A nearby customer cannot find the right menu", body: "Google, the website, location details, hours, and ordering path should agree before the customer loses the craving—or the patience." },
+      { title: "The shop looks better in person than online", body: "Brand, menu, content, reviews, and ordering should express the real food and experience without fake photography or stereotypes." },
+      { title: "The first order never becomes a relationship", body: "Consented loyalty, follow-up, review, referral, and win-back programs can support repeat business without unsupported promises." },
+    ],
+    workflow: ["Google / Maps / social", "Bilingual menu / site", "Direct order or phone", "Pickup or delivery", "Customer list / loyalty", "Reorder / win-back", "Review / referral"],
+    scope: ["Brand and menu design", "Mobile website", "Google and local search", "Paid search and social", "Ordering and phone paths", "English/Spanish materials", "Loyalty and retention", "Catering", "Reviews", "Reporting and systems"],
+    proofSlugs: ["barpulse", "big-paws-club", "kario-voss"],
+    safety: "Already have ordering or POS software you like? Keep it. We can improve the brand, website, demand generation, customer journey, and retention around it—and confirm what can connect before recommending a change. Bilingual website, campaign, and customer-facing materials can be included in the project. Live Spanish-language sales/support coverage is scoped when needed.",
+    faqs: [
+      { q: "Do we have to replace Toast, Square, Clover, Owner.com, DoorDash, Uber Eats, ChowNow, Tacoter, or our current tools?", a: "No. If your current ordering or POS software works, keep it. We can strengthen the brand, website, demand, customer journey, and retention around it. Compatibility is confirmed before any connection or change is recommended." },
+      { q: "Can the website and campaigns be bilingual?", a: "Yes. The project can include website, campaign, menu, and customer-facing materials in natural English and Spanish. Live Spanish-language sales or support coverage is scoped when needed." },
+      { q: "Can you help with direct orders, loyalty, and catering?", a: "Yes, where the strategy and current tools support them. We can improve the paths, messaging, creative, list growth, and follow-up, but we do not promise a particular order mix or retention result." },
     ],
   },
   medspa: {

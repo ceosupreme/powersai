@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useLocation } from "react-router-dom";
 import { Check } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +15,8 @@ const schema = z.object({
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function VerticalInquiry({ config, segment, initialNeeds = [], biz }: { config: VerticalConfig; segment?: string; initialNeeds?: string[]; biz?: string | null }) {
+export function VerticalInquiry({ config, segment, initialNeeds = [], biz, language = "en" }: { config: VerticalConfig; segment?: string; initialNeeds?: string[]; biz?: string | null; language?: "en" | "es" }) {
+  const location = useLocation();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const [name, setName] = useState("");
@@ -37,9 +39,9 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz }: { c
     const honeypot = String(new FormData(event.currentTarget).get("company_website") ?? "");
     if (honeypot) return;
     const parsed = schema.safeParse({ name, email, business, note });
-    if (!parsed.success) { setStatus("error"); setError(parsed.error.issues[0]?.message ?? "Please check your details"); return; }
-    if (!needs.length) { setStatus("error"); setError("Choose at least one area that needs attention"); return; }
-    if (typeof navigator !== "undefined" && navigator.onLine === false) { setStatus("error"); setError("You appear to be offline. Your details are still here—reconnect and try again."); return; }
+    if (!parsed.success) { setStatus("error"); setError(language === "es" ? "Revisa tu nombre, correo y negocio antes de enviar." : (parsed.error.issues[0]?.message ?? "Please check your details")); return; }
+    if (!needs.length) { setStatus("error"); setError(language === "es" ? "Elige por lo menos un área que necesite atención." : "Choose at least one area that needs attention"); return; }
+    if (typeof navigator !== "undefined" && navigator.onLine === false) { setStatus("error"); setError(language === "es" ? "Parece que no tienes conexión. Tus datos siguen aquí; vuelve a conectarte e inténtalo de nuevo." : "You appear to be offline. Your details are still here—reconnect and try again."); return; }
     setStatus("submitting");
     let result: { data: unknown; error: unknown };
     try {
@@ -54,9 +56,11 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz }: { c
           site_section: "vertical_flagship_inquiry",
           vertical_slug: config.slug,
           source_vertical: config.slug,
-          source_path: `/for/${config.slug}`,
+          source_path: location.pathname,
           selected_needs: needs,
           business_type: segment || null,
+          language,
+          biz: biz || null,
         },
         company_website: "",
       } });
@@ -67,27 +71,28 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz }: { c
       const invokeError = result.error as { message?: string; context?: { status?: number } } | null;
       const message = String(invokeError?.message ?? "");
       const rateLimited = invokeError?.context?.status === 429 || /429|too many/i.test(message);
-      setError(rateLimited ? "Please wait a minute before trying again." : "Your inquiry was not saved. Please try again or email hello@supremeteammedia.com.");
+      setError(rateLimited ? (language === "es" ? "Espera un minuto antes de intentarlo de nuevo." : "Please wait a minute before trying again.") : (language === "es" ? "No se guardó tu consulta. Inténtalo de nuevo o escribe a hello@supremeteammedia.com." : "Your inquiry was not saved. Please try again or email hello@supremeteammedia.com."));
       return;
     }
     setStatus("success");
   };
 
-  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>Thanks—your inquiry is saved.</h3><p>Sean will review it and reply by email with a practical next step.</p></div>;
+  const es = language === "es";
+  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>{es ? "Gracias—guardamos tu consulta." : "Thanks—your inquiry is saved."}</h3><p>{es ? "Sean la revisará y responderá por email con un siguiente paso práctico." : "Sean will review it and reply by email with a practical next step."}</p></div>;
 
   return (
     <form className="vertical-inquiry-form" onSubmit={onSubmit} noValidate>
       <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden"><label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" /></label></div>
       <div className="vertical-form-grid">
-        <Field label="Name" value={name} setValue={setName} autoComplete="name" />
-        <Field label="Email" value={email} setValue={setEmail} type="email" autoComplete="email" />
+        <Field label={es ? "Nombre" : "Name"} value={name} setValue={setName} autoComplete="name" />
+        <Field label={es ? "Correo electrónico" : "Email"} value={email} setValue={setEmail} type="email" autoComplete="email" />
       </div>
-      <Field label={config.slug === "legal" ? "Firm" : config.slug === "medspa" ? "Practice" : "Business"} value={business} setValue={setBusiness} autoComplete="organization" />
-      <fieldset><legend>What needs the most attention?</legend><div className="vertical-needs-grid">{config.needs.map((need) => <Button key={need.id} type="button" variant="outline" aria-pressed={needs.includes(need.id)} onClick={() => toggle(need.id)}>{need.label}</Button>)}</div></fieldset>
-      <label><span>Optional note</span><textarea rows={5} maxLength={3000} value={note} onChange={(event) => setNote(event.target.value)} placeholder="What is happening now, and what would you like to improve?" /></label>
+      <Field label={es ? "Negocio" : config.slug === "legal" ? "Firm" : config.slug === "medspa" ? "Practice" : "Business"} value={business} setValue={setBusiness} autoComplete="organization" />
+      <fieldset><legend>{es ? "¿Qué necesita más atención?" : "What needs the most attention?"}</legend><div className="vertical-needs-grid">{config.needs.map((need) => <Button key={need.id} type="button" variant="outline" aria-pressed={needs.includes(need.id)} onClick={() => toggle(need.id)}>{need.label}</Button>)}</div></fieldset>
+      <label><span>{es ? "Nota opcional" : "Optional note"}</span><textarea rows={5} maxLength={3000} value={note} onChange={(event) => setNote(event.target.value)} placeholder={es ? "¿Qué está pasando ahora y qué te gustaría mejorar?" : "What is happening now, and what would you like to improve?"} /></label>
       {error && <p className="vertical-form-error" role="alert">{error}</p>}
-      <Button type="submit" disabled={status === "submitting"} className="studio-btn studio-btn-primary w-full">{status === "submitting" ? "Sending…" : "Send my priorities"}</Button>
-      <p className="vertical-form-note">No auto-reply or enrollment. Your details go to Supreme Team Media for a direct response.</p>
+      <Button type="submit" disabled={status === "submitting"} className="studio-btn studio-btn-primary w-full">{status === "submitting" ? (es ? "Enviando…" : "Sending…") : (es ? "Envía mis prioridades" : "Send my priorities")}</Button>
+      <p className="vertical-form-note">{es ? "Sin respuestas automáticas ni inscripciones. Tus datos llegan a Supreme Team Media para una respuesta directa." : "No auto-reply or enrollment. Your details go to Supreme Team Media for a direct response."}</p>
     </form>
   );
 }
