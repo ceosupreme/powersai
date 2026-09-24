@@ -281,7 +281,7 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.redacted.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
                     </p>
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
@@ -386,11 +386,11 @@ export default function FreeAudit() {
                   <>
                     <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.full.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/mo estimated</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">estimated impact</span>
                     </p>
                     {audit.full.total_risk_exposure_dollars > 0 && (
                       <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)}/mo in exposure worth defending.
+                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)} in estimated exposure worth defending.
                       </p>
                     )}
                   </>
@@ -426,7 +426,7 @@ export default function FreeAudit() {
                           </p>
                         ) : (
                           <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50">/mo</span>
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> estimated impact</span>
                           </p>
                         )}
                       </div>

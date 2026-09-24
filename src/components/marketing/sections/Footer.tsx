@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Container, MonoLabel } from "@/components/marketing/site/primitives";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 const links = [
   { href: "#lead-followup", label: "Systems" },
@@ -54,8 +55,8 @@ export function Footer() {
           )}
 
           <div className="text-sm md:text-right">
-            <a href="mailto:hello@supremeteammedia.com" className="text-[hsl(var(--bone))] transition-colors hover:text-[hsl(var(--gold))]">
-              hello@supremeteammedia.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-[hsl(var(--bone))] transition-colors hover:text-[hsl(var(--gold))]">
+              {CONTACT_EMAIL}
             </a>
             <p className="mt-1 text-[hsl(var(--bone)/0.6)]">Phone &amp; social — coming soon</p>
           </div>

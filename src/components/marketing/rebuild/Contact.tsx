@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Your name is required").max(200),
@@ -88,7 +89,7 @@ export function Contact() {
 
     if (fnError) {
       setStatus("error");
-      setError("Something went wrong. Please email hello@supremeteammedia.com.");
+      setError(`Something went wrong. Please email ${CONTACT_EMAIL}.`);
       return;
     }
     setStatus("success");
@@ -120,11 +121,11 @@ export function Contact() {
               Tell me where the headache is. I'll reply with the first thing I'd fix — and whether it's worth building. Usually within a day.
             </p>
             <a
-              href="mailto:hello@supremeteammedia.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="mt-8 inline-flex items-center gap-2 text-sm transition-colors"
               style={{ color: "rgba(255,255,255,0.7)" }}
             >
-              <Mail size={14} /> hello@supremeteammedia.com
+              <Mail size={14} /> {CONTACT_EMAIL}
             </a>
           </div>
 
@@ -145,8 +146,8 @@ export function Contact() {
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   In the meantime, feel free to email me directly at{" "}
-                  <a href="mailto:hello@supremeteammedia.com" className="text-foreground underline-offset-4 hover:underline">
-                    hello@supremeteammedia.com
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline-offset-4 hover:underline">
+                    {CONTACT_EMAIL}
                   </a>
                   .
                 </p>
