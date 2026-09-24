@@ -75,7 +75,7 @@ function VerticalPage({ slug }: { slug: VerticalSlug }) {
   const segmentSelector = config.segments ? <div className="vertical-segment-block"><p className="studio-label">{config.segmentLabel}</p><div className="vertical-segment-control" role="group" aria-label={config.segmentLabel}>{config.segments.map((item) => <Button key={item.id} type="button" variant="outline" aria-pressed={segment === item.id} onClick={() => setSegment(item.id)}>{item.label}</Button>)}</div></div> : null;
 
   return <div className={`stm-studio flagship-vertical vertical-${slug}`}>
-    <StudioHeader />
+    <StudioHeader language={slug === "tacos" ? language : "en"} />
     <main>
       <section className="vertical-hero"><div className="studio-container vertical-hero-grid"><div className="vertical-hero-copy">{slug === "tacos" && <div className="vertical-language" role="group" aria-label={copy.language}><span>{copy.language}</span><Button type="button" variant="outline" aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</Button><Button type="button" variant="outline" aria-pressed={language === "es"} onClick={() => setLanguage("es")}>ES</Button></div>}<p className="studio-eyebrow">{config.eyebrow}</p>{biz && <p className="vertical-biz-note">{copy.biz} {biz}</p>}<h1 className="studio-display">{config.title}</h1><p className="vertical-hero-lede">{config.description}</p><div className="vertical-hero-actions"><a className="studio-btn studio-btn-primary" href="#diagnostic">{config.primaryLabel} <ArrowDown aria-hidden size={16}/></a><Link className="studio-btn studio-btn-outline" to={config.heroProofPath ?? freeAudit}>{config.heroProofLabel ?? config.secondaryLabel}</Link>{config.tertiaryLabel && <Link className="vertical-text-link" to={freeAudit}>{config.tertiaryLabel} <ArrowRight aria-hidden size={15}/></Link>}</div>{segmentSelector}</div><VerticalHeroVisual slug={slug} language={language}/></div></section>
 
@@ -103,6 +103,6 @@ function VerticalPage({ slug }: { slug: VerticalSlug }) {
       <section className="vertical-faq studio-section"><div className="studio-container"><p className="studio-eyebrow">{copy.faqEyebrow}</p><h2 className="studio-display">{copy.faqTitle}</h2><div className="vertical-faq-list">{config.faqs.map((faq) => <details key={faq.q}><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></div></section>
 
       <section className="vertical-final"><div className="studio-container"><p className="studio-eyebrow">{copy.finalEyebrow}</p><h2 className="studio-display">{copy.finalTitle}</h2><div><a className="studio-btn studio-btn-primary" href="#inquiry">{copy.finalButton}</a><Link className="studio-btn studio-btn-outline" to={freeAudit}>{config.secondaryLabel}</Link></div></div></section>
-    </main><StudioFooter />
+    </main><StudioFooter language={slug === "tacos" ? language : "en"} />
   </div>;
 }
