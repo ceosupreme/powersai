@@ -260,12 +260,12 @@ export default function FreeAudit() {
                     >
                       Try again
                     </button>
-                    <a
-                      href="/#contact"
+                    <Link
+                      to={recommendationHref}
                       className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--stm-bg))]/70 underline-offset-4 hover:underline"
                     >
                       Or talk to a human
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -295,7 +295,7 @@ export default function FreeAudit() {
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       A 2-minute call with your numbers puts dollars on them.
                     </p>
-                    <div className="mt-6"><BookingCta /></div>
+                    <div className="mt-6"><BookingCta src={src} biz={businessName} /></div>
                   </>
                 ) : (
                   <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
@@ -462,7 +462,7 @@ export default function FreeAudit() {
                 <p className="font-display text-2xl md:text-3xl leading-snug">Get a scoped recommendation</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
                   <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get a scoped recommendation</Link>
-                  <BookingCta className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />
+                  <BookingCta src={src} biz={businessName} className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />
                 </div>
               </div>
             </div>

@@ -23,7 +23,7 @@ export function SelectedWork() {
 
         {isError ? (
           <p className="mt-10 text-[0.95rem] text-muted-foreground" role="status">
-            The project list couldn&apos;t be loaded right now. Please refresh, or email
+            The project list couldn&apos;t be loaded right now. Please refresh, or email{" "}
             {CONTACT_EMAIL} and Sean will send examples directly.
           </p>
         ) : isLoading ? (

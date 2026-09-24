@@ -6,7 +6,7 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 function highlightMoney(text: string) {
   // wrap $-figures and %-figures in gold
-  const parts = text.split(/(\$[\d,]+(?:[–-]\$?[\d,]+)?(?:K|\/mo|\/yr)?|\b\d+%|\b\d+-venue|\b\d+ ?venue)/g);
+  const parts = text.split(/(\$[\d,]+(?:[–-]\$?[\d,]+)?(?:K|\/yr)?|\b\d+%|\b\d+-venue|\b\d+ ?venue)/g);
   return parts.map((p, i) =>
     /^(\$|\d+%|\d+-?venue)/i.test(p) ? (
       <span key={i} style={{ color: "hsl(var(--gold))" }} className="font-medium">

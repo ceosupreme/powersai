@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { cn } from "@/lib/utils";
 
-export function BookingCta({ className }: { className?: string }) {
+export function BookingCta({ className, src: srcOverride, biz: bizOverride }: { className?: string; src?: string | null; biz?: string | null }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: bookingUrl = "" } = useQuery({
@@ -23,8 +23,8 @@ export function BookingCta({ className }: { className?: string }) {
 
   const activate = () => {
     const params = new URLSearchParams(location.search);
-    const src = params.get("src");
-    const biz = params.get("biz");
+    const src = srcOverride ?? params.get("src");
+    const biz = bizOverride ?? params.get("biz");
     if (bookingUrl) {
       trackSiteEvent({ event_type: "cta_click", label: "book_call" });
       window.open(bookingUrl, "_blank", "noopener,noreferrer");
