@@ -95,7 +95,8 @@
 - [x] Verify types, build, functions, and public/mobile flows without live sends or publishing
 
 ## PASS B — buyable website offer
-- [ ] Resolve Connect Stripe test-key validation failure
-- [ ] Add checkout creation and payment verification
-- [ ] Add public thank-you page and buyable offer sections
-- [ ] Add STM order totals to HQ and test idempotency with a test purchase
+- [ ] Replace the validated live Stripe key with a test-mode restricted key
+- [x] Add checkout creation and payment verification
+- [x] Add public thank-you page and buyable offer sections
+- [x] Add STM order totals to HQ
+- [ ] Test successful checkout and idempotent reload after the test-mode key is connected
