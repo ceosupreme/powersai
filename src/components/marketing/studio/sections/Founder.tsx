@@ -13,10 +13,10 @@ export function Founder() {
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <Eyebrow>About Sean Mayo</Eyebrow>
+            <Eyebrow>About Sean Powers</Eyebrow>
             <SectionTitle>Business judgment, creative range, and hands-on execution.</SectionTitle>
             <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground md:text-lg">
-              I&apos;m Sean Mayo, founder of Supreme Team Media. Since 2002, I&apos;ve helped connect the way a business
+              I&apos;m Sean Powers, founder of Supreme Team Media. Since 2002, I&apos;ve helped connect the way a business
               presents itself with the way it attracts customers and gets work done. Today, that includes websites,
               branding, marketing, copy, and custom business systems.
             </p>

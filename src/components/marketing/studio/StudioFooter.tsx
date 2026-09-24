@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Container } from "./primitives";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 /** Every link here points at a real, implemented route — never a dead link. */
 export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
@@ -61,8 +62,8 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
 
         <div className="mt-12 flex flex-col gap-2 border-t border-[hsl(var(--band-text)/0.16)] pt-6 text-sm text-muted-foreground md:flex-row md:justify-between">
           <span>&copy; {new Date().getFullYear()} Supreme Team Media</span>
-          <a href="mailto:hello@supremeteammedia.com" className="inline-flex min-h-11 items-center hover:underline">
-            hello@supremeteammedia.com
+          <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 items-center hover:underline">
+            {CONTACT_EMAIL}
           </a>
         </div>
       </Container>

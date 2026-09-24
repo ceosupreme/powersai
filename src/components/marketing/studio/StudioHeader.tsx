@@ -4,6 +4,7 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Container } from "./primitives";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 const SERVICES = [
   { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Credible sites, landing pages, commerce, and web apps", noteEs: "Sitios confiables, páginas de campaña, comercio y aplicaciones web" },
@@ -112,7 +113,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link to={attributedContact} className="studio-btn studio-btn-primary studio-header-cta">
+          <Link to={attributedContact} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="studio-btn studio-btn-primary studio-header-cta">
             {labels.start}
           </Link>
           <Button
@@ -148,7 +149,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/#about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
             <Link
               to={attributedContact}
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); trackSiteEvent({ event_type: "cta_click", label: "start_project" }); }}
               className="studio-btn studio-btn-primary mt-3 w-full"
             >
               {labels.start}

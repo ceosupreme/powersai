@@ -54,3 +54,10 @@ export function trackSiteEvent(event: SiteEvent): void {
   }
 }
 
+export type StudioEvent = "service_selected" | "project_opened" | "inquiry_started" | "inquiry_submitted" | "hiring_interest" | "resume_download";
+
+export function trackStudioEvent(event: StudioEvent, detail?: { category?: string; id?: string }): void {
+  const label = detail?.id ?? detail?.category ?? event;
+  trackSiteEvent({ event_type: event === "inquiry_submitted" ? "form_success" : "cta_click", label });
+}
+

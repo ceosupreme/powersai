@@ -11,6 +11,7 @@ import { VerticalHeroVisual, JourneyDiagram } from "@/components/marketing/verti
 import { VerticalInquiry } from "@/components/marketing/vertical-flagship/VerticalInquiry";
 import { VerticalProof } from "@/components/marketing/vertical-flagship/VerticalProof";
 import { TACO_SPANISH } from "@/components/marketing/vertical-flagship/tacoSpanish";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 const PAGE_COPY = {
   en: {
@@ -102,7 +103,7 @@ function VerticalPage({ slug }: { slug: VerticalSlug }) {
 
       <section className="vertical-faq studio-section"><div className="studio-container"><p className="studio-eyebrow">{copy.faqEyebrow}</p><h2 className="studio-display">{copy.faqTitle}</h2><div className="vertical-faq-list">{config.faqs.map((faq) => <details key={faq.q}><summary>{faq.q}</summary><p>{faq.a}</p></details>)}</div></div></section>
 
-      <section className="vertical-final"><div className="studio-container"><p className="studio-eyebrow">{copy.finalEyebrow}</p><h2 className="studio-display">{copy.finalTitle}</h2><div><a className="studio-btn studio-btn-primary" href="#inquiry">{copy.finalButton}</a><Link className="studio-btn studio-btn-outline" to={freeAudit}>{config.secondaryLabel}</Link></div></div></section>
+      <section className="vertical-final"><div className="studio-container"><p className="studio-eyebrow">{copy.finalEyebrow}</p><h2 className="studio-display">{copy.finalTitle}</h2><div><a className="studio-btn studio-btn-primary" href="#inquiry" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "send_priorities", vertical: slug, src: `for-${slug}` })}>{copy.finalButton}</a><Link className="studio-btn studio-btn-outline" to={freeAudit} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "run_free_check", vertical: slug, src: `for-${slug}` })}>{config.secondaryLabel}</Link></div></div></section>
     </main><StudioFooter language={slug === "tacos" ? language : "en"} />
   </div>;
 }

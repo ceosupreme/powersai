@@ -9,6 +9,7 @@ import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { STUDIO_CATEGORIES, STUDIO_CATEGORY_LABEL, type StudioCategoryId } from "@/content/studioProjects";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
+import { CONTACT_EMAIL } from "@/lib/siteContact";
 
 const VALID = new Set<string>(STUDIO_CATEGORIES.map((c) => c.id));
 
@@ -34,7 +35,7 @@ export default function Work() {
   useStudioHead({
     title: active === "all" ? "Work — Supreme Team Media" : `${activeLabel} work — Supreme Team Media`,
     description:
-      "Selected live websites, creative projects, and business systems, each identifying the type of work and Sean Mayo's contribution.",
+      "Selected live websites, creative projects, and business systems, each identifying the type of work and Sean Powers' contribution.",
     path: active === "all" ? "/work" : `/work?category=${active}`,
     canonicalPath: "/work",
   });
@@ -63,7 +64,7 @@ export default function Work() {
 
           {isError ? (
             <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">
-               Something went wrong loading the projects. Please refresh, or email hello@supremeteammedia.com.
+               Something went wrong loading the projects. Please refresh, or email {CONTACT_EMAIL}.
             </p>
           ) : isLoading ? (
             <p className="py-16 text-[0.95rem] text-muted-foreground" role="status">

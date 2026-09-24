@@ -2,6 +2,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Container } from "@/components/marketing/site/primitives";
 import { Reveal } from "@/components/marketing/site/Reveal";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 function highlightMoney(text: string) {
   // wrap $-figures and %-figures in gold
@@ -43,6 +44,7 @@ export function ProofBand({ proofLine }: { proofLine: string }) {
         <Reveal delay={280}>
           <Link
             to="/work"
+            onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })}
             className="group mt-8 inline-flex items-center gap-2 text-sm font-medium underline decoration-2 underline-offset-8"
             style={{ color: "hsl(var(--gold))" }}
           >
