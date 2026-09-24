@@ -10,6 +10,7 @@ import { ProjectPlate } from "./ProjectPlate";
 import { Container, Eyebrow, SectionTitle } from "./primitives";
 import { useStudioHead } from "./useStudioHead";
 import { ServiceExplainerVisual, ServiceHeroVisual, ServiceMediaBand } from "./ServiceVisuals";
+import { OfferSection } from "@/components/marketing/offer/OfferSection";
 
 export type ServicePageContent = {
   eyebrow: string;
@@ -84,6 +85,8 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
             <Container><ServiceExplainerVisual tone={content.tone} /></Container>
           </section>
         </StudioReveal>
+
+        {content.tone === "websites" && <StudioReveal><OfferSection source="services-websites" /></StudioReveal>}
 
         <StudioReveal>
           <section className="studio-section">

@@ -54,6 +54,8 @@ type WebsiteStats = {
   callRequests: number;
   inquiries: Record<string, number>;
   firstResponseRate: number | null;
+  ordersCount: number;
+  ordersTotal: number;
 };
 
 const QUICK_LINKS = [
@@ -102,13 +104,15 @@ export default function ProjectHome() {
     }
     let cancelled = false;
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const ordersSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     Promise.all([
       supabase.from('site_events').select('event_type').gte('created_at', since),
       supabase.from('inbound_leads').select('email,first_response_at,qualifier_data').is('captured_for_project_id', null).gte('created_at', since),
-    ]).then(([eventsResult, leadsResult]) => {
+      supabase.from('site_orders').select('amount_cents,status').in('status', ['paid', 'active']).gte('created_at', ordersSince),
+    ]).then(([eventsResult, leadsResult, ordersResult]) => {
       if (cancelled) return;
-      if (eventsResult.error || leadsResult.error) {
-        console.error('[project-home] website stats failed', eventsResult.error ?? leadsResult.error);
+      if (eventsResult.error || leadsResult.error || ordersResult.error) {
+        console.error('[project-home] website stats failed', eventsResult.error ?? leadsResult.error ?? ordersResult.error);
         return;
       }
       const events = eventsResult.data ?? [];
@@ -130,6 +134,8 @@ export default function ProjectHome() {
         callRequests: events.filter((event) => event.event_type === 'call_request').length,
         inquiries,
         firstResponseRate: emailLeads ? Math.round((responded / emailLeads) * 100) : null,
+        ordersCount: (ordersResult.data ?? []).length,
+        ordersTotal: (ordersResult.data ?? []).reduce((sum, order) => sum + (order.amount_cents ?? 0), 0),
       });
     });
     return () => { cancelled = true; };
@@ -441,6 +447,7 @@ export default function ProjectHome() {
                 )) : <span className="text-sm text-muted-foreground">—</span>}
               </div>
             </div>
+            <p className="text-sm text-muted-foreground">Orders, last 30 days: <span className="font-medium text-foreground">{websiteStats.ordersCount} · ${(websiteStats.ordersTotal / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span></p>
           </CardContent>
         </Card>
       )}

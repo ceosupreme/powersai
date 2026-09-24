@@ -2,8 +2,8 @@ import { ServicePage, type ServicePageContent } from "@/components/marketing/stu
 
 const content: ServicePageContent = {
   eyebrow: "Websites & digital products",
-  title: "Websites people trust. Experiences that give them a reason to act.",
-  description: "Help people understand your offer quickly, trust what they see, and know what to do next. Strategy, website and landing-page copy, UX, design, and development stay connected from the first page to launch.",
+  title: "Websites that run your business.",
+  description: "A real site built for your trade that captures every inquiry, answers it the moment it lands, and shows you what it did. Built by one founder in San Diego, live in days once your content is in.",
   path: "/services/websites",
   seoTitle: "Websites & Digital Products | Supreme Team Media",
   seoDescription: "Strategy, design and development for credible business websites, landing pages, ecommerce, web apps and responsive digital products.",

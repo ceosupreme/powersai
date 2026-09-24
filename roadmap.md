@@ -2,6 +2,11 @@
 
 ## Public studio website (STM build pack)
 
+- [x] PASS B part 1 — buyable website offer
+  - Stripe test key connected; inline checkout for Launch deposit, Launch monthly, and Care Seat
+  - Idempotent payment verification, order recording, lead notifications, and public thank-you page
+  - Approved offer ladder on Home and Website Services; 30-day order total in STM HQ
+
 - [x] Phase 1 — Foundation + homepage
   - `.stm-studio` scoped tokens, isolated components under `src/components/marketing/studio`
   - Homepage sections in spec order; real `submit-inbound-lead` intake
