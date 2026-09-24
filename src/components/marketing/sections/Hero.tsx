@@ -41,7 +41,7 @@ export function Hero() {
             >
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                  { n: "$108K/yr", k: "1 missed call/day" },
+                  { n: "Every lead", k: "Prompt email follow-up" },
                   { n: "63%", k: "of leads buy from the first responder" },
                   { n: "<5s", k: "reply time" },
                 ].map((s) => (

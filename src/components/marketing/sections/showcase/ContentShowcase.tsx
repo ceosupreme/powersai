@@ -44,7 +44,7 @@ export function ContentShowcase() {
       sub="Trained on your tone, your offers, and your last 6 months of winning posts — your AI drafts on-brand promos, emails, and captions in seconds, ready for approval."
       bullets={[
         "Voice-matched to your brand",
-        "Multi-channel: SMS, email, social",
+        "Multi-channel: email and social",
         "Owner-approves before anything ships",
       ]}
     >

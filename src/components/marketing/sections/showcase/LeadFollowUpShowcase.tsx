@@ -35,7 +35,7 @@ export function LeadFollowUpShowcase() {
       title={<>Every inquiry answered in seconds — never sits in an inbox.</>}
       sub="The moment a lead lands, your AI replies on-brand, qualifies, and moves them through the CRM. You wake up to booked calls instead of unread messages."
       bullets={[
-        "Instant first reply across web, SMS, DM",
+        "Instant first reply by email from web inquiries",
         "Auto-qualifies and routes to the right stage",
         "Hands off to a human when it matters",
       ]}
