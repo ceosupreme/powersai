@@ -109,7 +109,7 @@ export function Inquiry() {
   useEffect(() => {
     if (!offer) return;
     const service = OFFER_CONTEXT[offer].service;
-    setServices((prev) => (prev.length === 0 ? [service] : prev));
+    setServices((prev) => (prev.includes(service) ? prev : [...prev, service]));
   }, [offer]);
 
   // Backwards compatibility with older marketing links that carried a prefill

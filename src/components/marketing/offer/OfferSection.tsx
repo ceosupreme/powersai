@@ -6,15 +6,15 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 type OfferKey = "launch-site" | "business-site" | "care" | "growth" | "custom-systems";
 
-const offerHref = (offer: OfferKey) => {
+const offerHref = (offer: OfferKey, source: "home" | "services-websites") => {
   const intent = offer === "growth" ? "marketing" : offer === "custom-systems" ? "ai-systems" : "websites";
-  return `/?intent=${intent}&offer=${offer}#contact`;
+  return `/?intent=${intent}&offer=${offer}&src=${source}#contact`;
 };
 
-function OfferLink({ offer, children, primary = false }: { offer: OfferKey; children: React.ReactNode; primary?: boolean }) {
+function OfferLink({ offer, source, children, primary = false }: { offer: OfferKey; source: "home" | "services-websites"; children: React.ReactNode; primary?: boolean }) {
   return (
     <Link
-      to={offerHref(offer)}
+      to={offerHref(offer, source)}
       onClick={() => trackSiteEvent({ event_type: "cta_click", label: `offer_${offer.replaceAll("-", "_")}` })}
       className={`studio-btn ${primary ? "studio-btn-primary" : "studio-btn-outline"}`}
     >
@@ -63,7 +63,7 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
             <ul className="website-option-list">
               {LAUNCH_SCOPE.map((item) => <li key={item}><Check aria-hidden size={16} />{item}</li>)}
             </ul>
-            <div><OfferLink offer="launch-site" primary>Start a Launch Site</OfferLink></div>
+            <div><OfferLink offer="launch-site" source={source} primary>Start a Launch Site</OfferLink></div>
           </article>
 
           <article className="website-option website-option-business">
@@ -77,7 +77,7 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
               <span>Quoted after the free check or scoped review</span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <OfferLink offer="business-site" primary>Get a scoped Business Site quote</OfferLink>
+              <OfferLink offer="business-site" source={source} primary>Get a scoped Business Site quote</OfferLink>
               <Link to="/free-audit?src=services-websites" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "run_free_check" })} className="studio-btn studio-btn-outline">Run the free business checkup</Link>
             </div>
           </article>
@@ -92,7 +92,7 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
               <strong>$149/month founding rate</strong>
               <span>For the first 10 Care seats; $199/month after.</span>
             </div>
-            <div><OfferLink offer="care">Ask about Care</OfferLink></div>
+            <div><OfferLink offer="care" source={source}>Ask about Care</OfferLink></div>
           </article>
         </div>
 
@@ -105,13 +105,13 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
             <h3 className="studio-display text-[1.55rem]">Growth</h3>
             <p className="mt-2 font-semibold">From $497/month</p>
             <p className="mt-2 text-sm text-muted-foreground">Quoted based on scope.</p>
-            <OfferLink offer="growth">Discuss Growth</OfferLink>
+            <OfferLink offer="growth" source={source}>Discuss Growth</OfferLink>
           </article>
           <article>
             <h3 className="studio-display text-[1.55rem]">Custom Systems</h3>
             <p className="mt-2 font-semibold">Starts at $10,000</p>
             <p className="mt-2 text-sm text-muted-foreground">Custom scope.</p>
-            <OfferLink offer="custom-systems">Discuss a Custom System</OfferLink>
+            <OfferLink offer="custom-systems" source={source}>Discuss a Custom System</OfferLink>
           </article>
         </div>
 
