@@ -1,7 +1,9 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BookingCta } from "@/components/marketing/BookingCta";
+import { CheckoutButton } from "@/components/marketing/offer/CheckoutButton";
 import { Container, Eyebrow } from "@/components/marketing/studio/primitives";
+import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 
 type OfferKey = "launch-site" | "business-site" | "care" | "growth" | "custom-systems";
@@ -33,6 +35,7 @@ const LAUNCH_SCOPE = [
 
 export function OfferSection({ source = "home" }: { source?: "home" | "services-websites" }) {
   const isServicePage = source === "services-websites";
+  const { enabled: checkout } = useCheckoutEnabled();
   return (
     <section id="website-options" className="website-options studio-section bg-[hsl(var(--surface))]">
       <Container>
@@ -63,7 +66,15 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
             <ul className="website-option-list">
               {LAUNCH_SCOPE.map((item) => <li key={item}><Check aria-hidden size={16} />{item}</li>)}
             </ul>
-            <div><OfferLink offer="launch-site" source={source} primary>Start a Launch Site</OfferLink></div>
+            <div className="flex flex-col items-start gap-3">
+              {checkout && (
+                <div className="flex flex-wrap gap-3">
+                  <CheckoutButton product="launch_site_deposit" label="Start with the deposit" />
+                  <CheckoutButton product="launch_site_monthly" label="Start monthly" />
+                </div>
+              )}
+              <OfferLink offer="launch-site" source={source} primary={!checkout}>{checkout ? "Ask a question first" : "Start a Launch Site"}</OfferLink>
+            </div>
           </article>
 
           <article className="website-option website-option-business">
@@ -92,7 +103,10 @@ export function OfferSection({ source = "home" }: { source?: "home" | "services-
               <strong>$149/month founding rate</strong>
               <span>For the first 10 Care seats; $199/month after.</span>
             </div>
-            <div><OfferLink offer="care" source={source}>Ask about Care</OfferLink></div>
+            <div className="flex flex-col items-start gap-3">
+              {checkout && <CheckoutButton product="care_seat" label="Get the care seat" />}
+              <OfferLink offer="care" source={source}>Ask about Care</OfferLink>
+            </div>
           </article>
         </div>
 
