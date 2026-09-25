@@ -134,7 +134,8 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const screens = arr<string>(proof.screens);
   const price = row.price_block ?? {};
   const ackBusiness = biz ?? (lang === "es" ? "tu negocio" : `your ${String(row.display_name).toLowerCase()} business`);
-  const inquiryConfig = { slug, name: row.display_name, needs: DEFAULT_NEEDS.map((l) => ({ id: l, label: l, detail: "" })) } as any;
+  const needsList: string[] = Array.isArray(row.needs) && row.needs.every((n: unknown) => typeof n === "string") && row.needs.length ? row.needs : DEFAULT_NEEDS;
+  const inquiryConfig = { slug, name: row.display_name, needs: needsList.map((l) => ({ id: l, label: l, detail: "" })) } as any;
 
   const section = "studio-section border-t border-border";
   const H2 = ({ children }: { children: React.ReactNode }) => <h2 className="studio-display text-3xl md:text-5xl">{children}</h2>;
@@ -182,7 +183,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_form}</p>
               <div className="mt-3 space-y-2 text-sm" aria-hidden>{["Name", "Email", "Business"].map((f) => <div key={f} className="rounded-md border border-border bg-background px-3 py-2 text-muted-foreground">{f}</div>)}
-                <div className="flex flex-wrap gap-2">{DEFAULT_NEEDS.map((n) => <span key={n} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{n}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{needsList.map((n) => <span key={n} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{n}</span>)}</div>
                 <div className="rounded-md border border-border bg-background px-3 py-6 text-muted-foreground">Optional note</div></div><Caption i={1} /></div>
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_email}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: {ackSubject(ackBusiness, lang)}</p><pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap font-sans text-xs leading-relaxed text-muted-foreground">{lang === "es" ? ackSpanishBody("", ackBusiness, "") : ackEnglishBody("", ackBusiness, "")}</pre><Caption i={2} /></div>
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_alert}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: New website inquiry — [customer name]</p><ul className="mt-2 grid grid-cols-2 gap-1 text-xs text-muted-foreground">{["Name", "Email", "Phone", "Company", "Interested in", "Timing", "Source", "Submitted", "Project note"].map((f) => <li key={f}>{f}</li>)}</ul><Caption i={3} /></div>
@@ -194,13 +195,13 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
 
         <section id="pricing" className={section}><div className="studio-container"><StudioReveal><H2>{price.heading || L.price_heading}</H2></StudioReveal>
           <div className="mt-6">
-            <PriceRow text={str(price.launch)}>{checkout ? <><CheckoutButton product="launch_site_deposit" label={L.deposit} /><CheckoutButton product="launch_site_monthly" label={L.monthly} /></> : <Link className="studio-btn studio-btn-primary" to={inquiry("launch-site")} onClick={() => track("v2_offer_launch_site")}>{L.launch_inquiry}</Link>}</PriceRow>
-            <PriceRow text={str(price.care)}>{checkout ? <CheckoutButton product="care_seat" label={L.care} /> : <Link className="studio-btn studio-btn-outline" to={inquiry("care")} onClick={() => track("v2_offer_care")}>{L.care_inquiry}</Link>}</PriceRow>
+            <PriceRow text={str(price.launch)}>{checkout ? <><CheckoutButton product="launch_site_deposit" label={L.deposit} sourceVertical={slug} originPath={location.pathname} /><CheckoutButton product="launch_site_monthly" label={L.monthly} sourceVertical={slug} originPath={location.pathname} /></> : <Link className="studio-btn studio-btn-primary" to={inquiry("launch-site")} onClick={() => track("v2_offer_launch_site")}>{L.launch_inquiry}</Link>}</PriceRow>
+            <PriceRow text={str(price.care)}>{checkout ? <CheckoutButton product="care_seat" label={L.care} sourceVertical={slug} originPath={location.pathname} /> : <Link className="studio-btn studio-btn-outline" to={inquiry("care")} onClick={() => track("v2_offer_care")}>{L.care_inquiry}</Link>}</PriceRow>
             <PriceRow text={str(price.business)}><Link className="studio-btn studio-btn-outline" to={inquiry("business-site")} onClick={() => track("v2_offer_business_site")}>{L.business_quote}</Link><Link className="studio-btn studio-btn-outline" to={freeCheck} onClick={() => track("v2_offer_free_check")}>{L.free_check}</Link></PriceRow>
             <PriceRow text={str(price.growth)}><Link className="studio-btn studio-btn-outline" to={`/?intent=marketing&offer=growth&src=${src}${bizQ}${langQ}#contact`} onClick={() => track("v2_offer_growth")}>{L.growth}</Link></PriceRow>
           </div>
           {row.guarantee_line && <p className="mt-6 max-w-3xl text-foreground">{row.guarantee_line}</p>}
-          {arr(row.how_it_works).length > 0 && <ol className="mt-10 grid gap-4 md:grid-cols-3">{arr<any>(row.how_it_works).slice(0, 3).map((s, i) => <li key={i} className="rounded-xl border border-border bg-card p-5"><span className="studio-display text-3xl" style={{ color: accent }}>{i + 1}</span><h3 className="mt-2 font-semibold text-foreground">{s.title}</h3>{s.body && <p className="mt-1 text-muted-foreground">{s.body}</p>}</li>)}</ol>}
+          {arr(row.how_it_works).length > 0 && <ol className="mt-10 grid gap-4 md:grid-cols-3">{arr<any>(row.how_it_works).slice(0, 3).map((s, i) => <li key={i} className="rounded-xl border border-border bg-card p-5"><span className="studio-display text-3xl" style={{ color: accent }}>{i + 1}</span><h3 className="mt-2 font-semibold text-foreground">{typeof s === "string" ? `${lang === "es" ? "Paso" : "Step"} ${i + 1}` : s?.title}</h3>{(typeof s === "string" ? s : s?.body) && <p className="mt-1 text-muted-foreground">{typeof s === "string" ? s : s.body}</p>}</li>)}</ol>}
         </div></section>
 
         {arr(row.market_facts).length > 0 && <section className={section}><div className="studio-container"><StudioReveal><H2>{L.market}</H2></StudioReveal>
