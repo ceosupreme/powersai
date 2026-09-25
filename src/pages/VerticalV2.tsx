@@ -50,7 +50,12 @@ export default function VerticalV2({ row, slug }: { row: any; slug: string }) {
   const bizQ = biz ? `&biz=${encodeURIComponent(biz)}` : "";
   const src = `for-${slug}`;
   const { enabled: checkout } = useCheckoutEnabled();
-  const accent = `hsl(var(--${["rust", "gold", "green"].includes(row.accent_color) ? row.accent_color : "rust"}))`;
+  // Reuse FlagshipVertical's accent color map (VerticalHero). The raw --rust/--gold/--green
+  // CSS variables are scoped to .stm-marketing and do not resolve inside .stm-studio,
+  // so fall back to the literal hex values with hsl(var(--primary)) as the fallback.
+  const accent = ({ rust: "#E15C4A", gold: "#465CFF", green: "#198A5A" } as Record<string, string>)[
+    String(row.accent_color ?? "").toLowerCase()
+  ] ?? "hsl(var(--primary))";
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label, vertical: slug, src });
 
   useStudioHead({ title: str(row.meta_title) || str(row.display_name), description: str(row.meta_description), path: location.pathname, canonicalPath: `/for/${slug}` });
@@ -62,7 +67,7 @@ export default function VerticalV2({ row, slug }: { row: any; slug: string }) {
 
   const headline = str(row.headline);
   const word = str(row.headline_accent_word);
-  const idx = word ? headline.indexOf(word) : -1;
+  const idx = word ? headline.toLowerCase().indexOf(word.toLowerCase()) : -1;
   const withBiz = (url: string) => (!biz || !url || url.startsWith("#") ? url : `${url}${url.includes("?") ? "&" : "?"}biz=${encodeURIComponent(biz)}`);
   const Cta = ({ url, label, primary, name }: { url: string; label: string; primary?: boolean; name: string }) => {
     const cls = `studio-btn ${primary ? "studio-btn-primary" : "studio-btn-outline"}`;
@@ -93,7 +98,7 @@ export default function VerticalV2({ row, slug }: { row: any; slug: string }) {
       <main>
         <section className="pt-36 pb-16"><div className="studio-container">
           {biz && <p className="vertical-biz-note">Checking for {biz}</p>}
-          <h1 className="studio-display text-4xl md:text-7xl">{idx >= 0 ? <>{headline.slice(0, idx)}<span style={{ color: accent }}>{word}</span>{headline.slice(idx + word.length)}</> : headline}</h1>
+          <h1 className="studio-display text-4xl md:text-7xl">{idx >= 0 ? <>{headline.slice(0, idx)}<span style={{ color: accent }}>{headline.slice(idx, idx + word.length)}</span>{headline.slice(idx + word.length)}</> : headline}</h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{row.subline}</p>
           {row.stat_value && <p className="mt-8"><span className="studio-display text-5xl" style={{ color: accent }}>{row.stat_value}</span><span className="ml-3 text-sm text-muted-foreground">{row.stat_label}</span></p>}
           <div className="mt-8 flex flex-wrap gap-3"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary" /><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary" /></div>
