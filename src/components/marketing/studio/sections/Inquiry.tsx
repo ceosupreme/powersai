@@ -18,6 +18,16 @@ import {
 /** Server hard limit on `message` (submit-inbound-lead). Never exceeded, never silently trimmed. */
 const SERVER_MESSAGE_LIMIT = 4000;
 
+const OFFER_CONTEXT = {
+  "launch-site": { label: "Launch Site", service: "websites-apps" },
+  "business-site": { label: "Business Site", service: "websites-apps" },
+  care: { label: "Care", service: "websites-apps" },
+  growth: { label: "Growth", service: "marketing-growth" },
+  "custom-systems": { label: "Custom Systems", service: "ai-systems" },
+} as const satisfies Record<string, { label: string; service: ServiceId }>;
+
+type OfferKey = keyof typeof OFFER_CONTEXT;
+
 const TIMING_OPTIONS = ["As soon as possible", "Next 1–3 months", "Later this year", "Just exploring"] as const;
 const BUDGET_OPTIONS = [
   "Not sure yet",
@@ -72,6 +82,8 @@ export function Inquiry() {
   const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "publishing"]);
   const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : "studio_home_inquiry";
   const callRequested = params.get("call_requested") === "1";
+  const offerParam = params.get("offer");
+  const offer = offerParam && offerParam in OFFER_CONTEXT ? offerParam as OfferKey : null;
 
   const startedRef = useRef(false);
   const convertedRef = useRef(false);
@@ -93,6 +105,12 @@ export function Inquiry() {
     window.addEventListener(SERVICE_INTENT_EVENT, handler as EventListener);
     return () => window.removeEventListener(SERVICE_INTENT_EVENT, handler as EventListener);
   }, []);
+
+  useEffect(() => {
+    if (!offer) return;
+    const service = OFFER_CONTEXT[offer].service;
+    setServices((prev) => (prev.length === 0 ? [service] : prev));
+  }, [offer]);
 
   // Backwards compatibility with older marketing links that carried a prefill
   // string. It fills the note ONLY while the note is still empty — a visitor's
@@ -220,6 +238,7 @@ export function Inquiry() {
             src: sourceParam,
             biz: initialBiz || null,
             call_requested: callRequested,
+            offer,
           },
           company_website: "",
         },
@@ -299,6 +318,12 @@ export function Inquiry() {
                       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
                     </label>
                   </div>
+
+                  {offer && (
+                    <div className="border-l-2 border-primary bg-[hsl(var(--cobalt-pale))] px-4 py-3 text-sm" role="status">
+                      You&apos;re asking about: <strong>{OFFER_CONTEXT[offer].label}</strong>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <Field label="Name" name="name" value={name} onChange={setName} required autoComplete="name" />
