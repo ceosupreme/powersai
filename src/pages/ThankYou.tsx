@@ -4,8 +4,13 @@ import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { Container, Eyebrow } from "@/components/marketing/studio/primitives";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
+import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
+import CheckoutThankYou from "./CheckoutThankYou";
 
 export default function ThankYou() {
+  const { enabled, loading } = useCheckoutEnabled();
+  if (loading) return <div className="stm-studio min-h-screen"><StudioHeader /><main className="pt-40"><Container><p role="status">Loading…</p></Container></main></div>;
+  if (enabled) return <CheckoutThankYou />;
   return (
     <div className="stm-studio min-h-screen">
       <StudioHeader />
