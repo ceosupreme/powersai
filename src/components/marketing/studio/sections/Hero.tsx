@@ -90,9 +90,9 @@ export function WebsiteLedModel() {
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
             <span className="studio-eyebrow block text-[hsl(var(--band-text)/0.72)]">The website-led model</span>
-            <h2 id="website-model-title" className="studio-display mt-4 max-w-4xl text-balance text-[2.35rem] md:text-[3.8rem]">The public experience and the work behind it, connected.</h2>
+            <h2 id="website-model-title" className="studio-display mt-4 max-w-4xl text-balance text-[2.35rem] md:text-[3.8rem]">Your website should not stop working after someone clicks Send.</h2>
           </div>
-          <p className="max-w-xl text-[1rem] text-muted-foreground lg:col-span-5">Each engagement is scoped to the business. The sequence shows what can connect; it does not mean every module is included in every website.</p>
+          <p className="max-w-xl text-[1rem] text-muted-foreground lg:col-span-5">Every inquiry gets a confirmation in seconds and lands in a lead inbox with an alert to your phone. Follow-up, reminders and review requests run from the same place, and you get a plain monthly report of what happened. What is included in each package is listed next to its price below.</p>
         </div>
         <ol className="website-model-track mt-12">
           {stages.map((stage) => (
