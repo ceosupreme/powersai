@@ -11313,11 +11313,13 @@ export type Database = {
       vertical_landing_pages: {
         Row: {
           accent_color: string
+          audience: Json
           created_at: string
           cta_primary_label: string
           cta_primary_url: string
           cta_secondary_label: string | null
           cta_secondary_url: string | null
+          differentiators: Json
           display_name: string
           family_key: string | null
           faq: Json
@@ -11328,16 +11330,22 @@ export type Database = {
           how_it_works: Json | null
           id: string
           included_features: Json | null
+          lang: Json | null
           leaks: Json
           leaks_heading: string | null
           live_in_line: string | null
+          local_plan: Json
+          market_facts: Json
           math_config: Json | null
           meta_description: string
           meta_title: string
           og_image_url: string | null
+          page_version: number
           price_block: Json | null
           project_type_id: string | null
+          proof: Json
           proof_line: string
+          research_slug: string | null
           slug: string
           sort_order: number
           stat_label: string
@@ -11350,11 +11358,13 @@ export type Database = {
         }
         Insert: {
           accent_color?: string
+          audience?: Json
           created_at?: string
           cta_primary_label: string
           cta_primary_url: string
           cta_secondary_label?: string | null
           cta_secondary_url?: string | null
+          differentiators?: Json
           display_name: string
           family_key?: string | null
           faq?: Json
@@ -11365,16 +11375,22 @@ export type Database = {
           how_it_works?: Json | null
           id?: string
           included_features?: Json | null
+          lang?: Json | null
           leaks?: Json
           leaks_heading?: string | null
           live_in_line?: string | null
+          local_plan?: Json
+          market_facts?: Json
           math_config?: Json | null
           meta_description: string
           meta_title: string
           og_image_url?: string | null
+          page_version?: number
           price_block?: Json | null
           project_type_id?: string | null
+          proof?: Json
           proof_line: string
+          research_slug?: string | null
           slug: string
           sort_order?: number
           stat_label: string
@@ -11387,11 +11403,13 @@ export type Database = {
         }
         Update: {
           accent_color?: string
+          audience?: Json
           created_at?: string
           cta_primary_label?: string
           cta_primary_url?: string
           cta_secondary_label?: string | null
           cta_secondary_url?: string | null
+          differentiators?: Json
           display_name?: string
           family_key?: string | null
           faq?: Json
@@ -11402,16 +11420,22 @@ export type Database = {
           how_it_works?: Json | null
           id?: string
           included_features?: Json | null
+          lang?: Json | null
           leaks?: Json
           leaks_heading?: string | null
           live_in_line?: string | null
+          local_plan?: Json
+          market_facts?: Json
           math_config?: Json | null
           meta_description?: string
           meta_title?: string
           og_image_url?: string | null
+          page_version?: number
           price_block?: Json | null
           project_type_id?: string | null
+          proof?: Json
           proof_line?: string
+          research_slug?: string | null
           slug?: string
           sort_order?: number
           stat_label?: string
@@ -11438,6 +11462,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vertical_research: {
+        Row: {
+          competitors: Json
+          differentiation: Json
+          keywords: Json
+          notes: string | null
+          objections: Json
+          owner_pains: Json
+          page_patterns: Json
+          slug: string
+          stats: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          competitors?: Json
+          differentiation?: Json
+          keywords?: Json
+          notes?: string | null
+          objections?: Json
+          owner_pains?: Json
+          page_patterns?: Json
+          slug: string
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          competitors?: Json
+          differentiation?: Json
+          keywords?: Json
+          notes?: string | null
+          objections?: Json
+          owner_pains?: Json
+          page_patterns?: Json
+          slug?: string
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       voice_notes: {
         Row: {
