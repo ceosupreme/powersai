@@ -52,12 +52,12 @@ export function Capabilities() {
       <span id="how-we-help" aria-hidden className="block h-0" />
       <Container>
         <Eyebrow>Services</Eyebrow>
-        <SectionTitle>What do you need to make better?</SectionTitle>
-        <Lede>Start with the problem. We&apos;ll bring the right mix of strategy, creative, marketing, copy, and technology to solve it.</Lede>
+        <SectionTitle>Start with the website. Connect the rest when it helps.</SectionTitle>
+        <Lede>Websites are the clearest starting point. Brand, marketing, systems, and publishing remain available as focused engagements or connected work.</Lede>
 
         <div className="mt-14 divide-y divide-border border-y border-border">
           {ROWS.map((r, i) => (
-            <article key={r.title} className={`service-entry service-entry-${r.tone} grid gap-7 py-9 md:grid-cols-12 md:items-center md:py-12`}>
+            <article key={r.title} className={`service-entry service-entry-${r.tone} ${i === 0 ? "service-entry-featured" : ""} grid gap-7 py-9 md:grid-cols-12 md:items-center md:py-12`}>
               <div className="md:col-span-4">
                 <span className="studio-display block text-[1rem] text-primary">0{i + 1}</span>
                 <h3 className="studio-display mt-3 text-[1.65rem] leading-snug md:text-[2rem]">{r.title}</h3>

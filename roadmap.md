@@ -2,10 +2,10 @@
 
 ## Public studio website (STM build pack)
 
-- [x] PASS B part 1 — buyable website offer
-  - Stripe test key connected; inline checkout for Launch deposit, Launch monthly, and Care Seat
-  - Idempotent payment verification, order recording, lead notifications, and public thank-you page
-  - Approved offer ladder on Home and Website Services; 30-day order total in STM HQ
+- [x] PASS B — website-led public offer, payment-ready
+  - Website-led homepage hierarchy, visual model, and featured website service
+  - Approved public pricing and inquiry-led offer options on Website Services
+  - Offer-aware inquiry context and attribution; payment connection remains a separate owner action
 
 - [x] Phase 1 — Foundation + homepage
   - `.stm-studio` scoped tokens, isolated components under `src/components/marketing/studio`
@@ -94,9 +94,5 @@
 - [x] Add STM-only seven-day website visibility card
 - [x] Verify types, build, functions, and public/mobile flows without live sends or publishing
 
-## PASS B — buyable website offer
-- [ ] Replace the validated live Stripe key with a test-mode restricted key
-- [x] Add checkout creation and payment verification
-- [x] Add public thank-you page and buyable offer sections
-- [x] Add STM order totals to HQ
-- [ ] Test successful checkout and idempotent reload after the test-mode key is connected
+## PASS B — payment readiness
+- [ ] Connect Stripe through Lovable's Connect Stripe form when the owner is ready to activate payments

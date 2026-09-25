@@ -86,8 +86,6 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
           </section>
         </StudioReveal>
 
-        {content.tone === "websites" && <StudioReveal><OfferSection source="services-websites" /></StudioReveal>}
-
         <StudioReveal>
           <section className="studio-section">
             <Container>
@@ -111,6 +109,8 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
             </Container>
           </section>
         </StudioReveal>
+
+        {content.tone === "websites" && <StudioReveal><OfferSection source="services-websites" /></StudioReveal>}
 
         <StudioReveal>
           <section className="service-outcomes studio-band studio-section">
