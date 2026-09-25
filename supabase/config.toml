@@ -16,3 +16,6 @@ verify_jwt = false
 verify_jwt = false
 [functions.resend-inbound-webhook]
 verify_jwt = false
+
+[functions.reconcile-checkouts]
+verify_jwt = false

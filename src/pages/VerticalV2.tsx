@@ -134,7 +134,8 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const screens = arr<string>(proof.screens);
   const price = row.price_block ?? {};
   const ackBusiness = biz ?? (lang === "es" ? "tu negocio" : `your ${String(row.display_name).toLowerCase()} business`);
-  const inquiryConfig = { slug, name: row.display_name, needs: DEFAULT_NEEDS.map((l) => ({ id: l, label: l, detail: "" })) } as any;
+  const needsList: string[] = Array.isArray(row.needs) && row.needs.every((n: unknown) => typeof n === "string") && row.needs.length ? row.needs : DEFAULT_NEEDS;
+  const inquiryConfig = { slug, name: row.display_name, needs: needsList.map((l) => ({ id: l, label: l, detail: "" })) } as any;
 
   const section = "studio-section border-t border-border";
   const H2 = ({ children }: { children: React.ReactNode }) => <h2 className="studio-display text-3xl md:text-5xl">{children}</h2>;
@@ -182,7 +183,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_form}</p>
               <div className="mt-3 space-y-2 text-sm" aria-hidden>{["Name", "Email", "Business"].map((f) => <div key={f} className="rounded-md border border-border bg-background px-3 py-2 text-muted-foreground">{f}</div>)}
-                <div className="flex flex-wrap gap-2">{DEFAULT_NEEDS.map((n) => <span key={n} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{n}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{needsList.map((n) => <span key={n} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{n}</span>)}</div>
                 <div className="rounded-md border border-border bg-background px-3 py-6 text-muted-foreground">Optional note</div></div><Caption i={1} /></div>
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_email}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: {ackSubject(ackBusiness, lang)}</p><pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap font-sans text-xs leading-relaxed text-muted-foreground">{lang === "es" ? ackSpanishBody("", ackBusiness, "") : ackEnglishBody("", ackBusiness, "")}</pre><Caption i={2} /></div>
             <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_alert}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: New website inquiry — [customer name]</p><ul className="mt-2 grid grid-cols-2 gap-1 text-xs text-muted-foreground">{["Name", "Email", "Phone", "Company", "Interested in", "Timing", "Source", "Submitted", "Project note"].map((f) => <li key={f}>{f}</li>)}</ul><Caption i={3} /></div>
