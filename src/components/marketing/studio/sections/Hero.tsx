@@ -25,12 +25,11 @@ export function Hero() {
               <span className="studio-serif">Work smarter.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-[1.12rem] leading-relaxed text-muted-foreground md:text-[1.28rem]">
-              Supreme Team Media builds the brands, websites, campaigns, and AI-powered systems that help businesses
-              attract customers and run better behind the scenes.
+              <strong className="font-semibold text-foreground">Websites that run your business.</strong> Supreme Team Media builds conversion-focused websites with the customer capture, follow-up, reporting, and business systems behind them—plus brand, marketing, and custom systems when the job needs more.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="studio-btn studio-btn-primary">See the work</Link>
-              <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="studio-btn studio-btn-outline">Start a project</a>
+              <Link to="/services/websites#website-options" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="studio-btn studio-btn-primary">See website options</Link>
+              <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="studio-btn studio-btn-outline">See the work</Link>
             </div>
             <p className="mt-7 text-[0.9rem] text-muted-foreground">
               Founder-led since 2002. Based in San Diego. Available for remote projects.
@@ -72,6 +71,41 @@ export function ScopeStrip() {
              Start with the problem in front of you. Bring the rest together when the business needs it.
           </p>
         </div>
+      </Container>
+    </section>
+  );
+}
+
+export function WebsiteLedModel() {
+  const stages = [
+    { number: "01", title: "Customer-facing website", detail: "A clear offer, useful copy, proof, and a direct next step." },
+    { number: "02", title: "Capture / follow-up", detail: "The inquiry is saved and the customer gets a prompt email response." },
+    { number: "03", title: "Business workflow", detail: "Qualified work can move into the tools and process the business already uses." },
+    { number: "04", title: "Owner visibility", detail: "Reporting shows what came in and what needs attention." },
+  ];
+
+  return (
+    <section className="website-model studio-band py-16 md:py-20" aria-labelledby="website-model-title">
+      <Container>
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
+            <span className="studio-eyebrow block text-[hsl(var(--band-text)/0.72)]">The website-led model</span>
+            <h2 id="website-model-title" className="studio-display mt-4 max-w-4xl text-balance text-[2.35rem] md:text-[3.8rem]">The public experience and the work behind it, connected.</h2>
+          </div>
+          <p className="max-w-xl text-[1rem] text-muted-foreground lg:col-span-5">Each engagement is scoped to the business. The sequence shows what can connect; it does not mean every module is included in every website.</p>
+        </div>
+        <ol className="website-model-track mt-12">
+          {stages.map((stage) => (
+            <li key={stage.number}>
+              <span>{stage.number}</span>
+              <strong>{stage.title}</strong>
+              <p>{stage.detail}</p>
+            </li>
+          ))}
+        </ol>
+        <Link to="/industries" className="mt-9 inline-flex min-h-[44px] items-center gap-2 font-medium text-[hsl(var(--band-text))] underline decoration-[hsl(var(--cobalt-pale))] underline-offset-8">
+          See what this looks like for your industry
+        </Link>
       </Container>
     </section>
   );

@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
+import { Hero, ScopeStrip, WebsiteLedModel } from "@/components/marketing/studio/sections/Hero";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
 import { BuyerChooser } from "@/components/marketing/studio/sections/BuyerChooser";
@@ -21,9 +21,9 @@ export default function MarketingSite() {
   const { hash } = useLocation();
 
   useStudioHead({
-    title: "Supreme Team Media | Websites, Branding, Marketing & AI Systems",
+    title: "Supreme Team Media | Websites That Run Your Business",
     description:
-      "Founder-led websites, branding, digital marketing and custom AI business systems. Explore Sean Powers' work and discuss your next project with Supreme Team Media.",
+      "Websites, branding, marketing and connected business systems for companies that need a stronger customer experience and a smarter way to run the work behind it.",
     path: "/",
   });
 
@@ -42,6 +42,7 @@ export default function MarketingSite() {
       <StudioHeader />
       <main>
         <Hero />
+        <WebsiteLedModel />
         <StudioReveal><SelectedWork /></StudioReveal>
         <StudioReveal><StudioMediaReel /></StudioReveal>
         <ScopeStrip />
