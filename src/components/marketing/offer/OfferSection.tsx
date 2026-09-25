@@ -15,7 +15,7 @@ function OfferLink({ offer, source, children, primary = false }: { offer: OfferK
   return (
     <Link
       to={offerHref(offer, source)}
-      onClick={() => trackSiteEvent({ event_type: "cta_click", label: `offer_${offer.replaceAll("-", "_")}` })}
+      onClick={() => trackSiteEvent({ event_type: "cta_click", label: `offer_${offer.replace(/-/g, "_")}` })}
       className={`studio-btn ${primary ? "studio-btn-primary" : "studio-btn-outline"}`}
     >
       {children} <ArrowRight aria-hidden size={15} />
