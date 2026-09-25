@@ -72,7 +72,7 @@ import LaunchChecklist from "./pages/LaunchChecklist";
 import QualifyLanding from "./pages/QualifyLanding";
 import QualifyForVenue from "./pages/QualifyForVenue";
 import VerticalLanding from "./pages/VerticalLanding";
-import FlagshipVertical from "./pages/FlagshipVertical";
+import VerticalResolver from "./pages/VerticalResolver";
 import Industries from "./pages/Industries";
 import AutomationInbox from "./pages/AutomationInbox";
 import ClientApprovals from "./pages/ClientApprovals";
@@ -129,18 +129,8 @@ const App = () => {
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
                 <Route path="/qualify/:slug" element={<QualifyLanding />} />
                 {/* Flagship acquisition pages bypass the legacy database-driven renderer. */}
-                <Route path="/for/hvac" element={<FlagshipVertical slug="hvac" />} />
-                <Route path="/for/auto" element={<FlagshipVertical slug="auto" />} />
-                <Route path="/for/real-estate" element={<FlagshipVertical slug="real-estate" />} />
-                <Route path="/for/legal" element={<FlagshipVertical slug="legal" />} />
-                <Route path="/for/medspa" element={<FlagshipVertical slug="medspa" />} />
-                <Route path="/for/restaurants" element={<FlagshipVertical slug="restaurants" />} />
-                <Route path="/for/bars-restaurants" element={<FlagshipVertical slug="restaurants" />} />
-                <Route path="/for/pizza" element={<FlagshipVertical slug="pizza" />} />
-                <Route path="/for/tacos" element={<FlagshipVertical slug="tacos" />} />
-                <Route path="/for/taquerias" element={<FlagshipVertical slug="tacos" />} />
                 {/* All other public vertical pages retain the legacy config-driven renderer. */}
-                <Route path="/for/:slug" element={<VerticalLanding />} />
+                <Route path="/for/:slug" element={<VerticalResolver />} />
                 {/* Public per-client qualifier — resolves a venue by slug and
                     stamps inbound leads with captured_for_project_id so the
                     client's follow-up enrollment fires automatically. */}
