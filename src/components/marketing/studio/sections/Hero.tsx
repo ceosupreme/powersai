@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { getStudioMedia } from "@/config/studioMedia";
 import { BrowserFrame } from "../BrowserFrame";
 import { Container } from "../primitives";
@@ -11,47 +12,51 @@ const HERO_WORK = [
 ];
 
 export function Hero() {
+  const art = getStudioMedia("home-hero");
   return (
-    <section id="top" className="studio-hero overflow-hidden pb-14 pt-[116px] md:pb-20 md:pt-[148px]">
-      <Container>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-6 xl:col-span-7">
-            <span className="studio-eyebrow block">Creative · Marketing · Technology</span>
-            <h1 className="studio-display mt-6 text-balance" style={{ fontSize: "clamp(3rem, 6.2vw, 5.4rem)" }}>
-              Stand out.
-              <br />
-              Get chosen.
-              <br />
-              <span className="studio-serif">Work smarter.</span>
-            </h1>
-            <p className="mt-8 max-w-2xl text-[1.12rem] leading-relaxed text-muted-foreground md:text-[1.28rem]">
-              <strong className="font-semibold text-foreground">Websites that run your business.</strong> Supreme Team Media builds conversion-focused websites with the customer capture, follow-up, reporting, and business systems behind them—plus brand, marketing, and custom systems when the job needs more.
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link to="/services/websites#website-options" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="studio-btn studio-btn-primary">See website options</Link>
-              <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="studio-btn studio-btn-outline">See the work</Link>
-            </div>
-            <p className="mt-7 text-[0.9rem] text-muted-foreground">
-              Founder-led since 2002. Based in San Diego. Available for remote projects.
-            </p>
+    <section id="top" className="home-hero-v3">
+      {art?.src && (
+        <div className="home-hero-v3-art" aria-hidden={false}>
+          <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" style={{ objectPosition: art.objectPosition ?? "center" }} />
+        </div>
+      )}
+      <Container className="relative">
+        <div className="home-hero-v3-copy">
+          <span className="home-hero-v3-kicker">Websites that run your business</span>
+          <h1 className="home-hero-v3-title">
+            Stand out.<br />Get chosen.<br /><span>Work smarter.</span>
+          </h1>
+          <p className="home-hero-v3-lede">
+            Supreme Team Media builds conversion-focused websites with customer capture, follow-up, reporting, and business systems behind them — so you get more customers and less chaos.
+          </p>
+          <div className="home-hero-v3-actions">
+            <Link to="/services/websites#website-options" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="home-btn-amber">See website options <ArrowRight size={16} aria-hidden /></Link>
+            <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="home-btn-ghost">See the work <ArrowRight size={16} aria-hidden /></Link>
           </div>
+          <p className="home-hero-v3-note">Founder-led since 2002. Based in San Diego. Available for remote projects.</p>
+        </div>
+      </Container>
+    </section>
+  );
+}
 
-          <div className="lg:col-span-6 xl:col-span-5">
-            <div className="studio-hero-proof" aria-label="Selected live project previews">
-              {HERO_WORK.map((item) => {
-                const media = getStudioMedia(item.mediaKey);
-                if (!media?.src) return null;
-                return (
-                  <Link key={item.slug} to={`/work/${item.slug}`} className={`${item.className} group block`} aria-label={`View ${item.title} case study`}>
-                    <BrowserFrame>
-                      <img src={media.src} alt={media.alt} width={media.width} height={media.height} className="studio-project-image size-full object-cover object-top" />
-                    </BrowserFrame>
-                    <span className="studio-label mt-2 block">{item.title}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+/** Previous hero kept for reference/rollback; not rendered on the homepage. */
+export function HeroLegacy() {
+  return (
+    <section className="studio-hero overflow-hidden pb-14 pt-[116px] md:pb-20 md:pt-[148px]">
+      <Container>
+        <div className="studio-hero-proof" aria-label="Selected live project previews">
+          {HERO_WORK.map((item) => {
+            const media = getStudioMedia(item.mediaKey);
+            if (!media?.src) return null;
+            return (
+              <Link key={item.slug} to={`/work/${item.slug}`} className={`${item.className} group block`} aria-label={`View ${item.title} case study`}>
+                <BrowserFrame>
+                  <img src={media.src} alt={media.alt} width={media.width} height={media.height} className="studio-project-image size-full object-cover object-top" />
+                </BrowserFrame>
+              </Link>
+            );
+          })}
         </div>
       </Container>
     </section>
