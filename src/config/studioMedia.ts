@@ -32,9 +32,47 @@ export type StudioMediaSlot = {
   objectPosition?: string;
   /** Visible caption/disclosure printed with the media when supplied. */
   disclosure?: string;
+  mobileSrc?: string | null;
+  videoSrc?: string | null;
+  posterSrc?: string | null;
 };
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
+  "home-hero": {
+    src: null,
+    mobileSrc: null,
+    videoSrc: null,
+    posterSrc: null,
+    alt: "Supreme Team Media websites that work composition",
+    aspectRatio: "3 / 2",
+    width: 1800,
+    height: 1200,
+    objectFit: "cover",
+  },
+  "home-industry-hvac": {
+    src: null,
+    alt: "HVAC and home services website experience",
+    aspectRatio: "4 / 3",
+    width: 1600,
+    height: 1200,
+    objectFit: "cover",
+  },
+  "home-industry-pizza": {
+    src: null,
+    alt: "Restaurant and pizza website experience",
+    aspectRatio: "4 / 3",
+    width: 1600,
+    height: 1200,
+    objectFit: "cover",
+  },
+  "home-industry-medspa": {
+    src: null,
+    alt: "Med spa and wellness website experience",
+    aspectRatio: "4 / 3",
+    width: 1600,
+    height: 1200,
+    objectFit: "cover",
+  },
   "hero-composition": {
     src: null,
     alt: "Supreme Team Media studio composition",
