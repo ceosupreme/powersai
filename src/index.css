@@ -1740,3 +1740,8 @@
 .stm-studio .home-ind-v3-cta { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; background: hsl(30 12% 9%); color: hsl(38 40% 96%); font-size: .8rem; font-weight: 700; }
 @media (min-width: 720px) { .stm-studio .home-ind-v3-cards { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 1024px) { .stm-studio .home-ind-v3-grid { grid-template-columns: 4fr 8fr; align-items: center; gap: 40px; } }
+@media (min-width: 1024px) {
+  .stm-studio .home-hero-v3-art img { -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%); mask-image: linear-gradient(90deg, transparent 0%, #000 32%); }
+  .stm-studio .home-hero-v3-art::after { background: linear-gradient(0deg, hsl(var(--h-ivory)) 0%, transparent 18%); }
+  .stm-studio .home-hero-v3-copy { max-width: 520px; }
+}
