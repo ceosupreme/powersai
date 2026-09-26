@@ -1,18 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
 import { Container } from "./primitives";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
+import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
+import { sanitizeBiz } from "@/pages/VerticalLanding";
+
+const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
 
 /** Every link here points at a real, implemented route — never a dead link. */
 export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
   const { pathname, search } = useLocation();
-  const routeSlug = pathname.match(/^\/for\/(hvac|auto|real-estate|legal|medspa|restaurants|bars-restaurants|pizza|tacos|taquerias)$/)?.[1];
-  const verticalSlug = routeSlug === "bars-restaurants" ? "restaurants" : routeSlug === "taquerias" ? "tacos" : routeSlug;
+  const routeSlug = pathname.match(/^\/for\/([a-z0-9-]{2,40})\/?$/)?.[1];
+  const verticalSlug = routeSlug ? normalizeSlug(routeSlug) : null;
   const params = new URLSearchParams(search);
-  const biz = params.get("biz");
-  const source = verticalSlug ? `?src=for-${verticalSlug}${biz ? `&biz=${encodeURIComponent(biz)}` : ""}` : "";
-  const contactHref = verticalSlug ? `/${source}#contact` : "/#contact";
-  const auditHref = verticalSlug ? `/free-audit${source}` : "/free-audit";
-  const es = language === "es";
+  const biz = sanitizeBiz(params.get("biz"));
+  const queryLanguage = params.get("lang") === "es" ? "es" : null;
+  const sourceParams = new URLSearchParams();
+  if (verticalSlug) sourceParams.set("src", `for-${verticalSlug}`);
+  else if (/^[a-z0-9-]{1,80}$/i.test(params.get("src") ?? "")) sourceParams.set("src", params.get("src") ?? "");
+  if (biz) sourceParams.set("biz", biz);
+  if (queryLanguage) sourceParams.set("lang", queryLanguage);
+  const source = sourceParams.size ? `?${sourceParams.toString()}` : "";
+  const contactHref = `/${source}#contact`;
+  const auditHref = `/free-audit${source}`;
+  const es = language === "es" || queryLanguage === "es";
+  const { data: landers = [], isError } = usePublishedVerticalLanders();
+  const industries = landers.map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
   return (
     <footer className="studio-band">
       <Container className="py-16 md:py-20">
@@ -48,15 +60,10 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
 
         <nav aria-label="Industries" className="mt-10 border-t border-[hsl(var(--band-text)/0.16)] pt-7">
           <p className="studio-label mb-4" style={{ color: "hsl(var(--band-text) / 0.62)" }}>{es ? "Industrias" : "Industries"}</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-            <Link to="/for/hvac" className="inline-flex min-h-11 min-w-11 items-center hover:underline">HVAC</Link>
-            <Link to="/for/auto" className="inline-flex min-h-11 items-center hover:underline">{es ? "Automotriz" : "Automotive"}</Link>
-            <Link to="/for/real-estate" className="inline-flex min-h-11 items-center hover:underline">{es ? "Bienes raíces" : "Real estate"}</Link>
-            <Link to="/for/legal" className="inline-flex min-h-11 min-w-11 items-center hover:underline">Legal</Link>
-            <Link to="/for/medspa" className="inline-flex min-h-11 items-center hover:underline">{es ? "Spa médico" : "Med spa"}</Link>
-            <Link to="/for/restaurants" className="inline-flex min-h-11 items-center hover:underline">{es ? "Bares y restaurantes" : "Bars & restaurants"}</Link>
-            <Link to="/for/pizza" className="inline-flex min-h-11 items-center hover:underline">{es ? "Pizzerías" : "Pizza shops"}</Link>
-            <Link to="/for/tacos" className="inline-flex min-h-11 items-center hover:underline">{es ? "Taquerías / restaurantes de tacos" : "Taco shops / Taquerías"}</Link>
+           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+             {industries.map((row) => <Link key={row.slug} to={`/for/${row.slug}`} className="inline-flex min-h-11 items-center hover:underline">{row.display_name}</Link>)}
+             {isError && <span className="inline-flex min-h-11 items-center">Industry links are temporarily unavailable.</span>}
+             <Link to="/industries" className="inline-flex min-h-11 items-center font-medium text-foreground hover:underline">{es ? "Ver todas" : "View all industries"}</Link>
           </div>
         </nav>
 

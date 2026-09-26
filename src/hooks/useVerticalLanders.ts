@@ -45,6 +45,7 @@ export interface VerticalLandingPage {
   guarantee_line?: string | null;
   created_at: string;
   updated_at: string;
+  page_version?: number | null;
 }
 
 
@@ -57,11 +58,12 @@ export function usePublishedVerticalLanders() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("vertical_landing_pages")
-        .select("slug,display_name,sort_order")
+        .select("slug,display_name,sort_order,page_version")
         .eq("status", "published")
+        .gte("page_version", 2)
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as Pick<VerticalLandingPage, "slug" | "display_name" | "sort_order">[];
+      return (data ?? []) as Pick<VerticalLandingPage, "slug" | "display_name" | "sort_order" | "page_version">[];
     },
     staleTime: 60_000,
   });

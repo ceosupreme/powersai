@@ -2,6 +2,11 @@
 
 ## Public studio website (STM build pack)
 
+- [x] Owner-approved visual overhaul checkpoint 1
+  - Database-backed desktop/mobile/footer industry navigation
+  - Animated after-click website experience and immediate homepage industry access
+  - Named replacement-ready media slots; approved hero transfer remains pending
+
 - [x] PASS B — website-led public offer, payment-ready
   - Website-led homepage hierarchy, visual model, and featured website service
   - Approved public pricing and inquiry-led offer options on Website Services
