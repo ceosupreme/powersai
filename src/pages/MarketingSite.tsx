@@ -3,7 +3,9 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Hero, ScopeStrip, WebsiteLedModel } from "@/components/marketing/studio/sections/Hero";
+import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
+import { AfterClick } from "@/components/marketing/studio/sections/AfterClick";
+import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
 import { BuyerChooser } from "@/components/marketing/studio/sections/BuyerChooser";
@@ -42,7 +44,8 @@ export default function MarketingSite() {
       <StudioHeader />
       <main>
         <Hero />
-        <WebsiteLedModel />
+        <AfterClick />
+        <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
         <StudioReveal><StudioMediaReel /></StudioReveal>
         <ScopeStrip />
