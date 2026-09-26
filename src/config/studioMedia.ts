@@ -3,6 +3,10 @@ import bigPawsClub from "@/assets/studio/big-paws-club.png";
 import supremeWellnessClub from "@/assets/studio/supreme-wellness-club.png";
 import barpulse from "@/assets/studio/barpulse.png";
 import karioVoss from "@/assets/studio/kario-voss.png";
+import homeHeroDevices from "@/assets/studio/home-hero-devices.jpg";
+import homeIndustryService from "@/assets/studio/home-industry-service.jpg";
+import homeIndustryRestaurant from "@/assets/studio/home-industry-restaurant.jpg";
+import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.jpg";
 import coastalBeauties from "@/assets/studio/coastal-beauties.png";
 
 /**
@@ -39,38 +43,38 @@ export type StudioMediaSlot = {
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "home-hero": {
-    src: null,
+    src: homeHeroDevices,
     mobileSrc: null,
     videoSrc: null,
     posterSrc: null,
-    alt: "Supreme Team Media websites that work composition",
-    aspectRatio: "3 / 2",
-    width: 1800,
-    height: 1200,
+    alt: "Laptop and phone showing a home services website and a pizza restaurant website on a sunny San Diego terrace",
+    aspectRatio: "529 / 414",
+    width: 1058,
+    height: 828,
     objectFit: "cover",
   },
   "home-industry-hvac": {
-    src: null,
+    src: homeIndustryService,
     alt: "HVAC and home services website experience",
-    aspectRatio: "4 / 3",
-    width: 1600,
-    height: 1200,
+    aspectRatio: "161 / 72",
+    width: 483,
+    height: 216,
     objectFit: "cover",
   },
   "home-industry-pizza": {
-    src: null,
+    src: homeIndustryRestaurant,
     alt: "Restaurant and pizza website experience",
-    aspectRatio: "4 / 3",
-    width: 1600,
-    height: 1200,
+    aspectRatio: "161 / 72",
+    width: 483,
+    height: 216,
     objectFit: "cover",
   },
   "home-industry-medspa": {
-    src: null,
+    src: homeIndustryMedspa,
     alt: "Med spa and wellness website experience",
-    aspectRatio: "4 / 3",
-    width: 1600,
-    height: 1200,
+    aspectRatio: "161 / 72",
+    width: 483,
+    height: 216,
     objectFit: "cover",
   },
   "hero-composition": {
