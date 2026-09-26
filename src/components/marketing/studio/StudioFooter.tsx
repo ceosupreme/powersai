@@ -13,16 +13,16 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
   const verticalSlug = routeSlug ? normalizeSlug(routeSlug) : null;
   const params = new URLSearchParams(search);
   const biz = sanitizeBiz(params.get("biz"));
-  const language = params.get("lang") === "es" ? "es" : null;
+  const queryLanguage = params.get("lang") === "es" ? "es" : null;
   const sourceParams = new URLSearchParams();
   if (verticalSlug) sourceParams.set("src", `for-${verticalSlug}`);
   else if (/^[a-z0-9-]{1,80}$/i.test(params.get("src") ?? "")) sourceParams.set("src", params.get("src") ?? "");
   if (biz) sourceParams.set("biz", biz);
-  if (language) sourceParams.set("lang", language);
+  if (queryLanguage) sourceParams.set("lang", queryLanguage);
   const source = sourceParams.size ? `?${sourceParams.toString()}` : "";
   const contactHref = verticalSlug ? `/${source}#contact` : "/#contact";
   const auditHref = verticalSlug ? `/free-audit${source}` : "/free-audit";
-  const es = language === "es";
+  const es = language === "es" || queryLanguage === "es";
   const { data: landers = [], isError } = usePublishedVerticalLanders();
   const industries = landers.map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
   return (

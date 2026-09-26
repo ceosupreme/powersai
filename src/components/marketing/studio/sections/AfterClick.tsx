@@ -64,18 +64,19 @@ export function AfterClick() {
 
         <div className="after-click-stage-row" role="tablist" aria-label="What happens after a customer visits">
           {STAGES.map((label, index) => (
-            <button
+            <Button
               key={label}
               type="button"
               role="tab"
               aria-selected={stage === index}
               aria-controls="after-click-composition"
+              variant="ghost"
               className={cn("after-click-stage", stage === index && "is-active", stage > index && "is-complete")}
               onClick={() => selectStage(index)}
             >
               <span aria-hidden>{stage > index ? <Check size={14} /> : String(index + 1).padStart(2, "0")}</span>
               {label}
-            </button>
+            </Button>
           ))}
           <span className="after-click-line" aria-hidden><i style={{ width: `${(stage / (STAGES.length - 1)) * 100}%` }} /></span>
         </div>
