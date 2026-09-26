@@ -20,8 +20,8 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
   if (biz) sourceParams.set("biz", biz);
   if (queryLanguage) sourceParams.set("lang", queryLanguage);
   const source = sourceParams.size ? `?${sourceParams.toString()}` : "";
-  const contactHref = verticalSlug ? `/${source}#contact` : "/#contact";
-  const auditHref = verticalSlug ? `/free-audit${source}` : "/free-audit";
+  const contactHref = `/${source}#contact`;
+  const auditHref = `/free-audit${source}`;
   const es = language === "es" || queryLanguage === "es";
   const { data: landers = [], isError } = usePublishedVerticalLanders();
   const industries = landers.map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
