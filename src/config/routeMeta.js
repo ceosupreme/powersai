@@ -13,4 +13,4 @@ export const ROUTE_META = {
   "/about": { title: "About Supreme Team Media | Sean Powers", description: "Meet Sean Powers, founder of Supreme Team Media, building brands and websites from North County San Diego since 2002." },
   "/privacy": { title: "Privacy Policy | Supreme Team Media", description: "How Supreme Team Media collects, uses, protects and shares information." },
   "/terms": { title: "Terms of Service | Supreme Team Media", description: "The terms for Supreme Team Media websites, creative, marketing, systems and publishing services." },
-} as const;
+};
