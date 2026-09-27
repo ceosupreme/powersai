@@ -3,19 +3,14 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
+import { Hero } from "@/components/marketing/studio/sections/Hero";
 import { AfterClick } from "@/components/marketing/studio/sections/AfterClick";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
-import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
-import { BuyerChooser } from "@/components/marketing/studio/sections/BuyerChooser";
-import { BarPulseFeature } from "@/components/marketing/studio/sections/BarPulseFeature";
-import { WhySupremeTeam } from "@/components/marketing/studio/sections/WhySupremeTeam";
-import { Founder } from "@/components/marketing/studio/sections/Founder";
+import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
-import { StudioMediaReel } from "@/components/marketing/studio/sections/StudioMediaReel";
 import { OfferSection } from "@/components/marketing/offer/OfferSection";
 
 export default function MarketingSite() {
@@ -47,14 +42,8 @@ export default function MarketingSite() {
         <AfterClick />
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
-        <StudioReveal><StudioMediaReel /></StudioReveal>
-        <ScopeStrip />
-        <StudioReveal><BuyerChooser /></StudioReveal>
-        <StudioReveal><Capabilities /></StudioReveal>
-        <StudioReveal><OfferSection source="home" /></StudioReveal>
-        <StudioReveal><BarPulseFeature /></StudioReveal>
-        <StudioReveal><WhySupremeTeam /></StudioReveal>
-        <StudioReveal><Founder /></StudioReveal>
+        <StudioReveal><OfferSection source="home" compact /></StudioReveal>
+        <StudioReveal><HomeProcess /></StudioReveal>
         <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />

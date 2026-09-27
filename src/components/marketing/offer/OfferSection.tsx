@@ -5,6 +5,7 @@ import { CheckoutButton } from "@/components/marketing/offer/CheckoutButton";
 import { Container, Eyebrow } from "@/components/marketing/studio/primitives";
 import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
+import { CustomerWalkthrough } from "@/components/marketing/studio/sections/CustomerWalkthrough";
 
 type OfferKey = "launch-site" | "business-site" | "care" | "growth" | "custom-systems";
 
@@ -33,9 +34,19 @@ const LAUNCH_SCOPE = [
   "Launch QA and handoff",
 ];
 
-export function OfferSection({ source = "home" }: { source?: "home" | "services-websites" }) {
+export function OfferSection({ source = "home", compact = false }: { source?: "home" | "services-websites"; compact?: boolean }) {
   const isServicePage = source === "services-websites";
   const { enabled: checkout } = useCheckoutEnabled();
+  if (compact) return <section id="website-options" className="home-offer" aria-labelledby="home-offer-title"><Container>
+    <div className="home-offer-heading"><span className="home-eyebrow">05 / Website options</span><h2 id="home-offer-title" className="home-section-title">Start with the right<br /><em>next step.</em></h2><p>Exact scope, integrations and third-party costs are confirmed before work begins.</p></div>
+    <div className="home-offer-layout"><div className="home-offer-list">
+      <article><div><span>01 / Website</span><h3>Launch Site</h3><p>A clear, responsive website with messaging, contact path, launch QA and handoff. For businesses needing a credible starting point.</p></div><div><strong>$2,500</strong><small>$1,250 to start + $1,250 at launch. Or $0 down, $297/month for 12 months, then $149/month.</small><div className="home-offer-actions">{checkout && <><CheckoutButton product="launch_site_deposit" label="Start with the deposit" /><CheckoutButton product="launch_site_monthly" label="Start monthly" /></>}<OfferLink offer="launch-site" source={source}>Ask about Launch</OfferLink></div></div></article>
+      <article><div><span>02 / Connected website</span><h3>Business Site</h3><p>Website plus scoped capture, email follow-up, reporting or workflows. For businesses that need more than a standalone site.</p></div><div><strong>From $3,500 setup + $297/month</strong><small>Quoted after a scoped review.</small><div className="home-offer-actions"><OfferLink offer="business-site" source={source}>Get a quote</OfferLink></div></div></article>
+      <article><div><span>03 / Ongoing</span><h3>Care</h3><p>Ongoing website care and support. For businesses that want continued help after launch; responsibilities agreed in writing.</p></div><div><strong>$149/month founding rate</strong><small>First 10 paid, active Care seats; $199/month after.</small><div className="home-offer-actions">{checkout && <CheckoutButton product="care_seat" label="Get the care seat" />}<OfferLink offer="care" source={source}>Ask about Care</OfferLink></div></div></article>
+      <article><div><span>04 / Growth</span><h3>Growth</h3><p>Scoped marketing and growth work. For businesses ready to strengthen their audience path and follow-up.</p></div><div><strong>From $497/month</strong><small>Quoted based on scope.</small><div className="home-offer-actions"><OfferLink offer="growth" source={source}>Discuss Growth</OfferLink></div></div></article>
+      <article><div><span>05 / Systems</span><h3>Custom Systems</h3><p>Custom workflows and connected tools. For businesses that need a system built around their operations.</p></div><div><strong>Starts at $10,000</strong><small>Custom scope.</small><div className="home-offer-actions"><OfferLink offer="custom-systems" source={source}>Discuss Systems</OfferLink></div></div></article>
+    </div><CustomerWalkthrough /></div>
+  </Container></section>;
   return (
     <section id="website-options" className="website-options studio-section bg-[hsl(var(--surface))]">
       <Container>

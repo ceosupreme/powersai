@@ -7,6 +7,7 @@ import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { Container, Eyebrow } from "../primitives";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { ProjectMontage } from "../ServiceVisuals";
+import { getStudioMedia } from "@/config/studioMedia";
 import {
   CONTEXT_OPTIONS,
   SERVICE_INTENT_EVENT,
@@ -63,6 +64,7 @@ type Status = "idle" | "submitting" | "success" | "error";
  * when the invoke succeeds AND the server confirms a saved record.
  */
 export function Inquiry() {
+  const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [services, setServices] = useState<ServiceId[]>([]);
@@ -273,31 +275,26 @@ export function Inquiry() {
   };
 
   return (
-    <section id="contact" className="studio-band studio-section">
+    <section id="contact" className="home-contact studio-section">
       <Container>
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-20">
-          <div className="lg:col-span-5">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div id="about" className="lg:col-span-5">
             <Eyebrow style={{ color: "hsl(var(--band-text) / 0.75)" }}>Start a conversation</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-              What would you like to make work better?
+              Let&apos;s make what&apos;s next work better.
             </h2>
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
-              Share what is happening now, what needs to change, and what success would look like. I&apos;ll review your
-              note and reply with a practical next step.
+              I&apos;m Sean Powers. I&apos;ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I&apos;ll reply personally within one business day.
             </p>
-            <ol className="mt-10 space-y-5 border-t border-[hsl(var(--band-text)/0.2)] pt-7">
-              {["I review your goals and current situation.", "I reply with questions or a recommended next step.", "If there’s a fit, we agree on scope, responsibilities, and timing."].map((step, index) => (
-                <li key={step} className="flex gap-4 text-[1rem] leading-relaxed text-muted-foreground"><span className="studio-display text-[hsl(var(--band-text))]">0{index + 1}</span><span>{step}</span></li>
-              ))}
-            </ol>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-8 inline-block text-[1rem] hover:underline">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
-            <ProjectMontage className="studio-contact-montage mt-10" />
+            <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County, available for remote projects.</p>
+            {map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
           </div>
 
           <div className="lg:col-span-7">
-            <div className="studio-inquiry-card rounded-xl bg-[hsl(var(--surface))] p-6 text-[hsl(var(--ink))] md:p-10">
+            <div className="studio-inquiry-card rounded-md bg-[hsl(var(--surface))] p-6 text-[hsl(var(--ink))] md:p-10">
               {status === "success" ? (
                 <div className="py-6" role="status">
                   <span className="inline-flex items-center justify-center rounded-full bg-[hsl(var(--cobalt-pale))] p-3 text-[hsl(var(--cobalt))]">
