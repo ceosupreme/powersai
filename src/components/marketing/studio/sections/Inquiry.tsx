@@ -7,6 +7,7 @@ import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { Container, Eyebrow } from "../primitives";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
+import { BookingCta } from "@/components/marketing/BookingCta";
 import {
   CONTEXT_OPTIONS,
   SERVICE_INTENT_EVENT,
@@ -62,7 +63,7 @@ type Status = "idle" | "submitting" | "success" | "error";
  * fields survive an error; duplicate submits are blocked; success is shown only
  * when the invoke succeeds AND the server confirms a saved record.
  */
-export function Inquiry() {
+export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
   const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +113,11 @@ export function Inquiry() {
     const service = OFFER_CONTEXT[offer].service;
     setServices((prev) => (prev.includes(service) ? prev : [...prev, service]));
   }, [offer]);
+
+  useEffect(() => {
+    if (!websitePage) return;
+    setServices((prev) => prev.includes("websites-apps") ? prev : [...prev, "websites-apps"]);
+  }, [websitePage]);
 
   // Backwards compatibility with older marketing links that carried a prefill
   // string. It fills the note ONLY while the note is still empty — a visitor's
@@ -274,22 +280,23 @@ export function Inquiry() {
   };
 
   return (
-    <section id="contact" className="home-contact studio-section">
+    <section id="contact" className={`home-contact studio-section${websitePage ? " websites-contact" : ""}`}>
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div id="about" className="lg:col-span-5">
-            <Eyebrow>Start a conversation</Eyebrow>
+            <Eyebrow>{websitePage ? "A clear next step" : "Start a conversation"}</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-              Let&apos;s make what&apos;s next work better.
+              {websitePage ? "Talk about your website." : "Let’s make what’s next work better."}
             </h2>
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
-              I&apos;m Sean Powers. I&apos;ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I&apos;ll reply personally within one business day.
+              {websitePage ? "Tell me what the website needs to do for your business. I’ll reply personally within one business day." : "I’m Sean Powers. I’ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I’ll reply personally within one business day."}
             </p>
+            {websitePage && <div className="mt-7"><BookingCta src="services-websites" /></div>}
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
             <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County, available for remote projects.</p>
-            {map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
+            {!websitePage && map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
           </div>
 
           <div className="lg:col-span-7">

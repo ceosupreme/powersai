@@ -17,7 +17,7 @@ export function SelectedWork() {
       <Container>
         <div className="home-work-head">
           <div><span className="home-eyebrow">04 / Selected work</span><h2 id="home-work-title" className="home-section-title">The work speaks<br /><em>for itself.</em></h2></div>
-          <p>From the systems behind a business to the experience customers see first. These are actual projects, not industry concepts.</p>
+          <p>From the systems behind a business to the experience customers see first.</p>
         </div>
         {isLoading ? <p role="status" className="home-work-status">Loading work…</p> : isError ? <p role="status" className="home-work-status">Work could not be loaded right now. <Link to="/work">See all work</Link>.</p> : (
           <div className="home-work-grid">
