@@ -82,7 +82,7 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
   const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "publishing"]);
-  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : "studio_home_inquiry";
+  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : websitePage ? "services-websites" : "studio_home_inquiry";
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
   const offer = offerParam && offerParam in OFFER_CONTEXT ? offerParam as OfferKey : null;
@@ -242,7 +242,7 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
             timing: timing || null,
             source_vertical: sourceVertical,
             source_path: window.location.pathname,
-            src: sourceParam,
+             src: sourceParam ?? (websitePage ? "services-websites" : null),
             biz: initialBiz || null,
             call_requested: callRequested,
             offer,
