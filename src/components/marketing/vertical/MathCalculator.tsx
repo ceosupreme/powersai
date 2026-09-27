@@ -29,20 +29,28 @@ function blockEstimate(inputs: MathInput[], vals: Record<string, number>): numbe
   return inputs.reduce((acc, i) => acc * factor(i, vals?.[i.key] ?? 0), 1);
 }
 
-function Estimated({ amount }: { amount: number }) {
+function Estimated({ amount, language }: { amount: number; language: "en" | "es" }) {
   return (
     <span className="inline-flex flex-wrap items-baseline gap-2">
       <span className="font-display" style={{ color: "hsl(var(--rust))", fontSize: "1.75rem", lineHeight: 1 }}>
         {formatDollars(amount)}
       </span>
       <span className="font-mono-label text-[0.65rem]" style={{ color: "hsl(var(--ink-soft))" }}>
-        Estimated
+        {language === "es" ? "Estimado" : "Estimated"}
       </span>
     </span>
   );
 }
 
-export function MathCalculator({ config }: { config: MathConfig }) {
+const ES_MATH: Record<string, string> = {
+  "The math": "Los números", "Total monthly leak": "Pérdida mensual estimada", "Reset to benchmarks": "Restablecer valores",
+  "Catering requests that go unanswered": "Solicitudes de catering sin respuesta", "catering inquiries per month × share that would have booked × average catering order": "solicitudes mensuales × porcentaje que habría reservado × pedido promedio", "Catering inquiries per month": "Solicitudes de catering al mes", "Share that would have booked": "Porcentaje que habría reservado", "Average catering order": "Pedido promedio de catering",
+  "Regulars who did not come back this month": "Clientes habituales que no regresaron este mes", "regulars on your list × share an email brings in × average ticket": "clientes en tu lista × porcentaje que regresa por email × cuenta promedio", "Regulars on your list": "Clientes habituales en tu lista", "Share an email brings in": "Porcentaje que regresa por email", "Average ticket": "Cuenta promedio",
+  "Commissions paid to the delivery apps": "Comisiones pagadas a las apps de entrega", "app orders per month × average ticket × commission rate": "pedidos mensuales por app × cuenta promedio × comisión", "App orders per month": "Pedidos por app al mes", "Commission rate you pay": "Comisión que pagas",
+};
+const translate = (text: string | undefined, language: "en" | "es") => language === "es" && text ? ES_MATH[text] ?? text : text;
+
+export function MathCalculator({ config, language = "en" }: { config: MathConfig; language?: "en" | "es" }) {
   const blocks = config.blocks ?? [];
   const [values, setValues] = useState<Values>(() => seedValues(config));
 
@@ -58,26 +66,26 @@ export function MathCalculator({ config }: { config: MathConfig }) {
     <section id="math" className="relative border-t border-[hsl(var(--line))] bg-[hsl(var(--bone-2))] py-16 md:py-24">
       <Container>
         <Reveal>
-          <span className="eyebrow">The math</span>
+           <span className="eyebrow">{translate("The math", language)}</span>
           {config.intro && (
-            <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-[hsl(var(--ink-soft))]">{config.intro}</p>
+             <p className="mt-4 max-w-2xl text-[1rem] leading-relaxed text-[hsl(var(--ink-soft))]">{translate(config.intro, language)}</p>
           )}
         </Reveal>
 
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
           {blocks.map((b, bi) => (
             <div key={b.key} className="rounded-xl border border-[hsl(var(--line))] bg-[hsl(var(--surface))] p-5 md:p-6">
-              <h3 className="font-display text-[1.1rem] leading-snug text-foreground">{b.label}</h3>
+               <h3 className="font-display text-[1.1rem] leading-snug text-foreground">{translate(b.label, language)}</h3>
               {b.formula_text && (
                 <p className="font-mono-label mt-3 text-[0.7rem]" style={{ color: "hsl(var(--ink-soft))" }}>
-                  {b.formula_text}
+                   {translate(b.formula_text, language)}
                 </p>
               )}
               <div className="mt-5 space-y-3">
                 {(b.inputs ?? []).map((i) => (
                   <div key={i.key} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <label htmlFor={`${b.key}-${i.key}`} className="text-[0.9rem] text-[hsl(var(--ink-soft))]">
-                      {i.label}
+                       {translate(i.label, language)}
                       {i.type === "percent" ? " (%)" : ""}
                     </label>
                     <Input
@@ -101,7 +109,7 @@ export function MathCalculator({ config }: { config: MathConfig }) {
                 ))}
               </div>
               <div className="mt-5 border-t border-[hsl(var(--line))] pt-4">
-                <Estimated amount={estimates[bi]} />
+                 <Estimated amount={estimates[bi]} language={language} />
               </div>
             </div>
           ))}
@@ -110,10 +118,10 @@ export function MathCalculator({ config }: { config: MathConfig }) {
         <div className="mt-6 flex flex-col gap-4 rounded-xl border border-[hsl(var(--line))] bg-[hsl(var(--surface))] p-5 md:flex-row md:items-center md:justify-between md:p-6">
           <div>
             <div className="font-mono-label" style={{ color: "hsl(var(--ink))" }}>
-              Total monthly leak
+               {translate("Total monthly leak", language)}
             </div>
             <div className="mt-2">
-              <Estimated amount={total} />
+               <Estimated amount={total} language={language} />
             </div>
           </div>
           <button
@@ -122,7 +130,7 @@ export function MathCalculator({ config }: { config: MathConfig }) {
             className="inline-flex items-center gap-2 self-start rounded-full border border-[hsl(var(--line))] px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-[hsl(var(--bone-2))] md:self-auto"
           >
             <RotateCcw size={14} />
-            Reset to benchmarks
+             {translate("Reset to benchmarks", language)}
           </button>
         </div>
 
