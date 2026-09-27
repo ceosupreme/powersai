@@ -8,4 +8,4 @@
 - Systems and Publishing sales routes own their six-section layouts and share `Inquiry`'s servicePage context; this keeps their workflow and product compositions distinct without duplicating lead handling.
 - Industries reads published V2 rows including layout media and interaction for its visual directory; Work uses the published-project adapter and URL `type` filters so neither page duplicates editorial data.
 - Local Vite proxies only Lovable CDN asset paths to this project's preview host; otherwise media pointers return the Vite HTML fallback instead of images during local visual QA.
-- Case studies render only published project-adapter fields and registered media, while Hire reuses that adapter and the existing inquiry; this keeps public evidence accurate and avoids duplicate content sources.
+- Case studies use published fields/media; Hire uses that adapter and inquiry, keeping evidence accurate. Free Check uses existing audit state; Thank-you retains checkout verification/switch, protecting attribution and orders.
