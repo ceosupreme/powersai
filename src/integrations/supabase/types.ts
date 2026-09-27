@@ -9223,6 +9223,7 @@ export type Database = {
           created_at: string
           event_type: string
           id: string
+          is_internal: boolean
           label: string | null
           path: string
           referrer: string | null
@@ -9234,6 +9235,7 @@ export type Database = {
           created_at?: string
           event_type: string
           id?: string
+          is_internal?: boolean
           label?: string | null
           path: string
           referrer?: string | null
@@ -9245,6 +9247,7 @@ export type Database = {
           created_at?: string
           event_type?: string
           id?: string
+          is_internal?: boolean
           label?: string | null
           path?: string
           referrer?: string | null
@@ -9841,6 +9844,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      testimonials: {
+        Row: {
+          business: string | null
+          created_at: string
+          id: string
+          name: string
+          published: boolean
+          quote: string
+          role: string | null
+          sort_order: number
+          source: string | null
+        }
+        Insert: {
+          business?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          published?: boolean
+          quote: string
+          role?: string | null
+          sort_order?: number
+          source?: string | null
+        }
+        Update: {
+          business?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          published?: boolean
+          quote?: string
+          role?: string | null
+          sort_order?: number
+          source?: string | null
+        }
+        Relationships: []
       }
       time_entries: {
         Row: {
