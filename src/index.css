@@ -2611,3 +2611,46 @@
 .hire-editorial .hire-contact-links { background: hsl(var(--home-soft)); }
 @media (max-width: 767px) { .case-study-page .case-back { margin-bottom: 42px; } .case-study-page .case-two-col, .case-study-page .case-detail-layout, .hire-editorial .hire-project, .hire-editorial .hire-capability-list > div, .hire-editorial .hire-background dl > div { grid-template-columns: 1fr; gap: 18px; } .case-study-page .case-lead { min-height: 0; aspect-ratio: 4/3; } .case-study-page .case-full-media figure { aspect-ratio: 4/3; } .hire-editorial .hire-project:nth-child(even) .hire-project-image { order: 0; } .hire-editorial .hire-project-copy h3 { margin-top: 10px; } .hire-editorial .hire-projects { margin-top: 35px; } .hire-editorial .hire-project { padding: 28px 0 45px; } .hire-editorial .hire-capability-list { margin-bottom: 55px; } }
 @media (prefers-reduced-motion: reduce) { .case-study-page *, .hire-editorial * { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Calm diagnostic and payment-state shells, built from the public studio palette. */
+.stm-studio.check-page, .stm-studio.checkout-page { --paper: var(--home-ivory); --surface: var(--home-soft); --ink: var(--home-ink); --ink-muted: 30 11% 34%; --cobalt: var(--home-copper); --rule: var(--home-rule); --primary: var(--home-copper); --background: var(--home-ivory); --foreground: var(--home-ink); --muted-foreground: 30 11% 34%; --border: var(--home-rule); background: hsl(var(--home-ivory)); color: hsl(var(--home-ink)); overflow-x: clip; }
+.check-page .check-shell { padding-top: 134px; padding-bottom: 96px; }
+.check-page .check-intro { padding-bottom: 39px; border-bottom: 1px solid hsl(var(--home-rule)); margin-bottom: 35px; }
+.check-page .check-intro h1, .checkout-page .checkout-content h1 { font-size: clamp(3rem, 5vw, 5rem); }
+.check-page .check-intro h1 em, .checkout-page .checkout-content h1 em { color: hsl(var(--home-copper)); }
+.check-page .check-lede { max-width: 680px; margin-top: 24px; font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.55; }
+.check-page .check-context { display: inline-block; margin-top: 25px; padding: 11px 0; border-top: 1px solid hsl(var(--home-rule)); font-weight: 700; overflow-wrap: anywhere; }
+.check-page .check-form, .check-page .check-results > div:not(.check-interpretation):not(.check-progress), .check-page .check-results > ul > li { border-radius: 6px; box-shadow: none; }
+.check-page .check-form { background: hsl(var(--home-light)); border-color: hsl(var(--home-rule)); }
+.check-page .check-form input { border-radius: 4px; background: hsl(var(--home-ivory)); border-color: hsl(var(--home-rule)); color: hsl(var(--home-ink)); }
+.check-page .check-form button[type="button"] { border-radius: 100px; }
+.check-page .check-form button[type="submit"], .check-page .check-progress button, .check-page .check-results button[type="submit"], .check-page .check-results .studio-btn-primary { border-radius: 100px; background: hsl(var(--home-amber)); color: hsl(var(--home-ink)); box-shadow: none; }
+.check-page .check-progress { border-radius: 6px; background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); box-shadow: none; }
+.check-page .check-progress pre { overflow-wrap: anywhere; }
+.check-page .check-interpretation { padding: 25px 0; border-top: 1px solid hsl(var(--home-rule)); border-bottom: 1px solid hsl(var(--home-rule)); }
+.check-page .check-interpretation p { margin-top: 10px; max-width: 730px; font-size: 1.1rem; line-height: 1.6; }
+.check-page .check-results { overflow-wrap: anywhere; }
+.check-page .check-results .font-display { font-family: 'Inter Tight', sans-serif; font-weight: 800; }
+.check-page .check-results .font-mono { font-family: inherit; }
+.check-page .check-results > div { border-color: hsl(var(--home-rule)); }
+.check-page .check-results > div.bg-white { background: hsl(var(--home-light)); }
+.check-page .check-results > div.shadow-lg { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); box-shadow: none; }
+.check-page .check-results > div.shadow-lg input { color: hsl(var(--home-light)); }
+.check-page .check-results > div.shadow-lg input::placeholder { color: hsl(var(--home-light) / .6); }
+.check-page .check-results > div.shadow-lg .studio-btn-primary { color: hsl(var(--home-ink)); }
+.check-page .check-results > ul > li { background: hsl(var(--home-light)); border-color: hsl(var(--home-rule)); }
+.check-page .check-results > ul > li > div > div:last-child { text-align: left; }
+.check-page .check-results > ul > li p { line-height: 1.5; }
+.check-page .check-results > div:first-of-type + div { border-color: hsl(var(--home-rule)); }
+.check-page .check-results h4, .check-page .check-results h3 { font-family: 'Inter Tight', sans-serif; font-weight: 800; }
+.check-page .check-results .studio-btn { display: inline-flex; min-height: 44px; align-items: center; }
+.checkout-page .checkout-main { min-height: 70vh; padding: clamp(140px, 15vw, 210px) 0 105px; }
+.checkout-page .checkout-content { padding-top: 25px; border-top: 1px solid hsl(var(--home-rule)); }
+.checkout-page .checkout-content .home-eyebrow, .checkout-page .checkout-content .studio-label { color: hsl(var(--home-copper)); }
+.checkout-page .checkout-copy { max-width: 650px; margin-top: 33px; font-size: 1.18rem; line-height: 1.65; }
+.checkout-page .checkout-product { margin-top: 35px; padding: 22px 0; border-top: 1px solid hsl(var(--home-rule)); border-bottom: 1px solid hsl(var(--home-rule)); font: 700 clamp(1.3rem, 2.3vw, 1.9rem) 'Inter Tight', sans-serif; overflow-wrap: anywhere; }
+.checkout-page .checkout-actions, .checkout-page .checkout-status, .checkout-page .checkout-return { margin-top: 34px; }
+.checkout-page .checkout-content .home-btn-amber { display: inline-flex; align-items: center; min-height: 48px; padding: 12px 23px; border-radius: 100px; font-weight: 700; }
+.checkout-page .checkout-content .studio-btn-primary { background: hsl(var(--home-amber)); color: hsl(var(--home-ink)); border-radius: 100px; }
+@media (max-width: 767px) { .check-page .check-shell { padding-top: 115px; padding-bottom: 70px; } .check-page .check-form { padding: 20px; } .check-page .check-form .mt-8 { gap: 15px; } .check-page .check-results > ul > li > div > div:last-child { width: 100%; } .check-page .check-results > ul > li > div > div:last-child p { max-width: none; } .check-page .check-results .font-display.text-6xl, .check-page .check-results .font-display.text-5xl { font-size: 2.9rem; line-height: 1.05; } .check-page .check-results .font-display > span { display: block; margin: 10px 0 0; } .checkout-page .checkout-main { padding-top: 125px; } }
+@media (prefers-reduced-motion: reduce) { .check-page *, .checkout-page * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

@@ -6,24 +6,26 @@ import { Container, Eyebrow } from "@/components/marketing/studio/primitives";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
 import CheckoutThankYou from "./CheckoutThankYou";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 
 export default function ThankYou() {
+  useStudioHead({ title: "Your next step | Supreme Team Media", description: "Check your order status and find out what happens next with Supreme Team Media.", path: "/thank-you" });
   const { enabled, loading } = useCheckoutEnabled();
-  if (loading) return <div className="stm-studio min-h-screen"><StudioHeader /><main className="pt-40"><Container><p role="status">Loading…</p></Container></main></div>;
+  if (loading) return <div className="stm-studio checkout-page min-h-screen"><StudioHeader /><main className="checkout-main"><Container><p role="status">Loading…</p></Container></main><StudioFooter /></div>;
   if (enabled) return <CheckoutThankYou />;
   return (
-    <div className="stm-studio min-h-screen">
+    <div className="stm-studio checkout-page min-h-screen">
       <StudioHeader />
-      <main className="pt-40">
+      <main className="checkout-main">
         <Container>
-          <section className="min-h-[55vh] max-w-3xl">
+          <section className="checkout-content max-w-3xl">
             <Eyebrow>Website options</Eyebrow>
-            <h1 className="studio-display mt-4 text-5xl md:text-7xl">Online payment is not available yet.</h1>
-            <p className="mt-7 text-lg leading-relaxed text-muted-foreground">
+            <h1 className="home-section-title">Online payment is <em>not available yet.</em></h1>
+            <p className="checkout-copy">
               Start with a scoped inquiry and Sean will confirm the work, responsibilities, and next step in writing. Questions any time: <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link className="studio-btn studio-btn-primary" to="/?intent=websites&offer=launch-site&src=website-options#contact">Start a Launch Site</Link>
+            <div className="checkout-actions flex flex-wrap gap-3">
+              <Link className="home-btn-amber" to="/?intent=websites&offer=launch-site&src=website-options#contact">Start a Launch Site →</Link>
               <BookingCta src="website-options" />
             </div>
           </section>
