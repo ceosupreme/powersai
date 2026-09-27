@@ -12,7 +12,6 @@ import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
-import { ackEnglishBody, ackSubject } from "../../supabase/functions/_shared/prospectAckCopy";
 
 const workOrder = ["allmighty-supreme", "coastal-beauties", "kario-voss"];
 const steps = ["Service page", "Request service", "What happens next"];
@@ -31,7 +30,6 @@ const questions = [
 
 function WebsiteWalkthrough() {
   const [active, setActive] = useState(0);
-  const email = ackEnglishBody("", "", "");
   return <section className="websites-flow" aria-labelledby="websites-flow-title"><Container>
     <div className="websites-flow-head"><span className="home-eyebrow">02 / From visitor to owner</span><h2 id="websites-flow-title" className="home-section-title">The click is only<br /><em>the beginning.</em></h2><p>See how an inquiry moves from a customer’s screen to the business. Select a step to follow it through.</p></div>
     <div className="websites-flow-tabs" role="tablist" aria-label="Website inquiry steps">{steps.map((step, i) => <Button key={step} id={`websites-tab-${i}`} role="tab" aria-selected={active === i} aria-controls="websites-flow-panel" type="button" variant="ghost" onClick={() => setActive(i)} className={active === i ? "is-active" : ""}><span>0{i + 1}</span>{step}</Button>)}</div>
