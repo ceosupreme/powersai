@@ -2,7 +2,7 @@
 
 ## Public studio website (STM build pack)
 
-- [ ] Homepage part 2: approved full-size artwork, header, actual work, compact offers/walkthrough, process and local close; preview-only verification
+- [x] Homepage part 2: approved full-size artwork, header, actual work, compact offers/walkthrough, process and local close; preview-only verification
 
 - [x] Owner-approved visual overhaul checkpoint 1
   - Database-backed desktop/mobile/footer industry navigation
