@@ -2286,6 +2286,7 @@
 @media (max-width: 390px) { .svc-page .brand-identity-mark { left: 5%; } .svc-page .brand-identity-card, .svc-page .brand-identity-menu { right: 3%; width: 43%; } .svc-page .brand-identity-card strong { font-size: 1rem; } .svc-page .campaign-hero-stack { min-height: 360px; } .svc-page .campaign-hero-main .campaign-scene { min-height: 315px; } .svc-page .marketing-spread-details { grid-template-columns: 1fr; } .svc-page .marketing-spread-details .campaign-email { grid-column: auto; } }
 @media (prefers-reduced-motion: reduce) { .svc-page .svc-work-image img { transition: none; } .svc-page .svc-work-image:hover img { transform: none; } }
 .svc-page .marketing-close .svc-section { padding-block: clamp(76px, 9vw, 132px) 0; }
+.stm-studio.svc-page .campaign-scene { position: static; inset: auto; width: auto; height: auto; transform: none; }
 .svc-page .brand-identity-menu small { display: block; margin-top: 12px; }
 @media (max-width: 767px) {
   .svc-page .brand-identity-card { width: 39%; }
