@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { VerticalInquiry } from "@/components/marketing/vertical-flagship/VerticalInquiry";
 import { MathCalculator } from "@/components/marketing/vertical/MathCalculator";
@@ -12,7 +11,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
-import { ackEnglishBody, ackSpanishBody, ackSubject } from "../../supabase/functions/_shared/prospectAckCopy";
+import { getStudioMedia } from "@/config/studioMedia";
+import { BrowserScene, PhoneScene, IndustryInteraction, type Interaction } from "@/components/marketing/vertical-v2/IndustryInteraction";
 
 const SITE = "https://supremeteammedia.com";
 const DEFAULT_NEEDS = ["A new website", "The site I have is not bringing work", "Follow-up, reviews and reminders", "The whole system"];
@@ -100,19 +100,15 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const src = `for-${slug}`;
   const langQ = lang === "es" ? "&lang=es" : "";
   const { enabled: checkout } = useCheckoutEnabled();
-  // Reuse FlagshipVertical's accent color map (VerticalHero). The raw --rust/--gold/--green
-  // CSS variables are scoped to .stm-marketing and do not resolve inside .stm-studio,
-  // so fall back to the literal hex values with hsl(var(--primary)) as the fallback.
-  const accent = ({ rust: "#E15C4A", gold: "#465CFF", green: "#198A5A" } as Record<string, string>)[
-    String(row.accent_color ?? "").toLowerCase()
-  ] ?? "hsl(var(--primary))";
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label, vertical: slug, src });
 
   useStudioHead({ title: str(row.meta_title) || str(row.display_name), description: str(row.meta_description), path: location.pathname, canonicalPath: `/for/${slug}` });
   useOgImage(str(row.og_image_url) || null);
 
   const faq = arr<{ q: string; a: string }>(row.faq);
-  useJsonLd("ld-faq", faq.length ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) } : null);
+  const layout = row.layout && typeof row.layout === "object" ? row.layout : null;
+  const sequence = layout?.sequence && Array.isArray(layout.sequence) ? layout.sequence : null;
+  useJsonLd("ld-faq", (!sequence || sequence.some((s: any) => s.key === "questions")) && faq.length ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) } : null);
   useJsonLd("ld-service", { "@context": "https://schema.org", "@type": "Service", name: `${row.display_name} website`, url: `${SITE}/for/${slug}`, provider: { "@type": "Organization", name: "Supreme Team Media", url: SITE }, areaServed: [{ "@type": "AdministrativeArea", name: "San Diego County" }, { "@type": "Country", name: "United States" }] });
 
   const headline = str(row.headline);
@@ -120,7 +116,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const idx = word ? headline.toLowerCase().indexOf(word.toLowerCase()) : -1;
   const withBiz = (url: string) => (!biz || !url || url.startsWith("#") ? url : `${url}${url.includes("?") ? "&" : "?"}biz=${encodeURIComponent(biz)}`);
   const Cta = ({ url, label, primary, name }: { url: string; label: string; primary?: boolean; name: string }) => {
-    const cls = `studio-btn ${primary ? "studio-btn-primary" : "studio-btn-outline"}`;
+    const cls = `industry-cta ${primary ? "home-btn-amber" : "home-btn-ghost"}`;
     if (!url || !label) return null;
     if (url === "#pricing") return <a className={cls} href="#pricing" onClick={(e) => { e.preventDefault(); track(name); document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }}>{label}</a>;
     if (url.startsWith("http")) return <a className={cls} href={url} onClick={() => track(name)}>{label}</a>;
@@ -131,88 +127,40 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
 
   const audience = row.audience ?? {};
   const proof = row.proof ?? {};
-  const screens = arr<string>(proof.screens);
   const price = row.price_block ?? {};
-  const ackBusiness = biz ?? (lang === "es" ? "tu negocio" : `your ${String(row.display_name).toLowerCase()} business`);
   const needsList: string[] = Array.isArray(row.needs) && row.needs.every((n: unknown) => typeof n === "string") && row.needs.length ? row.needs : DEFAULT_NEEDS;
   const inquiryConfig = { slug, name: row.display_name, needs: needsList.map((l) => ({ id: l, label: l, detail: "" })) } as any;
 
-  const section = "studio-section border-t border-border";
-  const H2 = ({ children }: { children: React.ReactNode }) => <h2 className="studio-display text-3xl md:text-5xl">{children}</h2>;
-  const Card = ({ title, body }: { title: string; body: string }) => <div className="rounded-xl border border-border bg-card p-5"><h3 className="text-lg font-semibold text-foreground">{title}</h3><p className="mt-2 leading-relaxed text-muted-foreground">{body}</p></div>;
-  const Caption = ({ i }: { i: number }) => (screens[i] ? <p className="mt-3 text-xs text-muted-foreground">{screens[i]}</p> : null);
-  const PriceRow = ({ text, children }: { text: string; children: React.ReactNode }) => text ? <div className="flex flex-col gap-4 border-b border-border py-6 md:flex-row md:items-center md:justify-between"><p className="max-w-2xl text-foreground">{text}</p><div className="flex flex-wrap gap-2">{children}</div></div> : null;
-
-  return (
-    <div className={`stm-studio flagship-vertical vertical-${slug}`}>
-      <StudioHeader />
-      <main>
-        <section className="pt-36 pb-16"><div className="studio-container">
-          {hasEs && <p className="mb-4"><Link className="text-sm underline text-foreground" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link></p>}
-          {biz && <p className="vertical-biz-note">{L.checking_for} {biz}</p>}
-          <h1 className="studio-display text-4xl md:text-7xl">{idx >= 0 ? <>{headline.slice(0, idx)}<span style={{ color: accent }}>{headline.slice(idx, idx + word.length)}</span>{headline.slice(idx + word.length)}</> : headline}</h1>
-          <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{row.subline}</p>
-          {row.stat_value && <p className="mt-8"><span className="studio-display text-5xl" style={{ color: accent }}>{row.stat_value}</span><span className="ml-3 text-sm text-muted-foreground">{row.stat_label}</span></p>}
-          <div className="mt-8 flex flex-wrap gap-3"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary" /><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary" /></div>
-        </div></section>
-
-        {(audience.who || audience.not_for) && <section className={section}><div className="studio-container grid gap-8 md:grid-cols-2">
-          <StudioReveal><p className="studio-eyebrow">{L.who}</p><p className="mt-3 text-lg text-foreground">{audience.who}</p></StudioReveal>
-          <StudioReveal><p className="studio-eyebrow">{L.not_for}</p><p className="mt-3 text-lg text-muted-foreground">{audience.not_for}</p></StudioReveal>
-        </div></section>}
-
-        {arr(row.leaks).length > 0 && <section className={section}><div className="studio-container"><StudioReveal><H2>{row.leaks_heading}</H2></StudioReveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">{arr<any>(row.leaks).map((l) => <div key={l.title} className="rounded-xl border border-border bg-card p-5"><h3 className="text-lg font-semibold text-foreground">{l.title}</h3><p className="mt-2 text-muted-foreground">{l.line}</p>{l.dollar_note && <p className="mt-3 text-xs" style={{ color: accent }}>{l.dollar_note}</p>}</div>)}</div>
-        </div></section>}
-
-        {row.math_config && <><MathCalculator config={row.math_config} /><div className="studio-container pb-12"><p className="text-xs text-muted-foreground">{L.estimate}</p>{row.free_check_line && <p className="mt-4 max-w-2xl text-foreground">{row.free_check_line}</p>}<Link className="studio-btn studio-btn-primary mt-4" to={freeCheck} onClick={() => track("v2_math_free_check")}>{L.free_check}</Link></div></>}
-
-        {arr(row.differentiators).length > 0 && <section className={section}><div className="studio-container"><StudioReveal><H2>{L.why}</H2></StudioReveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">{arr<any>(row.differentiators).map((d) => <Card key={d.title} title={d.title} body={d.body} />)}</div></div></section>}
-
-        <section className={section}><div className="studio-container"><StudioReveal><H2>{L.does}</H2></StudioReveal>
-          <ul className="mt-8 grid gap-3 md:grid-cols-2">{arr<any>(row.tour_features).map((t, i) => { const label = typeof t === "string" ? t : t?.title; return <li key={i} className="flex gap-3 text-foreground"><Check aria-hidden size={18} style={{ color: accent }} className="mt-1 shrink-0" />{label}</li>; })}</ul>
-          <div className="mt-8 space-y-4">{arr<string>(row.included_features).map((p, i) => <p key={i} className="max-w-3xl leading-relaxed text-muted-foreground">{p}</p>)}</div>
-          {row.live_in_line && <p className="mt-6 font-semibold text-foreground">{row.live_in_line}</p>}
-        </div></section>
-
-        {arr(row.local_plan).length > 0 && <section className={section}><div className="studio-container"><StudioReveal><H2>{L.local}</H2></StudioReveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">{arr<any>(row.local_plan).map((d) => <Card key={d.title} title={d.title} body={d.body} />)}</div></div></section>}
-
-        <section className={section}><div className="studio-container"><StudioReveal><H2>{proof.heading || L.proof_heading}</H2></StudioReveal>
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_form}</p>
-              <div className="mt-3 space-y-2 text-sm" aria-hidden>{["Name", "Email", "Business"].map((f) => <div key={f} className="rounded-md border border-border bg-background px-3 py-2 text-muted-foreground">{f}</div>)}
-                <div className="flex flex-wrap gap-2">{needsList.map((n) => <span key={n} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{n}</span>)}</div>
-                <div className="rounded-md border border-border bg-background px-3 py-6 text-muted-foreground">Optional note</div></div><Caption i={1} /></div>
-            <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_email}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: {ackSubject(ackBusiness, lang)}</p><pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap font-sans text-xs leading-relaxed text-muted-foreground">{lang === "es" ? ackSpanishBody("", ackBusiness, "") : ackEnglishBody("", ackBusiness, "")}</pre><Caption i={2} /></div>
-            <div className="rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.proof_alert}</p><p className="mt-3 text-sm font-semibold text-foreground">Subject: New website inquiry — [customer name]</p><ul className="mt-2 grid grid-cols-2 gap-1 text-xs text-muted-foreground">{["Name", "Email", "Phone", "Company", "Interested in", "Timing", "Source", "Submitted", "Project note"].map((f) => <li key={f}>{f}</li>)}</ul><Caption i={3} /></div>
-            {proof.case && <Link to="/work/barpulse" onClick={() => track("v2_proof_barpulse")} className="block rounded-xl border border-border bg-card p-5"><p className="studio-label">{L.case}</p><h3 className="mt-3 text-xl font-semibold text-foreground">{proof.case.name}</h3><p className="mt-2 text-muted-foreground">{proof.case.line}</p><span className="mt-3 inline-flex items-center gap-1 text-sm text-foreground">{L.see_case} <ArrowRight aria-hidden size={14} /></span></Link>}
-          </div>
-          {screens.length > 0 && <ul className="mt-6 space-y-1 text-xs text-muted-foreground">{screens.filter((_, i) => i === 0 || i > 3).map((s) => <li key={s}>{s}</li>)}</ul>}
-          {proof.honesty_line && <p className="mt-4 text-xs text-muted-foreground">{proof.honesty_line}</p>}
-        </div></section>
-
-        <section id="pricing" className={section}><div className="studio-container"><StudioReveal><H2>{price.heading || L.price_heading}</H2></StudioReveal>
-          <div className="mt-6">
-            <PriceRow text={str(price.launch)}>{checkout ? <><CheckoutButton product="launch_site_deposit" label={L.deposit} sourceVertical={slug} originPath={location.pathname} /><CheckoutButton product="launch_site_monthly" label={L.monthly} sourceVertical={slug} originPath={location.pathname} /></> : <Link className="studio-btn studio-btn-primary" to={inquiry("launch-site")} onClick={() => track("v2_offer_launch_site")}>{L.launch_inquiry}</Link>}</PriceRow>
-            <PriceRow text={str(price.care)}>{checkout ? <CheckoutButton product="care_seat" label={L.care} sourceVertical={slug} originPath={location.pathname} /> : <Link className="studio-btn studio-btn-outline" to={inquiry("care")} onClick={() => track("v2_offer_care")}>{L.care_inquiry}</Link>}</PriceRow>
-            <PriceRow text={str(price.business)}><Link className="studio-btn studio-btn-outline" to={inquiry("business-site")} onClick={() => track("v2_offer_business_site")}>{L.business_quote}</Link><Link className="studio-btn studio-btn-outline" to={freeCheck} onClick={() => track("v2_offer_free_check")}>{L.free_check}</Link></PriceRow>
-            <PriceRow text={str(price.growth)}><Link className="studio-btn studio-btn-outline" to={`/?intent=marketing&offer=growth&src=${src}${bizQ}${langQ}#contact`} onClick={() => track("v2_offer_growth")}>{L.growth}</Link></PriceRow>
-          </div>
-          {row.guarantee_line && <p className="mt-6 max-w-3xl text-foreground">{row.guarantee_line}</p>}
-          {arr(row.how_it_works).length > 0 && <ol className="mt-10 grid gap-4 md:grid-cols-3">{arr<any>(row.how_it_works).slice(0, 3).map((s, i) => <li key={i} className="rounded-xl border border-border bg-card p-5"><span className="studio-display text-3xl" style={{ color: accent }}>{i + 1}</span><h3 className="mt-2 font-semibold text-foreground">{typeof s === "string" ? `${lang === "es" ? "Paso" : "Step"} ${i + 1}` : s?.title}</h3>{(typeof s === "string" ? s : s?.body) && <p className="mt-1 text-muted-foreground">{typeof s === "string" ? s : s.body}</p>}</li>)}</ol>}
-        </div></section>
-
-        {arr(row.market_facts).length > 0 && <section className={section}><div className="studio-container"><StudioReveal><H2>{L.market}</H2></StudioReveal>
-          <ul className="mt-8 space-y-5">{arr<any>(row.market_facts).map((m, i) => <li key={i} className="max-w-3xl"><p className="text-foreground">{m.fact}</p><p className="mt-1 text-xs text-muted-foreground">{m.publisher}{m.year ? `, ${m.year}` : ""}{m.label ? ` · ${m.label}` : ""}{m.url && <> · <a className="underline" href={m.url} target="_blank" rel="noopener noreferrer">{m.url}</a></>}</p></li>)}</ul></div></section>}
-
-        {faq.length > 0 && <section className={section}><div className="studio-container max-w-3xl"><H2>{L.faq}</H2>
-          <Accordion type="single" collapsible className="mt-6">{faq.map((f, i) => <AccordionItem key={i} value={`f${i}`}><AccordionTrigger className="text-left">{f.q}</AccordionTrigger><AccordionContent className="text-muted-foreground">{f.a}</AccordionContent></AccordionItem>)}</Accordion></div></section>}
-
-        <section id="inquiry" className={section}><div className="studio-container max-w-3xl"><H2>{L.inquiry_title}</H2><p className="mt-3 text-muted-foreground">{L.inquiry_sub}</p><div className="mt-8"><VerticalInquiry config={inquiryConfig} biz={biz} language={lang} /></div></div></section>
-      </main>
-      <StudioFooter />
-    </div>
-  );
+  const interaction: Interaction | null = layout?.interaction?.kind === "walkthrough" || layout?.interaction?.kind === "selector" ? layout.interaction : null;
+  const heroTone = layout?.hero?.tone === "charcoal" ? "charcoal" : "ivory";
+  const art = typeof layout?.hero?.media === "string" ? getStudioMedia(layout.hero.media) : null;
+  const [failedArt, setFailedArt] = useState<string | null>(null);
+  const sectionOrder = sequence ?? ["local-audience", "leaks", "differentiators", "features", "local-plan", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
+  const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
+  const cards = (items: any[], cols = "three") => <div className={`industry-list industry-list-${cols}`}>{items.map((item, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>;
+  const PriceRow = ({ text, children }: { text: string; children: React.ReactNode }) => text ? <div className="industry-price-row"><p>{text}</p><div className="industry-price-actions">{children}</div></div> : null;
+  const renderSection = (key: string) => {
+    switch (key) {
+      case "interaction": return interaction && <IndustryInteraction interaction={interaction}/>;
+      case "leaks": return <>{arr(row.leaks).length > 0 && <>{heading(row.leaks_heading || "Where the opportunities go")}<div className="industry-list industry-list-two">{arr<any>(row.leaks).map((l, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{l.title}</h3><p>{l.line}</p>{l.dollar_note && <small>{l.dollar_note}</small>}</article>)}</div></>}{row.math_config && <div className="industry-math"><MathCalculator config={row.math_config}/><p className="industry-small">{L.estimate}</p></div>}{row.free_check_line && <p className="industry-lede">{row.free_check_line}</p>}{(row.math_config || row.free_check_line) && <Link className="home-btn-amber" to={freeCheck} onClick={() => track("v2_math_free_check")}>{L.free_check} <ArrowRight size={16} aria-hidden/></Link>}</>;
+      case "differentiators": return arr(row.differentiators).length > 0 && <>{heading(L.why)}{cards(arr(row.differentiators))}</>;
+      case "local-audience": return (audience.who || audience.not_for) && <div className="industry-audience"><div><span className="home-eyebrow">{L.who}</span><p>{audience.who}</p></div><div><span className="home-eyebrow">{L.not_for}</span><p>{audience.not_for}</p></div></div>;
+      case "local-plan": return arr(row.local_plan).length > 0 && <>{heading(L.local)}{cards(arr(row.local_plan))}</>;
+      case "local": return <>{renderSection("local-audience")}{renderSection("local-plan")}</>;
+      case "features": return <>{heading(L.does)}<ul className="industry-feature-list">{arr<any>(row.tour_features).map((t, i) => <li key={i}><Check size={18} aria-hidden/>{typeof t === "string" ? t : t?.title}</li>)}</ul><div className="industry-included">{arr<string>(row.included_features).map((p, i) => <p key={i}>{p}</p>)}</div>{row.live_in_line && <p className="industry-lede">{row.live_in_line}</p>}</>;
+      case "owner": {
+        const alert = interaction?.steps?.find(s => s.screen === "alert");
+        return <>{heading(proof.heading || L.proof_heading)}<div className="industry-owner-grid"><article className="industry-owner-panel"><span className="home-eyebrow">{L.proof_alert}</span><h3>{alert?.heading || L.proof_alert}</h3>{alert?.body && <p>{alert.body}</p>}<div className="industry-owner-fields">{["Name", "Email", "Business", "Request", "Source"].map(f => <span key={f}>{f}</span>)}</div></article><article className="industry-owner-panel"><span className="home-eyebrow">{lang === "es" ? "Informe mensual" : "Monthly report"}</span><h3>{interaction?.business || row.display_name}</h3><dl>{arr<{label: string; value: string}>(layout?.report).map((r, i) => <div key={i}><dt>{r.label}</dt><dd>{r.value}</dd></div>)}</dl></article></div>{proof.case && <Link to="/work/barpulse" onClick={() => track("v2_proof_barpulse")} className="industry-case"><span className="home-eyebrow">{L.case}</span><h3>{proof.case.name}</h3><p>{proof.case.line}</p><span>{L.see_case} <ArrowRight size={16} aria-hidden /></span></Link>}</>;
+      }
+      case "offer": return <><span className="home-eyebrow">{L.price_heading}</span>{heading(price.heading || L.price_heading)}<div className="industry-prices"><PriceRow text={str(price.launch)}>{checkout ? <><CheckoutButton product="launch_site_deposit" label={L.deposit} sourceVertical={slug} originPath={location.pathname}/><CheckoutButton product="launch_site_monthly" label={L.monthly} sourceVertical={slug} originPath={location.pathname}/></> : <Link className="home-btn-amber" to={inquiry("launch-site")} onClick={() => track("v2_offer_launch_site")}>{L.launch_inquiry}</Link>}</PriceRow><PriceRow text={str(price.care)}>{checkout ? <CheckoutButton product="care_seat" label={L.care} sourceVertical={slug} originPath={location.pathname}/> : <Link className="home-btn-ghost" to={inquiry("care")} onClick={() => track("v2_offer_care")}>{L.care_inquiry}</Link>}</PriceRow><PriceRow text={str(price.business)}><Link className="home-btn-ghost" to={inquiry("business-site")} onClick={() => track("v2_offer_business_site")}>{L.business_quote}</Link><Link className="home-btn-ghost" to={freeCheck} onClick={() => track("v2_offer_free_check")}>{L.free_check}</Link></PriceRow><PriceRow text={str(price.growth)}><Link className="home-btn-ghost" to={`/?intent=marketing&offer=growth&src=${src}${bizQ}${langQ}#contact`} onClick={() => track("v2_offer_growth")}>{L.growth}</Link></PriceRow></div>{row.guarantee_line && <p className="industry-lede">{row.guarantee_line}</p>}{arr(row.how_it_works).length > 0 && <ol className="industry-steps">{arr<any>(row.how_it_works).map((step, i) => <li key={i}><span>0{i + 1}</span><h3>{typeof step === "string" ? `${lang === "es" ? "Paso" : "Step"} ${i + 1}` : step?.title}</h3><p>{typeof step === "string" ? step : step?.body}</p></li>)}</ol>}</>;
+      case "facts": return arr(row.market_facts).length > 0 && <>{heading(L.market)}<ul className="industry-facts">{arr<any>(row.market_facts).map((m, i) => <li key={i}><p>{m.fact}</p><small>{m.publisher}{m.year ? `, ${m.year}` : ""}{m.label ? ` · ${m.label}` : ""}{m.url && <> · <a href={m.url} target="_blank" rel="noopener noreferrer">{m.label || m.publisher || m.url}</a></>}</small></li>)}</ul></>;
+      case "questions": return faq.length > 0 && <div className="industry-questions">{heading(L.faq)}<Accordion type="single" collapsible>{faq.map((f, i) => <AccordionItem key={i} value={`f${i}`}><AccordionTrigger>{f.q}</AccordionTrigger><AccordionContent>{f.a}</AccordionContent></AccordionItem>)}</Accordion></div>;
+      case "contact": return <div className="industry-contact">{heading(L.inquiry_title)}<p>{L.inquiry_sub}</p><VerticalInquiry config={inquiryConfig} biz={biz} language={lang}/></div>;
+      default: return null;
+    }
+  };
+  return <div className="stm-studio industry-v2"><StudioHeader language={lang}/><main>
+    <section className={`industry-hero industry-tone-${heroTone}`}><div className="studio-container industry-hero-grid"><div className="industry-hero-copy"><span className="home-eyebrow">{row.display_name}</span>{hasEs && <Link className="industry-language" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link>}<h1>{idx >= 0 ? <>{headline.slice(0, idx)}<em>{headline.slice(idx, idx + word.length)}</em>{headline.slice(idx + word.length)}</> : headline}</h1><p className="industry-hero-subline">{row.subline}</p>{row.stat_value && <p className="industry-stat"><strong>{row.stat_value}</strong><span>{row.stat_label}</span></p>}<div className="industry-hero-actions"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary"/><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary"/></div>{biz && <p className="industry-biz-note">{L.checking_for} {biz}</p>}</div><div className="industry-hero-art">{art?.src && failedArt !== art.src ? <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" onError={() => setFailedArt(art.src)}/> : interaction && <div className="industry-device-pair"><BrowserScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.[0] : interaction.options?.[0]}/><PhoneScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.find(s => s.screen === "phone") : interaction.options?.[1]}/></div>}</div></div></section>
+    {sectionOrder.map((item: any, i: number) => <section key={`${item.key}-${i}`} id={item.key === "offer" ? "pricing" : item.key === "contact" ? "inquiry" : undefined} className={`industry-section industry-tone-${item.tone === "charcoal" ? "charcoal" : "ivory"}`}><div className="studio-container">{renderSection(item.key)}</div></section>)}
+  </main><StudioFooter/></div>;
 }

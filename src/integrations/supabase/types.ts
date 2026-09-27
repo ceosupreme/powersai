@@ -11331,6 +11331,7 @@ export type Database = {
           id: string
           included_features: Json | null
           lang: Json | null
+          layout: Json | null
           leaks: Json
           leaks_heading: string | null
           live_in_line: string | null
@@ -11376,6 +11377,7 @@ export type Database = {
           id?: string
           included_features?: Json | null
           lang?: Json | null
+          layout?: Json | null
           leaks?: Json
           leaks_heading?: string | null
           live_in_line?: string | null
@@ -11421,6 +11423,7 @@ export type Database = {
           id?: string
           included_features?: Json | null
           lang?: Json | null
+          layout?: Json | null
           leaks?: Json
           leaks_heading?: string | null
           live_in_line?: string | null

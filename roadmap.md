@@ -2,6 +2,8 @@
 
 ## Public studio website (STM build pack)
 
+- [x] Industry V2 layout-driven homepage-system restyle, regenerated types, signed-out desktop/phone QA (preview only)
+
 - [x] Websites page: six-section rebuild, homepage work copy cleanup, signed-out desktop/phone and offer/form checks
 
 - [x] Homepage part 2: approved full-size artwork, header, actual work, compact offers/walkthrough, process and local close; preview-only verification
