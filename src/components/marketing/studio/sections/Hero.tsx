@@ -17,7 +17,7 @@ export function Hero() {
     <section id="top" className="home-hero-v3">
       {art?.src && (
         <div className="home-hero-v3-art" aria-hidden={false}>
-          <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" style={{ objectPosition: art.objectPosition ?? "center" }} />
+          <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" style={{ objectPosition: art.objectPosition ?? "center", objectFit: art.objectFit }} />
         </div>
       )}
       <Container className="relative">

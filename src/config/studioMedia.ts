@@ -3,10 +3,12 @@ import bigPawsClub from "@/assets/studio/big-paws-club.png";
 import supremeWellnessClub from "@/assets/studio/supreme-wellness-club.png";
 import barpulse from "@/assets/studio/barpulse.png";
 import karioVoss from "@/assets/studio/kario-voss.png";
-import homeHeroDevices from "@/assets/studio/home-hero-devices.jpg";
-import homeIndustryService from "@/assets/studio/home-industry-service.jpg";
-import homeIndustryRestaurant from "@/assets/studio/home-industry-restaurant.jpg";
-import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.jpg";
+import homeHeroDevices from "@/assets/studio/home-hero.webp.asset.json";
+import homeIndustryService from "@/assets/studio/home-industry-hvac.webp.asset.json";
+import homeIndustryRestaurant from "@/assets/studio/home-industry-pizza.webp.asset.json";
+import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.webp.asset.json";
+import websitesHero from "@/assets/studio/service-websites-hero.webp.asset.json";
+import contactMap from "@/assets/studio/contact-map.webp.asset.json";
 import coastalBeauties from "@/assets/studio/coastal-beauties.png";
 
 /**
@@ -43,39 +45,56 @@ export type StudioMediaSlot = {
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "home-hero": {
-    src: homeHeroDevices,
+    src: homeHeroDevices.url,
     mobileSrc: null,
     videoSrc: null,
     posterSrc: null,
     alt: "Laptop and phone showing a home services website and a pizza restaurant website on a sunny San Diego terrace",
-    aspectRatio: "529 / 414",
-    width: 1058,
-    height: 828,
-    objectFit: "cover",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
+    objectPosition: "center",
   },
   "home-industry-hvac": {
-    src: homeIndustryService,
+    src: homeIndustryService.url,
     alt: "HVAC and home services website experience",
-    aspectRatio: "161 / 72",
-    width: 483,
-    height: 216,
-    objectFit: "cover",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
   },
   "home-industry-pizza": {
-    src: homeIndustryRestaurant,
+    src: homeIndustryRestaurant.url,
     alt: "Restaurant and pizza website experience",
-    aspectRatio: "161 / 72",
-    width: 483,
-    height: 216,
-    objectFit: "cover",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
   },
   "home-industry-medspa": {
-    src: homeIndustryMedspa,
+    src: homeIndustryMedspa.url,
     alt: "Med spa and wellness website experience",
-    aspectRatio: "161 / 72",
-    width: 483,
-    height: 216,
-    objectFit: "cover",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
+  },
+  "service-websites-hero": {
+    src: websitesHero.url,
+    alt: "Website service laptop and phone composition",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
+  },
+  "contact-map": {
+    src: contactMap.url,
+    alt: "Illustrated map of the San Diego region",
+    aspectRatio: "1448 / 1086",
+    width: 1448,
+    height: 1086,
+    objectFit: "contain",
   },
   "hero-composition": {
     src: null,
