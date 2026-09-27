@@ -113,3 +113,7 @@
 
 ## PASS B — payment readiness
 - [ ] Connect Stripe through Lovable's Connect Stripe form when the owner is ready to activate payments
+
+## Case studies and Hire visual rebuild
+- [x] Rebuild project-specific case stories and employer page without changing published data or the résumé PDF
+- [x] Verify signed-out desktop and phone views, filtered return, résumé download, and no sideways scroll
