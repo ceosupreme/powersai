@@ -1,44 +1,47 @@
-import { ServicePage, type ServicePageContent } from "@/components/marketing/studio/ServicePage";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Container } from "@/components/marketing/studio/primitives";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
+import { ServiceWork } from "@/components/marketing/studio/ServiceWork";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
-const content: ServicePageContent = {
-  eyebrow: "Marketing & growth",
-  title: "Turn attention into a path to choose you.",
-  description: "Give people a clear reason to care, a useful place to land, and an obvious next step. Campaign messaging, landing-page copy, email, social content, launch support, and creative stay focused on the same audience and action.",
-  path: "/services/marketing",
-  seoTitle: "Marketing Strategy & Campaigns | Supreme Team Media",
-  seoDescription: "Positioning, campaigns, landing pages, email, social content, launches and advertising support with a clear path from attention to action.",
-  intent: "marketing",
-  primaryCta: "Discuss marketing and growth",
-  secondaryCta: "See marketing work",
-  proofSlugs: ["big-paws-club", "coastal-beauties", "supreme-wellness-club"],
-  problemTitle: "More activity is not the same as a better customer path.",
-  problems: [
-    { title: "The message changes from channel to channel.", body: "A clear campaign idea and message system should keep landing-page, email, social, and content copy focused without making every channel sound identical." },
-    { title: "Attention has nowhere useful to go.", body: "Landing pages, email paths, offers, and follow-up need to connect the campaign to a realistic next action." },
-    { title: "Content is being made without a system.", body: "A workable content structure helps the team create consistently around real audience needs and business priorities." },
-  ],
-  outcomesTitle: "A connected path from message to action.",
-  outcomesIntro: "The work stays focused on a specific audience, offer, and decision, with no promises the market or platform may not keep.",
-  outcomes: ["A sharper reason for people to care", "A clearer landing and response path", "Consistent copy and creative across selected channels", "A repeatable content or launch plan"],
-  capabilitiesTitle: "Build the message, destination, and follow-up together.",
-  capabilities: ["Positioning and campaign messaging", "Landing-page strategy and copy", "Email campaign copy", "Social and content copy", "Launch campaigns", "Event promotion", "Content systems and editorial planning", "Advertising creative and support when scoped", "Measurement planning around available data"],
-  process: [
-    { title: "Choose the objective", body: "Define the audience, offer, decision, channels, and what the campaign should help people understand or do." },
-    { title: "Write and build the path", body: "Shape the campaign message, landing-page copy, creative, email or social content, and follow-up around one clear action." },
-    { title: "Release and learn", body: "Launch the agreed work, review the information available, and define refinements or ongoing support when scoped." },
-  ],
-  connectedTitle: "Marketing works better when the offer, brand, and destination agree.",
-  connectedBody: "Campaign work can connect to brand refinement, a purpose-built landing page, publishing support, or systems that make follow-up easier to manage.",
-  connectedLinks: [{ label: "Brand & creative", to: "/services/brand" }, { label: "Websites & digital products", to: "/services/websites" }, { label: "Publishing & launch", to: "/publishing" }],
-  faqs: [
-    { q: "Can you help with one campaign or launch?", a: "Yes. A defined campaign, event, launch, landing page, or content package can be scoped as a focused engagement." },
-    { q: "Do you manage advertising?", a: "Advertising strategy, creative, setup, or support can be included when scoped. Media spend, platform policies, and results remain separate from the creative engagement." },
-    { q: "Do you guarantee leads, sales, or ROAS?", a: "No. The work improves the strategy, message, creative, and customer path, but no responsible studio can guarantee market response or platform performance." },
-    { q: "Can you work with our existing team?", a: "Yes. Responsibilities, approvals, access, and handoffs can be defined around an internal team, outside partners, or a founder-led workflow." },
-  ],
-  finalTitle: "Give the right audience a reason to care—and a clear next step.",
-  finalBody: "Share the offer, audience, current channels, and the point where attention stops turning into action.",
-  tone: "marketing",
-};
+const offer = "Spring tune-up";
+const needs = [
+  { label: "Launching something new", text: "We shape the offer and message before building the launch path. The landing page, creative and follow-up all point toward the same next step." },
+  { label: "The offer is not clear", text: "We find the simplest useful promise and write it in your customer’s language. Then we align the ad, page and response around it." },
+  { label: "Not showing up locally", text: "We review where nearby customers find you and how you appear when they do. The work can include local presence, message and a clearer route to contact." },
+  { label: "Leads come in and go cold", text: "We map what happens after an inquiry and where people lose the thread. Confirmation and agreed follow-up give your team a clearer handoff." },
+];
+const steps = ["Creative", "Landing page", "Inquiry", "Follow-up"];
+const questions = [
+  ["Do you run the ads?", "Yes. Ads management is part of Growth when scoped, quoted after the free check. Ad spend is paid directly to the platform."],
+  ["Who owns the ad accounts?", "You do, in your own name."],
+  ["Do you guarantee results?", "No. Nobody honest can guarantee market response. The inquiry path can send an instant confirmation when an inquiry lands; a personal reply and campaign performance cannot be guaranteed."],
+  ["How is it priced?", "Growth starts at $497 a month, quoted after the free check."],
+];
 
-export default function MarketingServices() { return <ServicePage content={content} />; }
+function CampaignScene({ variant }: { variant: "ad" | "social" | "landing" | "email" | "request" }) {
+  if (variant === "email") return <div className="campaign-scene campaign-email"><small>PACIFIC AIR HEATING & COOLING · EMAIL</small><div className="campaign-email-paper"><span>From: Pacific Air Heating & Cooling</span><strong>Your spring tune-up request</strong><p>Thanks for getting in touch. We received your request and will be in touch with a next step.</p><hr/><span>A few days later · Reminder</span><p>Still thinking about a spring tune-up? Reply when you’re ready and we’ll help you find the right next step.</p></div></div>;
+  if (variant === "request") return <div className="campaign-scene campaign-request"><small>PACIFIC AIR HEATING & COOLING · REQUEST</small><h3>Ready for a spring tune-up?</h3><p>Tell us where to reach you.</p><div>Name <span>Alex Rivera</span></div><div>Email <span>alex@example.com</span></div><div>How can we help? <span>Spring tune-up</span></div><span className="campaign-faux-action">Send request <ArrowRight size={15} aria-hidden/></span></div>;
+  return <div className={`campaign-scene campaign-${variant}`}><div className="campaign-scene-top"><strong>Pacific Air</strong><span>HEATING & COOLING</span></div><div className="campaign-scene-content"><small>{variant === "ad" ? "SPRING IS IN THE AIR" : variant === "social" ? "YOUR HOME, READY FOR SPRING" : "PACIFIC AIR · SPRING SERVICE"}</small><h3>Keep your cool.<br/><i>Get spring-ready.</i></h3><p>{offer} for a more comfortable season.</p><span className="campaign-faux-action">Request a tune-up <ArrowRight size={15} aria-hidden/></span></div><div className="campaign-scene-bottom"><span>PACIFIC AIR</span><span>SAN DIEGO COUNTY</span></div></div>;
+}
+
+export default function MarketingServices() {
+  const [step, setStep] = useState(0);
+  const [need, setNeed] = useState(0);
+  useStudioHead({ title: "Marketing & Growth | Supreme Team Media", description: "A clear offer carried through ads, social, email and landing pages. Growth engagements start at $497 a month, quoted after a free check.", path: "/services/marketing" });
+  return <div className="stm-studio svc-page marketing-page min-h-screen"><StudioHeader/><main>
+    <section className="svc-hero svc-band-dark" aria-labelledby="marketing-title"><Container className="svc-hero-grid"><div className="svc-hero-copy"><span className="home-eyebrow">01 / Marketing & growth</span><h1 id="marketing-title">Give people a reason to <em>choose you.</em></h1><p>One clear offer carried through your ads, social posts, emails and landing page, so the next step is the same everywhere and every inquiry gets followed up. Growth engagements start at $497 a month, quoted after the free check.</p><div className="svc-actions"><a className="home-btn-amber" href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "talk_marketing" })}>Talk about marketing <ArrowRight size={16} aria-hidden/></a><Link className="home-btn-ghost" to="/free-audit?src=services-marketing" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "marketing_free_check" })}>Run the free check <ArrowRight size={16} aria-hidden/></Link></div></div><div className="campaign-hero-stack" aria-label="Pacific Air spring tune-up campaign across ad, social and landing page"><div className="campaign-hero-main"><CampaignScene variant="ad"/></div><div className="campaign-hero-social"><CampaignScene variant="social"/></div><div className="campaign-hero-landing"><CampaignScene variant="landing"/></div></div></Container></section>
+    <section className="svc-section svc-band-light marketing-path" aria-labelledby="marketing-path-title"><Container><span className="home-eyebrow">02 / The campaign path</span><h2 id="marketing-path-title" className="home-section-title">One offer. <em>Every step.</em></h2><div className="svc-tabs" role="tablist" aria-label="Campaign steps" onKeyDown={e => { const next = e.key === "ArrowRight" ? (step+1)%4 : e.key === "ArrowLeft" ? (step+3)%4 : e.key === "Home" ? 0 : e.key === "End" ? 3 : null; if (next !== null) { e.preventDefault(); setStep(next); document.getElementById(`campaign-tab-${next}`)?.focus(); } }}>{steps.map((s,i) => <Button key={s} variant="ghost" type="button" role="tab" id={`campaign-tab-${i}`} aria-controls="campaign-panel" aria-selected={step===i} tabIndex={step===i ? 0 : -1} onClick={() => setStep(i)} className={step===i ? "is-active" : ""}><span>0{i+1}</span>{s}</Button>)}</div><div className="marketing-path-panel" id="campaign-panel" role="tabpanel" aria-labelledby={`campaign-tab-${step}`}><div><span className="home-eyebrow">{steps[step]} / {offer}</span><h3>{["Start with a reason to care.", "Give the offer a place to land.", "Make the next step simple.", "Keep the conversation going."][step]}</h3><p>{["The ad and social post share one spring tune-up message.", "The page repeats that same offer and makes the request clear.", "The visitor sends a request without switching to a new story.", "An instant confirmation acknowledges the request. A reminder a few days later keeps the offer in view."][step]}</p></div><CampaignScene variant={(["ad","landing","request","email"] as const)[step]}/></div></Container></section>
+    <section className="svc-section svc-band-dark svc-campaign-spread" aria-labelledby="marketing-spread-title"><Container><span className="home-eyebrow">03 / Carried across the campaign</span><h2 id="marketing-spread-title" className="home-section-title">Recognizable from first look<br/>to <em>last reply.</em></h2><div className="marketing-spread-layout"><div className="marketing-spread-large"><CampaignScene variant="ad"/></div><div className="marketing-spread-details"><CampaignScene variant="email"/><CampaignScene variant="social"/><CampaignScene variant="landing"/></div></div></Container></section>
+    <section className="svc-section svc-band-light marketing-scope" aria-labelledby="marketing-scope-title"><Container><span className="home-eyebrow">04 / Where to begin</span><h2 id="marketing-scope-title" className="home-section-title">Start with what <em>needs to change.</em></h2><div className="marketing-scope-layout"><div className="marketing-need-list" role="tablist" aria-label="Starting needs" onKeyDown={e => { const next = e.key === "ArrowDown" ? (need+1)%4 : e.key === "ArrowUp" ? (need+3)%4 : e.key === "Home" ? 0 : e.key === "End" ? 3 : null; if (next !== null) { e.preventDefault(); setNeed(next); document.getElementById(`need-tab-${next}`)?.focus(); } }}>{needs.map((item,i) => <Button key={item.label} variant="ghost" type="button" role="tab" id={`need-tab-${i}`} aria-controls="need-panel" aria-selected={need===i} tabIndex={need===i ? 0 : -1} onClick={() => setNeed(i)} className={need===i ? "is-active" : ""}><span>0{i+1}</span>{item.label}<ArrowRight size={18} aria-hidden/></Button>)}</div><div id="need-panel" role="tabpanel" aria-labelledby={`need-tab-${need}`} className="marketing-need-detail"><span className="home-eyebrow">The engagement</span><h3>{needs[need].label}</h3><p>{needs[need].text}</p><a href="#contact" className="home-btn-amber" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "marketing_scope_contact" })}>Talk about it <ArrowRight size={16} aria-hidden/></a></div></div></Container></section>
+    <ServiceWork type="marketing" order={["coastal-beauties", "big-paws-club", "supreme-wellness-club"]}/>
+    <section className="svc-band-light marketing-close" aria-labelledby="marketing-questions-title"><div className="svc-section"><Container><span className="home-eyebrow">06 / Before we begin</span><h2 id="marketing-questions-title" className="home-section-title">Straight <em>answers.</em></h2><div className="svc-questions"><h3>Questions worth asking.</h3><Accordion type="single" collapsible>{questions.map(([q,a],i) => <AccordionItem key={q} value={`marketing-q-${i}`}><AccordionTrigger>{q}</AccordionTrigger><AccordionContent>{a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></div><Inquiry servicePage="marketing"/></section>
+  </main><StudioFooter/></div>;
+}

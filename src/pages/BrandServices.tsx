@@ -1,44 +1,30 @@
-import { ServicePage, type ServicePageContent } from "@/components/marketing/studio/ServicePage";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Container } from "@/components/marketing/studio/primitives";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
+import { ServiceWork } from "@/components/marketing/studio/ServiceWork";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { trackSiteEvent } from "@/lib/studioAnalytics";
 
-const content: ServicePageContent = {
-  eyebrow: "Brand & creative",
-  title: "Build a brand people recognize—and know what to do with.",
-  description: "Clarify what the business stands for, how it should sound, and how it should look. Positioning, voice, message architecture, identity, and creative applications work together so the brand is easier to recognize and choose.",
-  path: "/services/brand",
-  seoTitle: "Brand Strategy & Creative Direction | Supreme Team Media",
-  seoDescription: "Brand positioning, identity direction, visual systems, campaign creative and digital applications built for real business use.",
-  intent: "brand",
-  primaryCta: "Discuss brand or creative work",
-  secondaryCta: "See brand work",
-  proofSlugs: ["kario-voss", "big-paws-club", "coastal-beauties"],
-  problemTitle: "Good work gets overlooked when the presentation does not hold together.",
-  problems: [
-    { title: "The business looks different everywhere.", body: "A practical visual system makes the website, social content, campaigns, and sales materials feel like the same brand." },
-    { title: "The message is broad or forgettable.", body: "Positioning, voice, and message architecture clarify why the brand matters, how it should speak, and what people should remember." },
-    { title: "Creative assets are one-offs instead of a system.", body: "Reusable direction and applications make future work faster without making every expression identical." },
-  ],
-  outcomesTitle: "A recognizable system with room to move.",
-  outcomesIntro: "The goal is clarity people can recognize: a distinct position, a consistent voice, and a visual identity that works wherever the business shows up.",
-  outcomes: ["A sharper position and point of view", "A clear voice and message structure", "A coherent visual identity", "Stronger application across web and campaigns"],
-  capabilitiesTitle: "Build the words and visuals people will associate with the business.",
-  capabilities: ["Positioning and differentiation", "Voice and message architecture", "Naming and tagline support when appropriate", "Identity and art direction", "Visual systems and brand guidance", "Campaign concepts and creative", "Presentation and sales materials", "Graphics and content assets", "Digital brand application", "Launch and rollout support"],
-  process: [
-    { title: "Find what sets you apart", body: "Review the audience, offer, existing perception, useful assets, and the gaps that make the brand harder to understand or remember." },
-    { title: "Shape the message and identity", body: "Develop the position, voice, key messages, and visual direction, then test them against the places where the brand needs to work." },
-    { title: "Apply it", body: "Create the agreed system and priority assets, with clear guidance for continued use and future work." },
-  ],
-  connectedTitle: "The strongest brand systems are designed for use, not just presentation.",
-  connectedBody: "The identity can flow directly into a website, campaign, publishing package, or product experience so the public-facing work stays coherent.",
-  connectedLinks: [{ label: "Websites & digital products", to: "/services/websites" }, { label: "Marketing & growth", to: "/services/marketing" }, { label: "Publishing & launch", to: "/publishing" }],
-  faqs: [
-    { q: "Can you work with an existing logo or brand?", a: "Yes. The work can refine, extend, or better apply what already exists rather than replacing it without a reason." },
-    { q: "Is this only for a full rebrand?", a: "No. A focused identity direction, campaign system, presentation, or set of digital assets can stand alone." },
-    { q: "Will we receive usable files and guidance?", a: "Deliverables, formats, ownership or licensing, and the level of guidance are defined in the proposal for the specific engagement." },
-    { q: "Can brand work connect directly to a website?", a: "Yes. Brand and website work can be scoped together so the identity is developed in the context of a working customer experience." },
-  ],
-  finalTitle: "Make the business easier to recognize, trust, and choose.",
-  finalBody: "Share what the business needs to be known for and where the current message or identity falls short.",
-  tone: "brand",
-};
+const questions = [
+  ["Do you write the words too?", "Yes. Messaging and copywriting can be part of the agreed scope."],
+  ["Can you work with my existing logo?", "Yes. We can refresh or extend it rather than replacing it without a reason."],
+  ["Who owns it?", "You do. Ownership is documented in writing."],
+  ["How is it priced?", "The work is scoped and quoted in writing after a short conversation."],
+];
+const scope = ["Positioning and messaging", "Copywriting", "Naming help", "Logo and identity system", "Typography and color", "Short brand guide", "Signage, print and menus", "Social templates", "Website look"];
 
-export default function BrandServices() { return <ServicePage content={content} />; }
+export default function BrandServices() {
+  useStudioHead({ title: "Brand Strategy & Creative | Supreme Team Media", description: "Positioning, messaging, identity and practical brand applications for businesses ready to look as good as the work they do.", path: "/services/brand" });
+  return <div className="stm-studio svc-page brand-page min-h-screen"><StudioHeader/><main>
+    <section className="svc-hero svc-band-light" aria-labelledby="brand-title"><Container className="svc-hero-grid"><div className="svc-hero-copy"><span className="home-eyebrow">01 / Brand & creative</span><h1 id="brand-title">Make the quality of your business <em>obvious.</em></h1><p>Positioning, messaging, logo and visual identity, plus the signs, menus, social templates and website pieces that carry it.</p><div className="svc-actions"><a className="home-btn-amber" href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "talk_brand" })}>Talk about your brand <ArrowRight size={16} aria-hidden/></a><Link className="home-btn-ghost" to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "brand_see_work" })}>See the work <ArrowRight size={16} aria-hidden/></Link></div></div><div className="brand-identity" aria-label="The Harbor Room identity spread with business card, menu, type specimen and color palette"><div className="brand-identity-top"><span>THE HARBOR ROOM</span><span>EST. BY THE WATER</span></div><div className="brand-identity-mark">The<br/><i>Harbor</i><br/>Room<span>COASTAL DINING</span></div><div className="brand-identity-strip"><span/><span/><span/><span/></div><div className="brand-identity-type"><small>TYPE / VOICE</small><strong>Good things take time.</strong><i>Stay a while.</i></div><div className="brand-identity-card"><span>THE HARBOR ROOM</span><strong>Come as you are.<br/>Stay for the evening.</strong><small>Coastal dining · San Diego</small></div><div className="brand-identity-menu"><span>THE HARBOR ROOM</span><strong>Tonight’s Menu</strong><hr/><p>To start<br/>From the coast<br/>Something sweet</p><small>GOOD FOOD. LONG EVENINGS.</small></div></div></Container></section>
+    <section className="svc-section svc-band-dark brand-system" aria-labelledby="brand-system-title"><Container><span className="home-eyebrow">02 / Message to identity</span><h2 id="brand-system-title" className="home-section-title">One idea, carried <em>all the way through.</em></h2><div className="brand-system-grid"><div><small>POSITIONING</small><p>A neighborhood dining room worth staying for.</p></div><div><small>VOICE</small><p>Come as you are. Stay for the evening.</p></div><div><small>TYPOGRAPHY</small><p className="brand-system-type">The evening is yours.</p></div><div><small>COLOR</small><div className="brand-system-colors"><i/><i/><i/><i/></div></div><div className="brand-system-logo"><small>LOGO LOCKUP</small><strong>The <i>Harbor</i> Room</strong><span>COASTAL DINING</span></div></div></Container></section>
+    <section className="svc-section svc-band-light brand-gallery" aria-labelledby="brand-gallery-title"><Container><span className="home-eyebrow">03 / In the world</span><h2 id="brand-gallery-title" className="home-section-title">An identity that <em>shows up.</em></h2><div className="brand-gallery-layout"><div className="brand-sign"><span>THE HARBOR ROOM</span><strong>The <i>Harbor</i><br/> Room</strong><small>COASTAL DINING</small></div><div className="brand-gallery-details"><div className="brand-gallery-print"><span>MENU / PRINT</span><strong>Tonight’s Menu</strong><p>A good evening starts here.</p></div><div className="brand-gallery-social"><span>SOCIAL</span><strong>Pull up a chair.</strong><small>THE HARBOR ROOM</small></div><div className="brand-gallery-web"><span>WEBSITE</span><nav>The Harbor Room <b>Menu &nbsp; Visit</b></nav><strong>Stay a while.</strong></div></div></div></Container></section>
+    <ServiceWork type="brand" order={["big-paws-club", "coastal-beauties", "kario-voss"]}/>
+    <section className="svc-section svc-band-light brand-engagement" aria-labelledby="brand-engagement-title"><Container><span className="home-eyebrow">05 / Working together</span><h2 id="brand-engagement-title" className="home-section-title">Built to be <em>used.</em></h2><div className="brand-engagement-grid"><div><h3>What we can scope</h3><ul>{scope.map(item => <li key={item}>{item}</li>)}</ul></div><div><h3>What you receive</h3><p>Final files in standard formats, source files, a short brand guide and ownership documented in writing.</p><h3>Review points</h3><ol><li>Direction</li><li>First round</li><li>Refinement</li><li>Final approval</li></ol></div></div><div className="svc-questions"><h3>Questions worth asking.</h3><Accordion type="single" collapsible>{questions.map(([q,a],i) => <AccordionItem key={q} value={`brand-q-${i}`}><AccordionTrigger>{q}</AccordionTrigger><AccordionContent>{a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>
+    <Inquiry servicePage="brand"/>
+  </main><StudioFooter/></div>;
+}

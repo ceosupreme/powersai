@@ -63,7 +63,14 @@ type Status = "idle" | "submitting" | "success" | "error";
  * fields survive an error; duplicate submits are blocked; success is shown only
  * when the invoke succeeds AND the server confirms a saved record.
  */
-export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
+const PAGE_COPY = {
+  websites: { service: "websites-apps", src: "services-websites", heading: "Talk about your website.", intro: "Tell me what the website needs to do for your business. I’ll reply personally within one business day." },
+  brand: { service: "brand-creative", src: "services-brand", heading: "Talk about your brand.", intro: "Tell me what your business needs to be known for. I’ll reply personally within one business day." },
+  marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where the customer path loses momentum. I’ll reply personally within one business day." },
+} as const;
+
+export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY }) {
+  const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
   const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +89,7 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
   const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "publishing"]);
-  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : websitePage ? "services-websites" : "studio_home_inquiry";
+  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? "studio_home_inquiry";
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
   const offer = offerParam && offerParam in OFFER_CONTEXT ? offerParam as OfferKey : null;
@@ -115,9 +122,9 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
   }, [offer]);
 
   useEffect(() => {
-    if (!websitePage) return;
-    setServices((prev) => prev.includes("websites-apps") ? prev : [...prev, "websites-apps"]);
-  }, [websitePage]);
+    if (!pageCopy) return;
+    setServices((prev) => prev.includes(pageCopy.service) ? prev : [...prev, pageCopy.service]);
+  }, [pageCopy]);
 
   // Backwards compatibility with older marketing links that carried a prefill
   // string. It fills the note ONLY while the note is still empty — a visitor's
@@ -242,7 +249,7 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
             timing: timing || null,
             source_vertical: sourceVertical,
             source_path: window.location.pathname,
-             src: sourceParam ?? (websitePage ? "services-websites" : null),
+            src: sourceParam ?? pageCopy?.src ?? null,
             biz: initialBiz || null,
             call_requested: callRequested,
             offer,
@@ -280,23 +287,23 @@ export function Inquiry({ websitePage = false }: { websitePage?: boolean }) {
   };
 
   return (
-    <section id="contact" className={`home-contact studio-section${websitePage ? " websites-contact" : ""}`}>
+     <section id="contact" className={`home-contact studio-section${servicePage ? " websites-contact" : ""}`}>
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div id="about" className="lg:col-span-5">
-            <Eyebrow>{websitePage ? "A clear next step" : "Start a conversation"}</Eyebrow>
+             <Eyebrow>{servicePage ? "A clear next step" : "Start a conversation"}</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-              {websitePage ? "Talk about your website." : "Let’s make what’s next work better."}
+               {pageCopy?.heading ?? "Let’s make what’s next work better."}
             </h2>
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
-              {websitePage ? "Tell me what the website needs to do for your business. I’ll reply personally within one business day." : "I’m Sean Powers. I’ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I’ll reply personally within one business day."}
+               {pageCopy?.intro ?? "I’m Sean Powers. I’ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I’ll reply personally within one business day."}
             </p>
-            {websitePage && <div className="mt-7"><BookingCta src="services-websites" /></div>}
+             {servicePage && <div className="mt-7"><BookingCta src={pageCopy?.src} /></div>}
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
             <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County, available for remote projects.</p>
-            {!websitePage && map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
+             {!servicePage && map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
           </div>
 
           <div className="lg:col-span-7">
