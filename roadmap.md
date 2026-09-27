@@ -2,6 +2,8 @@
 
 ## Public studio website (STM build pack)
 
+- [ ] Industries visual directory and Work alternating project pages; signed-out desktop/phone QA (preview only)
+
 - [x] Systems and Publishing six-section sales pages, service inquiry context, signed-out desktop/phone QA (preview only)
 
 - [x] Brand and Marketing six-section sales pages, shared service inquiry context, signed-out desktop/phone QA (preview only)
