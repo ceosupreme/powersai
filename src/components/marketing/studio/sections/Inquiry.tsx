@@ -6,7 +6,6 @@ import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { Container, Eyebrow } from "../primitives";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
-import { ProjectMontage } from "../ServiceVisuals";
 import { getStudioMedia } from "@/config/studioMedia";
 import {
   CONTEXT_OPTIONS,
@@ -279,7 +278,7 @@ export function Inquiry() {
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div id="about" className="lg:col-span-5">
-            <Eyebrow style={{ color: "hsl(var(--band-text) / 0.75)" }}>Start a conversation</Eyebrow>
+            <Eyebrow>Start a conversation</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
               Let&apos;s make what&apos;s next work better.
             </h2>
