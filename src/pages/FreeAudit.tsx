@@ -79,7 +79,7 @@ export default function FreeAudit() {
   const firstFinding = audit.full?.results[0];
   const workingSignal = audit.full?.competitor_block?.in_map_pack === true
     ? 'Your business appears in the local map results.'
-    : audit.full?.results.length === 0 ? 'No gaps were detected in this check.' : 'The check found areas to protect as well as gaps to review.';
+    : audit.full?.results.length === 0 ? 'No gaps were detected in this check.' : 'This check reads public signals and industry benchmarks.';
 
   const completionLogged = useRef(false);
   const contextQuery = new URLSearchParams();

@@ -2630,13 +2630,19 @@
 .check-page .check-interpretation { padding: 25px 0; border-top: 1px solid hsl(var(--home-rule)); border-bottom: 1px solid hsl(var(--home-rule)); }
 .check-page .check-interpretation p { margin-top: 10px; max-width: 730px; font-size: 1.1rem; line-height: 1.6; }
 .check-page .check-results { overflow-wrap: anywhere; }
+.check-page .check-results .font-display { font-family: 'Inter Tight', sans-serif; font-weight: 800; }
+.check-page .check-results .font-mono { font-family: inherit; }
+.check-page .check-results > div { border-color: hsl(var(--home-rule)); }
+.check-page .check-results > div.bg-white { background: hsl(var(--home-light)); }
+.check-page .check-results > div.shadow-lg { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); box-shadow: none; }
+.check-page .check-results > div.shadow-lg input { color: hsl(var(--home-light)); }
+.check-page .check-results > div.shadow-lg input::placeholder { color: hsl(var(--home-light) / .6); }
+.check-page .check-results > div.shadow-lg .studio-btn-primary { color: hsl(var(--home-ink)); }
 .check-page .check-results > ul > li { background: hsl(var(--home-light)); border-color: hsl(var(--home-rule)); }
 .check-page .check-results > ul > li > div > div:last-child { text-align: left; }
 .check-page .check-results > ul > li p { line-height: 1.5; }
 .check-page .check-results > div:first-of-type + div { border-color: hsl(var(--home-rule)); }
 .check-page .check-results h4, .check-page .check-results h3 { font-family: 'Inter Tight', sans-serif; font-weight: 800; }
-.check-page .check-results > div.bg-\[hsl\(var\(--stm-cobalt\)\)\] { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); }
-.check-page .check-results > div.bg-\[hsl\(var\(--stm-ink\)\)\] { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); }
 .check-page .check-results .studio-btn { display: inline-flex; min-height: 44px; align-items: center; }
 .checkout-page .checkout-main { min-height: 70vh; padding: clamp(140px, 15vw, 210px) 0 105px; }
 .checkout-page .checkout-content { padding-top: 25px; border-top: 1px solid hsl(var(--home-rule)); }
