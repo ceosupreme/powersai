@@ -32,7 +32,7 @@ export default function WorkCaseStudy() {
   }, [project]);
 
   return (
-    <div className="stm-studio relative min-h-screen">
+    <div className="stm-studio case-study-page relative min-h-screen">
       <StudioHeader />
       <main className="pt-[88px]">
         <Container className="pt-6">
