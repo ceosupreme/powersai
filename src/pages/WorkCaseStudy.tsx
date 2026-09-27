@@ -40,7 +40,7 @@ export default function WorkCaseStudy() {
             to={backTo}
             className="inline-flex min-h-[44px] items-center gap-2 text-[0.9rem] text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft size={14} /> All work
+             <ArrowLeft size={14} /> Back to work
           </Link>
 
         </Container>
@@ -64,7 +64,7 @@ export default function WorkCaseStudy() {
               </p>
             </div></Container>
           ) : (
-            <CaseDetail project={project} />
+             <CaseDetail project={project} backTo={backTo} />
           )}
       </main>
       <StudioFooter />

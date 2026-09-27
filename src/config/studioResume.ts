@@ -10,9 +10,9 @@ import { CONTACT_EMAIL } from "@/lib/siteContact";
  * external sandbox URL.
  */
 export const STUDIO_RESUME: { file: string | null; label: string; downloadName: string } = {
-  file: "/sean-powers-resume.pdf",
+  file: "/sean-mayo-resume.pdf",
   label: "Download résumé",
-  downloadName: "sean-powers-resume.pdf",
+  downloadName: "sean-mayo-resume.pdf",
 };
 
 export const RESUME_REQUEST_MAILTO =

@@ -71,7 +71,7 @@ const PAGE_COPY = {
   publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
 } as const;
 
-export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY }) {
+export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" }) {
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
   const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
@@ -91,7 +91,7 @@ export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY 
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
   const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
-  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? (window.location.pathname === "/work" ? "work" : "studio_home_inquiry");
+  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? source ?? (window.location.pathname === "/work" ? "work" : "studio_home_inquiry");
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
   const offer = offerParam && offerParam in OFFER_CONTEXT ? offerParam as OfferKey : null;
