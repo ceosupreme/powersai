@@ -1750,7 +1750,7 @@
 .stm-studio {
   --home-ivory: 38 40% 96%;
   --home-ink: 150 10% 7%;
-  --home-copper: 24 59% 40%;
+  --home-copper: 24 60% 37%;
   --home-amber: 33 82% 72%;
   --home-charcoal: 150 10% 7%;
   --home-soft: 38 33% 90%;
@@ -2671,6 +2671,7 @@
 .stm-studio .websites-flow .home-eyebrow,
 .stm-studio .industry-tone-charcoal .home-eyebrow,
 .stm-studio .curated-work-dark .home-eyebrow { color: hsl(var(--home-amber)); }
+.stm-studio .websites-demo-body .home-eyebrow { color: hsl(var(--home-copper)); }
 .stm-studio .studio-header-legal { display: none; gap: 12px; font-size: .73rem; color: hsl(var(--ink-muted)); }
 @media (min-width: 1280px) { .stm-studio .studio-header-legal { display: flex; } }
 .stm-studio.legal-page,.stm-studio.about-page,.stm-studio.not-found-page { --paper: var(--home-ivory); --surface: var(--home-soft); --ink: var(--home-ink); --ink-muted: 30 11% 28%; --cobalt: var(--home-copper); --rule: var(--home-rule); --primary: var(--home-copper); --background: var(--home-ivory); --foreground: var(--home-ink); --muted-foreground: 30 11% 28%; --border: var(--home-rule); overflow-x: clip; }
