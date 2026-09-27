@@ -12,6 +12,8 @@ import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
+import { Testimonials } from "@/components/marketing/studio/Testimonials";
+import { ROUTE_META } from "@/config/routeMeta";
 
 const workOrder = ["allmighty-supreme", "coastal-beauties", "kario-voss"];
 const steps = ["Service page", "Request service", "What happens next"];
@@ -53,7 +55,7 @@ function WebsiteWork() {
 export default function WebsiteServices() {
   const { hash } = useLocation();
   const art = getStudioMedia("service-websites-hero");
-  useStudioHead({ title: "Websites That Make the Next Step Easy | Supreme Team Media", description: "A website built for your business, with clear inquiry paths. Compare Launch Site, Business Site, Care and custom options.", path: "/services/websites" });
+  useStudioHead({ ...ROUTE_META["/services/websites"], path: "/services/websites" });
   useEffect(() => {
     if (!hash) return;
     const el = document.getElementById(hash.slice(1));
@@ -75,6 +77,7 @@ export default function WebsiteServices() {
     <WebsiteWalkthrough/>
     <OfferSection source="services-websites"/>
     <WebsiteWork/>
+    <Testimonials />
     <section className="websites-process" aria-labelledby="websites-process-title"><Container><span className="home-eyebrow">05 / From first draft to handover</span><h2 id="websites-process-title" className="home-section-title">Clear work.<br/><em>Clear ownership.</em></h2><ol className="websites-process-steps">{process.map((item, i) => <li key={item.title}><span>0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></li>)}</ol><div className="websites-questions"><div><span className="home-eyebrow">Before we begin</span><h3>Questions worth asking.</h3></div><Accordion type="single" collapsible>{questions.map((item, i) => <AccordionItem key={item.q} value={`q-${i}`}><AccordionTrigger>{item.q}</AccordionTrigger><AccordionContent>{item.a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>
      <Inquiry servicePage="websites"/>
   </main><StudioFooter/></div>;

@@ -3,6 +3,9 @@ import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRole } from "@/context/RoleContext";
 import { getRoleHome } from "@/types/roles";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Container } from "@/components/marketing/studio/primitives";
 
 const NotFound = () => {
   const location = useLocation();
@@ -16,15 +19,7 @@ const NotFound = () => {
   const home = user ? getRoleHome(currentRole) : "/";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <Link to={home} className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </Link>
-      </div>
-    </div>
+    <div className="stm-studio not-found-page min-h-screen"><StudioHeader/><main><Container><span className="home-eyebrow">404</span><h1 className="home-section-title">That page <em>isn&apos;t here.</em></h1><nav aria-label="Helpful pages"><Link to={home}>Homepage</Link><Link to="/industries">Industries</Link><Link to="/work">Work</Link><Link to="/free-audit">The free check</Link></nav></Container></main><StudioFooter/></div>
   );
 };
 

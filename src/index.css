@@ -1704,7 +1704,7 @@
 .stm-studio .home-hero-v3 { --h-ivory: 38 40% 96%; --h-ink: 30 12% 9%; --h-copper: 24 58% 42%; --h-amber: 33 82% 72%;
   position: relative; overflow: hidden; background: hsl(var(--h-ivory)); color: hsl(var(--h-ink)); padding: 104px 0 48px; }
 .stm-studio .home-hero-v3-art { position: relative; margin: 0 -8% 8px; }
-.stm-studio .home-hero-v3-art img { width: 100%; height: auto; display: block; animation: heroFloat 9s ease-in-out infinite alternate; }
+.stm-studio .home-hero-v3-art img { width: 100%; height: auto; display: block; }
 .stm-studio .home-hero-v3-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, hsl(var(--h-ivory)) 0%, transparent 30%); }
 .stm-studio .home-hero-v3-copy { position: relative; max-width: 560px; }
 .stm-studio .home-hero-v3-kicker { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: currentColor; opacity: .85; }
@@ -1717,7 +1717,6 @@
 .stm-studio .home-btn-amber { background: linear-gradient(180deg, hsl(33 85% 78%), hsl(28 72% 62%)); color: hsl(30 30% 10%); box-shadow: 0 10px 24px hsl(28 70% 45% / .28); }
 .stm-studio .home-btn-ghost { border: 1.5px solid currentColor; background: transparent; }
 .stm-studio .home-btn-amber:hover, .stm-studio .home-btn-ghost:hover { transform: translateY(-2px); }
-@keyframes heroFloat { from { transform: translateY(0) scale(1); } to { transform: translateY(-8px) scale(1.015); } }
 @media (min-width: 1024px) {
   .stm-studio .home-hero-v3 { min-height: min(820px, 100vh); display: flex; align-items: center; padding: 120px 0 60px; }
   .stm-studio .home-hero-v3-art { position: absolute; inset: 0 0 0 46%; margin: 0; }

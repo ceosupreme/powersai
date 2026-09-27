@@ -12,17 +12,14 @@ import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
 import { OfferSection } from "@/components/marketing/offer/OfferSection";
+import { Testimonials } from "@/components/marketing/studio/Testimonials";
+import { ROUTE_META } from "@/config/routeMeta";
 
 export default function MarketingSite() {
   const { user, isLoading } = useAuth();
   const { hash } = useLocation();
 
-  useStudioHead({
-    title: "Supreme Team Media | Websites That Run Your Business",
-    description:
-      "Websites, branding, marketing and connected business systems for companies that need a stronger customer experience and a smarter way to run the work behind it.",
-    path: "/",
-  });
+  useStudioHead({ ...ROUTE_META["/"], path: "/" });
 
   // Arriving from another route with a hash (e.g. /#services) must still scroll.
   useEffect(() => {
@@ -65,6 +62,7 @@ export default function MarketingSite() {
         <AfterClick />
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
+        <Testimonials />
         <StudioReveal><OfferSection source="home" compact /></StudioReveal>
         <StudioReveal><HomeProcess /></StudioReveal>
         <StudioReveal><Inquiry /></StudioReveal>

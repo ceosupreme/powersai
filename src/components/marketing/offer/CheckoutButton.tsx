@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { trackSiteEvent } from '@/lib/studioAnalytics';
 import { CONTACT_EMAIL } from '@/lib/siteContact';
+import { LegalConsent } from '@/components/marketing/studio/LegalConsent';
 
 type Product = 'launch_site_deposit' | 'launch_site_monthly' | 'care_seat';
 
@@ -36,6 +37,7 @@ export function CheckoutButton({ product, label, sourceVertical, originPath }: {
   };
   return (
     <div className="flex flex-col gap-2">
+      <LegalConsent />
       <Button type="button" className="studio-btn studio-btn-primary" onClick={start} disabled={busy}>{busy && <Loader2 className="animate-spin" aria-hidden />}{label}</Button>
       {failed && <p role="alert" className="max-w-sm text-sm text-destructive">Checkout could not start. Email <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the <a className="underline" href={onIndustry ? '#inquiry' : '#contact'}>inquiry form below</a> and I will send a payment link.</p>}
     </div>

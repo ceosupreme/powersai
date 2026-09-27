@@ -33,7 +33,7 @@ export function Hero() {
             <Link to="/services/websites#website-options" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="home-btn-amber">See website options <ArrowRight size={16} aria-hidden /></Link>
             <Link to="/work" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_work" })} className="home-btn-ghost">See the work <ArrowRight size={16} aria-hidden /></Link>
           </div>
-          <p className="home-hero-v3-note">Founder-led since 2002. Based in San Diego. Available for remote projects.</p>
+          <p className="home-hero-v3-note">Founder-led since 2002. Based in San Diego. Available for remote projects. <Link to="/about">About Sean</Link></p>
         </div>
       </Container>
     </section>

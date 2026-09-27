@@ -47,6 +47,7 @@ export function trackSiteEvent(event: SiteEvent): void {
       session_id: sessionId(),
       src: src ?? null,
       vertical: event.vertical ?? derivedVertical,
+      is_internal: localStorage.getItem("stm_internal") === "1",
     }).then(({ error }) => {
       if (error) console.error("[site-events] insert failed", error.message);
     });
