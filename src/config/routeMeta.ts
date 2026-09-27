@@ -1,0 +1,16 @@
+export const ROUTE_META = {
+  "/": { title: "Supreme Team Media | Websites That Run Your Business", description: "Websites, branding, marketing and connected business systems for companies that need a stronger customer experience and a smarter way to run the work behind it." },
+  "/services/websites": { title: "Websites That Make the Next Step Easy | Supreme Team Media", description: "A website built for your business, with clear inquiry paths. Compare Launch Site, Business Site, Care and custom options." },
+  "/services/brand": { title: "Brand Strategy & Creative | Supreme Team Media", description: "Positioning, messaging, identity and practical brand applications for businesses ready to look as good as the work they do." },
+  "/services/marketing": { title: "Marketing & Growth | Supreme Team Media", description: "A clear offer carried through ads, social, email and landing pages. Growth engagements start at $497 a month, quoted after a free check." },
+  "/services/ai-systems": { title: "AI & Business Systems | Supreme Team Media", description: "Connect the tools behind your business for clearer requests, customer records and next actions. Custom systems start at $10,000, quoted after mapping." },
+  "/publishing": { title: "Publishing & Launch | Supreme Team Media", description: "Cover design, interiors, product listings and launch materials for books and digital products, prepared in the creator's own accounts." },
+  "/industries": { title: "Industries | Supreme Team Media", description: "Websites and follow-up built around the way local businesses get customers. Explore published industry pages or tell Sean about your business." },
+  "/work": { title: "Work | Supreme Team Media", description: "Real websites, brands and systems designed and built by Sean Powers. See the work and his role on each project." },
+  "/hire": { title: "Hire Sean Powers — Strategy, creative work, and hands-on execution", description: "Sean Powers, founder of Supreme Team Media since 2002: marketing, sales, hospitality, websites and AI-assisted business systems." },
+  "/free-audit": { title: "The free check | Supreme Team Media", description: "A free check of your Google listing, website and reviews, showing where inquiries and trust may be slipping." },
+  "/thank-you": { title: "Your next step | Supreme Team Media", description: "Check your order status and find out what happens next with Supreme Team Media." },
+  "/about": { title: "About Supreme Team Media | Sean Powers", description: "Meet Sean Powers, founder of Supreme Team Media, building brands and websites from North County San Diego since 2002." },
+  "/privacy": { title: "Privacy Policy | Supreme Team Media", description: "How Supreme Team Media collects, uses, protects and shares information." },
+  "/terms": { title: "Terms of Service | Supreme Team Media", description: "The terms for Supreme Team Media websites, creative, marketing, systems and publishing services." },
+} as const;
