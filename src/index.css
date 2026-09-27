@@ -2455,3 +2455,4 @@
  .svc-page .publish-kit-layout { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .svc-page .systems-hero-request, .svc-page .systems-hero-record, .svc-page .publish-hero-book, .svc-page .publish-hero-phone, .svc-page .publish-hero-graphic { transition: none; animation: none; } }
+.svc-page .publish-stage-panel .publish-interior p { color: hsl(var(--home-ink)); }
