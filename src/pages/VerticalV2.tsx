@@ -135,7 +135,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const heroTone = layout?.hero?.tone === "charcoal" ? "charcoal" : "ivory";
   const art = typeof layout?.hero?.media === "string" ? getStudioMedia(layout.hero.media) : null;
   const [failedArt, setFailedArt] = useState<string | null>(null);
-  const sectionOrder = sequence ?? ["local", "leaks", "differentiators", "features", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
+  const sectionOrder = sequence ?? ["local-audience", "leaks", "differentiators", "features", "local-plan", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
   const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
   const cards = (items: any[], cols = "three") => <div className={`industry-list industry-list-${cols}`}>{items.map((item, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>;
   const PriceRow = ({ text, children }: { text: string; children: React.ReactNode }) => text ? <div className="industry-price-row"><p>{text}</p><div className="industry-price-actions">{children}</div></div> : null;
@@ -144,7 +144,9 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
       case "interaction": return interaction && <IndustryInteraction interaction={interaction}/>;
       case "leaks": return <>{arr(row.leaks).length > 0 && <>{heading(row.leaks_heading || "Where the opportunities go")}<div className="industry-list industry-list-two">{arr<any>(row.leaks).map((l, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{l.title}</h3><p>{l.line}</p>{l.dollar_note && <small>{l.dollar_note}</small>}</article>)}</div></>}{row.math_config && <div className="industry-math"><MathCalculator config={row.math_config}/><p className="industry-small">{L.estimate}</p></div>}{row.free_check_line && <p className="industry-lede">{row.free_check_line}</p>}{(row.math_config || row.free_check_line) && <Link className="home-btn-amber" to={freeCheck} onClick={() => track("v2_math_free_check")}>{L.free_check} <ArrowRight size={16} aria-hidden/></Link>}</>;
       case "differentiators": return arr(row.differentiators).length > 0 && <>{heading(L.why)}{cards(arr(row.differentiators))}</>;
-      case "local": return <>{(audience.who || audience.not_for) && <div className="industry-audience"><div><span className="home-eyebrow">{L.who}</span><p>{audience.who}</p></div><div><span className="home-eyebrow">{L.not_for}</span><p>{audience.not_for}</p></div></div>}{arr(row.local_plan).length > 0 && <>{heading(L.local)}{cards(arr(row.local_plan))}</>}</>;
+      case "local-audience": return (audience.who || audience.not_for) && <div className="industry-audience"><div><span className="home-eyebrow">{L.who}</span><p>{audience.who}</p></div><div><span className="home-eyebrow">{L.not_for}</span><p>{audience.not_for}</p></div></div>;
+      case "local-plan": return arr(row.local_plan).length > 0 && <>{heading(L.local)}{cards(arr(row.local_plan))}</>;
+      case "local": return <>{renderSection("local-audience")}{renderSection("local-plan")}</>;
       case "features": return <>{heading(L.does)}<ul className="industry-feature-list">{arr<any>(row.tour_features).map((t, i) => <li key={i}><Check size={18} aria-hidden/>{typeof t === "string" ? t : t?.title}</li>)}</ul><div className="industry-included">{arr<string>(row.included_features).map((p, i) => <p key={i}>{p}</p>)}</div>{row.live_in_line && <p className="industry-lede">{row.live_in_line}</p>}</>;
       case "owner": {
         const alert = interaction?.steps?.find(s => s.screen === "alert");
