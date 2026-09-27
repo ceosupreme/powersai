@@ -3,19 +3,14 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Hero, ScopeStrip } from "@/components/marketing/studio/sections/Hero";
+import { Hero } from "@/components/marketing/studio/sections/Hero";
 import { AfterClick } from "@/components/marketing/studio/sections/AfterClick";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
-import { Capabilities } from "@/components/marketing/studio/sections/Capabilities";
-import { BuyerChooser } from "@/components/marketing/studio/sections/BuyerChooser";
-import { BarPulseFeature } from "@/components/marketing/studio/sections/BarPulseFeature";
-import { WhySupremeTeam } from "@/components/marketing/studio/sections/WhySupremeTeam";
-import { Founder } from "@/components/marketing/studio/sections/Founder";
+import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
-import { StudioMediaReel } from "@/components/marketing/studio/sections/StudioMediaReel";
 import { OfferSection } from "@/components/marketing/offer/OfferSection";
 
 export default function MarketingSite() {
@@ -33,7 +28,30 @@ export default function MarketingSite() {
   useEffect(() => {
     if (!hash) return;
     const el = document.getElementById(hash.slice(1));
-    if (el) window.requestAnimationFrame(() => el.scrollIntoView({ block: "start" }));
+    if (!el) return;
+    // Artwork and the published-work query can grow sections above a deep link
+    // after the browser's initial fragment jump. Keep it anchored while loading.
+    let active = true;
+    const align = () => {
+      if (active && Math.abs(el.getBoundingClientRect().top) > 90) {
+        el.scrollIntoView({ block: "start", behavior: "instant" });
+      }
+    };
+    const frame = requestAnimationFrame(align);
+    const observer = new ResizeObserver(align);
+    const main = document.querySelector("main");
+    if (main) observer.observe(main);
+    const done = window.setTimeout(() => { active = false; observer.disconnect(); }, 4000);
+    const cancel = () => { active = false; observer.disconnect(); };
+    window.addEventListener("wheel", cancel, { once: true, passive: true });
+    window.addEventListener("touchstart", cancel, { once: true, passive: true });
+    return () => {
+      cancel();
+      cancelAnimationFrame(frame);
+      clearTimeout(done);
+      window.removeEventListener("wheel", cancel);
+      window.removeEventListener("touchstart", cancel);
+    };
   }, [hash]);
 
   // Preserved behavior: signed-in visitors go straight into the app.
@@ -47,14 +65,8 @@ export default function MarketingSite() {
         <AfterClick />
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
-        <StudioReveal><StudioMediaReel /></StudioReveal>
-        <ScopeStrip />
-        <StudioReveal><BuyerChooser /></StudioReveal>
-        <StudioReveal><Capabilities /></StudioReveal>
-        <StudioReveal><OfferSection source="home" /></StudioReveal>
-        <StudioReveal><BarPulseFeature /></StudioReveal>
-        <StudioReveal><WhySupremeTeam /></StudioReveal>
-        <StudioReveal><Founder /></StudioReveal>
+        <StudioReveal><OfferSection source="home" compact /></StudioReveal>
+        <StudioReveal><HomeProcess /></StudioReveal>
         <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />

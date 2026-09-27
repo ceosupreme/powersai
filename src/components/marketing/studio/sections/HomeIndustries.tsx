@@ -38,7 +38,7 @@ export function HomeIndustries() {
                 const m = getStudioMedia(item.media);
                 return (
                   <Link key={item.slug} to={`/for/${item.slug}`} className="home-ind-v3-card" onClick={() => trackSiteEvent({ event_type: "cta_click", label: `home_industry_${item.slug}` })}>
-                    {m?.src && <img src={m.src} alt={m.alt} width={m.width} height={m.height} loading="lazy" />}
+                    {m?.src && <img src={m.src} alt={m.alt} width={m.width} height={m.height} loading="lazy" style={{ objectPosition: m.objectPosition ?? "center", objectFit: m.objectFit }} />}
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.detail}</p>

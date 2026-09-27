@@ -106,7 +106,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all",
-        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.95)] shadow-sm backdrop-blur" : "border-b border-transparent",
+        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.97)] shadow-sm backdrop-blur" : "border-b border-border bg-[hsl(var(--paper))]",
       )}
     >
       <Container className="flex h-[76px] items-center justify-between gap-6">
@@ -158,7 +158,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link to={attributedContact} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="studio-btn studio-btn-primary studio-header-cta">
+          <Link to={attributedContact} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="home-btn-amber studio-header-cta">
             {labels.start}
           </Link>
           <Button
@@ -202,7 +202,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             <Link
               to={attributedContact}
               onClick={() => { setOpen(false); trackSiteEvent({ event_type: "cta_click", label: "start_project" }); }}
-              className="studio-btn studio-btn-primary mt-3 w-full"
+              className="home-btn-amber mt-3 w-full justify-center"
             >
               {labels.start}
             </Link>
