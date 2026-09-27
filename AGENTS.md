@@ -5,3 +5,4 @@
 - The Websites sales route owns its six-section layout in `src/pages/WebsiteServices.tsx` and reuses `OfferSection` and `Inquiry`; this preserves existing checkout and lead handling without duplicating business logic.
 - Published V2 industry pages render the database `layout.sequence` and `layout.interaction` in the shared homepage visual system; keep copy and ordering row-driven so markets and Spanish overrides stay editable without per-market branches.
 - Brand and Marketing sales routes own their six-section layouts in their respective page files and share `Inquiry`'s servicePage context; this keeps their distinct compositions independent while preserving one lead workflow.
+- Systems and Publishing sales routes own their six-section layouts and share `Inquiry`'s servicePage context; this keeps their workflow and product compositions distinct without duplicating lead handling.
