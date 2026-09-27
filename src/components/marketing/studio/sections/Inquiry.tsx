@@ -67,6 +67,8 @@ const PAGE_COPY = {
   websites: { service: "websites-apps", src: "services-websites", heading: "Talk about your website.", intro: "Tell me what the website needs to do for your business. I’ll reply personally within one business day." },
   brand: { service: "brand-creative", src: "services-brand", heading: "Talk about your brand.", intro: "Tell me what your business needs to be known for. I’ll reply personally within one business day." },
   marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where the customer path loses momentum. I’ll reply personally within one business day." },
+  systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about a system.", intro: "Tell me which tools you use and where the handoffs get lost. I’ll reply personally within one business day." },
+  publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
 } as const;
 
 export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY }) {
@@ -88,7 +90,7 @@ export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY 
   const [timing, setTiming] = useState("");
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
-  const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "publishing"]);
+  const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
   const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? "studio_home_inquiry";
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
