@@ -2090,3 +2090,198 @@
  .industry-v2 .industry-price-actions > * { max-width: 100%; }
  .industry-v2 .industry-owner-panel { padding: 22px; }
 }
+
+/* Brand and Marketing: paired editorial service worlds, with shared studio tokens. */
+.stm-studio.svc-page { --paper: var(--home-ivory); --surface: var(--home-soft); --ink: var(--home-ink); --ink-muted: 30 11% 34%; --cobalt: var(--home-copper); --cobalt-pale: var(--home-soft); --rule: var(--home-rule); --band: var(--home-charcoal); --band-text: var(--home-light); --primary: var(--home-copper); --background: var(--home-ivory); --foreground: var(--home-ink); --muted-foreground: 30 11% 34%; --border: var(--home-rule); overflow-x: clip; }
+.svc-page .svc-band-light { background: hsl(var(--home-ivory)); color: hsl(var(--home-ink)); }
+.svc-page .svc-band-dark { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); }
+.svc-page .svc-band-dark .home-eyebrow { color: hsl(var(--home-amber)); }
+.svc-page .svc-band-light .home-section-title em { color: hsl(var(--home-copper)); }
+.svc-page .svc-section { padding-block: clamp(76px, 9vw, 132px); }
+.svc-page .svc-hero { padding: clamp(112px, 11vw, 152px) 0 72px; }
+.svc-page .svc-hero-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(24px, 4vw, 76px); }
+.svc-page .svc-hero-copy { min-width: 0; }
+.svc-page .svc-hero h1 { margin-top: 24px; font-family: "Inter Tight",sans-serif; font-size: clamp(3.3rem, 5.5vw, 6.4rem); font-weight: 800; line-height: 1.02; overflow-wrap: break-word; }
+.svc-page .svc-hero h1 em { font-family: Georgia,serif; font-weight: 400; color: hsl(var(--home-copper)); }
+.svc-page .svc-band-dark h1 em { color: hsl(var(--home-amber)); }
+.svc-page .svc-hero-copy > p { max-width: 580px; margin-top: 26px; font-size: 1.16rem; line-height: 1.7; }
+.svc-page .svc-band-dark .svc-hero-copy > p { color: hsl(var(--home-light) / .78); }
+.svc-page .svc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.svc-page .home-btn-amber, .svc-page .home-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 22px; border-radius: 100px; font-size: .9rem; font-weight: 700; text-decoration: none; }
+.svc-page .home-btn-ghost { border: 1px solid currentColor; }
+.svc-page .svc-section-head { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(200px, .6fr); align-items: end; gap: 10px 55px; }
+.svc-page .svc-section-head .home-eyebrow { grid-column: 1/-1; }
+.svc-page .svc-section-head > p { max-width: 340px; color: hsl(var(--home-light) / .7); }
+/* Tactile identity spread; each element remains selectable, live type. */
+.svc-page .brand-identity { position: relative; isolation: isolate; min-height: 570px; padding: 24px; overflow: hidden; background: hsl(var(--home-soft)); border: 1px solid hsl(var(--home-rule)); color: hsl(var(--home-ink)); }
+.svc-page .brand-identity-top { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid hsl(var(--home-rule)); padding-bottom: 12px; font-size: .64rem; font-weight: 700; }
+.svc-page .brand-identity-mark { position: absolute; left: 8%; top: 15%; font: 700 clamp(3.8rem,7vw,7.5rem)/.77 Georgia,serif; }
+.svc-page .brand-identity-mark i, .svc-page .brand-sign i { color: hsl(var(--home-copper)); font-weight: 400; }
+.svc-page .brand-identity-mark > span { display: block; margin-top: 17px; font: 700 .67rem "Inter Tight",sans-serif; }
+.svc-page .brand-identity-strip { position: absolute; left: 8%; top: 61%; display: flex; width: 32%; height: 18px; }
+.svc-page .brand-identity-strip span, .svc-page .brand-system-colors i { flex: 1; background: hsl(var(--home-charcoal)); }
+.svc-page .brand-identity-strip span:nth-child(2), .svc-page .brand-system-colors i:nth-child(2) { background: hsl(var(--home-copper)); }
+.svc-page .brand-identity-strip span:nth-child(3), .svc-page .brand-system-colors i:nth-child(3) { background: hsl(var(--home-amber)); }
+.svc-page .brand-identity-strip span:nth-child(4), .svc-page .brand-system-colors i:nth-child(4) { background: hsl(var(--home-ivory)); }
+.svc-page .brand-identity-type { position: absolute; left: 8%; bottom: 7%; display: grid; gap: 5px; }
+.svc-page .brand-identity-type small, .svc-page .brand-identity-card small, .svc-page .brand-identity-menu small { font-size: .6rem; font-weight: 700; }
+.svc-page .brand-identity-type strong { font: 1.2rem Georgia,serif; }
+.svc-page .brand-identity-type i { color: hsl(var(--home-copper)); font: italic 1.05rem Georgia,serif; }
+.svc-page .brand-identity-card, .svc-page .brand-identity-menu { position: absolute; right: 5%; width: 40%; padding: 23px; box-shadow: 0 12px 28px hsl(var(--home-ink) / .16); }
+.svc-page .brand-identity-card { top: 14%; display: flex; flex-direction: column; justify-content: space-between; min-height: 190px; background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); transform: rotate(5deg); }
+.svc-page .brand-identity-card span, .svc-page .brand-identity-menu span { font-size: .64rem; font-weight: 700; }
+.svc-page .brand-identity-card strong { font: 1.25rem Georgia,serif; }
+.svc-page .brand-identity-menu { bottom: 6%; min-height: 200px; background: hsl(var(--home-ivory)); transform: rotate(-4deg); }
+.svc-page .brand-identity-menu strong { display: block; margin-top: 10px; font: 1.5rem Georgia,serif; }
+.svc-page .brand-identity-menu hr { margin: 12px 0; border-color: hsl(var(--home-rule)); }
+.svc-page .brand-identity-menu p { font-size: .72rem; line-height: 1.6; }
+.svc-page .brand-system-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin-top: 55px; border-top: 1px solid hsl(var(--home-light) / .25); }
+.svc-page .brand-system-grid > div { min-height: 185px; padding: 24px; border-right: 1px solid hsl(var(--home-light) / .25); border-bottom: 1px solid hsl(var(--home-light) / .25); }
+.svc-page .brand-system-grid > div:first-child { padding-left: 0; }
+.svc-page .brand-system-grid small { font-size: .7rem; font-weight: 700; color: hsl(var(--home-amber)); }
+.svc-page .brand-system-grid p { margin-top: 28px; font-size: 1.3rem; line-height: 1.3; }
+.svc-page .brand-system-grid .brand-system-type { font: 1.7rem Georgia,serif; }
+.svc-page .brand-system-colors { display: flex; height: 48px; margin-top: 30px; }
+.svc-page .brand-system-logo { grid-column: 1/-1; display: flex; align-items: center; gap: 35px; border-right: 0 !important; }
+.svc-page .brand-system-logo strong { font: 3rem Georgia,serif; }
+.svc-page .brand-system-logo strong i { color: hsl(var(--home-amber)); }
+.svc-page .brand-system-logo span { font-size: .65rem; }
+.svc-page .brand-gallery-layout { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,.7fr); gap: 14px; margin-top: 48px; }
+.svc-page .brand-sign { display: flex; flex-direction: column; justify-content: center; min-height: 610px; padding: 9%; background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); }
+.svc-page .brand-sign > span, .svc-page .brand-sign > small { font-size: .75rem; font-weight: 700; }
+.svc-page .brand-sign strong { margin: 65px 0 40px; font: 6rem/.95 Georgia,serif; }
+.svc-page .brand-gallery-details { display: grid; grid-template-rows: repeat(3,minmax(0,1fr)); gap: 14px; }
+.svc-page .brand-gallery-details > div { min-height: 180px; padding: 26px; }
+.svc-page .brand-gallery-details span { display: block; margin-bottom: 18px; font-size: .68rem; font-weight: 700; }
+.svc-page .brand-gallery-details strong { display: block; font: 2rem Georgia,serif; }
+.svc-page .brand-gallery-print { background: hsl(var(--home-soft)); }
+.svc-page .brand-gallery-social { background: hsl(var(--home-copper)); color: hsl(var(--home-ivory)); }
+.svc-page .brand-gallery-social small { display: block; margin-top: 18px; }
+.svc-page .brand-gallery-web { background: hsl(var(--home-light)); border: 1px solid hsl(var(--home-rule)); }
+.svc-page .brand-gallery-web nav { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 28px; font-size: .8rem; }
+.svc-page .brand-gallery-web nav b { font-weight: 400; }
+.svc-page .svc-work-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 48px 22px; margin-top: 48px; }
+.svc-page .svc-work-item:first-child { grid-column: 1/-1; }
+.svc-page .svc-work-image { display: flex; align-items: center; justify-content: center; aspect-ratio: 16/10; overflow: hidden; background: hsl(var(--home-soft)); color: hsl(var(--home-ink)); }
+.svc-page .svc-work-item:first-child .svc-work-image { aspect-ratio: 2/1; }
+.svc-page .svc-work-image img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .35s ease; }
+.svc-page .svc-work-image:hover img { transform: scale(1.025); }
+.svc-page .svc-work-caption { display: flex; align-items: start; justify-content: space-between; gap: 15px; padding-top: 18px; border-top: 1px solid hsl(var(--home-light) / .3); margin-top: 12px; }
+.svc-page .svc-work-caption span { color: hsl(var(--home-amber)); font-size: .72rem; }
+.svc-page .svc-work-caption h3 { margin-top: 8px; font: 700 1.55rem "Inter Tight",sans-serif; }
+.svc-page .svc-work-caption p { margin-top: 7px; max-width: 590px; font-size: .85rem; color: hsl(var(--home-light) / .72); }
+.svc-page .brand-engagement-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15%; margin-top: 50px; padding-top: 30px; border-top: 1px solid hsl(var(--home-rule)); }
+.svc-page .brand-engagement-grid h3 { margin-bottom: 24px; font: 700 1.7rem "Inter Tight",sans-serif; }
+.svc-page .brand-engagement-grid h3:not(:first-child) { margin-top: 36px; }
+.svc-page .brand-engagement-grid ul { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+.svc-page .brand-engagement-grid li { border-bottom: 1px solid hsl(var(--home-rule)); padding-bottom: 11px; font-size: .92rem; }
+.svc-page .brand-engagement-grid ol { list-style: decimal inside; line-height: 2.3; }
+.svc-page .svc-questions { display: grid; grid-template-columns: minmax(0,.75fr) minmax(0,1.25fr); gap: 40px; margin-top: 70px; padding-top: 35px; border-top: 1px solid hsl(var(--home-rule)); }
+.svc-page .svc-questions h3 { font: 700 2rem "Inter Tight",sans-serif; }
+.svc-page .svc-questions [data-state] { border-color: hsl(var(--home-rule)); }
+.svc-page .svc-questions button { text-align: left; }
+.svc-page .svc-questions [data-radix-accordion-content] { color: hsl(var(--home-ink) / .75); }
+.brand-page .home-contact { background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); --foreground: var(--home-light); --muted-foreground: 38 18% 70%; --surface: var(--home-light); --ink: var(--home-ink); }
+.brand-page .home-contact .studio-inquiry-card { box-shadow: none; }
+.marketing-page .home-contact { background: hsl(var(--home-ivory)); color: hsl(var(--home-ink)); }
+/* Marketing scenes repeat one offer in formats a customer would actually see. */
+.svc-page .campaign-hero-stack { position: relative; min-height: 530px; }
+.svc-page .campaign-hero-main { width: 83%; }
+.svc-page .campaign-hero-social { position: absolute; right: 0; top: 12%; width: 36%; transform: rotate(5deg); box-shadow: 0 16px 36px hsl(var(--home-ink) / .4); }
+.svc-page .campaign-hero-landing { position: absolute; right: 3%; bottom: 0; width: 47%; transform: rotate(-5deg); box-shadow: 0 16px 36px hsl(var(--home-ink) / .4); }
+.svc-page .campaign-scene { display: flex; flex-direction: column; min-height: 280px; padding: 26px; overflow: hidden; background: hsl(var(--home-soft)); color: hsl(var(--home-ink)); }
+.svc-page .campaign-hero-main .campaign-scene { min-height: 480px; padding: 34px; }
+.svc-page .campaign-hero-social .campaign-scene, .svc-page .campaign-hero-landing .campaign-scene { min-height: 220px; padding: 18px; }
+.svc-page .campaign-scene-top { display: flex; align-items: baseline; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid hsl(var(--home-rule)); }
+.svc-page .campaign-scene-top strong { font: 700 1.7rem "Inter Tight",sans-serif; }
+.svc-page .campaign-scene-top span { font-size: .54rem; font-weight: 700; }
+.svc-page .campaign-scene-content { display: flex; flex: 1; flex-direction: column; justify-content: center; padding-block: 20px; }
+.svc-page .campaign-scene-content small { font-size: .65rem; font-weight: 700; color: hsl(var(--home-copper)); }
+.svc-page .campaign-scene-content h3 { margin-top: 16px; font: 700 clamp(2.5rem,4.2vw,5.5rem)/.96 "Inter Tight",sans-serif; }
+.svc-page .campaign-scene-content h3 i { color: hsl(var(--home-copper)); font: italic .88em Georgia,serif; }
+.svc-page .campaign-scene-content p { margin-top: 16px; font-size: .9rem; }
+.svc-page .campaign-faux-action { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin-top: 20px; padding: 9px 16px; border-radius: 40px; background: hsl(var(--home-copper)); color: hsl(var(--home-ivory)); font-size: .78rem; font-weight: 700; }
+.svc-page .campaign-scene-bottom { display: flex; justify-content: space-between; gap: 10px; font-size: .61rem; font-weight: 700; }
+.svc-page .campaign-hero-social .campaign-scene-content h3, .svc-page .campaign-hero-landing .campaign-scene-content h3 { font-size: 1.65rem; }
+.svc-page .campaign-hero-social .campaign-scene-content p, .svc-page .campaign-hero-landing .campaign-scene-content p, .svc-page .campaign-hero-social .campaign-faux-action, .svc-page .campaign-hero-landing .campaign-faux-action { display: none; }
+.svc-page .svc-tabs { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 46px; border-bottom: 1px solid hsl(var(--home-rule)); }
+.svc-page .svc-tabs button { width: 100%; height: auto; min-height: 65px; justify-content: flex-start; gap: 12px; border-radius: 0; border-bottom: 3px solid transparent; color: hsl(var(--home-ink)); }
+.svc-page .svc-tabs button.is-active { border-color: hsl(var(--home-copper)); }
+.svc-page .svc-tabs button span { color: hsl(var(--home-copper)); }
+.svc-page .marketing-path-panel { display: grid; grid-template-columns: minmax(0,.7fr) minmax(0,1.3fr); gap: 40px; align-items: center; padding: 46px 0; min-height: 410px; }
+.svc-page .marketing-path-panel h3 { margin-top: 18px; font: 700 2.4rem "Inter Tight",sans-serif; }
+.svc-page .marketing-path-panel p { margin-top: 18px; line-height: 1.6; }
+.svc-page .marketing-path-panel .campaign-scene { min-height: 360px; }
+.svc-page .marketing-spread-layout { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); gap: 14px; margin-top: 48px; }
+.svc-page .marketing-spread-large .campaign-scene { height: 100%; min-height: 670px; padding: 40px; }
+.svc-page .marketing-spread-details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.svc-page .marketing-spread-details .campaign-email { grid-column: 1/-1; }
+.svc-page .marketing-spread-details .campaign-scene { min-height: 250px; }
+.svc-page .marketing-spread-details .campaign-scene-content h3 { font-size: 1.7rem; }
+.svc-page .marketing-spread-details .campaign-scene-content p, .svc-page .marketing-spread-details .campaign-faux-action { display: none; }
+.svc-page .campaign-email { background: hsl(var(--home-light)); }
+.svc-page .campaign-email > small, .svc-page .campaign-request > small { font-size: .65rem; font-weight: 700; color: hsl(var(--home-copper)); }
+.svc-page .campaign-email-paper { display: grid; gap: 10px; margin-top: 16px; padding: 18px; background: hsl(var(--home-ivory)); font-size: .8rem; }
+.svc-page .campaign-email-paper strong { font: 700 1.3rem "Inter Tight",sans-serif; }
+.svc-page .campaign-email-paper hr { border-color: hsl(var(--home-rule)); }
+.svc-page .campaign-request h3 { margin-top: 25px; font: 700 2rem "Inter Tight",sans-serif; }
+.svc-page .campaign-request p { margin: 8px 0 18px; }
+.svc-page .campaign-request > div:not(.campaign-scene-top) { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 10px; border: 1px solid hsl(var(--home-rule)); font-size: .8rem; }
+.svc-page .marketing-scope-layout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px,6vw,90px); margin-top: 48px; }
+.svc-page .marketing-need-list { border-top: 1px solid hsl(var(--home-rule)); }
+.svc-page .marketing-need-list button { display: flex; width: 100%; height: auto; min-height: 78px; justify-content: flex-start; gap: 20px; border-bottom: 1px solid hsl(var(--home-rule)); border-radius: 0; text-align: left; white-space: normal; color: hsl(var(--home-ink)); }
+.svc-page .marketing-need-list button.is-active { color: hsl(var(--home-copper)); }
+.svc-page .marketing-need-list button svg { margin-left: auto; flex: none; }
+.svc-page .marketing-need-detail { padding-top: 20px; }
+.svc-page .marketing-need-detail h3 { margin-top: 22px; font: 700 2.8rem "Inter Tight",sans-serif; }
+.svc-page .marketing-need-detail p { margin: 20px 0 26px; max-width: 420px; line-height: 1.7; }
+@media (max-width: 767px) {
+  .svc-page .svc-hero { padding-top: 112px; padding-bottom: 52px; }
+  .svc-page .svc-hero-grid { grid-template-columns: 1fr; gap: 34px; }
+  .svc-page .svc-hero h1 { font-size: clamp(3rem, 10vw, 4.2rem); }
+  .svc-page .svc-actions { flex-direction: column; align-items: stretch; }
+  .svc-page .brand-identity { min-height: 450px; padding: 16px; }
+  .svc-page .brand-identity-mark { font-size: clamp(3.2rem,12vw,5rem); }
+  .svc-page .brand-identity-card, .svc-page .brand-identity-menu { padding: 15px; }
+  .svc-page .brand-identity-card { min-height: 135px; }
+  .svc-page .brand-identity-menu { min-height: 175px; }
+  .svc-page .brand-identity-menu strong { font-size: 1.2rem; }
+  .svc-page .brand-identity-type { bottom: 5%; }
+  .svc-page .brand-system-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .svc-page .brand-system-grid > div { padding: 18px 12px; min-height: 145px; }
+  .svc-page .brand-system-grid p { font-size: 1rem; margin-top: 18px; }
+  .svc-page .brand-system-logo { flex-wrap: wrap; gap: 10px; }
+  .svc-page .brand-system-logo strong { font-size: 2.2rem; }
+  .svc-page .brand-gallery-layout { grid-template-columns: 1fr; }
+  .svc-page .brand-sign { min-height: 360px; }
+  .svc-page .brand-sign strong { margin: 40px 0; font-size: clamp(3.5rem,12vw,5rem); }
+  .svc-page .brand-gallery-details { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .svc-page .brand-gallery-web { grid-column: 1/-1; }
+  .svc-page .brand-gallery-details > div { min-height: 165px; padding: 20px; }
+  .svc-page .brand-gallery-details strong { font-size: 1.45rem; }
+  .svc-page .svc-section-head { display: block; }
+  .svc-page .svc-section-head > p { margin-top: 20px; }
+  .svc-page .svc-work-grid { grid-template-columns: 1fr; gap: 36px; }
+  .svc-page .svc-work-item:first-child { grid-column: auto; }
+  .svc-page .svc-work-item:first-child .svc-work-image { aspect-ratio: 16/10; }
+  .svc-page .brand-engagement-grid { grid-template-columns: 1fr; gap: 35px; }
+  .svc-page .brand-engagement-grid ul { grid-template-columns: 1fr 1fr; }
+  .svc-page .svc-questions { grid-template-columns: 1fr; gap: 20px; }
+  .svc-page .campaign-hero-stack { min-height: 390px; }
+  .svc-page .campaign-hero-main .campaign-scene { min-height: 350px; }
+  .svc-page .campaign-hero-main .campaign-scene-content h3 { font-size: 2.5rem; }
+  .svc-page .campaign-hero-social { top: 10%; width: 39%; }
+  .svc-page .campaign-hero-landing { width: 51%; }
+  .svc-page .campaign-hero-social .campaign-scene, .svc-page .campaign-hero-landing .campaign-scene { min-height: 165px; padding: 10px; }
+  .svc-page .campaign-hero-social .campaign-scene-content h3, .svc-page .campaign-hero-landing .campaign-scene-content h3 { font-size: 1rem; }
+  .svc-page .campaign-hero-social .campaign-scene-top strong, .svc-page .campaign-hero-landing .campaign-scene-top strong { font-size: .9rem; }
+  .svc-page .campaign-hero-social .campaign-scene-top span, .svc-page .campaign-hero-landing .campaign-scene-top span { display: none; }
+  .svc-page .svc-tabs button { display: flex; flex-direction: column; align-items: start; gap: 3px; padding: 8px 4px; font-size: .7rem; }
+  .svc-page .marketing-path-panel, .svc-page .marketing-scope-layout { grid-template-columns: 1fr; gap: 24px; }
+  .svc-page .marketing-path-panel { padding: 30px 0; }
+  .svc-page .marketing-spread-layout { grid-template-columns: 1fr; }
+  .svc-page .marketing-spread-large .campaign-scene { min-height: 430px; }
+  .svc-page .marketing-spread-details .campaign-scene { min-height: 220px; }
+}
+@media (max-width: 390px) { .svc-page .brand-identity-mark { left: 5%; } .svc-page .brand-identity-card, .svc-page .brand-identity-menu { right: 3%; width: 43%; } .svc-page .brand-identity-card strong { font-size: 1rem; } .svc-page .campaign-hero-stack { min-height: 360px; } .svc-page .campaign-hero-main .campaign-scene { min-height: 315px; } .svc-page .marketing-spread-details { grid-template-columns: 1fr; } .svc-page .marketing-spread-details .campaign-email { grid-column: auto; } }
+@media (prefers-reduced-motion: reduce) { .svc-page .svc-work-image img { transition: none; } .svc-page .svc-work-image:hover img { transform: none; } }
