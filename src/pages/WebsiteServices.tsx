@@ -76,6 +76,6 @@ export default function WebsiteServices() {
     <OfferSection source="services-websites"/>
     <WebsiteWork/>
     <section className="websites-process" aria-labelledby="websites-process-title"><Container><span className="home-eyebrow">05 / From first draft to handover</span><h2 id="websites-process-title" className="home-section-title">Clear work.<br/><em>Clear ownership.</em></h2><ol className="websites-process-steps">{process.map((item, i) => <li key={item.title}><span>0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></li>)}</ol><div className="websites-questions"><div><span className="home-eyebrow">Before we begin</span><h3>Questions worth asking.</h3></div><Accordion type="single" collapsible>{questions.map((item, i) => <AccordionItem key={item.q} value={`q-${i}`}><AccordionTrigger>{item.q}</AccordionTrigger><AccordionContent>{item.a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>
-    <Inquiry websitePage/>
+     <Inquiry servicePage="websites"/>
   </main><StudioFooter/></div>;
 }
