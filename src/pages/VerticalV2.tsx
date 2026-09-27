@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { VerticalInquiry } from "@/components/marketing/vertical-flagship/VerticalInquiry";
 import { MathCalculator } from "@/components/marketing/vertical/MathCalculator";
@@ -128,7 +127,6 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
 
   const audience = row.audience ?? {};
   const proof = row.proof ?? {};
-  const screens = arr<string>(proof.screens);
   const price = row.price_block ?? {};
   const needsList: string[] = Array.isArray(row.needs) && row.needs.every((n: unknown) => typeof n === "string") && row.needs.length ? row.needs : DEFAULT_NEEDS;
   const inquiryConfig = { slug, name: row.display_name, needs: needsList.map((l) => ({ id: l, label: l, detail: "" })) } as any;
@@ -136,6 +134,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const interaction: Interaction | null = layout?.interaction?.kind === "walkthrough" || layout?.interaction?.kind === "selector" ? layout.interaction : null;
   const heroTone = layout?.hero?.tone === "charcoal" ? "charcoal" : "ivory";
   const art = typeof layout?.hero?.media === "string" ? getStudioMedia(layout.hero.media) : null;
+  const [failedArt, setFailedArt] = useState<string | null>(null);
   const sectionOrder = sequence ?? ["local", "leaks", "differentiators", "features", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
   const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
   const cards = (items: any[], cols = "three") => <div className={`industry-list industry-list-${cols}`}>{items.map((item, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>;
@@ -159,7 +158,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
     }
   };
   return <div className="stm-studio industry-v2"><StudioHeader language={lang}/><main>
-    <section className={`industry-hero industry-tone-${heroTone}`}><div className="studio-container industry-hero-grid"><div className="industry-hero-copy"><span className="home-eyebrow">{row.display_name}</span>{hasEs && <Link className="industry-language" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link>}<h1>{idx >= 0 ? <>{headline.slice(0, idx)}<em>{headline.slice(idx, idx + word.length)}</em>{headline.slice(idx + word.length)}</> : headline}</h1><p className="industry-hero-subline">{row.subline}</p>{row.stat_value && <p className="industry-stat"><strong>{row.stat_value}</strong><span>{row.stat_label}</span></p>}<div className="industry-hero-actions"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary"/><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary"/></div>{biz && <p className="industry-biz-note">{L.checking_for} {biz}</p>}</div><div className="industry-hero-art">{art?.src ? <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high"/> : interaction && <div className="industry-device-pair"><BrowserScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.[0] : interaction.options?.[0]}/><PhoneScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.find(s => s.screen === "phone") : interaction.options?.[1]}/></div>}</div></div></section>
+    <section className={`industry-hero industry-tone-${heroTone}`}><div className="studio-container industry-hero-grid"><div className="industry-hero-copy"><span className="home-eyebrow">{row.display_name}</span>{hasEs && <Link className="industry-language" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link>}<h1>{idx >= 0 ? <>{headline.slice(0, idx)}<em>{headline.slice(idx, idx + word.length)}</em>{headline.slice(idx + word.length)}</> : headline}</h1><p className="industry-hero-subline">{row.subline}</p>{row.stat_value && <p className="industry-stat"><strong>{row.stat_value}</strong><span>{row.stat_label}</span></p>}<div className="industry-hero-actions"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary"/><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary"/></div>{biz && <p className="industry-biz-note">{L.checking_for} {biz}</p>}</div><div className="industry-hero-art">{art?.src && failedArt !== art.src ? <img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" onError={() => setFailedArt(art.src)}/> : interaction && <div className="industry-device-pair"><BrowserScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.[0] : interaction.options?.[0]}/><PhoneScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.find(s => s.screen === "phone") : interaction.options?.[1]}/></div>}</div></div></section>
     {sectionOrder.map((item: any, i: number) => <section key={`${item.key}-${i}`} id={item.key === "offer" ? "pricing" : item.key === "contact" ? "inquiry" : undefined} className={`industry-section industry-tone-${item.tone === "charcoal" ? "charcoal" : "ivory"}`}><div className="studio-container">{renderSection(item.key)}</div></section>)}
   </main><StudioFooter/></div>;
 }
