@@ -2,7 +2,7 @@
 
 ## Public studio website (STM build pack)
 
-- [ ] Brand and Marketing six-section sales pages, shared service inquiry context, signed-out desktop/phone QA (preview only)
+- [x] Brand and Marketing six-section sales pages, shared service inquiry context, signed-out desktop/phone QA (preview only)
 
 - [x] Industry V2 layout-driven homepage-system restyle, regenerated types, signed-out desktop/phone QA (preview only)
 
