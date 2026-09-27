@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { BookingCta } from '@/components/marketing/BookingCta';
 import { sanitizeBiz } from '@/pages/VerticalLanding';
 import { trackSiteEvent } from '@/lib/studioAnalytics';
+import { StudioHeader } from '@/components/marketing/studio/StudioHeader';
+import { StudioFooter } from '@/components/marketing/studio/StudioFooter';
+import { useStudioHead } from '@/components/marketing/studio/useStudioHead';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Resolving your Google Business Profile' },
@@ -54,17 +57,7 @@ function sourceLine(inputs: Array<{ source?: string; unresolved?: boolean }> | u
 }
 
 export default function FreeAudit() {
-  useEffect(() => {
-    const prev = document.title;
-    document.title = 'The free Missed Money Checkup — see what your business is losing';
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const prevDesc = meta?.getAttribute('content') ?? null;
-    if (meta) meta.setAttribute('content', 'Two minutes. My system reads the public side of your business — your Google listing, your website, your reviews — and shows where leads, follow-up, and trust are slipping.');
-    return () => {
-      document.title = prev;
-      if (meta && prevDesc != null) meta.setAttribute('content', prevDesc);
-    };
-  }, []);
+  useStudioHead({ title: 'The free check | Supreme Team Media', description: 'A free check of your Google listing, website and reviews, showing where inquiries and trust may be slipping.', path: '/free-audit' });
   const audit = usePublicAudit();
   const search = new URLSearchParams(window.location.search);
   const initialBiz = sanitizeBiz(search.get('biz')) ?? '';
@@ -83,6 +76,10 @@ export default function FreeAudit() {
   const canSubmit = businessName.trim().length > 0 && city.trim().length > 0 && !audit.submitting;
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
   const currentStageIdx = audit.status ? ORDER[audit.status] : -1;
+  const firstFinding = audit.full?.results[0];
+  const workingSignal = audit.full?.competitor_block?.in_map_pack === true
+    ? 'Your business appears in the local map results.'
+    : audit.full?.results.length === 0 ? 'No gaps were detected in this check.' : 'The check found areas to protect as well as gaps to review.';
 
   const completionLogged = useRef(false);
   const contextQuery = new URLSearchParams();
@@ -119,22 +116,20 @@ export default function FreeAudit() {
   }
 
   return (
-    <>
-      <main className="stm-marketing min-h-screen bg-[hsl(var(--stm-bg))] font-body text-[hsl(var(--stm-ink))]">
-        <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
-          <header className="mb-10">
-            <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]/70">Free Missed Money Checkup</p>
-            <h1 className="font-display text-4xl leading-[1.05] md:text-6xl">
-              The free Missed Money Checkup
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-[hsl(var(--stm-ink))]/70">
-              Two minutes. My system reads the public side of your business — your Google listing, your website, your reviews — and shows where leads, follow-up, and trust are slipping, with an honest estimate of what it may be costing.
-            </p>
+    <div className="stm-studio check-page min-h-screen">
+      <StudioHeader />
+      <main>
+        <div className="check-shell mx-auto max-w-4xl px-6">
+          <header className="check-intro">
+            <p className="home-eyebrow">Free business check</p>
+            <h1 className="home-section-title">The <em>free check.</em></h1>
+            <p className="check-lede">Two minutes. It reads your Google listing, your site and your reviews and shows what is slipping, with your own numbers.</p>
+            {initialBiz && <p className="check-context">Checking for {initialBiz}</p>}
           </header>
 
           {/* Intake */}
           {!running && !audit.redacted && (
-            <form onSubmit={onSubmit} className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8 shadow-sm">
+            <form onSubmit={onSubmit} className="check-form rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8 shadow-sm">
               <div className="grid gap-5 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-1.5 block font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/60">Business name *</span>
@@ -218,7 +213,7 @@ export default function FreeAudit() {
 
           {/* Progress theater */}
           {(running || audit.status === 'failed') && (
-            <div className="mt-2 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-6 font-mono text-sm text-[hsl(var(--stm-bg))] shadow-lg md:p-8">
+            <div className="check-progress mt-2 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-6 font-mono text-sm text-[hsl(var(--stm-bg))] shadow-lg md:p-8" role="status" aria-live="polite">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-bg))]/70">Live read · {businessName || 'your business'}</p>
               <ul className="space-y-2">
                 {STAGES.map((stage) => {
@@ -274,7 +269,8 @@ export default function FreeAudit() {
 
           {/* Redacted result */}
           {audit.redacted && !audit.full && (
-            <div className="mt-2 space-y-8">
+            <div className="check-results mt-2 space-y-8">
+              <div className="check-interpretation"><span className="home-eyebrow">First read</span><p>{audit.redacted.leak_count === 0 ? 'No gaps were detected in this check. Keep protecting what is already working.' : `${audit.redacted.leak_count} gap${audit.redacted.leak_count === 1 ? ' needs' : 's need'} a closer look. ${audit.redacted.top_leaks[0] ? `Start with ${audit.redacted.top_leaks[0].toLowerCase()}; the full list shows where to focus next.` : 'Open the full list to see where to focus first.'}`} These figures are estimates from public signals and industry benchmarks, not booked revenue.</p></div>
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Money you're likely missing</p>
                 {(audit.redacted.total_monthly_dollars ?? 0) > 0 ? (
@@ -379,7 +375,8 @@ export default function FreeAudit() {
 
           {/* Full result */}
           {audit.full && (
-            <div className="mt-2 space-y-8">
+            <div className="check-results mt-2 space-y-8">
+              <div className="check-interpretation"><span className="home-eyebrow">What this means</span><p>{workingSignal} {firstFinding ? `${firstFinding.name} is the first place to look: ${whyForLeak(firstFinding.name, firstFinding.benchmark)} ` : ''}{audit.full.results.length > 1 ? `${audit.full.results.length - 1} other area${audit.full.results.length === 2 ? '' : 's'} also need attention. ` : ''}The monthly figures below are estimates, not guaranteed revenue.</p></div>
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">The full list</p>
                 {audit.full.total_monthly_dollars > 0 ? (
@@ -473,6 +470,7 @@ export default function FreeAudit() {
           </p>
         </div>
       </main>
-    </>
+      <StudioFooter />
+    </div>
   );
 }
