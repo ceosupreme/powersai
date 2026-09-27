@@ -41,12 +41,14 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/services/marketing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marketing y crecimiento" : "Marketing & growth"}</Link>
             <Link to="/services/ai-systems" className="inline-flex min-h-11 items-center hover:underline">{es ? "IA y sistemas" : "AI & systems"}</Link>
             <Link to="/publishing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Publicación y lanzamiento" : "Publishing & Launch"}</Link>
-            <Link to="/#about" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acerca de" : "About"}</Link>
+            <Link to="/about" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acerca de" : "About"}</Link>
             <Link to={contactHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Habla de un proyecto" : "Discuss a project"}</Link>
             <Link to={auditHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Revisión gratuita" : "Free business checkup"}</Link>
             <Link to="/industries" className="inline-flex min-h-11 items-center hover:underline">{es ? "Industrias" : "Industries"}</Link>
             <Link to="/hire" className="inline-flex min-h-11 items-center hover:underline">{es ? "¿Quieres contratar a Sean?" : "Hiring Sean?"}</Link>
             <Link to="/login" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acceso para clientes" : "Client login"}</Link>
+            <Link to="/privacy" className="inline-flex min-h-11 items-center hover:underline">{es ? "Privacidad" : "Privacy"}</Link>
+            <Link to="/terms" className="inline-flex min-h-11 items-center hover:underline">{es ? "Términos" : "Terms"}</Link>
             <a
               href="https://www.linkedin.com/in/supremepowers"
               target="_blank"

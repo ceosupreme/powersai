@@ -2,6 +2,8 @@
 
 ## Public studio website (STM build pack)
 
+- [ ] Build 1 trust and function: accessibility, legal, route previews, About, testimonials, Spanish, internal traffic, reply-to, hero motion
+
 - [x] Free Check and Thank-you presentation refresh; signed-out desktop/phone and intercepted audit/checkout QA (preview only)
 
 - [x] Industries visual directory and Work alternating project pages; signed-out desktop/phone QA (preview only)

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import type { VerticalConfig } from "./config";
+import { LegalConsent } from "@/components/marketing/studio/LegalConsent";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(200),
@@ -94,6 +95,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
       <fieldset><legend>{es ? "¿Qué necesita más atención?" : "What needs the most attention?"}</legend><div className="vertical-needs-grid">{config.needs.map((need) => <Button key={need.id} type="button" variant="outline" aria-pressed={needs.includes(need.id)} onClick={() => toggle(need.id)}>{need.label}</Button>)}</div></fieldset>
       <label><span>{es ? "Nota opcional" : "Optional note"}</span><textarea rows={5} maxLength={3000} value={note} onChange={(event) => setNote(event.target.value)} placeholder={es ? "¿Qué está pasando ahora y qué te gustaría mejorar?" : "What is happening now, and what would you like to improve?"} /></label>
       {error && <p className="vertical-form-error" role="alert">{error}</p>}
+      <LegalConsent language={language} />
       <Button type="submit" disabled={status === "submitting"} className="studio-btn studio-btn-primary w-full">{status === "submitting" ? (es ? "Enviando…" : "Sending…") : (es ? "Envía mis prioridades" : "Send my priorities")}</Button>
       <p className="vertical-form-note">{es ? "Recibirás una confirmación en cuanto llegue y una respuesta personal de Sean dentro de un día hábil." : "You will get a confirmation the moment this lands, and a personal reply from Sean within one business day."}</p>
     </form>

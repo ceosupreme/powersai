@@ -85,6 +85,8 @@ import { SetupWizard } from "@/components/help/SetupWizard";
 import { ThemeSync } from "@/components/layout/ThemeSync";
 import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics";
 import ThankYou from "./pages/ThankYou";
+import About from "./pages/About";
+import LegalPage from "./pages/LegalPage";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -114,6 +116,9 @@ const App = () => {
                 <Route path="/" element={<MarketingSite />} />
                 <Route path="/free-audit" element={<FreeAudit />} />
                 <Route path="/thank-you" element={<ThankYou />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<LegalPage kind="privacy" />} />
+                <Route path="/terms" element={<LegalPage kind="terms" />} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />

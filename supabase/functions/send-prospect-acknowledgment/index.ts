@@ -43,13 +43,14 @@ Deno.serve(async (req) => {
   if ((lead.source ?? "").endsWith(":client")) return json({ skipped: "client_source" });
   if (lead.first_response_at) return json({ skipped: "already_sent" });
 
-  const { data: setting } = await sb.from("site_settings").select("value").eq("key", "booking_url").maybeSingle();
-  const bookingUrl = clean(setting?.value, 500);
+  const { data: settings } = await sb.from("site_settings").select("key,value").in("key", ["booking_url", "reply_to_email"]);
+  const bookingUrl = clean(settings?.find((row) => row.key === "booking_url")?.value, 500);
+  const replyTo = clean(settings?.find((row) => row.key === "reply_to_email")?.value, 255) || CONTACT_EMAIL;
   const business = clean(lead.business_name);
   const firstName = clean(lead.name).split(/\s+/)[0] ?? "";
   const language = (lead.qualifier_data as Record<string, unknown> | null)?.language === "es" ? "es" : "en";
   const result = await resendEmailAdapter.send({
-    channel: "email", to: email, from: FROM, reply_to: CONTACT_EMAIL,
+    channel: "email", to: email, from: FROM, reply_to: replyTo,
     subject: business ? (language === "es" ? `Recibí tu mensaje sobre ${business}` : `Got your note about ${business}`) : (language === "es" ? "Recibí tu mensaje" : "Got your note"),
     body: language === "es" ? spanishBody(firstName, business, bookingUrl) : englishBody(firstName, business, bookingUrl),
     project_id: "owner_notification", queue_id: `prospect_ack:${lead.id}`,

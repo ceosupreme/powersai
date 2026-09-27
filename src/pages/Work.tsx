@@ -8,6 +8,7 @@ import { Container } from "@/components/marketing/studio/primitives";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { ROUTE_META } from "@/config/routeMeta";
 import { getStudioMedia } from "@/config/studioMedia";
 import { STUDIO_CATEGORIES, STUDIO_CATEGORY_LABEL, type StudioCategoryId } from "@/content/studioProjects";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
@@ -35,7 +36,7 @@ export default function Work() {
     };
   }, [projects, active]);
   const activeLabel = active === "all" ? "All work" : STUDIO_CATEGORY_LABEL[active];
-  useStudioHead({ title: active === "all" ? "Work | Supreme Team Media" : `${activeLabel} work | Supreme Team Media`, description: "Real websites, brands and systems designed and built by Sean Powers. See the work and his role on each project.", path: active === "all" ? "/work" : `/work?type=${active}`, canonicalPath: "/work" });
+  useStudioHead({ title: active === "all" ? ROUTE_META["/work"].title : `${activeLabel} work | Supreme Team Media`, description: ROUTE_META["/work"].description, path: active === "all" ? "/work" : `/work?type=${active}`, canonicalPath: "/work" });
   const onChange = (next: StudioCategoryId | "all") => {
     const updated = new URLSearchParams(params);
     updated.delete("category");

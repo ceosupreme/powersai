@@ -7,6 +7,7 @@ import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Container } from "@/components/marketing/studio/primitives";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { ROUTE_META } from "@/config/routeMeta";
 import { BrowserScene, type Interaction } from "@/components/marketing/vertical-v2/IndustryInteraction";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
@@ -36,7 +37,7 @@ function DirectoryArt({ row, mediaKey }: { row: DirectoryRow; mediaKey?: string 
 }
 
 export default function Industries() {
-  useStudioHead({ title: "Industries | Supreme Team Media", description: "Websites and follow-up built around the way local businesses get customers. Explore published industry pages or tell Sean about your business.", path: "/industries" });
+  useStudioHead({ ...ROUTE_META["/industries"], path: "/industries" });
   const { data: rows = [], isLoading, isError } = useQuery({
     queryKey: ["industries-v2-directory"],
     staleTime: 5 * 60 * 1000,

@@ -106,7 +106,7 @@ export default function ProjectHome() {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const ordersSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     Promise.all([
-      supabase.from('site_events').select('event_type').gte('created_at', since),
+      supabase.from('site_events').select('event_type').eq('is_internal', false).gte('created_at', since),
       supabase.from('inbound_leads').select('email,first_response_at,qualifier_data').is('captured_for_project_id', null).gte('created_at', since),
       supabase.from('site_orders').select('amount_cents,status').in('status', ['paid', 'active']).gte('created_at', ordersSince),
     ]).then(([eventsResult, leadsResult, ordersResult]) => {

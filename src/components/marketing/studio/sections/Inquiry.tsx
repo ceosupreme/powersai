@@ -8,6 +8,7 @@ import { Container, Eyebrow } from "../primitives";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { BookingCta } from "@/components/marketing/BookingCta";
+import { LegalConsent } from "../LegalConsent";
 import {
   CONTEXT_OPTIONS,
   SERVICE_INTENT_EVENT,
@@ -443,6 +444,7 @@ export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PA
                     </p>
                   )}
 
+                  <LegalConsent />
                   <button
                     type="submit"
                     disabled={status === "submitting"}
