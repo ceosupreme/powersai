@@ -91,7 +91,7 @@ export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY 
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
   const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
-  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? "studio_home_inquiry";
+  const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? (window.location.pathname === "/work" ? "work" : "studio_home_inquiry");
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
   const offer = offerParam && offerParam in OFFER_CONTEXT ? offerParam as OfferKey : null;
@@ -251,7 +251,7 @@ export function Inquiry({ servicePage }: { servicePage?: keyof typeof PAGE_COPY 
             timing: timing || null,
             source_vertical: sourceVertical,
             source_path: window.location.pathname,
-            src: sourceParam ?? pageCopy?.src ?? null,
+            src: sourceParam ?? pageCopy?.src ?? (window.location.pathname === "/work" ? "work" : null),
             biz: initialBiz || null,
             call_requested: callRequested,
             offer,
