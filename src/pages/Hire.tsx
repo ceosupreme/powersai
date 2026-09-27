@@ -10,6 +10,7 @@ import { STUDIO_RESUME, RESUME_REQUEST_MAILTO } from "@/config/studioResume";
 import { trackStudioEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
+import { ROUTE_META } from "@/config/routeMeta";
 
 const LINKEDIN = "https://www.linkedin.com/in/supremepowers";
 const EVIDENCE_SLUGS = ["barpulse", "big-paws-club", "kario-voss"];
@@ -27,7 +28,7 @@ function ResumeLink({ primary = false }: { primary?: boolean }) {
 export default function Hire() {
   const { projects, isError, isLoading } = useStudioProjects();
   const evidence = EVIDENCE_SLUGS.map(slug => projects.find(project => project.slug === slug)).filter((project): project is NonNullable<typeof project> => Boolean(project));
-  useStudioHead({ title: "Hire Sean Powers — Strategy, creative work, and hands-on execution", description: "Sean Powers, founder of Supreme Team Media since 2002: marketing, sales, hospitality, websites and AI-assisted business systems. For employers and teams considering an individual role, contract, or embedded project.", path: "/hire" });
+  useStudioHead({ ...ROUTE_META["/hire"], path: "/hire" });
 
   return <div className="stm-studio hire-editorial min-h-screen"><StudioHeader /><main>
     <section className="hire-intro"><Container><span className="home-eyebrow">For employers and teams</span><h1 className="home-section-title">Sean Powers — Strategy, creative thinking, <em>and hands-on execution.</em></h1><p className="hire-lede">Founder of Supreme Team Media since 2002, with experience across marketing, sales, hospitality, websites, and AI-assisted business systems. I connect strategy with execution, take ownership of the work, and stay close enough to the business to make sound decisions quickly.</p><p>For employers and teams considering Sean for an individual role, contract, or embedded project.</p><div className="hire-actions"><ResumeLink primary /><a className="hire-text-link" href="#contact" onClick={() => trackStudioEvent("hiring_interest", { id: "discuss_role" })}>Discuss a role or contract <ArrowRight size={17} aria-hidden /></a></div></Container></section>

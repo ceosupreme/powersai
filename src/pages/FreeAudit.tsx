@@ -7,6 +7,7 @@ import { trackSiteEvent } from '@/lib/studioAnalytics';
 import { StudioHeader } from '@/components/marketing/studio/StudioHeader';
 import { StudioFooter } from '@/components/marketing/studio/StudioFooter';
 import { useStudioHead } from '@/components/marketing/studio/useStudioHead';
+import { ROUTE_META } from '@/config/routeMeta';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Resolving your Google Business Profile' },
@@ -57,7 +58,7 @@ function sourceLine(inputs: Array<{ source?: string; unresolved?: boolean }> | u
 }
 
 export default function FreeAudit() {
-  useStudioHead({ title: 'The free check | Supreme Team Media', description: 'A free check of your Google listing, website and reviews, showing where inquiries and trust may be slipping.', path: '/free-audit' });
+  useStudioHead({ ...ROUTE_META['/free-audit'], path: '/free-audit' });
   const audit = usePublicAudit();
   const search = new URLSearchParams(window.location.search);
   const initialBiz = sanitizeBiz(search.get('biz')) ?? '';

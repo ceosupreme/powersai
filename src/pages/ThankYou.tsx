@@ -7,9 +7,10 @@ import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
 import CheckoutThankYou from "./CheckoutThankYou";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { ROUTE_META } from "@/config/routeMeta";
 
 export default function ThankYou() {
-  useStudioHead({ title: "Your next step | Supreme Team Media", description: "Check your order status and find out what happens next with Supreme Team Media.", path: "/thank-you" });
+  useStudioHead({ ...ROUTE_META["/thank-you"], path: "/thank-you" });
   const { enabled, loading } = useCheckoutEnabled();
   if (loading) return <div className="stm-studio checkout-page min-h-screen"><StudioHeader /><main className="checkout-main"><Container><p role="status">Loading…</p></Container></main><StudioFooter /></div>;
   if (enabled) return <CheckoutThankYou />;
