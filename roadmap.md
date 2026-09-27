@@ -2,7 +2,7 @@
 
 ## Public studio website (STM build pack)
 
-- [ ] Websites page: six-section rebuild, homepage work copy cleanup, signed-out desktop/phone and offer/form checks
+- [x] Websites page: six-section rebuild, homepage work copy cleanup, signed-out desktop/phone and offer/form checks
 
 - [x] Homepage part 2: approved full-size artwork, header, actual work, compact offers/walkthrough, process and local close; preview-only verification
 
