@@ -11,7 +11,7 @@ import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess"
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
-import { OfferSection } from "@/components/marketing/offer/OfferSection";
+import { PricingTeaser } from "@/components/marketing/studio/sections/PricingTeaser";
 import { Testimonials } from "@/components/marketing/studio/Testimonials";
 import { ROUTE_META } from "@/config/routeMeta";
 
@@ -63,8 +63,8 @@ export default function MarketingSite() {
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
         <Testimonials />
-        <StudioReveal><OfferSection source="home" compact /></StudioReveal>
         <StudioReveal><HomeProcess /></StudioReveal>
+        <StudioReveal><PricingTeaser /></StudioReveal>
         <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />

@@ -87,6 +87,8 @@ import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics"
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import LegalPage from "./pages/LegalPage";
+import Pricing from "./pages/Pricing";
+import Startups from "./pages/Startups";
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -119,6 +121,8 @@ const App = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/privacy" element={<LegalPage kind="privacy" />} />
                 <Route path="/terms" element={<LegalPage kind="terms" />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/startups" element={<Startups />} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />

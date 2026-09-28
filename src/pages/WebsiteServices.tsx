@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Container } from "@/components/marketing/studio/primitives";
-import { OfferSection } from "@/components/marketing/offer/OfferSection";
+import { PricingTeaser } from "@/components/marketing/studio/sections/PricingTeaser";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
@@ -75,7 +75,7 @@ export default function WebsiteServices() {
   return <div className="stm-studio websites-page relative min-h-screen"><StudioHeader/><main>
     <section className="websites-hero" aria-labelledby="websites-title"><Container className="websites-hero-layout"><div className="websites-hero-copy"><span className="home-eyebrow">01 / Websites & digital products</span><h1 id="websites-title">Look the part.<br/><em>Make the next<br/>step easy.</em></h1><p>A website built for your business that answers every inquiry in seconds, alerts you, and gives you a clear next step. $2,500, or $0 down at $297 a month.</p><div className="websites-hero-actions"><a href="#website-options" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="home-btn-amber">See website options <ArrowRight size={16} aria-hidden/></a><a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "talk_website" })} className="home-btn-ghost">Talk about your website <ArrowRight size={16} aria-hidden/></a></div></div>{art?.src && <div className="websites-hero-art"><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high"/></div>}</Container></section>
     <WebsiteWalkthrough/>
-    <OfferSection source="services-websites"/>
+    <PricingTeaser websitePage/>
     <WebsiteWork/>
     <Testimonials />
     <section className="websites-process" aria-labelledby="websites-process-title"><Container><span className="home-eyebrow">05 / From first draft to handover</span><h2 id="websites-process-title" className="home-section-title">Clear work.<br/><em>Clear ownership.</em></h2><ol className="websites-process-steps">{process.map((item, i) => <li key={item.title}><span>0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></li>)}</ol><div className="websites-questions"><div><span className="home-eyebrow">Before we begin</span><h3>Questions worth asking.</h3></div><Accordion type="single" collapsible>{questions.map((item, i) => <AccordionItem key={item.q} value={`q-${i}`}><AccordionTrigger>{item.q}</AccordionTrigger><AccordionContent>{item.a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>

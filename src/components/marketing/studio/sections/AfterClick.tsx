@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { Container } from "../primitives";
 
-const STAGES = ["Attract", "Capture", "Follow up", "See what needs attention"] as const;
+const STAGES = ["Attract — Show up clearly", "Capture — Make the next step easy", "Follow up — Keep the conversation moving", "See what needs attention — Know what is waiting on you"] as const;
 
 export function AfterClick() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -59,7 +59,7 @@ export function AfterClick() {
             <span className="after-click-eyebrow">More than a website</span>
             <h2 id="after-click-title" className="studio-display">A website is just the <em>beginning.</em></h2>
           </div>
-          <p>Make a strong first impression. Give people an easy way to get in touch. Keep the next step moving while you run the business.</p>
+          <p>Getting found is step one. The real value is helping the right person take the next step and keeping the conversation moving while the business is busy.</p>
         </div>
 
         <div className="after-click-stage-row" role="tablist" aria-label="What happens after a customer visits">
