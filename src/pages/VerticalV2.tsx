@@ -18,6 +18,7 @@ const SITE = "https://supremeteammedia.com";
 const DEFAULT_NEEDS = ["A new website", "The site I have is not bringing work", "Follow-up, reviews and reminders", "The whole system"];
 const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const str = (v: unknown) => (typeof v === "string" ? v : "");
+const INDUSTRY_MEDIA: Record<string, string> = { plumbing: "industry-plumbing-hero", restaurants: "industry-restaurants-hero", tacos: "industry-tacos-hero", auto: "industry-auto-hero", "real-estate": "industry-realestate-hero", dealerships: "industry-dealerships-hero", legal: "industry-legal-hero" };
 
 function useJsonLd(id: string, data: unknown | null) {
   useEffect(() => {
@@ -134,7 +135,9 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
 
   const interaction: Interaction | null = layout?.interaction?.kind === "walkthrough" || layout?.interaction?.kind === "selector" ? layout.interaction : null;
   const heroTone = layout?.hero?.tone === "charcoal" ? "charcoal" : "ivory";
-  const art = typeof layout?.hero?.media === "string" ? getStudioMedia(layout.hero.media) : null;
+  const configuredArt = typeof layout?.hero?.media === "string" ? getStudioMedia(layout.hero.media) : null;
+  const requestedArt = getStudioMedia(INDUSTRY_MEDIA[slug]);
+  const art = requestedArt?.src ? requestedArt : configuredArt;
   const [failedArt, setFailedArt] = useState<string | null>(null);
   const sectionOrder = sequence ?? ["local-audience", "leaks", "differentiators", "features", "local-plan", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
   const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
