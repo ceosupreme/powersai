@@ -4,6 +4,12 @@ Page layouts & media map
 
 Keep the graphics. Map the pages. Produce only what is missing.
 
+## Pricing and startup paths
+
+`/pricing` is the full commercial decision page. It holds the approved offer comparison, checkout actions, customer walkthrough, ownership terms, support questions, and final inquiry path. The homepage and Websites page retain concise, visible starting-price summaries that link here.
+
+`/startups` serves aspiring entrepreneurs, side-hustle builders, idea-stage founders, and early businesses. It combines a stage selector, an immediate client-side Business Readiness result, relevant work, and an inquiry path without requiring contact details to see the result.
+
 This plan replaces the earlier broad generation list. The owner has
 already selected Option 1 and likes its imagery. The homepage hero,
 photographic direction, device styling, industry examples and light/dark
