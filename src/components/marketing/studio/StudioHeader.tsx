@@ -127,7 +127,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             {servicesOpen && (
               <div id="studio-services-menu" ref={servicesPanelRef} className="studio-services-menu absolute left-1/2 top-[calc(100%+12px)] w-[680px] -translate-x-1/2 border border-border bg-[hsl(var(--paper))] p-3 shadow-xl">
                 <div className="grid grid-cols-2 gap-1">
-                  {SERVICES.map((service, index) => (
+                  {SERVICES.map((service) => (
                     <Link key={service.to} to={service.to} onClick={() => setServicesOpen(false)} className="group min-h-[92px] border-b border-border p-4 hover:bg-[hsl(var(--surface))]">
                       <span className="studio-display block text-[1.02rem] group-hover:text-primary">{language === "es" ? service.labelEs : service.label}</span>
                       <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{language === "es" ? service.noteEs : service.note}</span>
