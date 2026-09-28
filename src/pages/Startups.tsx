@@ -22,7 +22,7 @@ export default function Startups() {
   const [stage, setStage] = useState(0); const [answers,setAnswers] = useState<number[]>(Array(questions.length).fill(0)); const [showResult,setShowResult]=useState(false);
   const { projects } = useStudioProjects();
   const result = useMemo(() => { const ranked = questions.map(([name],i)=>({name,score:answers[i]})); const strongest=[...ranked].sort((a,b)=>b.score-a.score)[0]; const gap=[...ranked].sort((a,b)=>a.score-b.score)[0]; const band=resultFor(answers.reduce((a,b)=>a+b,0)); return {band,strongest,gap, next: ranked.filter(x=>x.score<3).slice(0,4)}; },[answers]);
-  const actual = ["allmighty-supreme","big-paws-club","barpulse"].flatMap(slug => { const p=projects.find(x=>x.slug===slug); return p?[p]:[]; });
+  const actual = ["allmighty-supreme","big-paws-club","supreme-wellness-club"].flatMap(slug => { const p=projects.find(x=>x.slug===slug); return p?[p]:[]; });
   useStudioHead({ ...ROUTE_META["/startups"], path:"/startups" });
   return <div className="stm-studio startups-page min-h-screen"><StudioHeader/><main>
     <section className="startup-hero"><Container><span className="home-eyebrow">Startups and founders</span><h1 className="home-section-title">Turn the idea into <em>something real.</em></h1><p>For aspiring entrepreneurs, side-hustle builders, idea-stage founders and early businesses that need a clearer path from possibility to launch.</p><a href="#readiness" className="home-btn-amber">Check your readiness <ArrowRight size={16}/></a></Container></section>
