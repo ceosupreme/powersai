@@ -14,9 +14,13 @@ export function StudioMotion() {
     const main = document.querySelector(".stm-studio main");
     if (!main) return;
     const hero = main.querySelector(":scope > section:first-of-type");
-    const targets = new Set<HTMLElement>();
-    main.querySelectorAll<HTMLElement>(`${TEXT}, ${BODY}, ${VISUAL}, ${GROUPS}`).forEach((node) => {
-      if (hero?.contains(node) || node.closest(CALM)) return;
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      (entry.target as HTMLElement).classList.add("studio-motion-enter");
+      observer.unobserve(entry.target);
+    }), { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
+    const prepare = (root: ParentNode) => root.querySelectorAll<HTMLElement>(`${TEXT}, ${BODY}, ${VISUAL}, ${GROUPS}`).forEach((node) => {
+      if (node.classList.contains("studio-motion-ready") || hero?.contains(node) || node.closest(CALM)) return;
       node.classList.add("studio-motion-ready");
       if (node.matches(BODY)) node.classList.add("studio-motion-delay");
       if (node.matches(VISUAL)) node.classList.add("studio-motion-visual");
@@ -28,14 +32,13 @@ export function StudioMotion() {
           child.style.setProperty("--motion-index", String(Math.min(index, 6)));
         });
       }
-      targets.add(node);
+      observer.observe(node);
     });
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      (entry.target as HTMLElement).classList.add("studio-motion-enter");
-      observer.unobserve(entry.target);
-    }), { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
-    targets.forEach((node) => observer.observe(node));
+    prepare(main);
+    const mutations = new MutationObserver((records) => records.forEach((record) => record.addedNodes.forEach((node) => {
+      if (node instanceof HTMLElement) prepare(node.parentNode ?? main);
+    })));
+    mutations.observe(main, { childList: true, subtree: true });
     const art = main.querySelector<HTMLElement>(".home-hero-v3-art");
     const depth = () => {
       if (!art || window.innerWidth < 1024 || !canAnimate()) return;
@@ -43,7 +46,7 @@ export function StudioMotion() {
     };
     depth();
     window.addEventListener("scroll", depth, { passive: true });
-    return () => { observer.disconnect(); window.removeEventListener("scroll", depth); };
+    return () => { observer.disconnect(); mutations.disconnect(); window.removeEventListener("scroll", depth); };
   }, []);
   return null;
 }

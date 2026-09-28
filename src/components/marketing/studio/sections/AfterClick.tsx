@@ -81,7 +81,7 @@ export function AfterClick() {
           <span className="after-click-line" aria-hidden><i style={{ width: `${(stage / (STAGES.length - 1)) * 100}%` }} /></span>
         </div>
 
-        <div id="after-click-composition" className={`after-click-composition is-stage-${stage}`} role="tabpanel">
+        <div key={stage} id="after-click-composition" className={`after-click-composition studio-state-panel is-stage-${stage}`} role="tabpanel">
           <div className="after-click-glow" aria-hidden />
           <article className="after-click-request">
             <div className="after-click-windowbar"><span /><span /><span /><small>Service request</small></div>
