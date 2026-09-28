@@ -8,7 +8,6 @@ import homeIndustryService from "@/assets/studio/home-industry-hvac.webp.asset.j
 import homeIndustryRestaurant from "@/assets/studio/home-industry-pizza.webp.asset.json";
 import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.webp.asset.json";
 import websitesHero from "@/assets/studio/service-websites-hero.webp.asset.json";
-import contactMap from "@/assets/studio/contact-map.webp.asset.json";
 import coastalBeauties from "@/assets/studio/coastal-beauties.png";
 
 /**
@@ -88,14 +87,16 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 941,
     objectFit: "contain",
   },
-  "contact-map": {
-    src: contactMap.url,
-    alt: "Illustrated map of the San Diego region",
-    aspectRatio: "1448 / 1086",
-    width: 1448,
-    height: 1086,
-    objectFit: "contain",
-  },
+  "industry-plumbing-hero": { src: null, alt: "Plumbing business website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-restaurants-hero": { src: null, alt: "Restaurant website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-tacos-hero": { src: null, alt: "Taco shop website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-auto-hero": { src: null, alt: "Auto repair website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-realestate-hero": { src: null, alt: "Real estate website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-dealerships-hero": { src: null, alt: "Independent dealership website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "industry-legal-hero": { src: null, alt: "Law firm website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
+  "brand-materials-spread": { src: null, alt: "Brand identity materials spread", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
+  "marketing-campaign-scene": { src: null, alt: "Coordinated marketing campaign scene", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
+  "publishing-release-spread": { src: null, alt: "Book and digital product release materials", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
   "hero-composition": {
     src: null,
     alt: "Supreme Team Media studio composition",
