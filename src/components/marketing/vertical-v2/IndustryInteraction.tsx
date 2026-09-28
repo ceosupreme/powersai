@@ -47,7 +47,7 @@ export function IndustryInteraction({ interaction }: { interaction: Interaction 
   return <div className="industry-interaction">
     <div className="industry-interaction-head"><div><span className="home-eyebrow">{interaction.eyebrow}</span><h2 className="industry-title">{interaction.title}</h2></div>{interaction.intro && <p>{interaction.intro}</p>}</div>
     <div className="industry-tabs" role="tablist" aria-label={interaction.title || "Choose a view"}>{items.map((step, i) => <Button key={i} type="button" variant="ghost" id={`industry-tab-${i}`} role="tab" aria-selected={index === i} aria-controls="industry-panel" tabIndex={index === i ? 0 : -1} className={index === i ? "is-active" : ""} onKeyDown={(event) => onKey(event, i)} onClick={() => setActive(i)}>{step.label}</Button>)}</div>
-    <div id="industry-panel" role="tabpanel" aria-labelledby={`industry-tab-${index}`} className="industry-interaction-panel">
+    <div key={index} id="industry-panel" role="tabpanel" aria-labelledby={`industry-tab-${index}`} className="industry-interaction-panel studio-state-panel">
       {interaction.kind === "selector" ? <BrowserScene interaction={interaction} screen={item} /> : interaction.steps?.[index]?.screen === "phone" ? <PhoneScene interaction={interaction} screen={item}/> : interaction.steps?.[index]?.screen === "email" ? <MessageScene interaction={interaction} screen={item ?? {}} /> : interaction.steps?.[index]?.screen === "alert" ? <MessageScene interaction={interaction} screen={item ?? {}} owner/> : <BrowserScene interaction={interaction} screen={item} />}
     </div>
   </div>;

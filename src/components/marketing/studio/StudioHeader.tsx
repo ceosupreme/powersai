@@ -7,6 +7,7 @@ import { Container } from "./primitives";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
+import { StudioMotion } from "./StudioMotion";
 
 const SERVICES = [
   { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Credible sites, landing pages, commerce, and web apps", noteEs: "Sitios confiables, páginas de campaña, comercio y aplicaciones web" },
@@ -103,7 +104,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   }, [servicesOpen, industriesOpen]);
 
   return (
-    <header
+    <><StudioMotion /><header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all",
         scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.97)] shadow-sm backdrop-blur" : "border-b border-border bg-[hsl(var(--paper))]",
@@ -211,6 +212,6 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
           </Container>
         </div>
       )}
-    </header>
+    </header></>
   );
 }

@@ -16,7 +16,7 @@ export function CustomerWalkthrough() {
     <div className="home-walkthrough-tabs" role="tablist" aria-label="Customer steps">
       {STEPS.map((step, index) => <Button key={step.title} variant="ghost" type="button" role="tab" aria-selected={active === index} aria-controls="customer-walkthrough-panel" onClick={() => setActive(index)} className={active === index ? "is-active" : ""}><span>0{index + 1}</span>{step.title}</Button>)}
     </div>
-    <div id="customer-walkthrough-panel" role="tabpanel" className="home-walkthrough-panel" key={active}>
+    <div id="customer-walkthrough-panel" role="tabpanel" className="home-walkthrough-panel studio-state-panel" key={active}>
       <div className="home-walkthrough-browser" aria-hidden><i /><i /><i /><span>yourbusiness.com</span></div>
       <div className="home-walkthrough-screen">
         <span className="home-walkthrough-mark">Your business <ArrowRight size={15} aria-hidden /></span>
