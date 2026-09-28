@@ -1,0 +1,35 @@
+import { useMemo, useState } from "react";
+import { ArrowRight, Check } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
+import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
+import { Container } from "@/components/marketing/studio/primitives";
+import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
+import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
+import { useStudioProjects } from "@/hooks/useStudioProjects";
+import { getStudioMedia } from "@/config/studioMedia";
+import { ROUTE_META } from "@/config/routeMeta";
+
+const stages = ["I have an idea", "I’m validating it", "I’m ready to launch", "I’m already selling and need to grow"];
+const paths = [["Validate the idea","Clarify the problem, customer and offer before spending heavily on a launch."],["Build the brand","Create a name, message and identity people can understand and remember."],["Launch it","Turn the offer into a polished website and a clear way to buy or inquire."],["Build the machine","Connect acquisition, follow-up and operations as the business grows."]] as const;
+const questions = [
+  ["Problem", "Can you clearly describe the problem you solve?"], ["Customer", "Do you know exactly who feels that problem most?"], ["Offer", "Can someone understand what you sell in one sentence?"], ["Difference", "Can you explain why someone would choose you?"], ["Pricing", "Have you chosen and tested a realistic price?"], ["Demand", "Have people asked for, joined, preordered or bought the offer?"], ["Brand", "Do you have a usable name and clear identity?"], ["Online presence", "Can someone find and understand the business online?"], ["Acquisition", "Do you know how the next customers will find you?"], ["Follow-up", "Is there a reliable next step after someone shows interest?"], ["Operations", "Can you deliver the offer consistently?"],
+] as const;
+const resultFor = (score: number) => score <= 8 ? {name:"Idea Stage",path:"Validate the idea"} : score <= 15 ? {name:"Validation Stage",path:"Build the brand"} : score <= 26 ? {name:"Launch Ready",path:"Launch it"} : {name:"Growth Ready",path:"Build the machine"};
+
+export default function Startups() {
+  const [stage, setStage] = useState(0); const [answers,setAnswers] = useState<number[]>(Array(questions.length).fill(0)); const [showResult,setShowResult]=useState(false);
+  const { projects } = useStudioProjects();
+  const result = useMemo(() => { const ranked = questions.map(([name],i)=>({name,score:answers[i]})); const strongest=[...ranked].sort((a,b)=>b.score-a.score)[0]; const gap=[...ranked].sort((a,b)=>a.score-b.score)[0]; const band=resultFor(answers.reduce((a,b)=>a+b,0)); return {band,strongest,gap, next: ranked.filter(x=>x.score<3).slice(0,4)}; },[answers]);
+  const actual = ["allmighty-supreme","big-paws-club","barpulse"].flatMap(slug => { const p=projects.find(x=>x.slug===slug); return p?[p]:[]; });
+  useStudioHead({ ...ROUTE_META["/startups"], path:"/startups" });
+  return <div className="stm-studio startups-page min-h-screen"><StudioHeader/><main>
+    <section className="startup-hero"><Container><span className="home-eyebrow">Startups and founders</span><h1 className="home-section-title">Turn the idea into <em>something real.</em></h1><p>For aspiring entrepreneurs, side-hustle builders, idea-stage founders and early businesses that need a clearer path from possibility to launch.</p><a href="#readiness" className="home-btn-amber">Check your readiness <ArrowRight size={16}/></a></Container></section>
+    <section className="startup-stage"><Container><span className="home-eyebrow">Where are you now?</span><div className="startup-stage-tabs" role="tablist" aria-label="Startup stage">{stages.map((item,i)=><Button key={item} type="button" variant="ghost" role="tab" aria-selected={stage===i} onClick={()=>setStage(i)} className={stage===i?"is-active":""}>{item}</Button>)}</div><div className="startup-stage-panel studio-state-panel" key={stage}><span>0{stage+1}</span><h2>{stages[stage]}</h2><p>{["Start by making the problem, customer and offer specific enough to test.","Look for real signals of demand before investing in a full launch.","Bring the offer, brand and customer path together so people can act.","Strengthen acquisition, follow-up and operations without losing clarity."][stage]}</p></div></Container></section>
+    <section id="readiness" className="startup-diagnostic"><Container><span className="home-eyebrow">Business readiness diagnostic</span><h2 className="home-section-title">See what is ready—and <em>what needs work next.</em></h2><p>Choose the answer that best reflects where you are today. Your result appears here and is not sent anywhere.</p><div className="startup-question-list">{questions.map(([area,q],i)=><fieldset key={area}><legend><span>{String(i+1).padStart(2,"0")} / {area}</span>{q}</legend><div>{["Not yet","Partly","Mostly","Yes"].map((label,value)=><Button key={label} type="button" variant="outline" aria-pressed={answers[i]===value} onClick={()=>setAnswers(prev=>prev.map((x,n)=>n===i?value:x))}>{label}</Button>)}</div></fieldset>)}</div><Button type="button" className="home-btn-amber" onClick={()=>setShowResult(true)}>See my result <ArrowRight size={16}/></Button>{showResult&&<div className="startup-result" role="status"><span className="home-eyebrow">Your result</span><h3>{result.band.name}</h3><div><p><strong>Strongest area</strong>{result.strongest.name}</p><p><strong>Biggest gap</strong>{result.gap.name}</p><p><strong>First recommended action</strong>Make your {result.gap.name.toLowerCase()} specific enough to test with a real customer.</p><p><strong>Most relevant path</strong>{result.band.path}</p></div><h4>Next steps</h4><ul>{result.next.length?result.next.map(item=><li key={item.name}><Check size={16}/>{item.name}: move this from an assumption to something you can explain or test.</li>):<li><Check size={16}/>Document what is working, then choose the next growth constraint to solve.</li>}</ul></div>}</Container></section>
+    <section className="startup-paths"><Container><span className="home-eyebrow">Ways forward</span><h2 className="home-section-title">Build only what the idea <em>needs next.</em></h2><div>{paths.map(([title,body])=><article key={title}><h3>{title}</h3><p>{body}</p></article>)}</div></Container></section>
+    <section className="startup-work"><Container><span className="home-eyebrow">Relevant work</span><h2 className="home-section-title">Ideas shaped into <em>working experiences.</em></h2><div>{actual.map(project=>{const media=getStudioMedia(project.mediaKey);const src=project.imageUrl||media?.src;return <Link to={`/work/${project.slug}`} key={project.slug}><div>{src&&<img src={src} alt={media?.alt||project.title}/>}</div><h3>{project.title.split(" — ")[0]}</h3><p>{project.role}</p></Link>})}</div></Container></section>
+    <Inquiry servicePage="startups"/>
+  </main><StudioFooter/></div>;
+}
