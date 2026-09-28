@@ -72,9 +72,8 @@ const PAGE_COPY = {
   publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
 } as const;
 
-export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" }) {
+export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" | "pricing" | "startups" }) {
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
-  const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [services, setServices] = useState<ServiceId[]>([]);
@@ -91,7 +90,7 @@ export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PA
   const [timing, setTiming] = useState("");
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
-  const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
+  const knownSections = new Set(["audit", "ack", "hire", "work", "pricing", "startups", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
   const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? source ?? (window.location.pathname === "/work" ? "work" : "studio_home_inquiry");
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");
@@ -306,7 +305,7 @@ export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PA
               {CONTACT_EMAIL}
             </a>
             <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County, available for remote projects.</p>
-             {!servicePage && map?.src && <img className="home-contact-map mt-10" src={map.src} alt={map.alt} width={map.width} height={map.height} loading="lazy" />}
+              {!servicePage && <div className="home-contact-map mt-10"><iframe title="OpenStreetMap view of San Diego County and North County" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-117.65%2C32.53%2C-116.08%2C33.55&layer=mapnik"/><p>Based in San Diego County. Remote projects welcome. <a href="https://www.openstreetmap.org/#map=9/33.04/-116.87" target="_blank" rel="noreferrer">Open accessible map</a></p></div>}
           </div>
 
           <div className="lg:col-span-7">

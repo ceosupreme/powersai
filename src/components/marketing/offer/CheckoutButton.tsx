@@ -9,7 +9,7 @@ import { LegalConsent } from '@/components/marketing/studio/LegalConsent';
 
 type Product = 'launch_site_deposit' | 'launch_site_monthly' | 'care_seat';
 
-export function CheckoutButton({ product, label, sourceVertical, originPath }: { product: Product; label: string; sourceVertical?: string; originPath?: string }) {
+export function CheckoutButton({ product, label, sourceVertical, originPath, source }: { product: Product; label: string; sourceVertical?: string; originPath?: string; source?: string }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const loc = useLocation();
@@ -24,7 +24,7 @@ export function CheckoutButton({ product, label, sourceVertical, originPath }: {
     const source_vertical = sourceVertical ?? src?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
     let navigated = false;
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', { body: { product_key: product, src: src ?? (sourceVertical ? `for-${sourceVertical}` : null), biz, source_vertical, origin_path: originPath ?? null } });
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', { body: { product_key: product, src: src ?? source ?? (sourceVertical ? `for-${sourceVertical}` : null), biz, source_vertical, origin_path: originPath ?? null } });
       if (error || !data?.url) throw error ?? new Error('No checkout url');
       navigated = true;
       window.location.assign(data.url);
