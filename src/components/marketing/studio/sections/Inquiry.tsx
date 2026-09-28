@@ -70,9 +70,10 @@ const PAGE_COPY = {
   marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where the customer path loses momentum. I’ll reply personally within one business day." },
   systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about a system.", intro: "Tell me which tools you use and where the handoffs get lost. I’ll reply personally within one business day." },
   publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
+  startups: { service: "brand-creative", src: "startups", heading: "Talk about your idea.", intro: "Tell me where the idea stands and what you need to make real next. I’ll reply personally within one business day." },
 } as const;
 
-export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" }) {
+export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" | "pricing" }) {
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
   const map = getStudioMedia("contact-map");
   const [status, setStatus] = useState<Status>("idle");
@@ -91,7 +92,7 @@ export function Inquiry({ servicePage, source }: { servicePage?: keyof typeof PA
   const [timing, setTiming] = useState("");
   const sourceParam = params.get("src");
   const sourceVertical = sourceParam?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
-  const knownSections = new Set(["audit", "ack", "hire", "work", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
+  const knownSections = new Set(["audit", "ack", "hire", "work", "pricing", "startups", "services-websites", "services-brand", "services-marketing", "services-ai-systems", "services-publishing", "publishing"]);
   const siteSection = sourceParam && knownSections.has(sourceParam) ? sourceParam : pageCopy?.src ?? source ?? (window.location.pathname === "/work" ? "work" : "studio_home_inquiry");
   const callRequested = params.get("call_requested") === "1";
   const offerParam = params.get("offer");

@@ -41,6 +41,8 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/services/marketing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marketing y crecimiento" : "Marketing & growth"}</Link>
             <Link to="/services/ai-systems" className="inline-flex min-h-11 items-center hover:underline">{es ? "IA y sistemas" : "AI & systems"}</Link>
             <Link to="/publishing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Publicación y lanzamiento" : "Publishing & Launch"}</Link>
+            <Link to="/pricing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Planes y precios" : "Plans & pricing"}</Link>
+            <Link to="/startups" className="inline-flex min-h-11 items-center hover:underline">{es ? "Startups y fundadores" : "Startups & founders"}</Link>
             <Link to="/about" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acerca de" : "About"}</Link>
             <Link to={contactHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Habla de un proyecto" : "Discuss a project"}</Link>
             <Link to={auditHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Revisión gratuita" : "Free business checkup"}</Link>

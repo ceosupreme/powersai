@@ -15,6 +15,8 @@ const SERVICES = [
   { to: "/services/marketing", label: "Marketing & growth", labelEs: "Marketing y crecimiento", note: "Campaigns, content, launches, and audience paths", noteEs: "Campañas, contenido, lanzamientos y recorridos de audiencia" },
   { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Dashboards, workflows, integrations, and automation", noteEs: "Paneles, flujos de trabajo, integraciones y automatización" },
   { to: "/publishing", label: "Publishing & launch", labelEs: "Publicación y lanzamiento", note: "Books, apps, and digital products ready for release", noteEs: "Libros, aplicaciones y productos digitales listos para salir" },
+  { to: "/startups", label: "Startups & founders", labelEs: "Startups y fundadores", note: "Validate the idea, build the brand, launch, and grow", noteEs: "Valida la idea, crea la marca, lanza y crece" },
+  { to: "/pricing", label: "Plans & pricing", labelEs: "Planes y precios", note: "Compare website, care, growth, and systems options", noteEs: "Compara opciones de sitio, soporte, crecimiento y sistemas" },
 ];
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -126,7 +128,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
               <div id="studio-services-menu" ref={servicesPanelRef} className="studio-services-menu absolute left-1/2 top-[calc(100%+12px)] w-[680px] -translate-x-1/2 border border-border bg-[hsl(var(--paper))] p-3 shadow-xl">
                 <div className="grid grid-cols-2 gap-1">
                   {SERVICES.map((service, index) => (
-                    <Link key={service.to} to={service.to} onClick={() => setServicesOpen(false)} className={cn("group min-h-[92px] border-b border-border p-4 hover:bg-[hsl(var(--surface))]", index === SERVICES.length - 1 && "col-span-2")}>
+                    <Link key={service.to} to={service.to} onClick={() => setServicesOpen(false)} className="group min-h-[92px] border-b border-border p-4 hover:bg-[hsl(var(--surface))]">
                       <span className="studio-display block text-[1.02rem] group-hover:text-primary">{language === "es" ? service.labelEs : service.label}</span>
                       <span className="mt-2 block text-[0.8rem] leading-snug text-muted-foreground">{language === "es" ? service.noteEs : service.note}</span>
                     </Link>
@@ -156,7 +158,6 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
           </div>
           <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.work}</Link>
           <Link to="/about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.about}</Link>
-          <div className="studio-header-legal"><Link to="/privacy">{language === "es" ? "Privacidad" : "Privacy"}</Link><Link to="/terms">{language === "es" ? "Términos" : "Terms"}</Link></div>
         </nav>
 
         <div className="flex items-center gap-3">
