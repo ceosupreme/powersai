@@ -10,11 +10,12 @@
 }
 .ws-page *, .ws-page *::before, .ws-page *::after { box-sizing: border-box; }
 .ws-page .ws-container { width: min(1392px, calc(100% - 96px)); margin-inline: auto; }
+.ws-page > header .studio-container, .ws-page > footer > .studio-container, .ws-page .home-contact > .studio-container { width: min(1392px, calc(100% - 96px)); max-width: none; padding-inline: 0; }
 .ws-page main { margin: 0; }
 .ws-page main [id] { scroll-margin-top: 100px; }
 .ws-page .ws-kicker { display: block; font-size: 11px; line-height: 1.5; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: hsl(var(--home-copper)); }
 .ws-page h1, .ws-page .ws-section-heading h2, .ws-page .ws-industry-intro h2, .ws-page .ws-offer h2 {
-  font-family: "Inter Tight", "Inter Display", "Inter", sans-serif; font-weight: 800; letter-spacing: -.045em; text-wrap: balance;
+  font-family: "Inter Tight", "Inter Display", "Inter", sans-serif; font-weight: 800; letter-spacing: -.03em; text-wrap: balance;
 }
 .ws-page h1 { font-size: clamp(58px, 6.6vw, 98px); line-height: 1; margin: 18px 0 0; max-width: 1100px; }
 .ws-page h1 > span, .ws-page h2 > span { color: hsl(var(--home-copper)); }
@@ -41,20 +42,18 @@
 .ws-page .ws-text-link svg { transition: transform .2s ease; }
 .ws-page .ws-text-link:hover svg { transform: translateX(4px); }
 .ws-page .ws-arrow-down { transform: rotate(90deg); }
-
 .ws-page .ws-hero { padding-top: 133px; }
 .ws-page .ws-hero-intro { padding-bottom: 38px; }
 .ws-page .ws-hero-bottom { display: flex; justify-content: space-between; gap: 40px; align-items: flex-end; margin-top: 26px; }
 .ws-page .ws-hero-bottom > p { max-width: 580px; color: hsl(var(--ink-muted)); font-size: 17px; line-height: 1.65; }
 .ws-page .ws-hero-showcase { position: relative; width: 100%; isolation: isolate; background: #4a3523; }
-.ws-page .ws-hero-showcase > img { display: block; width: 100%; height: clamp(440px, 42vw, 680px); object-fit: cover; object-position: 50% 60%; }
+.ws-page .ws-hero-showcase > img { display: block; width: 100%; height: auto; aspect-ratio: 2.05; object-fit: cover; object-position: 50% 45%; }
 .ws-page .ws-showcase-note { position: absolute; top: 11%; left: max(48px, calc((100% - 1392px) / 2)); color: #27201a; }
 .ws-page .ws-handnote { display: inline-block; font-family: "Caveat", "Segoe Print", "Bradley Hand", cursive; font-size: 23px; line-height: 1.23; font-weight: 400; transform: rotate(-5deg); }
 .ws-page .ws-showcase-note svg { display: block; width: 90px; margin-top: 8px; margin-left: 90px; transform: rotate(-8deg); }
 .ws-page .ws-showcase-strip { position: absolute; bottom: 0; inset-inline: 0; display: flex; gap: 52px; justify-content: center; align-items: center; padding: 17px 24px; background: rgb(19 23 19 / .9); color: #fff3de; backdrop-filter: blur(8px); }
 .ws-page .ws-showcase-strip > span { display: flex; gap: 12px; align-items: center; font-size: 12px; font-weight: 500; }
 .ws-page .ws-showcase-strip svg { color: #e5b77f; }
-
 .ws-page .ws-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 60px; margin-bottom: 48px; }
 .ws-page .ws-section-heading > p, .ws-page .ws-section-heading > div:last-child:not(:first-child) { max-width: 360px; }
 .ws-page .ws-section-heading p { font-size: 16px; line-height: 1.65; color: hsl(var(--ink-muted)); }
@@ -64,7 +63,7 @@
 .ws-page .ws-step-list button { background: transparent; color: inherit; border: 0; border-top: 1px solid rgb(255 240 218 / .2); padding: 23px 0; display: grid; grid-template-columns: 30px 1fr 22px; gap: 18px; width: 100%; text-align: left; cursor: pointer; }
 .ws-page .ws-step-number { font-size: 11px; color: #b7ad9c; padding-top: 5px; }
 .ws-page .ws-step-list strong { display: block; font-family: "Inter Tight", "Inter Display", sans-serif; font-size: 22px; line-height: 1.22; font-weight: 700; letter-spacing: -.02em; }
-.ws-page .ws-step-list button > span:nth-child(2) > span { display: block; margin-top: 9px; font-size: 14px; line-height: 1.65; color: #b9b9ac; }
+.ws-page .ws-step-list button > span:nth-child(2) > span { font-weight: 400; display: block; margin-top: 9px; font-size: 14px; line-height: 1.65; color: #b9b9ac; }
 .ws-page .ws-step-list button > svg { margin-top: 3px; opacity: .35; transition: transform .2s ease, opacity .2s ease; }
 .ws-page .ws-step-list button.is-active { border-color: #e8b577; }
 .ws-page .ws-step-list button.is-active strong, .ws-page .ws-step-list button.is-active .ws-step-number { color: #efc38d; }
@@ -102,14 +101,13 @@
 .ws-page .ws-message p { font-size: 12px; margin-top: 5px; }
 .ws-page .ws-demo-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px; border-top: 1px solid #dfd5c7; font-size: 10px; color: #666253; }
 .ws-page .ws-demo-bottom button { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; border: 0; background: transparent; font: inherit; font-weight: 650; color: #7e471f; cursor: pointer; }
-
 .ws-page .ws-work { padding: 94px 0; }
 .ws-page .ws-work .ws-text-link { margin-top: 9px; }
 .ws-page .ws-work-grid { display: grid; grid-template-columns: 1.18fr 1fr 1fr; gap: 24px; align-items: start; }
 .ws-page .ws-project-2 { padding-top: 50px; }
 .ws-page .ws-project-3 { padding-top: 100px; }
 .ws-page .ws-project-link { display: block; color: inherit; text-decoration: none; }
-.ws-page .ws-project-image { position: relative; overflow: hidden; aspect-ratio: 1.16; background: #e7e1d6; }
+.ws-page .ws-project-image { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: #e7e1d6; }
 .ws-page .ws-project-image > img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top center; transition: transform .45s ease; }
 .ws-page .ws-project-link:hover img, .ws-page .ws-project-link:focus-visible img { transform: scale(1.025); }
 .ws-page .ws-project-arrow { position: absolute; bottom: 16px; right: 16px; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #e7cfaa; border-radius: 50%; color: #fff2db; background: #181d17; transition: background .22s ease, transform .22s ease; }
@@ -118,7 +116,6 @@
 .ws-page .ws-project-caption > span { font-size: 10px; line-height: 1.5; color: #76684f; text-transform: uppercase; letter-spacing: .065em; }
 .ws-page .ws-project-caption h3 { font: 750 26px/1.15 "Inter Tight", "Inter Display", sans-serif; letter-spacing: -.035em; margin: 9px 0; }
 .ws-page .ws-project-caption p { font-size: 13px; line-height: 1.65; color: hsl(var(--ink-muted)); }
-
 .ws-page .ws-industries { padding: 68px 0; background: #eee8dd; border-top: 1px solid #e4d9c7; }
 .ws-page .ws-industry-layout { display: grid; grid-template-columns: .8fr 1.8fr; gap: 48px; align-items: center; }
 .ws-page .ws-industry-intro h2 { font-size: clamp(32px, 3vw, 43px); }
@@ -132,7 +129,6 @@
 .ws-page .ws-industry-card h3 { font: 750 19px/1.2 "Inter Tight", "Inter Display", sans-serif; letter-spacing: -.02em; margin: 0 0 18px; }
 .ws-page .ws-industry-card > div > span { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; line-height: 1.5; }
 .ws-page .ws-industry-card svg { flex-shrink: 0; color: #9a6235; }
-
 .ws-page .ws-offer { padding: 90px 0 44px; }
 .ws-page .ws-offer-layout { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(60px, 10vw, 160px); align-items: start; }
 .ws-page .ws-offer-copy > p { max-width: 570px; margin-top: 23px; font-size: 16px; line-height: 1.7; }
@@ -151,7 +147,6 @@
 .ws-page .ws-outright h3 { font: 650 24px/1.15 "Inter Tight", "Inter Display", sans-serif; letter-spacing: -.025em; margin: 10px 0 0; }
 .ws-page .ws-outright p { font-size: 13px; line-height: 1.6; }
 .ws-page .ws-outright .ws-text-link { font-size: 12px; }
-
 .ws-page .ws-process { padding: 90px 0 80px; }
 .ws-page .ws-process-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px; margin: 0; padding: 0; list-style: none; }
 .ws-page .ws-process-steps li { border-top: 1px solid #cabea8; padding-top: 20px; }
@@ -169,11 +164,11 @@
 .ws-page .home-contact { border-top: 1px solid #ddd0bb; background: #eee8dc; padding: 75px 0; }
 .ws-page .home-contact h2 { font-family: "Inter Tight", "Inter Display", sans-serif; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; }
 .ws-page .home-contact .studio-inquiry-card { box-shadow: 0 12px 36px rgb(71 53 27 / .05); }
+.ws-page .studio-motion-enter { animation: none !important; }
 .ws-page .ws-enter { animation: ws-panel-in .55s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes ws-panel-in { from { opacity: .2; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 1100px) {
-  .ws-page .ws-container { width: calc(100% - 64px); }
+  .ws-page .ws-container, .ws-page > header .studio-container, .ws-page > footer > .studio-container, .ws-page .home-contact > .studio-container { width: calc(100% - 64px); }
   .ws-page .ws-hero-bottom { align-items: flex-start; gap: 24px; }
   .ws-page .ws-hero-bottom > p { max-width: 460px; }
   .ws-page .ws-hero-bottom .ws-actions { gap: 9px; }
@@ -188,7 +183,7 @@
   .ws-page .ws-journey-layout { gap: 32px; }
 }
 @media (max-width: 767px) {
-  .ws-page .ws-container { width: calc(100% - 40px); }
+  .ws-page .ws-container, .ws-page > header .studio-container, .ws-page > footer > .studio-container, .ws-page .home-contact > .studio-container { width: calc(100% - 40px); }
   .ws-page .ws-hero { padding-top: 112px; }
   .ws-page h1 { font-size: clamp(42px, 10.7vw, 68px); letter-spacing: -.04em; margin-top: 15px; }
   .ws-page .ws-hero-intro { padding-bottom: 28px; }
@@ -196,7 +191,7 @@
   .ws-page .ws-hero-bottom > p { font-size: 15px; line-height: 1.7; max-width: 520px; }
   .ws-page .ws-hero-bottom .ws-actions { margin-top: 22px; }
   .ws-page .ws-button { min-height: 48px; padding: 13px 19px; font-size: 12px; gap: 12px; }
-  .ws-page .ws-hero-showcase > img { height: auto; aspect-ratio: 1.28; object-fit: cover; object-position: 69% center; }
+  .ws-page .ws-hero-showcase > img { height: auto; aspect-ratio: 1.28; object-fit: cover; object-position: right center; }
   .ws-page .ws-showcase-note { display: none; }
   .ws-page .ws-showcase-strip { gap: 15px; padding: 12px 16px; justify-content: space-between; }
   .ws-page .ws-showcase-strip > span { font-size: 9px; gap: 6px; }
