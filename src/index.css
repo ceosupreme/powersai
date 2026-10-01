@@ -2876,108 +2876,153 @@
   .stm-studio .systems-stage-connector { animation: none; transform: scaleX(1); }
 }
 
-
-/* STM full-bleed production hero media */
+/* STM editorial split heroes — production artwork */
 .industry-v2 .industry-hero {
   position: relative;
   overflow: hidden;
 }
 .industry-v2 .industry-hero.has-hero-media {
-  min-height: min(820px, 92vh);
+  min-height: 720px;
+  padding: 110px 0 72px;
   display: flex;
   align-items: center;
 }
 .industry-v2 .industry-hero.has-hero-media .industry-hero-grid {
   position: relative;
   z-index: 2;
-  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  display: grid;
+  grid-template-columns: minmax(0, 44%) minmax(0, 56%);
+  align-items: center;
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-copy {
+  grid-column: 1;
+  position: relative;
+  z-index: 3;
+  max-width: 590px;
+  padding-right: clamp(28px, 4vw, 62px);
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-copy h1 {
+  max-width: 12ch;
+  margin-top: 20px;
+  font-size: clamp(3.25rem, 4.65vw, 4.9rem);
+  line-height: .96;
+  text-wrap: balance;
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-copy[data-headline-size="medium"] h1 {
+  font-size: clamp(3.05rem, 4.3vw, 4.55rem);
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-copy[data-headline-size="long"] h1 {
+  max-width: 13ch;
+  font-size: clamp(2.85rem, 3.85vw, 4.15rem);
+  line-height: .98;
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-subline {
+  max-width: 540px;
+  margin-top: 22px;
+  font-size: clamp(1rem, 1.25vw, 1.12rem);
+  line-height: 1.58;
+}
+.industry-v2 .industry-hero.has-hero-media .industry-hero-actions {
+  margin-top: 26px;
 }
 .industry-v2 .industry-hero-media {
   position: absolute;
-  inset: 0 0 0 42%;
+  inset: 0 0 0 48%;
   z-index: 0;
   overflow: hidden;
+  background: hsl(var(--industry-bg));
 }
 .industry-v2 .industry-hero-media img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center center;
 }
-.industry-v2 .industry-tone-ivory .industry-hero-media::after,
-.industry-v2 .industry-tone-charcoal .industry-hero-media::after {
+.industry-v2 .industry-hero-media::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 auto 0 0;
+  width: clamp(46px, 6vw, 92px);
   pointer-events: none;
-}
-.industry-v2 .industry-tone-ivory .industry-hero-media::after {
-  background:
-    linear-gradient(90deg,
-      hsl(var(--industry-bg)) 0%,
-      hsl(var(--industry-bg) / .96) 11%,
-      hsl(var(--industry-bg) / .58) 28%,
-      hsl(var(--industry-bg) / .14) 44%,
-      transparent 62%);
-}
-.industry-v2 .industry-tone-charcoal .industry-hero-media::after {
-  background:
-    linear-gradient(90deg,
-      hsl(var(--industry-bg)) 0%,
-      hsl(var(--industry-bg) / .95) 11%,
-      hsl(var(--industry-bg) / .62) 28%,
-      hsl(var(--industry-bg) / .18) 46%,
-      transparent 64%);
-}
-.industry-v2 .industry-hero.has-hero-media .industry-hero-copy {
-  position: relative;
-  z-index: 3;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--industry-bg)) 0%,
+    hsl(var(--industry-bg) / .78) 28%,
+    hsl(var(--industry-bg) / .28) 68%,
+    transparent 100%
+  );
 }
 .industry-v2 .industry-hero.has-hero-media .industry-hero-art {
   display: none;
 }
 
+/* Hero artwork focal points — preserve the industry-specific subject/device composition. */
+.industry-v2 .industry-hero-media img[data-media-key="industry-plumbing-hero"] { object-position: 60% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-restaurants-hero"] { object-position: 60% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-tacos-hero"] { object-position: 58% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-auto-hero"] { object-position: 58% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-realestate-hero"] { object-position: 58% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-dealerships-hero"] { object-position: 57% center; }
+.industry-v2 .industry-hero-media img[data-media-key="industry-legal-hero"] { object-position: 57% center; }
+
+/* Service heroes: artwork is the visual, native UI remains in the explanatory sections below. */
 .svc-page .svc-hero-media {
   position: relative;
-  min-height: clamp(500px, 54vw, 680px);
+  min-height: clamp(500px, 48vw, 650px);
   overflow: hidden;
-  border: 1px solid hsl(var(--home-rule));
+  border: 0;
   background: hsl(var(--home-soft));
 }
 .svc-page .svc-hero-media .optional-studio-media {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
 }
 @media (min-width: 1024px) {
+  .svc-page .svc-hero-grid {
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  }
   .svc-page .svc-hero-media {
-    margin-right: clamp(-8vw, -5vw, -3vw);
+    margin-right: min(-4vw, -36px);
   }
 }
 @media (max-width: 767px) {
   .industry-v2 .industry-hero.has-hero-media {
     min-height: auto;
+    padding: 112px 0 0;
     display: block;
   }
   .industry-v2 .industry-hero.has-hero-media .industry-hero-grid {
-    grid-template-columns: 1fr;
+    display: block;
+  }
+  .industry-v2 .industry-hero.has-hero-media .industry-hero-copy {
+    max-width: none;
+    padding-right: 0;
+    padding-bottom: 34px;
+  }
+  .industry-v2 .industry-hero.has-hero-media .industry-hero-copy h1,
+  .industry-v2 .industry-hero.has-hero-media .industry-hero-copy[data-headline-size="medium"] h1,
+  .industry-v2 .industry-hero.has-hero-media .industry-hero-copy[data-headline-size="long"] h1 {
+    max-width: 13ch;
+    font-size: clamp(2.8rem, 11vw, 4rem);
+    line-height: .98;
   }
   .industry-v2 .industry-hero-media {
     position: relative;
     inset: auto;
-    width: calc(100% + 32px);
-    margin: 30px -16px -56px;
+    width: 100%;
     aspect-ratio: 4 / 3;
   }
   .industry-v2 .industry-hero-media::after {
     display: none;
   }
   .industry-v2 .industry-hero-media img {
-    object-position: center;
+    object-position: center center;
   }
   .svc-page .svc-hero-media {
     min-height: 0;
