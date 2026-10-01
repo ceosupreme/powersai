@@ -9,6 +9,16 @@ import homeIndustryRestaurant from "@/assets/studio/home-industry-pizza.webp.ass
 import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.webp.asset.json";
 import websitesHero from "@/assets/studio/service-websites-hero.webp.asset.json";
 import coastalBeauties from "@/assets/studio/coastal-beauties.png";
+import plumbingHero from "@/assets/studio/industry-plumbing-hero.webp.asset.json";
+import restaurantsHero from "@/assets/studio/industry-restaurants-hero.png.asset.json";
+import tacosHero from "@/assets/studio/industry-tacos-hero.webp.asset.json";
+import autoHero from "@/assets/studio/industry-auto-hero.webp.asset.json";
+import realEstateHero from "@/assets/studio/industry-realestate-hero.webp.asset.json";
+import dealershipsHero from "@/assets/studio/industry-dealerships-hero.webp.asset.json";
+import legalHero from "@/assets/studio/industry-legal-hero.webp.asset.json";
+import brandMaterials from "@/assets/studio/brand-materials-spread.webp.asset.json";
+import marketingCampaign from "@/assets/studio/marketing-campaign-scene.webp.asset.json";
+import publishingRelease from "@/assets/studio/publishing-release-spread.webp.asset.json";
 
 /**
  * Single media configuration for the public studio site.
@@ -87,16 +97,16 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 941,
     objectFit: "contain",
   },
-  "industry-plumbing-hero": { src: null, alt: "Plumbing business website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-restaurants-hero": { src: null, alt: "Restaurant website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-tacos-hero": { src: null, alt: "Taco shop website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-auto-hero": { src: null, alt: "Auto repair website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-realestate-hero": { src: null, alt: "Real estate website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-dealerships-hero": { src: null, alt: "Independent dealership website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "industry-legal-hero": { src: null, alt: "Law firm website experience", aspectRatio: "16 / 9", width: 1600, height: 900, objectFit: "cover" },
-  "brand-materials-spread": { src: null, alt: "Brand identity materials spread", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
-  "marketing-campaign-scene": { src: null, alt: "Coordinated marketing campaign scene", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
-  "publishing-release-spread": { src: null, alt: "Book and digital product release materials", aspectRatio: "4 / 3", width: 1600, height: 1200, objectFit: "cover" },
+  "industry-plumbing-hero": { src: plumbingHero.url, alt: "Plumber servicing a home beside a Summit Plumbing van, with the company website shown on laptop and phone", aspectRatio: "3 / 2", width: 1920, height: 1280, objectFit: "cover", objectPosition: "center" },
+  "industry-restaurants-hero": { src: restaurantsHero.url, alt: "Restaurant dining room with an Ember and Oak website shown on laptop and phone", aspectRatio: "73 / 49", width: 1168, height: 784, objectFit: "cover", objectPosition: "center" },
+  "industry-tacos-hero": { src: tacosHero.url, alt: "Busy taquería with tacos and the restaurant website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
+  "industry-auto-hero": { src: autoHero.url, alt: "Auto repair shop with the Riverdale Auto Care website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
+  "industry-realestate-hero": { src: realEstateHero.url, alt: "Southern California home with a real estate website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
+  "industry-dealerships-hero": { src: dealershipsHero.url, alt: "Independent auto dealership with its inventory website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
+  "industry-legal-hero": { src: legalHero.url, alt: "Law office with the Harrington and Blake website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
+  "brand-materials-spread": { src: brandMaterials.url, alt: "Aura and Stone identity system across typography, print, packaging, color and social media", aspectRatio: "75 / 56", width: 1200, height: 896, objectFit: "cover", objectPosition: "center" },
+  "marketing-campaign-scene": { src: marketingCampaign.url, alt: "Coordinated Evergreen Home Care campaign across website, social, email and inquiry materials", aspectRatio: "4 / 3", width: 1448, height: 1086, objectFit: "cover", objectPosition: "center" },
+  "publishing-release-spread": { src: publishingRelease.url, alt: "The Brighter Path release across print book, website, phone and launch materials", aspectRatio: "4 / 3", width: 1448, height: 1086, objectFit: "cover", objectPosition: "center" },
   "hero-composition": {
     src: null,
     alt: "Supreme Team Media studio composition",
