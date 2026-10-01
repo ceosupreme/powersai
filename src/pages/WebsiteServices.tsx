@@ -1,84 +1,141 @@
-import { useEffect, useState } from "react";
+import { Component, useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, Check, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ArrowRight, ArrowUpRight, Check, CheckCheck, Mail, MessageSquare, Monitor, MousePointer2, Smartphone } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Container } from "@/components/marketing/studio/primitives";
-import { PricingTeaser } from "@/components/marketing/studio/sections/PricingTeaser";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
+import { Testimonials } from "@/components/marketing/studio/Testimonials";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { useStudioProjects } from "@/hooks/useStudioProjects";
+import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
-import { Testimonials } from "@/components/marketing/studio/Testimonials";
 import { ROUTE_META } from "@/config/routeMeta";
+import "@/styles/website-studio.css";
 
-const workOrder = ["allmighty-supreme", "coastal-beauties", "kario-voss"];
-const steps = ["Service page", "Request service", "What happens next"];
-const process = [
-  { title: "Copy & direction", body: "We clarify the offer and write the pages around what customers need to know." },
-  { title: "Design & build", body: "A mobile-first experience with a clear inquiry path, built for the agreed scope." },
-  { title: "Review & launch", body: "One round of revisions, launch on your domain, handover, then 30 days of fixes." },
-];
-const questions = [
-  { q: "What is included with a Launch Site?", a: "Up to eight pages, mobile-first design, an inquiry form with an instant confirmation to the visitor and an alert to the owner, your Google listing and contact details on every page, page titles and structured data, one round of revisions, launch on your domain and 30 days of fixes." },
-  { q: "How does the $0-down option work?", a: "It is a 12-month payment plan for the build at $297 a month. After the first 12 months, it becomes $149 a month. If you stop early, the remaining balance of the $2,500 build price is due before handover." },
-  { q: "Who owns the site?", a: "The one-time Launch Site is yours at launch. You own the site, domain, content and customer list in writing. On leaving, you get the files and every login. Our hosting, automations and updates stop unless you keep Care." },
-  { q: "What does Care cover?", a: "Care is month to month. Its exact support responsibilities are agreed in writing before you start." },
-  { q: "What does the Business Site add?", a: "The Business Site includes follow-up sequences, reminders, review requests and a monthly owner report. The exact scope is confirmed in your quote." },
+const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
+const requestPlan = (name: string, label: string) => {
+  track(label);
+  window.dispatchEvent(new CustomEvent("stm:contact-prefill", { detail: `I’d like to discuss ${name} for my business.` }));
+};
+const workOrder = ["kario-voss", "big-paws-club", "coastal-beauties"];
+const industryMedia: Record<string, string> = {
+  hvac: "home-industry-hvac", pizza: "home-industry-pizza", medspa: "home-industry-medspa",
+};
+
+/** Content is visible by default. Motion is a one-time enhancement, not a loading gate. */
+class Reveal extends Component<{ children: ReactNode; className?: string }> {
+  private node: HTMLDivElement | null = null;
+  private observer?: IntersectionObserver;
+  componentDidMount() {
+    if (!this.node || typeof IntersectionObserver === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    this.observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { this.node?.classList.add("ws-enter"); this.observer?.disconnect(); }
+    }, { threshold: 0.08 });
+    this.observer.observe(this.node);
+  }
+  componentWillUnmount() { this.observer?.disconnect(); }
+  render() { return <div ref={node => { this.node = node; }} className={this.props.className}>{this.props.children}</div>; }
+}
+
+const journey = [
+  { title: "Look worth choosing", label: "First impression", body: "Show what you do, who you help, and why you’re the right fit. Give visitors a reason to stay—not another website to figure out." },
+  { title: "Make reaching out easy", label: "The inquiry", body: "A clear next step and a short, phone-friendly form make it easier for someone to ask about the work they need." },
+  { title: "Keep the opportunity moving", label: "The response", body: "Their request gets acknowledged. Your team gets the details. The follow-up can continue from one place while you get on with the business." },
 ];
 
-function WebsiteWalkthrough() {
-  const [active, setActive] = useState(0);
-  return <section className="websites-flow" aria-labelledby="websites-flow-title"><Container>
-    <div className="websites-flow-head"><span className="home-eyebrow">02 / From visitor to owner</span><h2 id="websites-flow-title" className="home-section-title">The click is only<br /><em>the beginning.</em></h2><p>See how an inquiry moves from a customer’s screen to the business. Select a step to follow it through.</p></div>
-    <div className="websites-flow-tabs" role="tablist" aria-label="Website inquiry steps">{steps.map((step, i) => <Button key={step} id={`websites-tab-${i}`} role="tab" aria-selected={active === i} aria-controls="websites-flow-panel" type="button" variant="ghost" onClick={() => setActive(i)} className={active === i ? "is-active" : ""}><span>0{i + 1}</span>{step}</Button>)}</div>
-    <div id="websites-flow-panel" role="tabpanel" aria-labelledby={`websites-tab-${active}`} className="websites-flow-stage studio-state-panel" key={active}>
-      {active === 0 && <div className="websites-demo-browser"><div className="websites-demo-chrome"><i/><i/><i/><span>northcountyhomeservices.com</span></div><div className="websites-demo-service"><div className="websites-demo-nav"><strong>North County Home Services</strong><span>Services &nbsp; About &nbsp; Contact</span></div><div className="websites-demo-body"><span className="home-eyebrow">Service in your neighborhood</span><h3>Help when your home needs it.</h3><p>Find the right service, tell us what is happening, and send your request in a few steps.</p><span className="websites-demo-action">Request service <ArrowRight size={15} aria-hidden /></span></div><div className="websites-demo-bottom"><span>Services</span><span>Our approach</span><span>Get in touch</span></div></div></div>}
-      {active === 1 && <div className="websites-phone-wrap"><div className="websites-demo-phone"><div className="websites-phone-top"/><div className="websites-phone-content"><strong>North County Home Services</strong><span className="home-eyebrow">Request service</span><h3>Tell us what you need.</h3><p>A short form makes the next step clear.</p><label>Your name <span>Alex Rivera</span></label><label>Email <span>alex@example.com</span></label><label>What can we help with? <span>Tell us about the project…</span></label><div className="websites-demo-action">Send request <ArrowRight size={15} aria-hidden /></div></div></div><p className="websites-phone-note">The visitor sends the request from their phone. No account or app needed.</p></div>}
-      {active === 2 && <div className="websites-email-grid"><article className="websites-email"><div className="websites-email-icon"><Mail size={20} aria-hidden /></div><span className="home-eyebrow">What the visitor receives</span><div className="websites-email-header"><span>From</span> North County Home Services &lt;hello@northcountyhomeservices.com&gt;<br/><span>Subject</span> We got your request</div><pre>{"Hi Alex,\n\nThanks for reaching out to North County Home Services. Your request landed and it is in front of us now.\n\nHere is what happens next: we will look at what you sent and reply by email within one business day with a clear next step — what we recommend, what it would involve, and when we could come out.\n\nOne more thing. This email went out the moment your form came in.\n\nNorth County Home Services\nhello@northcountyhomeservices.com"}</pre></article><article className="websites-email"><div className="websites-email-icon"><Mail size={20} aria-hidden /></div><span className="home-eyebrow">What you receive</span><div className="websites-email-header"><span>Subject</span> New website inquiry — Alex Rivera</div><pre>{"New inquiry from your website.\n\nName: Alex Rivera\nEmail: alex@example.com\nChannel: form\n\nProject note:\nI need help with my website.\n\nOpen the inbox: [private inbox link]"}</pre><p>The owner receives the inquiry details and a link to the private inbox.</p></article></div>}
-    </div>
-  </Container></section>;
+class CustomerJourney extends Component<Record<string, never>, { active: number }> {
+  state = { active: 0 };
+  select = (active: number, focus = false) => this.setState({ active }, () => {
+    if (focus) document.getElementById(`ws-step-${active}`)?.focus();
+  });
+  render() {
+    const { active } = this.state;
+    return <section className="ws-journey ws-dark" aria-labelledby="ws-journey-title">
+      <div className="ws-container">
+        <Reveal className="ws-section-heading"><div><span className="ws-kicker">More than a first impression</span><h2 id="ws-journey-title">Good looks open the door.<br/><span>Make the next step count.</span></h2></div><p>Your website should make it easier to get a customer—not give you more work to manage.</p></Reveal>
+        <div className="ws-journey-layout">
+          <div className="ws-step-list" role="tablist" aria-label="Follow the customer journey" aria-orientation="vertical" onKeyDown={event => {
+            const next = event.key === "ArrowDown" || event.key === "ArrowRight" ? (active + 1) % 3 : event.key === "ArrowUp" || event.key === "ArrowLeft" ? (active + 2) % 3 : event.key === "Home" ? 0 : event.key === "End" ? 2 : null;
+            if (next !== null) { event.preventDefault(); this.select(next, true); }
+          }}>
+            {journey.map((step, i) => <button key={step.label} id={`ws-step-${i}`} type="button" role="tab" aria-selected={active === i} aria-controls="ws-journey-panel" tabIndex={active === i ? 0 : -1} className={active === i ? "is-active" : ""} onClick={() => this.select(i)}><span className="ws-step-number">0{i + 1}</span><span><strong>{step.title}</strong><span>{step.body}</span></span><ArrowRight aria-hidden size={20}/></button>)}
+            <span className="ws-handnote">Try the steps. See what changes.</span>
+          </div>
+          <div id="ws-journey-panel" role="tabpanel" aria-labelledby={`ws-step-${active}`} className="ws-demo" tabIndex={0}>
+            <div className="ws-demo-top"><span className="ws-browser-dots" aria-hidden><i/><i/><i/></span><span>North County Home Services</span><span>{journey[active].label}</span></div>
+            <div className="ws-demo-stage" key={active}>
+              {active === 0 && <div className="ws-demo-website"><span className="ws-kicker">Here when your home needs us</span><h3>Comfort at home.<br/>Help close by.</h3><p>Heating, cooling and home-service help from a local team. Tell us what you need.</p><span className="ws-demo-cta">Request service <ArrowRight size={16} aria-hidden/></span><div className="ws-demo-services"><span>Heating & cooling</span><span>Repairs</span><span>Maintenance</span></div><Monitor className="ws-demo-watermark" size={160} strokeWidth={.7} aria-hidden/></div>}
+              {active === 1 && <div className="ws-demo-inquiry"><div><Smartphone size={25} aria-hidden/><span className="ws-kicker">Easy on a phone, too</span><h3>What can we<br/>help with?</h3><p>Only the details needed to start a conversation.</p></div><div className="ws-demo-form" aria-label="Illustration of a short service inquiry"><div><span>Name</span><strong>Alex Rivera</strong></div><div><span>Email</span><strong>alex@example.com</strong></div><div><span>How can we help?</span><strong>Our AC needs a check.</strong></div><span className="ws-demo-cta">Send request <ArrowRight size={16} aria-hidden/></span></div></div>}
+              {active === 2 && <div className="ws-demo-response"><div className="ws-response-intro"><CheckCheck size={30} aria-hidden/><h3>The request is in.<br/>Nobody is left guessing.</h3></div><div className="ws-message"><Mail size={21} aria-hidden/><div><span>To your customer</span><strong>We received your request.</strong><p>Thanks, Alex. Our team will get back to you with the next step.</p></div><Check size={17} aria-hidden/></div><div className="ws-message"><MessageSquare size={21} aria-hidden/><div><span>To your team</span><strong>New inquiry · AC service</strong><p>Alex’s details and request, ready for someone to follow up.</p></div><Check size={17} aria-hidden/></div></div>}
+            </div>
+            <div className="ws-demo-bottom"><span>One connected customer experience</span><button type="button" onClick={() => this.select((active + 1) % 3)} aria-label={`Show ${journey[(active + 1) % 3].label.toLowerCase()}`}>Next step <ArrowRight size={16} aria-hidden/></button></div>
+          </div>
+        </div>
+      </div>
+    </section>;
+  }
 }
 
 function WebsiteWork() {
   const { projects, isLoading, isError } = useStudioProjects();
-  const selected = workOrder.map(slug => projects.find(project => project.slug === slug)).filter(p => p !== undefined);
-  return <section className="websites-work home-work" aria-labelledby="websites-work-title"><Container>
-    <div className="home-work-head"><div><span className="home-eyebrow">04 / Actual work</span><h2 id="websites-work-title" className="home-section-title">Made to be seen.<br/><em>Built to be used.</em></h2></div><p>Three different websites, each shaped around its own audience and purpose.</p></div>
-    {isLoading ? <p className="home-work-status" role="status">Loading work…</p> : isError ? <p className="home-work-status" role="status">Work could not be loaded. <Link to="/work">Browse all work</Link>.</p> : <div className="home-work-grid">{selected.map((project, index) => { const media = getStudioMedia(project.mediaKey); const image = project.imageUrl || media?.src; const label = `website_work_${project.slug.replace(/-/g, "_")}`; return <article key={project.slug} className={`home-work-project home-work-project-${index + 1}`}><Link to={`/work/${project.slug}`} className="home-work-image" onClick={() => trackSiteEvent({ event_type: "cta_click", label })} aria-label={`View ${project.title}`}>{image ? <img src={image} alt={media?.alt ?? project.title} loading="lazy"/> : <span>{project.title}</span>}</Link><div className="websites-work-detail" aria-hidden>{image && <img src={image} alt="" loading="lazy"/>}</div><div className="home-work-caption"><div><span>{project.classification}</span><h3>{project.title.split(" — ")[0]}</h3><p>{project.summary}</p></div><Link to={`/work/${project.slug}`} aria-label={`Open ${project.title} case study`} onClick={() => trackSiteEvent({ event_type: "cta_click", label })}><ArrowUpRight aria-hidden/></Link></div></article>; })}</div>}
-  </Container></section>;
+  const selected = workOrder.map(slug => projects.find(project => project.slug === slug)).filter(project => project !== undefined);
+  return <section id="website-work" className="ws-work" aria-labelledby="ws-work-title"><div className="ws-container">
+    <Reveal className="ws-section-heading"><div><span className="ws-kicker">Selected work</span><h2 id="ws-work-title">Different businesses.<br/><span>Not the same website.</span></h2></div><div><p>Artist, lifestyle brand, or local business—the experience should feel like yours.</p><Link className="ws-text-link" to="/work" onClick={() => track("website_all_work")}>Explore the portfolio <ArrowUpRight size={18} aria-hidden/></Link></div></Reveal>
+    {isLoading ? <p role="status">Loading selected work…</p> : isError ? <p>Selected work is temporarily unavailable. <Link to="/work">Visit the portfolio.</Link></p> : <div className="ws-work-grid">{selected.map((project, index) => {
+      const media = getStudioMedia(project.mediaKey); const src = project.imageUrl || media?.src;
+      return <Reveal key={project.slug} className={`ws-project ws-project-${index + 1}`}><Link to={`/work/${project.slug}`} className="ws-project-link" onClick={() => track(`website_work_${project.slug.replace(/-/g, "_")}`)}><div className="ws-project-image">{src ? <img src={src} alt={media?.alt || project.title} width={media?.width || 1920} height={media?.height || 1080} loading="lazy"/> : <span>{project.title}</span>}<span className="ws-project-arrow" aria-hidden><ArrowUpRight size={23}/></span></div><div className="ws-project-caption"><span>{project.classification}</span><h3>{project.title.split(" — ")[0]}</h3><p>{project.role}</p></div></Link></Reveal>;
+    })}</div>}
+  </div></section>;
 }
 
+function IndustryDoors() {
+  const { data = [] } = usePublishedVerticalLanders();
+  const rows = ["hvac", "pizza", "medspa"].map(slug => data.find(row => row.slug === slug)).filter(row => row !== undefined);
+  if (!rows.length) return null;
+  return <section className="ws-industries" aria-labelledby="ws-industries-title"><div className="ws-container ws-industry-layout"><Reveal className="ws-industry-intro"><span className="ws-kicker">Your business. Your customers.</span><h2 id="ws-industries-title">Built around<br/>the way <span>you work.</span></h2><p>Estimate requests, catering inquiries, or consultations. Start with the customer journey that fits your business.</p><Link className="ws-text-link" to="/industries">Find your industry <ArrowRight size={17} aria-hidden/></Link></Reveal><div className="ws-industry-cards">{rows.map(row => {
+    const media = getStudioMedia(industryMedia[row.slug]);
+    return <Link key={row.slug} to={`/for/${row.slug}`} className="ws-industry-card" onClick={() => track(`website_industry_${row.slug}`)}>{media?.src && <img src={media.src} alt={media.alt} width={media.width} height={media.height} loading="lazy"/>}<div><h3>{row.display_name}</h3><span>See your customer’s next step <ArrowUpRight size={18} aria-hidden/></span></div></Link>;
+  })}</div></div></section>;
+}
+
+const questions = [
+  { q: "Can you work with the website I already have?", a: "Yes. We’ll look at what is worth keeping, what is getting in the way, and whether improving it or replacing it makes more sense." },
+  { q: "Do you help with the words and images?", a: "Yes. The message, design and customer journey are developed together. We’ll identify what we can use from your existing material and what else the site needs." },
+  { q: "What is the difference between monthly and buying outright?", a: "The monthly website runs on our platform as part of your subscription and stops if the service ends. The $2,500 custom build is sold outright. We’ll make the included work and ongoing costs clear before you commit." },
+  { q: "What is the commitment for Local Growth?", a: "The initial term is three months, then month to month. The first ten Local Growth clients keep the $297 monthly rate while they remain subscribed; new clients after those places are filled enter at $347. The founding offer includes permission to feature your results." },
+  { q: "When can text-back and follow-up start working?", a: "We set up the customer journey with your business details. Text messaging requires carrier registration and approval, so its activation date is confirmed separately from the website launch." },
+  { q: "How long will the website take?", a: "We agree on the schedule after reviewing the pages, content and features you need. You’ll know what we need from you and what happens next before work starts." },
+];
+
 export default function WebsiteServices() {
-  const { hash } = useLocation();
+  const { hash, search } = useLocation();
   const art = getStudioMedia("service-websites-hero");
+  const source = new URLSearchParams(search);
+  const pricingQuery = new URLSearchParams();
+  for (const key of ["src", "biz", "lang"]) { const value = source.get(key); if (value) pricingQuery.set(key, value); }
+  if (!pricingQuery.has("src")) pricingQuery.set("src", "services-websites");
+  const pricingHref = `/pricing?${pricingQuery.toString()}`;
   useStudioHead({ ...ROUTE_META["/services/websites"], path: "/services/websites" });
   useEffect(() => {
     if (!hash) return;
-    const el = document.getElementById(hash.slice(1));
-    if (!el) return;
-    let active = true;
-    const align = () => { if (active && Math.abs(el.getBoundingClientRect().top) > 90) el.scrollIntoView({ block: "start", behavior: "instant" }); };
-    const frame = requestAnimationFrame(align);
-    const observer = new ResizeObserver(align);
-    const main = document.querySelector("main");
-    if (main) observer.observe(main);
-    const done = window.setTimeout(() => { active = false; observer.disconnect(); }, 4000);
-    const cancel = () => { active = false; observer.disconnect(); };
-    window.addEventListener("wheel", cancel, { once: true, passive: true });
-    window.addEventListener("touchstart", cancel, { once: true, passive: true });
-    return () => { cancel(); cancelAnimationFrame(frame); clearTimeout(done); window.removeEventListener("wheel", cancel); window.removeEventListener("touchstart", cancel); };
+    const target = hash === "#website-options" ? "website-options" : hash.slice(1);
+    const frame = requestAnimationFrame(() => document.getElementById(target)?.scrollIntoView({ block: "start" }));
+    return () => cancelAnimationFrame(frame);
   }, [hash]);
-  return <div className="stm-studio websites-page relative min-h-screen"><StudioHeader/><main>
-    <section className="websites-hero" aria-labelledby="websites-title"><Container className="websites-hero-layout"><div className="websites-hero-copy"><span className="home-eyebrow">01 / Websites & digital products</span><h1 id="websites-title">Look the part.<br/><em>Make the next<br/>step easy.</em></h1><p>A polished website that makes the business look credible, gives people a clear next step and acknowledges their inquiry right away. $2,500, or $0 down at $297 a month.</p><div className="websites-hero-actions"><Link to="/pricing" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "website_options" })} className="home-btn-amber">See website options <ArrowRight size={16} aria-hidden/></Link><a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "talk_website" })} className="home-btn-ghost">Talk about your website <ArrowRight size={16} aria-hidden/></a></div></div>{art?.src && <div className="websites-hero-art"><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high"/></div>}</Container></section>
-    <WebsiteWalkthrough/>
-    <PricingTeaser websitePage/>
+  return <div className="stm-studio ws-page"><StudioHeader/><main>
+    <section className="ws-hero" aria-labelledby="websites-title">
+      <div className="ws-container ws-hero-intro"><span className="ws-kicker">Websites that work for your business</span><h1 id="websites-title">Built to impress.<br/><span>Ready for business.</span></h1><div className="ws-hero-bottom"><p>A website that makes you look credible, makes it easy to reach you, and helps keep new opportunities moving. Designed around your business—not a template you have to fit.</p><div className="ws-actions"><a href="#website-options" className="ws-button" onClick={() => track("website_options")}>Find your website plan <ArrowRight size={17} aria-hidden/></a><a href="#website-work" className="ws-button ws-button-outline" onClick={() => track("website_view_work")}>See the work <ArrowDownIcon/></a></div></div></div>
+      {art?.src && <div className="ws-hero-showcase"><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high"/><div className="ws-showcase-note"><span className="ws-handnote">Make a good first impression.<br/>Make the next step easy.</span><svg viewBox="0 0 94 51" fill="none" aria-hidden><path d="M3 3c9 28 37 39 77 27M70 21l15 7-8 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></div><div className="ws-showcase-strip"><span><Monitor size={17} aria-hidden/>Built for your business</span><span><Smartphone size={17} aria-hidden/>Made for mobile</span><span><MousePointer2 size={17} aria-hidden/>Ready for the next step</span></div></div>}
+    </section>
+    <CustomerJourney/>
     <WebsiteWork/>
-    <Testimonials />
-    <section className="websites-process" aria-labelledby="websites-process-title"><Container><span className="home-eyebrow">05 / From first draft to handover</span><h2 id="websites-process-title" className="home-section-title">Clear work.<br/><em>Clear ownership.</em></h2><ol className="websites-process-steps">{process.map((item, i) => <li key={item.title}><span>0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></li>)}</ol><div className="websites-questions"><div><span className="home-eyebrow">Before we begin</span><h3>Questions worth asking.</h3></div><Accordion type="single" collapsible>{questions.map((item, i) => <AccordionItem key={item.q} value={`q-${i}`}><AccordionTrigger>{item.q}</AccordionTrigger><AccordionContent>{item.a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>
-     <Inquiry servicePage="websites"/>
+    <Testimonials/>
+    <IndustryDoors/>
+    <section id="website-options" className="ws-offer ws-dark" aria-labelledby="ws-offer-title"><div className="ws-container"><Reveal className="ws-offer-layout"><div className="ws-offer-copy"><span className="ws-kicker">The website. The follow-up. The support.</span><h2 id="ws-offer-title">More than a launch.<br/><span>A plan for what’s next.</span></h2><p>Local Growth brings your website and everyday customer follow-up together. Less chasing messages. More clarity about who needs a reply.</p><div className="ws-included"><span><Check size={18} aria-hidden/>Website & mobile experience</span><span><Check size={18} aria-hidden/>Missed-call text-back</span><span><Check size={18} aria-hidden/>Booking & one inbox</span><span><Check size={18} aria-hidden/>Review requests & follow-up</span><span><Check size={18} aria-hidden/>Monthly report</span></div></div><div className="ws-offer-price"><span className="ws-kicker">Local Growth · Founding offer</span><div className="ws-price"><strong>$297</strong><span>/ month</span></div><p className="ws-price-terms">$0 down. Three months to start,<br/>then month to month.</p><a href="#contact" className="ws-button" onClick={() => requestPlan("Local Growth", "website_local_growth_inquiry")}>Talk about Local Growth <ArrowRight size={17} aria-hidden/></a><p className="ws-founding">The first ten clients keep this rate while subscribed, with permission to feature their results. Then $347/month for new clients.</p><Link to={pricingHref} className="ws-text-link" onClick={() => track("website_view_pricing")}>Compare plans and what’s included <ArrowRight size={16} aria-hidden/></Link></div></Reveal><div className="ws-outright"><div><span className="ws-kicker">Prefer to buy it outright?</span><h3>Your custom website. One project.</h3></div><p>Custom builds from <strong>$2,500.</strong><br/>A separate option from the monthly subscription.</p><a href="#contact" className="ws-text-link" onClick={() => requestPlan("an outright custom website build", "website_outright_inquiry")}>Talk through the build <ArrowRight size={17} aria-hidden/></a></div></div></section>
+    <section className="ws-process" aria-labelledby="ws-process-title"><div className="ws-container"><Reveal className="ws-section-heading"><div><span className="ws-kicker">A clear path to launch</span><h2 id="ws-process-title">You run the business.<br/><span>We’ll handle the website.</span></h2></div><p>You know your business. We turn that knowledge into the words, design and customer experience it deserves.</p></Reveal><ol className="ws-process-steps"><li><span>01</span><h3>Get the message right.</h3><p>What you do, who you help, and why someone should choose you. That comes before the layout.</p></li><li><span>02</span><h3>Build it around your customers.</h3><p>See the design as it takes shape. Review the pages, the phone experience, and the next step visitors will take.</p></li><li><span>03</span><h3>Launch with a plan.</h3><p>We connect your domain, check the customer journey, and make sure you know what happens after launch.</p></li></ol><div className="ws-faq"><div><span className="ws-kicker">Before we begin</span><h3>A few things you<br/>may be wondering.</h3></div><div>{questions.map(({q,a}) => <details key={q}><summary>{q}<span aria-hidden>+</span></summary><p>{a}</p></details>)}</div></div></div></section>
+    <Inquiry servicePage="websites"/>
   </main><StudioFooter/></div>;
 }
+
+function ArrowDownIcon() { return <ArrowRight size={17} className="ws-arrow-down" aria-hidden/>; }

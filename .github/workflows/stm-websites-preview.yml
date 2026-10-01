@@ -1,0 +1,29 @@
+name: Websites prototype verification
+on:
+  push:
+    branches: ['stm/websites-prototype-2026-10-01']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx tsc --noEmit -p tsconfig.app.json
+      - run: npx vite build
+      - run: npm install --no-save --no-audit --no-fund playwright && npx playwright install --with-deps chromium
+      - run: |
+          npm run dev -- --host 127.0.0.1 --port 8080 > /tmp/stm-vite.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080 >/dev/null && break || sleep 1; done
+          node scripts/verify-websites-prototype.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stm-websites-rendered-check
+          path: artifacts/websites/
+          retention-days: 7
