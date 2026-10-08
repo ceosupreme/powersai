@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Copy, Mail, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { EMAIL, PACKAGES, PHONE } from "./config";
@@ -7,11 +7,18 @@ export type DialogKind = "contact" | "packages" | "blog" | null;
 
 export function ReviewDialogs({ open, setOpen }: { open: DialogKind; setOpen: (k: DialogKind) => void }) {
   const [copied, setCopied] = useState<"" | "ok" | "fail">("");
+  const opener = useRef<HTMLElement | null>(null);
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpen.current) opener.current = document.activeElement as HTMLElement;
+    wasOpen.current = !!open;
+  }, [open]);
   const close = (v: boolean) => { if (!v) setOpen(null); };
+  const restore = (e: Event) => { e.preventDefault(); if (!open) opener.current?.focus(); };
   return (
     <>
       <Dialog open={open === "contact"} onOpenChange={close}>
-        <DialogContent className="rh-dialog">
+        <DialogContent className="rh-dialog" onCloseAutoFocus={restore}>
           <DialogTitle className="rh-dialog-title">Contact Us</DialogTitle>
           <DialogDescription className="rh-dialog-text">Call or email us directly. No form required.</DialogDescription>
           <div className="rh-dialog-actions">
@@ -31,7 +38,7 @@ export function ReviewDialogs({ open, setOpen }: { open: DialogKind; setOpen: (k
       </Dialog>
 
       <Dialog open={open === "packages"} onOpenChange={close}>
-        <DialogContent className="rh-dialog rh-dialog-wide">
+        <DialogContent className="rh-dialog rh-dialog-wide" onCloseAutoFocus={restore}>
           <DialogTitle className="rh-dialog-title">Built around your business.</DialogTitle>
           <DialogDescription className="rh-dialog-text">Most work starts with a conversation and a solution shaped to fit. If one of these starting points fits, we tailor it from there.</DialogDescription>
           <ul className="rh-packages">
@@ -50,7 +57,7 @@ export function ReviewDialogs({ open, setOpen }: { open: DialogKind; setOpen: (k
       </Dialog>
 
       <Dialog open={open === "blog"} onOpenChange={close}>
-        <DialogContent className="rh-dialog">
+        <DialogContent className="rh-dialog" onCloseAutoFocus={restore}>
           <DialogTitle className="rh-dialog-title">Blog — coming in first release</DialogTitle>
           <DialogDescription className="rh-dialog-text">Preview note: the educational blog is planned for the first release and is not built in this preview.</DialogDescription>
         </DialogContent>
