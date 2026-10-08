@@ -23,7 +23,7 @@ export const SERVICE_LINKS = [
 ];
 
 export const PACKAGES = [
-  { name: "Local Growth", price: "$297/month", body: "A ready local marketing setup, configured for your business from a proven HighLevel foundation." },
-  { name: "Custom Website + Backend", price: "$2,500 build + monthly Smart Services & Care", note: "Monthly care amount to be confirmed.", line: "Websites that work while you sleep.", body: "A custom site with the inquiry handling and follow-up built behind it." },
+  { name: "Custom Website + Backend", price: "$2,500 build + required monthly Smart Services & Care", note: "Monthly Smart Services & Care amount to be confirmed.", line: "Websites that work while you sleep.", body: "A custom website with a real owner admin behind it: inquiries saved and answered, follow-up, and a backend you can see and manage." },
   { name: "Custom Business Operating System", price: "Starts at $10,000 + scoped monthly operation and support", body: "The tools behind your business, mapped and connected around how you actually work." },
+  { name: "Local Growth", price: "$297/month", body: "A repeatable starting option: local marketing configured for your business from a reusable HighLevel configuration." },
 ];
