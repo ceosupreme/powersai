@@ -113,3 +113,4 @@
 .rh-pkg-price { color: hsl(210 25% 97%) !important; font-weight: 600; }
 .rh-pkg-note { font-size: 0.85rem !important; font-style: italic; }
 .rh-dialog .rh-btn { white-space: normal; height: auto; padding-block: 0.7rem; text-align: center; overflow-wrap: anywhere; max-width: 100%; }
+@media (max-width: 400px) { .rh-brand { max-width: 7.2rem; font-size: 0.95rem; } }
