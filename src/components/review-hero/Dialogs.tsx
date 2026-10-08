@@ -32,7 +32,7 @@ export function ReviewDialogs({ open, setOpen }: { open: DialogKind; setOpen: (k
             ) : (
               <div className="rh-pending" role="note"><Phone size={18} aria-hidden /> <span><strong>Phone connection pending</strong> — review only. The number will be added once the owner confirms it.</span></div>
             )}
-            <a className={PHONE ? "rh-btn rh-btn-ghost" : "rh-btn rh-btn-primary"} href={`mailto:${EMAIL}`}><Mail size={18} aria-hidden /> Email {EMAIL}</a>
+            <a className={PHONE ? "rh-btn rh-btn-ghost" : "rh-btn rh-btn-primary"} href={`mailto:${EMAIL}`}><Mail size={18} aria-hidden /> <span className="rh-email">Email us <small>{EMAIL}</small></span></a>
           </div>
         </DialogContent>
       </Dialog>
