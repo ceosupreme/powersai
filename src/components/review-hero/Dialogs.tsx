@@ -6,20 +6,20 @@ import { EMAIL, PACKAGES, PHONE } from "./config";
 export type DialogKind = "contact" | "packages" | "blog" | null;
 
 export function ReviewDialogs({ open, setOpen }: { open: DialogKind; setOpen: (k: DialogKind) => void }) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"" | "ok" | "fail">("");
   const close = (v: boolean) => { if (!v) setOpen(null); };
   return (
     <>
       <Dialog open={open === "contact"} onOpenChange={close}>
         <DialogContent className="rh-dialog">
           <DialogTitle className="rh-dialog-title">Contact Us</DialogTitle>
-          <DialogDescription className="rh-dialog-text">Call or email Sean directly. No form required.</DialogDescription>
+          <DialogDescription className="rh-dialog-text">Call or email us directly. No form required.</DialogDescription>
           <div className="rh-dialog-actions">
             {PHONE ? (
               <div className="rh-row">
                 <a className="rh-btn rh-btn-primary" href={`tel:${PHONE.tel}`}><Phone size={18} aria-hidden /> Call Us · {PHONE.display}</a>
-                <button type="button" className="rh-btn rh-btn-ghost rh-desktop-only" onClick={() => { navigator.clipboard?.writeText(PHONE.display); setCopied(true); }}>
-                  <Copy size={16} aria-hidden /> {copied ? "Copied" : "Copy number"}
+                <button type="button" className="rh-btn rh-btn-ghost rh-desktop-only" onClick={async () => { try { await navigator.clipboard.writeText(PHONE.display); setCopied("ok"); } catch { setCopied("fail"); } }}>
+                  <Copy size={16} aria-hidden /> {copied === "ok" ? "Copied" : copied === "fail" ? "Copy failed — select the number" : "Copy number"}
                 </button>
               </div>
             ) : (
