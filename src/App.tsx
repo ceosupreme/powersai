@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -89,6 +90,7 @@ import About from "./pages/About";
 import LegalPage from "./pages/LegalPage";
 import Pricing from "./pages/Pricing";
 import Startups from "./pages/Startups";
+const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -123,6 +125,7 @@ const App = () => {
                 <Route path="/terms" element={<LegalPage kind="terms" />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/startups" element={<Startups />} />
+                <Route path="/_review/home-hero" element={<Suspense fallback={null}><HomeHeroReview /></Suspense>} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />
                 <Route path="/work/:slug" element={<WorkCaseStudy />} />
