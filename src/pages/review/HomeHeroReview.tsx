@@ -7,8 +7,13 @@ import { SERVICE_LINKS, SERVICE_OBJECTS } from "@/components/review-hero/config"
 import "@/components/review-hero/homeHero.css";
 
 export default function HomeHeroReview() {
-  const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const [paused, setPaused] = useState(reduced);
+  const [userPaused, setUserPaused] = useState(false);
+  const [reduced, setReduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [idle, setIdle] = useState(false);
+  const paused = userPaused || reduced;
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const header = useRef<HTMLElement>(null);
+  const hero = useRef<HTMLElement>(null);
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [menu, setMenu] = useState(false);
   const [services, setServices] = useState(false);
@@ -22,6 +27,41 @@ export default function HomeHeroReview() {
     document.head.appendChild(meta);
     return () => { document.title = prevTitle; meta.remove(); };
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+
+  useEffect(() => {
+    let vis = true;
+    const sync = () => setIdle(!vis || document.hidden);
+    const io = new IntersectionObserver(([e]) => { vis = e.isIntersecting; sync(); });
+    if (hero.current) io.observe(hero.current);
+    document.addEventListener("visibilitychange", sync);
+    return () => { io.disconnect(); document.removeEventListener("visibilitychange", sync); };
+  }, []);
+
+  useEffect(() => {
+    if (!menu) return;
+    const closeMenu = (focus: boolean) => { setMenu(false); setServices(false); if (focus) menuBtn.current?.focus(); };
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") closeMenu(true); };
+    const down = (e: PointerEvent) => { if (header.current && !header.current.contains(e.target as Node)) closeMenu(false); };
+    document.addEventListener("keydown", key);
+    document.addEventListener("pointerdown", down);
+    return () => { document.removeEventListener("keydown", key); document.removeEventListener("pointerdown", down); };
+  }, [menu]);
+
+  useEffect(() => {
+    if (!services || menu) return;
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setServices(false); };
+    const down = (e: PointerEvent) => { if (!(e.target as Element).closest?.(".rh-services")) setServices(false); };
+    document.addEventListener("keydown", key);
+    document.addEventListener("pointerdown", down);
+    return () => { document.removeEventListener("keydown", key); document.removeEventListener("pointerdown", down); };
+  }, [services, menu]);
 
   useEffect(() => {
     const el = scene.current;
@@ -58,17 +98,17 @@ export default function HomeHeroReview() {
   );
 
   return (
-    <div className={`rh-root${paused ? " rh-paused" : ""}`}>
-      <header className="rh-header">
+    <div className={`rh-root${paused ? " rh-paused" : ""}${idle ? " rh-idle" : ""}`}>
+      <header className="rh-header" ref={header}>
         <Link to="/" className="rh-brand">Supreme Team Media</Link>
         <nav aria-label="Primary" className="rh-nav">{navItems}</nav>
         <button type="button" className="rh-btn rh-btn-primary rh-header-cta" onClick={contact}>Contact Us</button>
-        <button type="button" className="rh-menu-btn" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>{menu ? <X size={20} /> : <Menu size={20} />}</button>
-        {menu && <nav aria-label="Mobile" className="rh-mobile-nav">{navItems}<button type="button" className="rh-btn rh-btn-primary" onClick={contact}>Contact Us</button></nav>}
+        <button ref={menuBtn} type="button" className="rh-menu-btn" aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>{menu ? <X size={20} /> : <Menu size={20} />}</button>
+        {menu && <nav aria-label="Mobile" className="rh-mobile-nav">{navItems}</nav>}
       </header>
 
       <main>
-        <section className="rh-hero" aria-labelledby="rh-title">
+        <section ref={hero} className="rh-hero" aria-labelledby="rh-title">
           <LightField paused={paused} />
           <div className="rh-copy">
             <h1 id="rh-title" className="rh-title"><span>Get noticed.</span><span>Get chosen.</span><span className="rh-accent">Get more done.</span></h1>
@@ -87,8 +127,8 @@ export default function HomeHeroReview() {
               ))}
             </ul>
           </div>
-          <button type="button" className="rh-motion" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
-            {paused ? <Play size={14} aria-hidden /> : <Pause size={14} aria-hidden />} {paused ? "Play motion" : "Pause motion"}
+          <button type="button" className="rh-motion" onClick={() => setUserPaused((p) => !p)} aria-pressed={paused} disabled={reduced} title={reduced ? "Motion is off by your system setting" : undefined}>
+            {paused ? <Play size={14} aria-hidden /> : <Pause size={14} aria-hidden />} {reduced ? "Motion off (system setting)" : paused ? "Play motion" : "Pause motion"}
           </button>
         </section>
       </main>
