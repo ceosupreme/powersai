@@ -2,6 +2,8 @@
 
 ## Public studio website (STM build pack)
 
+- [x] Isolated header + hero review prototype at /_review/home-hero (preview only; phone pending)
+
 - [x] Install ten approved production images into existing industry and service media slots; responsive crop QA (preview only)
 - [x] Consolidated public-site refinement: Pricing, Startups, buyer-language copy, trust/legal accuracy, accurate map, resilient public-page prerendering, media slots, and signed-out QA
 - [x] Build 1 trust and function: accessibility, legal, route previews, About, testimonials, Spanish, internal traffic, reply-to, hero motion
