@@ -130,10 +130,10 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           <path className="stm-command-energy-gold" d="M968 365 C967 319 930 322 933 248" />
           <path className="stm-command-energy-wine" d="M1115 381 C1105 307 968 316 965 249" />
         </g>
-        <g className="stm-command-panel" transform="matrix(.998 .066 -.394 .738 636 380)"><Megaphone x="-20" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
-        <g className="stm-command-panel" transform="matrix(.994 .107 -.224 .853 784 400)"><Play x="-17" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>
-        <g className="stm-command-panel" transform="matrix(.994 .107 -.204 .772 942 422)"><Globe x="-16" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
-        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.994 .108 -.124 .762 1116 447)"><Cog x="-15" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
+        <g className="stm-command-panel" transform="matrix(.994 .112 -.406 .767 633 383)"><Megaphone x="-20" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
+        <g className="stm-command-panel" transform="matrix(.992 .123 -.282 .760 785 399)"><Play x="-18" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>
+        <g className="stm-command-panel" transform="matrix(.995 .102 -.208 .768 946 422)"><Globe x="-17" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
+        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.992 .126 -.126 .703 1119 444)"><Cog x="-15" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
         <g className="stm-command-core"><text x="907" y="175">BUSINESS</text><text x="907" y="199">GROWTH</text></g>
       </svg>
       <div className="stm-command-mobile-controls">
