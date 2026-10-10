@@ -35,7 +35,7 @@
 .stm-studio .stm-opening-menu-toggle { display: none; min-width: 44px; min-height: 44px; color: hsl(var(--opening-ivory)); background: transparent; border-color: hsl(var(--opening-silver) / .45); }
 .stm-studio .stm-opening-mobile-menu { display: none; }
 .stm-studio .stm-opening-hero { position: relative; overflow: hidden; color: hsl(var(--opening-ivory)); background: hsl(var(--opening-night)); }
-.stm-studio .stm-opening-hero-inner { position: relative; width: 100%; min-height: max(600px, calc(100vw * 826 / 1792)); }
+.stm-studio .stm-opening-hero-inner { position: relative; width: 100%; min-height: calc(100vw * 826 / 1792); }
 .stm-studio .stm-opening-copy { position: relative; z-index: 5; width: 43%; margin-left: 4%; padding: 142px 0 65px; }
 .stm-studio .stm-opening-eyebrow { color: hsl(var(--opening-gold)); font-size: 13px; font-weight: 800; letter-spacing: 0; }
 .stm-studio .stm-opening-copy h1 { margin-top: 20px; font: 800 88px/.98 "Inter Tight", sans-serif; letter-spacing: 0; }
@@ -47,7 +47,7 @@
 .stm-studio .stm-opening-secondary { color: hsl(var(--opening-ivory)); background: hsl(var(--opening-night) / .58); border-color: hsl(var(--opening-silver) / .48); border-radius: 999px; }
 .stm-studio .stm-opening-scene { position: absolute; z-index: 1; inset: 0; }
 .stm-studio .stm-opening-scene picture { display: block; position: absolute; inset: 0; overflow: hidden; }
-.stm-studio .stm-opening-scene picture img { display: block; width: 100%; height: auto; }
+.stm-studio .stm-opening-scene picture img { display: block; width: 100%; height: auto; clip-path: inset(0 0 25.18% 0); }
 .stm-studio .stm-opening-connectors { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; }
 .stm-studio .stm-opening-connectors path { fill: none; stroke: hsl(var(--opening-cyan)); stroke-width: 1.8; vector-effect: non-scaling-stroke; }
 .stm-studio .stm-opening-connector-base { opacity: .7; }
@@ -136,7 +136,8 @@
   .stm-studio .stm-opening-actions { margin-top: 20px; gap: 10px; }
   .stm-studio .stm-opening-primary, .stm-studio .stm-opening-secondary { min-height: 48px; padding-inline: 18px; }
   .stm-studio .stm-opening-scene { position: relative; }
-  .stm-studio .stm-opening-scene picture { position: relative; aspect-ratio: 774 / 575; }
+  .stm-studio .stm-opening-scene picture { position: relative; aspect-ratio: 800 / 594; }
+  .stm-studio .stm-opening-scene picture img { aspect-ratio: 800 / 794; }
   .stm-studio .stm-opening-connectors { display: none; }
   .stm-studio .stm-opening-labels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 4% 24px; }
   .stm-studio .stm-opening-callout { position: static; width: 100%; height: 58px; }
