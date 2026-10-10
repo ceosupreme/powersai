@@ -1,9 +1,8 @@
 import { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
-import { Hero } from "@/components/marketing/studio/sections/Hero";
+import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterClick } from "@/components/marketing/studio/sections/AfterClick";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
@@ -56,9 +55,8 @@ export default function MarketingSite() {
 
   return (
     <div className="stm-studio relative min-h-screen">
-      <StudioHeader />
       <main>
-        <Hero />
+        <HomeOpening />
         <AfterClick />
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
