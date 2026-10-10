@@ -109,7 +109,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
 
   return <section id="top" className="stm-opening-hero stm-command-hero">
     <div className="stm-command-artboard" ref={sceneRef}>
-      {art?.src && <picture className="stm-command-background"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>}
+      {art?.src && <div className="stm-command-visual"><picture className="stm-command-background"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture><div className="stm-command-mobile-core">BUSINESS<br />GROWTH</div></div>}
       <div className="stm-opening-copy stm-command-copy">
         <p className="stm-opening-eyebrow">SUPREME TEAM MEDIA · SAN DIEGO</p>
         <h1><span>Grow your</span><span>business.</span><span>Make a bigger</span><span className="stm-command-impact">impact.</span></h1>
@@ -137,7 +137,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <g className="stm-command-panel" transform="matrix(1.08 .12 -.20 1.02 1067 385)"><Cog x="43" y="16" width="30" height="30" /><text x="58" y="72">Automation</text></g>
         <g className="stm-command-core"><text x="907" y="175">BUSINESS</text><text x="907" y="199">GROWTH</text></g>
       </svg>
-      <div className="stm-command-mobile-controls" aria-hidden="true">
+      <div className="stm-command-mobile-controls">
         <span><Megaphone />Marketing</span><span><Play />Media</span><span><Globe />Web</span><span><Cog />Automation</span>
       </div>
       <div className="stm-command-stories" aria-label="Story scenes">
