@@ -123,18 +123,18 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           <div><strong>20+ years</strong><span>ADVERTISING AND DESIGN</span></div>
         </div>
       </div>
-      <svg className="stm-command-overlays" viewBox="0 0 1200 750" aria-label="Marketing, Media, Web and Automation connected to Business Growth">
+      <svg className="stm-command-overlays" viewBox="0 0 1200 675" aria-label="Marketing, Media, Web and Automation connected to Business Growth">
         <g className="stm-command-energy" fill="none" aria-hidden="true">
-          <path className="stm-command-energy-gold" d="M641 334 C700 312 851 319 857 245" />
-          <path className="stm-command-energy-wine" d="M807 349 C842 317 908 314 906 248" />
-          <path className="stm-command-energy-gold" d="M968 365 C967 319 930 322 933 248" />
-          <path className="stm-command-energy-wine" d="M1115 381 C1105 307 968 316 965 249" />
+          <path className="stm-command-energy-gold" d="M688 306 C705 275 880 285 900 262" />
+          <path className="stm-command-energy-cyan" d="M819 320 C840 285 900 290 912 262" />
+          <path className="stm-command-energy-gold" d="M959 339 C965 300 935 290 930 262" />
+          <path className="stm-command-energy-cyan" d="M1115 354 C1105 300 960 300 942 262" />
         </g>
-        <g className="stm-command-panel" transform="matrix(.986 .165 -.406 .767 633 383)"><Megaphone x="-20" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
-        <g className="stm-command-panel" transform="matrix(.985 .174 -.282 .760 785 399)"><Play x="-18" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>
-        <g className="stm-command-panel" transform="matrix(.989 .148 -.208 .768 946 422)"><Globe x="-17" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
-        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.985 .174 -.126 .703 1119 444)"><Cog x="-15" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
-        <g className="stm-command-core"><text x="907" y="175">BUSINESS</text><text x="907" y="199">GROWTH</text></g>
+        <g className="stm-command-panel" transform="matrix(.992 .122 -.443 .818 665 349)"><Megaphone x="-21" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
+        <g className="stm-command-panel" transform="matrix(.990 .141 -.361 .839 800 366)"><Play x="-19" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>
+        <g className="stm-command-panel" transform="matrix(.989 .146 -.215 .773 946 387)"><Globe x="-17" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
+        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.987 .160 -.113 .786 1107 408)"><Cog x="-15" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
+        <g className="stm-command-core"><text x="921" y="163">BUSINESS</text><text x="921" y="187">GROWTH</text></g>
       </svg>
       <div className="stm-command-mobile-controls">
         <span><Megaphone />Marketing</span><span><Play />Media</span><span><Globe />Web</span><span><Cog />Automation</span>

@@ -207,7 +207,7 @@
 
 /* Scene 1: the complete source artboard and its perspective-matched console. */
 .stm-studio .stm-command-hero { --opening-wine: 345 52% 25%; --opening-wine-light: 348 63% 47%; }
-.stm-studio .stm-command-artboard { position: relative; width: 100%; aspect-ratio: 1920 / 1201; }
+.stm-studio .stm-command-artboard { position: relative; width: 100%; aspect-ratio: 1920 / 1081; }
 .stm-studio .stm-command-background { position: absolute; inset: 0; display: block; }
 .stm-studio .stm-command-background img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .stm-studio .stm-command-copy { position: absolute; top: 0; width: 40%; padding: 126px 0 120px; }
@@ -222,15 +222,15 @@
 .stm-studio .stm-command-credibility span { color: hsl(var(--opening-silver)); font-size: 10px; line-height: 1.4; }
 .stm-studio .stm-command-overlays { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .stm-studio .stm-command-panel { color: hsl(var(--opening-gold)); transition: filter .25s ease; }
-.stm-studio .stm-command-panel text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 19px "Inter Tight", sans-serif; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); }
+.stm-studio .stm-command-panel text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); }
 .stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 4px hsl(var(--opening-gold) / .5)); }
 .stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .65)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }
 .stm-studio .stm-command-core text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; paint-order: stroke; stroke: hsl(var(--opening-night) / .75); stroke-width: 3px; }
 .stm-studio .stm-command-energy path { stroke-width: 2px; stroke-linecap: round; stroke-dasharray: 12 260; animation: stm-command-energy 6s linear infinite; }
 .stm-studio .stm-command-energy-gold { stroke: hsl(var(--opening-gold)); }
-.stm-studio .stm-command-energy-wine { stroke: hsl(var(--opening-wine-light)); animation-delay: 2s; }
-.stm-studio .stm-command-stories { position: absolute; right: 4%; bottom: 135px; width: 48%; display: grid; grid-template-columns: 1.55fr 1fr 1fr; align-items: end; gap: 10px; }
+.stm-studio .stm-command-energy-cyan { stroke: hsl(var(--opening-cyan)); animation-delay: 2s; }
+.stm-studio .stm-command-stories { position: absolute; right: 4%; bottom: 60px; width: 48%; display: grid; grid-template-columns: 1.55fr 1fr 1fr; align-items: end; gap: 10px; }
 .stm-studio .stm-command-story { position: relative; display: grid; gap: 9px; min-height: 88px; padding: 16px; border-radius: 6px; border: 1px solid hsl(var(--opening-silver) / .25); background: hsl(var(--opening-night) / .91); color: hsl(var(--opening-silver)); }
 .stm-studio .stm-command-story small { font-size: 11px; color: hsl(var(--opening-gold)); }
 .stm-studio .stm-command-story strong { font: 700 20px/1.1 "Inter Tight", sans-serif; }
@@ -251,15 +251,15 @@
   .stm-studio .stm-command-copy .stm-opening-subhead { font-size: 19px; }
   .stm-studio .stm-command-credibility { gap: 14px; margin-top: 24px; }
   .stm-studio .stm-command-credibility strong { font-size: 18px; }
-  .stm-studio .stm-command-stories { bottom: 114px; width: 49%; }
+  .stm-studio .stm-command-stories { bottom: 50px; width: 49%; }
 }
 @media (min-width: 761px) and (max-width: 1100px) {
   .stm-studio .stm-command-artboard { min-height: 790px; aspect-ratio: auto; }
-  .stm-studio .stm-command-background, .stm-studio .stm-command-overlays { top: 120px; height: auto; aspect-ratio: 1920 / 1201; }
+  .stm-studio .stm-command-background, .stm-studio .stm-command-overlays { top: 120px; height: auto; aspect-ratio: 1920 / 1081; }
   .stm-studio .stm-command-copy { width: 42%; }
   .stm-studio .stm-command-copy h1 { font-size: 52px; }
   .stm-studio .stm-command-copy .stm-opening-subhead { font-size: 18px; }
-  .stm-studio .stm-command-stories { bottom: 115px; }
+  .stm-studio .stm-command-stories { bottom: 50px; }
 }
 @media (max-width: 760px) {
   .stm-studio .stm-command-artboard { display: flex; flex-direction: column; aspect-ratio: auto; }
@@ -270,7 +270,7 @@
   .stm-studio .stm-command-credibility { gap: 14px; justify-content: space-between; margin-top: 26px; }
   .stm-studio .stm-command-credibility strong { font-size: 17px; }
   .stm-studio .stm-command-credibility span { font-size: 10px; max-width: 104px; }
-  .stm-studio .stm-command-background { position: relative; order: 1; aspect-ratio: 1920 / 1201; }
+  .stm-studio .stm-command-background { position: relative; order: 1; aspect-ratio: 1920 / 1081; }
   .stm-studio .stm-command-overlays { display: none; }
   .stm-studio .stm-command-mobile-controls { display: grid; order: 2; grid-template-columns: 1fr 1fr; gap: 12px; padding: 18px 4%; }
   .stm-studio .stm-command-mobile-controls span { display: flex; align-items: center; gap: 12px; padding: 12px; color: hsl(var(--opening-ivory)); background: hsl(var(--opening-wine) / .55); border: 1px solid hsl(var(--opening-gold) / .4); border-radius: 6px; font-size: 17px; }
@@ -288,5 +288,5 @@
 .stm-studio .stm-command-mobile-core { display: none; }
 @media (max-width: 760px) {
   .stm-studio .stm-command-visual { position: relative; order: 1; }
-  .stm-studio .stm-command-mobile-core { display: block; position: absolute; left: 75.6%; top: 25%; transform: translate(-50%, -50%); color: hsl(var(--opening-ivory)); text-shadow: 0 1px 3px hsl(var(--opening-night)); font: 700 13px/1.1 "Inter Tight", sans-serif; text-align: center; }
+  .stm-studio .stm-command-mobile-core { display: block; position: absolute; left: 76.8%; top: 25.5%; transform: translate(-50%, -50%); color: hsl(var(--opening-ivory)); text-shadow: 0 1px 3px hsl(var(--opening-night)); font: 700 13px/1.1 "Inter Tight", sans-serif; text-align: center; }
 }
