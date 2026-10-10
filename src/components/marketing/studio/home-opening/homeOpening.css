@@ -283,3 +283,9 @@
   .stm-studio .stm-command-core { animation: none; }
   .stm-studio .stm-command-panel { transition: none; }
 }
+.stm-studio .stm-command-visual { position: absolute; inset: 0; }
+.stm-studio .stm-command-mobile-core { display: none; }
+@media (max-width: 760px) {
+  .stm-studio .stm-command-visual { position: relative; order: 1; }
+  .stm-studio .stm-command-mobile-core { display: block; position: absolute; left: 75.6%; top: 25%; transform: translate(-50%, -50%); color: hsl(var(--opening-ivory)); text-shadow: 0 1px 3px hsl(var(--opening-night)); font: 700 13px/1.1 "Inter Tight", sans-serif; text-align: center; }
+}
