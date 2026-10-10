@@ -221,10 +221,10 @@
 .stm-studio .stm-command-credibility strong { color: hsl(var(--opening-gold)); font: 700 20px/1.15 "Inter Tight", sans-serif; }
 .stm-studio .stm-command-credibility span { color: hsl(var(--opening-silver)); font-size: 10px; line-height: 1.4; }
 .stm-studio .stm-command-overlays { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.stm-studio .stm-command-panel { color: hsl(var(--opening-gold)); transition: filter .25s ease; }
-.stm-studio .stm-command-panel text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); }
-.stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 4px hsl(var(--opening-gold) / .5)); }
-.stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .65)); }
+.stm-studio .stm-command-panel { color: hsl(195 100% 86%); transition: filter .25s ease; }
+.stm-studio .stm-command-panel text { fill: hsl(200 100% 95%); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .75)); }
+.stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 5px hsl(var(--opening-cyan) / .7)); }
+.stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .9)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }
 .stm-studio .stm-command-core text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; paint-order: stroke; stroke: hsl(var(--opening-night) / .75); stroke-width: 3px; }
 .stm-studio .stm-command-energy path { stroke-width: 2px; stroke-linecap: round; stroke-dasharray: 12 260; animation: stm-command-energy 6s linear infinite; }
