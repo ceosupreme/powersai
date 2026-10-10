@@ -222,7 +222,9 @@
 .stm-studio .stm-command-credibility span { color: hsl(var(--opening-silver)); font-size: 10px; line-height: 1.4; }
 .stm-studio .stm-command-overlays { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .stm-studio .stm-command-panel { color: hsl(var(--opening-gold)); transition: filter .25s ease; }
-.stm-studio .stm-command-panel text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; }
+.stm-studio .stm-command-panel text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); }
+.stm-studio .stm-command-panel-wide text { font-size: 15px; }
+.stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 4px hsl(var(--opening-gold) / .5)); }
 .stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .65)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }
 .stm-studio .stm-command-core text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; paint-order: stroke; stroke: hsl(var(--opening-night) / .75); stroke-width: 3px; }
