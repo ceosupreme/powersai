@@ -3,6 +3,7 @@
 ## Public studio website (STM build pack)
 
 - [x] Approved production homepage opening: dedicated header, chess hero, credibility strip, and simple Services cards; later sections preserved (preview only)
+- [x] Reference-match homepage opening refinement with responsive 3D service tiles and truthful claim safeguards (preview only)
 
 - [x] Isolated header + hero review prototype at /_review/home-hero (preview only; phone pending)
 
