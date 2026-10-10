@@ -33,6 +33,8 @@ import openingAutomation from "@/assets/stm-opening/automation-gear.png.asset.js
 import openingTrustPeople from "@/assets/stm-opening/trust-people-black.png.asset.json";
 import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json";
 import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
+import commandCenterDesktop from "@/assets/stm-opening/command-center-desktop.webp.asset.json";
+import commandCenterMobile from "@/assets/stm-opening/command-center-mobile.webp.asset.json";
 
 /**
  * Single media configuration for the public studio site.
@@ -67,6 +69,15 @@ export type StudioMediaSlot = {
 };
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
+  "home-opening-command-center": {
+    src: commandCenterDesktop.url,
+    mobileSrc: commandCenterMobile.url,
+    alt: "Right-weighted four-panel command console with a foreground chair, gold and wine energy conduits, and a glowing central core",
+    aspectRatio: "1920 / 1201",
+    width: 1920,
+    height: 1201,
+    objectFit: "contain",
+  },
   "home-opening-chess": {
     src: openingChessV2.url,
     mobileSrc: openingChessV2Mobile.url,
