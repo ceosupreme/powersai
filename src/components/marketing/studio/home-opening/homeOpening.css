@@ -163,3 +163,31 @@
 }
 .stm-studio .stm-opening-scene picture::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, hsl(var(--opening-night) / .78) 0%, hsl(var(--opening-night) / .5) 28%, transparent 46%); }
 @media (max-width: 760px) { .stm-studio .stm-opening-scene picture::after { display: none; } }
+
+/* Depth, energy and spotlight effects — fine pointers only; static otherwise. */
+.stm-studio .stm-opening-float { position: absolute; inset: 0; z-index: 3; }
+.stm-studio .stm-opening-connector-pulse path { animation: stm-opening-flow 6s ease-in-out 1.2s infinite both; }
+.stm-studio .stm-opening-connector-pulse path:nth-child(2) { animation-delay: 1.6s; }
+.stm-studio .stm-opening-connector-pulse path:nth-child(3) { animation-delay: 2s; }
+.stm-studio .stm-opening-scene.is-offscreen .stm-opening-connector-pulse path { animation-play-state: paused; }
+@keyframes stm-opening-flow { 0% { stroke-dashoffset: -650; opacity: 0; } 8% { opacity: 1; } 30% { stroke-dashoffset: 0; opacity: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.stm-studio .stm-opening-connector-base path { transition: stroke .2s ease, opacity .2s ease, stroke-width .2s ease; }
+.stm-studio .stm-opening-scene[data-active] .stm-opening-connector-base path { opacity: .45; }
+.stm-studio .stm-opening-scene[data-active="marketing"] .stm-opening-connector-base path:nth-child(1),
+.stm-studio .stm-opening-scene[data-active="web"] .stm-opening-connector-base path:nth-child(2),
+.stm-studio .stm-opening-scene[data-active="ai"] .stm-opening-connector-base path:nth-child(3) { opacity: 1; stroke-width: 2.6; filter: drop-shadow(0 0 4px hsl(var(--opening-cyan))); }
+.stm-studio .stm-opening-service-card { position: relative; overflow: hidden; transition: transform .2s ease, border-color .2s ease; }
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+  .stm-studio .stm-opening-scene { perspective: 1000px; }
+  .stm-studio .stm-opening-art { transform: translate3d(calc(var(--px, 0) * -8px), calc(var(--py, 0) * -6px), 0) scale(1.012); will-change: transform; }
+  .stm-studio .stm-opening-float { transform-style: preserve-3d; transform: translate3d(calc(var(--px, 0) * 10px), calc(var(--py, 0) * 7px), 0); will-change: transform; }
+  .stm-studio .stm-opening-callout { transform: translateZ(30px) rotateY(calc(var(--px, 0) * 7deg)) rotateX(calc(var(--py, 0) * -6deg)); }
+  .stm-studio .stm-callout-web { transform: translateZ(45px) rotateY(calc(var(--px, 0) * 8deg)) rotateX(calc(var(--py, 0) * -7deg)); }
+  .stm-studio .stm-opening-callout:hover { transform: translateZ(55px) translateY(-3px) rotateY(calc(var(--px, 0) * 7deg)) rotateX(calc(var(--py, 0) * -6deg)); }
+  .stm-studio .stm-opening-service-card:hover { transform: perspective(700px) rotateX(calc((0.5 - var(--my, .5)) * 8deg)) rotateY(calc((var(--mx, .5) - 0.5) * 10deg)) translateY(-3px); border-color: hsl(var(--opening-gold) / .5); }
+  .stm-studio .stm-opening-service-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .2s ease; background: radial-gradient(220px circle at calc(var(--mx, .5) * 100%) calc(var(--my, .5) * 100%), hsl(var(--opening-gold) / .16), transparent 70%); }
+  .stm-studio .stm-opening-service-card:hover::before { opacity: 1; }
+  .stm-studio .stm-opening-service-card img { transition: transform .2s ease; }
+  .stm-studio .stm-opening-service-card:hover img { transform: translateY(-4px) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) { .stm-studio .stm-opening-connector-pulse { display: none; } }

@@ -95,6 +95,39 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
   const biz = sanitizeBiz(source.get("biz"));
   if (biz) checkup.set("biz", biz);
 
+  const sceneRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState<string | null>(null);
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const hero = scene?.closest("section");
+    if (!scene || !hero) return;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, last = 0, visible = true;
+    const apply = () => { scene.style.setProperty("--px", x.toFixed(4)); scene.style.setProperty("--py", y.toFixed(4)); };
+    const tick = (now: number) => {
+      const dt = Math.min((now - (last || now)) / 1000, 0.05); last = now;
+      const k = 1 - Math.exp(-6 * dt);
+      x += (tx - x) * k; y += (ty - y) * k; apply();
+      if (Math.abs(tx - x) + Math.abs(ty - y) > 0.001) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    const move = (e: PointerEvent) => {
+      if (!fine.matches || reduce.matches || !visible || e.pointerType !== "mouse") return;
+      const r = hero.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; kick();
+    };
+    const reset = () => { tx = 0; ty = 0; kick(); };
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; scene.classList.toggle("is-offscreen", !visible); if (!visible) reset(); });
+    io.observe(hero);
+    const onReduce = () => { if (reduce.matches) { cancelAnimationFrame(raf); raf = 0; x = y = tx = ty = 0; apply(); } };
+    hero.addEventListener("pointermove", move);
+    hero.addEventListener("pointerleave", reset);
+    reduce.addEventListener("change", onReduce);
+    return () => { cancelAnimationFrame(raf); io.disconnect(); hero.removeEventListener("pointermove", move); hero.removeEventListener("pointerleave", reset); reduce.removeEventListener("change", onReduce); };
+  }, []);
+  const hover = (key: string) => ({ onPointerEnter: () => setActive(key), onPointerLeave: () => setActive(null) });
+
   return <section id="top" className="stm-opening-hero">
     <div className="stm-opening-shell stm-opening-hero-inner">
       <div className="stm-opening-copy">
@@ -106,17 +139,17 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           <Button asChild variant="outline" className="stm-opening-secondary"><Link to={`/free-audit?${checkup.toString()}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "free_business_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link></Button>
         </div>
       </div>
-      {art?.src && <div className="stm-opening-scene">
-        <picture><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>
-        <svg className="stm-opening-connectors" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden>
+      {art?.src && <div className="stm-opening-scene" ref={sceneRef} data-active={active ?? undefined}>
+        <picture className="stm-opening-art"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>
+        <div className="stm-opening-float"><svg className="stm-opening-connectors" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden>
           <g className="stm-opening-connector-base"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
           <g className="stm-opening-connector-pulse"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
         </svg>
         <div className="stm-opening-labels">
-          <div className="stm-opening-callout stm-callout-marketing"><Target aria-hidden /><strong>MARKETING</strong></div>
-          <div className="stm-opening-callout stm-callout-web"><Monitor aria-hidden /><strong>WEB DESIGN</strong></div>
-          <div className="stm-opening-callout stm-callout-ai"><Cog aria-hidden /><strong>AUTOMATION</strong></div>
-        </div>
+          <div className="stm-opening-callout stm-callout-marketing" {...hover("marketing")}><Target aria-hidden /><strong>MARKETING</strong></div>
+          <div className="stm-opening-callout stm-callout-web" {...hover("web")}><Monitor aria-hidden /><strong>WEB DESIGN</strong></div>
+          <div className="stm-opening-callout stm-callout-ai" {...hover("ai")}><Cog aria-hidden /><strong>AUTOMATION</strong></div>
+        </div></div>
       </div>}
     </div>
   </section>;
@@ -138,7 +171,7 @@ function CredibilityStrip() {
 function OpeningServices() {
   return <section id="services" className="stm-opening-services"><div className="stm-opening-shell stm-opening-services-layout">
     <div className="stm-opening-services-heading"><h2>Everything you need to grow in one place.</h2></div>
-    <div className="stm-opening-service-grid">{SERVICE_LINKS.map((service) => { const media = getStudioMedia(service.media); return <Link key={service.label} to={service.to} className="stm-opening-service-card">{media?.src && <img src={media.src} alt="" width={media.width} height={media.height} />}<h3>{service.label}</h3><span>Learn More <ArrowRight aria-hidden /></span></Link>; })}</div>
+    <div className="stm-opening-service-grid" onPointerMove={(e) => { if (e.pointerType !== "mouse") return; const card = (e.target as HTMLElement).closest<HTMLElement>(".stm-opening-service-card"); if (!card) return; const r = card.getBoundingClientRect(); card.style.setProperty("--mx", String((e.clientX - r.left) / r.width)); card.style.setProperty("--my", String((e.clientY - r.top) / r.height)); }}>{SERVICE_LINKS.map((service) => { const media = getStudioMedia(service.media); return <Link key={service.label} to={service.to} className="stm-opening-service-card">{media?.src && <img src={media.src} alt="" width={media.width} height={media.height} />}<h3>{service.label}</h3><span>Learn More <ArrowRight aria-hidden /></span></Link>; })}</div>
   </div></section>;
 }
 
