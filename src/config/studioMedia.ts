@@ -22,6 +22,8 @@ import publishingRelease from "@/assets/studio/publishing-release-spread.webp.as
 import openingChessDesktop from "@/assets/stm-opening/chess-hero-desktop.webp.asset.json";
 import openingChessMedium from "@/assets/stm-opening/chess-hero-1280.webp.asset.json";
 import openingChessMobile from "@/assets/stm-opening/chess-hero-mobile.webp.asset.json";
+import openingChessV2 from "@/assets/stm-opening/chess-hero-v2.webp.asset.json";
+import openingChessV2Mobile from "@/assets/stm-opening/chess-hero-v2-mobile.webp.asset.json";
 import openingMark from "@/assets/stm-opening/stm-mark.png.asset.json";
 import openingWebDesign from "@/assets/stm-opening/web-design-monitor.png.asset.json";
 import openingMarketing from "@/assets/stm-opening/marketing-bars.png.asset.json";
@@ -66,13 +68,13 @@ export type StudioMediaSlot = {
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "home-opening-chess": {
-    src: openingChessDesktop.url,
-    mobileSrc: openingChessMobile.url,
-    posterSrc: openingChessMedium.url,
-    alt: "A hand moving a gold king across a reflective chessboard",
-    aspectRatio: "1792 / 1104",
-    width: 1792,
-    height: 1104,
+    src: openingChessV2.url,
+    mobileSrc: openingChessV2Mobile.url,
+    posterSrc: openingChessV2Mobile.url,
+    alt: "A Black businessman's hand moving a glowing gold king across a futuristic chessboard",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
     objectFit: "contain",
     objectPosition: "center top",
   },

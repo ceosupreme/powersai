@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, ChevronDown, Cog, Mail, Menu, Monitor, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Cog, Mail, Menu, Monitor, Target, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
@@ -108,14 +108,14 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
       </div>
       {art?.src && <div className="stm-opening-scene">
         <picture><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>
-        <svg className="stm-opening-connectors" viewBox="0 0 1792 826" preserveAspectRatio="none" aria-hidden>
-          <g className="stm-opening-connector-base"><path d="M1066 220 H1100 L1218 560"/><path d="M1021 440 H1060 L1218 580"/><path d="M1442 420 H1395 L1270 580"/></g>
-          <g className="stm-opening-connector-pulse"><path d="M1066 220 H1100 L1218 560"/><path d="M1021 440 H1060 L1218 580"/><path d="M1442 420 H1395 L1270 580"/></g>
+        <svg className="stm-opening-connectors" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden>
+          <g className="stm-opening-connector-base"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
+          <g className="stm-opening-connector-pulse"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
         </svg>
         <div className="stm-opening-labels">
-          <div className="stm-opening-callout stm-callout-ai"><strong><b>AI</b> AUTOMATION</strong></div>
+          <div className="stm-opening-callout stm-callout-marketing"><Target aria-hidden /><strong>MARKETING</strong></div>
           <div className="stm-opening-callout stm-callout-web"><Monitor aria-hidden /><strong>WEB DESIGN</strong></div>
-          <div className="stm-opening-callout stm-callout-marketing"><Cog aria-hidden /><strong>MARKETING</strong></div>
+          <div className="stm-opening-callout stm-callout-ai"><Cog aria-hidden /><strong>AUTOMATION</strong></div>
         </div>
       </div>}
     </div>
