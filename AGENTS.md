@@ -10,3 +10,4 @@
 - Local Vite proxies only Lovable CDN asset paths to this project's preview host; otherwise media pointers return the Vite HTML fallback instead of images during local visual QA.
 - Case studies use published fields/media; Hire uses that adapter and inquiry. Free Check and Thank-you retain protected logic. Public motion is progressive enhancement: visible by default, in-view animated, reduced-motion static.
 - Public builds prerender marketing HTML then hydrate React; failed dynamic renders retain route-specific SPA metadata fallbacks.
+- The homepage opening owns a dedicated header and visual scope; shared `StudioHeader` remains authoritative on every other public route so homepage art direction cannot alter sitewide navigation.
