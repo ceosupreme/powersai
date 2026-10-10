@@ -111,7 +111,6 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
     <div className="stm-command-artboard" ref={sceneRef}>
       {art?.src && <div className="stm-command-visual"><picture className="stm-command-background"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture><div className="stm-command-mobile-core">BUSINESS<br />GROWTH</div></div>}
       <div className="stm-opening-copy stm-command-copy">
-        <p className="stm-opening-eyebrow">SUPREME TEAM MEDIA · SAN DIEGO</p>
         <h1><span>Grow your</span><span>business.</span><span>Make a bigger</span><span className="stm-command-impact">impact.</span></h1>
         <p className="stm-opening-subhead">Intelligent marketing and media solutions for business growth.</p>
         <div className="stm-opening-actions">
@@ -131,10 +130,10 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           <path className="stm-command-energy-gold" d="M968 365 C967 319 930 322 933 248" />
           <path className="stm-command-energy-wine" d="M1115 381 C1105 307 968 316 965 249" />
         </g>
-        <g className="stm-command-panel" transform="matrix(1 .10 -.48 .86 599 337)"><Megaphone x="40" y="16" width="30" height="30" /><text x="55" y="72">Marketing</text></g>
-        <g className="stm-command-panel" transform="matrix(1 .10 -.38 .90 748 352)"><Play x="40" y="16" width="30" height="30" /><text x="55" y="72">Media</text></g>
-        <g className="stm-command-panel" transform="matrix(1 .12 -.27 .96 902 370)"><Globe x="40" y="16" width="30" height="30" /><text x="55" y="72">Web</text></g>
-        <g className="stm-command-panel" transform="matrix(1.08 .12 -.20 1.02 1067 385)"><Cog x="43" y="16" width="30" height="30" /><text x="58" y="72">Automation</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .10 -.55 .86 636 380)"><Megaphone x="-12" y="-25" width="24" height="24" /><text x="0" y="21">Marketing</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .10 -.40 .90 787 398)"><Play x="-12" y="-25" width="24" height="24" /><text x="0" y="21">Media</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .12 -.30 .96 947 420)"><Globe x="-12" y="-25" width="24" height="24" /><text x="0" y="21">Web</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .12 -.20 1.02 1118 441)"><Cog x="-12" y="-25" width="24" height="24" /><text x="0" y="21">Automation</text></g>
         <g className="stm-command-core"><text x="907" y="175">BUSINESS</text><text x="907" y="199">GROWTH</text></g>
       </svg>
       <div className="stm-command-mobile-controls">
