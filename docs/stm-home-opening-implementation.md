@@ -23,3 +23,9 @@ Industries remain database-driven. Blog is visibly disabled because no public Bl
 The direct contact panel uses `hello@supremeteammedia.com`. No authoritative public business phone is configured, so phone remains pending and no call or AI-receptionist claim is shown.
 
 The credibility strip retains `500+ businesses` and `4.9 client satisfaction` only as visibly marked sample figures for draft review. Before publishing, the owner must approve actual figures or replace them with confirmed experience-since-2001 wording. No ratings structured data was added.
+
+## Reference-match refinement
+
+The opening uses the supplied chess artwork with live HTML/vector details rather than replacement generated art. Marketing, Web Design, and AI Automation use desktop-only fine-pointer 3D movement with separate depth values; touch and reduced-motion presentations remain still. The hero also pauses its animation work when it leaves the viewport or the document is hidden.
+
+The reference phone number was not added because it is not an authoritative configured public number. Resources was also omitted because there is no corresponding public destination. These choices avoid a false click-to-call action and a dead navigation link.
