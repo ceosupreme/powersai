@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, ChevronDown, Cog, Mail, Menu, Monitor, Target, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Cog, Globe, Mail, Megaphone, Menu, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
@@ -85,7 +85,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
 }
 
 function OpeningHero({ onContact }: { onContact: () => void }) {
-  const art = getStudioMedia("home-opening-chess");
+  const art = getStudioMedia("home-opening-command-center");
   const { search } = useLocation();
   const source = new URLSearchParams(search);
   const checkup = new URLSearchParams();
@@ -96,61 +96,55 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
   if (biz) checkup.set("biz", biz);
 
   const sceneRef = useRef<HTMLDivElement | null>(null);
-  const [active, setActive] = useState<string | null>(null);
   useEffect(() => {
     const scene = sceneRef.current;
-    const hero = scene?.closest("section");
-    if (!scene || !hero) return;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, last = 0, visible = true;
-    const apply = () => { scene.style.setProperty("--px", x.toFixed(4)); scene.style.setProperty("--py", y.toFixed(4)); };
-    const tick = (now: number) => {
-      const dt = Math.min((now - (last || now)) / 1000, 0.05); last = now;
-      const k = 1 - Math.exp(-6 * dt);
-      x += (tx - x) * k; y += (ty - y) * k; apply();
-      if (Math.abs(tx - x) + Math.abs(ty - y) > 0.001) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
-    };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
-    const move = (e: PointerEvent) => {
-      if (!fine.matches || reduce.matches || !visible || e.pointerType !== "mouse") return;
-      const r = hero.getBoundingClientRect();
-      tx = ((e.clientX - r.left) / r.width) * 2 - 1; ty = ((e.clientY - r.top) / r.height) * 2 - 1; kick();
-    };
-    const reset = () => { tx = 0; ty = 0; kick(); };
-    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; scene.classList.toggle("is-offscreen", !visible); if (!visible) reset(); });
-    io.observe(hero);
-    const onReduce = () => { if (reduce.matches) { cancelAnimationFrame(raf); raf = 0; x = y = tx = ty = 0; apply(); } };
-    hero.addEventListener("pointermove", move);
-    hero.addEventListener("pointerleave", reset);
-    reduce.addEventListener("change", onReduce);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); hero.removeEventListener("pointermove", move); hero.removeEventListener("pointerleave", reset); reduce.removeEventListener("change", onReduce); };
+    if (!scene) return;
+    let visible = true;
+    const sync = () => scene.classList.toggle("is-paused", !visible || document.hidden);
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); });
+    observer.observe(scene);
+    document.addEventListener("visibilitychange", sync);
+    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", sync); };
   }, []);
-  const hover = (key: string) => ({ onPointerEnter: () => setActive(key), onPointerLeave: () => setActive(null) });
 
-  return <section id="top" className="stm-opening-hero">
-    <div className="stm-opening-shell stm-opening-hero-inner">
-      <div className="stm-opening-copy">
-        <p className="stm-opening-eyebrow">STRATEGY <span>♦</span> MARKETING <span>♦</span> TECHNOLOGY</p>
-        <h1><span>Strategy</span><span>turns ideas</span><span>into <em>income.</em></span></h1>
-        <p className="stm-opening-subhead">Wealth through intelligent systems.</p>
+  return <section id="top" className="stm-opening-hero stm-command-hero">
+    <div className="stm-command-artboard" ref={sceneRef}>
+      {art?.src && <picture className="stm-command-background"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>}
+      <div className="stm-opening-copy stm-command-copy">
+        <p className="stm-opening-eyebrow">SUPREME TEAM MEDIA · SAN DIEGO</p>
+        <h1><span>Grow your</span><span>business.</span><span>Make a bigger</span><span className="stm-command-impact">impact.</span></h1>
+        <p className="stm-opening-subhead">Intelligent marketing and media solutions for business growth.</p>
         <div className="stm-opening-actions">
           <Button type="button" onClick={onContact} className="stm-opening-primary">Contact Us <ArrowRight aria-hidden /></Button>
           <Button asChild variant="outline" className="stm-opening-secondary"><Link to={`/free-audit?${checkup.toString()}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "free_business_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link></Button>
         </div>
+        <div className="stm-command-credibility">
+          <div><strong>Since 2001</strong><span>DIGITAL MARKETING</span></div>
+          <div><strong>San Diego</strong><span>SERVING ANYWHERE</span></div>
+          <div><strong>20+ years</strong><span>ADVERTISING AND DESIGN</span></div>
+        </div>
       </div>
-      {art?.src && <div className="stm-opening-scene" ref={sceneRef} data-active={active ?? undefined}>
-        <picture className="stm-opening-art"><source media="(max-width: 760px)" srcSet={art.mobileSrc ?? art.src} /><img src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" /></picture>
-        <div className="stm-opening-float"><svg className="stm-opening-connectors" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden>
-          <g className="stm-opening-connector-base"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
-          <g className="stm-opening-connector-pulse"><path d="M936 282 H1000 L1150 560"/><path d="M903 438 H960 L1150 600"/><path d="M1371 424 H1330 L1250 580"/></g>
-        </svg>
-        <div className="stm-opening-labels">
-          <div className="stm-opening-callout stm-callout-marketing" {...hover("marketing")}><Target aria-hidden /><strong>MARKETING</strong></div>
-          <div className="stm-opening-callout stm-callout-web" {...hover("web")}><Monitor aria-hidden /><strong>WEB DESIGN</strong></div>
-          <div className="stm-opening-callout stm-callout-ai" {...hover("ai")}><Cog aria-hidden /><strong>AUTOMATION</strong></div>
-        </div></div>
-      </div>}
+      <svg className="stm-command-overlays" viewBox="0 0 1200 750" aria-label="Marketing, Media, Web and Automation connected to Business Growth">
+        <g className="stm-command-energy" fill="none" aria-hidden="true">
+          <path className="stm-command-energy-gold" d="M641 334 C700 312 851 319 857 245" />
+          <path className="stm-command-energy-wine" d="M807 349 C842 317 908 314 906 248" />
+          <path className="stm-command-energy-gold" d="M968 365 C967 319 930 322 933 248" />
+          <path className="stm-command-energy-wine" d="M1115 381 C1105 307 968 316 965 249" />
+        </g>
+        <g className="stm-command-panel" transform="matrix(1 .10 -.48 .86 599 337)"><Megaphone x="40" y="16" width="30" height="30" /><text x="55" y="72">Marketing</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .10 -.38 .90 748 352)"><Play x="40" y="16" width="30" height="30" /><text x="55" y="72">Media</text></g>
+        <g className="stm-command-panel" transform="matrix(1 .12 -.27 .96 902 370)"><Globe x="40" y="16" width="30" height="30" /><text x="55" y="72">Web</text></g>
+        <g className="stm-command-panel" transform="matrix(1.08 .12 -.20 1.02 1067 385)"><Cog x="43" y="16" width="30" height="30" /><text x="58" y="72">Automation</text></g>
+        <g className="stm-command-core"><text x="907" y="175">BUSINESS</text><text x="907" y="199">GROWTH</text></g>
+      </svg>
+      <div className="stm-command-mobile-controls" aria-hidden="true">
+        <span><Megaphone />Marketing</span><span><Play />Media</span><span><Globe />Web</span><span><Cog />Automation</span>
+      </div>
+      <div className="stm-command-stories" aria-label="Story scenes">
+        <div className="stm-command-story is-current" aria-current="step"><small>1 OF 3</small><strong>Dialed in</strong><p>Marketing, media, web and automation, set up to work as one.</p><span className="stm-command-progress" /></div>
+        <div className="stm-command-story" aria-disabled="true"><small>2 OF 3</small><strong>Launched</strong></div>
+        <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
+      </div>
     </div>
   </section>;
 }
