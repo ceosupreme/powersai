@@ -129,3 +129,4 @@
 ## Case studies and Hire visual rebuild
 - [x] Rebuild project-specific case stories and employer page without changing published data or the résumé PDF
 - [x] Verify signed-out desktop and phone views, filtered return, résumé download, and no sideways scroll
+- [x] Homepage hero: new chess background, callouts Marketing/Web Design/Automation repositioned
