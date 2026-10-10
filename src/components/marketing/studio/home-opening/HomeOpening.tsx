@@ -10,12 +10,22 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
 import "./homeOpening.css";
 
-const SERVICE_LINKS = [
-  { to: "/services/websites", label: "Web Design", description: "Websites that look sharp and turn attention into action.", media: "home-opening-web-design" },
-  { to: "/services/marketing", label: "Marketing", description: "Focused campaigns that help the right customers find you.", media: "home-opening-marketing" },
-  { to: "/services/ai-systems?intent=sales", label: "Sales", description: "Practical systems for turning interest into real opportunities.", media: "home-opening-sales" },
-  { to: "/services/ai-systems?intent=crm", label: "CRM", description: "Keep contacts, conversations and next steps organized.", media: "home-opening-crm" },
-  { to: "/services/ai-systems", label: "Automation", description: "Reduce busywork and keep important work moving.", media: "home-opening-automation" },
+const MACHINE_STATIONS = [
+  { to: "/services/marketing", num: "01", name: "Marketing", ghost: "REACH", media: "home-services-reach", side: "l",
+    benefit: "Create demand. Drive visibility. Turn attention into customers.",
+    items: ["Strategy", "Paid media", "Local SEO", "Content", "Brand growth"], link: "Explore Marketing" },
+  { to: "/services/websites", num: "02", name: "Web Design", ghost: "PRESENCE", media: "home-services-presence", side: "r",
+    benefit: "Turn your online presence into a stronger business asset.",
+    items: ["Modern design", "Mobile first", "SEO foundation", "Conversion focused"], link: "Explore Web Design" },
+  { to: "/services/brand", num: "03", name: "Media & Creative", ghost: "IMPACT", media: "home-services-impact", side: "l",
+    benefit: "Give people something worth noticing and remembering.",
+    items: ["Photo and video", "Content creation", "Brand storytelling", "Social media"], link: "Explore Media & Creative" },
+  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & Customer Systems", ghost: "MOMENTUM", media: "home-services-momentum", side: "r",
+    benefit: "Capture more leads. Follow up faster. Turn conversations into revenue.",
+    items: ["CRM setup", "Lead management", "Booking and appointments", "Reviews"], link: "Explore Sales Systems" },
+  { to: "/services/ai-systems", num: "05", name: "Automation", ghost: "SCALE", media: "home-services-scale", side: "l",
+    benefit: "Take repetitive work off your plate and keep your business moving.",
+    items: ["Workflow automation", "AI assistants", "Missed-call text back", "Email and SMS"], link: "Explore Automation" },
 ] as const;
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -162,10 +172,83 @@ function CredibilityStrip() {
 }
 
 function OpeningServices() {
-  return <section id="services" className="stm-opening-services"><div className="stm-opening-shell stm-opening-services-layout">
-    <div className="stm-opening-services-heading"><h2>Everything you need to grow in one place.</h2></div>
-    <div className="stm-opening-service-grid" onPointerMove={(e) => { if (e.pointerType !== "mouse") return; const card = (e.target as HTMLElement).closest<HTMLElement>(".stm-opening-service-card"); if (!card) return; const r = card.getBoundingClientRect(); card.style.setProperty("--mx", String((e.clientX - r.left) / r.width)); card.style.setProperty("--my", String((e.clientY - r.top) / r.height)); }}>{SERVICE_LINKS.map((service) => { const media = getStudioMedia(service.media); return <Link key={service.label} to={service.to} className="stm-opening-service-card">{media?.src && <img src={media.src} alt="" width={media.width} height={media.height} />}<h3>{service.label}</h3><span>Learn More <ArrowRight aria-hidden /></span></Link>; })}</div>
-  </div></section>;
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const lwRef = useRef<HTMLDivElement | null>(null);
+  const spineRef = useRef<HTMLDivElement | null>(null);
+  const fillRef = useRef<HTMLDivElement | null>(null);
+  const orbRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current, lw = lwRef.current, spine = spineRef.current, fill = fillRef.current, orb = orbRef.current;
+    if (!section || !lw || !spine || !fill || !orb) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("on"); });
+    }, { threshold: 0.28 });
+    section.querySelectorAll("[data-watch]").forEach((el) => io.observe(el));
+    const offTop = (el: HTMLElement, anc: HTMLElement) => {
+      let y = 0; let node: HTMLElement | null = el;
+      while (node && node !== anc) { y += node.offsetTop; node = node.offsetParent as HTMLElement | null; }
+      return y;
+    };
+    let spineTop = 0, spineH = 1;
+    const onScroll = () => {
+      const r = section.getBoundingClientRect();
+      const p = reduce ? 1 : (window.innerHeight * 0.62 - (r.top + spineTop)) / spineH;
+      fill.style.height = `${Math.max(0, Math.min(1, p)) * spineH}px`;
+    };
+    const layout = () => {
+      spineTop = window.innerWidth <= 860 ? offTop(lw, section) : 0;
+      spineH = Math.max(1, offTop(orb, section) + orb.offsetHeight / 2 - spineTop);
+      spine.style.top = `${spineTop}px`; spine.style.height = `${spineH}px`;
+      fill.style.top = `${spineTop}px`;
+      onScroll();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", layout);
+    if (document.fonts?.ready) document.fonts.ready.then(layout);
+    layout();
+    return () => { io.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", layout); };
+  }, []);
+
+  return <section id="services" ref={sectionRef} className="stm-mach" aria-label="Services">
+    <div className="stm-mach-spine" ref={spineRef} aria-hidden="true" />
+    <div className="stm-mach-fill" ref={fillRef} aria-hidden="true" />
+    <div className="stm-mach-head" data-watch>
+      <div className="stm-mach-rise"><span className="stm-mach-eyebrow">— Services</span></div>
+      <h2><span className="stm-mach-rise"><span>Built to move your</span></span><span className="stm-mach-rise"><span>business <em>forward.</em></span></span></h2>
+      <div className="stm-mach-rise"><span className="stm-mach-sub">Marketing and media solutions applied where your business needs them most.</span></div>
+    </div>
+    <div className="stm-mach-lw" ref={lwRef}>
+      {MACHINE_STATIONS.map((st) => {
+        const media = getStudioMedia(st.media);
+        return <Link key={st.num} to={st.to} className="stm-mach-station" data-watch onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${st.ghost.toLowerCase()}` })}>
+          <span className={`stm-mach-vis ${st.side === "l" ? "gr" : "gl"}`} aria-hidden="true">
+            <span className="stm-mach-ghost">{st.ghost}</span>
+            {media?.src && <img src={media.src} alt="" width={media.width} height={media.height} loading="lazy" />}
+          </span>
+          <span className="stm-mach-dot" aria-hidden="true" />
+          <span className={st.side === "l" ? "stm-mach-bl" : "stm-mach-br"}>
+            <span className="stm-mach-num">{st.num}</span>
+            <span className="stm-mach-name"><span className="stm-mach-rise"><span>{st.name}</span></span></span>
+            <span className="stm-mach-benefit">{st.benefit}</span>
+            <span className="stm-mach-inc">{st.items.map((item, i) => <span key={item} style={{ transitionDelay: `${0.4 + i * 0.08}s` }}>{i > 0 ? " · " : ""}{item}</span>)}</span>
+            <span className="stm-mach-go">{st.link} →</span>
+          </span>
+        </Link>;
+      })}
+      <div className="stm-mach-core" data-watch>
+        <span className="stm-mach-ghostc" aria-hidden="true">GROWTH</span>
+        <div className="stm-mach-orb" ref={orbRef} aria-hidden="true" />
+        <h3>Let&rsquo;s build what&rsquo;s next.</h3>
+        <p>Five systems, one goal. Tell us yours and get a custom plan for your business.</p>
+        <div className="stm-mach-ctas">
+          <Link to="/pricing" className="stm-mach-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
+          <Link to="/free-audit?src=home-services" className="stm-mach-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_free_checkup" })}>Free Business Checkup →</Link>
+        </div>
+      </div>
+    </div>
+  </section>;
 }
 
 export function HomeOpening() {
