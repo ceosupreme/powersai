@@ -19,6 +19,18 @@ import legalHero from "@/assets/studio/industry-legal-hero.webp.asset.json";
 import brandMaterials from "@/assets/studio/brand-materials-spread.webp.asset.json";
 import marketingCampaign from "@/assets/studio/marketing-campaign-scene.webp.asset.json";
 import publishingRelease from "@/assets/studio/publishing-release-spread.webp.asset.json";
+import openingChessDesktop from "@/assets/stm-opening/chess-hero-desktop.webp.asset.json";
+import openingChessMedium from "@/assets/stm-opening/chess-hero-1280.webp.asset.json";
+import openingChessMobile from "@/assets/stm-opening/chess-hero-mobile.webp.asset.json";
+import openingMark from "@/assets/stm-opening/stm-mark.png.asset.json";
+import openingWebDesign from "@/assets/stm-opening/web-design-monitor.png.asset.json";
+import openingMarketing from "@/assets/stm-opening/marketing-bars.png.asset.json";
+import openingSales from "@/assets/stm-opening/sales-people.png.asset.json";
+import openingCrm from "@/assets/stm-opening/crm-database.png.asset.json";
+import openingAutomation from "@/assets/stm-opening/automation-gear.png.asset.json";
+import openingTrustPeople from "@/assets/stm-opening/trust-people-black.png.asset.json";
+import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json";
+import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
 
 /**
  * Single media configuration for the public studio site.
@@ -53,6 +65,26 @@ export type StudioMediaSlot = {
 };
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
+  "home-opening-chess": {
+    src: openingChessDesktop.url,
+    mobileSrc: openingChessMobile.url,
+    posterSrc: openingChessMedium.url,
+    alt: "A hand moving a gold king across a reflective chessboard",
+    aspectRatio: "1792 / 1104",
+    width: 1792,
+    height: 1104,
+    objectFit: "contain",
+    objectPosition: "center top",
+  },
+  "home-opening-mark": { src: openingMark.url, alt: "", aspectRatio: "61 / 77", width: 61, height: 77, objectFit: "contain" },
+  "home-opening-web-design": { src: openingWebDesign.url, alt: "", aspectRatio: "75 / 68", width: 75, height: 68, objectFit: "contain" },
+  "home-opening-marketing": { src: openingMarketing.url, alt: "", aspectRatio: "69 / 71", width: 69, height: 71, objectFit: "contain" },
+  "home-opening-sales": { src: openingSales.url, alt: "", aspectRatio: "92 / 70", width: 92, height: 70, objectFit: "contain" },
+  "home-opening-crm": { src: openingCrm.url, alt: "", aspectRatio: "61 / 74", width: 61, height: 74, objectFit: "contain" },
+  "home-opening-automation": { src: openingAutomation.url, alt: "", aspectRatio: "74 / 74", width: 74, height: 74, objectFit: "contain" },
+  "home-opening-trust-people": { src: openingTrustPeople.url, alt: "", aspectRatio: "55 / 43", width: 55, height: 43, objectFit: "contain" },
+  "home-opening-trust-shield": { src: openingTrustShield.url, alt: "", aspectRatio: "43 / 50", width: 43, height: 50, objectFit: "contain" },
+  "home-opening-trust-star": { src: openingTrustStar.url, alt: "", aspectRatio: "44 / 45", width: 44, height: 45, objectFit: "contain" },
   "home-hero": {
     src: homeHeroDevices.url,
     mobileSrc: null,
