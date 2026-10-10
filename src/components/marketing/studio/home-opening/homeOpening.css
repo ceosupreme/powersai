@@ -191,3 +191,16 @@
   .stm-studio .stm-opening-service-card:hover img { transform: translateY(-4px) scale(1.06); }
 }
 @media (prefers-reduced-motion: reduce) { .stm-studio .stm-opening-connector-pulse { display: none; } }
+
+/* Hero art bleeds under a compact, left-aligned trust strip (desktop only) */
+@media (min-width: 761px) {
+  .stm-studio .stm-opening-trust { margin-top: -96px; background: transparent; border-bottom: 0; pointer-events: none; }
+  .stm-studio .stm-opening-trust-grid { pointer-events: auto; max-width: min(820px, 58%); margin-left: 2.5%; border-radius: 0 14px 0 0;
+    background: linear-gradient(90deg, hsl(var(--opening-ivory)) 0%, hsl(var(--opening-ivory)) 82%, hsl(var(--opening-ivory) / .92) 100%);
+    box-shadow: 0 -14px 40px hsl(var(--opening-night) / .35); padding-inline: 10px; }
+  .stm-studio .stm-opening-trust::before { content: ""; position: absolute; inset: 0 0 0 0; z-index: -1; background: linear-gradient(180deg, transparent 0%, hsl(var(--opening-ivory) / .0) 40%, hsl(var(--opening-ivory)) 100%); }
+  .stm-studio .stm-opening-trust-item { justify-content: flex-start; padding-inline: 16px; }
+}
+@media (min-width: 761px) and (max-width: 1180px) {
+  .stm-studio .stm-opening-trust-grid { max-width: 92%; }
+}
