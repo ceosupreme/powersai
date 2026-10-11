@@ -39,6 +39,35 @@ export function AfterDark() {
     return () => io.disconnect();
   }, []);
 
+  // Chips light from scroll position: each one pops as the scene travels
+  // through the viewport, reversible when scrolling back up. Reduced motion
+  // gets them all lit and still.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const stage = section.querySelector<HTMLElement>(".stm-dark-stage");
+    const chips = Array.from(section.querySelectorAll<HTMLElement>(".stm-dark-chips li"));
+    if (!stage || chips.length === 0) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      chips.forEach((chip) => chip.classList.add("lit"));
+      return;
+    }
+    const THRESHOLDS = [0.2, 0.42, 0.64, 0.86];
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const rect = stage.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const progress = (vh * 0.88 - rect.top) / Math.max(rect.height * 0.95, 1);
+      chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
+  }, []);
+
   return (
     <section ref={sectionRef} id="after-dark" className="stm-dark" aria-labelledby="after-dark-title">
       <div className="stm-dark-stage">
@@ -48,11 +77,11 @@ export function AfterDark() {
         </h2>
         <div className="stm-dark-frame" data-watch>
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
-          <div className="stm-dark-floor" aria-hidden="true" />
         </div>
-        <ul className="stm-dark-chips" data-watch aria-label="Overnight activity">
+        <ul className="stm-dark-chips" aria-label="Overnight activity">
           {RECEIPTS.map((item) => (
             <li key={item.label}>
+              <svg className="stm-dark-trace" aria-hidden="true"><rect pathLength={100} /></svg>
               <span className="stm-dark-chip-ic" aria-hidden="true"><item.icon /></span>
               <span className="stm-dark-chip-tx"><strong>{item.label}</strong><small>{item.time}</small></span>
             </li>

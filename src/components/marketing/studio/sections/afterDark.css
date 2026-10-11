@@ -7,14 +7,13 @@
    reduced motion. */
 .stm-studio .stm-dark{position:relative;overflow:hidden;padding:104px 0 110px;background:hsl(var(--opening-night));color:hsl(var(--opening-ivory))}
 .stm-studio .stm-dark::before{content:"";position:absolute;left:50%;top:46%;width:min(1100px,86vw);height:520px;transform:translate(-50%,-50%);background:radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,.14), transparent 70%);pointer-events:none}
-.stm-studio .stm-dark-stage{position:relative;width:min(92%,1240px);margin:0 auto;container-type:inline-size}
+.stm-studio .stm-dark-stage{position:relative;width:100%;margin:0 auto;container-type:inline-size}
 .stm-studio .stm-dark-frame{position:relative;opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-dark-frame.on{opacity:1;transform:none}
-.stm-studio .stm-dark-frame img{display:block;width:100%;height:auto;border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 1px rgba(249,246,241,.07)}
-.stm-studio .stm-dark-floor{position:absolute;left:50%;bottom:-70px;width:72%;height:120px;transform:translateX(-50%);background:radial-gradient(50% 55% at 50% 38%, rgba(59,130,246,.22), transparent 72%);filter:blur(14px);pointer-events:none}
+.stm-studio .stm-dark-frame img{display:block;width:100%;height:auto}
 
 /* Headline, seated in the render's empty upper-left room */
-.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font:800 4.4cqw/1.1 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
+.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(4.4cqw,76px);line-height:1.1;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
 .stm-studio .stm-dark-title.on{opacity:1;transform:none}
 .stm-studio .stm-dark-title span{display:block}
 .stm-studio .stm-dark-title b{color:#7CBDFF;font-weight:800;text-shadow:0 0 18px rgba(80,160,255,.65),0 2px 18px rgba(0,10,25,.75)}
@@ -22,19 +21,19 @@
 
 /* The receipt chips: glass boxes drawn in code, glow matched to the render */
 .stm-studio .stm-dark-chips{list-style:none;margin:0;padding:0;z-index:2}
-.stm-studio .stm-dark-chips li{position:relative;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:15px;background:linear-gradient(180deg,rgba(11,19,32,.9),rgba(8,14,25,.84));border:1px solid rgba(118,195,255,.5);box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1);backdrop-filter:blur(3px);opacity:0}
-.stm-studio .stm-dark-chips.on li{animation:stmChipPop .8s cubic-bezier(.3,1.35,.5,1) both}
-.stm-studio .stm-dark-chips.on li:nth-child(1){animation-delay:.8s}
-.stm-studio .stm-dark-chips.on li:nth-child(2){animation-delay:1.25s}
-.stm-studio .stm-dark-chips.on li:nth-child(3){animation-delay:1.7s}
-.stm-studio .stm-dark-chips.on li:nth-child(4){animation-delay:2.15s}
-@keyframes stmChipPop{
-  0%{opacity:0;transform:translateY(16px) scale(.86);box-shadow:0 0 0 rgba(70,160,255,0)}
-  55%{opacity:1;transform:translateY(-3px) scale(1.04);box-shadow:0 0 30px rgba(100,185,255,.6),0 0 60px rgba(50,130,240,.3),inset 0 0 14px rgba(90,170,255,.2)}
-  100%{opacity:1;transform:none;box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1)}
-}
+.stm-studio .stm-dark-chips li{position:relative;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:15px;background:linear-gradient(180deg,rgba(11,19,32,.9),rgba(8,14,25,.84));border:1px solid rgba(118,195,255,.5);box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1);backdrop-filter:blur(3px);opacity:0;transform:translateY(18px) scale(.9);transition:opacity .5s cubic-bezier(.3,1.3,.5,1),transform .55s cubic-bezier(.3,1.3,.5,1)}
+.stm-studio .stm-dark-chips li.lit{opacity:1;transform:none}
 .stm-studio .stm-dark-chips li::after{content:"";position:absolute;top:11px;right:12px;width:7px;height:7px;border-radius:50%;background:#F2BD7D;box-shadow:0 0 10px rgba(242,189,125,.9);animation:stmDotPulse 2.6s ease-in-out infinite}
 @keyframes stmDotPulse{50%{opacity:.45}}
+/* The electric hand-off: a gold line laps the chip's border once as it lands */
+.stm-studio .stm-dark-trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.stm-studio .stm-dark-trace rect{x:1px;y:1px;width:calc(100% - 2px);height:calc(100% - 2px);rx:14px;fill:none;stroke:#F6C65A;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:30 70;stroke-dashoffset:100;opacity:0;filter:drop-shadow(0 0 6px rgba(246,198,90,.95)) drop-shadow(0 0 14px rgba(232,161,60,.5))}
+.stm-studio .stm-dark-chips li.lit .stm-dark-trace rect{animation:stmTrace 1.05s linear .3s 1 both}
+@keyframes stmTrace{
+  0%{opacity:1;stroke-dashoffset:100}
+  82%{opacity:1}
+  100%{stroke-dashoffset:0;opacity:0}
+}
 .stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 34%, rgba(120,195,255,.55), rgba(35,80,150,.5) 70%);border:1px solid rgba(140,205,255,.55);box-shadow:0 0 12px rgba(80,160,255,.45);color:#D9EDFF}
 .stm-studio .stm-dark-chip-ic svg{width:18px;height:18px}
 .stm-studio .stm-dark-chip-tx{min-width:0}
@@ -59,11 +58,9 @@
 
 @media (max-width:760px){
   .stm-studio .stm-dark{padding:64px 0 72px}
-  .stm-studio .stm-dark-stage{width:auto;margin:0 12px}
-  .stm-studio .stm-dark-title{position:static;font-size:clamp(30px,8.4vw,40px);text-align:center;margin-bottom:20px}
+  .stm-studio .stm-dark-title{position:static;font-size:clamp(30px,8.4vw,40px);text-align:center;margin:0 14px 20px}
   .stm-studio .stm-dark-title::after{margin:14px auto 0}
-  .stm-studio .stm-dark-frame img{border-radius:14px}
-  .stm-studio .stm-dark-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+  .stm-studio .stm-dark-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 12px 0}
   .stm-studio .stm-dark-chips li{padding:11px 13px}
   .stm-studio .stm-dark-chip-ic{width:34px;height:34px}
   .stm-studio .stm-dark-chip-tx strong{font-size:13.5px;white-space:normal}
@@ -72,6 +69,7 @@
 }
 @media (prefers-reduced-motion: reduce){
   .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy,.stm-studio .stm-dark-title{opacity:1 !important;transform:none !important;transition:none !important}
-  .stm-studio .stm-dark-chips li{opacity:1 !important;animation:none !important}
+  .stm-studio .stm-dark-chips li{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-dark-chips li::after{animation:none !important}
+  .stm-studio .stm-dark-trace rect{animation:none !important;opacity:0 !important}
 }
