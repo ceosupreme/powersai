@@ -34,11 +34,6 @@ import openingTrustPeople from "@/assets/stm-opening/trust-people-black.png.asse
 import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json";
 import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
-import svcReach from "@/assets/stm-opening/services-reach.webp";
-import svcPresence from "@/assets/stm-opening/services-presence.webp";
-import svcImpact from "@/assets/stm-opening/services-impact.webp";
-import svcMomentum from "@/assets/stm-opening/services-momentum.webp";
-import svcScale from "@/assets/stm-opening/services-scale.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 
 /**
@@ -74,46 +69,6 @@ export type StudioMediaSlot = {
 };
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
-  "home-services-reach": {
-    src: svcReach,
-    alt: "Sunset skyline with a rising golden growth curve",
-    aspectRatio: "436 / 228",
-    width: 436,
-    height: 228,
-    objectFit: "contain",
-  },
-  "home-services-presence": {
-    src: svcPresence,
-    alt: "Angled laptop showing a coastal business website",
-    aspectRatio: "344 / 211",
-    width: 344,
-    height: 211,
-    objectFit: "contain",
-  },
-  "home-services-impact": {
-    src: svcImpact,
-    alt: "Camera lens reflecting a golden coastal sunset",
-    aspectRatio: "330 / 208",
-    width: 330,
-    height: 208,
-    objectFit: "contain",
-  },
-  "home-services-momentum": {
-    src: svcMomentum,
-    alt: "Notification cards: new lead, follow up, appointment booked",
-    aspectRatio: "242 / 211",
-    width: 242,
-    height: 211,
-    objectFit: "contain",
-  },
-  "home-services-scale": {
-    src: svcScale,
-    alt: "Flowing light trails connecting leads, follow up, booking and growth",
-    aspectRatio: "368 / 220",
-    width: 368,
-    height: 220,
-    objectFit: "contain",
-  },
   "home-opening-command-center": {
     src: commandCenterDesktop,
     mobileSrc: commandCenterMobile,

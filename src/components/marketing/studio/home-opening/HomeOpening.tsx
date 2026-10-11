@@ -10,22 +10,22 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
 import "./homeOpening.css";
 
-const MACHINE_STATIONS = [
-  { to: "/services/marketing", num: "01", name: "Marketing", ghost: "REACH", media: "home-services-reach", side: "l",
-    benefit: "Create demand. Drive visibility. Turn attention into customers.",
-    items: ["Strategy", "Paid media", "Local SEO", "Content", "Brand growth"], link: "Explore Marketing" },
-  { to: "/services/websites", num: "02", name: "Web Design", ghost: "PRESENCE", media: "home-services-presence", side: "r",
-    benefit: "Turn your online presence into a stronger business asset.",
-    items: ["Modern design", "Mobile first", "SEO foundation", "Conversion focused"], link: "Explore Web Design" },
-  { to: "/services/brand", num: "03", name: "Media & Creative", ghost: "IMPACT", media: "home-services-impact", side: "l",
-    benefit: "Give people something worth noticing and remembering.",
-    items: ["Photo and video", "Content creation", "Brand storytelling", "Social media"], link: "Explore Media & Creative" },
-  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & Customer Systems", ghost: "MOMENTUM", media: "home-services-momentum", side: "r",
-    benefit: "Capture more leads. Follow up faster. Turn conversations into revenue.",
-    items: ["CRM setup", "Lead management", "Booking and appointments", "Reviews"], link: "Explore Sales Systems" },
-  { to: "/services/ai-systems", num: "05", name: "Automation", ghost: "SCALE", media: "home-services-scale", side: "l",
-    benefit: "Take repetitive work off your plate and keep your business moving.",
-    items: ["Workflow automation", "AI assistants", "Missed-call text back", "Email and SMS"], link: "Explore Automation" },
+const SERVICE_INDEX = [
+  { to: "/services/marketing", num: "01", name: "Marketing", slug: "marketing",
+    lead: "Create demand. Drive visibility.", punch: "Turn attention into customers.",
+    items: "Strategy \u00b7 Paid media \u00b7 Local SEO \u00b7 Content", link: "Explore Marketing" },
+  { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design",
+    lead: "Turn your online presence into", punch: "a stronger business asset.",
+    items: "Modern design \u00b7 Mobile first \u00b7 Conversion focused", link: "Explore Web Design" },
+  { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative",
+    lead: "Give people something worth", punch: "noticing and remembering.",
+    items: "Photo and video \u00b7 Content \u00b7 Brand storytelling", link: "Explore Media & Creative" },
+  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm",
+    lead: "Capture more leads. Follow up faster.", punch: "Turn conversations into revenue.",
+    items: "CRM setup \u00b7 Lead management \u00b7 Booking \u00b7 Reviews", link: "Explore Sales Systems" },
+  { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation",
+    lead: "Take repetitive work off your plate and", punch: "keep your business moving.",
+    items: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS", link: "Explore Automation" },
 ] as const;
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -173,80 +173,47 @@ function CredibilityStrip() {
 
 function OpeningServices() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const lwRef = useRef<HTMLDivElement | null>(null);
-  const spineRef = useRef<HTMLDivElement | null>(null);
-  const fillRef = useRef<HTMLDivElement | null>(null);
-  const orbRef = useRef<HTMLDivElement | null>(null);
+  const [live, setLive] = useState(0);
 
   useEffect(() => {
-    const section = sectionRef.current, lw = lwRef.current, spine = spineRef.current, fill = fillRef.current, orb = orbRef.current;
-    if (!section || !lw || !spine || !fill || !orb) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const section = sectionRef.current;
+    if (!section) return;
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("on"); });
-    }, { threshold: 0.28 });
+    }, { threshold: 0.2 });
     section.querySelectorAll("[data-watch]").forEach((el) => io.observe(el));
-    const offTop = (el: HTMLElement, anc: HTMLElement) => {
-      let y = 0; let node: HTMLElement | null = el;
-      while (node && node !== anc) { y += node.offsetTop; node = node.offsetParent as HTMLElement | null; }
-      return y;
-    };
-    let spineTop = 0, spineH = 1;
-    const onScroll = () => {
-      const r = section.getBoundingClientRect();
-      const p = reduce ? 1 : (window.innerHeight * 0.62 - (r.top + spineTop)) / spineH;
-      fill.style.height = `${Math.max(0, Math.min(1, p)) * spineH}px`;
-    };
-    const layout = () => {
-      spineTop = window.innerWidth <= 860 ? offTop(lw, section) : 0;
-      spineH = Math.max(1, offTop(orb, section) + orb.offsetHeight / 2 - spineTop);
-      spine.style.top = `${spineTop}px`; spine.style.height = `${spineH}px`;
-      fill.style.top = `${spineTop}px`;
-      onScroll();
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", layout);
-    if (document.fonts?.ready) document.fonts.ready.then(layout);
-    layout();
-    return () => { io.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", layout); };
+    const io2 = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setLive(Number((entry.target as HTMLElement).dataset.i ?? 0));
+      });
+    }, { rootMargin: "-42% 0px -42% 0px" });
+    section.querySelectorAll(".stm-svc-blk").forEach((el) => io2.observe(el));
+    return () => { io.disconnect(); io2.disconnect(); };
   }, []);
 
-  return <section id="services" ref={sectionRef} className="stm-mach" aria-label="Services">
-    <div className="stm-mach-spine" ref={spineRef} aria-hidden="true" />
-    <div className="stm-mach-fill" ref={fillRef} aria-hidden="true" />
-    <div className="stm-mach-head" data-watch>
-      <div className="stm-mach-rise"><span className="stm-mach-eyebrow">— Services</span></div>
-      <h2><span className="stm-mach-rise"><span>Built to move your</span></span><span className="stm-mach-rise"><span>business <em>forward.</em></span></span></h2>
-      <div className="stm-mach-rise"><span className="stm-mach-sub">Marketing and media solutions applied where your business needs them most.</span></div>
+  return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
+    <div className="stm-svc-head" data-watch>
+      <div className="stm-svc-rise"><span className="stm-svc-eyebrow">— Services</span></div>
+      <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
+      <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions applied where your business needs them most.</span></div>
     </div>
-    <div className="stm-mach-lw" ref={lwRef}>
-      {MACHINE_STATIONS.map((st) => {
-        const media = getStudioMedia(st.media);
-        return <Link key={st.num} to={st.to} className="stm-mach-station" data-watch onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${st.ghost.toLowerCase()}` })}>
-          <span className={`stm-mach-vis ${st.side === "l" ? "gr" : "gl"}`} aria-hidden="true">
-            <span className="stm-mach-ghost">{st.ghost}</span>
-            {media?.src && <img src={media.src} alt="" width={media.width} height={media.height} loading="lazy" />}
-          </span>
-          <span className="stm-mach-dot" aria-hidden="true" />
-          <span className={st.side === "l" ? "stm-mach-bl" : "stm-mach-br"}>
-            <span className="stm-mach-num">{st.num}</span>
-            <span className="stm-mach-name"><span className="stm-mach-rise"><span>{st.name}</span></span></span>
-            <span className="stm-mach-benefit">{st.benefit}</span>
-            <span className="stm-mach-inc">{st.items.map((item, i) => <span key={item} style={{ transitionDelay: `${0.4 + i * 0.08}s` }}>{i > 0 ? " · " : ""}{item}</span>)}</span>
-            <span className="stm-mach-go">{st.link} →</span>
-          </span>
-        </Link>;
-      })}
-      <div className="stm-mach-core" data-watch>
-        <span className="stm-mach-ghostc" aria-hidden="true">GROWTH</span>
-        <div className="stm-mach-orb" ref={orbRef} aria-hidden="true" />
-        <h3>Let&rsquo;s build what&rsquo;s next.</h3>
-        <p>Five systems, one goal. Tell us yours and get a custom plan for your business.</p>
-        <div className="stm-mach-ctas">
-          <Link to="/pricing" className="stm-mach-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
-          <Link to="/free-audit?src=home-services" className="stm-mach-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_free_checkup" })}>Free Business Checkup →</Link>
-        </div>
+    <div className="stm-svc-frame">
+      <div className="stm-svc-names" aria-hidden="true">
+        {SERVICE_INDEX.map((svc, i) => <span key={svc.num} className={`stm-svc-nm${live === i ? " live" : ""}`}><i>{svc.num}</i>{svc.name}</span>)}
       </div>
+      <div className="stm-svc-blocks">
+        {SERVICE_INDEX.map((svc, i) => <Link key={svc.num} to={svc.to} className="stm-svc-blk" data-watch data-i={i}
+          onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
+          <span className="stm-svc-nm-m">{svc.name}</span>
+          <span className="stm-svc-big">{svc.lead} <b>{svc.punch}</b></span>
+          <span className="stm-svc-inc">{svc.items}</span>
+          <span className="stm-svc-go">{svc.link} →</span>
+        </Link>)}
+      </div>
+    </div>
+    <div className="stm-svc-foot" data-watch>
+      <Link to="/pricing" className="stm-svc-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
+      <Link to="/free-audit?src=home-services" className="stm-svc-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_free_checkup" })}>Free Business Checkup →</Link>
     </div>
   </section>;
 }
