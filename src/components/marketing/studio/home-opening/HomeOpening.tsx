@@ -164,7 +164,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
-    <svg className="stm-hero-shore" viewBox="0 0 1440 140" preserveAspectRatio="none" aria-hidden="true"><path d="M0 140 L0 92 C 360 54 820 24 1440 64 L1440 140 Z" /></svg>
+    <svg className="stm-hero-shore" viewBox="0 0 1440 190" preserveAspectRatio="none" aria-hidden="true"><path d="M0 190 L0 132 C 340 76 760 18 1440 72 L1440 190 Z" /></svg>
   </section>;
 }
 

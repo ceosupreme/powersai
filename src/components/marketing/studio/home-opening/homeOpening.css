@@ -294,7 +294,7 @@
 
 /* Hero shore: a gentle ivory arc closes the hero; the trust row lives in flow at the top of services. */
 .stm-studio .stm-command-hero{position:relative}
-.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:140px;pointer-events:none;z-index:4}
+.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:190px;pointer-events:none;z-index:4}
 .stm-studio .stm-hero-shore path{fill:hsl(var(--opening-ivory))}
 .stm-studio .stm-svc-trust{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:34px;width:min(92%,1240px);margin:0 auto 44px;opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-svc-trust.on{opacity:1;transform:none}
@@ -303,16 +303,16 @@
 .stm-studio .stm-svc-trust strong{font:800 17px "Inter Tight",sans-serif;letter-spacing:-.01em;color:#101412}
 .stm-studio .stm-svc-trust small{font:600 11.5px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,18,.55)}
 @media (max-width:760px){
-  .stm-studio .stm-hero-shore{height:64px}
+  .stm-studio .stm-hero-shore{height:84px}
 }
 
 /* Services: eight-card grid menu with the hero's energy continued — washes, serif numerals, and a light thread weaving the cards together. */
 .stm-studio .stm-svc{position:relative;overflow:hidden;padding:96px 0 90px;background:hsl(var(--opening-ivory));color:#101412}
 .stm-studio .stm-svc-wash{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
-.stm-studio .stm-svc-wash.a{width:620px;height:470px;left:-140px;top:-60px;background:rgba(242,189,125,.52)}
+.stm-studio .stm-svc-wash.a{width:620px;height:470px;left:-140px;top:210px;background:rgba(242,189,125,.52)}
 .stm-studio .stm-svc-wash.b{width:680px;height:560px;right:-180px;bottom:40px;background:rgba(79,195,224,.26)}
 .stm-studio .stm-svc-corner{position:absolute;pointer-events:none;color:rgba(151,83,38,.5)}
-.stm-studio .stm-svc-corner.tr{top:-30px;right:-60px;width:300px;transform:rotate(14deg)}
+.stm-studio .stm-svc-corner.tr{top:34px;right:-60px;width:300px;transform:rotate(14deg)}
 .stm-studio .stm-svc-corner.bl{bottom:-40px;left:-70px;width:280px;transform:rotate(195deg);color:rgba(79,195,224,.45)}
 .stm-studio .stm-svc-head{position:relative;width:min(92%,1240px);margin:0 auto;text-align:center}
 .stm-studio .stm-svc-note{position:absolute;top:8px;font:600 12px/1.9 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(16,20,18,.38)}
