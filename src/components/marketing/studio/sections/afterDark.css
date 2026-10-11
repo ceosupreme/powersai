@@ -1,10 +1,10 @@
-/* After Dark: the one-big-message back-end section. Clean-plate night render;
-   headline and the four overnight receipts are live text seated into the
-   render's empty slots. Slot geometry measured from the 1536x1024 image:
-   icon centers x=137/489/841/1193, card band centered at y=74%.
-   Public motion is progressive enhancement: visible by default without
-   IntersectionObserver, in-view animated otherwise, static under reduced
-   motion. On phones the overlay hides and real chips render below. */
+/* After Dark: the one-big-message back-end section. Chip-free night render;
+   the headline AND the four overnight receipt chips are drawn in code, so
+   content is editable and the chips pop in like live events. On desktop the
+   chips sit over the bedding band of the render; on phones the same chips
+   flow under the image. Public motion is progressive enhancement: visible
+   without IntersectionObserver, in-view animated otherwise, static under
+   reduced motion. */
 .stm-studio .stm-dark{position:relative;overflow:hidden;padding:104px 0 110px;background:hsl(var(--opening-night));color:hsl(var(--opening-ivory))}
 .stm-studio .stm-dark::before{content:"";position:absolute;left:50%;top:46%;width:min(1100px,86vw);height:520px;transform:translate(-50%,-50%);background:radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,.14), transparent 70%);pointer-events:none}
 .stm-studio .stm-dark-stage{position:relative;width:min(92%,1240px);margin:0 auto;container-type:inline-size}
@@ -20,29 +20,32 @@
 .stm-studio .stm-dark-title b{color:#7CBDFF;font-weight:800;text-shadow:0 0 18px rgba(80,160,255,.65),0 2px 18px rgba(0,10,25,.75)}
 .stm-studio .stm-dark-title::after{content:"";display:block;width:64px;height:3px;margin-top:1.4cqw;border-radius:3px;background:linear-gradient(90deg,#F6C65A,#E89A2B)}
 
-/* Receipts, seated over the render's four empty slots (desktop) */
-.stm-studio .stm-dark-receipts{position:absolute;inset:0;z-index:2;pointer-events:none}
-.stm-studio .stm-dark-receipt{position:absolute;top:74%;transform:translateY(-50%);width:13%;display:grid;gap:.25cqw;text-align:left;opacity:0;transition:opacity .6s ease}
-.stm-studio .stm-dark-receipt strong{font:700 1.2cqw/1.25 Inter,sans-serif;color:#EAF4FF;text-shadow:0 1px 8px rgba(0,25,55,.85);white-space:nowrap}
-.stm-studio .stm-dark-receipt small{font:500 .95cqw/1.2 Inter,sans-serif;color:rgba(170,205,255,.78);text-shadow:0 1px 8px rgba(0,25,55,.85)}
-.stm-studio .stm-dark-receipt.r1{left:11.4%}
-.stm-studio .stm-dark-receipt.r2{left:34.3%}
-.stm-studio .stm-dark-receipt.r3{left:57.2%}
-.stm-studio .stm-dark-receipt.r4{left:80.1%}
-.stm-studio .stm-dark-frame.on .stm-dark-receipt{opacity:1}
-.stm-studio .stm-dark-frame.on .stm-dark-receipt.r1{transition-delay:.9s}
-.stm-studio .stm-dark-frame.on .stm-dark-receipt.r2{transition-delay:1.3s}
-.stm-studio .stm-dark-frame.on .stm-dark-receipt.r3{transition-delay:1.7s}
-.stm-studio .stm-dark-frame.on .stm-dark-receipt.r4{transition-delay:2.1s}
+/* The receipt chips: glass boxes drawn in code, glow matched to the render */
+.stm-studio .stm-dark-chips{list-style:none;margin:0;padding:0;z-index:2}
+.stm-studio .stm-dark-chips li{position:relative;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:15px;background:linear-gradient(180deg,rgba(11,19,32,.9),rgba(8,14,25,.84));border:1px solid rgba(118,195,255,.5);box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1);backdrop-filter:blur(3px);opacity:0}
+.stm-studio .stm-dark-chips.on li{animation:stmChipPop .8s cubic-bezier(.3,1.35,.5,1) both}
+.stm-studio .stm-dark-chips.on li:nth-child(1){animation-delay:.8s}
+.stm-studio .stm-dark-chips.on li:nth-child(2){animation-delay:1.25s}
+.stm-studio .stm-dark-chips.on li:nth-child(3){animation-delay:1.7s}
+.stm-studio .stm-dark-chips.on li:nth-child(4){animation-delay:2.15s}
+@keyframes stmChipPop{
+  0%{opacity:0;transform:translateY(16px) scale(.86);box-shadow:0 0 0 rgba(70,160,255,0)}
+  55%{opacity:1;transform:translateY(-3px) scale(1.04);box-shadow:0 0 30px rgba(100,185,255,.6),0 0 60px rgba(50,130,240,.3),inset 0 0 14px rgba(90,170,255,.2)}
+  100%{opacity:1;transform:none;box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1)}
+}
+.stm-studio .stm-dark-chips li::after{content:"";position:absolute;top:11px;right:12px;width:7px;height:7px;border-radius:50%;background:#F2BD7D;box-shadow:0 0 10px rgba(242,189,125,.9);animation:stmDotPulse 2.6s ease-in-out infinite}
+@keyframes stmDotPulse{50%{opacity:.45}}
+.stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 34%, rgba(120,195,255,.55), rgba(35,80,150,.5) 70%);border:1px solid rgba(140,205,255,.55);box-shadow:0 0 12px rgba(80,160,255,.45);color:#D9EDFF}
+.stm-studio .stm-dark-chip-ic svg{width:18px;height:18px}
+.stm-studio .stm-dark-chip-tx{min-width:0}
+.stm-studio .stm-dark-chip-tx strong{display:block;font:700 14px/1.25 Inter,sans-serif;color:#EAF4FF;white-space:nowrap}
+.stm-studio .stm-dark-chip-tx small{font:500 11.5px/1.3 Inter,sans-serif;color:rgba(170,205,255,.78)}
 
-/* Mobile chips: the readable version of the receipts under the image */
-.stm-studio .stm-dark-chips{display:none;list-style:none;margin:18px 0 0;padding:0;grid-template-columns:repeat(2,1fr);gap:10px;opacity:0;transition:opacity .6s ease .2s}
-.stm-studio .stm-dark-chips.on{opacity:1}
-.stm-studio .stm-dark-chips li{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:14px;background:rgba(13,20,32,.82);border:1px solid rgba(110,180,255,.35);box-shadow:0 0 18px rgba(50,120,230,.15)}
-.stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(45,95,170,.45);border:1px solid rgba(130,195,255,.5);color:#BFE0FF}
-.stm-studio .stm-dark-chip-ic svg{width:17px;height:17px}
-.stm-studio .stm-dark-chips strong{display:block;font:700 13.5px/1.25 Inter,sans-serif;color:#EAF4FF}
-.stm-studio .stm-dark-chips small{font:500 11px/1.2 Inter,sans-serif;color:rgba(170,205,255,.75)}
+/* Desktop: chips ride the bedding band of the render */
+@media (min-width:761px){
+  .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:73.5%;transform:translateY(-50%);display:flex;gap:2.6%}
+  .stm-studio .stm-dark-chips li{flex:1;min-width:0}
+}
 
 .stm-studio .stm-dark-copy{position:relative;width:min(92%,1240px);margin:44px auto 0;text-align:center;opacity:0;transform:translateY(14px);transition:opacity .7s ease .15s,transform .7s cubic-bezier(.22,1,.36,1) .15s}
 .stm-studio .stm-dark-copy.on{opacity:1;transform:none}
@@ -60,12 +63,15 @@
   .stm-studio .stm-dark-title{position:static;font-size:clamp(30px,8.4vw,40px);text-align:center;margin-bottom:20px}
   .stm-studio .stm-dark-title::after{margin:14px auto 0}
   .stm-studio .stm-dark-frame img{border-radius:14px}
-  .stm-studio .stm-dark-receipts{display:none}
-  .stm-studio .stm-dark-chips{display:grid}
+  .stm-studio .stm-dark-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+  .stm-studio .stm-dark-chips li{padding:11px 13px}
+  .stm-studio .stm-dark-chip-ic{width:34px;height:34px}
+  .stm-studio .stm-dark-chip-tx strong{font-size:13.5px;white-space:normal}
   .stm-studio .stm-dark-copy{margin-top:30px}
   .stm-studio .stm-dark-copy p{font-size:17.5px}
 }
 @media (prefers-reduced-motion: reduce){
-  .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy,.stm-studio .stm-dark-title,.stm-studio .stm-dark-chips,.stm-studio .stm-dark-receipt{opacity:1 !important;transform:none !important;transition:none !important}
-  .stm-studio .stm-dark-receipt{transform:translateY(-50%) !important}
+  .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy,.stm-studio .stm-dark-title{opacity:1 !important;transform:none !important;transition:none !important}
+  .stm-studio .stm-dark-chips li{opacity:1 !important;animation:none !important}
+  .stm-studio .stm-dark-chips li::after{animation:none !important}
 }

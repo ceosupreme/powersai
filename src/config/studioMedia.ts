@@ -81,7 +81,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "home-after-dark": {
     src: afterDark3am,
-    alt: "A business owner asleep at 3:00 AM while his glowing website floats above the bed, with four notification slots lighting up below",
+    alt: "A business owner asleep at 3:00 AM while his glowing website floats above the bed, casting blue light over the room",
     aspectRatio: "1536 / 1024",
     width: 1536,
     height: 1024,

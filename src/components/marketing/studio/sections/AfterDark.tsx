@@ -48,21 +48,13 @@ export function AfterDark() {
         </h2>
         <div className="stm-dark-frame" data-watch>
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
-          <div className="stm-dark-receipts">
-            {RECEIPTS.map((item, index) => (
-              <span key={item.label} className={`stm-dark-receipt r${index + 1}`}>
-                <strong>{item.label}</strong>
-                <small>{item.time}</small>
-              </span>
-            ))}
-          </div>
           <div className="stm-dark-floor" aria-hidden="true" />
         </div>
         <ul className="stm-dark-chips" data-watch aria-label="Overnight activity">
           {RECEIPTS.map((item) => (
             <li key={item.label}>
               <span className="stm-dark-chip-ic" aria-hidden="true"><item.icon /></span>
-              <span><strong>{item.label}</strong><small>{item.time}</small></span>
+              <span className="stm-dark-chip-tx"><strong>{item.label}</strong><small>{item.time}</small></span>
             </li>
           ))}
         </ul>
