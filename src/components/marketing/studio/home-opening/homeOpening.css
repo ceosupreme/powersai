@@ -294,7 +294,7 @@
 
 /* Hero shore: the ivory of the next sections rises into the hero's dark as a soft crest, so the dark-to-light hand-off is a shape, not a line. */
 .stm-studio .stm-command-hero{position:relative}
-.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:92px;pointer-events:none;z-index:6}
+.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:92px;pointer-events:none;z-index:4}
 .stm-studio .stm-hero-shore path{fill:hsl(var(--opening-ivory))}
 @media (max-width:760px){
   .stm-studio .stm-hero-shore{height:46px}
