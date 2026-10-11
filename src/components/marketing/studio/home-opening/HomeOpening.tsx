@@ -12,20 +12,20 @@ import "./homeOpening.css";
 
 const SERVICE_INDEX = [
   { to: "/services/marketing", num: "01", name: "Marketing", slug: "marketing",
-    lead: "Create demand. Drive visibility.", punch: "Turn attention into customers.",
-    items: "Strategy \u00b7 Paid media \u00b7 Local SEO \u00b7 Content", link: "Explore Marketing" },
+    desc: "Create demand. Drive visibility. Turn attention into customers.",
+    items: "Strategy \u00b7 Paid media \u00b7 Local SEO \u00b7 Content" },
   { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design",
-    lead: "Turn your online presence into", punch: "a stronger business asset.",
-    items: "Modern design \u00b7 Mobile first \u00b7 Conversion focused", link: "Explore Web Design" },
+    desc: "Turn your online presence into a stronger business asset.",
+    items: "Modern design \u00b7 Mobile first \u00b7 Conversion focused" },
   { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative",
-    lead: "Give people something worth", punch: "noticing and remembering.",
-    items: "Photo and video \u00b7 Content \u00b7 Brand storytelling", link: "Explore Media & Creative" },
+    desc: "Give people something worth noticing and remembering.",
+    items: "Photo and video \u00b7 Content \u00b7 Brand storytelling" },
   { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm",
-    lead: "Capture more leads. Follow up faster.", punch: "Turn conversations into revenue.",
-    items: "CRM setup \u00b7 Lead management \u00b7 Booking \u00b7 Reviews", link: "Explore Sales Systems" },
+    desc: "Capture more leads. Follow up faster. Turn conversations into revenue.",
+    items: "CRM setup \u00b7 Lead management \u00b7 Booking \u00b7 Reviews" },
   { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation",
-    lead: "Take repetitive work off your plate and", punch: "keep your business moving.",
-    items: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS", link: "Explore Automation" },
+    desc: "Take repetitive work off your plate. Keep your business moving.",
+    items: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS" },
 ] as const;
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -173,44 +173,37 @@ function CredibilityStrip() {
 
 function OpeningServices() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const [live, setLive] = useState(0);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("on"); });
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) { entry.target.classList.add("on"); io.unobserve(entry.target); }
+      });
     }, { threshold: 0.2 });
     section.querySelectorAll("[data-watch]").forEach((el) => io.observe(el));
-    const io2 = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setLive(Number((entry.target as HTMLElement).dataset.i ?? 0));
-      });
-    }, { rootMargin: "-42% 0px -42% 0px" });
-    section.querySelectorAll(".stm-svc-blk").forEach((el) => io2.observe(el));
-    return () => { io.disconnect(); io2.disconnect(); };
+    return () => io.disconnect();
   }, []);
 
   return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
     <div className="stm-svc-head" data-watch>
       <div className="stm-svc-rise"><span className="stm-svc-eyebrow">— Services</span></div>
       <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
-      <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions applied where your business needs them most.</span></div>
+      <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions. Pick where your business needs them most.</span></div>
     </div>
-    <div className="stm-svc-frame">
-      <div className="stm-svc-names" aria-hidden="true">
-        {SERVICE_INDEX.map((svc, i) => <span key={svc.num} className={`stm-svc-nm${live === i ? " live" : ""}`}><i>{svc.num}</i>{svc.name}</span>)}
-      </div>
-      <div className="stm-svc-blocks">
-        {SERVICE_INDEX.map((svc, i) => <Link key={svc.num} to={svc.to} className="stm-svc-blk" data-watch data-i={i}
-          onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
-          <span className="stm-svc-nm-m">{svc.name}</span>
-          <span className="stm-svc-big">{svc.lead} <b>{svc.punch}</b></span>
-          <span className="stm-svc-inc">{svc.items}</span>
-          <span className="stm-svc-go">{svc.link} →</span>
-        </Link>)}
-      </div>
-    </div>
+    <nav className="stm-svc-menu" aria-label="Service menu">
+      {SERVICE_INDEX.map((svc) => <Link key={svc.num} to={svc.to} className="stm-svc-row" data-watch
+        onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
+        <span className="stm-svc-num" aria-hidden="true">{svc.num}</span>
+        <span className="stm-svc-main">
+          <span className="stm-svc-name">{svc.name}</span>
+          <span className="stm-svc-desc">{svc.desc}</span>
+          <span className="stm-svc-tags">{svc.items}</span>
+        </span>
+        <span className="stm-svc-arrow" aria-hidden="true"><ArrowRight /></span>
+      </Link>)}
+    </nav>
     <div className="stm-svc-foot" data-watch>
       <Link to="/pricing" className="stm-svc-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
       <Link to="/free-audit?src=home-services" className="stm-svc-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_free_checkup" })}>Free Business Checkup →</Link>
