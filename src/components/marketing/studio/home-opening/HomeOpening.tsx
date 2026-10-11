@@ -12,20 +12,15 @@ import "./homeOpening.css";
 
 const SERVICE_INDEX = [
   { to: "/services/marketing", num: "01", name: "Marketing", slug: "marketing",
-    desc: "Create demand. Drive visibility. Turn attention into customers.",
-    items: "Strategy \u00b7 Paid media \u00b7 Local SEO \u00b7 Content" },
+    subs: "Marketing strategy \u00b7 Paid ads \u00b7 Local SEO \u00b7 Social content \u00b7 Landing pages" },
   { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design",
-    desc: "Turn your online presence into a stronger business asset.",
-    items: "Modern design \u00b7 Mobile first \u00b7 Conversion focused" },
+    subs: "Business websites \u00b7 Site redesigns \u00b7 Mobile-first design \u00b7 Conversion-focused pages \u00b7 Hosting and care plans" },
   { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative",
-    desc: "Give people something worth noticing and remembering.",
-    items: "Photo and video \u00b7 Content \u00b7 Brand storytelling" },
+    subs: "Logo and identity \u00b7 Brand messaging \u00b7 Copywriting \u00b7 Photo and video \u00b7 Social templates \u00b7 Print, signage and menus" },
   { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm",
-    desc: "Capture more leads. Follow up faster. Turn conversations into revenue.",
-    items: "CRM setup \u00b7 Lead management \u00b7 Booking \u00b7 Reviews" },
+    subs: "CRM setup \u00b7 Lead management \u00b7 Online booking \u00b7 Review requests \u00b7 Follow-up sequences \u00b7 Owner reports" },
   { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation",
-    desc: "Take repetitive work off your plate. Keep your business moving.",
-    items: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS" },
+    subs: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS automation \u00b7 Appointment reminders \u00b7 Tool integrations \u00b7 Custom systems" },
 ] as const;
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -198,8 +193,7 @@ function OpeningServices() {
         <span className="stm-svc-num" aria-hidden="true">{svc.num}</span>
         <span className="stm-svc-main">
           <span className="stm-svc-name">{svc.name}</span>
-          <span className="stm-svc-desc">{svc.desc}</span>
-          <span className="stm-svc-tags">{svc.items}</span>
+          <span className="stm-svc-subs">{svc.subs}</span>
         </span>
         <span className="stm-svc-arrow" aria-hidden="true"><ArrowRight /></span>
       </Link>)}
