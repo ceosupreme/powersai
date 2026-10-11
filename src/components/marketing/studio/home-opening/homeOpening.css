@@ -305,11 +305,7 @@
 .stm-studio .stm-svc-grid{width:min(92%,1240px);margin:48px auto 0;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .stm-studio .stm-svc-card{position:relative;display:flex;flex-direction:column;gap:22px;padding:30px 32px 26px;border:1px solid rgba(16,20,18,.15);border-radius:18px;background:rgba(255,255,255,.55);text-decoration:none;color:#101412;opacity:0;transform:translateY(14px);transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease,transform .3s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-svc-card.on{opacity:1;transform:none;animation:stm-svc-card-in .6s cubic-bezier(.22,1,.36,1) backwards}
-.stm-studio .stm-svc-card.on:nth-child(2){animation-delay:.07s}
-.stm-studio .stm-svc-card.on:nth-child(3){animation-delay:.14s}
-.stm-studio .stm-svc-card.on:nth-child(4){animation-delay:.21s}
-.stm-studio .stm-svc-card.on:nth-child(5){animation-delay:.28s}
-.stm-studio .stm-svc-card.on:nth-child(6){animation-delay:.35s}
+.stm-studio .stm-svc-card.on:nth-child(even){animation-delay:.09s}
 @keyframes stm-svc-card-in{from{opacity:0;transform:translateY(14px)}}
 .stm-studio .stm-svc-cnum{position:absolute;top:26px;right:28px;font:700 14px/1 Inter,sans-serif;letter-spacing:.14em;color:rgba(151,83,38,.7)}
 .stm-studio .stm-svc-ctop{display:flex;align-items:center;gap:16px;padding-right:48px}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, BookOpen, ChevronDown, Cog, Globe, Mail, Megaphone, Menu, Play, Users, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, Cog, Database, Globe, Handshake, Mail, Megaphone, Menu, PenTool, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
@@ -17,16 +17,22 @@ const SERVICE_INDEX = [
   { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design", icon: Globe,
     line: "Turn your online presence into a business asset.",
     subs: ["Business websites", "Landing pages", "Site redesigns", "Mobile-first design", "Conversion-focused pages", "Hosting and care plans"] },
-  { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative", icon: Play,
+  { to: "/services/brand", num: "03", name: "Media", slug: "media", icon: Play,
     line: "Give people something worth remembering.",
-    subs: ["Logo and identity", "Brand messaging", "Copywriting", "Photo and video", "Social templates", "Print, signage and menus"] },
-  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm", icon: Users,
+    subs: ["Photography", "Video production", "Content creation", "Social content", "Brand storytelling"] },
+  { to: "/services/brand", num: "04", name: "Brand", slug: "brand", icon: PenTool,
+    line: "Make the quality of your business obvious.",
+    subs: ["Logo and identity", "Naming", "Brand messaging", "Copywriting", "Typography and color", "Print, signage and menus"] },
+  { to: "/services/ai-systems?intent=sales", num: "05", name: "Sales", slug: "sales", icon: Handshake,
     line: "Turn conversations into revenue.",
-    subs: ["CRM setup", "Lead management", "Online booking", "Review requests", "Follow-up sequences", "Owner reports"] },
-  { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation", icon: Cog,
+    subs: ["Lead capture", "Inquiry handling", "Online booking", "Follow-up sequences", "Review requests"] },
+  { to: "/services/ai-systems?intent=sales", num: "06", name: "CRM", slug: "crm", icon: Database,
+    line: "Every lead and customer in one clear view.",
+    subs: ["CRM setup", "Lead management", "Customer records", "Pipeline tracking", "Owner reports"] },
+  { to: "/services/ai-systems", num: "07", name: "Automation", slug: "automation", icon: Cog,
     line: "Take repetitive work off your plate.",
     subs: ["AI assistants", "Missed-call text back", "Email and SMS automation", "Appointment reminders", "Tool integrations", "Custom systems"] },
-  { to: "/publishing", num: "06", name: "Publishing", slug: "publishing", icon: BookOpen,
+  { to: "/publishing", num: "08", name: "Publishing", slug: "publishing", icon: BookOpen,
     line: "Take finished work all the way to release.",
     subs: ["Book covers", "Print and ebook formatting", "Listing copy and keywords", "Product pages", "Launch graphics and emails", "Publishing account setup"] },
 ] as const;
