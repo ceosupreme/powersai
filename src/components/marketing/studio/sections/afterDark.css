@@ -13,7 +13,7 @@
 .stm-studio .stm-dark-frame img{display:block;width:100%;height:auto}
 
 /* Headline, seated in the render's empty upper-left room */
-.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(4.4cqw,76px);line-height:1.1;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
+.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(3.8cqw,60px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
 .stm-studio .stm-dark-title.on{opacity:1;transform:none}
 .stm-studio .stm-dark-title span{display:block}
 .stm-studio .stm-dark-title b{color:#7CBDFF;font-weight:800;text-shadow:0 0 18px rgba(80,160,255,.65),0 2px 18px rgba(0,10,25,.75)}
@@ -21,7 +21,7 @@
 
 /* The receipt chips: glass boxes drawn in code, glow matched to the render */
 .stm-studio .stm-dark-chips{list-style:none;margin:0;padding:0;z-index:2}
-.stm-studio .stm-dark-chips li{position:relative;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:15px;background:linear-gradient(180deg,rgba(11,19,32,.9),rgba(8,14,25,.84));border:1px solid rgba(118,195,255,.5);box-shadow:0 0 14px rgba(70,160,255,.3),0 0 36px rgba(40,120,230,.16),inset 0 0 12px rgba(80,160,255,.1);backdrop-filter:blur(3px);opacity:0;transform:translateY(18px) scale(.9);transition:opacity .5s cubic-bezier(.3,1.3,.5,1),transform .55s cubic-bezier(.3,1.3,.5,1)}
+.stm-studio .stm-dark-chips li{position:relative;display:flex;align-items:center;gap:12px;padding:17px 17px;border-radius:16px;background:linear-gradient(180deg,rgba(11,19,32,.9),rgba(8,14,25,.84));border:1.5px solid rgba(140,210,255,.85);box-shadow:0 0 18px rgba(80,170,255,.5),0 0 46px rgba(45,130,240,.26),inset 0 0 14px rgba(90,170,255,.16);backdrop-filter:blur(3px);opacity:0;transform:translateY(18px) scale(.9);transition:opacity .5s cubic-bezier(.3,1.3,.5,1),transform .55s cubic-bezier(.3,1.3,.5,1)}
 .stm-studio .stm-dark-chips li.lit{opacity:1;transform:none}
 .stm-studio .stm-dark-chips li::after{content:"";position:absolute;top:11px;right:12px;width:7px;height:7px;border-radius:50%;background:#F2BD7D;box-shadow:0 0 10px rgba(242,189,125,.9);animation:stmDotPulse 2.6s ease-in-out infinite}
 @keyframes stmDotPulse{50%{opacity:.45}}
@@ -35,7 +35,7 @@
   88%{opacity:1}
   100%{stroke-dashoffset:0;opacity:0}
 }
-.stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 34%, rgba(120,195,255,.55), rgba(35,80,150,.5) 70%);border:1px solid rgba(140,205,255,.55);box-shadow:0 0 12px rgba(80,160,255,.45);color:#D9EDFF}
+.stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 34%, rgba(120,195,255,.55), rgba(35,80,150,.5) 70%);border:1px solid rgba(140,205,255,.55);box-shadow:0 0 12px rgba(80,160,255,.45);color:#D9EDFF}
 .stm-studio .stm-dark-chip-ic svg{width:18px;height:18px}
 .stm-studio .stm-dark-chip-tx{min-width:0}
 .stm-studio .stm-dark-chip-tx strong{display:block;font:700 14px/1.25 Inter,sans-serif;color:#EAF4FF;white-space:nowrap}
@@ -43,7 +43,7 @@
 
 /* Desktop: chips ride the bedding band of the render */
 @media (min-width:761px){
-  .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:73.5%;transform:translateY(-50%);display:flex;gap:2.6%}
+  .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:82%;transform:translateY(-50%);display:flex;gap:2.6%}
   .stm-studio .stm-dark-chips li{flex:1;min-width:0}
 }
 
@@ -62,8 +62,8 @@
   .stm-studio .stm-dark-title{position:static;font-size:clamp(30px,8.4vw,40px);text-align:center;margin:0 14px 20px}
   .stm-studio .stm-dark-title::after{margin:14px auto 0}
   .stm-studio .stm-dark-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 12px 0}
-  .stm-studio .stm-dark-chips li{padding:11px 13px}
-  .stm-studio .stm-dark-chip-ic{width:34px;height:34px}
+  .stm-studio .stm-dark-chips li{padding:14px 14px}
+  .stm-studio .stm-dark-chip-ic{width:36px;height:36px}
   .stm-studio .stm-dark-chip-tx strong{font-size:13.5px;white-space:normal}
   .stm-studio .stm-dark-copy{margin-top:30px}
   .stm-studio .stm-dark-copy p{font-size:17.5px}

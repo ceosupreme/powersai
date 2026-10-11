@@ -75,8 +75,8 @@ export function AfterDark() {
     <section ref={sectionRef} id="after-dark" className="stm-dark" aria-labelledby="after-dark-title">
       <div className="stm-dark-stage">
         <h2 id="after-dark-title" className="stm-dark-title" data-watch>
-          <span>A website that</span>
-          <span><b>works</b> while you sleep.</span>
+          <span>We build websites that</span>
+          <span><b>work</b> while you sleep.</span>
         </h2>
         <div className="stm-dark-frame" data-watch>
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
