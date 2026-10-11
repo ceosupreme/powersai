@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, ChevronDown, Cog, Globe, Mail, Megaphone, Menu, Play, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, Cog, Globe, Mail, Megaphone, Menu, Play, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
@@ -11,16 +11,24 @@ import { sanitizeBiz } from "@/pages/VerticalLanding";
 import "./homeOpening.css";
 
 const SERVICE_INDEX = [
-  { to: "/services/marketing", num: "01", name: "Marketing", slug: "marketing",
-    subs: "Marketing strategy \u00b7 Paid ads \u00b7 Local SEO \u00b7 Social content \u00b7 Landing pages" },
-  { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design",
-    subs: "Business websites \u00b7 Site redesigns \u00b7 Mobile-first design \u00b7 Conversion-focused pages \u00b7 Hosting and care plans" },
-  { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative",
-    subs: "Logo and identity \u00b7 Brand messaging \u00b7 Copywriting \u00b7 Photo and video \u00b7 Social templates \u00b7 Print, signage and menus" },
-  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm",
-    subs: "CRM setup \u00b7 Lead management \u00b7 Online booking \u00b7 Review requests \u00b7 Follow-up sequences \u00b7 Owner reports" },
-  { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation",
-    subs: "AI assistants \u00b7 Missed-call text back \u00b7 Email and SMS automation \u00b7 Appointment reminders \u00b7 Tool integrations \u00b7 Custom systems" },
+  { to: "/services/marketing", num: "01", name: "Marketing", slug: "marketing", icon: Megaphone,
+    line: "Create demand. Turn attention into customers.",
+    subs: ["Marketing strategy", "Paid ads", "Local SEO", "Google Business Profile", "Social media content", "Performance reporting"] },
+  { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design", icon: Globe,
+    line: "Turn your online presence into a business asset.",
+    subs: ["Business websites", "Landing pages", "Site redesigns", "Mobile-first design", "Conversion-focused pages", "Hosting and care plans"] },
+  { to: "/services/brand", num: "03", name: "Media & Creative", slug: "media_creative", icon: Play,
+    line: "Give people something worth remembering.",
+    subs: ["Logo and identity", "Brand messaging", "Copywriting", "Photo and video", "Social templates", "Print, signage and menus"] },
+  { to: "/services/ai-systems?intent=sales", num: "04", name: "Sales & CRM", slug: "sales_crm", icon: Users,
+    line: "Turn conversations into revenue.",
+    subs: ["CRM setup", "Lead management", "Online booking", "Review requests", "Follow-up sequences", "Owner reports"] },
+  { to: "/services/ai-systems", num: "05", name: "Automation", slug: "automation", icon: Cog,
+    line: "Take repetitive work off your plate.",
+    subs: ["AI assistants", "Missed-call text back", "Email and SMS automation", "Appointment reminders", "Tool integrations", "Custom systems"] },
+  { to: "/publishing", num: "06", name: "Publishing", slug: "publishing", icon: BookOpen,
+    line: "Take finished work all the way to release.",
+    subs: ["Book covers", "Print and ebook formatting", "Listing copy and keywords", "Product pages", "Launch graphics and emails", "Publishing account setup"] },
 ] as const;
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -187,15 +195,21 @@ function OpeningServices() {
       <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
       <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions. Pick where your business needs them most.</span></div>
     </div>
-    <nav className="stm-svc-menu" aria-label="Service menu">
-      {SERVICE_INDEX.map((svc) => <Link key={svc.num} to={svc.to} className="stm-svc-row" data-watch
+    <nav className="stm-svc-grid" aria-label="Service menu">
+      {SERVICE_INDEX.map((svc) => <Link key={svc.num} to={svc.to} className="stm-svc-card" data-watch
         onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
-        <span className="stm-svc-num" aria-hidden="true">{svc.num}</span>
-        <span className="stm-svc-main">
-          <span className="stm-svc-name">{svc.name}</span>
-          <span className="stm-svc-subs">{svc.subs}</span>
+        <span className="stm-svc-cnum" aria-hidden="true">{svc.num}</span>
+        <span className="stm-svc-ctop">
+          <span className="stm-svc-chip" aria-hidden="true"><svc.icon /></span>
+          <span className="stm-svc-ctitle">
+            <span className="stm-svc-cname">{svc.name}</span>
+            <span className="stm-svc-cline">{svc.line}</span>
+          </span>
         </span>
-        <span className="stm-svc-arrow" aria-hidden="true"><ArrowRight /></span>
+        <span className="stm-svc-clist">
+          {svc.subs.map((item) => <span key={item}>{item}</span>)}
+        </span>
+        <span className="stm-svc-cgo">Explore {svc.name} <ArrowRight aria-hidden /></span>
       </Link>)}
     </nav>
     <div className="stm-svc-foot" data-watch>
