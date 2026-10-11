@@ -1,15 +1,49 @@
-/* After Dark: the one-big-message back-end section. Night room, the 3 AM
-   render as the whole story, one line of copy and two doors out.
-   Public motion is progressive enhancement: visible by default when
-   IntersectionObserver is absent, in-view animated otherwise, static under
-   reduced motion. */
+/* After Dark: the one-big-message back-end section. Clean-plate night render;
+   headline and the four overnight receipts are live text seated into the
+   render's empty slots. Slot geometry measured from the 1536x1024 image:
+   icon centers x=137/489/841/1193, card band centered at y=74%.
+   Public motion is progressive enhancement: visible by default without
+   IntersectionObserver, in-view animated otherwise, static under reduced
+   motion. On phones the overlay hides and real chips render below. */
 .stm-studio .stm-dark{position:relative;overflow:hidden;padding:104px 0 110px;background:hsl(var(--opening-night));color:hsl(var(--opening-ivory))}
 .stm-studio .stm-dark::before{content:"";position:absolute;left:50%;top:46%;width:min(1100px,86vw);height:520px;transform:translate(-50%,-50%);background:radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,.14), transparent 70%);pointer-events:none}
-.stm-studio .stm-dark-srtitle{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.stm-studio .stm-dark-frame{position:relative;width:min(92%,1240px);margin:0 auto;opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.stm-studio .stm-dark-stage{position:relative;width:min(92%,1240px);margin:0 auto;container-type:inline-size}
+.stm-studio .stm-dark-frame{position:relative;opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-dark-frame.on{opacity:1;transform:none}
 .stm-studio .stm-dark-frame img{display:block;width:100%;height:auto;border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 1px rgba(249,246,241,.07)}
 .stm-studio .stm-dark-floor{position:absolute;left:50%;bottom:-70px;width:72%;height:120px;transform:translateX(-50%);background:radial-gradient(50% 55% at 50% 38%, rgba(59,130,246,.22), transparent 72%);filter:blur(14px);pointer-events:none}
+
+/* Headline, seated in the render's empty upper-left room */
+.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font:800 4.4cqw/1.1 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
+.stm-studio .stm-dark-title.on{opacity:1;transform:none}
+.stm-studio .stm-dark-title span{display:block}
+.stm-studio .stm-dark-title b{color:#7CBDFF;font-weight:800;text-shadow:0 0 18px rgba(80,160,255,.65),0 2px 18px rgba(0,10,25,.75)}
+.stm-studio .stm-dark-title::after{content:"";display:block;width:64px;height:3px;margin-top:1.4cqw;border-radius:3px;background:linear-gradient(90deg,#F6C65A,#E89A2B)}
+
+/* Receipts, seated over the render's four empty slots (desktop) */
+.stm-studio .stm-dark-receipts{position:absolute;inset:0;z-index:2;pointer-events:none}
+.stm-studio .stm-dark-receipt{position:absolute;top:74%;transform:translateY(-50%);width:13%;display:grid;gap:.25cqw;text-align:left;opacity:0;transition:opacity .6s ease}
+.stm-studio .stm-dark-receipt strong{font:700 1.2cqw/1.25 Inter,sans-serif;color:#EAF4FF;text-shadow:0 1px 8px rgba(0,25,55,.85);white-space:nowrap}
+.stm-studio .stm-dark-receipt small{font:500 .95cqw/1.2 Inter,sans-serif;color:rgba(170,205,255,.78);text-shadow:0 1px 8px rgba(0,25,55,.85)}
+.stm-studio .stm-dark-receipt.r1{left:11.4%}
+.stm-studio .stm-dark-receipt.r2{left:34.3%}
+.stm-studio .stm-dark-receipt.r3{left:57.2%}
+.stm-studio .stm-dark-receipt.r4{left:80.1%}
+.stm-studio .stm-dark-frame.on .stm-dark-receipt{opacity:1}
+.stm-studio .stm-dark-frame.on .stm-dark-receipt.r1{transition-delay:.9s}
+.stm-studio .stm-dark-frame.on .stm-dark-receipt.r2{transition-delay:1.3s}
+.stm-studio .stm-dark-frame.on .stm-dark-receipt.r3{transition-delay:1.7s}
+.stm-studio .stm-dark-frame.on .stm-dark-receipt.r4{transition-delay:2.1s}
+
+/* Mobile chips: the readable version of the receipts under the image */
+.stm-studio .stm-dark-chips{display:none;list-style:none;margin:18px 0 0;padding:0;grid-template-columns:repeat(2,1fr);gap:10px;opacity:0;transition:opacity .6s ease .2s}
+.stm-studio .stm-dark-chips.on{opacity:1}
+.stm-studio .stm-dark-chips li{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:14px;background:rgba(13,20,32,.82);border:1px solid rgba(110,180,255,.35);box-shadow:0 0 18px rgba(50,120,230,.15)}
+.stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(45,95,170,.45);border:1px solid rgba(130,195,255,.5);color:#BFE0FF}
+.stm-studio .stm-dark-chip-ic svg{width:17px;height:17px}
+.stm-studio .stm-dark-chips strong{display:block;font:700 13.5px/1.25 Inter,sans-serif;color:#EAF4FF}
+.stm-studio .stm-dark-chips small{font:500 11px/1.2 Inter,sans-serif;color:rgba(170,205,255,.75)}
+
 .stm-studio .stm-dark-copy{position:relative;width:min(92%,1240px);margin:44px auto 0;text-align:center;opacity:0;transform:translateY(14px);transition:opacity .7s ease .15s,transform .7s cubic-bezier(.22,1,.36,1) .15s}
 .stm-studio .stm-dark-copy.on{opacity:1;transform:none}
 .stm-studio .stm-dark-copy p{margin:0 auto;max-width:52ch;font-size:clamp(19px,1.6vw,23px);line-height:1.55;color:hsl(var(--opening-ivory) / .86)}
@@ -19,13 +53,19 @@
 .stm-studio .stm-dark-btn.gold{background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;box-shadow:0 10px 26px rgba(232,154,43,.3)}
 .stm-studio .stm-dark-btn.wine{background:#5E1F2E;color:#F9F6F1;border:1px solid #8C2F43}
 .stm-studio .stm-dark-btn.wine:hover{background:#8C2F43}
+
 @media (max-width:760px){
   .stm-studio .stm-dark{padding:64px 0 72px}
-  .stm-studio .stm-dark-frame{width:auto;margin:0 12px}
+  .stm-studio .stm-dark-stage{width:auto;margin:0 12px}
+  .stm-studio .stm-dark-title{position:static;font-size:clamp(30px,8.4vw,40px);text-align:center;margin-bottom:20px}
+  .stm-studio .stm-dark-title::after{margin:14px auto 0}
   .stm-studio .stm-dark-frame img{border-radius:14px}
+  .stm-studio .stm-dark-receipts{display:none}
+  .stm-studio .stm-dark-chips{display:grid}
   .stm-studio .stm-dark-copy{margin-top:30px}
   .stm-studio .stm-dark-copy p{font-size:17.5px}
 }
 @media (prefers-reduced-motion: reduce){
-  .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy{opacity:1 !important;transform:none !important;transition:none !important}
+  .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy,.stm-studio .stm-dark-title,.stm-studio .stm-dark-chips,.stm-studio .stm-dark-receipt{opacity:1 !important;transform:none !important;transition:none !important}
+  .stm-studio .stm-dark-receipt{transform:translateY(-50%) !important}
 }

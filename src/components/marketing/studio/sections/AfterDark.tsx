@@ -1,15 +1,24 @@
 import { useEffect, useRef } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarDays, MessageSquare, Send, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import "./afterDark.css";
 
 /**
- * The back-end section: one big simple message. The 3 AM render carries the
- * headline and the overnight receipts; the copy below it names the systems
- * and routes to them. Media swaps via the "home-after-dark" studioMedia entry.
+ * The back-end section: one big simple message. The clean-plate 3 AM render
+ * carries the scene; headline and the four overnight receipts are live text
+ * seated into the render's empty slots (measured from the image pixels), so
+ * copy stays crisp and editable. On phones the receipts become real chips
+ * under the image. Media swaps via the "home-after-dark" studioMedia entry.
  */
+const RECEIPTS = [
+  { label: "Lead captured", time: "Just now", icon: UserRound },
+  { label: "Appointment booked", time: "12 minutes ago", icon: CalendarDays },
+  { label: "Follow-up sent", time: "28 minutes ago", icon: Send },
+  { label: "Inquiry received", time: "1 hour ago", icon: MessageSquare },
+] as const;
+
 export function AfterDark() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const art = getStudioMedia("home-after-dark");
@@ -32,10 +41,31 @@ export function AfterDark() {
 
   return (
     <section ref={sectionRef} id="after-dark" className="stm-dark" aria-labelledby="after-dark-title">
-      <h2 id="after-dark-title" className="stm-dark-srtitle">A website that works while you sleep.</h2>
-      <div className="stm-dark-frame" data-watch>
-        {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
-        <div className="stm-dark-floor" aria-hidden="true" />
+      <div className="stm-dark-stage">
+        <h2 id="after-dark-title" className="stm-dark-title" data-watch>
+          <span>A website that</span>
+          <span><b>works</b> while you sleep.</span>
+        </h2>
+        <div className="stm-dark-frame" data-watch>
+          {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
+          <div className="stm-dark-receipts">
+            {RECEIPTS.map((item, index) => (
+              <span key={item.label} className={`stm-dark-receipt r${index + 1}`}>
+                <strong>{item.label}</strong>
+                <small>{item.time}</small>
+              </span>
+            ))}
+          </div>
+          <div className="stm-dark-floor" aria-hidden="true" />
+        </div>
+        <ul className="stm-dark-chips" data-watch aria-label="Overnight activity">
+          {RECEIPTS.map((item) => (
+            <li key={item.label}>
+              <span className="stm-dark-chip-ic" aria-hidden="true"><item.icon /></span>
+              <span><strong>{item.label}</strong><small>{item.time}</small></span>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="stm-dark-copy" data-watch>
         <p>The systems behind your site answer calls, reply to leads and book jobs around the clock.</p>
