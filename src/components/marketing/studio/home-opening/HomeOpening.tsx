@@ -263,7 +263,7 @@ function OpeningServices() {
   }, []);
 
   return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
-    <svg className="stm-svc-cap" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 H1440 V38 C 1150 52 900 64 700 96 C 500 128 300 148 0 112 Z" /></svg>
+    <div className="stm-svc-fade" aria-hidden="true" />
     <div className="stm-svc-wash a" aria-hidden="true" />
     <div className="stm-svc-wash b" aria-hidden="true" />
     <svg className="stm-svc-corner tr" viewBox="0 0 300 180" fill="none" stroke="currentColor" aria-hidden="true">

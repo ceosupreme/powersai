@@ -292,23 +292,23 @@
 }
 
 
-/* Seam: the hero's dark flows down into services as a cap inside the section, so the two sections meet dark against dark and no line can read. */
-.stm-studio .stm-svc-cap{position:absolute;top:0;left:0;right:0;width:100%;height:160px;pointer-events:none;z-index:1}
-.stm-studio .stm-svc-cap path{fill:hsl(var(--opening-night))}
+/* Seam: double dissolve. The hero photo is masked out into solid night before its crop edge can show, and night melts into ivory inside services. No shapes, no edges, nothing that can render as a line. */
+.stm-studio .stm-command-background img{-webkit-mask-image:linear-gradient(180deg,#000 84%,transparent 99%);mask-image:linear-gradient(180deg,#000 84%,transparent 99%)}
+.stm-studio .stm-svc-fade{position:absolute;top:0;left:0;right:0;height:210px;pointer-events:none;z-index:1;background:linear-gradient(180deg,hsl(var(--opening-night)) 0%,hsl(var(--opening-night)) 16%,hsl(var(--opening-night) / 0) 100%)}
 .stm-studio .stm-svc-proofline{position:relative;z-index:2;width:min(92%,1240px);margin:56px auto 0;text-align:center;font:600 12.5px/2 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,18,.55);opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-svc-proofline.on{opacity:1;transform:none}
 @media (max-width:760px){
-  .stm-studio .stm-svc-cap{height:92px}
+  .stm-studio .stm-svc-fade{height:132px}
   .stm-studio .stm-svc-proofline{font-size:11px;letter-spacing:.08em;margin-top:40px}
 }
 
 /* Services: eight-card grid menu with the hero's energy continued — washes, serif numerals, and a light thread weaving the cards together. */
-.stm-studio .stm-svc{position:relative;overflow:hidden;margin-top:-2px;padding:170px 0 90px;background:hsl(var(--opening-ivory));color:#101412}
+.stm-studio .stm-svc{position:relative;overflow:hidden;margin-top:-2px;padding:230px 0 90px;background:hsl(var(--opening-ivory));color:#101412}
 .stm-studio .stm-svc-wash{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
 .stm-studio .stm-svc-wash.a{width:620px;height:470px;left:-140px;top:210px;background:rgba(242,189,125,.52)}
 .stm-studio .stm-svc-wash.b{width:680px;height:560px;right:-180px;bottom:40px;background:rgba(79,195,224,.26)}
 .stm-studio .stm-svc-corner{position:absolute;pointer-events:none;color:rgba(151,83,38,.5)}
-.stm-studio .stm-svc-corner.tr{top:70px;right:-60px;width:300px;transform:rotate(14deg)}
+.stm-studio .stm-svc-corner.tr{top:250px;right:-60px;width:300px;transform:rotate(14deg)}
 .stm-studio .stm-svc-corner.bl{bottom:-40px;left:-70px;width:280px;transform:rotate(195deg);color:rgba(79,195,224,.45)}
 .stm-studio .stm-svc-head{position:relative;width:min(92%,1240px);margin:0 auto;text-align:center}
 .stm-studio .stm-svc-note{position:absolute;top:8px;font:600 12px/1.9 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(16,20,18,.38)}
@@ -377,7 +377,7 @@
 .stm-studio .stm-svc-btn.wine{background:#5E1F2E;color:#F9F6F1;border:1px solid #8C2F43}
 .stm-studio .stm-svc-btn.wine:hover{background:#8C2F43}
 @media (max-width:860px){
-  .stm-studio .stm-svc{padding:112px 0 60px}
+  .stm-studio .stm-svc{padding:150px 0 60px}
   .stm-studio .stm-svc-head{width:auto;margin:0 16px}
   .stm-studio .stm-svc-gridwrap{width:auto;margin:30px 16px 0}
   .stm-studio .stm-svc-grid{grid-template-columns:1fr;gap:14px}
