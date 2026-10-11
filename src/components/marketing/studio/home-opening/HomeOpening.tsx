@@ -164,21 +164,13 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
-    <svg className="stm-hero-shore" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 90 L0 58 C 420 34 980 22 1440 40 L1440 90 Z" /></svg>
+    <svg className="stm-hero-shore" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true"><path d="M0 260 L0 44 C 300 16 470 178 740 212 C 980 242 1200 206 1440 176 L1440 260 Z" /></svg>
+    <div className="stm-hero-bridge" aria-label="Supreme Team Media credentials">
+      <div><strong>Since 2001</strong><small>Digital marketing</small></div>
+      <div><strong>San Diego</strong><small>California</small></div>
+      <div><strong>20+ years</strong><small>Advertising and design</small></div>
+    </div>
   </section>;
-}
-
-function CredibilityStrip() {
-  // Draft-only numerical placeholders; not verified claims or structured data.
-  const items = [
-    { media: "home-opening-trust-people", value: "500+ BUSINESSES", note: "TRUSTED BY", illustrative: true },
-    { media: "home-opening-trust-star", value: "4.9★", note: "CLIENT SATISFACTION", illustrative: true },
-    { media: "home-opening-trust-shield", value: "SAN DIEGO,", note: "CALIFORNIA", illustrative: false },
-  ];
-  return <section className="stm-opening-trust" aria-label="Credibility overview"><div className="stm-opening-shell stm-opening-trust-grid">
-    {items.map((item) => { const media = getStudioMedia(item.media); return <div key={item.value} className="stm-opening-trust-item" aria-describedby={item.illustrative ? "stm-opening-figures-note" : undefined}>{media?.src && <img src={media.src} alt="" width={media.width} height={media.height} />}<span>{item.media === "home-opening-trust-people" ? <><small>{item.note}</small><strong>{item.value}</strong></> : <><strong>{item.value}</strong><small>{item.note}</small></>}</span></div>; })}
-    <p id="stm-opening-figures-note" className="stm-opening-sample">Illustrative figures</p>
-  </div></section>;
 }
 
 function OpeningServices() {
@@ -350,7 +342,6 @@ export function HomeOpening() {
   return <>
     <OpeningHeader onContact={openContact} />
     <OpeningHero onContact={openContact} />
-    <CredibilityStrip />
     <OpeningServices />
     <Dialog open={contactOpen} onOpenChange={setContactOpen}><DialogContent className="stm-opening-dialog"><DialogHeader><DialogTitle>Contact Supreme Team Media</DialogTitle><DialogDescription>Call or email us directly. No form required.</DialogDescription></DialogHeader><div className="stm-opening-phone-pending"><strong>Phone connection pending</strong><span>A public business number has not been confirmed.</span></div><Button asChild className="stm-opening-email"><a href={`mailto:${CONTACT_EMAIL}`}><Mail aria-hidden /> Email Us <span>{CONTACT_EMAIL}</span></a></Button></DialogContent></Dialog>
   </>;

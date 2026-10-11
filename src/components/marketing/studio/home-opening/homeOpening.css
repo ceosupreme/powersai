@@ -292,12 +292,21 @@
 }
 
 
-/* Hero shore: the ivory of the next sections rises into the hero's dark as a soft crest, so the dark-to-light hand-off is a shape, not a line. */
+/* Hero shore: the services ivory sweeps up into the hero's dark as one big asymmetric wave; the credentials pill rides the seam as a bridge. */
 .stm-studio .stm-command-hero{position:relative}
-.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:72px;pointer-events:none;z-index:4}
+.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:260px;pointer-events:none;z-index:4}
 .stm-studio .stm-hero-shore path{fill:hsl(var(--opening-ivory))}
+.stm-studio .stm-hero-bridge{position:absolute;left:50%;bottom:0;transform:translate(-50%,46%);z-index:8;display:flex;align-items:center;gap:34px;padding:19px 38px;background:#FFFDF8;border:1px solid rgba(16,20,18,.14);border-radius:999px;box-shadow:0 20px 48px rgba(12,16,15,.22),inset 0 1px 0 rgba(255,255,255,.7)}
+.stm-studio .stm-hero-bridge > div{display:grid;gap:3px;text-align:center;white-space:nowrap}
+.stm-studio .stm-hero-bridge > div + div{border-left:1px solid rgba(16,20,18,.14);padding-left:34px}
+.stm-studio .stm-hero-bridge strong{font:800 17px "Inter Tight",sans-serif;letter-spacing:-.01em;color:#101412}
+.stm-studio .stm-hero-bridge small{font:600 11.5px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,18,.55)}
 @media (max-width:760px){
-  .stm-studio .stm-hero-shore{height:38px}
+  .stm-studio .stm-hero-shore{height:120px}
+  .stm-studio .stm-hero-bridge{gap:14px;padding:12px 18px;border-radius:22px;max-width:calc(100% - 28px)}
+  .stm-studio .stm-hero-bridge > div + div{padding-left:14px}
+  .stm-studio .stm-hero-bridge strong{font-size:13.5px}
+  .stm-studio .stm-hero-bridge small{font-size:9.5px;letter-spacing:.1em}
 }
 
 /* Services: eight-card grid menu with the hero's energy continued — washes, serif numerals, and a light thread weaving the cards together. */
