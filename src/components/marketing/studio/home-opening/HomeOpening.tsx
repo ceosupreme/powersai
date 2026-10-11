@@ -164,6 +164,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
+    <svg className="stm-hero-shore" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 90 L0 52 C 420 -6 1020 -6 1440 52 L1440 90 Z" /></svg>
   </section>;
 }
 
@@ -292,7 +293,7 @@ function OpeningServices() {
       <span className="stm-svc-note r" aria-hidden="true">Strategy<br />Creative<br />Systems<br />Growth</span>
       <div className="stm-svc-rise"><span className="stm-svc-eyebrow">— Services —</span></div>
       <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
-      <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions. Pick where your business needs them most.</span></div>
+      <span className="stm-svc-dock" aria-hidden="true" />
     </div>
     <div className="stm-svc-gridwrap" ref={wrapRef}>
       <svg className="stm-svc-thread" ref={svgRef} viewBox="0 0 1200 1500" preserveAspectRatio="none" aria-hidden="true">
