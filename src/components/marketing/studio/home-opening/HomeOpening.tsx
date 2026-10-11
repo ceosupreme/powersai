@@ -164,12 +164,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
-    <svg className="stm-hero-shore" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true"><path d="M0 260 L0 44 C 300 16 470 178 740 212 C 980 242 1200 206 1440 176 L1440 260 Z" /></svg>
-    <div className="stm-hero-bridge" aria-label="Credibility overview">
-      <div><small>Trusted by</small><strong>500+ businesses</strong></div>
-      <div><strong>4.9★</strong><small>Client satisfaction</small></div>
-      <div><strong>San Diego,</strong><small>California</small></div>
-    </div>
+    <svg className="stm-hero-shore" viewBox="0 0 1440 140" preserveAspectRatio="none" aria-hidden="true"><path d="M0 140 L0 92 C 360 54 820 24 1440 64 L1440 140 Z" /></svg>
   </section>;
 }
 
@@ -280,6 +275,11 @@ function OpeningServices() {
       <path d="M10 170 C 90 60, 210 40, 296 86" strokeWidth="1" />
       <path d="M26 176 C 104 84, 212 66, 294 104" strokeWidth="1" opacity=".65" />
     </svg>
+    <div className="stm-svc-trust" data-watch aria-label="Credibility overview">
+      <div><small>Trusted by</small><strong>500+ businesses</strong></div>
+      <div><strong>4.9★</strong><small>Client satisfaction</small></div>
+      <div><strong>San Diego,</strong><small>California</small></div>
+    </div>
     <div className="stm-svc-head" data-watch>
       <span className="stm-svc-note l" aria-hidden="true">Real solutions<br />for a brighter<br />tomorrow</span>
       <span className="stm-svc-note r" aria-hidden="true">Strategy<br />Creative<br />Systems<br />Growth</span>
