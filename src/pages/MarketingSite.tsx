@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
-import { AfterClick } from "@/components/marketing/studio/sections/AfterClick";
+import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
@@ -57,7 +57,7 @@ export default function MarketingSite() {
     <div className="stm-studio relative min-h-screen">
       <main>
         <HomeOpening />
-        <AfterClick />
+        <AfterDark />
         <HomeIndustries />
         <StudioReveal><SelectedWork /></StudioReveal>
         <Testimonials />

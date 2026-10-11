@@ -35,6 +35,7 @@ import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json
 import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
+import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
 
 /**
  * Single media configuration for the public studio site.
@@ -76,6 +77,14 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     aspectRatio: "1920 / 1081",
     width: 1920,
     height: 1081,
+    objectFit: "contain",
+  },
+  "home-after-dark": {
+    src: afterDark3am,
+    alt: "A business owner asleep at 3:00 AM while his glowing website floats above, capturing a lead, booking an appointment and sending follow-ups",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
     objectFit: "contain",
   },
   "home-opening-chess": {

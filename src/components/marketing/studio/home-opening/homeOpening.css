@@ -309,7 +309,7 @@
 .stm-studio .stm-svc-wash.b{width:680px;height:560px;right:-180px;bottom:40px;background:rgba(79,195,224,.26)}
 .stm-studio .stm-svc-corner{position:absolute;pointer-events:none;color:rgba(151,83,38,.5)}
 .stm-studio .stm-svc-corner.tr{top:170px;right:-60px;width:300px;transform:rotate(14deg)}
-.stm-studio .stm-svc-corner.bl{bottom:-40px;left:-70px;width:280px;transform:rotate(195deg);color:rgba(79,195,224,.45)}
+.stm-studio .stm-svc-corner.bl{bottom:22px;left:-70px;width:280px;transform:rotate(195deg);color:rgba(79,195,224,.45)}
 .stm-studio .stm-svc-head{position:relative;width:min(92%,1240px);margin:0 auto;text-align:center}
 .stm-studio .stm-svc-note{position:absolute;top:8px;font:600 12px/1.9 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(16,20,18,.38)}
 .stm-studio .stm-svc-note.l{left:0;text-align:left}
