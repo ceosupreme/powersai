@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { ArrowRight, CalendarDays, MessageSquare, Send, UserRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Bell, CalendarDays, Database, MessageSquare, Phone, Send, Star, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
@@ -12,16 +12,25 @@ import "./afterDark.css";
  * copy stays crisp and editable. On phones the receipts become real chips
  * under the image. Media swaps via the "home-after-dark" studioMedia entry.
  */
+/** The night's event pool: the first four scroll in; the rest rotate through
+ *  the same four boxes while the section is on screen. Edit freely. */
 const RECEIPTS = [
   { label: "Lead captured", time: "Just now", icon: UserRound },
   { label: "Appointment booked", time: "12 minutes ago", icon: CalendarDays },
   { label: "Follow-up sent", time: "28 minutes ago", icon: Send },
   { label: "Inquiry received", time: "1 hour ago", icon: MessageSquare },
+  { label: "Missed call texted back", time: "2 minutes ago", icon: Phone },
+  { label: "Review request sent", time: "44 minutes ago", icon: Star },
+  { label: "Reminder delivered", time: "2 hours ago", icon: Bell },
+  { label: "Customer record updated", time: "3 hours ago", icon: Database },
 ] as const;
 
 export function AfterDark() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const art = getStudioMedia("home-after-dark");
+  const [slots, setSlots] = useState<number[]>([0, 1, 2, 3]);
+  const queueRef = useRef<number[]>(RECEIPTS.map((_, i) => i).slice(4));
+  const allLitRef = useRef(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -75,12 +84,45 @@ export function AfterDark() {
       // light before the row itself is fully visible.
       const progress = (vh * 0.92 - rect.top) / (vh * 0.57);
       chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
+      allLitRef.current = progress > THRESHOLDS[THRESHOLDS.length - 1];
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
+  }, []);
+
+  // Once all four chips are lit, the night keeps happening: every few seconds
+  // one box crossfades to the next event from the pool, round-robin. Paused
+  // off-screen and in hidden tabs; no rotation under reduced motion.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (RECEIPTS.length <= 4) return;
+    let slot = 0;
+    let swapTimer = 0;
+    const id = window.setInterval(() => {
+      if (!allLitRef.current || document.visibilityState !== "visible") return;
+      const chipNodes = section.querySelectorAll<HTMLElement>(".stm-dark-chips li");
+      const s = slot % 4;
+      slot += 1;
+      const node = chipNodes[s];
+      if (node) node.dataset.swap = "1";
+      swapTimer = window.setTimeout(() => {
+        setSlots((prev) => {
+          const incoming = queueRef.current.shift();
+          if (incoming === undefined) return prev;
+          const next = [...prev];
+          queueRef.current.push(next[s]);
+          next[s] = incoming;
+          return next;
+        });
+        if (node) delete node.dataset.swap;
+      }, 340);
+    }, 3600);
+    return () => { window.clearInterval(id); window.clearTimeout(swapTimer); };
   }, []);
 
   return (
@@ -95,13 +137,17 @@ export function AfterDark() {
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
         </div>
         <ul className="stm-dark-chips" aria-label="Overnight activity">
-          {RECEIPTS.map((item) => (
-            <li key={item.label}>
-              <svg className="stm-dark-trace" aria-hidden="true"><rect pathLength={100} /></svg>
-              <span className="stm-dark-chip-ic" aria-hidden="true"><item.icon /></span>
-              <span className="stm-dark-chip-tx"><strong>{item.label}</strong><small>{item.time}</small></span>
-            </li>
-          ))}
+          {slots.map((poolIndex, slotIndex) => {
+            const item = RECEIPTS[poolIndex];
+            const Icon = item.icon;
+            return (
+              <li key={`slot-${slotIndex}`}>
+                <svg className="stm-dark-trace" aria-hidden="true"><rect pathLength={100} /></svg>
+                <span className="stm-dark-chip-ic" aria-hidden="true"><Icon /></span>
+                <span className="stm-dark-chip-tx"><strong>{item.label}</strong><small>{item.time}</small></span>
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div className="stm-dark-copy" data-watch>
