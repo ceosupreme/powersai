@@ -182,6 +182,9 @@ function CredibilityStrip() {
 
 function OpeningServices() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const motionRef = useRef<SVGElement | null>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -195,32 +198,147 @@ function OpeningServices() {
     return () => io.disconnect();
   }, []);
 
+  // The energy thread: path geometry is measured from the real card positions,
+  // so it stays seated at every screen width. Hidden under 861px by CSS.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const svg = svgRef.current;
+    if (!wrap || !svg) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const build = () => {
+      if (!window.matchMedia("(min-width: 861px)").matches) return;
+      const cards = Array.from(wrap.querySelectorAll<HTMLElement>(".stm-svc-card"));
+      if (cards.length < 4) return;
+      const wr = wrap.getBoundingClientRect();
+      if (wr.width < 10 || wr.height < 10) return;
+      const rows: { top: number; bottom: number }[] = [];
+      cards.forEach((card, i) => {
+        const r = card.getBoundingClientRect();
+        const row = Math.floor(i / 2);
+        const top = r.top - wr.top;
+        const bottom = r.bottom - wr.top;
+        if (!rows[row]) rows[row] = { top, bottom };
+        else { rows[row].top = Math.min(rows[row].top, top); rows[row].bottom = Math.max(rows[row].bottom, bottom); }
+      });
+      const cx = wr.width / 2;
+      const sw = Math.min(230, wr.width * 0.19);
+      const pts: [number, number][] = [[cx, -24]];
+      rows.forEach((row, i) => {
+        pts.push([cx, (row.top + row.bottom) / 2]);
+        if (i < rows.length - 1) pts.push([cx + (i % 2 === 0 ? -sw : sw), (row.bottom + rows[i + 1].top) / 2]);
+      });
+      pts.push([cx, rows[rows.length - 1].bottom + 16]);
+      let d = `M${pts[0][0]} ${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) {
+        const [x, y] = pts[i];
+        const py = pts[i - 1][1];
+        const k = Math.max(30, (y - py) * 0.45);
+        d += i === 1 ? ` C${pts[0][0]} ${py + k} ${x} ${y - k} ${x} ${y}` : ` S${x} ${y - k} ${x} ${y}`;
+      }
+      svg.setAttribute("viewBox", `0 0 ${wr.width} ${wr.height}`);
+      const paths = Array.from(svg.querySelectorAll<SVGPathElement>("path"));
+      paths.forEach((p) => p.setAttribute("d", d));
+      const core = svg.querySelector<SVGPathElement>(".stm-svc-t-core");
+      const len = (core ? core.getTotalLength() : 4000) + 40;
+      paths.forEach((p) => p.style.setProperty("--len", String(len)));
+      const seams = rows.slice(0, -1).map((row, i) => (row.bottom + rows[i + 1].top) / 2);
+      const totalY = pts[pts.length - 1][1] + 24;
+      wrap.querySelectorAll<HTMLElement>(".stm-svc-orb").forEach((orb, i) => {
+        if (seams[i] == null) return;
+        orb.style.left = `${cx + (i % 2 === 0 ? -sw : sw)}px`;
+        orb.style.top = `${seams[i]}px`;
+        orb.style.setProperty("--fd", `${(3.4 + ((seams[i] + 24) / totalY) * 7).toFixed(2)}s`);
+      });
+    };
+
+    build();
+    if (document.fonts?.ready) document.fonts.ready.then(build).catch(() => undefined);
+    let timer = 0;
+    const onResize = () => { window.clearTimeout(timer); timer = window.setTimeout(build, 160); };
+    window.addEventListener("resize", onResize);
+    const gio = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        build();
+        wrap.classList.add("drawn");
+        if (!reduced.matches) window.setTimeout(() => {
+          try {
+            (motionRef.current as SVGAnimationElement | null)?.beginElement();
+            svg.classList.add("pulsing");
+          } catch { /* SMIL unavailable: thread still draws, pulse stays off */ }
+        }, 3400);
+        gio.disconnect();
+      });
+    }, { threshold: 0.08 });
+    gio.observe(wrap);
+    return () => { window.removeEventListener("resize", onResize); window.clearTimeout(timer); gio.disconnect(); };
+  }, []);
+
   return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
+    <div className="stm-svc-wash a" aria-hidden="true" />
+    <div className="stm-svc-wash b" aria-hidden="true" />
+    <div className="stm-svc-wash c" aria-hidden="true" />
+    <svg className="stm-svc-corner tr" viewBox="0 0 300 180" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d="M10 170 C 90 60, 210 40, 296 86" strokeWidth="1" />
+      <path d="M26 176 C 104 84, 212 66, 294 104" strokeWidth="1" opacity=".65" />
+      <path d="M44 180 C 118 106, 214 92, 292 122" strokeWidth="1" opacity=".38" />
+    </svg>
+    <svg className="stm-svc-corner bl" viewBox="0 0 300 180" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d="M10 170 C 90 60, 210 40, 296 86" strokeWidth="1" />
+      <path d="M26 176 C 104 84, 212 66, 294 104" strokeWidth="1" opacity=".65" />
+    </svg>
     <div className="stm-svc-head" data-watch>
+      <span className="stm-svc-note" aria-hidden="true">Strategy<br />Creative<br />Systems<br />Growth</span>
       <div className="stm-svc-rise"><span className="stm-svc-eyebrow">— Services</span></div>
       <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
       <div className="stm-svc-rise"><span className="stm-svc-sub">Marketing and media solutions. Pick where your business needs them most.</span></div>
     </div>
-    <nav className="stm-svc-grid" aria-label="Service menu">
-      {SERVICE_INDEX.map((svc) => <Link key={svc.num} to={svc.to} className="stm-svc-card" data-watch
-        onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
-        <span className="stm-svc-cnum" aria-hidden="true">{svc.num}</span>
-        <span className="stm-svc-ctop">
-          <span className="stm-svc-chip" aria-hidden="true"><svc.icon /></span>
-          <span className="stm-svc-ctitle">
-            <span className="stm-svc-cname">{svc.name}</span>
-            <span className="stm-svc-cline">{svc.line}</span>
+    <div className="stm-svc-gridwrap" ref={wrapRef}>
+      <svg className="stm-svc-thread" ref={svgRef} viewBox="0 0 1200 1500" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="stm-svc-tg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#F6C65A" />
+            <stop offset="0.55" stopColor="#E8A13C" />
+            <stop offset="1" stopColor="#4FC3E0" />
+          </linearGradient>
+        </defs>
+        <path className="stm-svc-t-halo" />
+        <path className="stm-svc-t-body" />
+        <path className="stm-svc-t-cy" />
+        <path className="stm-svc-t-core" id="stm-svc-tpath" />
+        <circle className="stm-svc-t-pulse" r="4.5" fill="#fff">
+          <animateMotion ref={motionRef} dur="7s" begin="indefinite" repeatCount="indefinite">
+            <mpath href="#stm-svc-tpath" xlinkHref="#stm-svc-tpath" />
+          </animateMotion>
+        </circle>
+      </svg>
+      <span className="stm-svc-orb" aria-hidden="true" />
+      <span className="stm-svc-orb" aria-hidden="true" />
+      <span className="stm-svc-orb" aria-hidden="true" />
+      <nav className="stm-svc-grid" aria-label="Service menu">
+        {SERVICE_INDEX.map((svc) => <Link key={svc.num} to={svc.to} className="stm-svc-card" data-watch
+          onClick={() => trackSiteEvent({ event_type: "cta_click", label: `services_${svc.slug}` })}>
+          <span className="stm-svc-cnum" aria-hidden="true">{svc.num}</span>
+          <span className="stm-svc-ctop">
+            <span className="stm-svc-chip" aria-hidden="true"><svc.icon /></span>
+            <span className="stm-svc-ctitle">
+              <span className="stm-svc-cname">{svc.name}</span>
+              <span className="stm-svc-cline">{svc.line}</span>
+            </span>
           </span>
-        </span>
-        <span className="stm-svc-clist">
-          {svc.subs.map((item) => <span key={item}>{item}</span>)}
-        </span>
-        <span className="stm-svc-cgo">Explore {svc.name} <ArrowRight aria-hidden /></span>
-      </Link>)}
-    </nav>
+          <span className="stm-svc-clist">
+            {svc.subs.map((item) => <span key={item}>{item}</span>)}
+          </span>
+          <span className="stm-svc-cgo">Explore {svc.name} <ArrowRight aria-hidden /></span>
+        </Link>)}
+      </nav>
+    </div>
     <div className="stm-svc-foot" data-watch>
+      <span className="stm-svc-fnote l" aria-hidden="true">More possibility.</span>
       <Link to="/pricing" className="stm-svc-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
       <Link to="/free-audit?src=home-services" className="stm-svc-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_free_checkup" })}>Free Business Checkup →</Link>
+      <span className="stm-svc-fnote r" aria-hidden="true">A stronger tomorrow.</span>
     </div>
   </section>;
 }
