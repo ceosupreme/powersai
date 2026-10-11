@@ -292,27 +292,23 @@
 }
 
 
-/* Hero shore: a gentle ivory arc closes the hero; the trust row lives in flow at the top of services. */
-.stm-studio .stm-command-hero{position:relative}
-.stm-studio .stm-hero-shore{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:190px;pointer-events:none;z-index:4}
-.stm-studio .stm-hero-shore path{fill:hsl(var(--opening-ivory))}
-.stm-studio .stm-svc-trust{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:34px;width:min(92%,1240px);margin:0 auto 44px;opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
-.stm-studio .stm-svc-trust.on{opacity:1;transform:none}
-.stm-studio .stm-svc-trust > div{display:grid;gap:3px;text-align:center;white-space:nowrap}
-.stm-studio .stm-svc-trust > div + div{border-left:1px solid rgba(16,20,18,.16);padding-left:34px}
-.stm-studio .stm-svc-trust strong{font:800 17px "Inter Tight",sans-serif;letter-spacing:-.01em;color:#101412}
-.stm-studio .stm-svc-trust small{font:600 11.5px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,18,.55)}
+/* Seam: the hero's dark flows down into services as a cap inside the section, so the two sections meet dark against dark and no line can read. */
+.stm-studio .stm-svc-cap{position:absolute;top:0;left:0;right:0;width:100%;height:160px;pointer-events:none;z-index:1}
+.stm-studio .stm-svc-cap path{fill:hsl(var(--opening-night))}
+.stm-studio .stm-svc-proofline{position:relative;z-index:2;width:min(92%,1240px);margin:56px auto 0;text-align:center;font:600 12.5px/2 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,18,.55);opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
+.stm-studio .stm-svc-proofline.on{opacity:1;transform:none}
 @media (max-width:760px){
-  .stm-studio .stm-hero-shore{height:84px}
+  .stm-studio .stm-svc-cap{height:92px}
+  .stm-studio .stm-svc-proofline{font-size:11px;letter-spacing:.08em;margin-top:40px}
 }
 
 /* Services: eight-card grid menu with the hero's energy continued — washes, serif numerals, and a light thread weaving the cards together. */
-.stm-studio .stm-svc{position:relative;overflow:hidden;padding:96px 0 90px;background:hsl(var(--opening-ivory));color:#101412}
+.stm-studio .stm-svc{position:relative;overflow:hidden;margin-top:-2px;padding:170px 0 90px;background:hsl(var(--opening-ivory));color:#101412}
 .stm-studio .stm-svc-wash{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
 .stm-studio .stm-svc-wash.a{width:620px;height:470px;left:-140px;top:210px;background:rgba(242,189,125,.52)}
 .stm-studio .stm-svc-wash.b{width:680px;height:560px;right:-180px;bottom:40px;background:rgba(79,195,224,.26)}
 .stm-studio .stm-svc-corner{position:absolute;pointer-events:none;color:rgba(151,83,38,.5)}
-.stm-studio .stm-svc-corner.tr{top:34px;right:-60px;width:300px;transform:rotate(14deg)}
+.stm-studio .stm-svc-corner.tr{top:70px;right:-60px;width:300px;transform:rotate(14deg)}
 .stm-studio .stm-svc-corner.bl{bottom:-40px;left:-70px;width:280px;transform:rotate(195deg);color:rgba(79,195,224,.45)}
 .stm-studio .stm-svc-head{position:relative;width:min(92%,1240px);margin:0 auto;text-align:center}
 .stm-studio .stm-svc-note{position:absolute;top:8px;font:600 12px/1.9 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(16,20,18,.38)}
@@ -381,7 +377,7 @@
 .stm-studio .stm-svc-btn.wine{background:#5E1F2E;color:#F9F6F1;border:1px solid #8C2F43}
 .stm-studio .stm-svc-btn.wine:hover{background:#8C2F43}
 @media (max-width:860px){
-  .stm-studio .stm-svc{padding:64px 0 60px}
+  .stm-studio .stm-svc{padding:112px 0 60px}
   .stm-studio .stm-svc-head{width:auto;margin:0 16px}
   .stm-studio .stm-svc-gridwrap{width:auto;margin:30px 16px 0}
   .stm-studio .stm-svc-grid{grid-template-columns:1fr;gap:14px}
@@ -396,10 +392,6 @@
   .stm-studio .stm-svc-clist > span{font-size:15px}
   .stm-studio .stm-svc-cnum{font-size:48px;top:12px;right:18px}
   .stm-studio .stm-svc-fnote{display:none}
-  .stm-studio .stm-svc-trust{gap:14px;margin-bottom:30px}
-  .stm-studio .stm-svc-trust > div + div{padding-left:14px}
-  .stm-studio .stm-svc-trust strong{font-size:14px}
-  .stm-studio .stm-svc-trust small{font-size:9.5px;letter-spacing:.1em}
   .stm-studio .stm-svc-wash.a{width:320px;height:260px}
   .stm-studio .stm-svc-wash.b{width:340px;height:300px}
 }
@@ -407,7 +399,7 @@
   .stm-studio .stm-svc-note{display:none}
 }
 @media (prefers-reduced-motion: reduce){
-  .stm-studio .stm-svc-rise > span,.stm-studio .stm-svc-card,.stm-studio .stm-svc-foot,.stm-studio .stm-svc-dock,.stm-studio .stm-svc-trust{opacity:1 !important;transform:none !important;transition:none !important;animation:none !important}
+  .stm-studio .stm-svc-rise > span,.stm-studio .stm-svc-card,.stm-studio .stm-svc-foot,.stm-studio .stm-svc-dock,.stm-studio .stm-svc-proofline{opacity:1 !important;transform:none !important;transition:none !important;animation:none !important}
   .stm-studio .stm-svc-clist > span{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-svc-thread path{stroke-dashoffset:0 !important;transition:none !important}
   .stm-studio .stm-svc-orb{opacity:1 !important;transition:none !important}

@@ -164,7 +164,6 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
-    <svg className="stm-hero-shore" viewBox="0 0 1440 190" preserveAspectRatio="none" aria-hidden="true"><path d="M0 190 L0 132 C 340 76 760 18 1440 72 L1440 190 Z" /></svg>
   </section>;
 }
 
@@ -264,6 +263,7 @@ function OpeningServices() {
   }, []);
 
   return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
+    <svg className="stm-svc-cap" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 H1440 V38 C 1150 52 900 64 700 96 C 500 128 300 148 0 112 Z" /></svg>
     <div className="stm-svc-wash a" aria-hidden="true" />
     <div className="stm-svc-wash b" aria-hidden="true" />
     <svg className="stm-svc-corner tr" viewBox="0 0 300 180" fill="none" stroke="currentColor" aria-hidden="true">
@@ -275,11 +275,6 @@ function OpeningServices() {
       <path d="M10 170 C 90 60, 210 40, 296 86" strokeWidth="1" />
       <path d="M26 176 C 104 84, 212 66, 294 104" strokeWidth="1" opacity=".65" />
     </svg>
-    <div className="stm-svc-trust" data-watch aria-label="Credibility overview">
-      <div><small>Trusted by</small><strong>500+ businesses</strong></div>
-      <div><strong>4.9★</strong><small>Client satisfaction</small></div>
-      <div><strong>San Diego,</strong><small>California</small></div>
-    </div>
     <div className="stm-svc-head" data-watch>
       <span className="stm-svc-note l" aria-hidden="true">Real solutions<br />for a brighter<br />tomorrow</span>
       <span className="stm-svc-note r" aria-hidden="true">Strategy<br />Creative<br />Systems<br />Growth</span>
@@ -327,6 +322,7 @@ function OpeningServices() {
         </Link>)}
       </nav>
     </div>
+    <div className="stm-svc-proofline" data-watch aria-label="Credibility overview">{"Trusted by 500+ businesses · 4.9★ client satisfaction · San Diego, California"}</div>
     <div className="stm-svc-foot" data-watch>
       <span className="stm-svc-fnote l" aria-hidden="true">More possibility.</span>
       <Link to="/pricing" className="stm-svc-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "services_see_packages" })}>See packages →</Link>
