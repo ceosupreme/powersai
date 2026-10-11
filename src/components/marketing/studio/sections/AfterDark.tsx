@@ -47,17 +47,29 @@ export function AfterDark() {
     if (!section) return;
     const chipRow = section.querySelector<HTMLElement>(".stm-dark-chips");
     const chips = Array.from(section.querySelectorAll<HTMLElement>(".stm-dark-chips li"));
+    const title = section.querySelector<HTMLElement>(".stm-dark-title");
+    const titleLines = Array.from(section.querySelectorAll<HTMLElement>(".stm-dark-tline"));
     if (!chipRow || chips.length === 0) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       chips.forEach((chip) => chip.classList.add("lit"));
+      titleLines.forEach((line) => line.classList.add("lit"));
+      title?.classList.add("lit");
       return;
     }
     const THRESHOLDS = [0.12, 0.38, 0.64, 0.9];
+    const TITLE_THRESHOLDS = [0.1, 0.45, 0.8];
     let ticking = false;
     const update = () => {
       ticking = false;
-      const rect = chipRow.getBoundingClientRect();
       const vh = window.innerHeight || 1;
+      // Headline lines light as the title climbs the lower half of the screen.
+      if (title && titleLines.length > 0) {
+        const tr = title.getBoundingClientRect();
+        const tp = (vh * 0.9 - tr.top) / (vh * 0.45);
+        titleLines.forEach((line, index) => line.classList.toggle("lit", tp > TITLE_THRESHOLDS[index]));
+        title.classList.toggle("lit", tp > TITLE_THRESHOLDS[2]);
+      }
+      const rect = chipRow.getBoundingClientRect();
       // 0 when the chip row crosses into the lower edge of the screen,
       // 1 once it has risen to the upper third - so the first chip cannot
       // light before the row itself is fully visible.
@@ -74,9 +86,10 @@ export function AfterDark() {
   return (
     <section ref={sectionRef} id="after-dark" className="stm-dark" aria-labelledby="after-dark-title">
       <div className="stm-dark-stage">
-        <h2 id="after-dark-title" className="stm-dark-title" data-watch>
-          <span>We build websites that</span>
-          <span><b>work</b> while you sleep.</span>
+        <h2 id="after-dark-title" className="stm-dark-title">
+          <span className="stm-dark-tline">We build websites</span>
+          <span className="stm-dark-tline">that <b>work</b></span>
+          <span className="stm-dark-tline">while you sleep.</span>
         </h2>
         <div className="stm-dark-frame" data-watch>
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
