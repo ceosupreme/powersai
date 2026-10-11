@@ -304,6 +304,7 @@
 @media (max-width:760px){
   .stm-studio .stm-hero-shore{height:120px}
   .stm-studio .stm-hero-bridge{gap:14px;padding:12px 18px;border-radius:22px;max-width:calc(100% - 28px)}
+  .stm-studio .stm-hero-bridge > div{white-space:normal}
   .stm-studio .stm-hero-bridge > div + div{padding-left:14px}
   .stm-studio .stm-hero-bridge strong{font-size:13.5px}
   .stm-studio .stm-hero-bridge small{font-size:9.5px;letter-spacing:.1em}

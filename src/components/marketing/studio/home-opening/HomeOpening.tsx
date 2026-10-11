@@ -165,10 +165,10 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
       </div>
     </div>
     <svg className="stm-hero-shore" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true"><path d="M0 260 L0 44 C 300 16 470 178 740 212 C 980 242 1200 206 1440 176 L1440 260 Z" /></svg>
-    <div className="stm-hero-bridge" aria-label="Supreme Team Media credentials">
-      <div><strong>Since 2001</strong><small>Digital marketing</small></div>
-      <div><strong>San Diego</strong><small>California</small></div>
-      <div><strong>20+ years</strong><small>Advertising and design</small></div>
+    <div className="stm-hero-bridge" aria-label="Credibility overview">
+      <div><small>Trusted by</small><strong>500+ businesses</strong></div>
+      <div><strong>4.9★</strong><small>Client satisfaction</small></div>
+      <div><strong>San Diego,</strong><small>California</small></div>
     </div>
   </section>;
 }
