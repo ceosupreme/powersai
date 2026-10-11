@@ -45,20 +45,23 @@ export function AfterDark() {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-    const stage = section.querySelector<HTMLElement>(".stm-dark-stage");
+    const chipRow = section.querySelector<HTMLElement>(".stm-dark-chips");
     const chips = Array.from(section.querySelectorAll<HTMLElement>(".stm-dark-chips li"));
-    if (!stage || chips.length === 0) return;
+    if (!chipRow || chips.length === 0) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       chips.forEach((chip) => chip.classList.add("lit"));
       return;
     }
-    const THRESHOLDS = [0.2, 0.42, 0.64, 0.86];
+    const THRESHOLDS = [0.12, 0.38, 0.64, 0.9];
     let ticking = false;
     const update = () => {
       ticking = false;
-      const rect = stage.getBoundingClientRect();
+      const rect = chipRow.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      const progress = (vh * 0.88 - rect.top) / Math.max(rect.height * 0.95, 1);
+      // 0 when the chip row crosses into the lower edge of the screen,
+      // 1 once it has risen to the upper third - so the first chip cannot
+      // light before the row itself is fully visible.
+      const progress = (vh * 0.92 - rect.top) / (vh * 0.57);
       chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };

@@ -28,10 +28,11 @@
 /* The electric hand-off: a gold line laps the chip's border once as it lands */
 .stm-studio .stm-dark-trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .stm-studio .stm-dark-trace rect{x:1px;y:1px;width:calc(100% - 2px);height:calc(100% - 2px);rx:14px;fill:none;stroke:#F6C65A;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:30 70;stroke-dashoffset:100;opacity:0;filter:drop-shadow(0 0 6px rgba(246,198,90,.95)) drop-shadow(0 0 14px rgba(232,161,60,.5))}
-.stm-studio .stm-dark-chips li.lit .stm-dark-trace rect{animation:stmTrace 1.05s linear .3s 1 both}
+.stm-studio .stm-dark-chips li.lit .stm-dark-trace rect{animation:stmTrace 1.9s linear .35s 1 both}
 @keyframes stmTrace{
-  0%{opacity:1;stroke-dashoffset:100}
-  82%{opacity:1}
+  0%{opacity:0;stroke-dashoffset:100}
+  7%{opacity:1}
+  88%{opacity:1}
   100%{stroke-dashoffset:0;opacity:0}
 }
 .stm-studio .stm-dark-chip-ic{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 38% 34%, rgba(120,195,255,.55), rgba(35,80,150,.5) 70%);border:1px solid rgba(140,205,255,.55);box-shadow:0 0 12px rgba(80,160,255,.45);color:#D9EDFF}
