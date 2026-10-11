@@ -13,9 +13,10 @@
 .stm-studio .stm-dark-frame img{display:block;width:100%;height:auto}
 
 /* Headline, seated in the render's empty upper-left room */
-.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(3.8cqw,60px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
+.stm-studio .stm-dark-title{position:absolute;z-index:2;left:4.8%;top:13.5%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(4.1cqw,66px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,10,25,.75);opacity:0;transform:translateY(12px);transition:opacity .7s ease .25s,transform .7s cubic-bezier(.22,1,.36,1) .25s}
 .stm-studio .stm-dark-title.on{opacity:1;transform:none}
 .stm-studio .stm-dark-title span{display:block}
+.stm-studio .stm-dark-title span + span{margin-top:.38em}
 .stm-studio .stm-dark-title b{color:#7CBDFF;font-weight:800;text-shadow:0 0 18px rgba(80,160,255,.65),0 2px 18px rgba(0,10,25,.75)}
 .stm-studio .stm-dark-title::after{content:"";display:block;width:64px;height:3px;margin-top:1.4cqw;border-radius:3px;background:linear-gradient(90deg,#F6C65A,#E89A2B)}
 
@@ -43,7 +44,7 @@
 
 /* Desktop: chips ride the bedding band of the render */
 @media (min-width:761px){
-  .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:82%;transform:translateY(-50%);display:flex;gap:2.6%}
+  .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:79%;transform:translateY(-50%);display:flex;gap:2.6%}
   .stm-studio .stm-dark-chips li{flex:1;min-width:0}
 }
 
