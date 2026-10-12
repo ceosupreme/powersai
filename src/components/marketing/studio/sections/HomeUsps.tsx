@@ -143,14 +143,15 @@ export function ChosenFirst() {
   );
 }
 
-/** Slide 3, the finale: the rocket lifting off the city on a growth line.
+/** Slide 3, the finale: the owner on a rooftop at sunrise over the city, his
+ *  gold building below and his wins (sales, bookings, reviews) beside him.
  *  "See the results" drops straight into the Work section below. */
 export function BoostBrands() {
   return (
     <StorySlide
       id="boost-brands"
       variant="stm-slide-boost"
-      mediaKey="home-boost-rocket"
+      mediaKey="home-next-level"
       lines={["We boost brands", "higher,", <b key="f">faster.</b>]}
       line="Supreme Team Media blasts your business to the next level."
       actions={[

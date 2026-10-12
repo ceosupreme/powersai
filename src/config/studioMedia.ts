@@ -37,8 +37,7 @@ import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
 import chosenFirst from "@/assets/stm-opening/chosen-first.webp";
-import boostRocket from "@/assets/stm-opening/boost-rocket.webp";
-import boostRocketMobile from "@/assets/stm-opening/boost-rocket-mobile.webp";
+import rooftopNextLevel from "@/assets/stm-opening/rooftop-next-level.webp";
 
 /**
  * Single media configuration for the public studio site.
@@ -90,10 +89,9 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 941,
     objectFit: "contain",
   },
-  "home-boost-rocket": {
-    src: boostRocket,
-    mobileSrc: boostRocketMobile,
-    alt: "A glowing gold rocket lifting off from a city at sunset, riding a rising growth line into the clouds",
+  "home-next-level": {
+    src: rooftopNextLevel,
+    alt: "A business owner in a suit on a rooftop terrace at sunrise, looking over the city toward his glowing gold building, with panels showing rising sales, a full booking calendar and five-star reviews",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,

@@ -33,7 +33,7 @@
    it so no seam line shows. */
 .stm-studio .stm-slide{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:64px 0 72px;color:hsl(42 36% 94%);container-type:inline-size}
 .stm-studio .stm-slide-chosen{background:linear-gradient(180deg,#000A14 0%,#00060E 55%,#000206 100%)}
-.stm-studio .stm-slide-boost{background:linear-gradient(180deg,#22344A 0%,#1B2737 34%,#1C130D 72%,#0E0A08 100%)}
+.stm-studio .stm-slide-boost{background:linear-gradient(180deg,#103D78 0%,#1E3A62 45%,#27364D 100%)}
 .stm-studio .stm-slide-text{display:contents}
 .stm-studio .stm-slide-title{order:1}
 .stm-studio .stm-slide-frame{order:2}
@@ -46,6 +46,8 @@
 /* Phones: the city render's empty left side is dead space above the fold —
    crop to the city and give it real height. */
 .stm-studio .stm-slide-chosen .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:74% center}
+/* Phones: the rooftop crops to the owner, his panels and the gold tower. */
+.stm-studio .stm-slide-boost .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:94% center}
 
 .stm-studio .stm-slide-title{position:relative;z-index:2;margin:0 14px 20px;text-align:center;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:clamp(30px,8.4vw,40px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,8,20,.8)}
 .stm-studio .stm-slide-tline{display:block;opacity:0;transform:translateY(16px);transition:opacity .5s cubic-bezier(.3,1.3,.5,1),transform .55s cubic-bezier(.3,1.3,.5,1)}
@@ -69,7 +71,7 @@
   .stm-studio .stm-slide{display:block;height:100vh;height:100svh;min-height:560px;padding:0}
   .stm-studio .stm-slide-frame{position:absolute;inset:0;transform:none}
   .stm-studio .stm-slide-frame picture{display:block;height:100%}
-  .stm-studio .stm-slide-frame img,.stm-studio .stm-slide-chosen .stm-slide-frame img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center;-webkit-mask-image:none;mask-image:none}
+  .stm-studio .stm-slide-frame img,.stm-studio .stm-slide-chosen .stm-slide-frame img,.stm-studio .stm-slide-boost .stm-slide-frame img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center;-webkit-mask-image:none;mask-image:none}
   .stm-studio .stm-slide-chosen .stm-slide-frame img{object-position:70% center}
   /* Soft dark fade behind the text column only; the subject stays bright. */
   .stm-studio .stm-slide-scrim{display:block;position:absolute;z-index:1;inset:0 auto 0 0;width:62%;pointer-events:none;background:radial-gradient(70% 60% at 22% 42%,rgba(5,9,16,.72) 0%,rgba(5,9,16,.5) 45%,rgba(5,9,16,0) 100%),linear-gradient(90deg,rgba(5,9,16,.55) 0%,rgba(5,9,16,.3) 35%,rgba(5,9,16,0) 75%)}
