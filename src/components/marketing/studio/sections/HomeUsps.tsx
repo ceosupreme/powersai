@@ -29,7 +29,8 @@ type SlideAction = { label: string; to: string; tone: "gold" | "wine"; track: st
 
 /**
  * One story slide: a render, a three-line headline that lights line by line
- * on scroll (like the 3 AM slide), a line under the image and two buttons.
+ * on scroll (like the 3 AM slide), an optional line and the buttons. The line
+ * is only there when it adds to the message; otherwise headline + buttons.
  * Headline copy is live text; images swap via their studioMedia key, with an
  * optional phone version (mobileSrc).
  */
@@ -38,7 +39,7 @@ function StorySlide({ id, variant, mediaKey, lines, line, actions }: {
   variant: string;
   mediaKey: string;
   lines: React.ReactNode[];
-  line: string;
+  line?: string;
   actions: SlideAction[];
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -110,7 +111,7 @@ function StorySlide({ id, variant, mediaKey, lines, line, actions }: {
           {lines.map((content, index) => <span key={index} className="stm-slide-tline">{content}</span>)}
         </h2>
         <div className="stm-slide-copy" data-watch>
-          <p>{line}</p>
+          {line && <p>{line}</p>}
           <div className="stm-slide-actions">
             {actions.map((action) => {
               const onClick = () => trackSiteEvent({ event_type: "cta_click", label: action.track });
@@ -126,18 +127,18 @@ function StorySlide({ id, variant, mediaKey, lines, line, actions }: {
   );
 }
 
-/** Slide 1: one gold building in a blue city, traffic flowing to it. */
-export function ChosenFirst() {
+/** Slide 1: a man on a bench, stopped cold by glowing screens. The image
+ *  says "attention" on its own, so no line — headline and buttons only. */
+export function GetAttention() {
   return (
     <StorySlide
-      id="chosen-first"
-      variant="stm-slide-chosen"
-      mediaKey="home-chosen-first"
-      lines={["We create campaigns", "that get you", <>chosen <b>first.</b></>]}
-      line="Ads, local search and reviews working together, so when someone in town needs what you sell, they pick you."
+      id="get-attention"
+      variant="stm-slide-attention"
+      mediaKey="home-get-attention"
+      lines={["We build websites", "that get", <b key="a">attention.</b>]}
       actions={[
-        { label: "See the marketing", to: "/services/marketing", tone: "gold", track: "chosen_first_see_marketing" },
-        { label: "Free Business Checkup", to: "/free-audit?src=home-chosen-first", tone: "wine", track: "chosen_first_free_checkup" },
+        { label: "See our web design", to: "/services/websites", tone: "gold", track: "get_attention_see_web_design" },
+        { label: "Free Business Checkup", to: "/free-audit?src=home-get-attention", tone: "wine", track: "get_attention_free_checkup" },
       ]}
     />
   );

@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
-import { BoostBrands, ChosenFirst } from "@/components/marketing/studio/sections/HomeUsps";
+import { BoostBrands, GetAttention } from "@/components/marketing/studio/sections/HomeUsps";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
@@ -58,14 +58,14 @@ export default function MarketingSite() {
     <div className="stm-studio relative min-h-screen">
       <main>
         <HomeOpening />
-        {/* The slide stack: "We create campaigns that get you chosen first",
-            then the 3 AM scene slides up over it ("We build websites that
-            work while you sleep"), then the rocket ("We boost brands higher,
-            faster").
+        {/* The slide stack, one owner's story: "We build websites that get
+            attention" (the bench), then the 3 AM scene slides up over it ("We
+            build websites that work while you sleep"), then the rooftop ("We
+            boost brands higher, faster").
             Work follows as its own normal section — the proof right after
             the promises. Industries sits below the proof content. */}
         <div className="stm-stack">
-          <ChosenFirst />
+          <GetAttention />
           <div className="stm-stack-hold" aria-hidden="true" />
           <AfterDark />
           <div className="stm-stack-hold long" aria-hidden="true" />

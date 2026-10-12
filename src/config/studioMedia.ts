@@ -36,7 +36,7 @@ import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
-import chosenFirst from "@/assets/stm-opening/chosen-first.webp";
+import benchAttention from "@/assets/stm-opening/bench-attention.webp";
 import rooftopNextLevel from "@/assets/stm-opening/rooftop-next-level.webp";
 
 /**
@@ -81,9 +81,9 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 1081,
     objectFit: "contain",
   },
-  "home-chosen-first": {
-    src: chosenFirst,
-    alt: "Aerial view of a blue city at night where one building glows gold, with a beam of light rising from its roof and traffic flowing toward it",
+  "home-get-attention": {
+    src: benchAttention,
+    alt: "A man sitting on a bench in a dark room, stopped and staring at three huge glowing website screens",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,

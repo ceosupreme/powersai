@@ -1,5 +1,5 @@
-/* The homepage slide stack: "chosen first", the 3 AM scene, and the
-   rocket. Each holds while the next slides up over it — pure CSS sticky, no
+/* The homepage slide stack: the bench ("get attention"), the 3 AM scene,
+   and the rooftop. Each holds while the next slides up over it — pure CSS sticky, no
    scroll hijack. A percent top can't express "own height" (it resolves
    against the whole stack), so useStackPanel measures each panel and sets
    --stack-top to min(0, viewport − height): viewport-size panels pin at
@@ -22,7 +22,7 @@
 .stm-studio .stm-stack-hold.long{height:90vh}
 .stm-studio .stm-after-stack{position:relative;z-index:5}
 
-/* Story slides (chosen first, boost brands): one render, a live three-line
+/* Story slides (get attention, boost brands): one render, a live three-line
    headline, a line and two buttons.
    Desktop (761px+): the slide is exactly one screen tall, the render fills it
    edge to edge, and the text column sits over the render's quiet left side
@@ -32,7 +32,7 @@
    from the render's edges, with the image's top and bottom dissolving into
    it so no seam line shows. */
 .stm-studio .stm-slide{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:64px 0 72px;color:hsl(42 36% 94%);container-type:inline-size}
-.stm-studio .stm-slide-chosen{background:linear-gradient(180deg,#000A14 0%,#00060E 55%,#000206 100%)}
+.stm-studio .stm-slide-attention{background:linear-gradient(180deg,#000B1D 0%,#020D20 50%,#030E23 100%)}
 .stm-studio .stm-slide-boost{background:linear-gradient(180deg,#103D78 0%,#1E3A62 45%,#27364D 100%)}
 .stm-studio .stm-slide-text{display:contents}
 .stm-studio .stm-slide-title{order:1}
@@ -43,9 +43,9 @@
 .stm-studio .stm-slide-frame{position:relative;opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-slide-frame.on{opacity:1;transform:none}
 .stm-studio .stm-slide-frame img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
-/* Phones: the city render's empty left side is dead space above the fold —
-   crop to the city and give it real height. */
-.stm-studio .stm-slide-chosen .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:74% center}
+/* Phones: the bench render's empty left side is dead space — crop to the
+   man and his three screens. */
+.stm-studio .stm-slide-attention .stm-slide-frame img{aspect-ratio:4 / 3;object-fit:cover;object-position:100% center}
 /* Phones: the rooftop crops to the owner, his panels and the gold tower. */
 .stm-studio .stm-slide-boost .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:94% center}
 
@@ -71,8 +71,8 @@
   .stm-studio .stm-slide{display:block;height:100vh;height:100svh;min-height:560px;padding:0}
   .stm-studio .stm-slide-frame{position:absolute;inset:0;transform:none}
   .stm-studio .stm-slide-frame picture{display:block;height:100%}
-  .stm-studio .stm-slide-frame img,.stm-studio .stm-slide-chosen .stm-slide-frame img,.stm-studio .stm-slide-boost .stm-slide-frame img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center;-webkit-mask-image:none;mask-image:none}
-  .stm-studio .stm-slide-chosen .stm-slide-frame img{object-position:70% center}
+  .stm-studio .stm-slide-frame img,.stm-studio .stm-slide-attention .stm-slide-frame img,.stm-studio .stm-slide-boost .stm-slide-frame img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center;-webkit-mask-image:none;mask-image:none}
+  .stm-studio .stm-slide-attention .stm-slide-frame img{object-position:center}
   /* Soft dark fade behind the text column only; the subject stays bright. */
   .stm-studio .stm-slide-scrim{display:block;position:absolute;z-index:1;inset:0 auto 0 0;width:62%;pointer-events:none;background:radial-gradient(70% 60% at 22% 42%,rgba(5,9,16,.72) 0%,rgba(5,9,16,.5) 45%,rgba(5,9,16,0) 100%),linear-gradient(90deg,rgba(5,9,16,.55) 0%,rgba(5,9,16,.3) 35%,rgba(5,9,16,0) 75%)}
   .stm-studio .stm-slide-text{display:block;position:absolute;z-index:2;left:4.8%;top:clamp(56px,13vh,140px);width:min(44%,640px)}
