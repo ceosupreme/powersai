@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
+import { UspFound, UspLook } from "@/components/marketing/studio/sections/HomeUsps";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
@@ -57,13 +58,25 @@ export default function MarketingSite() {
     <div className="stm-studio relative min-h-screen">
       <main>
         <HomeOpening />
-        <AfterDark />
-        <HomeIndustries />
-        <StudioReveal><SelectedWork /></StudioReveal>
-        <Testimonials />
-        <StudioReveal><HomeProcess /></StudioReveal>
-        <StudioReveal><PricingTeaser /></StudioReveal>
-        <StudioReveal><Inquiry /></StudioReveal>
+        {/* The stack: the 3 AM scene holds while each next panel slides up
+            over it — two bundle-plus-outcome messages, then the work itself
+            as the payoff. Selected Work enters as the last panel (the
+            slide-over is its reveal) and carries the page on normally.
+            Industries sits below the proof content: it earns SEO and leads,
+            not the first scroll. */}
+        <div className="stm-stack">
+          <AfterDark />
+          <UspLook />
+          <UspFound />
+          <SelectedWork />
+        </div>
+        <div className="stm-after-stack">
+          <Testimonials />
+          <HomeIndustries />
+          <StudioReveal><HomeProcess /></StudioReveal>
+          <StudioReveal><PricingTeaser /></StudioReveal>
+          <StudioReveal><Inquiry /></StudioReveal>
+        </div>
       </main>
       <StudioFooter />
     </div>

@@ -1,0 +1,49 @@
+/* The homepage stack: the 3 AM scene, the two USP panels and Selected Work.
+   Each panel holds while the next slides up over it — pure CSS sticky, no
+   scroll hijack. A percent top can't express "own height" (it resolves
+   against the whole stack), so useStackPanel measures each panel and sets
+   --stack-top to min(0, viewport − height): viewport-size panels pin at the
+   top, taller ones pin by their bottom edge so all content is reachable.
+   The last child has no stack room below it and never pins, so Selected
+   Work slides over the dark panel and then carries the page on normally. */
+.stm-studio .stm-stack{position:relative}
+.stm-studio .stm-stack > section{position:sticky;top:var(--stack-top,0px)}
+.stm-studio .stm-stack > section:nth-child(1){z-index:1}
+.stm-studio .stm-stack > section:nth-child(2){z-index:2}
+.stm-studio .stm-stack > section:nth-child(3){z-index:3}
+.stm-studio .stm-stack > section:nth-child(4){z-index:4}
+.stm-studio .stm-stack > section + section{box-shadow:0 -30px 80px rgba(5,8,10,.4)}
+.stm-studio .stm-after-stack{position:relative;z-index:5}
+
+.stm-studio .stm-usp{position:relative;overflow:hidden;min-height:100vh;min-height:100svh;display:grid;align-content:center;padding:96px 0}
+.stm-studio .stm-usp-light{background:hsl(var(--opening-ivory));color:#101412}
+.stm-studio .stm-usp-dark{background:hsl(var(--opening-night));color:hsl(var(--opening-ivory))}
+.stm-studio .stm-usp-wash{position:absolute;right:-160px;top:120px;width:640px;height:520px;border-radius:50%;filter:blur(80px);background:rgba(242,189,125,.4);pointer-events:none}
+.stm-studio .stm-usp-pool{position:absolute;left:50%;top:50%;width:min(1100px,88vw);height:540px;transform:translate(-50%,-50%);background:radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,.13), transparent 70%);pointer-events:none}
+
+.stm-studio .stm-usp-inner{position:relative;width:min(92%,1240px);margin:0 auto;text-align:center;opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+.stm-studio .stm-usp-inner.on{opacity:1;transform:none}
+.stm-studio .stm-usp-eyebrow{font:700 16px Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#975326}
+.stm-studio .stm-usp-dark .stm-usp-eyebrow{color:#F2BD7D}
+.stm-studio .stm-usp h2{margin:18px auto 0;max-width:16ch;font:800 clamp(40px,5.6vw,84px)/1.06 "Inter Tight",sans-serif;letter-spacing:-.02em}
+.stm-studio .stm-usp h2 em{font-family:"DM Serif Display",serif;font-style:italic;font-weight:400;font-size:.98em;letter-spacing:0;color:#975326}
+.stm-studio .stm-usp-dark h2 em{color:#7CBDFF;text-shadow:0 0 20px rgba(80,160,255,.5)}
+.stm-studio .stm-usp p{margin:22px auto 0;max-width:52ch;font-size:clamp(19px,1.6vw,23px);line-height:1.55;color:rgba(16,20,18,.72)}
+.stm-studio .stm-usp-dark p{color:hsl(var(--opening-ivory) / .85)}
+.stm-studio .stm-usp-items{display:block;margin:20px auto 0;font:600 13px/1.8 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(16,20,18,.45)}
+.stm-studio .stm-usp-dark .stm-usp-items{color:hsl(var(--opening-ivory) / .5)}
+.stm-studio .stm-usp-actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:32px}
+.stm-studio .stm-usp-btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 28px;border-radius:999px;font:800 16px Inter,sans-serif;text-decoration:none}
+.stm-studio .stm-usp-btn svg{width:17px;height:17px}
+.stm-studio .stm-usp-btn.gold{background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;box-shadow:0 10px 26px rgba(232,154,43,.3)}
+.stm-studio .stm-usp .optional-studio-media{display:block;width:min(100%,980px);height:auto;margin:40px auto 0;border-radius:18px}
+
+@media (max-width:760px){
+  .stm-studio .stm-usp{padding:72px 0}
+  .stm-studio .stm-usp h2{font-size:clamp(34px,9vw,44px)}
+  .stm-studio .stm-usp p{font-size:17.5px}
+  .stm-studio .stm-usp-wash{width:340px;height:300px;right:-120px;top:60px}
+}
+@media (prefers-reduced-motion: reduce){
+  .stm-studio .stm-usp-inner{opacity:1 !important;transform:none !important;transition:none !important}
+}
