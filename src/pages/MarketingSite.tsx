@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
-import { UspFound, UspLook } from "@/components/marketing/studio/sections/HomeUsps";
+import { ChosenFirst } from "@/components/marketing/studio/sections/HomeUsps";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
@@ -58,16 +58,15 @@ export default function MarketingSite() {
     <div className="stm-studio relative min-h-screen">
       <main>
         <HomeOpening />
-        {/* The three slides: the 3 AM scene holds while two more "what we
-            do for you" panels slide up over it. Work follows as its own
-            normal section — the proof right after the promises. Panel copy
-            is placeholder until the messages are decided. Industries sits
-            below the proof content: it earns SEO and leads, not the first
-            scroll. */}
+        {/* The slide stack: "We create campaigns that get you chosen first",
+            then the 3 AM scene slides up over it ("We build websites that
+            work while you sleep"); the rocket slide ("We boost brands
+            higher, faster") joins as the third once its render exists.
+            Work follows as its own normal section — the proof right after
+            the promises. Industries sits below the proof content. */}
         <div className="stm-stack">
+          <ChosenFirst />
           <AfterDark />
-          <UspLook />
-          <UspFound />
         </div>
         <div className="stm-after-stack">
           <StudioReveal><SelectedWork /></StudioReveal>

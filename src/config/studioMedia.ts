@@ -36,6 +36,7 @@ import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
+import chosenFirst from "@/assets/stm-opening/chosen-first.webp";
 
 /**
  * Single media configuration for the public studio site.
@@ -77,6 +78,14 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     aspectRatio: "1920 / 1081",
     width: 1920,
     height: 1081,
+    objectFit: "contain",
+  },
+  "home-chosen-first": {
+    src: chosenFirst,
+    alt: "Aerial view of a blue city at night where one building glows gold, with a beam of light rising from its roof and traffic flowing toward it",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
     objectFit: "contain",
   },
   "home-after-dark": {
