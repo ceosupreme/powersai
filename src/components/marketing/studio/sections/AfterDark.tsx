@@ -69,7 +69,7 @@ export function AfterDark() {
       title?.classList.add("lit");
       return;
     }
-    const THRESHOLDS = [0.12, 0.38, 0.64, 0.9];
+    const THRESHOLDS = [0.09, 0.28, 0.47, 0.66];
     const TITLE_THRESHOLDS = [0.1, 0.45, 0.8];
     let ticking = false;
     let chipDocTop = 0; // chip row's document-space top, cached while unpinned
@@ -94,10 +94,10 @@ export function AfterDark() {
       const pinned = sectionRect.top <= pinTop + 2;
       if (!pinned) chipDocTop = rect.top + scrollY;
       const top = pinned ? chipDocTop - scrollY : rect.top;
-      // 0 once the chip row is fully on screen; the four chips then spread
-      // across a full screen-height of scrolling while the slide holds in
-      // place (the stack's 150vh hold), each landing about a quarter-screen
-      // apart, with the last leaving a long rest before the next slide.
+      // 0 once the chip row is fully on screen; the four chips then land
+      // about a fifth of a screen apart while the slide holds in place (the
+      // stack's 110vh hold), the last leaving about half a screen of rest
+      // before the next slide.
       const progress = (vh * 0.85 - top) / vh;
       chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
       allLitRef.current = progress > THRESHOLDS[THRESHOLDS.length - 1];

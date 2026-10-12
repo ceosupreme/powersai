@@ -250,9 +250,9 @@
 .stm-studio .stm-command-mobile-controls { display: none; }
 .stm-studio .stm-command-artboard.is-paused * { animation-play-state: paused; }
 @keyframes stm-command-breathe { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px hsl(var(--opening-gold) / .3)); } 50% { opacity: .88; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); } }
-@keyframes stm-energy-run { 0% { stroke-dashoffset: var(--d0); opacity: 0; } 3%, 27% { opacity: 1; } 31%, 100% { stroke-dashoffset: var(--d1); opacity: 0; } }
-/* A pulse lands every 1.3s (1.2s into each cycle), so the flash peaks at 92%. */
-@keyframes stm-energy-flash { 0% { opacity: .3; transform: scale(1.25); } 12% { opacity: 0; transform: scale(1.4); } 86% { opacity: 0; transform: scale(.8); } 92% { opacity: .9; transform: scale(1); } 100% { opacity: .3; transform: scale(1.25); } }
+@keyframes stm-energy-run { 0% { stroke-dashoffset: var(--d0); opacity: 0; } 2.4%, 21.8% { opacity: 1; } 25%, 100% { stroke-dashoffset: var(--d1); opacity: 0; } }
+/* A pulse lands every 1.3s (just under 1s into each cycle), so the flash peaks at 75%. */
+@keyframes stm-energy-flash { 0%, 69% { opacity: 0; transform: scale(.8); } 75% { opacity: .9; transform: scale(1); } 83% { opacity: .3; transform: scale(1.25); } 95%, 100% { opacity: 0; transform: scale(1.4); } }
 @media (min-width: 1600px) {
   .stm-studio .stm-command-copy { padding-top: 145px; }
   .stm-studio .stm-command-copy h1 { font-size: 86px; }

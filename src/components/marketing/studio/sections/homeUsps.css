@@ -18,8 +18,8 @@
    read before the next slide arrives. Not a scroll lock — the visitor is
    always in control; the slide simply holds for that stretch. Reduced
    motion has nothing to wait for, so the holds collapse. */
-.stm-studio .stm-stack-hold{height:80vh;pointer-events:none}
-.stm-studio .stm-stack-hold.long{height:150vh}
+.stm-studio .stm-stack-hold{height:55vh;pointer-events:none}
+.stm-studio .stm-stack-hold.long{height:110vh}
 .stm-studio .stm-after-stack{position:relative;z-index:5}
 
 /* Story slides (get attention, boost brands): one render, a live three-line

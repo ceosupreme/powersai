@@ -259,8 +259,10 @@ function cardEdgeLoops(w: number, h: number, plugY: number, right: boolean): [st
  * ending in a small junction. Every card has its own feed: an engraved line
  * from the nearest rail or lane into its outer edge at the icon, with a hidden
  * lit overlay that runs when the card is hovered (or once as it scrolls in on
- * touch screens). Flank bundles run in off the top edge (wired to the hero
- * above) and out the bottom edge. Ambient signals are numbered (data-o) and
+ * touch screens). Some engraved circuitry carries on under the cards and
+ * disappears beneath their frosted fronts. Flank
+ * bundles run in off the top edge (wired to the hero above) and out the
+ * bottom edge. Ambient signals are numbered (data-o) and
  * fired one at a time by OpeningServices; nothing runs down the middle, so the
  * cards keep the eye. Phones get one lit rail down each edge and a feed into
  * every card. Each card's edge-trace loops and feed timing are written here
@@ -336,6 +338,7 @@ function drawServiceBoard(section: HTMLElement, svg: SVGSVGElement) {
     comets.push(`<g class="cmg ${tone}" data-o="${seq}" data-dur="${dur.toFixed(2)}"${fx ? ` data-fx="${fx.id}" data-fxt="${fx.at}"` : ""}>${cometPaths(d, L, lead)}</g>`);
   };
   const pad = (x: number, y: number) => { pads.push(`<circle class="pu" cx="${f(x)}" cy="${f(y)}" r="4.2"/>`); };
+  const via = (x: number, y: number) => { pads.push(`<circle class="pu" cx="${f(x)}" cy="${f(y)}" r="3"/>`); };
   const joint = (x: number, y: number, tone: "gold" | "cyan") => { pads.push(`<circle class="jn ${tone}" cx="${f(x)}" cy="${f(y)}" r="3.4"/>`); };
   // A small glowing junction. `fx` lets a landing signal flash it; `card`
   // ties it to a card's touch-screen power-up.
@@ -368,6 +371,8 @@ function drawServiceBoard(section: HTMLElement, svg: SVGSVGElement) {
     unlit.push(`<path class="u" d="${pathD([[X(srcX), y], [X(edge), y]])}"/>`);
     if (withJoint) { if (srcLit) joint(X(srcX), y, tone); else pad(X(srcX), y); }
     pads.push(`<circle class="pin ${tone}" cx="${f(X(edge))}" cy="${f(y)}" r="3.6"/>`);
+    // Desktop: the stub carries on under the glass to a via beside the icon.
+    if (desktop) { trace([[X(edge), y], [X(edge + 22), y]]); via(X(edge + 22), y); }
     const pts = [[X(srcX), Math.max(top, y - 150)], [X(srcX), y], [X(edge + 2), y]];
     const d = pathD(pts);
     const L = length(pts);
@@ -425,7 +430,11 @@ function drawServiceBoard(section: HTMLElement, svg: SVGSVGElement) {
             const id = fxNext++;
             live(pts, tone, SEQ.lane[side][k], { id, at: 0.9 });
             node(X(endX), g, tone, 10, id);
-          } else { trace(pts); pad(X(endX), g); }
+          } else {
+            // Unlit lanes dive under the card below and run on under its glass.
+            trace([...pts, [X(endX + 26), g + 26], [X(endX + 96), g + 26]]);
+            via(X(endX + 96), g + 26);
+          }
         });
         if (M >= 70) plate(X(side === "l" ? -30 : laneX[0] + 24), gaps[0] + 54, X(side === "l" ? laneX[0] + 24 : -30), gaps[2] - 54);
         if (M >= 150) {
@@ -460,6 +469,41 @@ function drawServiceBoard(section: HTMLElement, svg: SVGSVGElement) {
         feedTime[i] = feed(i, srcX, top, fromLane ? LIT[side][row] : true, true);
       });
     }
+
+    // Under the glass: pairs of engraved traces cross every row gap from one
+    // card's quiet bottom corner into the next card's top padding, enter the
+    // top row from above and leave the bottom row below, and two short
+    // bridges tie the columns together. The lines show in the gaps and
+    // disappear under the frosted cards; they stay in padding and empty
+    // corners and are staggered so nothing lines up into a line down a column.
+    const colL = [G.l, G.r - cw];
+    const pair = (x: number, y0: number, y1: number, jogAt?: number) => {
+      [0, 9].forEach((o) => {
+        const pts = jogAt == null
+          ? [[x + o, y0], [x + o, y1]]
+          : [[x + o, y0], [x + o, jogAt - 5], [x + o + 9, jogAt + 4], [x + o + 9, y1]];
+        trace(pts);
+        via(pts[0][0], pts[0][1]);
+        via(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+      });
+    };
+    // Where each pair sits across its column (top entry, gaps 0-2, bottom
+    // exit): clear of the Explore links and of the lanes' ends in the gaps.
+    const FR = [[0.66, 0.6, 0.72, 0.56, 0.62], [0.5, 0.46, 0.52, 0.44, 0.48]];
+    [0, 1].forEach((col) => {
+      const x = (k: number) => colL[col] + cw * FR[col][k];
+      pair(x(0), G.t - 26, cards[col].t + 18);
+      [0, 1, 2].forEach((k) => pair(x(k + 1), cards[k * 2 + col].b - 34, cards[(k + 1) * 2 + col].t + 18, gaps[k]));
+      pair(x(4), cards[6 + col].b - 34, G.b + 26);
+    });
+    [1, 2].forEach((k) => {
+      const a = cards[k * 2];
+      const b = cards[k * 2 + 1];
+      const y = a.b - 12;
+      trace([[a.r - 84, y], [b.l + 24, y]]);
+      via(a.r - 84, y);
+      via(b.l + 24, y);
+    });
 
     // Header flank bundles: three traces run in off the top edge and bend
     // toward the cards; the middle one is lit and carries power down.
