@@ -58,19 +58,19 @@ export default function MarketingSite() {
     <div className="stm-studio relative min-h-screen">
       <main>
         <HomeOpening />
-        {/* The stack: the 3 AM scene holds while each next panel slides up
-            over it — two bundle-plus-outcome messages, then the work itself
-            as the payoff. Selected Work enters as the last panel (the
-            slide-over is its reveal) and carries the page on normally.
-            Industries sits below the proof content: it earns SEO and leads,
-            not the first scroll. */}
+        {/* The three slides: the 3 AM scene holds while two more "what we
+            do for you" panels slide up over it. Work follows as its own
+            normal section — the proof right after the promises. Panel copy
+            is placeholder until the messages are decided. Industries sits
+            below the proof content: it earns SEO and leads, not the first
+            scroll. */}
         <div className="stm-stack">
           <AfterDark />
           <UspLook />
           <UspFound />
-          <SelectedWork />
         </div>
         <div className="stm-after-stack">
+          <StudioReveal><SelectedWork /></StudioReveal>
           <Testimonials />
           <HomeIndustries />
           <StudioReveal><HomeProcess /></StudioReveal>

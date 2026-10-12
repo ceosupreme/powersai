@@ -1,17 +1,16 @@
-/* The homepage stack: the 3 AM scene, the two USP panels and Selected Work.
-   Each panel holds while the next slides up over it — pure CSS sticky, no
-   scroll hijack. A percent top can't express "own height" (it resolves
-   against the whole stack), so useStackPanel measures each panel and sets
-   --stack-top to min(0, viewport − height): viewport-size panels pin at the
-   top, taller ones pin by their bottom edge so all content is reachable.
-   The last child has no stack room below it and never pins, so Selected
-   Work slides over the dark panel and then carries the page on normally. */
+/* The homepage slide stack: the 3 AM scene and two more panels. Each
+   holds while the next slides up over it — pure CSS sticky, no scroll
+   hijack. A percent top can't express "own height" (it resolves against
+   the whole stack), so useStackPanel measures each panel and sets
+   --stack-top to min(0, viewport − height): viewport-size panels pin at
+   the top, taller ones pin by their bottom edge so all content is
+   reachable. The last slide has no stack room below it and never pins,
+   so the page scrolls on normally into the next section (Work). */
 .stm-studio .stm-stack{position:relative}
 .stm-studio .stm-stack > section{position:sticky;top:var(--stack-top,0px)}
 .stm-studio .stm-stack > section:nth-child(1){z-index:1}
 .stm-studio .stm-stack > section:nth-child(2){z-index:2}
 .stm-studio .stm-stack > section:nth-child(3){z-index:3}
-.stm-studio .stm-stack > section:nth-child(4){z-index:4}
 .stm-studio .stm-stack > section + section{box-shadow:0 -30px 80px rgba(5,8,10,.4)}
 .stm-studio .stm-after-stack{position:relative;z-index:5}
 
