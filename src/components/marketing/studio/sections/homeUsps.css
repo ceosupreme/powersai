@@ -32,7 +32,7 @@
    from the render's edges, with the image's top and bottom dissolving into
    it so no seam line shows. */
 .stm-studio .stm-slide{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:64px 0 72px;color:hsl(42 36% 94%);container-type:inline-size}
-.stm-studio .stm-slide-attention{background:linear-gradient(180deg,#000B1D 0%,#020D20 50%,#030E23 100%)}
+.stm-studio .stm-slide-attention{background:linear-gradient(180deg,#00071A 0%,#000516 50%,#000412 100%)}
 .stm-studio .stm-slide-boost{background:linear-gradient(180deg,#103D78 0%,#1E3A62 45%,#27364D 100%)}
 .stm-studio .stm-slide-text{display:contents}
 .stm-studio .stm-slide-title{order:1}
@@ -45,7 +45,7 @@
 .stm-studio .stm-slide-frame img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
 /* Phones: the bench render's empty left side is dead space — crop to the
    man and his three screens. */
-.stm-studio .stm-slide-attention .stm-slide-frame img{aspect-ratio:4 / 3;object-fit:cover;object-position:100% center}
+.stm-studio .stm-slide-attention .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:95% center}
 /* Phones: the rooftop crops to the owner, his panels and the gold tower. */
 .stm-studio .stm-slide-boost .stm-slide-frame img{aspect-ratio:1 / 1;object-fit:cover;object-position:94% center}
 
@@ -80,7 +80,10 @@
   .stm-studio .stm-slide-title::after{margin:clamp(14px,2.2vh,24px) 0 0;transform-origin:left}
   .stm-studio .stm-slide-copy{width:auto;margin:clamp(18px,3vh,32px) 0 0;text-align:left}
   .stm-studio .stm-slide-copy p{margin:0;max-width:34ch;font-size:clamp(18px,1.45vw,22px)}
-  .stm-studio .stm-slide-actions{justify-content:flex-start;margin-top:clamp(18px,3vh,30px)}
+  .stm-studio .stm-slide-actions{justify-content:flex-start;margin-top:clamp(18px,3vh,30px);gap:clamp(10px,1vw,14px)}
+  /* Buttons ease down on smaller laptops so the row never reaches into the
+     render's subject (full size from ~1460px wide). */
+  .stm-studio .stm-slide-btn{font-size:clamp(14px,1.1vw,16px);padding:0 clamp(18px,1.8vw,26px)}
 }
 @media (prefers-reduced-motion: reduce){
   .stm-studio .stm-stack-hold{height:0}

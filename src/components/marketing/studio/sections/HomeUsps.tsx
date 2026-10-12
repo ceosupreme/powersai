@@ -146,6 +146,7 @@ export function GetAttention() {
 
 /** Slide 3, the finale: the owner on a rooftop at sunrise over the city, his
  *  gold building below and his wins (sales, bookings, reviews) beside him.
+ *  The rooftop makes "next level" literal — he's standing on the top floor.
  *  "See the results" drops straight into the Work section below. */
 export function BoostBrands() {
   return (
@@ -154,7 +155,7 @@ export function BoostBrands() {
       variant="stm-slide-boost"
       mediaKey="home-next-level"
       lines={["We boost brands", "higher,", <b key="f">faster.</b>]}
-      line="Supreme Team Media blasts your business to the next level."
+      line="Supreme Team Media takes your business to the next level."
       actions={[
         { label: "See the results", to: "#work", tone: "gold", track: "boost_brands_see_results", hash: true },
         { label: "Free Business Checkup", to: "/free-audit?src=home-boost-brands", tone: "wine", track: "boost_brands_free_checkup" },
