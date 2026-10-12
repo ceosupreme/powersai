@@ -143,12 +143,10 @@ export function AfterDark() {
 
   return (
     <section ref={sectionRef} id="after-dark" className="stm-dark" aria-labelledby="after-dark-title">
+      {/* Desktop: the scene fills exactly one screen and the text column sits
+          over its quiet left side. Phones: the text wrapper dissolves
+          (display: contents) so the order is headline, scene, cards, copy. */}
       <div className="stm-dark-stage">
-        <h2 id="after-dark-title" className="stm-dark-title">
-          <span className="stm-dark-tline">We build websites</span>
-          <span className="stm-dark-tline">that <b>work</b></span>
-          <span className="stm-dark-tline">while you sleep.</span>
-        </h2>
         <div className="stm-dark-frame" data-watch>
           {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
         </div>
@@ -166,11 +164,19 @@ export function AfterDark() {
           })}
         </ul>
       </div>
-      <div className="stm-dark-copy" data-watch>
-        <p>The systems behind your site answer calls, reply to leads and book jobs around the clock.</p>
-        <div className="stm-dark-actions">
-          <Link to="/services/ai-systems" className="stm-dark-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_see_systems" })}>See the systems <ArrowRight aria-hidden /></Link>
-          <Link to="/free-audit?src=home-after-dark" className="stm-dark-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_free_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link>
+      <div className="stm-dark-scrim" aria-hidden="true" />
+      <div className="stm-dark-text">
+        <h2 id="after-dark-title" className="stm-dark-title">
+          <span className="stm-dark-tline">We build websites</span>
+          <span className="stm-dark-tline">that <b>work</b></span>
+          <span className="stm-dark-tline">while you sleep.</span>
+        </h2>
+        <div className="stm-dark-copy" data-watch>
+          <p>The systems behind your site answer calls, reply to leads and book jobs around the clock.</p>
+          <div className="stm-dark-actions">
+            <Link to="/services/ai-systems" className="stm-dark-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_see_systems" })}>See the systems <ArrowRight aria-hidden /></Link>
+            <Link to="/free-audit?src=home-after-dark" className="stm-dark-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_free_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link>
+          </div>
         </div>
       </div>
     </section>

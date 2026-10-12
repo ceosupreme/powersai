@@ -33,14 +33,13 @@ type SlideAction = { label: string; to: string; tone: "gold" | "wine"; track: st
  * Headline copy is live text; images swap via their studioMedia key, with an
  * optional phone version (mobileSrc).
  */
-function StorySlide({ id, variant, mediaKey, lines, line, actions, scrim = false }: {
+function StorySlide({ id, variant, mediaKey, lines, line, actions }: {
   id: string;
   variant: string;
   mediaKey: string;
   lines: React.ReactNode[];
   line: string;
   actions: SlideAction[];
-  scrim?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const art = getStudioMedia(mediaKey);
@@ -94,30 +93,33 @@ function StorySlide({ id, variant, mediaKey, lines, line, actions, scrim = false
 
   return (
     <section ref={sectionRef} id={id} className={`stm-slide ${variant}`} aria-labelledby={`${id}-title`}>
-      <div className="stm-slide-stage">
-        {scrim && <div className="stm-slide-scrim" aria-hidden="true" />}
+      {/* Desktop: the render fills exactly one screen and the text column sits
+          over its quiet left side. Phones: the text wrapper dissolves
+          (display: contents) so the order is headline, image, line, buttons. */}
+      <div className="stm-slide-frame" data-watch>
+        {art?.src && (
+          <picture>
+            {art.mobileSrc && <source media="(max-width: 760px)" srcSet={art.mobileSrc} />}
+            <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />
+          </picture>
+        )}
+      </div>
+      <div className="stm-slide-scrim" aria-hidden="true" />
+      <div className="stm-slide-text">
         <h2 id={`${id}-title`} className="stm-slide-title">
           {lines.map((content, index) => <span key={index} className="stm-slide-tline">{content}</span>)}
         </h2>
-        <div className="stm-slide-frame" data-watch>
-          {art?.src && (
-            <picture>
-              {art.mobileSrc && <source media="(max-width: 760px)" srcSet={art.mobileSrc} />}
-              <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />
-            </picture>
-          )}
-        </div>
-      </div>
-      <div className="stm-slide-copy" data-watch>
-        <p>{line}</p>
-        <div className="stm-slide-actions">
-          {actions.map((action) => {
-            const onClick = () => trackSiteEvent({ event_type: "cta_click", label: action.track });
-            const className = `stm-slide-btn ${action.tone}`;
-            return action.hash
-              ? <a key={action.label} href={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></a>
-              : <Link key={action.label} to={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></Link>;
-          })}
+        <div className="stm-slide-copy" data-watch>
+          <p>{line}</p>
+          <div className="stm-slide-actions">
+            {actions.map((action) => {
+              const onClick = () => trackSiteEvent({ event_type: "cta_click", label: action.track });
+              const className = `stm-slide-btn ${action.tone}`;
+              return action.hash
+                ? <a key={action.label} href={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></a>
+                : <Link key={action.label} to={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></Link>;
+            })}
+          </div>
         </div>
       </div>
     </section>
@@ -149,7 +151,6 @@ export function BoostBrands() {
       id="boost-brands"
       variant="stm-slide-boost"
       mediaKey="home-boost-rocket"
-      scrim
       lines={["We boost brands", "higher,", <b key="f">faster.</b>]}
       line="Supreme Team Media blasts your business to the next level."
       actions={[
