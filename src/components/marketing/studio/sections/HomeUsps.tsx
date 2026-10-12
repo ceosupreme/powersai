@@ -25,15 +25,25 @@ export function useStackPanel(sectionRef: React.MutableRefObject<HTMLElement | n
   }, [sectionRef]);
 }
 
+type SlideAction = { label: string; to: string; tone: "gold" | "wine"; track: string; hash?: boolean };
+
 /**
- * Slide 1 of the stack: "We create campaigns that get you chosen first."
- * The aerial render (one gold building in a blue city, traffic flowing to
- * it) carries the scene; the headline is live text that lights line by line
- * on scroll, matching the 3 AM slide. Image swaps via "home-chosen-first".
+ * One story slide: a render, a three-line headline that lights line by line
+ * on scroll (like the 3 AM slide), a line under the image and two buttons.
+ * Headline copy is live text; images swap via their studioMedia key, with an
+ * optional phone version (mobileSrc).
  */
-export function ChosenFirst() {
+function StorySlide({ id, variant, mediaKey, lines, line, actions, scrim = false }: {
+  id: string;
+  variant: string;
+  mediaKey: string;
+  lines: React.ReactNode[];
+  line: string;
+  actions: SlideAction[];
+  scrim?: boolean;
+}) {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const art = getStudioMedia("home-chosen-first");
+  const art = getStudioMedia(mediaKey);
   useStackPanel(sectionRef);
 
   // Image and copy fade in when they enter view.
@@ -58,11 +68,11 @@ export function ChosenFirst() {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-    const title = section.querySelector<HTMLElement>(".stm-chosen-title");
-    const lines = Array.from(section.querySelectorAll<HTMLElement>(".stm-chosen-tline"));
-    if (!title || lines.length === 0) return;
+    const title = section.querySelector<HTMLElement>(".stm-slide-title");
+    const tlines = Array.from(section.querySelectorAll<HTMLElement>(".stm-slide-tline"));
+    if (!title || tlines.length === 0) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      lines.forEach((line) => line.classList.add("lit"));
+      tlines.forEach((el) => el.classList.add("lit"));
       title.classList.add("lit");
       return;
     }
@@ -72,7 +82,7 @@ export function ChosenFirst() {
       ticking = false;
       const vh = window.innerHeight || 1;
       const tp = (vh * 0.9 - title.getBoundingClientRect().top) / (vh * 0.45);
-      lines.forEach((line, index) => line.classList.toggle("lit", tp > THRESHOLDS[index]));
+      tlines.forEach((el, index) => el.classList.toggle("lit", tp > THRESHOLDS[index]));
       title.classList.toggle("lit", tp > THRESHOLDS[2]);
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
@@ -83,24 +93,69 @@ export function ChosenFirst() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="chosen-first" className="stm-chosen" aria-labelledby="chosen-first-title">
-      <div className="stm-chosen-stage">
-        <h2 id="chosen-first-title" className="stm-chosen-title">
-          <span className="stm-chosen-tline">We create campaigns</span>
-          <span className="stm-chosen-tline">that get you</span>
-          <span className="stm-chosen-tline">chosen <b>first.</b></span>
+    <section ref={sectionRef} id={id} className={`stm-slide ${variant}`} aria-labelledby={`${id}-title`}>
+      <div className="stm-slide-stage">
+        {scrim && <div className="stm-slide-scrim" aria-hidden="true" />}
+        <h2 id={`${id}-title`} className="stm-slide-title">
+          {lines.map((content, index) => <span key={index} className="stm-slide-tline">{content}</span>)}
         </h2>
-        <div className="stm-chosen-frame" data-watch>
-          {art?.src && <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />}
+        <div className="stm-slide-frame" data-watch>
+          {art?.src && (
+            <picture>
+              {art.mobileSrc && <source media="(max-width: 760px)" srcSet={art.mobileSrc} />}
+              <img src={art.src} alt={art.alt} width={art.width} height={art.height} loading="lazy" />
+            </picture>
+          )}
         </div>
       </div>
-      <div className="stm-chosen-copy" data-watch>
-        <p>Ads, local search and reviews working together, so when someone in town needs what you sell, they pick you.</p>
-        <div className="stm-chosen-actions">
-          <Link to="/services/marketing" className="stm-chosen-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "chosen_first_see_marketing" })}>See the marketing <ArrowRight aria-hidden /></Link>
-          <Link to="/free-audit?src=home-chosen-first" className="stm-chosen-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "chosen_first_free_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link>
+      <div className="stm-slide-copy" data-watch>
+        <p>{line}</p>
+        <div className="stm-slide-actions">
+          {actions.map((action) => {
+            const onClick = () => trackSiteEvent({ event_type: "cta_click", label: action.track });
+            const className = `stm-slide-btn ${action.tone}`;
+            return action.hash
+              ? <a key={action.label} href={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></a>
+              : <Link key={action.label} to={action.to} className={className} onClick={onClick}>{action.label} <ArrowRight aria-hidden /></Link>;
+          })}
         </div>
       </div>
     </section>
+  );
+}
+
+/** Slide 1: one gold building in a blue city, traffic flowing to it. */
+export function ChosenFirst() {
+  return (
+    <StorySlide
+      id="chosen-first"
+      variant="stm-slide-chosen"
+      mediaKey="home-chosen-first"
+      lines={["We create campaigns", "that get you", <>chosen <b>first.</b></>]}
+      line="Ads, local search and reviews working together, so when someone in town needs what you sell, they pick you."
+      actions={[
+        { label: "See the marketing", to: "/services/marketing", tone: "gold", track: "chosen_first_see_marketing" },
+        { label: "Free Business Checkup", to: "/free-audit?src=home-chosen-first", tone: "wine", track: "chosen_first_free_checkup" },
+      ]}
+    />
+  );
+}
+
+/** Slide 3, the finale: the rocket lifting off the city on a growth line.
+ *  "See the results" drops straight into the Work section below. */
+export function BoostBrands() {
+  return (
+    <StorySlide
+      id="boost-brands"
+      variant="stm-slide-boost"
+      mediaKey="home-boost-rocket"
+      scrim
+      lines={["We boost brands", "higher,", <b key="f">faster.</b>]}
+      line="Supreme Team Media blasts your business to the next level."
+      actions={[
+        { label: "See the results", to: "#work", tone: "gold", track: "boost_brands_see_results", hash: true },
+        { label: "Free Business Checkup", to: "/free-audit?src=home-boost-brands", tone: "wine", track: "boost_brands_free_checkup" },
+      ]}
+    />
   );
 }

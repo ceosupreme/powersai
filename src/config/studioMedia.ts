@@ -37,6 +37,8 @@ import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
 import chosenFirst from "@/assets/stm-opening/chosen-first.webp";
+import boostRocket from "@/assets/stm-opening/boost-rocket.webp";
+import boostRocketMobile from "@/assets/stm-opening/boost-rocket-mobile.webp";
 
 /**
  * Single media configuration for the public studio site.
@@ -83,6 +85,15 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "home-chosen-first": {
     src: chosenFirst,
     alt: "Aerial view of a blue city at night where one building glows gold, with a beam of light rising from its roof and traffic flowing toward it",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "contain",
+  },
+  "home-boost-rocket": {
+    src: boostRocket,
+    mobileSrc: boostRocketMobile,
+    alt: "A glowing gold rocket lifting off from a city at sunset, riding a rising growth line into the clouds",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,

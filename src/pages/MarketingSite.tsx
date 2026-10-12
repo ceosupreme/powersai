@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
-import { ChosenFirst } from "@/components/marketing/studio/sections/HomeUsps";
+import { BoostBrands, ChosenFirst } from "@/components/marketing/studio/sections/HomeUsps";
 import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
@@ -60,8 +60,8 @@ export default function MarketingSite() {
         <HomeOpening />
         {/* The slide stack: "We create campaigns that get you chosen first",
             then the 3 AM scene slides up over it ("We build websites that
-            work while you sleep"); the rocket slide ("We boost brands
-            higher, faster") joins as the third once its render exists.
+            work while you sleep"), then the rocket ("We boost brands higher,
+            faster").
             Work follows as its own normal section — the proof right after
             the promises. Industries sits below the proof content. */}
         <div className="stm-stack">
@@ -69,6 +69,8 @@ export default function MarketingSite() {
           <div className="stm-stack-hold" aria-hidden="true" />
           <AfterDark />
           <div className="stm-stack-hold long" aria-hidden="true" />
+          <BoostBrands />
+          <div className="stm-stack-hold" aria-hidden="true" />
         </div>
         <div className="stm-after-stack">
           <StudioReveal><SelectedWork /></StudioReveal>
