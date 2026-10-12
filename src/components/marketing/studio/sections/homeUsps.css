@@ -6,12 +6,20 @@
    the top, taller ones pin by their bottom edge so all content is
    reachable. The last slide has no stack room below it and never pins, so
    the page scrolls on normally into the next section (Work). */
-.stm-studio .stm-stack{position:relative}
+.stm-studio .stm-stack{position:relative;background:#000206}
 .stm-studio .stm-stack > section{position:sticky;top:var(--stack-top,0px)}
-.stm-studio .stm-stack > section:nth-child(1){z-index:1}
-.stm-studio .stm-stack > section:nth-child(2){z-index:2}
-.stm-studio .stm-stack > section:nth-child(3){z-index:3}
-.stm-studio .stm-stack > section + section{box-shadow:0 -30px 80px rgba(0,0,0,.45)}
+.stm-studio .stm-stack > section:nth-of-type(1){z-index:1}
+.stm-studio .stm-stack > section:nth-of-type(2){z-index:2}
+.stm-studio .stm-stack > section:nth-of-type(3){z-index:3}
+.stm-studio .stm-stack > section ~ section{box-shadow:0 -30px 80px rgba(0,0,0,.45)}
+/* The pause: an invisible spacer after each slide. While the page scrolls
+   through it the slide above stays pinned and fully on screen, so its
+   scroll-driven effects (headline lines, receipt chips) finish and can be
+   read before the next slide arrives. Not a scroll lock — the visitor is
+   always in control; the slide simply holds for that stretch. Reduced
+   motion has nothing to wait for, so the holds collapse. */
+.stm-studio .stm-stack-hold{height:35vh;pointer-events:none}
+.stm-studio .stm-stack-hold.long{height:90vh}
 .stm-studio .stm-after-stack{position:relative;z-index:5}
 
 /* Slide: chosen first. The section background is sampled from the render's
@@ -25,7 +33,7 @@
 .stm-studio .stm-chosen-frame img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 9%,#000 90%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,#000 9%,#000 90%,transparent 100%)}
 
 /* Headline, seated in the render's dark left side */
-.stm-studio .stm-chosen-title{position:absolute;z-index:2;left:4.8%;top:24%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(4.1cqw,66px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,8,20,.8)}
+.stm-studio .stm-chosen-title{position:absolute;z-index:2;left:4.8%;top:6%;margin:0;font-family:"Inter Tight",sans-serif;font-weight:800;font-size:min(4.1cqw,66px);line-height:1.12;letter-spacing:-.02em;color:#F4F8FD;text-shadow:0 2px 18px rgba(0,8,20,.8)}
 .stm-studio .stm-chosen-tline{display:block;opacity:0;transform:translateY(16px);transition:opacity .5s cubic-bezier(.3,1.3,.5,1),transform .55s cubic-bezier(.3,1.3,.5,1)}
 .stm-studio .stm-chosen-tline.lit{opacity:1;transform:none}
 .stm-studio .stm-chosen-tline + .stm-chosen-tline{margin-top:.32em}
@@ -54,5 +62,6 @@
   .stm-studio .stm-chosen-copy p{font-size:17.5px}
 }
 @media (prefers-reduced-motion: reduce){
+  .stm-studio .stm-stack-hold{height:0}
   .stm-studio .stm-chosen-frame,.stm-studio .stm-chosen-copy,.stm-studio .stm-chosen-tline,.stm-studio .stm-chosen-title::after{opacity:1 !important;transform:none !important;transition:none !important}
 }

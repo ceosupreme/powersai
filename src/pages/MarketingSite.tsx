@@ -66,7 +66,9 @@ export default function MarketingSite() {
             the promises. Industries sits below the proof content. */}
         <div className="stm-stack">
           <ChosenFirst />
+          <div className="stm-stack-hold" aria-hidden="true" />
           <AfterDark />
+          <div className="stm-stack-hold long" aria-hidden="true" />
         </div>
         <div className="stm-after-stack">
           <StudioReveal><SelectedWork /></StudioReveal>
