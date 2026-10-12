@@ -95,10 +95,10 @@ export function AfterDark() {
       if (!pinned) chipDocTop = rect.top + scrollY;
       const top = pinned ? chipDocTop - scrollY : rect.top;
       // 0 once the chip row is fully on screen; the four chips then spread
-      // across most of a screen-height of scrolling. The slide holds in
-      // place (the stack's hold spacer) while the later chips arrive, so
-      // each one gets its moment before the next slide moves in.
-      const progress = (vh * 0.85 - top) / (vh * 0.75);
+      // across a full screen-height of scrolling while the slide holds in
+      // place (the stack's 150vh hold), each landing about a quarter-screen
+      // apart, with the last leaving a long rest before the next slide.
+      const progress = (vh * 0.85 - top) / vh;
       chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
       allLitRef.current = progress > THRESHOLDS[THRESHOLDS.length - 1];
     };

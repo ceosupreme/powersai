@@ -76,7 +76,9 @@
   .stm-studio .stm-dark{display:block;height:100vh;height:100svh;min-height:560px;padding:0}
   .stm-studio .stm-dark-stage{position:absolute;inset:0}
   .stm-studio .stm-dark-frame{position:absolute;inset:0;transform:none}
-  .stm-studio .stm-dark-frame img{width:100%;height:100%;object-fit:cover;object-position:center}
+  /* Anchor the scene to its top edge: on wide screens the crop comes off the
+     blanket at the bottom, never the 3:00 AM clock at the top. */
+  .stm-studio .stm-dark-frame img{width:100%;height:100%;object-fit:cover;object-position:center top}
   .stm-studio .stm-dark-chips{position:absolute;left:5%;right:5%;top:80%;transform:translateY(-50%);display:flex;gap:2.6%}
   .stm-studio .stm-dark-chips li{flex:1;min-width:0}
   /* Soft dark fade behind the text column only; the scene stays bright. */

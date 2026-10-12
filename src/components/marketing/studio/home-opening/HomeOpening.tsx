@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, BookOpen, ChevronDown, Cog, Database, Globe, Handshake, Mail, Megaphone, Menu, PenTool, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -103,6 +103,31 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
   );
 }
 
+
+/** Hero energy routes, traced onto the render's tubes (render pixel space,
+ *  tile end first so pulses travel up into the orb), with each route's
+ *  measured length. Fired left to right. Pulse colors contrast their tube
+ *  (cyan on the gold tubes, gold on the blue one) so they never blend in. */
+const COMMAND_ENERGY = [
+  { tone: "cyan", delay: "0s", len: 288.5, d: "M1140 479 C1225 464 1310 450 1352 436 C1380 426 1388 408 1387 380" },
+  { tone: "cyan", delay: "1.3s", len: 198, d: "M1336 502 C1375 490 1415 472 1440 459 C1458 449 1465 432 1466 382" },
+  { tone: "gold", delay: "2.6s", len: 176.4, d: "M1563 524 C1558 498 1530 476 1502 462 C1484 452 1481 430 1480 382" },
+  { tone: "cyan", delay: "3.9s", len: 280.2, d: "M1768 532 C1720 494 1650 470 1605 454 C1570 441 1550 424 1549 382" },
+] as const;
+/** One comet = four strokes sharing a leading edge: blurred glow, faint
+ *  long tail, bright colored body, white-hot head. Each runs a single dash
+ *  (period 1000, longer than any route) whose offset moves from
+ *  (1000 + its length) to (1000 + its length - route/0.75), so every layer's
+ *  leading edge travels together and every route lands at the same moment
+ *  (75% of the run), keeping the orb flash in sync. */
+const ENERGY_LAYERS = [
+  { cls: "stm-energy-glow", len: 80 },
+  { cls: "stm-energy-tail", len: 120 },
+  { cls: "stm-energy-body", len: 52 },
+  { cls: "stm-energy-head", len: 22 },
+] as const;
+const ENERGY_PERIOD = 1000;
+
 function OpeningHero({ onContact }: { onContact: () => void }) {
   const art = getStudioMedia("home-opening-command-center");
   const { search } = useLocation();
@@ -143,11 +168,38 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         </div>
       </div>
       <svg className="stm-command-overlays" viewBox="0 0 1200 675" aria-label="Marketing, Media, Web and Automation connected to Business Growth">
-        <g className="stm-command-energy" fill="none" aria-hidden="true">
-          <path className="stm-command-energy-gold" d="M688 306 C705 275 880 285 900 262" />
-          <path className="stm-command-energy-cyan" d="M819 320 C840 285 900 290 912 262" />
-          <path className="stm-command-energy-gold" d="M959 339 C965 300 935 290 930 262" />
-          <path className="stm-command-energy-cyan" d="M1115 354 C1105 300 960 300 942 262" />
+        <defs>
+          <filter id="stm-energy-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9" /></filter>
+          <radialGradient id="stm-energy-flash-fill">
+            <stop offset="0" stopColor="#FFF8E6" stopOpacity=".95" />
+            <stop offset=".35" stopColor="#F6C65A" stopOpacity=".55" />
+            <stop offset="1" stopColor="#F6C65A" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {/* Energy pulses: comets that ride the render's real tubes from each
+            tile up into the orb, fired left to right so power is always
+            flowing; the orb's base flashes as each one lands. Routes are
+            traced in the render's own pixel space (1920x1081) and scaled
+            onto the overlay. */}
+        <g className="stm-command-energy" fill="none" aria-hidden="true" transform="scale(.625 .62442)">
+          {COMMAND_ENERGY.map((route) => (
+            <g key={route.d} className={`stm-energy-${route.tone}`} style={{ "--ed": route.delay } as CSSProperties}>
+              {ENERGY_LAYERS.map((layer) => (
+                <path
+                  key={layer.cls}
+                  className={layer.cls}
+                  d={route.d}
+                  filter={layer.cls === "stm-energy-glow" ? "url(#stm-energy-blur)" : undefined}
+                  style={{
+                    strokeDasharray: `${layer.len} ${ENERGY_PERIOD - layer.len}`,
+                    "--d0": `${ENERGY_PERIOD + layer.len}px`,
+                    "--d1": `${(ENERGY_PERIOD + layer.len - route.len / 0.75).toFixed(1)}px`,
+                  } as CSSProperties}
+                />
+              ))}
+            </g>
+          ))}
+          <circle className="stm-energy-flash" cx="1468" cy="368" r="40" fill="url(#stm-energy-flash-fill)" />
         </g>
         <g className="stm-command-panel" transform="matrix(.992 .122 -.443 .818 665 349)"><Megaphone x="-21" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
         <g className="stm-command-panel" transform="matrix(.990 .141 -.361 .839 800 366)"><Play x="-19" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>

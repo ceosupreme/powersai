@@ -227,9 +227,19 @@
 .stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .9)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }
 .stm-studio .stm-command-core text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; paint-order: stroke; stroke: hsl(var(--opening-night) / .75); stroke-width: 3px; }
-.stm-studio .stm-command-energy path { stroke-width: 2px; stroke-linecap: round; stroke-dasharray: 12 260; animation: stm-command-energy 6s linear infinite; }
-.stm-studio .stm-command-energy-gold { stroke: hsl(var(--opening-gold)); }
-.stm-studio .stm-command-energy-cyan { stroke: hsl(var(--opening-cyan)); animation-delay: 2s; }
+/* Energy pulses (geometry and dash math live with COMMAND_ENERGY in
+   HomeOpening.tsx): every layer runs one shared keyframe between its own
+   --d0 and --d1 offsets. Arrival lands 1.2s into each 5.2s cycle. */
+.stm-studio .stm-command-energy path { stroke-linecap: round; opacity: 0; animation: stm-energy-run 5.2s linear var(--ed, 0s) infinite both; }
+.stm-studio .stm-energy-gold { --ec: #FFC860; }
+.stm-studio .stm-energy-cyan { --ec: #7FE9FF; }
+/* The glow is screened onto the render so it adds light — spilling onto the
+   dark console around the tube — instead of painting over it. */
+.stm-studio .stm-energy-glow { stroke: var(--ec); stroke-width: 36px; stroke-opacity: 1; mix-blend-mode: screen; }
+.stm-studio .stm-energy-tail { stroke: var(--ec); stroke-width: 3.5px; stroke-opacity: .55; }
+.stm-studio .stm-energy-body { stroke: var(--ec); stroke-width: 7px; }
+.stm-studio .stm-energy-head { stroke: #FFFFFF; stroke-width: 4.8px; }
+.stm-studio .stm-energy-flash { opacity: 0; transform-box: fill-box; transform-origin: center; animation: stm-energy-flash 1.3s linear infinite; }
 .stm-studio .stm-command-stories { position: absolute; right: 4%; bottom: 118px; width: 48%; display: grid; grid-template-columns: 1.55fr 1fr 1fr; align-items: end; gap: 10px; }
 .stm-studio .stm-command-story { position: relative; display: grid; gap: 9px; min-height: 88px; padding: 16px; border-radius: 6px; border: 1px solid hsl(var(--opening-silver) / .25); background: hsl(var(--opening-night) / .91); color: hsl(var(--opening-silver)); }
 .stm-studio .stm-command-story small { font-size: 11px; color: hsl(var(--opening-gold)); }
@@ -240,7 +250,9 @@
 .stm-studio .stm-command-mobile-controls { display: none; }
 .stm-studio .stm-command-artboard.is-paused * { animation-play-state: paused; }
 @keyframes stm-command-breathe { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px hsl(var(--opening-gold) / .3)); } 50% { opacity: .88; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); } }
-@keyframes stm-command-energy { 0% { stroke-dashoffset: 272; opacity: 0; } 15%, 60% { opacity: .8; } 85%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes stm-energy-run { 0% { stroke-dashoffset: var(--d0); opacity: 0; } 3%, 27% { opacity: 1; } 31%, 100% { stroke-dashoffset: var(--d1); opacity: 0; } }
+/* A pulse lands every 1.3s (1.2s into each cycle), so the flash peaks at 92%. */
+@keyframes stm-energy-flash { 0% { opacity: .3; transform: scale(1.25); } 12% { opacity: 0; transform: scale(1.4); } 86% { opacity: 0; transform: scale(.8); } 92% { opacity: .9; transform: scale(1); } 100% { opacity: .3; transform: scale(1.25); } }
 @media (min-width: 1600px) {
   .stm-studio .stm-command-copy { padding-top: 145px; }
   .stm-studio .stm-command-copy h1 { font-size: 86px; }
