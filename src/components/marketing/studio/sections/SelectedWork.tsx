@@ -152,9 +152,13 @@ export function SelectedWork() {
       <span id="proof" aria-hidden="true" />
       <div className="stm-work-head">
         <div className="stm-work-eyebrow">Our work</div>
-        <h2 id="home-work-title">Brands we've <em>switched on.</em></h2>
+        <h2 id="home-work-title">See our <em>best work.</em></h2>
         <p>Real brands, built by our team and live right now.</p>
       </div>
+      {/* The panels and the link to all the work sit in a dark window framed
+          by light above and below, led by their own smaller headline. */}
+      <div className="stm-work-window">
+      <h3 className="stm-work-window-title">Brands we've <em>switched on.</em></h3>
       <div className="stm-work-stage">
         <div className="stm-work-row" ref={rowRef}>
           {panels.map(({ slug, label, media, tone, project }) => {
@@ -187,6 +191,7 @@ export function SelectedWork() {
       </div>
       <div className="stm-work-foot">
         <Link to="/work" className="stm-work-btn" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_all_work" })}>See all our work <ArrowRight aria-hidden /></Link>
+      </div>
       </div>
     </section>
   );

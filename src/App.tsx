@@ -89,6 +89,8 @@ import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import LegalPage from "./pages/LegalPage";
 import Pricing from "./pages/Pricing";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Startups from "./pages/Startups";
 const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
 
@@ -124,6 +126,8 @@ const App = () => {
                 <Route path="/privacy" element={<LegalPage kind="privacy" />} />
                 <Route path="/terms" element={<LegalPage kind="terms" />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/startups" element={<Startups />} />
                 <Route path="/_review/home-hero" element={<Suspense fallback={null}><HomeHeroReview /></Suspense>} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}

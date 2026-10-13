@@ -1,19 +1,30 @@
-/* Homepage Work: brands that switch on. Dark navy with a faint grid, five
-   tall brand panels with LIVE lights, and a gold-to-cyan line beneath them
-   that a signal runs along as they power up (wide screens). Every panel is
-   lit by default; the script arms them (data-armed) only while the section
-   is still out of view, then powers them up in view. */
-.stm-studio .stm-work{position:relative;isolation:isolate;overflow:hidden;padding:clamp(92px,9vw,132px) 0 clamp(84px,8vw,118px);background:radial-gradient(90% 70% at 50% 28%,#101A33 0%,#080D1B 60%,#05080F 100%);color:#fff}
-.stm-studio .stm-work::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent);mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent)}
+/* Homepage Work: brands that switch on. The headline and the link below sit
+   in light areas; the panels sit in a dark navy window between them (full
+   width, a faint grid, gold-to-cyan edges): five tall brand panels with LIVE
+   lights and a gold-to-cyan line beneath them that a signal runs along as
+   they power up (wide screens). Every panel is lit by default; the script
+   arms them (data-armed) only while the section is still out of view, then
+   powers them up in view. The light ends on the next section's color. */
+.stm-studio .stm-work{position:relative;isolation:isolate;overflow:hidden;padding:clamp(88px,8vw,120px) 0 clamp(56px,5vw,72px);background:radial-gradient(120% 55% at 50% 0%,#F8F9FB 0%,#EFF2F5 72%);color:#0B1530}
 .stm-studio .stm-work-head{width:min(92%,1240px);margin:0 auto;text-align:center}
-.stm-studio .stm-work-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 15px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#E8A13C}
+.stm-studio .stm-work-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 15px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#C97A08}
 .stm-studio .stm-work-eyebrow::before,.stm-studio .stm-work-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
-.stm-studio .stm-work h2{margin:18px auto 0;font:800 clamp(40px,4.8vw,70px)/1.02 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#fff}
-.stm-studio .stm-work h2 em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F6B73C 0%,#E8920E 55%,#C9700A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.stm-studio .stm-work-head p{max-width:620px;margin:16px auto 0;font:500 clamp(17px,1.4vw,20px)/1.5 Inter,sans-serif;color:rgba(255,255,255,.74)}
+.stm-studio .stm-work h2{margin:18px auto 0;font:800 clamp(40px,4.8vw,70px)/1.02 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#0B1530}
+.stm-studio .stm-work h2 em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F2A516 0%,#DE8708 55%,#B9650A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stm-studio .stm-work-head p{max-width:620px;margin:16px auto 0;font:500 clamp(17px,1.4vw,20px)/1.5 Inter,sans-serif;color:#4A5568}
+
+/* The dark window */
+.stm-studio .stm-work-window{position:relative;isolation:isolate;margin-top:clamp(48px,5vw,64px);padding:clamp(56px,5.5vw,76px) 0 clamp(60px,5.5vw,76px);background:radial-gradient(90% 80% at 50% 40%,#101A33 0%,#080D1B 62%,#05080F 100%);box-shadow:0 30px 60px -40px rgba(11,21,48,.55),0 -30px 60px -40px rgba(11,21,48,.4)}
+.stm-studio .stm-work-window::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000,transparent);mask-image:radial-gradient(80% 75% at 50% 45%,#000,transparent)}
+/* Its top and bottom edges: a gold-to-cyan line, like the checkup console's. */
+.stm-studio .stm-work-window::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(242,162,15,0) 0%,#F2A20F 18%,#14B5E3 82%,rgba(20,181,227,0) 100%) top/100% 2px no-repeat,linear-gradient(90deg,rgba(242,162,15,0) 0%,#F2A20F 18%,#14B5E3 82%,rgba(20,181,227,0) 100%) bottom/100% 2px no-repeat;opacity:.85}
+
+/* The window's own headline, smaller, above the panels. */
+.stm-studio .stm-work-window-title{width:min(92%,1240px);margin:0 auto clamp(30px,3vw,40px);text-align:center;font:800 clamp(26px,2.4vw,36px)/1.1 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#fff}
+.stm-studio .stm-work-window-title em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F6B73C 0%,#E8920E 55%,#C9700A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 
 /* Panels */
-.stm-studio .stm-work-stage{position:relative;width:min(92%,1240px);margin:56px auto 0}
+.stm-studio .stm-work-stage{position:relative;width:min(92%,1240px);margin:0 auto}
 .stm-studio .stm-work-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
 .stm-studio .stm-work-panel{--tone:242,162,15;position:relative;aspect-ratio:.53;border-radius:18px;overflow:hidden;background:#0B1122;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(var(--tone),.55),0 0 38px rgba(var(--tone),.28),0 30px 60px -30px rgba(0,0,0,.85);transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease,border-color .35s ease}
 .stm-studio .stm-work-panel[data-tone="cyan"]{--tone:20,181,227}
@@ -83,7 +94,8 @@
 .stm-studio .stm-work-bus .cg{stroke:#FFB547;stroke-width:12;stroke-opacity:.35}
 .stm-studio .stm-work-bus .ch{stroke:#fff;stroke-width:3}
 
-.stm-studio .stm-work-foot{margin-top:90px;text-align:center}
+/* The link to all the work sits inside the window, clear of the 56px bus line under the panels. */
+.stm-studio .stm-work-foot{position:relative;margin-top:calc(56px + clamp(30px,3vw,40px));text-align:center}
 .stm-studio .stm-work-btn{display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 30px;border-radius:999px;font:800 17px Inter,sans-serif;text-decoration:none;background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;box-shadow:0 12px 26px -8px rgba(232,154,43,.6)}
 .stm-studio .stm-work-btn svg{width:18px;height:18px}
 
@@ -93,12 +105,17 @@
   .stm-studio .stm-work-row{grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
   .stm-studio .stm-work-panel{grid-column:span 2;aspect-ratio:.62}
   .stm-studio .stm-work-panel:nth-child(n+4){grid-column:span 3;aspect-ratio:1.25}
-  .stm-studio .stm-work-foot{margin-top:46px}
+  .stm-studio .stm-work-window{padding:56px 0 56px}
+  .stm-studio .stm-work-foot{margin-top:40px}
 }
 /* Phones: two columns, BarPulse full width at the end. */
 @media (max-width:760px){
+  .stm-studio .stm-work{padding:76px 0 40px}
   .stm-studio .stm-work-head{width:auto;margin:0 22px}
-  .stm-studio .stm-work-stage{width:auto;margin:36px 16px 0}
+  .stm-studio .stm-work-window{margin-top:36px;padding:36px 0 40px}
+  .stm-studio .stm-work-window-title{width:auto;margin:0 20px 24px;font-size:26px}
+  .stm-studio .stm-work-stage{width:auto;margin:0 16px}
+  .stm-studio .stm-work-foot{margin-top:30px}
   .stm-studio .stm-work-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .stm-studio .stm-work-panel,.stm-studio .stm-work-panel:nth-child(n+4){grid-column:span 1;aspect-ratio:.6}
   .stm-studio .stm-work-panel:nth-child(5){grid-column:span 2;aspect-ratio:1.45}

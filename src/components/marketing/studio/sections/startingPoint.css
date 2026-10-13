@@ -8,7 +8,8 @@
 .stm-studio .stm-start{position:relative;isolation:isolate;overflow:hidden;border-top:0;padding:clamp(100px,9vw,128px) 0 clamp(104px,9.5vw,136px);background:radial-gradient(130% 72% at 50% 38%,#F8F9FB 0%,#EFF2F5 52%,#E6EAEF 100%);color:#0B1530}
 
 /* Board */
-.stm-studio .stm-start-board{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* The section above ends on this same light color, so the rails fade in at the top instead of starting on a hard edge. */
+.stm-studio .stm-start-board{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 110px);mask-image:linear-gradient(180deg,transparent 0,#000 110px)}
 .stm-studio .stm-start-board .u{fill:none;stroke:#C0C8D3;stroke-width:1.7;stroke-linecap:round}
 .stm-studio .stm-start-board .pu{fill:#F1F3F6;stroke:#B1BAC6;stroke-width:1.6}
 .stm-studio .stm-start-board .lw{fill:none;stroke-width:26;stroke-opacity:.07;stroke-linecap:round;stroke-linejoin:round}

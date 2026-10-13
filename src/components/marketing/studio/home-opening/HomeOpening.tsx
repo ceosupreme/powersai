@@ -89,7 +89,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
               {landers.map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
             </div>}
           </div>
-          <Link to="/work">Work</Link><Link to="/pricing">Packages</Link><span className="stm-opening-disabled" aria-disabled="true">Blog</span><Link to="/about">About</Link>
+          <Link to="/work">Work</Link><Link to="/pricing">Packages</Link><Link to="/blog">Blog</Link><Link to="/about">About</Link>
         </nav>
         <div className="stm-opening-header-actions">
           <Button type="button" onClick={onContact} className="stm-opening-contact">Contact Us <ArrowRight aria-hidden /></Button>
@@ -97,7 +97,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
         </div>
       </div>
       {open && <div className="stm-opening-mobile-menu" ref={menuRef}>
-        <a href="#services" onClick={closeMenu}>Services</a><Link to="/industries" onClick={closeMenu}>Industries</Link><Link to="/work" onClick={closeMenu}>Work</Link><Link to="/pricing" onClick={closeMenu}>Packages</Link><span aria-disabled="true">Blog — coming later</span><Link to="/about" onClick={closeMenu}>About</Link>
+        <a href="#services" onClick={closeMenu}>Services</a><Link to="/industries" onClick={closeMenu}>Industries</Link><Link to="/work" onClick={closeMenu}>Work</Link><Link to="/pricing" onClick={closeMenu}>Packages</Link><Link to="/blog" onClick={closeMenu}>Blog</Link><Link to="/about" onClick={closeMenu}>About</Link>
       </div>}
     </header>
   );

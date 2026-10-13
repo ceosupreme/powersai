@@ -7,7 +7,8 @@ import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
 import { BoostBrands, GetAttention } from "@/components/marketing/studio/sections/HomeUsps";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
 import { StartingPoint } from "@/components/marketing/studio/sections/StartingPoint";
-import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
+import { HomeBlog } from "@/components/marketing/studio/sections/HomeBlog";
+import { HomeFaq } from "@/components/marketing/studio/sections/HomeFaq";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
@@ -66,6 +67,9 @@ export default function MarketingSite() {
             promises: the featured brands switch on as it scrolls in.
             Then "Where are you starting from?": four situations, each with
             one next step, and the free checkup for anyone who can't pick.
+            Then the three newest blog posts (hidden until one is published),
+            then the questions owners ask before they reach out (which also
+            cover how a project works, so there's no separate section for it).
             Industry pages stay linked from the header and footer. */}
         <div className="stm-stack">
           <GetAttention />
@@ -79,7 +83,8 @@ export default function MarketingSite() {
           <SelectedWork />
           <Testimonials />
           <StartingPoint />
-          <StudioReveal><HomeProcess /></StudioReveal>
+          <HomeBlog />
+          <HomeFaq />
           <StudioReveal><PricingTeaser /></StudioReveal>
           <StudioReveal><Inquiry /></StudioReveal>
         </div>

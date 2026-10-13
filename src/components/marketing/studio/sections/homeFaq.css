@@ -1,0 +1,58 @@
+/* Homepage questions: the light board, the heading pinned on the left on
+   wide screens, and big readable question cards on the right. Each card
+   opens in place (native details/summary, so it works without scripts). */
+.stm-studio .stm-faq{position:relative;padding:clamp(96px,8.5vw,128px) 0;background:radial-gradient(120% 70% at 50% 30%,#F6F7FA 0%,#EEF1F5 60%,#E8ECF1 100%);color:#0B1530}
+.stm-studio .stm-faq-wrap{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(40px,5vw,80px);align-items:start;width:min(92%,1180px);margin:0 auto}
+.stm-studio .stm-faq-head{position:sticky;top:120px}
+.stm-studio .stm-faq-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 15px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#C97A08}
+.stm-studio .stm-faq-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
+.stm-studio .stm-faq h2{margin-top:18px;font:800 clamp(38px,4.2vw,60px)/1.04 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#0B1530}
+.stm-studio .stm-faq h2 em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F2A516 0%,#DE8708 55%,#B9650A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stm-studio .stm-faq-head p{max-width:440px;margin-top:16px;font:500 clamp(18px,1.4vw,20px)/1.5 Inter,sans-serif;color:#4A5568}
+.stm-studio .stm-faq-ask{display:inline-flex;align-items:center;gap:8px;margin-top:26px;padding-bottom:5px;font:800 17px Inter,sans-serif;color:#0B1530;text-decoration:none;background:linear-gradient(90deg,#F6B73C,#E8750B) left bottom/100% 2.5px no-repeat}
+.stm-studio .stm-faq-ask svg{width:18px;height:18px;transition:transform .25s ease}
+.stm-studio .stm-faq-ask:hover svg,.stm-studio .stm-faq-ask:focus-visible svg{transform:translateX(4px)}
+
+.stm-studio .stm-faq-list{display:grid;gap:14px}
+.stm-studio .stm-faq-item{position:relative;border-radius:18px;background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(15,28,55,.07),0 14px 30px -22px rgba(15,28,55,.3);transition:box-shadow .3s ease}
+.stm-studio .stm-faq-item::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:4px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,#F2A20F,#14B5E3);opacity:0;transition:opacity .3s ease}
+.stm-studio .stm-faq-item[open]{box-shadow:0 0 0 1px rgba(15,28,55,.08),0 22px 44px -26px rgba(15,28,55,.4)}
+.stm-studio .stm-faq-item[open]::before{opacity:1}
+.stm-studio .stm-faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:76px;padding:20px 26px 20px 30px;cursor:pointer;list-style:none;border-radius:18px;font:800 clamp(19px,1.6vw,22px)/1.3 "Inter Tight",sans-serif;letter-spacing:-.01em;color:#0B1530}
+.stm-studio .stm-faq-item summary::-webkit-details-marker{display:none}
+.stm-studio .stm-faq-item summary:focus-visible{outline:2px solid #DE8708;outline-offset:3px}
+/* Plus that turns into a minus. */
+.stm-studio .stm-faq-item summary i{position:relative;flex:none;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(222,135,8,.55);transition:background .25s ease,border-color .25s ease}
+.stm-studio .stm-faq-item summary i::before,.stm-studio .stm-faq-item summary i::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2.4px;margin:-1.2px 0 0 -7px;border-radius:2px;background:#C97A08;transition:transform .25s ease}
+.stm-studio .stm-faq-item summary i::after{transform:rotate(90deg)}
+.stm-studio .stm-faq-item[open] summary i{background:#FFF4DC;border-color:#E8A13C}
+.stm-studio .stm-faq-item[open] summary i::after{transform:rotate(0deg)}
+.stm-studio .stm-faq-item summary:hover i{border-color:#E8A13C}
+.stm-studio .stm-faq-a{padding:0 30px 26px}
+.stm-studio .stm-faq-a p{max-width:62ch;font:500 18px/1.62 Inter,sans-serif;color:#4A5568}
+.stm-studio .stm-faq-a > * + *{margin-top:12px}
+.stm-studio .stm-faq-a ol{max-width:62ch;padding-left:1.4em;list-style:decimal;font:500 18px/1.62 Inter,sans-serif;color:#4A5568}
+.stm-studio .stm-faq-a li + li{margin-top:8px}
+.stm-studio .stm-faq-a li::marker{color:#DE8708;font-weight:800}
+.stm-studio .stm-faq-a strong{color:#0B1530;font-weight:750}
+.stm-studio .stm-faq-a a{color:#0B1530;font-weight:700;text-decoration:underline;text-decoration-color:#E8920E;text-decoration-thickness:2px;text-underline-offset:4px}
+
+@media (max-width:1023px){
+  .stm-studio .stm-faq-wrap{grid-template-columns:1fr;gap:36px}
+  .stm-studio .stm-faq-head{position:static}
+}
+@media (max-width:760px){
+  .stm-studio .stm-faq{padding:76px 0 80px}
+  .stm-studio .stm-faq-wrap{width:auto;margin:0 16px}
+  .stm-studio .stm-faq-head{margin:0 6px}
+  .stm-studio .stm-faq-eyebrow{gap:12px;font-size:13px}
+  .stm-studio .stm-faq-eyebrow::after{width:24px}
+  .stm-studio .stm-faq h2{font-size:36px}
+  .stm-studio .stm-faq-item summary{min-height:68px;padding:18px 18px 18px 22px;font-size:19px}
+  .stm-studio .stm-faq-item summary i{width:32px;height:32px}
+  .stm-studio .stm-faq-a{padding:0 22px 22px}
+  .stm-studio .stm-faq-a p,.stm-studio .stm-faq-a ol{font-size:17.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .stm-studio .stm-faq-item,.stm-studio .stm-faq-item::before,.stm-studio .stm-faq-item summary i,.stm-studio .stm-faq-item summary i::before,.stm-studio .stm-faq-item summary i::after,.stm-studio .stm-faq-ask svg{transition:none}
+}

@@ -51,8 +51,8 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   if (/^[a-z0-9-]{1,40}$/i.test(sourceParams.get("offer") ?? "")) contactParams.set("offer", sourceParams.get("offer") ?? "");
   const attributedContact = `/${contactParams.size ? `?${contactParams.toString()}` : ""}#contact`;
   const labels = language === "es"
-    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
-    : { work: "Work", services: "Services", industries: "Industries", about: "About", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
+    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", blog: "Blog", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
+    : { work: "Work", services: "Services", industries: "Industries", about: "About", blog: "Blog", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -157,6 +157,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             )}
           </div>
           <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.work}</Link>
+          <Link to="/blog" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.blog}</Link>
           <Link to="/about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.about}</Link>
         </nav>
 
@@ -201,6 +202,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
               {industriesLoading ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Loading industries…</p> : industriesError ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Direct links are temporarily unavailable.</p> : industries.map((industry) => <Link key={industry.slug} to={`/for/${industry.slug}`} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem] last:border-0">{industry.display_name}</Link>)}
             </div>}
             <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.work}</Link>
+            <Link to="/blog" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.blog}</Link>
             <Link to="/about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
             <div className="flex gap-5 border-b border-border px-2 py-2 text-sm"><Link to="/privacy" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center">{language === "es" ? "Privacidad" : "Privacy"}</Link><Link to="/terms" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center">{language === "es" ? "Términos" : "Terms"}</Link></div>
             <Link

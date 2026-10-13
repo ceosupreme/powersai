@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
-const CALM = ".home-offer, .home-contact, .testimonials-section, .website-options, .industry-offer, .industry-questions, .industry-contact, .svc-questions, form, .check-page, .checkout-page";
+// Blog post text stays still: reading an article, paragraphs shouldn't fade in one by one.
+const CALM = ".home-offer, .home-contact, .testimonials-section, .website-options, .industry-offer, .industry-questions, .industry-contact, .svc-questions, form, .check-page, .checkout-page, .stm-post-body";
 const TEXT = ".home-eyebrow, .home-hero-v3-kicker, h1, h2, .industry-title";
 const BODY = "p, .svc-actions, .websites-hero-actions, .hire-actions";
 const VISUAL = ".websites-hero-art, .svc-hero-grid > :last-child, .industry-hero-art, .directory-feature-image, .curated-work-art, .case-lead, .case-full-media figure, .hire-project-image";
