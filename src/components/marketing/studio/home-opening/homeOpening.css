@@ -226,7 +226,9 @@
 .stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 5px hsl(var(--opening-cyan) / .7)); }
 .stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .9)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }
-.stm-studio .stm-command-core text { fill: hsl(var(--opening-ivory)); text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; paint-order: stroke; stroke: hsl(var(--opening-night) / .75); stroke-width: 3px; }
+/* Warm, lit lettering so the words read as part of the glowing orb: ivory
+   with a dark amber edge and a soft gold glow (not a navy outline). */
+.stm-studio .stm-command-core text { fill: #FFF4DC; text-anchor: middle; font: 700 20px "Inter Tight", sans-serif; letter-spacing: .02em; paint-order: stroke; stroke: rgba(84, 50, 8, .72); stroke-width: 2.2px; filter: drop-shadow(0 0 4px rgba(255, 196, 90, .6)); }
 /* Energy pulses (geometry and dash math live with COMMAND_ENERGY in
    HomeOpening.tsx): every layer runs one shared keyframe between its own
    --d0 and --d1 offsets. Arrival lands 1.2s into each 5.2s cycle. */
@@ -240,13 +242,6 @@
 .stm-studio .stm-energy-body { stroke: var(--ec); stroke-width: 7px; }
 .stm-studio .stm-energy-head { stroke: #FFFFFF; stroke-width: 4.8px; }
 .stm-studio .stm-energy-flash { opacity: 0; transform-box: fill-box; transform-origin: center; animation: stm-energy-flash 1.3s linear infinite; }
-.stm-studio .stm-command-stories { position: absolute; right: 4%; bottom: 118px; width: 48%; display: grid; grid-template-columns: 1.55fr 1fr 1fr; align-items: end; gap: 10px; }
-.stm-studio .stm-command-story { position: relative; display: grid; gap: 9px; min-height: 88px; padding: 16px; border-radius: 6px; border: 1px solid hsl(var(--opening-silver) / .25); background: hsl(var(--opening-night) / .91); color: hsl(var(--opening-silver)); }
-.stm-studio .stm-command-story small { font-size: 11px; color: hsl(var(--opening-gold)); }
-.stm-studio .stm-command-story strong { font: 700 20px/1.1 "Inter Tight", sans-serif; }
-.stm-studio .stm-command-story p { font-size: 13px; line-height: 1.45; }
-.stm-studio .stm-command-story.is-current { min-height: 140px; border-color: hsl(var(--opening-gold)); color: hsl(var(--opening-ivory)); }
-.stm-studio .stm-command-progress { position: absolute; left: 16px; right: 16px; bottom: 0; height: 2px; background: hsl(var(--opening-gold)); }
 .stm-studio .stm-command-mobile-controls { display: none; }
 .stm-studio .stm-command-artboard.is-paused * { animation-play-state: paused; }
 @keyframes stm-command-breathe { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px hsl(var(--opening-gold) / .3)); } 50% { opacity: .88; filter: drop-shadow(0 0 5px hsl(var(--opening-gold) / .55)); } }
@@ -263,7 +258,6 @@
   .stm-studio .stm-command-copy .stm-opening-subhead { font-size: 19px; }
   .stm-studio .stm-command-credibility { gap: 14px; margin-top: 24px; }
   .stm-studio .stm-command-credibility strong { font-size: 18px; }
-  .stm-studio .stm-command-stories { bottom: 100px; width: 49%; }
 }
 @media (min-width: 761px) and (max-width: 1100px) {
   .stm-studio .stm-command-artboard { min-height: 790px; aspect-ratio: auto; }
@@ -271,7 +265,6 @@
   .stm-studio .stm-command-copy { width: 42%; }
   .stm-studio .stm-command-copy h1 { font-size: 52px; }
   .stm-studio .stm-command-copy .stm-opening-subhead { font-size: 18px; }
-  .stm-studio .stm-command-stories { bottom: 100px; }
 }
 @media (max-width: 760px) {
   .stm-studio .stm-command-artboard { display: flex; flex-direction: column; aspect-ratio: auto; }
@@ -284,12 +277,9 @@
   .stm-studio .stm-command-credibility span { font-size: 10px; max-width: 104px; }
   .stm-studio .stm-command-background { position: relative; order: 1; aspect-ratio: 1920 / 1081; }
   .stm-studio .stm-command-overlays { display: none; }
-  .stm-studio .stm-command-mobile-controls { display: grid; order: 2; grid-template-columns: 1fr 1fr; gap: 12px; padding: 18px 4%; }
+  .stm-studio .stm-command-mobile-controls { display: grid; order: 2; grid-template-columns: 1fr 1fr; gap: 12px; padding: 18px 4% 30px; }
   .stm-studio .stm-command-mobile-controls span { display: flex; align-items: center; gap: 12px; padding: 12px; color: hsl(var(--opening-ivory)); background: hsl(var(--opening-wine) / .55); border: 1px solid hsl(var(--opening-gold) / .4); border-radius: 6px; font-size: 17px; }
   .stm-studio .stm-command-mobile-controls svg { width: 23px; height: 23px; color: hsl(var(--opening-gold)); }
-  .stm-studio .stm-command-stories { position: static; order: 3; width: 92%; margin: 0 auto 28px; grid-template-columns: 1fr 1fr; }
-  .stm-studio .stm-command-story.is-current { grid-column: 1 / -1; min-height: 120px; }
-  .stm-studio .stm-command-story { min-height: 84px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stm-studio .stm-command-energy { display: none; }
@@ -300,7 +290,8 @@
 .stm-studio .stm-command-mobile-core { display: none; }
 @media (max-width: 760px) {
   .stm-studio .stm-command-visual { position: relative; order: 1; }
-  .stm-studio .stm-command-mobile-core { display: block; position: absolute; left: 76.8%; top: 25.5%; transform: translate(-50%, -50%); color: hsl(var(--opening-ivory)); text-shadow: 0 1px 3px hsl(var(--opening-night)); font: 700 13px/1.1 "Inter Tight", sans-serif; text-align: center; }
+  /* Same warm, lit lettering as the desktop orb. */
+  .stm-studio .stm-command-mobile-core { display: block; position: absolute; left: 76.8%; top: 25.5%; transform: translate(-50%, -50%); color: #FFF4DC; text-shadow: 0 0 1px rgba(84, 50, 8, .9), 0 1px 2px rgba(84, 50, 8, .75), 0 0 6px rgba(255, 196, 90, .7); font: 700 13px/1.1 "Inter Tight", sans-serif; letter-spacing: .02em; text-align: center; }
 }
 
 

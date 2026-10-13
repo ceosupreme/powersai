@@ -62,8 +62,9 @@ export default function MarketingSite() {
             attention" (the bench), then the 3 AM scene slides up over it ("We
             build websites that work while you sleep"), then the rooftop ("We
             boost brands higher, faster").
-            Work follows as its own normal section — the proof right after
-            the promises. Industries sits below the proof content. */}
+            Work follows as its own section, the proof right after the
+            promises: the featured brands switch on as it scrolls in.
+            Industries sits below the proof content. */}
         <div className="stm-stack">
           <GetAttention />
           <div className="stm-stack-hold" aria-hidden="true" />
@@ -73,7 +74,7 @@ export default function MarketingSite() {
           <div className="stm-stack-hold" aria-hidden="true" />
         </div>
         <div className="stm-after-stack">
-          <StudioReveal><SelectedWork /></StudioReveal>
+          <SelectedWork />
           <Testimonials />
           <HomeIndustries />
           <StudioReveal><HomeProcess /></StudioReveal>

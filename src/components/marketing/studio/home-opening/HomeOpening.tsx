@@ -201,19 +201,17 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           ))}
           <circle className="stm-energy-flash" cx="1468" cy="368" r="40" fill="url(#stm-energy-flash-fill)" />
         </g>
-        <g className="stm-command-panel" transform="matrix(.992 .122 -.443 .818 665 349)"><Megaphone x="-21" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
-        <g className="stm-command-panel" transform="matrix(.990 .141 -.361 .839 800 366)"><Play x="-19" y="-30" width="26" height="26" /><text x="0" y="22">Media</text></g>
-        <g className="stm-command-panel" transform="matrix(.989 .146 -.215 .773 946 387)"><Globe x="-17" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
-        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.987 .160 -.113 .786 1107 408)"><Cog x="-15" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
+        {/* Each tile's group sits on the tile's own center line and keeps
+            the console's lean (its matrix), so centering the icon and the
+            word on x 0 lines them up the way the tile tilts. */}
+        <g className="stm-command-panel" transform="matrix(.992 .122 -.443 .818 665 349)"><Megaphone x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
+        <g className="stm-command-panel" transform="matrix(.990 .141 -.361 .839 800 366)"><Play x="-13" y="-30" width="26" height="26" /><text x="1.1" y="22">Media</text></g>
+        <g className="stm-command-panel" transform="matrix(.989 .146 -.215 .773 946 387)"><Globe x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
+        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.987 .160 -.113 .786 1107 408)"><Cog x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
         <g className="stm-command-core"><text x="921" y="163">BUSINESS</text><text x="921" y="187">GROWTH</text></g>
       </svg>
       <div className="stm-command-mobile-controls">
         <span><Megaphone />Marketing</span><span><Play />Media</span><span><Globe />Web</span><span><Cog />Automation</span>
-      </div>
-      <div className="stm-command-stories" aria-label="Story scenes">
-        <div className="stm-command-story is-current" aria-current="step"><small>1 OF 3</small><strong>Dialed in</strong><p>Marketing, media, web and automation, set up to work as one.</p><span className="stm-command-progress" /></div>
-        <div className="stm-command-story" aria-disabled="true"><small>2 OF 3</small><strong>Launched</strong></div>
-        <div className="stm-command-story" aria-disabled="true"><small>3 OF 3</small><strong>Standing out</strong></div>
       </div>
     </div>
   </section>;

@@ -38,6 +38,10 @@ import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.w
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
 import benchAttention from "@/assets/stm-opening/bench-attention.webp";
 import rooftopNextLevel from "@/assets/stm-opening/rooftop-next-level.webp";
+import workPanelKario from "@/assets/studio/work/work-panel-kario-voss.webp";
+import workPanelCoastal from "@/assets/studio/work/work-panel-coastal-beauties.webp";
+import workPanelPaws from "@/assets/studio/work/work-panel-big-paws-club.webp";
+import workPanelWellness from "@/assets/studio/work/work-panel-supreme-wellness-club.webp";
 
 /**
  * Single media configuration for the public studio site.
@@ -249,6 +253,39 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 1080,
     objectFit: "cover",
     objectPosition: "top center",
+  },
+  // Homepage Work panels: tall key art taken from each live site.
+  "work-panel-kario-voss": {
+    src: workPanelKario,
+    alt: "Kario Voss in a black leather jacket against blurred city lights at night",
+    aspectRatio: "600 / 1080",
+    width: 600,
+    height: 1080,
+    objectFit: "cover",
+  },
+  "work-panel-coastal-beauties": {
+    src: workPanelCoastal,
+    alt: "A woman on a Southern California beach at golden hour with sandstone cliffs behind her",
+    aspectRatio: "600 / 1080",
+    width: 600,
+    height: 1080,
+    objectFit: "cover",
+  },
+  "work-panel-big-paws-club": {
+    src: workPanelPaws,
+    alt: "A Great Dane lounging on a white couch in a bright living room",
+    aspectRatio: "600 / 1080",
+    width: 600,
+    height: 1080,
+    objectFit: "cover",
+  },
+  "work-panel-supreme-wellness-club": {
+    src: workPanelWellness,
+    alt: "A man walking a grassy coastal trail above the ocean in early morning light",
+    aspectRatio: "600 / 1080",
+    width: 600,
+    height: 1080,
+    objectFit: "cover",
   },
   "founder-portrait": {
     src: null,

@@ -1,0 +1,117 @@
+/* Homepage Work: brands that switch on. Dark navy with a faint grid, five
+   tall brand panels with LIVE lights, and a gold-to-cyan line beneath them
+   that a signal runs along as they power up (wide screens). Every panel is
+   lit by default; the script arms them (data-armed) only while the section
+   is still out of view, then powers them up in view. */
+.stm-studio .stm-work{position:relative;isolation:isolate;overflow:hidden;padding:clamp(92px,9vw,132px) 0 clamp(84px,8vw,118px);background:radial-gradient(90% 70% at 50% 28%,#101A33 0%,#080D1B 60%,#05080F 100%);color:#fff}
+.stm-studio .stm-work::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent);mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent)}
+.stm-studio .stm-work-head{width:min(92%,1240px);margin:0 auto;text-align:center}
+.stm-studio .stm-work-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 15px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#E8A13C}
+.stm-studio .stm-work-eyebrow::before,.stm-studio .stm-work-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
+.stm-studio .stm-work h2{margin:18px auto 0;font:800 clamp(40px,4.8vw,70px)/1.02 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#fff}
+.stm-studio .stm-work h2 em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F6B73C 0%,#E8920E 55%,#C9700A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stm-studio .stm-work-head p{max-width:620px;margin:16px auto 0;font:500 clamp(17px,1.4vw,20px)/1.5 Inter,sans-serif;color:rgba(255,255,255,.74)}
+
+/* Panels */
+.stm-studio .stm-work-stage{position:relative;width:min(92%,1240px);margin:56px auto 0}
+.stm-studio .stm-work-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
+.stm-studio .stm-work-panel{--tone:242,162,15;position:relative;aspect-ratio:.53;border-radius:18px;overflow:hidden;background:#0B1122;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(var(--tone),.55),0 0 38px rgba(var(--tone),.28),0 30px 60px -30px rgba(0,0,0,.85);transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease,border-color .35s ease}
+.stm-studio .stm-work-panel[data-tone="cyan"]{--tone:20,181,227}
+.stm-studio .stm-work-art{position:absolute;inset:0;transition:opacity .3s ease}
+.stm-studio .stm-work-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%;transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.stm-studio .stm-work-panel::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(0deg,rgba(4,7,15,.95) 0%,rgba(4,7,15,.55) 27%,rgba(4,7,15,0) 52%)}
+.stm-studio .stm-work-open{position:absolute;inset:0;z-index:3;border-radius:inherit}
+.stm-studio .stm-work-open:focus-visible{outline:3px solid #F6B73C;outline-offset:3px}
+.stm-studio .stm-work-label{position:absolute;left:18px;right:18px;bottom:18px;z-index:4;pointer-events:none;transition:opacity .3s ease}
+.stm-studio .stm-work-label small{display:block;font:700 11.5px/1.3 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#F6C65A}
+.stm-studio .stm-work-label h3{margin-top:6px;font:800 clamp(19px,1.75vw,25px)/1.05 "Inter Tight",sans-serif;letter-spacing:-.01em;color:#fff}
+.stm-studio .stm-work-visit{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding-bottom:3px;font:700 14px Inter,sans-serif;color:#fff;text-decoration:none;border-bottom:1.5px solid rgba(var(--tone),.9);opacity:.82;transition:opacity .25s}
+.stm-studio .stm-work-visit svg{width:15px;height:15px}
+.stm-studio .stm-work-visit:hover,.stm-studio .stm-work-visit:focus-visible{opacity:1}
+.stm-studio .stm-work-live{position:absolute;right:14px;top:14px;z-index:4;display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:rgba(5,8,16,.62);font:800 10.5px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#fff;transition:opacity .3s ease,transform .3s ease}
+.stm-studio .stm-work-live i{width:7px;height:7px;border-radius:50%;background:#3FE08A;box-shadow:0 0 8px #3FE08A}
+.stm-studio .stm-work.is-live .stm-work-live i{animation:stmWorkLive 3.2s ease-in-out infinite}
+@keyframes stmWorkLive{50%{opacity:.45}}
+.stm-studio .stm-work-power{position:absolute;left:50%;top:44%;z-index:2;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;border:2px solid rgba(255,255,255,.18);display:grid;place-items:center;color:rgba(255,255,255,.3);opacity:0;transition:opacity .25s ease}
+.stm-studio .stm-work-power svg{width:26px;height:26px}
+.stm-studio .stm-work-scan{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 2px,transparent 2px 5px)}
+.stm-studio .stm-work-scan::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:#fff;box-shadow:0 0 18px 6px rgba(var(--tone),.75);opacity:0}
+
+/* Power states (only while armed by the script). */
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel:not(.on){border-color:rgba(255,255,255,.08);box-shadow:0 30px 60px -30px rgba(0,0,0,.85)}
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel:not(.on):not(.boot) .stm-work-art{opacity:0}
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel:not(.on):not(.boot) .stm-work-power{opacity:1}
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel:not(.on):not(.boot) .stm-work-label{opacity:.38}
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel:not(.on) .stm-work-live{opacity:0;transform:scale(.85)}
+.stm-studio .stm-work-panel.boot .stm-work-art{animation:stmWorkFlicker .46s linear both}
+.stm-studio .stm-work-panel.boot .stm-work-scan{opacity:1}
+.stm-studio .stm-work-panel.boot .stm-work-scan::after{animation:stmWorkSweep .46s ease-in both}
+.stm-studio .stm-work[data-armed="1"] .stm-work-panel.on{animation:stmWorkPop .8s ease-out}
+@keyframes stmWorkFlicker{0%{opacity:.12;filter:brightness(1.9) saturate(.3)}16%{opacity:.62}28%{opacity:.18}46%{opacity:.86}60%{opacity:.42}78%{opacity:.95}100%{opacity:1;filter:none}}
+@keyframes stmWorkSweep{0%{top:0;opacity:1}100%{top:100%;opacity:.2}}
+@keyframes stmWorkPop{0%{box-shadow:0 0 0 2px rgba(var(--tone),.95),0 0 80px rgba(var(--tone),.65),0 30px 60px -30px rgba(0,0,0,.85)}}
+
+/* Hover and keyboard focus: the panel lifts and glows brighter. */
+@media (hover:hover) and (pointer:fine){
+  .stm-studio .stm-work-panel:hover{transform:translateY(-6px);box-shadow:0 0 0 1.5px rgba(var(--tone),.85),0 0 56px rgba(var(--tone),.42),0 36px 70px -30px rgba(0,0,0,.9)}
+  .stm-studio .stm-work-panel:hover .stm-work-art img{transform:scale(1.05)}
+  .stm-studio .stm-work-panel:hover .stm-work-visit{opacity:1}
+}
+.stm-studio .stm-work-panel:focus-within{box-shadow:0 0 0 1.5px rgba(var(--tone),.85),0 0 56px rgba(var(--tone),.42),0 36px 70px -30px rgba(0,0,0,.9)}
+
+/* BarPulse: a live title card instead of a photo. */
+.stm-studio .stm-work-bp{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:26px 20px 104px;background:radial-gradient(120% 70% at 50% 35%,#132451 0%,#0A1430 55%,#050A18 100%)}
+.stm-studio .stm-work-bp-mark{display:inline-flex;align-items:center;gap:10px;font:700 15px Inter,sans-serif;color:#fff}
+.stm-studio .stm-work-bp-mark span{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#7C5CFF,#C04CFF)}
+.stm-studio .stm-work-bp-mark svg{width:17px;height:17px;color:#fff}
+.stm-studio .stm-work-bp strong{font:800 clamp(21px,1.9vw,27px)/1.12 "Inter Tight",sans-serif;letter-spacing:-.01em;color:#fff}
+.stm-studio .stm-work-bp .pulse{width:100%;height:54px;overflow:visible}
+.stm-studio .stm-work-bp .base{fill:none;stroke:rgba(20,181,227,.35);stroke-width:1.6}
+.stm-studio .stm-work-bp .beat{fill:none;stroke:#5FE3FF;stroke-width:2.4;stroke-linecap:round;filter:drop-shadow(0 0 6px #14B5E3);stroke-dasharray:70 330;animation:stmWorkBeat 2.6s linear infinite}
+@keyframes stmWorkBeat{from{stroke-dashoffset:400}to{stroke-dashoffset:0}}
+
+/* The line beneath (wide screens). */
+.stm-studio .stm-work-bus{position:absolute;left:0;top:100%;width:100%;height:56px;overflow:visible;pointer-events:none}
+.stm-studio .stm-work-bus .b0{fill:none;stroke:rgba(255,255,255,.12);stroke-width:2}
+.stm-studio .stm-work-bus .b1{fill:none;stroke:url(#stm-work-bus-g);stroke-width:2.4;opacity:0;transition:opacity 1s ease}
+.stm-studio .stm-work.is-live .stm-work-bus .b1{opacity:.85}
+.stm-studio .stm-work-bus .dr{fill:none;stroke:rgba(255,255,255,.14);stroke-width:2;transition:stroke .3s ease}
+.stm-studio .stm-work-bus .dr.lit{stroke:url(#stm-work-bus-g)}
+.stm-studio .stm-work-bus .nd{fill:rgba(255,255,255,.25);transition:fill .3s ease}
+.stm-studio .stm-work-bus .nd.lit{fill:#fff}
+.stm-studio .stm-work-bus .cm{fill:none;stroke-linecap:round;opacity:0}
+.stm-studio .stm-work-bus .cg{stroke:#FFB547;stroke-width:12;stroke-opacity:.35}
+.stm-studio .stm-work-bus .ch{stroke:#fff;stroke-width:3}
+
+.stm-studio .stm-work-foot{margin-top:90px;text-align:center}
+.stm-studio .stm-work-btn{display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 30px;border-radius:999px;font:800 17px Inter,sans-serif;text-decoration:none;background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;box-shadow:0 12px 26px -8px rgba(232,154,43,.6)}
+.stm-studio .stm-work-btn svg{width:18px;height:18px}
+
+/* Tablets: three tall panels over two wide ones; no bus line. */
+@media (max-width:1023px){
+  .stm-studio .stm-work-bus{display:none}
+  .stm-studio .stm-work-row{grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
+  .stm-studio .stm-work-panel{grid-column:span 2;aspect-ratio:.62}
+  .stm-studio .stm-work-panel:nth-child(n+4){grid-column:span 3;aspect-ratio:1.25}
+  .stm-studio .stm-work-foot{margin-top:46px}
+}
+/* Phones: two columns, BarPulse full width at the end. */
+@media (max-width:760px){
+  .stm-studio .stm-work-head{width:auto;margin:0 22px}
+  .stm-studio .stm-work-stage{width:auto;margin:36px 16px 0}
+  .stm-studio .stm-work-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .stm-studio .stm-work-panel,.stm-studio .stm-work-panel:nth-child(n+4){grid-column:span 1;aspect-ratio:.6}
+  .stm-studio .stm-work-panel:nth-child(5){grid-column:span 2;aspect-ratio:1.45}
+  .stm-studio .stm-work-label{left:14px;right:14px;bottom:14px}
+  .stm-studio .stm-work-label h3{font-size:19px}
+  .stm-studio .stm-work-label small{font-size:9.5px;letter-spacing:.12em}
+  .stm-studio .stm-work-visit{font-size:13px;margin-top:8px}
+  .stm-studio .stm-work-live{right:10px;top:10px;padding:5px 8px;font-size:9px}
+  .stm-studio .stm-work-bp{padding:20px 18px 96px;gap:10px}
+  .stm-studio .stm-work-bp strong{font-size:22px}
+  .stm-studio .stm-work-bp .pulse{height:34px}
+}
+@media (prefers-reduced-motion: reduce){
+  .stm-studio .stm-work-panel,.stm-studio .stm-work-art,.stm-studio .stm-work-art img,.stm-studio .stm-work-scan::after{animation:none !important;transition:none !important}
+  .stm-studio .stm-work-bp .beat,.stm-studio .stm-work.is-live .stm-work-live i{animation:none !important}
+}
