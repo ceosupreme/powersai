@@ -22,8 +22,15 @@ const firstSentence = (text: string | null) => {
   const value = (text ?? "").trim();
   return (value.match(/^.*?[.!?](\s|$)/)?.[0] ?? value).trim();
 };
-function layoutFor(row: DirectoryRow): { hero?: { media?: string | null }; interaction?: Interaction } {
-  return row.layout && typeof row.layout === "object" && !Array.isArray(row.layout) ? row.layout as { hero?: { media?: string | null }; interaction?: Interaction } : {};
+type DirectoryLayout = { hero?: { media?: string | null }; interaction?: Interaction; group?: string };
+function layoutFor(row: DirectoryRow): DirectoryLayout {
+  return row.layout && typeof row.layout === "object" && !Array.isArray(row.layout) ? row.layout as DirectoryLayout : {};
+}
+/** Rows with a picture or a scene get a tile; the rest are listed by their row's group until they get one. */
+function hasArt(row: DirectoryRow) {
+  const { hero, interaction } = layoutFor(row);
+  const screen = interaction?.kind === "walkthrough" ? interaction.steps?.[0] : interaction?.options?.[0];
+  return !!getStudioMedia(hero?.media)?.src || !!(interaction?.business || interaction?.domain || screen?.heading);
 }
 function DirectoryArt({ row, mediaKey }: { row: DirectoryRow; mediaKey?: string }) {
   const [failed, setFailed] = useState(false);
@@ -49,6 +56,13 @@ export default function Industries() {
   });
   const featured = priority.flatMap(item => { const row = rows.find(r => r.slug === item.slug); return row ? [{ row, media: item.media }] : []; });
   const other = rows.filter(row => !priority.some(item => item.slug === row.slug));
+  const tiles = other.filter(hasArt);
+  const groups = other.filter(row => !hasArt(row)).reduce<{ label: string; items: DirectoryRow[] }[]>((list, row) => {
+    const label = layoutFor(row).group?.trim() || "More industries";
+    const group = list.find(g => g.label === label);
+    if (group) group.items.push(row); else list.push({ label, items: [row] });
+    return list;
+  }, []);
   return <div className="stm-studio directory-page min-h-screen"><StudioHeader/><main>
     <section className="directory-intro"><Container><span className="home-eyebrow">Industries / built for your trade</span><h1 className="home-section-title">Built around <em>your business.</em></h1><p>Websites and follow-up built for how each trade actually gets customers. Pick yours, or tell me about a business that is not listed.</p></Container></section>
     <section className="directory-featured" aria-label="Featured industries"><Container>
@@ -56,7 +70,9 @@ export default function Industries() {
       {isError && <p role="status">Industries could not be loaded right now. Please try again.</p>}
       <div className="directory-featured-grid">{featured.map(({row,media},i) => <Link className={`directory-feature directory-feature-${i}`} key={row.slug} to={`/for/${row.slug}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: `industries_${row.slug}` })}><div className="directory-feature-image"><DirectoryArt row={row} mediaKey={media}/></div><div className="directory-feature-caption"><div><span className="home-eyebrow">Explore the industry</span><h2>{row.display_name}</h2><p>{firstSentence(row.subline)}</p></div><ArrowRight aria-hidden size={23}/></div></Link>)}</div>
     </Container></section>
-    {!isLoading && !isError && other.length > 0 && <section className="directory-rest" aria-label="More industries"><Container><span className="home-eyebrow">More ways to work together</span><h2 className="home-section-title">Find <em>your field.</em></h2><div className="directory-rest-grid">{other.map((row,i) => <article className={`directory-tile directory-tile-${i % 4}`} key={row.slug}><Link to={`/for/${row.slug}`} className="directory-tile-main" onClick={() => trackSiteEvent({ event_type: "cta_click", label: `industries_${row.slug}` })}><div className="directory-tile-art"><DirectoryArt row={row}/></div><div className="directory-tile-caption"><div><h3>{row.display_name}</h3><p>{firstSentence(row.subline)}</p></div><ArrowRight aria-hidden size={21}/></div></Link>{row.slug === "tacos" && <Link className="directory-es-link" to="/for/tacos?lang=es">Español <ArrowRight size={14} aria-hidden/></Link>}</article>)}</div></Container></section>}
+    {!isLoading && !isError && other.length > 0 && <section className="directory-rest" aria-label="More industries"><Container><span className="home-eyebrow">More ways to work together</span><h2 className="home-section-title">Find <em>your field.</em></h2>{tiles.length > 0 && <div className="directory-rest-grid">{tiles.map((row,i) =><article className={`directory-tile directory-tile-${i % 4}`} key={row.slug}><Link to={`/for/${row.slug}`} className="directory-tile-main" onClick={() => trackSiteEvent({ event_type: "cta_click", label: `industries_${row.slug}` })}><div className="directory-tile-art"><DirectoryArt row={row}/></div><div className="directory-tile-caption"><div><h3>{row.display_name}</h3><p>{firstSentence(row.subline)}</p></div><ArrowRight aria-hidden size={21}/></div></Link>{row.slug === "tacos" && <Link className="directory-es-link" to="/for/tacos?lang=es">Español <ArrowRight size={14} aria-hidden/></Link>}</article>)}</div>}
+      {groups.length > 0 && <div className="directory-more"><span className="home-eyebrow">More industries we serve</span><div className="directory-more-groups">{groups.map(group => <section className="directory-group" key={group.label} aria-label={group.label}><h3>{group.label}</h3><ul>{group.items.map(row => <li key={row.slug}><Link to={`/for/${row.slug}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: `industries_${row.slug}` })}>{row.display_name}<ArrowRight aria-hidden size={17}/></Link></li>)}</ul></section>)}</div></div>}
+    </Container></section>}
     <section className="directory-invite"><Container><span className="home-eyebrow">Something different?</span><h2 className="home-section-title">Don&apos;t see <em>your business?</em></h2><p>What these pages describe works for almost any local business that takes inquiries. Tell me about yours.</p><Link className="home-btn-amber" to="/?intent=websites&src=industries#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "industries_custom_project" })}>Tell me about yours <ArrowRight size={17} aria-hidden/></Link></Container></section>
   </main><StudioFooter/></div>;
 }

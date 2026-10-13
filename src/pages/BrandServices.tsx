@@ -5,6 +5,7 @@ import { Container } from "@/components/marketing/studio/primitives";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
+import { FamilyServices } from "@/components/marketing/pages/SitePageBits";
 import { ServiceWork } from "@/components/marketing/studio/ServiceWork";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
@@ -27,6 +28,6 @@ export default function BrandServices() {
     <section className="svc-section svc-band-light brand-gallery" aria-labelledby="brand-gallery-title"><Container><span className="home-eyebrow">03 / In the world</span><h2 id="brand-gallery-title" className="home-section-title">An identity that <em>shows up.</em></h2><div className="brand-gallery-layout"><div className="brand-sign"><span>THE HARBOR ROOM</span><strong>The <i>Harbor</i><br/> Room</strong><small>COASTAL DINING</small></div><div className="brand-gallery-details"><div className="brand-gallery-print"><span>MENU / PRINT</span><strong>Tonight’s Menu</strong><p>A good evening starts here.</p></div><div className="brand-gallery-social"><span>SOCIAL</span><strong>Pull up a chair.</strong><small>THE HARBOR ROOM</small></div><div className="brand-gallery-web"><span>WEBSITE</span><nav>The Harbor Room <b>Menu &nbsp; Visit</b></nav><strong>Stay a while.</strong></div></div></div></Container></section>
     <ServiceWork type="brand" order={["big-paws-club", "coastal-beauties", "kario-voss"]}/>
     <section className="svc-section svc-band-light brand-engagement" aria-labelledby="brand-engagement-title"><Container><span className="home-eyebrow">05 / Working together</span><h2 id="brand-engagement-title" className="home-section-title">Built to be <em>used.</em></h2><div className="brand-engagement-grid"><div><h3>What we can scope</h3><ul>{scope.map(item => <li key={item}>{item}</li>)}</ul></div><div><h3>What you receive</h3><p>Final files in standard formats, source files, a short brand guide and ownership documented in writing.</p><h3>Review points</h3><ol><li>Direction</li><li>First round</li><li>Refinement</li><li>Final approval</li></ol></div></div><div className="svc-questions"><h3>Questions worth asking.</h3><Accordion type="single" collapsible>{questions.map(([q,a],i) => <AccordionItem key={q} value={`brand-q-${i}`}><AccordionTrigger>{q}</AccordionTrigger><AccordionContent>{a}</AccordionContent></AccordionItem>)}</Accordion></div></Container></section>
-    <Inquiry servicePage="brand"/>
+    <FamilyServices family="/services/brand"/><Inquiry servicePage="brand"/>
   </main><StudioFooter/></div>;
 }

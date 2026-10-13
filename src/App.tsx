@@ -91,6 +91,10 @@ import LegalPage from "./pages/LegalPage";
 import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import ServicesHub from "./pages/ServicesHub";
+import ServiceDetail from "./pages/ServiceDetail";
+import AreasHub from "./pages/AreasHub";
+import AreaDetail from "./pages/AreaDetail";
 import Startups from "./pages/Startups";
 const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
 
@@ -141,6 +145,11 @@ const App = () => {
                 <Route path="/services/brand" element={<BrandServices />} />
                 <Route path="/services/marketing" element={<MarketingServices />} />
                 <Route path="/services/ai-systems" element={<SystemsServices />} />
+                {/* Every service and every place we serve: one page each, read from service_pages and city_pages rows. */}
+                <Route path="/services" element={<ServicesHub />} />
+                <Route path="/services/:slug" element={<ServiceDetail />} />
+                <Route path="/areas" element={<AreasHub />} />
+                <Route path="/areas/:slug" element={<AreaDetail />} />
                 <Route path="/industries" element={<Industries />} />
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
                 <Route path="/qualify/:slug" element={<QualifyLanding />} />

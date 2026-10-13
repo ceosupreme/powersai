@@ -1,0 +1,201 @@
+/* Simple service, city and hub pages, plus the service and area links on
+   family and industry pages. Same light boards, dark windows and gold accents
+   as the homepage sections. */
+.stm-studio.sp-page{background:radial-gradient(120% 60% at 50% 0%,#F8F9FB 0%,#EFF2F5 70%);color:#0B1530}
+.stm-studio.sp-page main > section + section{border-top:0}
+.stm-studio .sp-wrap{width:min(92%,1240px);margin:0 auto}
+.stm-studio .sp-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 14px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#C97A08}
+.stm-studio .sp-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
+.stm-studio .sp-dark .sp-eyebrow{color:#F6B73C}
+.stm-studio .sp-dark .sp-eyebrow::after{background:#F6B73C}
+.stm-studio .sp-accent{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F2A516 0%,#DE8708 55%,#B9650A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stm-studio .sp-dark .sp-accent{background:linear-gradient(95deg,#F6B73C 0%,#E8920E 55%,#C9700A 100%);-webkit-background-clip:text;background-clip:text}
+.stm-studio .sp-h2{margin-top:16px;font:800 clamp(34px,3.6vw,50px)/1.06 "Inter Tight",sans-serif;letter-spacing:-.03em;color:inherit}
+.stm-studio .sp-sub{max-width:640px;margin-top:14px;font:500 clamp(17px,1.4vw,19px)/1.55 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-dark .sp-sub{color:rgba(255,255,255,.74)}
+
+/* Buttons */
+.stm-studio .sp-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+.stm-studio .sp-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:58px;padding:0 30px;border-radius:999px;font:800 17px Inter,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;border:0;transition:transform .2s ease,box-shadow .2s ease}
+.stm-studio .sp-btn svg{width:18px;height:18px;flex:none}
+.stm-studio .sp-btn-gold{background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;box-shadow:0 12px 26px -8px rgba(232,154,43,.6)}
+.stm-studio .sp-btn-gold:hover{transform:translateY(-1px);box-shadow:0 16px 30px -10px rgba(232,154,43,.75)}
+.stm-studio .sp-btn-line{background:#fff;color:#0B1530;box-shadow:inset 0 0 0 1.5px rgba(11,21,48,.16),0 10px 24px -18px rgba(11,21,48,.35)}
+.stm-studio .sp-btn-ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.stm-studio .sp-btn:focus-visible{outline:2px solid #DE8708;outline-offset:3px}
+
+/* Hero */
+.stm-studio .sp-hero{position:relative;overflow:hidden;padding:clamp(118px,10.5vw,144px) 0 clamp(72px,7vw,96px);background:radial-gradient(110% 90% at 15% 0%,#FFFFFF 0%,#F4F6F9 55%,#ECEFF4 100%)}
+.stm-studio .sp-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(15,28,55,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,28,55,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(60% 80% at 85% 40%,#000,transparent);mask-image:radial-gradient(60% 80% at 85% 40%,#000,transparent)}
+.stm-studio .sp-crumbs{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:22px;font:600 14.5px Inter,sans-serif;color:#6B7588}
+.stm-studio .sp-crumbs a{color:#33405A;text-decoration:underline;text-decoration-color:rgba(232,146,14,.55);text-underline-offset:4px}
+.stm-studio .sp-crumbs svg{width:14px;height:14px;opacity:.6}
+.stm-studio .sp-hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:64px;align-items:center}
+.stm-studio .sp-hero h1{margin-top:18px;font:800 clamp(42px,4.8vw,66px)/1.04 "Inter Tight",sans-serif;letter-spacing:-.035em;color:#0B1530}
+.stm-studio .sp-lead{max-width:640px;margin-top:22px;font:500 clamp(18px,1.45vw,21px)/1.55 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-hub-hero .sp-hero-grid{grid-template-columns:1fr}
+.stm-studio .sp-hub-hero h1{max-width:900px}
+
+/* The big symbol on service pages (stands in for a photo or graphic later). */
+.stm-studio .sp-tile{position:relative;isolation:isolate;display:grid;place-items:center;aspect-ratio:1/1;max-width:440px;width:100%;justify-self:end;border-radius:32px;overflow:hidden;background:radial-gradient(80% 80% at 50% 40%,#13203F 0%,#0A1124 62%,#060A16 100%);box-shadow:0 40px 80px -40px rgba(11,21,48,.7)}
+.stm-studio .sp-tile::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:36px 36px;-webkit-mask-image:radial-gradient(80% 80% at 50% 50%,#000,transparent);mask-image:radial-gradient(80% 80% at 50% 50%,#000,transparent)}
+.stm-studio .sp-tile::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(242,162,15,0),#F2A20F 20%,#14B5E3 80%,rgba(20,181,227,0))}
+.stm-studio .sp-tile-glow{position:absolute;width:56%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(242,162,15,.42),rgba(242,162,15,0) 68%);filter:blur(6px)}
+.stm-studio .sp-tile-icon{position:relative;display:grid;place-items:center;width:46%;aspect-ratio:1;border-radius:30%;background:linear-gradient(145deg,#F6C65A,#E28A12);box-shadow:0 20px 40px -14px rgba(242,162,15,.8),inset 0 2px 0 rgba(255,255,255,.35)}
+.stm-studio .sp-tile-icon svg{width:52%;height:52%;color:#fff;stroke-width:1.9}
+.stm-studio .sp-tile-dots{position:absolute;bottom:13%;display:flex;gap:9px}
+.stm-studio .sp-tile-dots i{width:14px;height:14px;border-radius:50%;background:#FFC94F;box-shadow:0 0 12px 2px rgba(242,162,15,.75)}
+
+/* What's included */
+.stm-studio .sp-section{padding:clamp(80px,8vw,104px) 0}
+.stm-studio .sp-white{background:#fff}
+.stm-studio .sp-soft{background:radial-gradient(120% 70% at 50% 30%,#F6F7FA 0%,#EEF1F5 60%,#E8ECF1 100%)}
+.stm-studio .sp-incl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:44px;list-style:none;padding:0}
+.stm-studio .sp-incl li{padding:26px 24px;border-radius:20px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 20px 40px -32px rgba(15,28,55,.4)}
+.stm-studio .sp-incl-check{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#FFF4DC;box-shadow:inset 0 0 0 1.5px #E8A13C;color:#C97A08}
+.stm-studio .sp-incl-check svg{width:18px;height:18px;stroke-width:2.8}
+.stm-studio .sp-incl h3{margin-top:16px;font:800 20px/1.25 "Inter Tight",sans-serif;letter-spacing:-.01em;color:#0B1530}
+.stm-studio .sp-incl p{margin-top:7px;font:500 16.5px/1.5 Inter,sans-serif;color:#4A5568}
+
+/* Who it's for and related services */
+.stm-studio .sp-fit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:start}
+.stm-studio .sp-fit h3{margin-top:14px;font:800 clamp(26px,2.4vw,30px)/1.12 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#0B1530}
+.stm-studio .sp-fit p{margin-top:12px;font:500 18px/1.55 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.stm-studio .sp-chip{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 16px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px rgba(15,28,55,.12),0 8px 18px -16px rgba(15,28,55,.4);font:600 15.5px Inter,sans-serif;color:#26304A;text-decoration:none;transition:box-shadow .2s ease,color .2s ease}
+.stm-studio .sp-chip:hover,.stm-studio .sp-chip:focus-visible{box-shadow:inset 0 0 0 1.5px #E8A13C,0 10px 20px -16px rgba(15,28,55,.45);color:#0B1530}
+.stm-studio .sp-chip svg{width:15px;height:15px;color:#C97A08;stroke-width:2.4;flex:none}
+.stm-studio .sp-rel{display:grid;gap:12px;margin-top:22px}
+.stm-studio .sp-rel a{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 14px 30px -24px rgba(15,28,55,.4);text-decoration:none;color:#0B1530;transition:box-shadow .2s ease}
+.stm-studio .sp-rel a:hover,.stm-studio .sp-rel a:focus-visible{box-shadow:0 0 0 1.5px #E8A13C,0 14px 30px -24px rgba(15,28,55,.45)}
+.stm-studio .sp-rel b{display:block;font:800 18px "Inter Tight",sans-serif}
+.stm-studio .sp-rel small{display:block;margin-top:3px;font:500 15px/1.4 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-rel svg{flex:none;width:20px;height:20px;margin-left:auto;color:#C97A08;stroke-width:2.4}
+
+/* Dark closing band */
+.stm-studio .sp-band{position:relative;isolation:isolate;overflow:hidden;padding:clamp(64px,6.5vw,88px) 0;color:#fff;background:radial-gradient(90% 80% at 50% 40%,#101A33 0%,#080D1B 62%,#05080F 100%)}
+.stm-studio .sp-band::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000,transparent);mask-image:radial-gradient(80% 75% at 50% 45%,#000,transparent)}
+.stm-studio .sp-band::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(242,162,15,0) 0%,#F2A20F 18%,#14B5E3 82%,rgba(20,181,227,0) 100%) top/100% 2px no-repeat,linear-gradient(90deg,rgba(242,162,15,0) 0%,#F2A20F 18%,#14B5E3 82%,rgba(20,181,227,0) 100%) bottom/100% 2px no-repeat;opacity:.85}
+.stm-studio .sp-band-in{display:flex;align-items:center;justify-content:space-between;gap:48px}
+.stm-studio .sp-band h2{max-width:760px;font:800 clamp(30px,3.3vw,44px)/1.08 "Inter Tight",sans-serif;letter-spacing:-.025em;color:#fff}
+.stm-studio .sp-band p{max-width:620px;margin-top:14px;font:500 18px/1.55 Inter,sans-serif;color:rgba(255,255,255,.75)}
+.stm-studio .sp-band .sp-band-acts{display:flex;flex-direction:column;gap:12px;flex:none}
+
+/* City page: the free checkup with the city filled in */
+.stm-studio .sp-check{position:relative;isolation:isolate;overflow:hidden;padding:30px 28px 26px;border-radius:26px;color:#fff;background:radial-gradient(90% 90% at 30% 20%,#13203F 0%,#0A1124 60%,#060A16 100%);box-shadow:0 40px 80px -40px rgba(11,21,48,.7)}
+.stm-studio .sp-check::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:36px 36px;-webkit-mask-image:radial-gradient(90% 80% at 50% 30%,#000,transparent);mask-image:radial-gradient(90% 80% at 50% 30%,#000,transparent)}
+.stm-studio .sp-check::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(242,162,15,0),#F2A20F 20%,#14B5E3 80%,rgba(20,181,227,0))}
+.stm-studio .sp-check-kicker{display:block;font:800 12.5px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#F6B73C}
+.stm-studio .sp-check h2{margin-top:10px;font:800 27px/1.15 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#fff}
+.stm-studio .sp-check p{margin-top:8px;font:500 16px/1.5 Inter,sans-serif;color:rgba(255,255,255,.72)}
+.stm-studio .sp-check label{display:block;margin-top:16px;font:700 13.5px Inter,sans-serif;color:rgba(255,255,255,.82)}
+.stm-studio .sp-check input{display:block;width:100%;height:52px;margin-top:7px;padding:0 16px;border:0;border-radius:13px;background:#fff;font:500 16.5px Inter,sans-serif;color:#0B1530}
+.stm-studio .sp-check input:focus-visible{outline:2px solid #F6B73C;outline-offset:2px}
+.stm-studio .sp-check .sp-btn{width:100%;margin-top:20px}
+.stm-studio .sp-check-note{margin-top:12px;font:500 13.5px Inter,sans-serif;color:rgba(255,255,255,.62);text-align:center}
+.stm-studio .sp-check-error{margin-top:10px;font:600 14px Inter,sans-serif;color:#FFC94F}
+
+/* Services by group (city pages and the services hub) */
+.stm-studio .sp-groups{columns:3;column-gap:20px;margin-top:44px}
+.stm-studio .sp-group{break-inside:avoid;margin-bottom:20px;padding:22px 22px 16px;border-radius:20px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 18px 36px -30px rgba(15,28,55,.4)}
+.stm-studio .sp-group h3{margin-bottom:8px;font:800 18px "Inter Tight",sans-serif;letter-spacing:-.01em;color:#0B1530}
+.stm-studio .sp-group a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid rgba(15,28,55,.08);font:600 15.5px Inter,sans-serif;color:#26304A;text-decoration:none}
+.stm-studio .sp-group a:hover,.stm-studio .sp-group a:focus-visible{color:#0B1530;text-decoration:underline;text-decoration-color:#E8920E;text-underline-offset:4px}
+.stm-studio .sp-group a svg{flex:none;width:15px;height:15px;color:#C97A08;stroke-width:2.4}
+.stm-studio .sp-group a span{display:block}
+.stm-studio .sp-group a small{display:block;margin-top:2px;font:500 14px/1.4 Inter,sans-serif;color:#6B7588}
+.stm-studio .sp-near{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:48px;padding-top:30px;border-top:1px solid rgba(15,28,55,.1)}
+.stm-studio .sp-near-label{margin-right:6px;font:800 15px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#5A6478}
+.stm-studio .sp-link{display:inline-flex;align-items:center;gap:6px;padding-bottom:3px;font:800 16px Inter,sans-serif;color:#0B1530;text-decoration:none;background:linear-gradient(90deg,#F6B73C,#E8750B) left bottom/100% 2.5px no-repeat}
+.stm-studio .sp-link svg{width:16px;height:16px}
+
+/* Areas hub */
+.stm-studio .sp-regions{display:grid;gap:40px;margin-top:44px}
+.stm-studio .sp-region h2{font:800 22px "Inter Tight",sans-serif;letter-spacing:-.01em;color:#0B1530}
+.stm-studio .sp-city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px}
+.stm-studio .sp-city{display:flex;flex-direction:column;gap:6px;padding:20px 22px;border-radius:18px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 14px 30px -24px rgba(15,28,55,.4);text-decoration:none;color:#0B1530;transition:box-shadow .2s ease}
+.stm-studio .sp-city:hover,.stm-studio .sp-city:focus-visible{box-shadow:0 0 0 1.5px #E8A13C,0 14px 30px -24px rgba(15,28,55,.45)}
+.stm-studio .sp-city b{display:flex;align-items:center;justify-content:space-between;gap:10px;font:800 19px "Inter Tight",sans-serif}
+.stm-studio .sp-city b svg{width:18px;height:18px;color:#C97A08;stroke-width:2.4}
+.stm-studio .sp-city small{font:500 15px/1.45 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-tag{align-self:flex-start;padding:3px 10px;border-radius:999px;background:#E9F7FC;font:700 12px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#11708F}
+
+/* Loading and missing states */
+.stm-studio .sp-state{width:min(92%,760px);margin:0 auto;padding:clamp(140px,12vw,170px) 0 120px;text-align:center}
+.stm-studio .sp-state h1{font:800 clamp(32px,3.6vw,44px)/1.1 "Inter Tight",sans-serif;color:#0B1530}
+.stm-studio .sp-state p{margin-top:14px;font:500 18px/1.55 Inter,sans-serif;color:#4A5568}
+.stm-studio .sp-state a{color:#0B1530;font-weight:700;text-decoration:underline;text-decoration-color:#E8920E;text-underline-offset:4px}
+
+/* Family pages: the services in that family */
+.stm-studio .sp-family{padding:clamp(72px,7vw,96px) 0;background:radial-gradient(120% 70% at 50% 30%,#F6F7FA 0%,#EEF1F5 60%,#E8ECF1 100%);color:#0B1530}
+.stm-studio .sp-family-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:36px}
+.stm-studio .sp-family-grid a{display:flex;align-items:flex-start;gap:14px;padding:20px 20px 18px;border-radius:18px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 14px 30px -24px rgba(15,28,55,.4);text-decoration:none;color:#0B1530;transition:box-shadow .2s ease}
+.stm-studio .sp-family-grid a:hover,.stm-studio .sp-family-grid a:focus-visible{box-shadow:0 0 0 1.5px #E8A13C,0 14px 30px -24px rgba(15,28,55,.45)}
+.stm-studio .sp-family-icon{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:12px;background:#FFF4DC;color:#C97A08}
+.stm-studio .sp-family-icon svg{width:21px;height:21px;stroke-width:2.2}
+.stm-studio .sp-family-grid b{display:block;font:800 18px/1.25 "Inter Tight",sans-serif}
+.stm-studio .sp-family-grid small{display:block;margin-top:4px;font:500 15px/1.45 Inter,sans-serif;color:#4A5568}
+
+/* Industry pages: services that fit, and the areas we serve */
+.industry-v2 .sp-v2-services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+@media (max-width:1023px){.industry-v2 .sp-v2-services{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:639px){.industry-v2 .sp-v2-services{grid-template-columns:1fr}}
+.industry-v2 .sp-v2-services a{display:flex;align-items:flex-start;gap:14px;padding:20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(15,28,55,.1),0 14px 30px -24px rgba(15,28,55,.4);text-decoration:none;color:#0B1530}
+.industry-v2 .sp-v2-services a:hover,.industry-v2 .sp-v2-services a:focus-visible{box-shadow:0 0 0 1.5px #E8A13C,0 14px 30px -24px rgba(15,28,55,.45)}
+.industry-v2 .sp-v2-services b{display:block;font:800 18px/1.25 "Inter Tight",sans-serif}
+.industry-v2 .sp-v2-services small{display:block;margin-top:4px;font:500 15px/1.45 Inter,sans-serif;color:#4A5568}
+.industry-v2 .sp-v2-services .sp-family-icon{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:12px;background:#FFF4DC;color:#C97A08}
+.industry-v2 .sp-v2-services .sp-family-icon svg{width:21px;height:21px;stroke-width:2.2}
+.industry-v2 .sp-v2-areas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.industry-v2 .sp-v2-areas a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px rgba(15,28,55,.14);font:600 15px Inter,sans-serif;color:#26304A;text-decoration:none}
+.industry-v2 .sp-v2-areas a:hover,.industry-v2 .sp-v2-areas a:focus-visible{box-shadow:inset 0 0 0 1.5px #E8A13C;color:#0B1530}
+.industry-v2 .sp-v2-areas svg{width:15px;height:15px;color:#C97A08;stroke-width:2.4}
+.industry-v2 .industry-tone-charcoal .sp-v2-services a,.industry-v2 .industry-tone-charcoal .sp-v2-areas a{background:rgba(255,255,255,.06);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.industry-v2 .industry-tone-charcoal .sp-v2-services small{color:rgba(255,255,255,.7)}
+
+@media (max-width:1023px){
+  .stm-studio .sp-hero-grid{grid-template-columns:1fr;gap:40px}
+  .stm-studio .sp-tile{justify-self:start;max-width:none;aspect-ratio:16/9}
+  .stm-studio .sp-tile-icon{width:24%}
+  .stm-studio .sp-tile-glow{width:34%}
+  .stm-studio .sp-incl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stm-studio .sp-groups{columns:2}
+}
+@media (max-width:760px){
+  .stm-studio .sp-wrap{width:auto;margin:0 20px}
+  .stm-studio .sp-eyebrow{gap:12px;font-size:12.5px}
+  .stm-studio .sp-eyebrow::after{width:24px}
+  .stm-studio .sp-hero{padding:100px 0 56px}
+  .stm-studio .sp-crumbs{margin-bottom:16px;font-size:13.5px}
+  .stm-studio .sp-hero h1{margin-top:14px;font-size:38px;line-height:1.06}
+  .stm-studio .sp-lead{margin-top:16px;font-size:17.5px}
+  .stm-studio .sp-actions{flex-direction:column;gap:12px;margin-top:24px}
+  .stm-studio .sp-btn{width:100%;min-height:56px}
+  .stm-studio .sp-tile{aspect-ratio:16/10;border-radius:24px}
+  .stm-studio .sp-tile-icon{width:30%}
+  .stm-studio .sp-tile-glow{width:40%}
+  .stm-studio .sp-section{padding:60px 0 64px}
+  .stm-studio .sp-h2{margin-top:12px;font-size:32px}
+  .stm-studio .sp-incl{grid-template-columns:1fr;gap:12px;margin-top:28px}
+  .stm-studio .sp-incl li{display:grid;grid-template-columns:38px 1fr;column-gap:14px;padding:20px 18px}
+  .stm-studio .sp-incl-check{grid-row:span 2}
+  .stm-studio .sp-incl h3{margin-top:2px;font-size:19px}
+  .stm-studio .sp-incl p{font-size:16px}
+  .stm-studio .sp-fit{grid-template-columns:1fr;gap:48px}
+  .stm-studio .sp-fit p{font-size:17px}
+  .stm-studio .sp-band{padding:56px 0 60px}
+  .stm-studio .sp-band-in{flex-direction:column;align-items:stretch;gap:26px}
+  .stm-studio .sp-band h2{font-size:30px}
+  .stm-studio .sp-band p{font-size:17px}
+  .stm-studio .sp-check{padding:24px 18px 22px;border-radius:22px}
+  .stm-studio .sp-check h2{font-size:24px}
+  .stm-studio .sp-groups{columns:1;margin-top:28px}
+  .stm-studio .sp-group{margin-bottom:12px;padding:18px 18px 10px}
+  .stm-studio .sp-near{margin-top:34px}
+  .stm-studio .sp-regions{gap:32px;margin-top:30px}
+  .stm-studio .sp-family{padding:56px 0 60px}
+  .stm-studio .sp-family-grid{margin-top:26px}
+}
+@media (prefers-reduced-motion:reduce){
+  .stm-studio .sp-btn,.stm-studio .sp-chip,.stm-studio .sp-rel a,.stm-studio .sp-city,.stm-studio .sp-family-grid a{transition:none}
+}

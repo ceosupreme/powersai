@@ -26,6 +26,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileIndustriesOpen, setMobileIndustriesOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -34,9 +35,11 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   const servicesPanelRef = useRef<HTMLDivElement | null>(null);
   const industriesButtonRef = useRef<HTMLButtonElement | null>(null);
   const industriesPanelRef = useRef<HTMLDivElement | null>(null);
+  const aboutButtonRef = useRef<HTMLButtonElement | null>(null);
+  const aboutPanelRef = useRef<HTMLDivElement | null>(null);
   const { pathname, search } = useLocation();
   const { data: landers = [], isLoading: industriesLoading, isError: industriesError } = usePublishedVerticalLanders();
-  const industries = landers.map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
+  const industries = landers.filter((row) => row.sort_order < 100).map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
   const routeSlug = pathname.match(/^\/for\/([a-z0-9-]{2,40})\/?$/)?.[1];
   const verticalSlug = routeSlug ? normalizeSlug(routeSlug) : null;
   const sourceParams = new URLSearchParams(search);
@@ -51,8 +54,8 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   if (/^[a-z0-9-]{1,40}$/i.test(sourceParams.get("offer") ?? "")) contactParams.set("offer", sourceParams.get("offer") ?? "");
   const attributedContact = `/${contactParams.size ? `?${contactParams.toString()}` : ""}#contact`;
   const labels = language === "es"
-    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", blog: "Blog", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
-    : { work: "Work", services: "Services", industries: "Industries", about: "About", blog: "Blog", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
+    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", aboutUs: "Acerca de nosotros", areas: "Zonas que atendemos", allServices: "Ver todos los servicios", blog: "Blog", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
+    : { work: "Work", services: "Services", industries: "Industries", about: "About", aboutUs: "About us", areas: "Areas we serve", allServices: "See all services", blog: "Blog", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -65,6 +68,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
     setOpen(false);
     setServicesOpen(false);
     setIndustriesOpen(false);
+    setAboutOpen(false);
     setMobileServicesOpen(false);
     setMobileIndustriesOpen(false);
   }, [pathname]);
@@ -83,12 +87,13 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   }, [open]);
 
   useEffect(() => {
-    if (!servicesOpen && !industriesOpen) return;
+    if (!servicesOpen && !industriesOpen && !aboutOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        const focusTarget = servicesOpen ? servicesButtonRef.current : industriesButtonRef.current;
+        const focusTarget = servicesOpen ? servicesButtonRef.current : industriesOpen ? industriesButtonRef.current : aboutButtonRef.current;
         setServicesOpen(false);
         setIndustriesOpen(false);
+        setAboutOpen(false);
         focusTarget?.focus();
       }
     };
@@ -96,6 +101,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
       const target = e.target as Node;
       if (!servicesPanelRef.current?.contains(target) && !servicesButtonRef.current?.contains(target)) setServicesOpen(false);
       if (!industriesPanelRef.current?.contains(target) && !industriesButtonRef.current?.contains(target)) setIndustriesOpen(false);
+      if (!aboutPanelRef.current?.contains(target) && !aboutButtonRef.current?.contains(target)) setAboutOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
@@ -103,7 +109,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointer);
     };
-  }, [servicesOpen, industriesOpen]);
+  }, [servicesOpen, industriesOpen, aboutOpen]);
 
   return (
     <><StudioMotion /><header
@@ -120,7 +126,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex xl:gap-9">
           <div className="relative">
             <Button ref={servicesButtonRef} type="button" variant="ghost" aria-expanded={servicesOpen} aria-controls="studio-services-menu"
-              onClick={() => { setServicesOpen((value) => !value); setIndustriesOpen(false); }}
+              onClick={() => { setServicesOpen((value) => !value); setIndustriesOpen(false); setAboutOpen(false); }}
               className="h-11 gap-1.5 px-1 text-[1rem] font-normal text-foreground/80 hover:bg-transparent hover:text-foreground">
               {labels.services} <ChevronDown size={15} className={cn("transition-transform", servicesOpen && "rotate-180")} />
             </Button>
@@ -134,12 +140,15 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
                     </Link>
                   ))}
                 </div>
+                <Link to="/services" onClick={() => setServicesOpen(false)} className="mt-1 flex min-h-14 items-center justify-between border-t border-border px-4 font-medium hover:bg-[hsl(var(--surface))]">
+                  {labels.allServices} <span aria-hidden>→</span>
+                </Link>
               </div>
             )}
           </div>
           <div className="relative">
             <Button ref={industriesButtonRef} type="button" variant="ghost" aria-expanded={industriesOpen} aria-controls="studio-industries-menu"
-              onClick={() => { setIndustriesOpen((value) => !value); setServicesOpen(false); }}
+              onClick={() => { setIndustriesOpen((value) => !value); setServicesOpen(false); setAboutOpen(false); }}
               className="h-11 gap-1.5 px-1 text-[1rem] font-normal text-foreground/80 hover:bg-transparent hover:text-foreground">
               {labels.industries} <ChevronDown size={15} className={cn("transition-transform", industriesOpen && "rotate-180")} />
             </Button>
@@ -158,7 +167,19 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
           </div>
           <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.work}</Link>
           <Link to="/blog" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.blog}</Link>
-          <Link to="/about" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.about}</Link>
+          <div className="relative">
+            <Button ref={aboutButtonRef} type="button" variant="ghost" aria-expanded={aboutOpen} aria-controls="studio-about-menu"
+              onClick={() => { setAboutOpen((value) => !value); setServicesOpen(false); setIndustriesOpen(false); }}
+              className="h-11 gap-1.5 px-1 text-[1rem] font-normal text-foreground/80 hover:bg-transparent hover:text-foreground">
+              {labels.about} <ChevronDown size={15} className={cn("transition-transform", aboutOpen && "rotate-180")} />
+            </Button>
+            {aboutOpen && (
+              <div id="studio-about-menu" ref={aboutPanelRef} className="absolute right-0 top-[calc(100%+12px)] w-[280px] border border-border bg-[hsl(var(--paper))] p-2 shadow-xl">
+                <Link to="/about" onClick={() => setAboutOpen(false)} className="flex min-h-12 items-center px-4 hover:bg-[hsl(var(--surface))] hover:text-primary">{labels.aboutUs}</Link>
+                <Link to="/areas" onClick={() => setAboutOpen(false)} className="flex min-h-12 items-center px-4 hover:bg-[hsl(var(--surface))] hover:text-primary">{labels.areas}</Link>
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -192,8 +213,8 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
               {labels.services}<ChevronDown size={16} className={cn("transition-transform", mobileServicesOpen && "rotate-180")} />
             </Button>
             {mobileServicesOpen && <div id="studio-mobile-services" className="border-b border-border bg-[hsl(var(--surface))] px-3 py-1">{SERVICES.map((service) => (
-              <Link key={service.to} to={service.to} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem] last:border-0">{language === "es" ? service.labelEs : service.label}</Link>
-            ))}</div>}
+              <Link key={service.to} to={service.to} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem]">{language === "es" ? service.labelEs : service.label}</Link>
+            ))}<Link to="/services" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center px-2 text-[0.94rem] font-medium">{labels.allServices}</Link></div>}
             <Button type="button" variant="ghost" aria-expanded={mobileIndustriesOpen} aria-controls="studio-mobile-industries" onClick={() => { setMobileIndustriesOpen((value) => !value); setMobileServicesOpen(false); }} className="flex min-h-[48px] w-full justify-between rounded-none border-b border-border px-2 text-[1rem] font-normal">
               {labels.industries}<ChevronDown size={16} className={cn("transition-transform", mobileIndustriesOpen && "rotate-180")} />
             </Button>
@@ -204,6 +225,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.work}</Link>
             <Link to="/blog" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.blog}</Link>
             <Link to="/about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
+            <Link to="/areas" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.areas}</Link>
             <div className="flex gap-5 border-b border-border px-2 py-2 text-sm"><Link to="/privacy" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center">{language === "es" ? "Privacidad" : "Privacy"}</Link><Link to="/terms" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center">{language === "es" ? "Términos" : "Terms"}</Link></div>
             <Link
               to={attributedContact}

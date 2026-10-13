@@ -1730,6 +1730,69 @@ export type Database = {
           },
         ]
       }
+      city_pages: {
+        Row: {
+          checkup_city: string
+          created_at: string
+          eyebrow: string | null
+          headline: string
+          headline_accent: string | null
+          id: string
+          industries: Json
+          intro: string
+          is_coastal: boolean
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          nearby: Json
+          published: boolean
+          region: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          checkup_city: string
+          created_at?: string
+          eyebrow?: string | null
+          headline: string
+          headline_accent?: string | null
+          id?: string
+          industries?: Json
+          intro: string
+          is_coastal?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          nearby?: Json
+          published?: boolean
+          region: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          checkup_city?: string
+          created_at?: string
+          eyebrow?: string | null
+          headline?: string
+          headline_accent?: string | null
+          id?: string
+          industries?: Json
+          intro?: string
+          is_coastal?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          nearby?: Json
+          published?: boolean
+          region?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       content_automation_runs: {
         Row: {
           content_item_id: string
@@ -8995,6 +9058,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      service_pages: {
+        Row: {
+          audience_body: string | null
+          audience_heading: string | null
+          created_at: string
+          eyebrow: string | null
+          family_path: string
+          group_key: string
+          group_label: string
+          headline: string
+          headline_accent: string | null
+          icon: string | null
+          id: string
+          included: Json
+          industries: Json
+          intro: string
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          published: boolean
+          related: Json
+          slug: string
+          sort_order: number
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          audience_body?: string | null
+          audience_heading?: string | null
+          created_at?: string
+          eyebrow?: string | null
+          family_path: string
+          group_key: string
+          group_label: string
+          headline: string
+          headline_accent?: string | null
+          icon?: string | null
+          id?: string
+          included?: Json
+          industries?: Json
+          intro: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          published?: boolean
+          related?: Json
+          slug: string
+          sort_order?: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          audience_body?: string | null
+          audience_heading?: string | null
+          created_at?: string
+          eyebrow?: string | null
+          family_path?: string
+          group_key?: string
+          group_label?: string
+          headline?: string
+          headline_accent?: string | null
+          icon?: string | null
+          id?: string
+          included?: Json
+          industries?: Json
+          intro?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          published?: boolean
+          related?: Json
+          slug?: string
+          sort_order?: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       shift_feedback: {
         Row: {

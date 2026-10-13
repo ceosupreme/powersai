@@ -13,6 +13,8 @@ export const ROUTE_META = {
   "/about": { title: "About Supreme Team Media | Sean Powers", description: "Meet Sean Powers, founder of Supreme Team Media, building brands and websites from North County San Diego since 2002." },
   "/privacy": { title: "Privacy Policy | Supreme Team Media", description: "How Supreme Team Media collects, uses, protects and shares information." },
   "/terms": { title: "Terms of Service | Supreme Team Media", description: "The terms for Supreme Team Media websites, creative, marketing, systems and publishing services." },
+  "/services": { title: "Services | Supreme Team Media", description: "Every service in one place: websites, Google and reviews, social media, ads, branding, video, follow-up and business systems for San Diego County businesses." },
+  "/areas": { title: "Areas We Serve | Supreme Team Media", description: "Marketing, websites and follow-up for businesses in every city in San Diego County, from Oceanside and Carlsbad to Chula Vista and El Cajon." },
   "/blog": { title: "Blog | Supreme Team Media", description: "Straight answers for business owners on websites, Google listings, reviews and getting more calls, in plain English." },
   "/pricing": { title: "Plans & Pricing | Supreme Team Media", description: "Compare Launch Site, Business Site, Care, Growth and Custom Systems pricing and choose the right starting point." },
   "/startups": { title: "Startups & Founders | Supreme Team Media", description: "Turn the idea into something real with a readiness check and practical paths to validate, brand, launch and grow." },

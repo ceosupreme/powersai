@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Container } from "./primitives";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { usePublishedVerticalLanders } from "@/hooks/useVerticalLanders";
+import { useCityPages } from "@/hooks/useSitePages";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -24,7 +25,9 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
   const auditHref = `/free-audit${source}`;
   const es = language === "es" || queryLanguage === "es";
   const { data: landers = [], isError } = usePublishedVerticalLanders();
-  const industries = landers.map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
+  // The main industries here; every industry is on the Industries page.
+  const industries = landers.filter((row) => row.sort_order < 100).map((row) => ({ ...row, slug: normalizeSlug(row.slug) }));
+  const { data: cities = [] } = useCityPages();
   return (
     <footer className="studio-band">
       <Container className="py-16 md:py-20">
@@ -36,6 +39,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
 
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-1 text-[1rem] sm:grid-cols-3">
             <Link to="/work" className="inline-flex min-h-11 items-center hover:underline">{es ? "Trabajo" : "Work"}</Link>
+            <Link to="/services" className="inline-flex min-h-11 items-center hover:underline">{es ? "Todos los servicios" : "All services"}</Link>
             <Link to="/services/websites" className="inline-flex min-h-11 items-center hover:underline">{es ? "Sitios web" : "Websites"}</Link>
             <Link to="/services/brand" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marca y creatividad" : "Brand & creative"}</Link>
             <Link to="/services/marketing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marketing y crecimiento" : "Marketing & growth"}</Link>
@@ -45,6 +49,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/startups" className="inline-flex min-h-11 items-center hover:underline">{es ? "Startups y fundadores" : "Startups & founders"}</Link>
             <Link to="/blog" className="inline-flex min-h-11 items-center hover:underline">Blog</Link>
             <Link to="/about" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acerca de" : "About"}</Link>
+            <Link to="/areas" className="inline-flex min-h-11 items-center hover:underline">{es ? "Zonas que atendemos" : "Areas we serve"}</Link>
             <Link to={contactHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Habla de un proyecto" : "Discuss a project"}</Link>
             <Link to={auditHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Revisión gratuita" : "Free business checkup"}</Link>
             <Link to="/industries" className="inline-flex min-h-11 items-center hover:underline">{es ? "Industrias" : "Industries"}</Link>
@@ -71,6 +76,14 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
              <Link to="/industries" className="inline-flex min-h-11 items-center font-medium text-foreground hover:underline">{es ? "Ver todas" : "View all industries"}</Link>
           </div>
         </nav>
+
+        {cities.length > 0 && <nav aria-label="Areas we serve" className="mt-8 border-t border-[hsl(var(--band-text)/0.16)] pt-7">
+          <p className="studio-label mb-4" style={{ color: "hsl(var(--band-text) / 0.62)" }}>{es ? "Zonas que atendemos" : "Areas we serve"}</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+            {cities.map((city) => <Link key={city.slug} to={`/areas/${city.slug}`} className="inline-flex min-h-11 items-center hover:underline">{city.name}</Link>)}
+            <Link to="/areas" className="inline-flex min-h-11 items-center font-medium text-foreground hover:underline">{es ? "Ver todas" : "All areas"}</Link>
+          </div>
+        </nav>}
 
         <div className="mt-12 flex flex-col gap-2 border-t border-[hsl(var(--band-text)/0.16)] pt-6 text-sm text-muted-foreground md:flex-row md:justify-between">
           <span>&copy; {new Date().getFullYear()} Supreme Team Media</span>

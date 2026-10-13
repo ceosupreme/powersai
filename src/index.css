@@ -1972,6 +1972,8 @@
 .industry-v2 .industry-hero { padding: 132px 0 72px; }
 .industry-v2 .industry-hero-grid { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr); align-items: center; gap: clamp(24px,4vw,70px); }
 .industry-v2 .industry-hero-copy { min-width: 0; }
+/* An industry page with no picture or scene yet: the copy uses the full width instead of leaving the art column empty. */
+.industry-v2 .industry-hero:not(.has-hero-media) .industry-hero-grid:not(:has(.industry-hero-art)) { grid-template-columns: minmax(0, 1000px); }
 .industry-v2 .home-eyebrow { color: hsl(var(--industry-accent)); }
 .industry-v2 .industry-language { display: inline-block; margin-top: 18px; border-bottom: 1px solid currentColor; font-size: .85rem; }
 .industry-v2 .industry-hero h1 { margin-top: 20px; font-family: "Inter Tight", sans-serif; font-weight: 800; font-size: clamp(3rem,5.4vw,5.7rem); line-height: 1.02; overflow-wrap: break-word; }
@@ -2514,6 +2516,17 @@
 .directory-page .directory-invite .home-section-title { max-width: 800px; }
 .directory-page .directory-invite p { max-width: 630px; margin: 25px 0 34px; font-size: 1.13rem; line-height: 1.6; color: hsl(var(--home-light) / .8); }
 .directory-page .directory-invite .home-btn-amber, .curated-work-page .curated-work-feature .home-btn-amber { display: inline-flex; align-items: center; gap: 10px; }
+/* Industries without a picture yet: a compact list by group, under the tiles. */
+.directory-page .directory-more { margin-top: clamp(64px, 7vw, 104px); padding-top: clamp(30px, 3vw, 42px); border-top: 1px solid hsl(var(--home-rule)); }
+.directory-page .directory-rest-grid + .directory-more { margin-top: clamp(72px, 8vw, 116px); }
+.directory-page .directory-more-groups { columns: 3 280px; column-gap: 22px; margin-top: 28px; }
+.directory-page .directory-group { break-inside: avoid; margin-bottom: 22px; padding: 22px 24px 8px; border: 1px solid hsl(var(--home-rule)); background: hsl(var(--home-ivory)); }
+.directory-page .directory-group h3 { padding-bottom: 12px; border-bottom: 1px solid hsl(var(--home-rule)); font: 800 1.2rem/1.2 "Inter Tight", sans-serif; color: hsl(var(--home-ink)); }
+.directory-page .directory-group li + li { border-top: 1px solid hsl(var(--home-rule)); }
+.directory-page .directory-group a { display: flex; justify-content: space-between; align-items: center; gap: 14px; min-height: 50px; padding: 6px 0; font-weight: 600; color: hsl(var(--home-ink)); }
+.directory-page .directory-group a svg { flex: none; color: hsl(var(--home-copper)); transition: transform .2s ease; }
+.directory-page .directory-group a:hover, .directory-page .directory-group a:focus-visible { color: hsl(var(--home-copper)); }
+.directory-page .directory-group a:hover svg, .directory-page .directory-group a:focus-visible svg { transform: translateX(3px); }
 .curated-work-page .curated-work-filters { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 45px; }
 .curated-work-page .curated-work-filters button { min-height: 48px; height: auto; border-color: hsl(var(--home-rule)); border-radius: 100px; background: transparent; color: hsl(var(--home-ink)); white-space: normal; text-align: left; }
 .curated-work-page .curated-work-filters button[aria-pressed="true"] { border-color: hsl(var(--home-copper)); background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); }
@@ -2560,6 +2573,7 @@
  .curated-work-page .curated-work-service-rail { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 390px) { .curated-work-page .curated-work-service-rail { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .directory-page .directory-group a svg { transition: none; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .directory-page .directory-feature-image img, .directory-page .directory-tile-art img, .curated-work-page .curated-work-art img { transition: none; } .directory-page .directory-feature:hover img, .directory-page .directory-tile-main:hover img, .curated-work-page .curated-work-art:hover img { transform: none; } }
 
 /* Project stories and employer introduction — public studio visual system. */

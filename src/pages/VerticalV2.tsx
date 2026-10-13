@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, MapPin } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
@@ -13,6 +13,8 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { useCheckoutEnabled } from "@/hooks/useCheckoutEnabled";
 import { getStudioMedia } from "@/config/studioMedia";
 import { BrowserScene, PhoneScene, IndustryInteraction, type Interaction } from "@/components/marketing/vertical-v2/IndustryInteraction";
+import { useCityPages, useServicePages, type ServicePageRow } from "@/hooks/useSitePages";
+import { ServiceCard } from "@/components/marketing/pages/SitePageBits";
 
 const SITE = "https://supremeteammedia.com";
 const DEFAULT_NEEDS = ["A new website", "The site I have is not bringing work", "Follow-up, reviews and reminders", "The whole system"];
@@ -52,6 +54,7 @@ const LABELS_EN = {
   growth: "Ask about Growth", estimate: "Every figure above is an estimate.", proof_form: "The inquiry form", proof_email: "The confirmation email",
   proof_alert: "The owner alert", case: "Case study", see_case: "See the case study", checking_for: "Checking for", language_switch: "Español",
   launch_inquiry: "Start a Launch Site", care_inquiry: "Ask about Care", proof_heading: "What you can see before you buy", price_heading: "What it costs",
+  services: "Services that fit", areas: "Where we work",
 };
 
 function useHtmlLang(lang: "en" | "es") {
@@ -102,6 +105,9 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const langQ = lang === "es" ? "&lang=es" : "";
   const { enabled: checkout } = useCheckoutEnabled();
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label, vertical: slug, src });
+  // Row-driven link sections: the services a row names (layout.services) and every area we serve.
+  const { data: serviceRows = [] } = useServicePages();
+  const { data: cityRows = [] } = useCityPages();
 
   useStudioHead({ title: str(row.meta_title) || str(row.display_name), description: str(row.meta_description), path: location.pathname, canonicalPath: `/for/${slug}` });
   useOgImage(str(row.og_image_url) || null);
@@ -159,6 +165,11 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
       case "offer": return <><span className="home-eyebrow">{L.price_heading}</span>{heading(price.heading || L.price_heading)}<div className="industry-prices"><PriceRow text={str(price.launch)}>{checkout ? <><CheckoutButton product="launch_site_deposit" label={L.deposit} sourceVertical={slug} originPath={location.pathname}/><CheckoutButton product="launch_site_monthly" label={L.monthly} sourceVertical={slug} originPath={location.pathname}/></> : <Link className="home-btn-amber" to={inquiry("launch-site")} onClick={() => track("v2_offer_launch_site")}>{L.launch_inquiry}</Link>}</PriceRow><PriceRow text={str(price.care)}>{checkout ? <CheckoutButton product="care_seat" label={L.care} sourceVertical={slug} originPath={location.pathname}/> : <Link className="home-btn-ghost" to={inquiry("care")} onClick={() => track("v2_offer_care")}>{L.care_inquiry}</Link>}</PriceRow><PriceRow text={str(price.business)}><Link className="home-btn-ghost" to={inquiry("business-site")} onClick={() => track("v2_offer_business_site")}>{L.business_quote}</Link><Link className="home-btn-ghost" to={freeCheck} onClick={() => track("v2_offer_free_check")}>{L.free_check}</Link></PriceRow><PriceRow text={str(price.growth)}><Link className="home-btn-ghost" to={`/?intent=marketing&offer=growth&src=${src}${bizQ}${langQ}#contact`} onClick={() => track("v2_offer_growth")}>{L.growth}</Link></PriceRow></div>{row.guarantee_line && <p className="industry-lede">{row.guarantee_line}</p>}{arr(row.how_it_works).length > 0 && <ol className="industry-steps">{arr<any>(row.how_it_works).map((step, i) => <li key={i}><span>0{i + 1}</span><h3>{typeof step === "string" ? `${lang === "es" ? "Paso" : "Step"} ${i + 1}` : step?.title}</h3><p>{typeof step === "string" ? step : step?.body}</p></li>)}</ol>}</>;
       case "facts": return arr(row.market_facts).length > 0 && <>{heading(L.market)}<ul className="industry-facts">{arr<any>(row.market_facts).map((m, i) => <li key={i}><p>{m.fact}</p><small>{m.publisher}{m.year ? `, ${m.year}` : ""}{m.label ? ` · ${m.label}` : ""}{m.url && <> · <a href={m.url} target="_blank" rel="noopener noreferrer">{m.label || m.publisher || m.url}</a></>}</small></li>)}</ul></>;
       case "questions": return faq.length > 0 && <div className="industry-questions">{heading(L.faq)}<Accordion type="single" collapsible>{faq.map((f, i) => <AccordionItem key={i} value={`f${i}`}><AccordionTrigger>{f.q}</AccordionTrigger><AccordionContent>{f.a}</AccordionContent></AccordionItem>)}</Accordion></div>;
+      case "services": {
+        const picks = arr<string>(layout?.services).map((s) => serviceRows.find((r) => r.slug === s)).filter((r): r is ServicePageRow => !!r);
+        return picks.length > 0 && <>{heading(L.services)}<div className="sp-v2-services">{picks.map((r) => <ServiceCard key={r.slug} row={r} from={`v2_${slug.replace(/-/g, "_")}`}/>)}</div></>;
+      }
+      case "areas": return cityRows.length > 0 && <>{heading(L.areas)}<div className="sp-v2-areas">{cityRows.map((c) => <Link key={c.slug} to={`/areas/${c.slug}`} onClick={() => track(`v2_area_${c.slug}`)}><MapPin aria-hidden/>{c.name}</Link>)}</div></>;
       case "contact": return <div className="industry-contact">{heading(L.inquiry_title)}<p>{L.inquiry_sub}</p><VerticalInquiry config={inquiryConfig} biz={biz} language={lang}/></div>;
       default: return null;
     }
