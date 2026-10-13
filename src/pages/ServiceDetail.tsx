@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Plus } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { openAtTop } from "@/components/marketing/blog/BlogCard";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
-import { useServicePages } from "@/hooks/useSitePages";
+import { useServicePages, useStarterPackages } from "@/hooks/useSitePages";
+import { packageCart } from "@/lib/packageCart";
 import { Accent, CheckupBand, Crumbs, FAMILIES, ServiceIcon, prefillContact, useIndustryNames } from "@/components/marketing/pages/SitePageBits";
+import "@/components/marketing/pages/packages/packages.css";
 
 const SITE = "https://supremeteammedia.com";
 
@@ -17,6 +19,7 @@ export default function ServiceDetail() {
   const { slug = "" } = useParams();
   const { data: rows = [], isLoading, isError } = useServicePages();
   const industryNames = useIndustryNames();
+  const { data: starters = [] } = useStarterPackages();
   const row = rows.find((r) => r.slug === slug);
 
   useStudioHead({
@@ -46,6 +49,11 @@ export default function ServiceDetail() {
     trackSiteEvent({ event_type: "cta_click", label: `service_price_${row.slug.replace(/-/g, "_")}` });
     prefillContact(`I'd like a price for ${row.name.toLowerCase()}.`);
   };
+  const askQuestion = () => {
+    trackSiteEvent({ event_type: "cta_click", label: `service_question_${row.slug.replace(/-/g, "_")}` });
+    prefillContact(`I have a question about ${row.name.toLowerCase()}.`);
+  };
+  const partOf = starters.filter((p) => p.services.includes(row.slug));
   // Service and breadcrumb details for search engines ("<" escaped so row text can't close the tag).
   const jsonLd = JSON.stringify([
     { "@context": "https://schema.org", "@type": "Service", name: row.name, description: row.meta_description || row.intro, url: `${SITE}/services/${row.slug}`, provider: { "@type": "Organization", name: "Supreme Team Media", url: SITE }, areaServed: { "@type": "AdministrativeArea", name: "San Diego County" } },
@@ -68,9 +76,15 @@ export default function ServiceDetail() {
               <h1 id="service-title"><Accent text={row.headline} accent={row.headline_accent} /></h1>
               <p className="sp-lead">{row.intro}</p>
               <div className="sp-actions">
-                <a className="sp-btn sp-btn-gold" href="#contact" onClick={askPrice}>Get my price <ArrowRight aria-hidden /></a>
-                <Link className="sp-btn sp-btn-line" to={`/free-audit?src=service-${row.slug}`} onClick={() => { trackSiteEvent({ event_type: "cta_click", label: `service_checkup_${row.slug.replace(/-/g, "_")}` }); openAtTop(); }}>Run my free checkup</Link>
+                <Link className="sp-btn sp-btn-gold" to={`/pricing?add=${row.slug}&src=service-${row.slug}#build`} onClick={() => { trackSiteEvent({ event_type: "cta_click", label: `service_add_${row.slug.replace(/-/g, "_")}` }); packageCart.add([row.slug]); }}>Add to my package <Plus aria-hidden /></Link>
+                <a className="sp-btn sp-btn-line" href="#contact" onClick={askQuestion}>Ask a question</a>
               </div>
+              {partOf.length > 0 && (
+                <div className="pk-partof">
+                  <span>In these starter packages</span>
+                  {partOf.map((p) => <Link key={p.slug} to={`/pricing?package=${p.slug}&src=service-${row.slug}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: `service_package_${p.slug.replace(/-/g, "_")}` })}><i className="pk-led" aria-hidden="true" />{p.name}</Link>)}
+                </div>
+              )}
             </div>
             <div className="sp-tile" aria-hidden="true">
               <span className="sp-tile-glow" />

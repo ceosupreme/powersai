@@ -16,6 +16,6 @@ export const ROUTE_META = {
   "/services": { title: "Services | Supreme Team Media", description: "Every service in one place: websites, Google and reviews, social media, ads, branding, video, follow-up and business systems for San Diego County businesses." },
   "/areas": { title: "Areas We Serve | Supreme Team Media", description: "Marketing, websites and follow-up for businesses in every city in San Diego County, from Oceanside and Carlsbad to Chula Vista and El Cajon." },
   "/blog": { title: "Blog | Supreme Team Media", description: "Straight answers for business owners on websites, Google listings, reviews and getting more calls, in plain English." },
-  "/pricing": { title: "Plans & Pricing | Supreme Team Media", description: "Compare Launch Site, Business Site, Care, Growth and Custom Systems pricing and choose the right starting point." },
+  "/pricing": { title: "Packages | Supreme Team Media", description: "Pick a starter package for where your business is, or build your own from every service we offer. You get a clear price, in writing, before anything starts." },
   "/startups": { title: "Startups & Founders | Supreme Team Media", description: "Turn the idea into something real with a readiness check and practical paths to validate, brand, launch and grow." },
 };

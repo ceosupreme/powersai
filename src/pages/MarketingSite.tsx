@@ -12,7 +12,7 @@ import { HomeFaq } from "@/components/marketing/studio/sections/HomeFaq";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { StudioReveal } from "@/components/marketing/studio/StudioReveal";
-import { PricingTeaser } from "@/components/marketing/studio/sections/PricingTeaser";
+import { HomePackages } from "@/components/marketing/studio/sections/HomePackages";
 import { Testimonials } from "@/components/marketing/studio/Testimonials";
 import { ROUTE_META } from "@/config/routeMeta";
 
@@ -69,7 +69,8 @@ export default function MarketingSite() {
             one next step, and the free checkup for anyone who can't pick.
             Then the three newest blog posts (hidden until one is published),
             then the questions owners ask before they reach out (which also
-            cover how a project works, so there's no separate section for it).
+            cover how a project works, so there's no separate section for it),
+            then "Let's build yours" pointing to packages, then the contact form.
             Industry pages stay linked from the header and footer. */}
         <div className="stm-stack">
           <GetAttention />
@@ -85,7 +86,7 @@ export default function MarketingSite() {
           <StartingPoint />
           <HomeBlog />
           <HomeFaq />
-          <StudioReveal><PricingTeaser /></StudioReveal>
+          <StudioReveal><HomePackages /></StudioReveal>
           <StudioReveal><Inquiry /></StudioReveal>
         </div>
       </main>

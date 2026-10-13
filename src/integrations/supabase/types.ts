@@ -9683,6 +9683,60 @@ export type Database = {
         }
         Relationships: []
       }
+      starter_packages: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          name: string
+          price: string
+          price_label: string
+          price_note: string | null
+          published: boolean
+          services: Json
+          slug: string
+          sort_order: number
+          stage_label: string
+          stage_level: number
+          tagline: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items?: Json
+          name: string
+          price?: string
+          price_label?: string
+          price_note?: string | null
+          published?: boolean
+          services?: Json
+          slug: string
+          sort_order?: number
+          stage_label: string
+          stage_level?: number
+          tagline?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          name?: string
+          price?: string
+          price_label?: string
+          price_note?: string | null
+          published?: boolean
+          services?: Json
+          slug?: string
+          sort_order?: number
+          stage_label?: string
+          stage_level?: number
+          tagline?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       suppressed_insights: {
         Row: {
           bar_id: string | null

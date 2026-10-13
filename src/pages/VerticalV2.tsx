@@ -15,6 +15,7 @@ import { getStudioMedia } from "@/config/studioMedia";
 import { BrowserScene, PhoneScene, IndustryInteraction, type Interaction } from "@/components/marketing/vertical-v2/IndustryInteraction";
 import { useCityPages, useServicePages, type ServicePageRow } from "@/hooks/useSitePages";
 import { ServiceCard } from "@/components/marketing/pages/SitePageBits";
+import { StarterStrip } from "@/components/marketing/pages/packages/PackageBits";
 
 const SITE = "https://supremeteammedia.com";
 const DEFAULT_NEEDS = ["A new website", "The site I have is not bringing work", "Follow-up, reviews and reminders", "The whole system"];
@@ -54,7 +55,7 @@ const LABELS_EN = {
   growth: "Ask about Growth", estimate: "Every figure above is an estimate.", proof_form: "The inquiry form", proof_email: "The confirmation email",
   proof_alert: "The owner alert", case: "Case study", see_case: "See the case study", checking_for: "Checking for", language_switch: "Español",
   launch_inquiry: "Start a Launch Site", care_inquiry: "Ask about Care", proof_heading: "What you can see before you buy", price_heading: "What it costs",
-  services: "Services that fit", areas: "Where we work",
+  services: "Services that fit", areas: "Where we work", packages: "Pick a starter package",
 };
 
 function useHtmlLang(lang: "en" | "es") {
@@ -169,6 +170,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
         const picks = arr<string>(layout?.services).map((s) => serviceRows.find((r) => r.slug === s)).filter((r): r is ServicePageRow => !!r);
         return picks.length > 0 && <>{heading(L.services)}<div className="sp-v2-services">{picks.map((r) => <ServiceCard key={r.slug} row={r} from={`v2_${slug.replace(/-/g, "_")}`}/>)}</div></>;
       }
+      case "packages": return <>{heading(L.packages)}<StarterStrip src={src}/></>;
       case "areas": return cityRows.length > 0 && <>{heading(L.areas)}<div className="sp-v2-areas">{cityRows.map((c) => <Link key={c.slug} to={`/areas/${c.slug}`} onClick={() => track(`v2_area_${c.slug}`)}><MapPin aria-hidden/>{c.name}</Link>)}</div></>;
       case "contact": return <div className="industry-contact">{heading(L.inquiry_title)}<p>{L.inquiry_sub}</p><VerticalInquiry config={inquiryConfig} biz={biz} language={lang}/></div>;
       default: return null;

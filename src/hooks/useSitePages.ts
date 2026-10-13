@@ -80,6 +80,40 @@ export function useCityPages() {
   });
 }
 
+/** A starter package on the Packages page (/pricing). `services` are the
+ *  service_pages slugs it covers; `items` are the plain bullets on its card. */
+export type StarterPackageRow = {
+  slug: string;
+  name: string;
+  stage_label: string;
+  stage_level: number;
+  tagline: string;
+  items: string[];
+  services: string[];
+  price_label: string;
+  price: string;
+  price_note: string | null;
+  sort_order: number;
+};
+
+const STARTER_FIELDS = "slug,name,stage_label,stage_level,tagline,items,services,price_label,price,price_note,sort_order";
+
+/** Every published starter package, in page order. */
+export function useStarterPackages() {
+  return useQuery({
+    queryKey: ["starter-packages"],
+    staleTime: 300_000,
+    queryFn: async (): Promise<StarterPackageRow[]> => {
+      const { data, error } = await supabase.from("starter_packages").select(STARTER_FIELDS).eq("published", true).order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []).map((r) => {
+        const row = r as Record<string, unknown>;
+        return { ...row, items: list<string>(row.items), services: list<string>(row.services) } as StarterPackageRow;
+      });
+    },
+  });
+}
+
 /** Group services by their menu group, keeping the order they arrive in. */
 export function groupServices(rows: ServicePageRow[]) {
   const groups: { key: string; label: string; items: ServicePageRow[] }[] = [];

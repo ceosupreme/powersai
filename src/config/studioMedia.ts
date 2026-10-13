@@ -294,6 +294,14 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     width: 900,
     height: 1200,
     objectFit: "cover",
+  },  /** Homepage closing section ("Let's build yours"): a licensed photo of a local business owner, picked with the owner. */
+  "home-packages-photo": {
+    src: null,
+    alt: "A local business owner at work",
+    aspectRatio: "5 / 4",
+    width: 1500,
+    height: 1200,
+    objectFit: "cover",
   },
 };
 

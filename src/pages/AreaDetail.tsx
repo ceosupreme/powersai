@@ -8,7 +8,8 @@ import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { openAtTop } from "@/components/marketing/blog/BlogCard";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { groupServices, useCityPages, useServicePages } from "@/hooks/useSitePages";
-import { Accent, CheckupBand, Crumbs, prefillContact, useIndustryNames } from "@/components/marketing/pages/SitePageBits";
+import { Accent, Crumbs, prefillContact, useIndustryNames } from "@/components/marketing/pages/SitePageBits";
+import { PackageBand } from "@/components/marketing/pages/packages/PackageBits";
 
 const SITE = "https://supremeteammedia.com";
 const clean = (v: string, max: number) => v.replace(/[\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
@@ -145,12 +146,11 @@ export default function AreaDetail() {
         </div>
       </section>
 
-      <CheckupBand
-        title={`Let's talk about your ${row.name} business.`}
+      <PackageBand
+        title={`Let's build the right package for your ${row.name} business.`}
         accent={`${row.name} business.`}
-        body="Tell us where you are and what you need. You'll get a clear price, in writing, before anything starts."
+        body="Start from a package made for where your business is, or pick exactly what you need. You'll get a clear price, in writing, before anything starts."
         src={`area-${row.slug}`}
-        onPrice={askPrice}
       />
       <Inquiry section={`area-${row.slug}`} />
     </main><StudioFooter /></div>

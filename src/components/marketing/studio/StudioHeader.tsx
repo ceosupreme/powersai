@@ -16,7 +16,6 @@ const SERVICES = [
   { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Dashboards, workflows, integrations, and automation", noteEs: "Paneles, flujos de trabajo, integraciones y automatización" },
   { to: "/publishing", label: "Publishing & launch", labelEs: "Publicación y lanzamiento", note: "Books, apps, and digital products ready for release", noteEs: "Libros, aplicaciones y productos digitales listos para salir" },
   { to: "/startups", label: "Startups & founders", labelEs: "Startups y fundadores", note: "Validate the idea, build the brand, launch, and grow", noteEs: "Valida la idea, crea la marca, lanza y crece" },
-  { to: "/pricing", label: "Plans & pricing", labelEs: "Planes y precios", note: "Compare website, care, growth, and systems options", noteEs: "Compara opciones de sitio, soporte, crecimiento y sistemas" },
 ];
 
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
@@ -54,8 +53,8 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
   if (/^[a-z0-9-]{1,40}$/i.test(sourceParams.get("offer") ?? "")) contactParams.set("offer", sourceParams.get("offer") ?? "");
   const attributedContact = `/${contactParams.size ? `?${contactParams.toString()}` : ""}#contact`;
   const labels = language === "es"
-    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", aboutUs: "Acerca de nosotros", areas: "Zonas que atendemos", allServices: "Ver todos los servicios", blog: "Blog", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
-    : { work: "Work", services: "Services", industries: "Industries", about: "About", aboutUs: "About us", areas: "Areas we serve", allServices: "See all services", blog: "Blog", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
+    ? { work: "Trabajo", services: "Servicios", industries: "Industrias", about: "Acerca de", aboutUs: "Acerca de nosotros", packages: "Paquetes", areas: "Zonas que atendemos", allServices: "Ver todos los servicios", blog: "Blog", start: "Inicia un proyecto", open: "Abrir menú", close: "Cerrar menú", viewAll: "Ver todas las industrias" }
+    : { work: "Work", services: "Services", industries: "Industries", about: "About", aboutUs: "About us", packages: "Packages", areas: "Areas we serve", allServices: "See all services", blog: "Blog", start: "Start a project", open: "Open menu", close: "Close menu", viewAll: "View all industries" };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -166,6 +165,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             )}
           </div>
           <Link to="/work" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.work}</Link>
+          <Link to="/pricing" aria-current={pathname === "/pricing" ? "page" : undefined} className={cn("inline-flex min-h-11 items-center text-[1rem] hover:text-foreground", pathname === "/pricing" ? "font-medium text-foreground" : "text-foreground/80")}>{labels.packages}</Link>
           <Link to="/blog" className="inline-flex min-h-11 items-center text-[1rem] text-foreground/80 hover:text-foreground">{labels.blog}</Link>
           <div className="relative">
             <Button ref={aboutButtonRef} type="button" variant="ghost" aria-expanded={aboutOpen} aria-controls="studio-about-menu"
@@ -223,6 +223,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
               {industriesLoading ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Loading industries…</p> : industriesError ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Direct links are temporarily unavailable.</p> : industries.map((industry) => <Link key={industry.slug} to={`/for/${industry.slug}`} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem] last:border-0">{industry.display_name}</Link>)}
             </div>}
             <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.work}</Link>
+            <Link to="/pricing" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.packages}</Link>
             <Link to="/blog" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.blog}</Link>
             <Link to="/about" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.about}</Link>
             <Link to="/areas" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.areas}</Link>
