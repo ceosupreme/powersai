@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePublicAudit, type AuditStatus, type OperationFootprint } from '@/hooks/usePublicAudit';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BookingCta } from '@/components/marketing/BookingCta';
 import { sanitizeBiz } from '@/pages/VerticalLanding';
 import { trackSiteEvent } from '@/lib/studioAnalytics';
@@ -64,8 +64,11 @@ export default function FreeAudit() {
   const initialBiz = sanitizeBiz(search.get('biz')) ?? '';
   const src = search.get('src');
   const sourceVertical = src?.match(/^for-([a-z0-9-]{2,40})$/)?.[1] ?? null;
+  // A city can arrive with the name from the homepage checkup form.
+  const initialCity = (search.get('city') ?? '').replace(/[^\p{L}\p{N}\s,.'-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  const navigate = useNavigate();
   const [businessName, setBusinessName] = useState(initialBiz);
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState(initialCity);
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [footprint, setFootprint] = useState<OperationFootprint>('small_crew_2_5');
   const [honeypot, setHoneypot] = useState('');
@@ -81,6 +84,28 @@ export default function FreeAudit() {
   const workingSignal = audit.full?.competitor_block?.in_map_pack === true
     ? 'Your business appears in the local map results.'
     : audit.full?.results.length === 0 ? 'No gaps were detected in this check.' : 'This check reads public signals and industry benchmarks.';
+
+  // Started from the homepage checkup form (?start=1 with a name and city):
+  // run the same check this page's own form runs, once, then drop the flag
+  // from the address so a refresh doesn't start a second check.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('start') !== '1') return;
+    autoStarted.current = true;
+    params.delete('start');
+    const qs = params.toString();
+    navigate(`/free-audit${qs ? `?${qs}` : ''}`, { replace: true });
+    if (!initialBiz || !initialCity) return;
+    audit.run({
+      business_name: initialBiz,
+      city: initialCity,
+      operation_footprint: footprint,
+      company_website: '',
+    }, { src, sourceVertical, biz: initialBiz });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const completionLogged = useRef(false);
   const contextQuery = new URLSearchParams();

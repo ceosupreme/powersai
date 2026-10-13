@@ -5,8 +5,8 @@ import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
 import { BoostBrands, GetAttention } from "@/components/marketing/studio/sections/HomeUsps";
-import { HomeIndustries } from "@/components/marketing/studio/sections/HomeIndustries";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
+import { StartingPoint } from "@/components/marketing/studio/sections/StartingPoint";
 import { HomeProcess } from "@/components/marketing/studio/sections/HomeProcess";
 import { Inquiry } from "@/components/marketing/studio/sections/Inquiry";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
@@ -64,7 +64,9 @@ export default function MarketingSite() {
             boost brands higher, faster").
             Work follows as its own section, the proof right after the
             promises: the featured brands switch on as it scrolls in.
-            Industries sits below the proof content. */}
+            Then "Where are you starting from?": four situations, each with
+            one next step, and the free checkup for anyone who can't pick.
+            Industry pages stay linked from the header and footer. */}
         <div className="stm-stack">
           <GetAttention />
           <div className="stm-stack-hold" aria-hidden="true" />
@@ -76,7 +78,7 @@ export default function MarketingSite() {
         <div className="stm-after-stack">
           <SelectedWork />
           <Testimonials />
-          <HomeIndustries />
+          <StartingPoint />
           <StudioReveal><HomeProcess /></StudioReveal>
           <StudioReveal><PricingTeaser /></StudioReveal>
           <StudioReveal><Inquiry /></StudioReveal>
