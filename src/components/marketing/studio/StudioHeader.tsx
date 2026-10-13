@@ -10,10 +10,10 @@ import { sanitizeBiz } from "@/pages/VerticalLanding";
 import { StudioMotion } from "./StudioMotion";
 
 const SERVICES = [
-  { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Credible sites, landing pages, commerce, and web apps", noteEs: "Sitios confiables, páginas de campaña, comercio y aplicaciones web" },
-  { to: "/services/brand", label: "Brand & creative", labelEs: "Marca y creatividad", note: "Positioning, identity, systems, and campaign creative", noteEs: "Posicionamiento, identidad, sistemas y creatividad para campañas" },
-  { to: "/services/marketing", label: "Marketing & growth", labelEs: "Marketing y crecimiento", note: "Campaigns, content, launches, and audience paths", noteEs: "Campañas, contenido, lanzamientos y recorridos de audiencia" },
-  { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Dashboards, workflows, integrations, and automation", noteEs: "Paneles, flujos de trabajo, integraciones y automatización" },
+  { to: "/services/websites", label: "Websites & digital products", labelEs: "Sitios web y productos digitales", note: "Business websites, landing pages, online stores, and web apps", noteEs: "Sitios web de negocio, páginas de campaña, tiendas en línea y aplicaciones web" },
+  { to: "/services/brand", label: "Brand & creative", labelEs: "Marca y creatividad", note: "Positioning, logos and identity, messaging, and campaign graphics", noteEs: "Posicionamiento, logos e identidad, mensajes y gráficos para campañas" },
+  { to: "/services/marketing", label: "Marketing & growth", labelEs: "Marketing y crecimiento", note: "Campaigns, content, ads, and launches", noteEs: "Campañas, contenido, anuncios y lanzamientos" },
+  { to: "/services/ai-systems", label: "AI & business systems", labelEs: "IA y sistemas de negocio", note: "Answer calls, book appointments, and follow up automatically", noteEs: "Contesta llamadas, agenda citas y da seguimiento automáticamente" },
   { to: "/publishing", label: "Publishing & launch", labelEs: "Publicación y lanzamiento", note: "Books, apps, and digital products ready for release", noteEs: "Libros, aplicaciones y productos digitales listos para salir" },
   { to: "/startups", label: "Startups & founders", labelEs: "Startups y fundadores", note: "Validate the idea, build the brand, launch, and grow", noteEs: "Valida la idea, crea la marca, lanza y crece" },
 ];
@@ -156,7 +156,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
                 <Link to="/industries" onClick={() => setIndustriesOpen(false)} className="group flex min-h-14 items-center justify-between border-b border-border px-4 font-medium hover:bg-[hsl(var(--surface))]">
                   {labels.viewAll} <span aria-hidden>↗</span>
                 </Link>
-                {industriesLoading ? <p className="px-4 py-5 text-sm text-muted-foreground" role="status">Loading industries…</p> : industriesError ? <p className="px-4 py-5 text-sm text-muted-foreground" role="status">Direct links are temporarily unavailable. Use View all industries.</p> : (
+                {industriesLoading ? <p className="px-4 py-5 text-sm text-muted-foreground" role="status">{language === "es" ? "Cargando industrias…" : "Loading industries…"}</p> : industriesError ? <p className="px-4 py-5 text-sm text-muted-foreground" role="status">{language === "es" ? "Los enlaces directos no están disponibles por ahora. Usa Ver todas las industrias." : "Direct links are temporarily unavailable. Use View all industries."}</p> : (
                   <div className="grid grid-cols-2 gap-px pt-2">
                     {industries.map((industry) => <Link key={industry.slug} to={`/for/${industry.slug}`} onClick={() => setIndustriesOpen(false)} className="flex min-h-12 items-center px-4 text-sm hover:bg-[hsl(var(--surface))] hover:text-primary">{industry.display_name}</Link>)}
                   </div>
@@ -220,7 +220,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
             </Button>
             {mobileIndustriesOpen && <div id="studio-mobile-industries" className="border-b border-border bg-[hsl(var(--surface))] px-3 py-1">
               <Link to="/industries" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 font-medium">{labels.viewAll}</Link>
-              {industriesLoading ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Loading industries…</p> : industriesError ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">Direct links are temporarily unavailable.</p> : industries.map((industry) => <Link key={industry.slug} to={`/for/${industry.slug}`} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem] last:border-0">{industry.display_name}</Link>)}
+              {industriesLoading ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">{language === "es" ? "Cargando industrias…" : "Loading industries…"}</p> : industriesError ? <p className="px-2 py-4 text-sm text-muted-foreground" role="status">{language === "es" ? "Los enlaces directos no están disponibles por ahora." : "Direct links are temporarily unavailable."}</p> : industries.map((industry) => <Link key={industry.slug} to={`/for/${industry.slug}`} onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[0.94rem] last:border-0">{industry.display_name}</Link>)}
             </div>}
             <Link to="/work" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.work}</Link>
             <Link to="/pricing" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center border-b border-border px-2 text-[1rem]">{labels.packages}</Link>

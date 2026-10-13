@@ -17,9 +17,9 @@ import { PackageSend } from "@/components/marketing/pages/packages/PackageSend";
 
 const questions = [
   ["Which package should I choose?", "Pick the starter package that matches where your business is today, or build your own from the full menu. Not sure? Send what you have and Sean will recommend the smallest sensible starting point."],
-  ["How does the $0-down option work?", "The build is $297 a month for 12 months, then $149 a month. If you stop early, the remaining balance of the $2,500 build price is due before handover."],
-  ["What do I own?", "You own the site, domain, content and customer list in writing. If you leave, you receive the files and every login. Hosting, automations and updates stop unless Care continues."],
-  ["Are other costs included?", "You’ll know what is included, what it costs and what happens next before anything starts. Any third-party costs are identified in the written scope."],
+  ["How does the $0-down option work?", "On the Standard Web Package, the $0-down plan is $297 a month for 12 months, then $149 a month. If you stop early, the rest of the $2,500 is due before we hand the site over. The Local Growth Package is billed monthly from $300 a month, with nothing due up front."],
+  ["What do I own?", "It depends on the package, and you'll know before anything starts. A website you buy outright, including on the $0-down payment plan, is yours once it's paid in full. Sites on a monthly plan run on our platform while you're subscribed."],
+  ["Are other costs included?", "You’ll know what is included, what it costs and what happens next before anything starts. Any outside costs, like your domain name or ad spend, are listed in your written price."],
 ] as const;
 
 /** Shown in the top card until the visitor switches something on. */
@@ -120,7 +120,7 @@ export default function Pricing() {
         <div>
           <div className="sp-eyebrow">Packages</div>
           <h1 id="packages-title">Let's build the <em className="sp-accent">right package</em> for your business.</h1>
-          <p className="sp-lead">Tell us where your business is and what it needs. We'll put together a package with a clear price, in writing, before anything starts.</p>
+          <p className="sp-lead">Start with one of four ready-made packages, or pick exactly the services you need. Either way, you get a clear price, in writing, before anything starts.</p>
           <div className="sp-actions">
             <a className="sp-btn sp-btn-gold" href="#build" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "packages_hero_build" })}>Build my package <ArrowDown aria-hidden /></a>
             <a className="sp-btn sp-btn-line" href="#starters" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "packages_hero_starters" })}>See starter packages</a>
@@ -218,7 +218,7 @@ export default function Pricing() {
       </div>
     </section>
 
-    <section className="pricing-ownership"><Container><div><span className="home-eyebrow">Ownership and support</span><h2 className="home-section-title">Your business stays <em>yours.</em></h2><p>You own the site, domain, content and customer list in writing. The agreed scope, support and third-party costs are clear before work starts.</p></div><Accordion type="single" collapsible>{questions.map(([q,a],i) => <AccordionItem key={q} value={`pricing-${i}`}><AccordionTrigger>{q}</AccordionTrigger><AccordionContent>{a}</AccordionContent></AccordionItem>)}</Accordion></Container></section>
+    <section className="pricing-ownership"><Container><div><span className="home-eyebrow">Ownership and support</span><h2 className="home-section-title">Know what’s yours <em>before you start.</em></h2><p>A website you buy outright, including on the $0-down payment plan, is yours once it's paid in full. Sites on a monthly plan run on our platform while you're subscribed. The agreed scope, support and any outside costs are clear before work starts.</p></div><Accordion type="single" collapsible>{questions.map(([q,a],i) => <AccordionItem key={q} value={`pricing-${i}`}><AccordionTrigger>{q}</AccordionTrigger><AccordionContent>{a}</AccordionContent></AccordionItem>)}</Accordion></Container></section>
     <Inquiry source="pricing"/>
   </main><StudioFooter/>
   <PackageSend open={sendOpen} onOpenChange={setSendOpen} services={services} starters={starters} src={src} />

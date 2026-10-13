@@ -9,7 +9,7 @@ import { LegalConsent } from '@/components/marketing/studio/LegalConsent';
 
 type Product = 'launch_site_deposit' | 'launch_site_monthly' | 'care_seat';
 
-export function CheckoutButton({ product, label, sourceVertical, originPath, source }: { product: Product; label: string; sourceVertical?: string; originPath?: string; source?: string }) {
+export function CheckoutButton({ product, label, sourceVertical, originPath, source, consent = true }: { product: Product; label: string; sourceVertical?: string; originPath?: string; source?: string; consent?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const loc = useLocation();
@@ -37,7 +37,7 @@ export function CheckoutButton({ product, label, sourceVertical, originPath, sou
   };
   return (
     <div className="flex flex-col gap-2">
-      <LegalConsent />
+      {consent && <LegalConsent />}
       <Button type="button" className="studio-btn studio-btn-primary" onClick={start} disabled={busy}>{busy && <Loader2 className="animate-spin" aria-hidden />}{label}</Button>
       {failed && <p role="alert" className="max-w-sm text-sm text-destructive">Checkout could not start. Email <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the <a className="underline" href={onIndustry ? '#inquiry' : '#contact'}>inquiry form below</a> and I will send a payment link.</p>}
     </div>

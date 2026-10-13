@@ -44,7 +44,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
     const parsed = schema.safeParse({ name, email, business, note });
     if (!parsed.success) { setStatus("error"); setError(language === "es" ? "Revisa tu nombre, correo y negocio antes de enviar." : (parsed.error.issues[0]?.message ?? "Please check your details")); return; }
     if (!needs.length) { setStatus("error"); setError(language === "es" ? "Elige por lo menos un área que necesite atención." : "Choose at least one area that needs attention"); return; }
-    if (typeof navigator !== "undefined" && navigator.onLine === false) { setStatus("error"); setError(language === "es" ? "Parece que no tienes conexión. Tus datos siguen aquí; vuelve a conectarte e inténtalo de nuevo." : "You appear to be offline. Your details are still here—reconnect and try again."); return; }
+    if (typeof navigator !== "undefined" && navigator.onLine === false) { setStatus("error"); setError(language === "es" ? "Parece que no tienes conexión. Tus datos siguen aquí; vuelve a conectarte e inténtalo de nuevo." : "You appear to be offline. Your details are still here. Reconnect and try again."); return; }
     setStatus("submitting");
     let result: { data: unknown; error: unknown };
     try {

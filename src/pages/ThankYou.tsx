@@ -23,7 +23,7 @@ export default function ThankYou() {
             <Eyebrow>Website options</Eyebrow>
             <h1 className="home-section-title">Online payment is <em>not available yet.</em></h1>
             <p className="checkout-copy">
-              Start with a scoped inquiry and Sean will confirm the work, responsibilities, and next step in writing. Questions any time: <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+              Start with a short inquiry and Sean will confirm the work, responsibilities, and next step in writing. Questions any time: <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
             <div className="checkout-actions flex flex-wrap gap-3">
               <Link className="home-btn-amber" to="/?intent=websites&offer=launch-site&src=website-options#contact">Start a Launch Site →</Link>

@@ -10,7 +10,7 @@ export function ServiceWork({ type, order }: { type: "brand" | "marketing"; orde
   const { projects, isLoading, isError } = useStudioProjects();
   const selected = order.map(slug => projects.find(p => p.slug === slug)).filter(p => p !== undefined);
   return <section className="svc-work svc-band-dark" aria-labelledby={`${type}-work-title`}><Container>
-    <div className="svc-section-head"><span className="home-eyebrow">0{type === "brand" ? "4" : "5"} / Actual work</span><h2 id={`${type}-work-title`} className="home-section-title">Different businesses.<br/><em>Distinct expressions.</em></h2><p>Work shaped around each business’s audience and purpose.</p></div>
+    <div className="svc-section-head"><span className="home-eyebrow">0{type === "brand" ? "4" : "5"} / Actual work</span><h2 id={`${type}-work-title`} className="home-section-title">Real brands. <em>Each one its own.</em></h2><p>Work shaped around each business’s audience and purpose.</p></div>
     {isLoading ? <p role="status">Loading work…</p> : isError ? <p role="status">Work could not be loaded. <Link to="/work">Browse all work</Link>.</p> : <div className="svc-work-grid">{selected.map((project, i) => {
       const media = getStudioMedia(project.mediaKey);
       const image = project.imageUrl || media?.src;

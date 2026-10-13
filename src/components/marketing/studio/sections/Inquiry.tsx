@@ -30,12 +30,12 @@ const OFFER_CONTEXT = {
 
 type OfferKey = keyof typeof OFFER_CONTEXT;
 
-const TIMING_OPTIONS = ["As soon as possible", "Next 1–3 months", "Later this year", "Just exploring"] as const;
+const TIMING_OPTIONS = ["As soon as possible", "Next 1 to 3 months", "Later this year", "Just exploring"] as const;
 const BUDGET_OPTIONS = [
   "Not sure yet",
   "Under $2,500",
-  "$2,500 – $7,500",
-  "$7,500 – $20,000",
+  "$2,500 to $7,500",
+  "$7,500 to $20,000",
   "$20,000+",
   "Ongoing monthly",
 ] as const;
@@ -67,8 +67,8 @@ type Status = "idle" | "submitting" | "success" | "error";
 const PAGE_COPY = {
   websites: { service: "websites-apps", src: "services-websites", heading: "Talk about your website.", intro: "Tell me what the website needs to do for your business. I’ll reply personally within one business day." },
   brand: { service: "brand-creative", src: "services-brand", heading: "Talk about your brand.", intro: "Tell me what your business needs to be known for. I’ll reply personally within one business day." },
-  marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where the customer path loses momentum. I’ll reply personally within one business day." },
-  systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about a system.", intro: "Tell me which tools you use and where the handoffs get lost. I’ll reply personally within one business day." },
+  marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where interested customers drop off. I’ll reply personally within one business day." },
+  systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about your calls, leads and bookings.", intro: "Tell me which tools you use and where calls, leads or requests slip through the cracks. I’ll reply personally within one business day." },
   publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
 } as const;
 
@@ -160,7 +160,8 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
   // Allowlisted intent values only; anything else is ignored.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const intent = params.get("intent");
+    // The Hire page opens with the hiring choice already picked.
+    const intent = params.get("intent") ?? (source === "hire" ? "hiring" : null);
     if (intent === "hiring") {
       setShowContext(true);
       setServices((prev) => (prev.includes("hiring-contract") ? prev : [...prev, "hiring-contract"]));
@@ -233,7 +234,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
 
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       setStatus("error");
-      setError("You appear to be offline. Your note is still here — reconnect and send again.");
+      setError("You appear to be offline. Your note is still here. Reconnect and send again.");
       return;
     }
 
@@ -308,8 +309,8 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
-            <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County, available for remote projects.</p>
-              {!servicePage && <div className="home-contact-map mt-10"><iframe title="OpenStreetMap view of San Diego County and North County" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-117.65%2C32.53%2C-116.08%2C33.55&layer=mapnik"/><p>Based in San Diego County. Remote projects welcome. <a href="https://www.openstreetmap.org/#map=9/33.04/-116.87" target="_blank" rel="noreferrer">Open accessible map</a></p></div>}
+            <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County and clients anywhere online.</p>
+              {!servicePage && <div className="home-contact-map mt-10"><iframe title="OpenStreetMap view of San Diego County and North County" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-117.65%2C32.53%2C-116.08%2C33.55&layer=mapnik"/><p>Based in Carlsbad Village, North County San Diego. <a href="https://www.openstreetmap.org/#map=9/33.04/-116.87" target="_blank" rel="noreferrer">Open accessible map</a></p></div>}
           </div>
 
           <div className="lg:col-span-7">
@@ -320,7 +321,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                     <Check size={20} />
                   </span>
                   <h3 className="studio-display mt-5 text-[1.4rem]">
-                    Thanks—your note is in. Sean will review it and reply by email.
+                    Thanks, your note is in. Sean will review it and reply by email.
                   </h3>
                   <p className="mt-3 text-[0.95rem] text-[hsl(var(--ink-muted))]">
                     Your inquiry is saved. If you don&apos;t hear back, email {CONTACT_EMAIL} directly.
@@ -328,6 +329,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                 </div>
               ) : (
                 <form onSubmit={onSubmit} onFocus={noteStarted} noValidate className="grid grid-cols-1 gap-5">
+                  {callRequested && <p className="text-[0.95rem] text-[hsl(var(--ink-muted))]" role="status">Want a call? Add your phone number to your note and Sean will call you.</p>}
                   <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
                     <label>
                       Company website
@@ -410,7 +412,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                       className={`mt-1 block text-[0.8rem] ${messageOver ? "text-[hsl(0_60%_40%)]" : "text-[hsl(var(--ink-muted))]"}`}
                     >
                       {message.trim().length.toLocaleString()} of {messageBudget.toLocaleString()} characters
-                      {messageOver ? " — please shorten your note so it can be sent in full." : ""}
+                      {messageOver ? ". Please shorten your note so it can be sent in full." : ""}
                     </span>
                   </label>
 

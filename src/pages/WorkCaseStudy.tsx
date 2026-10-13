@@ -21,7 +21,7 @@ export default function WorkCaseStudy() {
       : "/work";
 
   useStudioHead({
-    title: project ? `${project.title} — Supreme Team Media` : "Project — Supreme Team Media",
+    title: project ? `${project.title}: ${project.classification} | Supreme Team Media` : "Project | Supreme Team Media",
     description: project?.summary || "A selected Supreme Team Media project.",
     path: `/work/${slug ?? ""}`,
   });

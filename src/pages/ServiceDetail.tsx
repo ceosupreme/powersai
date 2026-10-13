@@ -15,6 +15,9 @@ import "@/components/marketing/pages/packages/packages.css";
 const SITE = "https://supremeteammedia.com";
 
 /** /services/:slug: one service, read from its service_pages row. */
+/** A service name inside a sentence: "Local SEO" reads "local SEO", while names that start with an acronym or a brand stay as written. */
+const asPhrase = (name: string) => (/^(?:[A-Z]{2,}|Google|Amazon)\b/.test(name) ? name : name.charAt(0).toLowerCase() + name.slice(1));
+
 export default function ServiceDetail() {
   const { slug = "" } = useParams();
   const { data: rows = [], isLoading, isError } = useServicePages();
@@ -47,11 +50,11 @@ export default function ServiceDetail() {
   const industries = row.industries.filter((s) => industryNames.has(s));
   const askPrice = () => {
     trackSiteEvent({ event_type: "cta_click", label: `service_price_${row.slug.replace(/-/g, "_")}` });
-    prefillContact(`I'd like a price for ${row.name.toLowerCase()}.`);
+    prefillContact(`I'd like a price for ${asPhrase(row.name)}.`);
   };
   const askQuestion = () => {
     trackSiteEvent({ event_type: "cta_click", label: `service_question_${row.slug.replace(/-/g, "_")}` });
-    prefillContact(`I have a question about ${row.name.toLowerCase()}.`);
+    prefillContact(`I have a question about ${asPhrase(row.name)}.`);
   };
   const partOf = starters.filter((p) => p.services.includes(row.slug));
   // Service and breadcrumb details for search engines ("<" escaped so row text can't close the tag).

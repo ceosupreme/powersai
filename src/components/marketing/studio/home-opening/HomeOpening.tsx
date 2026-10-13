@@ -16,8 +16,8 @@ const SERVICE_INDEX = [
     subs: ["Marketing strategy", "Paid ads", "Local SEO", "Google Business Profile", "Social media content", "Performance reporting"] },
   { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design", icon: Monitor,
     line: "Turn your online presence into a business asset.",
-    subs: ["Business websites", "Landing pages", "Site redesigns", "Mobile-first design", "Conversion-focused pages", "Hosting and care plans"] },
-  { to: "/services/brand", num: "03", name: "Media", slug: "media", icon: Play,
+    subs: ["Business websites", "Landing pages", "Site redesigns", "Designs built for phones", "Pages that turn visitors into customers", "Hosting and care plans"] },
+  { to: "/services#photo-video", num: "03", name: "Media", slug: "media", icon: Play,
     line: "Give people something worth remembering.",
     subs: ["Photography", "Video production", "Content creation", "Social content", "Brand storytelling"] },
   { to: "/services/brand", num: "04", name: "Brand", slug: "brand", icon: Tag,
@@ -31,9 +31,9 @@ const SERVICE_INDEX = [
     subs: ["CRM setup", "Lead management", "Customer records", "Pipeline tracking", "Owner reports"] },
   { to: "/services/ai-systems", num: "07", name: "Automation", slug: "automation", icon: Cog,
     line: "Take repetitive work off your plate.",
-    subs: ["AI assistants", "Missed-call text back", "Email and SMS automation", "Appointment reminders", "Tool integrations", "Custom systems"] },
+    subs: ["Chat and phone assistants", "Missed-call text back", "Email and SMS automation", "Appointment reminders", "Tool integrations", "Custom systems"] },
   { to: "/publishing", num: "08", name: "Publishing", slug: "publishing", icon: BookOpen,
-    line: "Take finished work all the way to release.",
+    line: "Get your book or product published and ready to sell.",
     subs: ["Book covers", "Print and ebook formatting", "Listing copy and keywords", "Product pages", "Launch graphics and emails", "Publishing account setup"] },
 ] as const;
 
@@ -162,7 +162,7 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
           <Button asChild variant="outline" className="stm-opening-secondary"><Link to={`/free-audit?${checkup.toString()}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "free_business_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link></Button>
         </div>
         <div className="stm-command-credibility">
-          <div><strong>Since 2001</strong><span>DIGITAL MARKETING</span></div>
+          <div><strong>Since 2002</strong><span>DIGITAL MARKETING</span></div>
           <div><strong>San Diego</strong><span>SERVING ANYWHERE</span></div>
           <div><strong>20+ years</strong><span>ADVERTISING AND DESIGN</span></div>
         </div>
@@ -790,6 +790,6 @@ export function HomeOpening() {
     <OpeningHeader onContact={openContact} />
     <OpeningHero onContact={openContact} />
     <OpeningServices />
-    <Dialog open={contactOpen} onOpenChange={setContactOpen}><DialogContent className="stm-opening-dialog"><DialogHeader><DialogTitle>Contact Supreme Team Media</DialogTitle><DialogDescription>Call or email us directly. No form required.</DialogDescription></DialogHeader><div className="stm-opening-phone-pending"><strong>Phone connection pending</strong><span>A public business number has not been confirmed.</span></div><Button asChild className="stm-opening-email"><a href={`mailto:${CONTACT_EMAIL}`}><Mail aria-hidden /> Email Us <span>{CONTACT_EMAIL}</span></a></Button></DialogContent></Dialog>
+    <Dialog open={contactOpen} onOpenChange={setContactOpen}><DialogContent className="stm-opening-dialog"><DialogHeader><DialogTitle>Contact Supreme Team Media</DialogTitle><DialogDescription>Email us directly, or use the message form at the bottom of this page.</DialogDescription></DialogHeader><Button asChild className="stm-opening-email"><a href={`mailto:${CONTACT_EMAIL}`}><Mail aria-hidden /> Email Us <span>{CONTACT_EMAIL}</span></a></Button></DialogContent></Dialog>
   </>;
 }

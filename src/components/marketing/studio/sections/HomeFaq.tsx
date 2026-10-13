@@ -16,11 +16,11 @@ const openAtTop = () => requestAnimationFrame(() => window.scrollTo({ top: 0, le
 const QUESTIONS: Array<{ q: string; a: ReactNode }> = [
   {
     q: "How much does it cost?",
-    a: <p>It depends on what your business needs. Tell us where you are, and we'll put together a package with a clear price before anything starts. For reference, our websites start at $2,500, or $0 down at $297 a month. <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_faq_price_contact" })}>Tell us what you need</a>.</p>,
+    a: <p>It depends on what your business needs. Tell us where you are, and we'll put together a package with a clear price before anything starts. For reference, packages with a website start at $799. A custom website starts at $2,500, or $0 down at $297 a month for 12 months. <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_faq_price_contact" })}>Tell us what you need</a>.</p>,
   },
   {
     q: "Do I have to sign a long contract?",
-    a: <p>No. You can pay for the website up front. The $0-down plan spreads the $2,500 over 12 months at $297 a month, and if you stop early, the rest of the build price is due before we hand everything over. Care, our ongoing help plan, is month to month.</p>,
+    a: <p>No. You can pay for the website up front. The $0-down plan is $297 a month for 12 months, and if you stop early, the rest of the build price is due before we hand everything over. Care, our ongoing help plan, is month to month.</p>,
   },
   {
     q: "Do I own my website?",
@@ -67,8 +67,8 @@ export function HomeFaq() {
       <div className="stm-faq-wrap">
         <div className="stm-faq-head">
           <div className="stm-faq-eyebrow">Questions</div>
-          <h2 id="home-faq-title">Questions owners ask <em>before they call.</em></h2>
-          <p>Straight answers about price, timing and how working with us goes.</p>
+          <h2 id="home-faq-title">Questions owners ask <em>before they start.</em></h2>
+          <p>Clear answers about price, timing and how working with us goes.</p>
           <a href="#contact" className="stm-faq-ask" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_faq_ask" })}>
             Ask us something else <ArrowRight aria-hidden />
           </a>

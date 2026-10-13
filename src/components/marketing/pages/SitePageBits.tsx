@@ -90,7 +90,7 @@ export function CheckupBand({ title, accent, body, src, priceLabel = "Get my pri
 
 /** On a family page (Websites, Brand, Marketing, AI and systems, Publishing,
  *  Startups): every service in that family, each linking to its own page. */
-export function FamilyServices({ family, heading = "Every service in this area." }: { family: string; heading?: string }) {
+export function FamilyServices({ family, heading = "Every service in this group." }: { family: string; heading?: string }) {
   const { data = [] } = useServicePages();
   const rows = data.filter((row) => row.family_path === family);
   if (!rows.length) return null;

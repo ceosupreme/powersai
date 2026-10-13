@@ -22,7 +22,7 @@ const FEATURED = [
   { slug: "coastal-beauties", label: "Lifestyle brand", media: "work-panel-coastal-beauties", tone: "cyan" },
   { slug: "big-paws-club", label: "Brand and guide site", media: "work-panel-big-paws-club", tone: "gold" },
   { slug: "supreme-wellness-club", label: "Wellness brand", media: "work-panel-supreme-wellness-club", tone: "cyan" },
-  { slug: "barpulse", label: "AI operations platform", media: null, tone: "gold" },
+  { slug: "barpulse", label: "Hospitality operations platform", media: null, tone: "gold" },
 ] as const;
 
 /** Spacing of the power-on sequence (ms): first panel, then one per step. */

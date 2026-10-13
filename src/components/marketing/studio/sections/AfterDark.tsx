@@ -172,7 +172,7 @@ export function AfterDark() {
           <span className="stm-dark-tline">while you sleep.</span>
         </h2>
         <div className="stm-dark-copy" data-watch>
-          <p>The systems behind your site answer calls, reply to leads and book jobs around the clock.</p>
+          <p>The systems behind your site answer calls, reply to leads and book appointments around the clock.</p>
           <div className="stm-dark-actions">
             <Link to="/services/ai-systems" className="stm-dark-btn gold" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_see_systems" })}>See the systems <ArrowRight aria-hidden /></Link>
             <Link to="/free-audit?src=home-after-dark" className="stm-dark-btn wine" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "after_dark_free_checkup" })}>Free Business Checkup <ArrowRight aria-hidden /></Link>

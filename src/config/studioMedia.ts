@@ -79,7 +79,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "home-opening-command-center": {
     src: commandCenterDesktop,
     mobileSrc: commandCenterMobile,
-    alt: "Right-weighted four-screen command console with a foreground chair, cyan and gold energy conduits, and a glowing globe core",
+    alt: "A Supreme Team Media chair at a command desk with four glowing screens wired to a glowing globe, overlooking a city at night",
     aspectRatio: "1920 / 1081",
     width: 1920,
     height: 1081,
@@ -143,7 +143,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "home-industry-hvac": {
     src: homeIndustryService.url,
-    alt: "HVAC and home services website experience",
+    alt: "Laptop showing a home services website on a terrace at sunset, with a service van parked by a modern home",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,
@@ -151,7 +151,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "home-industry-pizza": {
     src: homeIndustryRestaurant.url,
-    alt: "Restaurant and pizza website experience",
+    alt: "Wood-fired pizza on a restaurant table beside a laptop and phone showing the restaurant's website and online ordering",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,
@@ -159,7 +159,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "home-industry-medspa": {
     src: homeIndustryMedspa.url,
-    alt: "Med spa and wellness website experience",
+    alt: "Laptop and phone showing a med spa website with a consultation button, in a bright spa lobby at sunset",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,
@@ -167,7 +167,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "service-websites-hero": {
     src: websitesHero.url,
-    alt: "Website service laptop and phone composition",
+    alt: "Laptop and phone showing a custom home builder’s website on a coastal terrace at sunset",
     aspectRatio: "1672 / 941",
     width: 1672,
     height: 941,
@@ -220,7 +220,7 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   },
   "work-allmighty-supreme": {
     src: allmightySupreme,
-    alt: "Screenshot of the AllMighty Supreme personal brand website",
+    alt: "Screenshot of the Allmighty Supreme personal brand website",
     aspectRatio: "16 / 9",
     width: 1920,
     height: 1080,

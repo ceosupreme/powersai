@@ -11,9 +11,9 @@ import { useStudioHead } from '@/components/marketing/studio/useStudioHead';
 import { ROUTE_META } from '@/config/routeMeta';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
-  { key: 'resolving', label: 'Resolving your Google Business Profile' },
+  { key: 'resolving', label: 'Finding your Google Business Profile' },
   { key: 'snapshotting', label: 'Scanning your website, reviews, and map ranking' },
-  { key: 'auditing', label: 'Running foundation and growth checks' },
+  { key: 'auditing', label: 'Checking the basics and where you can grow' },
   { key: 'ranking', label: "Putting dollar figures on what's slipping" },
   { key: 'complete', label: 'Ready' },
 ];
@@ -24,8 +24,8 @@ const ORDER: Record<AuditStatus, number> = {
 
 const FOOTPRINTS: { value: OperationFootprint; label: string }[] = [
   { value: 'solo_owner', label: 'Solo' },
-  { value: 'small_crew_2_5', label: '2–5 crew' },
-  { value: 'crew_6_plus', label: '6+ crew' },
+  { value: 'small_crew_2_5', label: '2 to 5 people' },
+  { value: 'crew_6_plus', label: '6 or more people' },
   { value: 'multi_location', label: 'Multi-location' },
 ];
 
@@ -42,7 +42,7 @@ const WHY_COPY: Record<string, string> = {
   'Missed calls':
     "Calls that ring out during business hours become someone else's booking within minutes.",
   'Unsold estimates':
-    'Estimates you gave that never turned into a job — most of these can still be closed with one follow-up.',
+    'Estimates you gave that never turned into a job. Many of these can still be won with one follow-up.',
 };
 
 function whyForLeak(name: string, fallbackBenchmark: string | null): string {
@@ -55,7 +55,7 @@ function sourceLine(inputs: Array<{ source?: string; unresolved?: boolean }> | u
   const srcs = new Set((inputs ?? []).map((i) => i.source).filter(Boolean) as string[]);
   if (srcs.has('signal')) return 'from a live read of your business';
   if (srcs.has('override')) return 'from a live read of your business';
-  return 'estimated from industry baseline';
+  return 'estimated from industry benchmarks';
 }
 
 export default function FreeAudit() {
@@ -148,9 +148,9 @@ export default function FreeAudit() {
       <main>
         <div className="check-shell mx-auto max-w-4xl px-6">
           <header className="check-intro">
-            <p className="home-eyebrow">Free business check</p>
-            <h1 className="home-section-title">The <em>free check.</em></h1>
-            <p className="check-lede">Two minutes. It reads your Google listing, your site and your reviews and shows what is slipping, with your own numbers.</p>
+            <p className="home-eyebrow">Free business checkup</p>
+            <h1 className="home-section-title">See how your business <em>shows up on Google.</em></h1>
+            <p className="check-lede">Two minutes. It reads your Google listing, your site and your reviews and shows what is slipping and what it may be costing you.</p>
             {initialBiz && <p className="check-context">Checking for {initialBiz}</p>}
           </header>
 
@@ -176,7 +176,7 @@ export default function FreeAudit() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full rounded-lg border border-[hsl(var(--stm-ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
-                    placeholder="Portland, OR"
+                    placeholder="San Diego, CA"
                     maxLength={120}
                   />
                 </label>
@@ -232,7 +232,7 @@ export default function FreeAudit() {
                 >
                   {audit.submitting ? 'Starting…' : "Show me what I'm missing"}
                 </button>
-                <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">~30 seconds</span>
+                <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">About two minutes</span>
               </div>
               {audit.error && <p className="mt-4 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>}
             </form>
@@ -259,9 +259,6 @@ export default function FreeAudit() {
                   );
                 })}
               </ul>
-              {audit.statusDetail && (
-                <pre className="mt-5 max-h-40 overflow-auto whitespace-pre-wrap border-t border-[hsl(var(--stm-bg))]/20 pt-3 text-xs opacity-70">{audit.statusDetail}</pre>
-              )}
               {audit.status === 'failed' && (
                 <div className="mt-5 border-t border-[hsl(var(--stm-bg))]/20 pt-4">
                   <p className="text-[hsl(var(--stm-warn))]">
@@ -269,8 +266,9 @@ export default function FreeAudit() {
                       const lines = (audit.statusDetail ?? '').trim().split('\n').filter(Boolean);
                       const last = lines[lines.length - 1] ?? '';
                       const cleaned = last.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '').replace(/^Pipeline failed:\s*/i, '');
-                      return cleaned && !/degraded/i.test(cleaned)
-                        ? `We couldn't finish this — ${cleaned}. Your business wasn't touched.`
+                      // Plain reasons only; technical server lines never reach the visitor.
+                      return cleaned && !/degraded|api|http|\b\d{3}\b|shell|dedupe|sync|token|timeout|pipeline|function/i.test(cleaned)
+                        ? `We couldn't finish this: ${cleaned}. Your business wasn't touched.`
                         : "We couldn't finish this. Your business wasn't touched.";
                     })()}
                   </p>
@@ -297,14 +295,14 @@ export default function FreeAudit() {
           {/* Redacted result */}
           {audit.redacted && !audit.full && (
             <div className="check-results mt-2 space-y-8">
-              <div className="check-interpretation"><span className="home-eyebrow">First read</span><p>{audit.redacted.leak_count === 0 ? 'No gaps were detected in this check. Keep protecting what is already working.' : `${audit.redacted.leak_count} gap${audit.redacted.leak_count === 1 ? ' needs' : 's need'} a closer look. ${audit.redacted.top_leaks[0] ? `Start with ${audit.redacted.top_leaks[0].toLowerCase()}; the full list shows where to focus next.` : 'Open the full list to see where to focus first.'}`} These figures are estimates from public signals and industry benchmarks, not booked revenue.</p></div>
+              <div className="check-interpretation"><span className="home-eyebrow">First read</span><p>{audit.redacted.leak_count === 0 ? 'No gaps were detected in this check. Keep protecting what is already working.' : `${audit.redacted.leak_count} gap${audit.redacted.leak_count === 1 ? ' needs' : 's need'} a closer look. ${audit.redacted.top_leaks[0] ? `Start with ${audit.redacted.top_leaks[0].toLowerCase()}. The full list shows where to focus next.` : 'Open the full list to see where to focus first.'}`} These figures are estimates from public signals and industry benchmarks, not booked revenue.</p></div>
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">Money you're likely missing</p>
                 {(audit.redacted.total_monthly_dollars ?? 0) > 0 ? (
                   <>
                     <p className="font-display text-6xl md:text-8xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.redacted.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">per month you're likely missing</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">a month</span>
                     </p>
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
                       {audit.redacted.leak_count} distinct gap{audit.redacted.leak_count === 1 ? '' : 's'} detected.
@@ -316,7 +314,7 @@ export default function FreeAudit() {
                       {audit.redacted.leak_count} gap{audit.redacted.leak_count === 1 ? '' : 's'} found
                     </p>
                     <p className="mt-4 text-lg text-[hsl(var(--stm-ink))]/70">
-                      A 2-minute call with your numbers puts dollars on them.
+                      A short call with your numbers puts dollars on them.
                     </p>
                     <div className="mt-6"><BookingCta src={src} biz={businessName} /></div>
                   </>
@@ -359,7 +357,7 @@ export default function FreeAudit() {
               {/* Unlock */}
               <form onSubmit={onUnlock} className="rounded-2xl bg-[hsl(var(--stm-ink))] p-8 text-[hsl(var(--stm-bg))] shadow-lg md:p-10">
                 <h3 className="font-display text-3xl md:text-4xl">See the full list.</h3>
-                <p className="mt-2 text-[hsl(var(--stm-bg))]/70">Every gap, every dollar, every source flag. Emailed to you and shown right here.</p>
+                <p className="mt-2 text-[hsl(var(--stm-bg))]/70">Every gap, every dollar figure and where it comes from. Emailed to you and shown right here.</p>
                 <div className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
                   <input
                     type="text"
@@ -390,11 +388,11 @@ export default function FreeAudit() {
                     disabled={audit.unlocking || !emailValid}
                     className="rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {audit.unlocking ? 'Unlocking…' : 'Show me the full list'}
+                    {audit.unlocking ? 'Sending…' : 'Show me the full list'}
                   </button>
                 </div>
                 {emailTouched && email && !emailValid && (
-                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">Enter a valid business email.</p>
+                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">Enter a valid email address.</p>
                 )}
                 {audit.error && (
                   <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>
@@ -406,24 +404,24 @@ export default function FreeAudit() {
           {/* Full result */}
           {audit.full && (
             <div className="check-results mt-2 space-y-8">
-              <div className="check-interpretation"><span className="home-eyebrow">What this means</span><p>{workingSignal} {firstFinding ? `${firstFinding.name} is the first place to look: ${whyForLeak(firstFinding.name, firstFinding.benchmark)} ` : ''}{audit.full.results.length > 1 ? `${audit.full.results.length - 1} other area${audit.full.results.length === 2 ? '' : 's'} also need attention. ` : ''}The monthly figures below are estimates, not guaranteed revenue.</p></div>
+              <div className="check-interpretation"><span className="home-eyebrow">What this means</span><p>{workingSignal} {firstFinding ? `${firstFinding.name} is the first place to look: ${whyForLeak(firstFinding.name, firstFinding.benchmark)} ` : ''}{audit.full.results.length > 1 ? `${audit.full.results.length - 1} other area${audit.full.results.length === 2 ? '' : 's'} could also use attention. ` : ''}The monthly figures below are estimates, not guaranteed revenue.</p></div>
               <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-8 md:p-10 shadow-sm">
                 <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">The full list</p>
                 {audit.full.total_monthly_dollars > 0 ? (
                   <>
                     <p className="font-display text-5xl md:text-7xl leading-[0.95] text-[hsl(var(--stm-loss))]">
                       {fmtMoney(audit.full.total_monthly_dollars)}
-                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">/ month</span>
+                      <span className="ml-2 text-2xl md:text-3xl text-[hsl(var(--stm-ink))]/50">a month</span>
                     </p>
                     {audit.full.total_risk_exposure_dollars > 0 && (
                       <p className="mt-2 text-lg text-[hsl(var(--stm-ink))]/60">
-                        Plus {fmtMoney(audit.full.total_risk_exposure_dollars)} per month in estimated exposure worth defending.
+                        Plus an estimated {fmtMoney(audit.full.total_risk_exposure_dollars)} a month at risk.
                       </p>
                     )}
                   </>
                 ) : (
                   <p className="font-display text-4xl md:text-6xl leading-[1.05] text-[hsl(var(--stm-ink))]">
-                    {audit.full.results.length} gap{audit.full.results.length === 1 ? '' : 's'} found — a 2-minute call with your numbers puts dollars on them.
+                    {audit.full.results.length} gap{audit.full.results.length === 1 ? '' : 's'} found. A short call with your numbers puts dollars on them.
                   </p>
                 )}
                 {audit.full.project_type_resolution?.path === 'default' && (
@@ -449,11 +447,11 @@ export default function FreeAudit() {
                       <div className="shrink-0 text-right">
                         {leak.render_state === 'priced_with_your_numbers' || leak.monthly_dollars == null ? (
                           <p className="font-display text-base text-[hsl(var(--stm-ink))]/70 max-w-[10rem]">
-                            Found — priced with your numbers
+                            Found. We'll price it with your numbers.
                           </p>
                         ) : (
                           <p className="font-display text-2xl text-[hsl(var(--stm-loss))]">
-                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> per month, estimated</span>
+                            {fmtMoney(leak.monthly_dollars)}<span className="text-sm text-[hsl(var(--stm-ink))]/50"> a month, estimated</span>
                           </p>
                         )}
                       </div>
@@ -490,7 +488,7 @@ export default function FreeAudit() {
               <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">
                 <p className="font-display text-2xl md:text-3xl leading-snug">Want this fixed?</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
-                  <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get a scoped recommendation</Link>
+                  <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get my recommendation</Link>
                   <BookingCta src={src} biz={businessName} className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />
                 </div>
               </div>
@@ -498,7 +496,7 @@ export default function FreeAudit() {
           )}
 
           <p className="mt-16 border-t border-[hsl(var(--stm-ink))]/10 pt-6 font-mono text-xs text-[hsl(var(--stm-ink))]/50">
-            Dollar figures are estimates from public signals and industry benchmarks — a live audit uses YOUR numbers.
+            Dollar figures are estimates from public signals and industry benchmarks. A live audit uses your real numbers.
           </p>
         </div>
       </main>

@@ -32,7 +32,7 @@ export function HomePackages() {
           <h2 id="home-packages-title">Let's put together the <em className="sp-accent">right package</em> for your business.</h2>
           <p className="sp-lead">Tell us where you are and what you need. You'll get a clear price, in writing, before anything starts.</p>
           <div className="sp-actions">
-            <a className="sp-btn sp-btn-gold" href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_packages_contact" })}>Get my package <ArrowRight aria-hidden /></a>
+            <Link className="sp-btn sp-btn-gold" to="/pricing#build" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_packages_build" })}>Get my package <ArrowRight aria-hidden /></Link>
             <Link className="sp-btn sp-btn-line" to="/pricing#starters" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_packages_starters" })}>See starter packages</Link>
           </div>
           <p className="pk-trust"><span><i className="pk-led gr" aria-hidden="true" />Sean replies within one business day</span></p>

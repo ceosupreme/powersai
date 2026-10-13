@@ -141,7 +141,7 @@ export function usePublicAudit() {
       pollOnce(t);
       timerRef.current = setInterval(() => pollOnce(t), 3000);
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to start audit');
+      setError(err?.message ?? 'We could not start the checkup. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -158,18 +158,18 @@ export function usePublicAudit() {
       if (e) {
         // Supabase functions client surfaces the response body under context.
         const ctx: any = (e as any).context;
-        let msg = e.message || 'Failed to unlock';
+        let msg = e.message || 'We could not send the full list. Please try again.';
         try {
           const parsed = ctx?.body ? JSON.parse(ctx.body) : ctx;
-          if (parsed?.error === 'invalid_email') msg = 'Enter a valid business email.';
-          else if (parsed?.details?.email?.length) msg = 'Enter a valid business email.';
+          if (parsed?.error === 'invalid_email') msg = 'Enter a valid email address.';
+          else if (parsed?.details?.email?.length) msg = 'Enter a valid email address.';
         } catch { /* ignore */ }
         throw new Error(msg);
       }
       const payload = data as { full_result: FullResult };
       setFull(payload.full_result);
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to unlock');
+      setError(err?.message ?? 'We could not send the full list. Please try again.');
     } finally {
       setUnlocking(false);
     }

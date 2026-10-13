@@ -20,14 +20,14 @@ export const SERVICE_OPTIONS: { id: ServiceId; label: string }[] = [
   { id: "brand-creative", label: "Brand or design" },
   { id: "marketing-growth", label: "Marketing or content" },
   { id: "ai-systems", label: "AI or business systems" },
-  { id: "publishing-launch", label: "Publishing / launch" },
+  { id: "publishing-launch", label: "Publishing or launch" },
   { id: "not-sure", label: "Not sure yet" },
 ];
 
 /** Context-only controls, shown when the visitor arrives from those paths. */
 export const CONTEXT_OPTIONS: { id: ServiceId; label: string }[] = [
   { id: "agency-collaboration", label: "Agency collaboration" },
-  { id: "hiring-contract", label: "Hiring / contract role" },
+  { id: "hiring-contract", label: "Hiring or contract role" },
 ];
 
 export const SERVICE_LABEL: Record<string, string> = [...SERVICE_OPTIONS, ...CONTEXT_OPTIONS].reduce(

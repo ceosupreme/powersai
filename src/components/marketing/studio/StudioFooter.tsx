@@ -34,7 +34,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="studio-display text-2xl">Supreme Team Media</p>
-            <p className="mt-3 max-w-sm text-[1rem] text-muted-foreground">{es ? "Marcas, sitios web, campañas y sistemas construidos alrededor del problema del negocio." : "Brands, websites, campaigns, and systems built around the business problem."}</p>
+            <p className="mt-3 max-w-sm text-[1rem] text-muted-foreground">{es ? "Soluciones de marketing y medios para hacer crecer tu negocio." : "Marketing and media solutions for business growth."}</p>
           </div>
 
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-1 text-[1rem] sm:grid-cols-3">
@@ -44,7 +44,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/services/brand" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marca y creatividad" : "Brand & creative"}</Link>
             <Link to="/services/marketing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marketing y crecimiento" : "Marketing & growth"}</Link>
             <Link to="/services/ai-systems" className="inline-flex min-h-11 items-center hover:underline">{es ? "IA y sistemas" : "AI & systems"}</Link>
-            <Link to="/publishing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Publicación y lanzamiento" : "Publishing & Launch"}</Link>
+            <Link to="/publishing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Publicación y lanzamiento" : "Publishing & launch"}</Link>
             <Link to="/pricing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Paquetes" : "Packages"}</Link>
             <Link to="/startups" className="inline-flex min-h-11 items-center hover:underline">{es ? "Startups y fundadores" : "Startups & founders"}</Link>
             <Link to="/blog" className="inline-flex min-h-11 items-center hover:underline">Blog</Link>
@@ -72,7 +72,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
           <p className="studio-label mb-4" style={{ color: "hsl(var(--band-text) / 0.62)" }}>{es ? "Industrias" : "Industries"}</p>
            <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
              {industries.map((row) => <Link key={row.slug} to={`/for/${row.slug}`} className="inline-flex min-h-11 items-center hover:underline">{row.display_name}</Link>)}
-             {isError && <span className="inline-flex min-h-11 items-center">Industry links are temporarily unavailable.</span>}
+             {isError && <span className="inline-flex min-h-11 items-center">{es ? "Los enlaces de industrias no están disponibles por ahora." : "Industry links are temporarily unavailable."}</span>}
              <Link to="/industries" className="inline-flex min-h-11 items-center font-medium text-foreground hover:underline">{es ? "Ver todas" : "View all industries"}</Link>
           </div>
         </nav>

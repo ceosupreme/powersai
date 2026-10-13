@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
@@ -15,6 +16,12 @@ export default function ServicesHub() {
   useStudioHead({ ...ROUTE_META["/services"], path: "/services" });
   const { data = [], isLoading, isError } = useServicePages();
   const groups = groupServices(data);
+  const { hash } = useLocation();
+  // A link to one group (for example /services#photo-video) lands on it once the list has loaded.
+  useEffect(() => {
+    if (!hash || !groups.length) return;
+    requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: "start" }));
+  }, [hash, groups.length]);
   const ask = () => prefillContact("I'm not sure which services I need. Can you help me put together the right mix?");
   return (
     <div className="stm-studio sp-page min-h-screen"><StudioHeader /><main>
@@ -35,7 +42,7 @@ export default function ServicesHub() {
           {isError && <p role="status">Services couldn't be loaded right now. Please refresh.</p>}
           <div className="sp-groups" style={{ marginTop: 0 }}>
             {groups.map((g) => (
-              <div className="sp-group" key={g.key}>
+              <div className="sp-group" key={g.key} id={g.key} style={{ scrollMarginTop: 96 }}>
                 <h2 style={{ marginBottom: 8, font: "800 18px 'Inter Tight',sans-serif", letterSpacing: "-.01em" }}>{g.label}</h2>
                 {g.items.map((s) => (
                   <Link key={s.slug} to={`/services/${s.slug}`} onClick={() => { trackSiteEvent({ event_type: "cta_click", label: `services_hub_${s.slug.replace(/-/g, "_")}` }); openAtTop(); }}>

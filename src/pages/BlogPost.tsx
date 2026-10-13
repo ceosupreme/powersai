@@ -40,7 +40,7 @@ export default function BlogPost() {
       <div className="stm-studio stm-post-page min-h-screen"><StudioHeader />
         <main><div className="stm-post-state" role="status">
           <h1>{isError ? "This post couldn't be loaded." : "This post isn't available."}</h1>
-          <p>{isError ? "Please refresh the page, or " : "It may have moved. "}<Link to="/blog" onClick={openAtTop}>see all posts on the blog</Link>.</p>
+          <p>{isError ? "Please refresh the page, or " : "It may have moved. You can "}<Link to="/blog" onClick={openAtTop}>see all posts on the blog</Link>.</p>
         </div></main>
       <StudioFooter /></div>
     );
