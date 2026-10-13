@@ -139,11 +139,11 @@
 .stm-studio .hp-close::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,rgba(242,162,15,0),#F2A20F 20%,#14B5E3 80%,rgba(20,181,227,0));opacity:.8}
 .stm-studio .hp-close-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;align-items:center}
 .stm-studio .hp-close-art{position:relative;aspect-ratio:5/4;margin:0 26px 30px 0}
-.stm-studio .hp-close-photo{position:absolute;inset:0;overflow:hidden;border-radius:28px;background:radial-gradient(80% 70% at 30% 25%,#FFF3D9 0%,#F6DDB0 45%,#E9C38A 100%);box-shadow:0 40px 80px -44px rgba(11,21,48,.55)}
+.stm-studio .hp-close-photo{position:absolute;inset:0;overflow:hidden;border-radius:28px;background:radial-gradient(80% 70% at 30% 25%,#1A2B52 0%,#0E1A36 50%,#070C1A 100%);box-shadow:0 40px 80px -44px rgba(11,21,48,.55)}
 .stm-studio .hp-close-photo img{width:100%;height:100%;object-fit:cover}
-/* Until the photo is in, the warm panel holds the package card in the middle. */
-.stm-studio .hp-close-art.is-blank .hp-close-photo::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(122,90,38,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(122,90,38,.09) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(75% 70% at 50% 50%,#000,transparent);mask-image:radial-gradient(75% 70% at 50% 50%,#000,transparent)}
-.stm-studio .hp-close-art.is-blank .hp-close-photo::after{content:"";position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,255,255,0) 70%)}
+/* Until the photo is in, a navy panel with a faint grid holds the package card in the middle. */
+.stm-studio .hp-close-art.is-blank .hp-close-photo::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(75% 70% at 50% 50%,#000,transparent);mask-image:radial-gradient(75% 70% at 50% 50%,#000,transparent)}
+.stm-studio .hp-close-art.is-blank .hp-close-photo::after{content:"";position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(242,162,15,.35),rgba(242,162,15,0) 68%)}
 .stm-studio .hp-close-art.is-blank{margin:0}
 .stm-studio .hp-close-art.is-blank .hp-close-float{left:50%;top:50%;right:auto;bottom:auto;width:min(74%,360px);padding:22px 22px 20px;transform:translate(-50%,-50%) rotate(-2.5deg)}
 .stm-studio .hp-close-art.is-blank .hp-close-float li{padding:12px 14px;font-size:16px}
