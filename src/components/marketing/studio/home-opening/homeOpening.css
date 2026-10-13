@@ -223,6 +223,7 @@
 .stm-studio .stm-command-overlays { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .stm-studio .stm-command-panel { color: hsl(195 100% 86%); transition: filter .25s ease; }
 .stm-studio .stm-command-panel text { fill: hsl(200 100% 95%); text-anchor: middle; font: 700 16px "Inter Tight", sans-serif; filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .75)); }
+.stm-studio .stm-command-panel-near text { font-size: 19px; }
 .stm-studio .stm-command-panel svg { filter: drop-shadow(0 0 5px hsl(var(--opening-cyan) / .7)); }
 .stm-studio .stm-command-panel:hover { filter: drop-shadow(0 0 6px hsl(var(--opening-cyan) / .9)); }
 .stm-studio .stm-command-core { animation: stm-command-breathe 5s ease-in-out infinite; }

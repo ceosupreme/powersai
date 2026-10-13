@@ -203,11 +203,13 @@ function OpeningHero({ onContact }: { onContact: () => void }) {
         </g>
         {/* Each tile's group sits on the tile's own center line and keeps
             the console's lean (its matrix), so centering the icon and the
-            word on x 0 lines them up the way the tile tilts. */}
+            word on x 0 lines them up the way the tile tilts. Web and
+            Automation are the nearer, bigger screens, so their words are
+            set larger to match. */}
         <g className="stm-command-panel" transform="matrix(.992 .122 -.443 .818 665 349)"><Megaphone x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Marketing</text></g>
         <g className="stm-command-panel" transform="matrix(.990 .141 -.361 .839 800 366)"><Play x="-13" y="-30" width="26" height="26" /><text x="1.1" y="22">Media</text></g>
-        <g className="stm-command-panel" transform="matrix(.989 .146 -.215 .773 946 387)"><Globe x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
-        <g className="stm-command-panel stm-command-panel-wide" transform="matrix(.987 .160 -.113 .786 1107 408)"><Cog x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
+        <g className="stm-command-panel stm-command-panel-near" transform="matrix(.989 .146 -.215 .773 946 387)"><Globe x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Web</text></g>
+        <g className="stm-command-panel stm-command-panel-wide stm-command-panel-near" transform="matrix(.987 .160 -.113 .786 1107 408)"><Cog x="-13" y="-30" width="26" height="26" /><text x="0" y="22">Automation</text></g>
         <g className="stm-command-core"><text x="921" y="163">BUSINESS</text><text x="921" y="187">GROWTH</text></g>
       </svg>
       <div className="stm-command-mobile-controls">
