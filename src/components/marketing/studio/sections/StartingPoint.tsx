@@ -62,11 +62,12 @@ const CHOICES: Choice[] = [
   },
 ];
 
-// What the checkup actually does from a name and city. The ranking against
+// What the checkup actually does from a name and city: it finds their
+// website on their Google listing and checks it too. The ranking against
 // the top three is in the full list (after email), so the steps say so.
 const CHECKUP_STEPS = [
   "You type in your business name and city.",
-  "The tool looks up your Google listing and reviews and finds the top three businesses near you on Google Maps.",
+  "The tool looks up your Google listing, reviews and website, and finds the top three businesses near you on Google Maps.",
   "Your report shows the top things to fix and roughly what they're costing you each month. Add your email to get the full list, including how you rank against those top three.",
 ];
 

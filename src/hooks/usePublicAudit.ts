@@ -8,6 +8,24 @@ export type OperationFootprint =
 export type AuditStatus =
   | 'queued' | 'resolving' | 'snapshotting' | 'auditing' | 'ranking' | 'complete' | 'failed';
 
+/** The checkup's look at their website (see _shared/website-quick-check.ts).
+ *  Null fields mean "couldn't tell", not "failed". Missing on older results. */
+export interface WebsiteCheck {
+  status: 'checked' | 'none' | 'social' | 'unreachable' | 'blocked';
+  url: string | null;
+  source: 'typed' | 'google' | null;
+  listing_has_site: boolean | null;
+  social_label: string | null;
+  opens: boolean | null;
+  secure: boolean | null;
+  phone_ready: boolean | null;
+  contact: boolean | null;
+  problem: string | null;
+  phone_load_seconds: number | null;
+  speed: 'fast' | 'ok' | 'slow' | null;
+  speed_score: number | null;
+}
+
 export interface RedactedResult {
   total_monthly_dollars: number | null;
   leak_count: number;
@@ -18,6 +36,7 @@ export interface RedactedResult {
     path: 'exact' | 'default';
     caveat?: string;
   } | null;
+  website?: WebsiteCheck | null;
 }
 
 export interface LeakResult {
@@ -43,6 +62,7 @@ export interface FullResult {
   } | null;
   project_type_resolution: RedactedResult['project_type_resolution'];
   inputs_basis: Record<string, unknown> | null;
+  website?: WebsiteCheck | null;
 }
 
 export interface RunInput {

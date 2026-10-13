@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePublicAudit, type AuditStatus, type OperationFootprint } from '@/hooks/usePublicAudit';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookingCta } from '@/components/marketing/BookingCta';
+import { WebsiteCheckCard } from '@/components/marketing/WebsiteCheckCard';
 import { sanitizeBiz } from '@/pages/VerticalLanding';
 import { trackSiteEvent } from '@/lib/studioAnalytics';
 import { StudioHeader } from '@/components/marketing/studio/StudioHeader';
@@ -189,7 +190,7 @@ export default function FreeAudit() {
                     placeholder="acmeplumbing.com"
                     maxLength={500}
                   />
-                  <p className="mt-1.5 text-xs text-[hsl(var(--stm-ink))]/50">Just the domain is fine — we’ll resolve the rest.</p>
+                  <p className="mt-1.5 text-xs text-[hsl(var(--stm-ink))]/50">Just the domain is fine. Leave it blank and we’ll use the one on your Google listing.</p>
                 </label>
                 <div className="md:col-span-2">
                   <span className="mb-2 block font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/60">Size of the operation *</span>
@@ -338,6 +339,9 @@ export default function FreeAudit() {
                 )}
               </div>
 
+              {/* Their website: free to see, before the email ask. */}
+              {audit.redacted.website && <WebsiteCheckCard site={audit.redacted.website} />}
+
               {/* Locked rows — only render if there are real remaining leaks beyond the top-3 tease. */}
               {(() => {
                 const remaining = Math.max(0, audit.redacted.leak_count - audit.redacted.top_leaks.length);
@@ -480,6 +484,8 @@ export default function FreeAudit() {
                   </ul>
                 </div>
               )}
+
+              {audit.full.website && <WebsiteCheckCard site={audit.full.website} />}
 
               <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">
                 <p className="font-display text-2xl md:text-3xl leading-snug">Want this fixed?</p>

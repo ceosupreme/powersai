@@ -10,10 +10,11 @@
 //        the miner already knows place_id and upserts gbp_place_mappings)
 //     3. gbp-sync-weekly
 //     4. compute-leak-stack  ← the leak numbers
-//   steps only THIS public path runs: website-resolve-url +
-//   website-crawl-dispatcher, map-pack-run, extract-review-themes,
-//   foundation-audit-refresh, growth-audit-refresh. See the header of
-//   checkup-prospect for why the internal batch path omits them.
+//   steps only THIS public path runs: website-resolve-url + the website
+//   quick check (_shared/website-quick-check.ts), map-pack-run,
+//   extract-review-themes, foundation-audit-refresh, growth-audit-refresh.
+//   See the header of checkup-prospect for why the internal batch path
+//   omits them.
 //
 // PUBLIC endpoint (verify_jwt=false). Anonymous prospects submit their
 // business + city; we insert a public_audit_requests row, return { token }
@@ -28,8 +29,13 @@
 //      project_type key (currently only 'home_services' has vectors +
 //      display_defaults); UPDATE the shell's project_type BEFORE audits run.
 //      Record the mapping path in full_result.project_type_resolution.
-//   3. Snapshot (parallel): gbp-sync-weekly, website-resolve+crawl (if url),
-//      extract-review-themes, map-pack-run.
+//   3. Snapshot: gbp-sync-weekly, then in parallel website-resolve + the
+//      website quick check, extract-review-themes, map-pack-run. The website
+//      is the one they typed, otherwise the one on their Google listing; the
+//      quick check (homepage + Google's phone speed test) is waited on, saved
+//      as the shell's website snapshot, and returned as `website` in both
+//      results. (It replaces the crawl dispatcher here, which re-scanned
+//      every mapped website on each checkup and wasn't waited on.)
 //   4. Audit (parallel): foundation-audit-refresh + growth-audit-refresh
 //      both with cold_only=true.
 //   5. compute-leak-stack, then build redacted_result + full_result.
@@ -42,6 +48,9 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3.23.8';
+import {
+  checkWebsite, displayUrl, emptyWebsiteBlock, normalizeSiteInput, type WebsiteBlock,
+} from '../_shared/website-quick-check.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -315,10 +324,10 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     }
 
     // Read the GBP snapshot for category info to power project-type mapping
-    // and the map-pack keyword.
+    // and the map-pack keyword, and the website their listing links to.
     const { data: gbpSnap } = await admin
       .from('gbp_snapshots')
-      .select('primary_category, secondary_categories')
+      .select('primary_category, secondary_categories, website, fetch_error')
       .eq('venue_id', shellVenueId)
       .order('captured_at', { ascending: false })
       .limit(1)
@@ -353,14 +362,31 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
 
     const mapKeyword = ((vHit?.label || gbpPrimary || 'home services') + ' ' + input.city).trim();
 
+    // Website: the one they typed, otherwise the one on their Google listing.
+    // With neither, and a listing we could read, "no website" is the finding.
+    const listingRead = !!gbpSnap && !(gbpSnap as any).fetch_error;
+    const listingSite = listingRead ? normalizeSiteInput((gbpSnap as any).website) : null;
+    const typedSite = normalizeSiteInput(input.website_url);
+    const siteUrl = typedSite ?? listingSite;
+    let website: WebsiteBlock | null = null;
+    if (siteUrl) {
+      await log(typedSite
+        ? `Checking your website: ${displayUrl(siteUrl)}`
+        : `Found your website on your Google listing: ${displayUrl(siteUrl)}`);
+    } else if (listingRead) {
+      website = emptyWebsiteBlock('none', { listing_has_site: false });
+      await log('No website on your Google listing.');
+    }
+    const psiKey = (Deno.env.get('GOOGLE_PAGESPEED_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY') || '').trim() || null;
+
     // Review-sample honesty: public Place Details returns at most a handful
     // of reviews. Skip theme extraction on cold runs — never present a
     // 5-review sample as a full review analysis. Managed venues keep the
     // normal path (they hit this fn from their own weekly flow, not here).
-    const [webResolve, reviewRes, mapRes] = await Promise.allSettled([
-      input.website_url
-        ? invoke('website-resolve-url', { venue_id: shellVenueId, website_url: input.website_url }, { timeoutMs: 20_000 })
-        : Promise.resolve({ ok: true, status: 200, data: { skipped: 'no website_url' } }),
+    const [webResolve, reviewRes, mapRes, siteRes] = await Promise.allSettled([
+      siteUrl
+        ? invoke('website-resolve-url', { venue_id: shellVenueId, website_url: siteUrl }, { timeoutMs: 20_000 })
+        : Promise.resolve({ ok: true, status: 200, data: { skipped: 'no website' } }),
       Promise.resolve({ ok: true, status: 200, data: { skipped: 'cold_public_run_limited_sample' } }),
       // map-pack-run needs a keyword row; without one it silently does nothing.
       // Insert a one-shot active keyword scoped to this shell.
@@ -378,13 +404,42 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
         }
         return invoke('map-pack-run', { venue_id: shellVenueId, force: true, trigger_source: 'public_audit' }, { timeoutMs: 60_000 });
       })(),
+      siteUrl
+        ? checkWebsite(siteUrl, {
+            source: typedSite ? 'typed' : 'google',
+            listingHasSite: listingRead ? !!listingSite : null,
+            psiKey,
+          })
+        : Promise.resolve(null),
     ]);
 
-    if (webResolve.status === 'fulfilled' && (webResolve.value as any)?.ok) {
-      const crawl = await invoke('website-crawl-dispatcher', { venue_id: shellVenueId }, { timeoutMs: 60_000 });
-      if (!crawl.ok) await log(`Website crawl degraded: HTTP ${crawl.status}`);
-    } else if (input.website_url) {
-      await log('Website resolve failed — skipping crawl.');
+    // The website check goes in the report, and is saved as the shell's
+    // website snapshot so the foundation checks (https, phones, contact)
+    // read the same results. A failure here never stops the checkup.
+    if (siteRes.status === 'fulfilled' && siteRes.value) {
+      website = siteRes.value.block;
+      if (siteRes.value.snapshot) {
+        const { error: wsErr } = await admin.from('website_snapshots').insert({
+          venue_id: shellVenueId,
+          source: 'automated',
+          scope: 'weekly_full',
+          notes: 'public checkup: homepage quick check',
+          ...siteRes.value.snapshot,
+        });
+        if (wsErr) console.error(`[run-public-audit] website_snapshots insert failed: ${wsErr.message}`);
+      }
+      await log(
+        website.status === 'social' ? `Your listing points to a ${website.social_label}, not a website of your own.`
+        : website.status === 'unreachable' ? `Couldn't open your website: ${website.problem ?? 'no answer'}.`
+        : website.status === 'blocked' ? 'Your website has a security screen, so we checked what we could.'
+        : 'Website checked.',
+      );
+    } else if (siteUrl) {
+      console.error('[run-public-audit] website check failed:', siteRes.status === 'rejected' ? String(siteRes.reason) : 'no result');
+      await log("Couldn't finish the website check.");
+    }
+    if (siteUrl && webResolve.status === 'fulfilled' && !(webResolve.value as any)?.ok) {
+      console.log(`[run-public-audit] website-resolve-url: HTTP ${(webResolve.value as any)?.status}`);
     }
     // Note the intentional skip so the operator sees it in status_detail.
     await log('Review themes: skipped on public run — sample from Google is too small (≤5 reviews) to analyze themes honestly.');
@@ -453,15 +508,18 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
             top_competitors: (mapSnap as any).top_competitors ?? [],
           }
         : null,
+      website,
       duration_ms: Date.now() - startedAt,
       request_context: input.context ?? null,
     };
 
+    // The website check is free to see (no email), so it rides in both.
     const redacted_result = {
       total_monthly_dollars: (leakRun as any).total_monthly_dollars,
       leak_count: results.length,
       top_leaks: topThree,
       project_type_resolution: ptRes,
+      website,
       request_context: input.context ?? null,
     };
 
