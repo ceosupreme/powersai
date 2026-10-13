@@ -226,7 +226,7 @@ export const EDITORIAL_CASES: EditorialCase[] = [
     statusNote: "Live website.",
     mediaKey: "work-sylina-renae",
     imageUrl: null,
-    externalUrl: "https://sylinarenea.com",
+    externalUrl: "https://sylinarenae.com",
     bodyText: null,
     plateTone: "paper",
   },
