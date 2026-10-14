@@ -39,6 +39,7 @@ import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.w
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
 import benchAttention from "@/assets/stm-opening/bench-attention.webp";
 import rooftopNextLevel from "@/assets/stm-opening/rooftop-next-level.webp";
+import chosenFirst from "@/assets/stm-opening/chosen-first.webp";
 import workPanelKario from "@/assets/studio/work/work-panel-kario-voss.webp";
 import workPanelCoastal from "@/assets/studio/work/work-panel-coastal-beauties.webp";
 import workPanelPaws from "@/assets/studio/work/work-panel-big-paws-club.webp";
@@ -101,6 +102,16 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     width: 1672,
     height: 941,
     objectFit: "contain",
+  },
+  /** Services overview (/services) top: one building lit up gold over a dark city, dark on the left for the headline. */
+  "services-hub-hero": {
+    src: chosenFirst,
+    alt: "A city at night seen from above, with one building lit up gold among dark blocks",
+    aspectRatio: "1672 / 941",
+    width: 1672,
+    height: 941,
+    objectFit: "cover",
+    objectPosition: "72% center",
   },
   "home-after-dark": {
     src: afterDark3am,
