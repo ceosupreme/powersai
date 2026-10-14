@@ -13120,6 +13120,10 @@ export type Database = {
         Returns: boolean
       }
       user_venue_ids: { Args: never; Returns: string[] }
+      verify_job_token: {
+        Args: { p_job: string; p_token: string }
+        Returns: boolean
+      }
     }
     Enums: {
       access_level: "all_staff" | "managers_only" | "gm_only" | "owner_only"
