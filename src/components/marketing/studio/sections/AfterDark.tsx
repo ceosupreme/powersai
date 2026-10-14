@@ -43,6 +43,10 @@ export function AfterDark() {
       section.querySelectorAll("[data-watch]").forEach((el) => el.classList.add("on"));
       return;
     }
+    // Visible by default: the hidden starting states (CSS) only apply once this marks the section,
+    // which it does when the section starts off screen and motion is on.
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && section.getBoundingClientRect().top >= window.innerHeight) section.dataset.armed = "1";
+
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add("on"); io.unobserve(entry.target); }
@@ -119,8 +123,11 @@ export function AfterDark() {
     if (RECEIPTS.length <= 4) return;
     let slot = 0;
     let swapTimer = 0;
+    let onScreen = false;
+    const seen = "IntersectionObserver" in window ? new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; }) : null;
+    if (seen) seen.observe(section); else onScreen = true;
     const id = window.setInterval(() => {
-      if (!allLitRef.current || document.visibilityState !== "visible") return;
+      if (!allLitRef.current || !onScreen || document.visibilityState !== "visible") return;
       const chipNodes = section.querySelectorAll<HTMLElement>(".stm-dark-chips li");
       const s = slot % 4;
       slot += 1;
@@ -138,7 +145,7 @@ export function AfterDark() {
         if (node) delete node.dataset.swap;
       }, 340);
     }, 3600);
-    return () => { window.clearInterval(id); window.clearTimeout(swapTimer); };
+    return () => { window.clearInterval(id); window.clearTimeout(swapTimer); seen?.disconnect(); };
   }, []);
 
   return (

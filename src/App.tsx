@@ -10,55 +10,55 @@ import { RoleProvider } from "@/context/RoleContext";
 import { AppProvider } from "@/context/AppContext";
 import { PreviewProvider } from "@/context/PreviewContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { useAuth } from "@/context/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/queryClient";
-import Login from "./pages/Login";
-import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
-import WeeklyReview from "./pages/WeeklyReview";
-import Sales from "./pages/Sales";
-import Labor from "./pages/Labor";
-import Operations from "./pages/Operations";
-import GuestExperience from "./pages/GuestExperience";
-import Insights from "./pages/Insights";
-import Admin from "./pages/Admin";
-import AdminSyncHealth from "./pages/AdminSyncHealth";
-import GrowthAudit from "./pages/GrowthAudit";
-import LeakStack from "./pages/LeakStack";
-import ProspectDock from "./pages/ProspectDock";
+const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const WeeklyReview = lazy(() => import("./pages/WeeklyReview"));
+const Sales = lazy(() => import("./pages/Sales"));
+const Labor = lazy(() => import("./pages/Labor"));
+const Operations = lazy(() => import("./pages/Operations"));
+const GuestExperience = lazy(() => import("./pages/GuestExperience"));
+const Insights = lazy(() => import("./pages/Insights"));
+const Admin = lazy(() => import("./pages/Admin"));
+const AdminSyncHealth = lazy(() => import("./pages/AdminSyncHealth"));
+const GrowthAudit = lazy(() => import("./pages/GrowthAudit"));
+const LeakStack = lazy(() => import("./pages/LeakStack"));
+const ProspectDock = lazy(() => import("./pages/ProspectDock"));
 import FreeAudit from "./pages/FreeAudit";
-import Templates from "./pages/Templates";
-import MarketingHub from "./pages/MarketingHub";
-import Tasks from "./pages/Tasks";
-import Logs from "./pages/Logs";
-import LogNew from "./pages/LogNew";
-import LogDetail from "./pages/LogDetail";
-import LogInterview from "./pages/LogInterview";
+const Templates = lazy(() => import("./pages/Templates"));
+const MarketingHub = lazy(() => import("./pages/MarketingHub"));
+const Tasks = lazy(() => import("./pages/Tasks"));
+const Logs = lazy(() => import("./pages/Logs"));
+const LogNew = lazy(() => import("./pages/LogNew"));
+const LogDetail = lazy(() => import("./pages/LogDetail"));
+const LogInterview = lazy(() => import("./pages/LogInterview"));
 import { useIntegrationDisabled } from "@/hooks/useIntegrationDisabled";
-import Chat from "./pages/Chat";
-import LeadShiftDashboard from "./pages/LeadShiftDashboard";
-import StaffTasksPage from "./pages/StaffTasksPage";
-import StaffChatPage from "./pages/StaffChatPage";
-import StaffLogsPage from "./pages/StaffLogsPage";
-import StaffMyShift from "./pages/StaffMyShift";
-import PortfolioOverview from "./pages/PortfolioOverview";
-import Employees from "./pages/Employees";
-import EmployeeDetail from "./pages/EmployeeDetail";
-import InsightsAudit from "./pages/InsightsAudit";
+const Chat = lazy(() => import("./pages/Chat"));
+const LeadShiftDashboard = lazy(() => import("./pages/LeadShiftDashboard"));
+const StaffTasksPage = lazy(() => import("./pages/StaffTasksPage"));
+const StaffChatPage = lazy(() => import("./pages/StaffChatPage"));
+const StaffLogsPage = lazy(() => import("./pages/StaffLogsPage"));
+const StaffMyShift = lazy(() => import("./pages/StaffMyShift"));
+const PortfolioOverview = lazy(() => import("./pages/PortfolioOverview"));
+const Employees = lazy(() => import("./pages/Employees"));
+const EmployeeDetail = lazy(() => import("./pages/EmployeeDetail"));
+const InsightsAudit = lazy(() => import("./pages/InsightsAudit"));
 import NotFound from "./pages/NotFound";
-import RolePreview from "./pages/RolePreview";
-import Workspace from "./pages/Workspace";
-import BrandKit from "./pages/BrandKit";
-import ContentPipeline from "./pages/ContentPipeline";
-import ProductionBoard from "./pages/ProductionBoard";
-import AnswerBank from "./pages/AnswerBank";
-import ChannelRevenue from "./pages/ChannelRevenue";
-import AffiliatePrograms from "./pages/AffiliatePrograms";
-import Products from "./pages/Products";
-import Offers from "./pages/Offers";
-import Crm from "./pages/Crm";
-import Inbox from "./pages/Inbox";
+const RolePreview = lazy(() => import("./pages/RolePreview"));
+const Workspace = lazy(() => import("./pages/Workspace"));
+const BrandKit = lazy(() => import("./pages/BrandKit"));
+const ContentPipeline = lazy(() => import("./pages/ContentPipeline"));
+const ProductionBoard = lazy(() => import("./pages/ProductionBoard"));
+const AnswerBank = lazy(() => import("./pages/AnswerBank"));
+const ChannelRevenue = lazy(() => import("./pages/ChannelRevenue"));
+const AffiliatePrograms = lazy(() => import("./pages/AffiliatePrograms"));
+const Products = lazy(() => import("./pages/Products"));
+const Offers = lazy(() => import("./pages/Offers"));
+const Crm = lazy(() => import("./pages/Crm"));
+const Inbox = lazy(() => import("./pages/Inbox"));
 import MarketingSite from "./pages/MarketingSite";
 import Work from "./pages/Work";
 import WorkCaseStudy from "./pages/WorkCaseStudy";
@@ -68,23 +68,23 @@ import WebsiteServices from "./pages/WebsiteServices";
 import BrandServices from "./pages/BrandServices";
 import MarketingServices from "./pages/MarketingServices";
 import SystemsServices from "./pages/SystemsServices";
-import HelpCenter from "./pages/HelpCenter";
-import LaunchChecklist from "./pages/LaunchChecklist";
-import QualifyLanding from "./pages/QualifyLanding";
-import QualifyForVenue from "./pages/QualifyForVenue";
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const LaunchChecklist = lazy(() => import("./pages/LaunchChecklist"));
+const QualifyLanding = lazy(() => import("./pages/QualifyLanding"));
+const QualifyForVenue = lazy(() => import("./pages/QualifyForVenue"));
 import VerticalLanding from "./pages/VerticalLanding";
 import VerticalResolver from "./pages/VerticalResolver";
 import Industries from "./pages/Industries";
-import AutomationInbox from "./pages/AutomationInbox";
-import ClientApprovals from "./pages/ClientApprovals";
-import ReactivationCampaigns from "./pages/ReactivationCampaigns";
-import RecoveryReports from "./pages/RecoveryReports";
-import PublicRecoveryReport from "./pages/PublicRecoveryReport";
-import FoundationAudit from "./pages/FoundationAudit";
-import ProjectHome from "./pages/ProjectHome";
-import { SetupWizard } from "@/components/help/SetupWizard";
+const AutomationInbox = lazy(() => import("./pages/AutomationInbox"));
+const ClientApprovals = lazy(() => import("./pages/ClientApprovals"));
+const ReactivationCampaigns = lazy(() => import("./pages/ReactivationCampaigns"));
+const RecoveryReports = lazy(() => import("./pages/RecoveryReports"));
+const PublicRecoveryReport = lazy(() => import("./pages/PublicRecoveryReport"));
+const FoundationAudit = lazy(() => import("./pages/FoundationAudit"));
+const ProjectHome = lazy(() => import("./pages/ProjectHome"));
 import { ThemeSync } from "@/components/layout/ThemeSync";
 import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics";
+import { ScrollToTopOnNavigate } from "@/components/ScrollToTopOnNavigate";
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import LegalPage from "./pages/LegalPage";
@@ -97,6 +97,26 @@ import AreasHub from "./pages/AreasHub";
 import AreaDetail from "./pages/AreaDetail";
 import Startups from "./pages/Startups";
 const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
+// The HQ app loads in its own pieces, so visitors to the public site only download the public pages.
+const LazyAppLayout = lazy(() => import("@/components/layout/AppLayout").then((m) => ({ default: m.AppLayout })));
+const SetupWizard = lazy(() => import("@/components/help/SetupWizard").then((m) => ({ default: m.SetupWizard })));
+
+/** The setup wizard is for signed-in users only, so public visitors never fetch it. */
+function SignedInSetupWizard() {
+  const { user } = useAuth();
+  return user ? <Suspense fallback={null}><SetupWizard /></Suspense> : null;
+}
+
+/** Shown for a moment while an HQ screen's code arrives. */
+function ScreenLoading() {
+  return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">One moment…</div>;
+}
+
+/** Each HQ screen waits for its code inside its own boundary. Public pages have none, so their saved copies match on the first draw. */
+function AppLayout({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<ScreenLoading />}><LazyAppLayout>{children}</LazyAppLayout></Suspense>;
+}
+const Waiting = ({ children }: { children: React.ReactNode }) => <Suspense fallback={<ScreenLoading />}>{children}</Suspense>;
 
 // Re-export for any remaining imports from App
 export { queryClient };
@@ -114,13 +134,14 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <SetupWizard />
+              <SignedInSetupWizard />
               <ThemeSync />
               <PublicSiteAnalytics />
+              <ScrollToTopOnNavigate />
               <Routes>
-                <Route path="/auth" element={<Login />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/auth" element={<Waiting><Login /></Waiting>} />
+                <Route path="/login" element={<Waiting><Login /></Waiting>} />
+                <Route path="/reset-password" element={<Waiting><ResetPassword /></Waiting>} />
                 {/* Public landing page — signed-out visitors see marketing,
                     signed-in users get redirected into the app (handled inside Marketing). */}
                 <Route path="/" element={<MarketingSite />} />
@@ -152,16 +173,16 @@ const App = () => {
                 <Route path="/areas/:slug" element={<AreaDetail />} />
                 <Route path="/industries" element={<Industries />} />
                 {/* Public lead qualifier landing pages — one per vertical slug. */}
-                <Route path="/qualify/:slug" element={<QualifyLanding />} />
+                <Route path="/qualify/:slug" element={<Waiting><QualifyLanding /></Waiting>} />
                 {/* Flagship acquisition pages bypass the legacy database-driven renderer. */}
                 {/* All other public vertical pages retain the legacy config-driven renderer. */}
                 <Route path="/for/:slug" element={<VerticalResolver />} />
                 {/* Public per-client qualifier — resolves a venue by slug and
                     stamps inbound leads with captured_for_project_id so the
                     client's follow-up enrollment fires automatically. */}
-                <Route path="/q/:venueSlug" element={<QualifyForVenue />} />
+                <Route path="/q/:venueSlug" element={<Waiting><QualifyForVenue /></Waiting>} />
                 {/* Public shared Recovery Report — no auth, integrity-gated by the edge function. */}
-                <Route path="/r/:token" element={<PublicRecoveryReport />} />
+                <Route path="/r/:token" element={<Waiting><PublicRecoveryReport /></Waiting>} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>
@@ -413,7 +434,7 @@ const App = () => {
                 <Route path="/staff" element={<Navigate to="/staff/tasks" replace />} />
                 <Route path="/preview/:role" element={
                   <ProtectedRoute allowedRoles={['owner']}>
-                    <RolePreview />
+                    <Waiting><RolePreview /></Waiting>
                   </ProtectedRoute>
                 } />
                 <Route path="*" element={<NotFound />} />

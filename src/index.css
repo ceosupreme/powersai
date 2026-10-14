@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&display=swap');
+/* Public-site fonts are served from this site (built into this stylesheet); HQ-only fonts load in
+   src/lib/extraFonts.ts. Never @import a font stylesheet from another server here: the browser would
+   wait for this file before it could even ask for the fonts. */
+@import "./styles/public-fonts.css";
 
 @tailwind base;
 @tailwind components;
@@ -2662,6 +2663,27 @@
 .check-page .check-form button[type="submit"], .check-page .check-progress button, .check-page .check-results button[type="submit"], .check-page .check-results .studio-btn-primary { border-radius: 100px; background: linear-gradient(135deg, #F6C65A, #E89A2B); color: #101412; box-shadow: none; }
 .check-page .check-progress { border-radius: 6px; background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); box-shadow: none; }
 .check-page .check-progress pre { overflow-wrap: anywhere; }
+/* The checkup's steps as a short circuit (FreeAudit.tsx). Finished steps are lit gold, the current
+   one glows cyan with a signal running down the line toward the next step, and steps still to come
+   wait dim. It only exists while a check is running. */
+.check-page .check-circuit { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.check-page .check-node { position: relative; display: flex; align-items: flex-start; gap: 14px; }
+.check-page .check-node::before { content: ""; position: absolute; left: 7px; top: 19px; bottom: -15px; width: 2px; border-radius: 2px; background: rgba(255, 255, 255, .14); }
+.check-page .check-node:last-child::before { display: none; }
+.check-page .check-node.is-done::before { background: linear-gradient(#F6B73C, #E8920E); box-shadow: 0 0 6px rgba(242, 162, 15, .55); }
+.check-page .check-node.is-active::before { background: linear-gradient(to bottom, rgba(95, 214, 245, 0), #5FD6F5, rgba(95, 214, 245, 0)) 0 -40% / 100% 40% no-repeat, rgba(255, 255, 255, .14); animation: checkSignal 1.15s linear infinite; }
+.check-page .check-led { position: relative; flex: none; width: 16px; height: 16px; margin-top: 1px; border-radius: 50%; background: #2A3550; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .18); }
+.check-page .is-done .check-led { background: #FFC94F; box-shadow: 0 0 0 3px rgba(255, 197, 77, .18), 0 0 12px 2px rgba(242, 162, 15, .8); animation: checkLedOn .7s ease-out; }
+.check-page .is-active .check-led { background: #5FD6F5; box-shadow: 0 0 0 3px rgba(95, 214, 245, .18), 0 0 12px 2px rgba(20, 181, 227, .75); }
+.check-page .is-active .check-led::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; box-shadow: 0 0 16px 3px rgba(95, 214, 245, .9); opacity: 0; animation: checkLedGlow 1.6s ease-in-out infinite; }
+.check-page .is-stopped .check-led { background: #E0566B; box-shadow: 0 0 0 3px rgba(224, 86, 107, .2), 0 0 10px rgba(224, 86, 107, .7); }
+.check-page .check-step { line-height: 1.45; }
+.check-page .is-next .check-step { opacity: .45; }
+.check-page .is-done .check-step { opacity: .78; }
+@keyframes checkSignal { to { background-position: 0 140%, 0 0; } }
+@keyframes checkLedOn { 35% { transform: scale(1.5); box-shadow: 0 0 0 6px rgba(255, 197, 77, .2), 0 0 22px 4px rgba(242, 162, 15, 1); } }
+@keyframes checkLedGlow { 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .check-page .check-node.is-active::before, .check-page .is-active .check-led::after, .check-page .is-done .check-led { animation: none; } }
 .check-page .check-interpretation { padding: 25px 0; border-top: 1px solid hsl(var(--home-rule)); border-bottom: 1px solid hsl(var(--home-rule)); }
 .check-page .check-interpretation p { margin-top: 10px; max-width: 730px; font-size: 1.1rem; line-height: 1.6; }
 .check-page .check-results { overflow-wrap: anywhere; }

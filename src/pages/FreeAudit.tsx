@@ -242,23 +242,23 @@ export default function FreeAudit() {
           {(running || audit.status === 'failed') && (
             <div className="check-progress mt-2 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-6 font-mono text-sm text-[hsl(var(--stm-bg))] shadow-lg md:p-8" role="status" aria-live="polite">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-bg))]/70">Live read · {businessName || 'your business'}</p>
-              <ul className="space-y-2">
+              {/* The steps as a short circuit: finished steps light up gold, the current one glows with a
+                  signal running toward the next. Same step logic as before; only the look changed. */}
+              <ol className="check-circuit">
                 {STAGES.map((stage) => {
                   const done = ORDER[stage.key] < currentStageIdx || audit.status === 'complete';
                   const active = ORDER[stage.key] === currentStageIdx && audit.status !== 'complete';
-                  const pending = ORDER[stage.key] > currentStageIdx;
+                  const stopped = active && audit.status === 'failed';
+                  const state = stopped ? 'is-stopped' : done ? 'is-done' : active ? 'is-active' : 'is-next';
                   return (
-                    <li key={stage.key} className="flex items-start gap-3">
-                      <span className="mt-0.5 w-4">
-                        {done ? '✓' : active ? <span className="inline-block animate-pulse">▸</span> : pending ? '·' : '×'}
-                      </span>
-                      <span className={done ? 'opacity-70' : active ? '' : 'opacity-40'}>
-                        {stage.label}{active ? '…' : ''}
-                      </span>
+                    <li key={stage.key} className={`check-node ${state}`}>
+                      <span className="check-led" aria-hidden="true" />
+                      <span className="check-step">{stage.label}{active && !stopped ? '…' : ''}</span>
+                      <span className="sr-only">{stopped ? ' (stopped)' : done ? ' (done)' : active ? ' (in progress)' : ''}</span>
                     </li>
                   );
                 })}
-              </ul>
+              </ol>
               {audit.status === 'failed' && (
                 <div className="mt-5 border-t border-[hsl(var(--stm-bg))]/20 pt-4">
                   <p className="text-[hsl(var(--stm-warn))]">

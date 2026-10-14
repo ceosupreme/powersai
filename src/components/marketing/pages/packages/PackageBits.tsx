@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { useStarterPackages, type StarterPackageRow } from "@/hooks/useSitePages";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { Accent } from "@/components/marketing/pages/SitePageBits";
+import { useArmOnScroll } from "@/hooks/useArmOnScroll";
 import "./packages.css";
 
 const label = (v: string) => v.replace(/[^a-z0-9_-]/gi, "_").slice(0, 60);
@@ -12,15 +13,16 @@ const label = (v: string) => v.replace(/[^a-z0-9_-]/gi, "_").slice(0, 60);
 export function StageMeter({ level }: { level: number }) {
   return (
     <span className="pk-meter" aria-hidden="true">
-      {[1, 2, 3].map((n) => <i key={n} className={level > 0 ? (n <= level ? "on" : "") : "cy"} />)}
+      {[1, 2, 3].map((n) => <i key={n} className={level > 0 ? (n <= level ? "on" : "") : "cy"} style={{ "--n": n - 1 } as CSSProperties} />)}
     </span>
   );
 }
 
-/** One starter package card. The button underneath depends on where the card sits. */
-export function StarterCard({ pkg, action, picked = false }: { pkg: StarterPackageRow; action: ReactNode; picked?: boolean }) {
+/** One starter package card. The button underneath depends on where the card sits; `index` sets its
+ *  place in the switch-on sequence when its row scrolls in. */
+export function StarterCard({ pkg, action, picked = false, index = 0 }: { pkg: StarterPackageRow; action: ReactNode; picked?: boolean; index?: number }) {
   return (
-    <article className={`pk-card${picked ? " is-picked" : ""}`} aria-label={pkg.name}>
+    <article className={`pk-card${picked ? " is-picked" : ""}`} aria-label={pkg.name} style={{ "--i": index } as CSSProperties}>
       <div className="pk-stage"><StageMeter level={pkg.stage_level} /><span>{pkg.stage_label}</span></div>
       <h3>{pkg.name}</h3>
       {pkg.tagline && <p className="pk-who">{pkg.tagline}</p>}
@@ -36,14 +38,17 @@ export function StarterCard({ pkg, action, picked = false }: { pkg: StarterPacka
 /** The starter packages on an industry page; each card opens the Packages page with that package ready to send. */
 export function StarterStrip({ src }: { src: string }) {
   const { data = [] } = useStarterPackages();
+  const strip = useRef<HTMLDivElement>(null);
+  useArmOnScroll(strip, data.length > 0);
   if (!data.length) return null;
   return (
     <>
-      <div className="pk-strip">
-        {data.map((pkg) => (
+      <div className="pk-strip" ref={strip}>
+        {data.map((pkg, i) => (
           <StarterCard
             key={pkg.slug}
             pkg={pkg}
+            index={i}
             action={
               <Link className="sp-btn sp-btn-gold" to={`/pricing?package=${pkg.slug}&src=${src}`} onClick={() => trackSiteEvent({ event_type: "cta_click", label: label(`${src}_package_${pkg.slug}`) })}>
                 Start with this package

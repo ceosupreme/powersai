@@ -108,9 +108,11 @@ export function FamilyServices({ family, heading = "Every service in this group.
   );
 }
 
-export function ServiceCard({ row, from }: { row: ServicePageRow; from: string }) {
+/** A service card. `trace` adds the homepage's hover effect: a gold line runs around the card's edge. */
+export function ServiceCard({ row, from, trace = false }: { row: ServicePageRow; from: string; trace?: boolean }) {
   return (
-    <Link to={`/services/${row.slug}`} onClick={() => { trackSiteEvent({ event_type: "cta_click", label: `${from}_service_${row.slug.replace(/-/g, "_")}` }); openAtTop(); }}>
+    <Link to={`/services/${row.slug}`} className={trace ? "has-trace" : undefined} onClick={() => { trackSiteEvent({ event_type: "cta_click", label: `${from}_service_${row.slug.replace(/-/g, "_")}` }); openAtTop(); }}>
+      {trace && <svg className="sp-trace" aria-hidden="true"><rect x="1" y="1" rx="15" pathLength={100} /></svg>}
       <span className="sp-family-icon"><ServiceIcon name={row.icon} /></span>
       <span><b>{row.name}</b>{row.summary && <small>{row.summary}</small>}</span>
     </Link>

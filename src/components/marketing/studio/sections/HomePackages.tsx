@@ -35,7 +35,7 @@ export function HomePackages() {
             <Link className="sp-btn sp-btn-gold" to="/pricing#build" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_packages_build" })}>Get my package <ArrowRight aria-hidden /></Link>
             <Link className="sp-btn sp-btn-line" to="/pricing#starters" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_packages_starters" })}>See starter packages</Link>
           </div>
-          <p className="pk-trust"><span><i className="pk-led gr" aria-hidden="true" />Sean replies within one business day</span></p>
+          <p className="pk-trust"><span><i className="pk-led gr" aria-hidden="true" />We reply within one business day</span></p>
         </div>
       </div>
     </section>

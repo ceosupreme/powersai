@@ -39,7 +39,7 @@ export function CheckoutButton({ product, label, sourceVertical, originPath, sou
     <div className="flex flex-col gap-2">
       {consent && <LegalConsent />}
       <Button type="button" className="studio-btn studio-btn-primary" onClick={start} disabled={busy}>{busy && <Loader2 className="animate-spin" aria-hidden />}{label}</Button>
-      {failed && <p role="alert" className="max-w-sm text-sm text-destructive">Checkout could not start. Email <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the <a className="underline" href={onIndustry ? '#inquiry' : '#contact'}>inquiry form below</a> and I will send a payment link.</p>}
+      {failed && <p role="alert" className="max-w-sm text-sm text-destructive">Checkout could not start. Email <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the <a className="underline" href={onIndustry ? '#inquiry' : '#contact'}>inquiry form below</a> and we will send a payment link.</p>}
     </div>
   );
 }

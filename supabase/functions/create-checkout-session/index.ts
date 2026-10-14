@@ -10,9 +10,9 @@ const Body = z.object({
   origin_path: z.string().max(200).optional().nullable(),
 });
 const P = {
-  launch_site_deposit: { mode: 'payment', amount: 125000, name: 'Launch Site: deposit to start (balance $1,250 at launch)' },
-  launch_site_monthly: { mode: 'subscription', amount: 29700, name: 'Launch Site: monthly plan ($0 down, 12-month minimum)' },
-  care_seat: { mode: 'subscription', amount: 14900, name: 'Care Seat: founding rate (first 10 seats)' },
+  launch_site_deposit: { mode: 'payment', amount: 125000, name: 'Standard Web Package: deposit to start (balance $1,250 at launch)' },
+  launch_site_monthly: { mode: 'subscription', amount: 29700, name: 'Standard Web Package: monthly plan ($0 down, 12-month minimum)' },
+  care_seat: { mode: 'subscription', amount: 14900, name: 'Website care: founding rate (first 10 clients)' },
 } as const;
 const hits = new Map<string, { n: number; reset: number }>();
 const json = (d: unknown, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
   if (p.data.product_key === 'care_seat') {
     const { count, error } = await serviceClient().from('site_orders').select('id', { count: 'exact', head: true }).eq('product_key', 'care_seat').in('status', ['active', 'paid']);
     if (error) { console.error('[checkout] care count', error.message); return json({ error: 'Could not start checkout' }, 502); }
-    if ((count ?? 0) >= 10) { amount = 19900; name = 'Care Seat: standard rate'; }
+    if ((count ?? 0) >= 10) { amount = 19900; name = 'Website care: standard rate'; }
   }
 
   const origin = new URL(req.headers.get('origin') || 'https://supremeteammedia.com').origin;

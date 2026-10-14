@@ -346,7 +346,7 @@
 .stm-studio .stm-svc-board .fd.hot{opacity:1;transition-duration:.12s}
 .stm-studio .stm-svc-board .fd.hot .cm{animation:stmFeedRun var(--fdur,.3s) linear both}
 @keyframes stmFeedRun{0%{stroke-dashoffset:var(--d0);opacity:1}85%{opacity:1}100%{stroke-dashoffset:var(--d1);opacity:0}}
-.stm-studio .stm-svc.is-paused .stm-svc-board *,.stm-studio .stm-svc.is-paused .stm-svc-status i{animation-play-state:paused}
+.stm-studio .stm-svc.is-paused .stm-svc-board *,.stm-studio .stm-svc.is-paused .stm-svc-status i,.stm-studio .stm-svc.is-paused .stm-svc-status i::after{animation-play-state:paused}
 
 /* Head */
 .stm-studio .stm-svc-head{position:relative;z-index:2;width:min(92%,1240px);margin:0 auto;text-align:center}
@@ -363,7 +363,8 @@
 /* Card grid */
 .stm-studio .stm-svc-gridwrap{position:relative;z-index:2;width:min(92%,1240px);margin:54px auto 0}
 
-/* Modules: frosted cards on the board */
+/* Modules: frosted cards on the board. The glass also keeps the moving signals
+   behind them from repainting the cards, so it stays (tested cheaper at rest). */
 .stm-studio .stm-svc-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
 .stm-studio .stm-svc-card{--hl:242,162,15;position:relative;display:flex;flex-direction:column;gap:20px;padding:28px 30px 26px;border:1px solid rgba(255,255,255,.95);border-radius:20px;background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 0 0 1px rgba(15,28,55,.07),0 20px 44px -22px rgba(15,28,55,.34),inset 0 1px 0 #fff;text-decoration:none;color:#0B1530;opacity:0;transform:translateY(14px);transition:border-color .25s ease,box-shadow .25s ease,transform .3s cubic-bezier(.22,1,.36,1)}
 .stm-studio .stm-svc-card.on{opacity:1;transform:none;animation:stm-svc-card-in .6s cubic-bezier(.22,1,.36,1) backwards}
@@ -379,11 +380,13 @@
 .stm-studio .stm-svc-status{position:absolute;top:31px;right:28px;display:flex;align-items:center;gap:10px}
 .stm-studio .stm-svc-cnum{font:600 20px/1 "Inter Tight",sans-serif;letter-spacing:.02em;color:#A3ACBA}
 .stm-studio .stm-svc-online{font:700 11px/1 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#677184}
-.stm-studio .stm-svc-status i{width:9px;height:9px;border-radius:50%;background:rgb(var(--hl));box-shadow:0 0 0 3px rgba(var(--hl),.18),0 0 9px rgba(var(--hl),.8);animation:stmSvcLed 5s ease-in-out infinite}
-.stm-studio .stm-svc-card[data-side="r"] .stm-svc-status i{animation-delay:-2.5s}
-@keyframes stmSvcLed{50%{box-shadow:0 0 0 4px rgba(var(--hl),.1),0 0 15px rgba(var(--hl),1)}}
+.stm-studio .stm-svc-status i{position:relative;width:9px;height:9px;border-radius:50%;background:rgb(var(--hl));box-shadow:0 0 0 3px rgba(var(--hl),.18),0 0 9px rgba(var(--hl),.8)}
+/* The pulse is a glow layer fading in and out (opacity only), so it costs next to nothing. */
+.stm-studio .stm-svc-status i::after{content:"";position:absolute;inset:-2px;border-radius:50%;box-shadow:0 0 15px 1px rgba(var(--hl),1);opacity:0;will-change:opacity;animation:stmSvcLedGlow 5s ease-in-out infinite}
+.stm-studio .stm-svc-card[data-side="r"] .stm-svc-status i::after{animation-delay:-2.5s}
+@keyframes stmSvcLedGlow{50%{opacity:1}}
 .stm-studio .stm-svc-card:hover .stm-svc-status i,.stm-studio .stm-svc-card:focus-visible .stm-svc-status i{animation:stmSvcLedOn .8s ease-out calc(var(--edl,.2s) + .4s) both}
-.stm-studio .stm-svc-card.zap .stm-svc-status i{animation:stmSvcLedZap .9s ease-out calc(var(--edl,.2s) + .4s),stmSvcLed 5s ease-in-out 1.6s infinite}
+.stm-studio .stm-svc-card.zap .stm-svc-status i{animation:stmSvcLedZap .9s ease-out calc(var(--edl,.2s) + .4s)}
 @keyframes stmSvcLedOn{35%{transform:scale(1.9);box-shadow:0 0 0 6px rgba(var(--hl),.22),0 0 22px rgba(var(--hl),1)}100%{transform:scale(1.2);box-shadow:0 0 0 4px rgba(var(--hl),.16),0 0 14px rgba(var(--hl),.95)}}
 @keyframes stmSvcLedZap{35%{transform:scale(1.9);box-shadow:0 0 0 6px rgba(var(--hl),.22),0 0 22px rgba(var(--hl),1)}}
 .stm-studio .stm-svc-ctop{display:flex;align-items:flex-start;gap:18px}
@@ -465,6 +468,13 @@
   .stm-studio .stm-svc-rise > span,.stm-studio .stm-svc-card,.stm-studio .stm-svc-foot,.stm-studio .stm-svc-sub,.stm-studio .stm-svc-trust{opacity:1 !important;transform:none !important;transition:none !important;animation:none !important}
   .stm-studio .stm-svc-clist > span{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-svc-board .cm{display:none}
-  .stm-studio .stm-svc-board .fl,.stm-studio .stm-svc-status i,.stm-studio .stm-svc-chip{animation:none !important;transition:none !important}
+  .stm-studio .stm-svc-board .fl,.stm-studio .stm-svc-status i,.stm-studio .stm-svc-status i::after,.stm-studio .stm-svc-chip{animation:none !important;transition:none !important}
   .stm-studio .stm-svc-edge path{animation:none !important;transition:none !important}
 }
+
+/* Visible by default: until the script marks a part (data-armed: it started below the screen and
+   motion is on), the hidden starting states above don't apply to it, so the saved page, visitors
+   without JavaScript and anything already on screen show everything. */
+.stm-studio .stm-svc-head:not([data-armed]) .stm-svc-sub,.stm-studio .stm-svc-card:not([data-armed]):not(.on),.stm-studio .stm-svc-card:not([data-armed]) .stm-svc-clist > span,.stm-studio .stm-svc-trust:not([data-armed]),.stm-studio .stm-svc-foot:not([data-armed]){opacity:1;transform:none}
+.stm-studio .stm-svc-head:not([data-armed]) .stm-svc-rise > span{transform:none}
+.stm-studio .stm-svc-card:not([data-armed]).on{animation:none}

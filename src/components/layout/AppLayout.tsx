@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
+import { ensureExtraFonts } from '@/lib/extraFonts';
 import { Link } from 'react-router-dom';
 import { useRole } from '@/context/RoleContext';
 import { useAuth } from '@/context/AuthContext';
@@ -17,6 +18,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  useEffect(() => { ensureExtraFonts(); }, []);
   const { layout, isLoading: roleLoading } = useRole();
   const { role: legacyRole } = useAuth();
   const { isPreview, previewRole, previewLayout, previewRoleLabel, setPreviewRole } = usePreview();

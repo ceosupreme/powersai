@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check, MapPin } from "lucide-react";
 import { StudioHeader } from "@/components/marketing/studio/StudioHeader";
@@ -17,6 +17,7 @@ import { BrowserScene, PhoneScene, IndustryInteraction, type Interaction } from 
 import { useCityPages, useServicePages, type ServicePageRow } from "@/hooks/useSitePages";
 import { ServiceCard } from "@/components/marketing/pages/SitePageBits";
 import { StarterStrip } from "@/components/marketing/pages/packages/PackageBits";
+import "@/components/marketing/vertical-v2/industryMotion.css";
 
 const SITE = "https://supremeteammedia.com";
 const DEFAULT_NEEDS = ["A new website", "The site I have is not bringing work", "Follow-up, reviews and reminders", "The whole system"];
@@ -50,12 +51,12 @@ function useOgImage(url: string | null) {
 
 const LABELS_EN = {
   who: "Who this is for", not_for: "If you need more", why: "Why this and not the agencies", does: "What your site will do",
-  local: "The local plan", market: "What the market says", faq: "Common questions", inquiry_title: "Tell me about the business.",
+  local: "The local plan", market: "What the market says", faq: "Common questions", inquiry_title: "Tell us about the business.",
   inquiry_sub: "You will get a confirmation right away and a personal reply within one business day.", free_check: "Run the free check",
-  deposit: "Start with the deposit", monthly: "Start monthly", care: "Get the Care Seat", business_quote: "Get a Business Site quote",
-  growth: "Ask about Growth", estimate: "Every figure above is an estimate.", proof_form: "The inquiry form", proof_email: "The confirmation email",
+  deposit: "Start with the deposit", monthly: "Start monthly", care: "Start website care", business_quote: "Get a quote",
+  growth: "Ask about marketing", estimate: "Every figure above is an estimate.", proof_form: "The inquiry form", proof_email: "The confirmation email",
   proof_alert: "The owner alert", case: "Case study", see_case: "See the case study", checking_for: "Checking for", language_switch: "Español",
-  launch_inquiry: "Start a Launch Site", care_inquiry: "Ask about Care", proof_heading: "What you can see before you buy", price_heading: "Pricing",
+  launch_inquiry: "Start the Standard Web Package", care_inquiry: "Ask about website care", proof_heading: "What you can see before you buy", price_heading: "Pricing",
   services: "Services that fit", areas: "Where we work", packages: "Pick a starter package",
 };
 
@@ -77,6 +78,12 @@ function useHreflang(slug: string, on: boolean) {
     });
     return () => els.forEach((e) => e.remove());
   }, [slug, on]);
+}
+
+/** Headline words, each in a span with its place in line, so the headline lights up word by word as the
+ *  page opens. Pure CSS, so the saved copy and reduced motion show it fully lit. */
+function litWords(text: string, counter: { n: number }) {
+  return text.split(/(\s+)/).filter(Boolean).map((part, i) => /^\s+$/.test(part) ? part : <span key={i} className="industry-w" style={{ "--w": counter.n++ } as CSSProperties}>{part}</span>);
 }
 
 export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: string }) {
@@ -127,7 +134,8 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const Cta = ({ url, label, primary, name }: { url: string; label: string; primary?: boolean; name: string }) => {
     const cls = `industry-cta ${primary ? "home-btn-amber" : "home-btn-ghost"}`;
     if (!url || !label) return null;
-    if (url === "#pricing") return <a className={cls} href="#pricing" onClick={(e) => { e.preventDefault(); track(name); document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }}>{label}</a>;
+    // A link to a spot on this page (#pricing, #inquiry) scrolls there instead of changing the address.
+    if (url.startsWith("#")) return <a className={cls} href={url} onClick={(e) => { e.preventDefault(); track(name); document.getElementById(url.slice(1))?.scrollIntoView({ behavior: "smooth" }); }}>{label}</a>;
     if (url.startsWith("http")) return <a className={cls} href={url} onClick={() => track(name)}>{label}</a>;
     return <Link className={cls} to={withBiz(url)} onClick={() => track(name)}>{label}</Link>;
   };
@@ -147,14 +155,23 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const requestedArt = getStudioMedia(INDUSTRY_MEDIA[slug]);
   const art = requestedArt?.src ? requestedArt : configuredArt;
   const [failedArt, setFailedArt] = useState<string | null>(null);
+  // A saved page can show its picture before this code runs; if it already failed by then, React never
+  // hears the error, so check once here and fall back the same way onError would.
+  const heroImg = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const img = heroImg.current;
+    if (img && art?.src && img.complete && img.naturalWidth === 0) setFailedArt(art.src);
+  }, [art?.src]);
   const sectionOrder = sequence ?? ["local-audience", "leaks", "differentiators", "features", "local-plan", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
+  // Prices and packages can sit in two neighboring sections; the first one is the #pricing target.
+  const pricingAt = sectionOrder.findIndex((item: { key: string }) => item.key === "offer" || item.key === "packages");
   const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
   const cards = (items: any[], cols = "three") => <div className={`industry-list industry-list-${cols}`}>{items.map((item, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>;
   const PriceRow = ({ text, children }: { text: string; children: React.ReactNode }) => text ? <div className="industry-price-row"><p>{text}</p><div className="industry-price-actions">{children}</div></div> : null;
   const renderSection = (key: string) => {
     switch (key) {
       case "interaction": return interaction && <IndustryInteraction interaction={interaction}/>;
-      case "leaks": return <>{arr(row.leaks).length > 0 && <>{heading(row.leaks_heading || "Where the opportunities go")}<div className="industry-list industry-list-two">{arr<any>(row.leaks).map((l, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{l.title}</h3><p>{l.line}</p>{l.dollar_note && <small>{l.dollar_note}</small>}</article>)}</div></>}{row.math_config && <div className="industry-math"><MathCalculator config={row.math_config} language={lang}/><p className="industry-small">{L.estimate}</p></div>}{row.free_check_line && <p className="industry-lede">{row.free_check_line}</p>}{(row.math_config || row.free_check_line) && <Link className="home-btn-amber" to={freeCheck} onClick={() => track("v2_math_free_check")}>{L.free_check} <ArrowRight size={16} aria-hidden/></Link>}</>;
+      case "leaks": return <>{arr(row.leaks).length > 0 && <>{heading(row.leaks_heading || "Where the opportunities go")}<div className="industry-list industry-list-two industry-leaks-list">{arr<any>(row.leaks).map((l, i) => <article key={i} style={{ "--i": i } as CSSProperties}><span className="industry-number">0{i + 1}</span><h3>{l.title}</h3><p>{l.line}</p>{l.dollar_note && <small>{l.dollar_note}</small>}</article>)}</div></>}{row.math_config && <div className="industry-math"><MathCalculator config={row.math_config} language={lang}/><p className="industry-small">{L.estimate}</p></div>}{row.free_check_line && <p className="industry-lede">{row.free_check_line}</p>}{(row.math_config || row.free_check_line) && <Link className="home-btn-amber" to={freeCheck} onClick={() => track("v2_math_free_check")}>{L.free_check} <ArrowRight size={16} aria-hidden/></Link>}</>;
       case "differentiators": return arr(row.differentiators).length > 0 && <>{heading(L.why)}{cards(arr(row.differentiators))}</>;
       case "local-audience": return (audience.who || audience.not_for) && <div className="industry-audience"><div><span className="home-eyebrow">{L.who}</span><p>{audience.who}</p></div><div><span className="home-eyebrow">{L.not_for}</span><p>{audience.not_for}</p></div></div>;
       case "local-plan": return arr(row.local_plan).length > 0 && <>{heading(L.local)}{cards(arr(row.local_plan))}</>;
@@ -169,7 +186,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
       case "questions": return faq.length > 0 && <div className="industry-questions">{heading(L.faq)}<Accordion type="single" collapsible>{faq.map((f, i) => <AccordionItem key={i} value={`f${i}`}><AccordionTrigger>{f.q}</AccordionTrigger><AccordionContent>{f.a}</AccordionContent></AccordionItem>)}</Accordion></div>;
       case "services": {
         const picks = arr<string>(layout?.services).map((s) => serviceRows.find((r) => r.slug === s)).filter((r): r is ServicePageRow => !!r);
-        return picks.length > 0 && <>{heading(L.services)}<div className="sp-v2-services">{picks.map((r) => <ServiceCard key={r.slug} row={r} from={`v2_${slug.replace(/-/g, "_")}`}/>)}</div></>;
+        return picks.length > 0 && <>{heading(L.services)}<div className="sp-v2-services">{picks.map((r) => <ServiceCard key={r.slug} row={r} from={`v2_${slug.replace(/-/g, "_")}`} trace/>)}</div></>;
       }
       case "packages": return <>{heading(L.packages)}<StarterStrip src={src}/></>;
       case "areas": return cityRows.length > 0 && <>{heading(L.areas)}<div className="sp-v2-areas">{cityRows.map((c) => <Link key={c.slug} to={`/areas/${c.slug}`} onClick={() => track(`v2_area_${c.slug}`)}><MapPin aria-hidden/>{c.name}</Link>)}</div></>;
@@ -178,7 +195,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
     }
   };
   return <div className="stm-studio industry-v2"><StudioHeader language={lang}/><main>
-    <section className={`industry-hero industry-tone-${heroTone}${art?.src && failedArt !== art.src ? " has-hero-media" : ""}`}>{art?.src && failedArt !== art.src && <div className="industry-hero-media"><img data-media-key={INDUSTRY_MEDIA[slug] ?? layout?.hero?.media ?? "industry-hero"} src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" onError={() => setFailedArt(art.src)}/></div>}<div className="studio-container industry-hero-grid"><div className="industry-hero-copy" data-headline-size={headline.length > 62 ? "long" : headline.length > 42 ? "medium" : "short"}><span className="home-eyebrow">{row.display_name}</span>{hasEs && <Link className="industry-language" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link>}<h1>{idx >= 0 ? <>{headline.slice(0, idx)}<em>{headline.slice(idx, idx + word.length)}</em>{headline.slice(idx + word.length)}</> : headline}</h1><p className="industry-hero-subline">{row.subline}</p>{row.stat_value && <p className="industry-stat"><strong>{row.stat_value}</strong><span>{row.stat_label}</span></p>}<div className="industry-hero-actions"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary"/><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary"/></div>{biz && <p className="industry-biz-note">{L.checking_for} {biz}</p>}</div>{!(art?.src && failedArt !== art.src) && interaction && <div className="industry-hero-art"><div className="industry-device-pair"><BrowserScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.[0] : interaction.options?.[0]}/><PhoneScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.find(s => s.screen === "phone") : interaction.options?.[1]}/></div></div>}</div></section>
-    {sectionOrder.map((item: any, i: number) => <section key={`${item.key}-${i}`} id={item.key === "offer" || item.key === "packages" ? "pricing" : item.key === "contact" ? "inquiry" : undefined} className={`industry-section industry-tone-${item.tone === "charcoal" ? "charcoal" : "ivory"}`}><div className="studio-container">{renderSection(item.key)}</div></section>)}
+    <section className={`industry-hero industry-tone-${heroTone}${art?.src && failedArt !== art.src ? " has-hero-media" : ""}`}>{art?.src && failedArt !== art.src && <div className="industry-hero-media"><img ref={heroImg} data-media-key={INDUSTRY_MEDIA[slug] ?? layout?.hero?.media ?? "industry-hero"} src={art.src} alt={art.alt} width={art.width} height={art.height} fetchPriority="high" onError={() => setFailedArt(art.src)}/></div>}<div className="studio-container industry-hero-grid"><div className="industry-hero-copy" data-headline-size={headline.length > 62 ? "long" : headline.length > 42 ? "medium" : "short"}><span className="home-eyebrow">{row.display_name}</span>{hasEs && <Link className="industry-language" to={switchHref} hrefLang={lang === "es" ? "en" : "es"} onClick={() => track(`v2_lang_${lang === "es" ? "en" : "es"}`)}>{L.language_switch}</Link>}<h1 key={`${slug}-${lang}`}>{(() => { const count = { n: 0 }; return idx >= 0 ? <>{litWords(headline.slice(0, idx), count)}<em>{litWords(headline.slice(idx, idx + word.length), count)}</em>{litWords(headline.slice(idx + word.length), count)}</> : litWords(headline, count); })()}</h1><p className="industry-hero-subline">{row.subline}</p>{row.stat_value && <p className="industry-stat"><strong>{row.stat_value}</strong><span>{row.stat_label}</span></p>}<div className="industry-hero-actions"><Cta url={row.cta_primary_url} label={row.cta_primary_label} primary name="v2_hero_primary"/><Cta url={row.cta_secondary_url} label={row.cta_secondary_label} name="v2_hero_secondary"/></div>{biz && <p className="industry-biz-note">{L.checking_for} {biz}</p>}</div>{!(art?.src && failedArt !== art.src) && interaction && <div className="industry-hero-art"><div className="industry-device-pair"><BrowserScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.[0] : interaction.options?.[0]}/><PhoneScene interaction={interaction} screen={interaction.kind === "walkthrough" ? interaction.steps?.find(s => s.screen === "phone") : interaction.options?.[1]}/></div></div>}</div></section>
+    {sectionOrder.map((item: any, i: number) => <section key={`${item.key}-${i}`} id={i === pricingAt ? "pricing" : item.key === "contact" ? "inquiry" : undefined} className={`industry-section industry-tone-${item.tone === "charcoal" ? "charcoal" : "ivory"}`}><div className="studio-container">{renderSection(item.key)}</div></section>)}
   </main><StudioFooter language={lang}/></div>;
 }

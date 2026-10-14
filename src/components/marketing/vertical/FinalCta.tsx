@@ -16,12 +16,12 @@ export function FinalCta({
         <div className="max-w-3xl">
           <Reveal>
             <h2 className="font-display text-foreground" style={{ fontSize: "clamp(2rem,4vw,3.25rem)", lineHeight: 1.05, letterSpacing: "-0.02em" }}>
-              Let me run the free audit.
+              We&apos;ll run the free audit.
             </h2>
           </Reveal>
           <Reveal delay={120}>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[hsl(var(--ink-soft))]">
-              Real money leaking → we talk. Nothing → I tell you straight, and you&apos;ve lost nothing.
+              Real money leaking → we talk. Nothing → we tell you straight, and you&apos;ve lost nothing.
             </p>
           </Reveal>
           <Reveal delay={200}>

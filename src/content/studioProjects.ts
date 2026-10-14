@@ -25,7 +25,7 @@ export const STUDIO_CATEGORIES: { id: StudioCategoryId; label: string }[] = [
   { id: "websites-apps", label: "Websites & apps" },
   { id: "brand-creative", label: "Brand & creative" },
   { id: "marketing-growth", label: "Marketing & growth" },
-  { id: "ai-systems", label: "AI & systems" },
+  { id: "ai-systems", label: "Business systems & automation" },
 ];
 
 export const STUDIO_CATEGORY_LABEL: Record<string, string> = STUDIO_CATEGORIES.reduce(
@@ -89,7 +89,7 @@ export const EDITORIAL_CASES: EditorialCase[] = [
     classification: "Personal brand website",
     categories: ["websites-apps", "brand-creative"],
     summary:
-      "A personal brand and portfolio experience built to present creative work, systems, and professional range in one place.",
+      "A personal brand hub with practical systems for thinking clearer, using time better and making more money, plus a home for Sean's work.",
     role: "Strategy, creative direction, copy, interface design, and implementation.",
     brief: "Create a flexible home for Sean's work, ideas, systems, and professional portfolio.",
     work: "Brand direction, portfolio architecture, responsive interface design, content structure, and implementation.",
@@ -162,7 +162,7 @@ export const EDITORIAL_CASES: EditorialCase[] = [
     demonstrates:
       "Business discovery, systems thinking, AI implementation, integrations, product design, and operational workflow development.",
     statusNote:
-      "Live product site; historical eight-venue client implementation is part of the case history, but this does not imply all eight venues are currently active clients.",
+      "Live product site. First built for an eight-venue hospitality group.",
     mediaKey: "work-barpulse",
     imageUrl: null,
     externalUrl: "https://barpulsehq.com",

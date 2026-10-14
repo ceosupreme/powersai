@@ -17,6 +17,8 @@ type SiteEvent = {
 
 const SAFE = /^[a-z0-9_-]{1,80}$/i;
 const SESSION_KEY = "stm.site.session";
+// Visits on the editor preview or any other address than the live site are the owner's own.
+const LIVE_SITE = /(^|\.)supremeteammedia\.com$/i;
 
 function sessionId(): string | null {
   try {
@@ -32,6 +34,8 @@ function sessionId(): string | null {
 
 export function trackSiteEvent(event: SiteEvent): void {
   try {
+    // Automated browsers (the publish step, site checks) are not visitors.
+    if (navigator.webdriver) return;
     if (event.label && !SAFE.test(event.label)) return;
     if (event.vertical && !SAFE.test(event.vertical)) return;
     if (event.src && !SAFE.test(event.src)) return;
@@ -47,7 +51,7 @@ export function trackSiteEvent(event: SiteEvent): void {
       session_id: sessionId(),
       src: src ?? null,
       vertical: event.vertical ?? derivedVertical,
-      is_internal: localStorage.getItem("stm_internal") === "1",
+      is_internal: localStorage.getItem("stm_internal") === "1" || !LIVE_SITE.test(window.location.hostname),
     }).then(({ error }) => {
       if (error) console.error("[site-events] insert failed", error.message);
     });

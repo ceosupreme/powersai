@@ -16,11 +16,11 @@ const openAtTop = () => requestAnimationFrame(() => window.scrollTo({ top: 0, le
 const QUESTIONS: Array<{ q: string; a: ReactNode }> = [
   {
     q: "How much does it cost?",
-    a: <p>It depends on what your business needs. Tell us where you are, and we'll put together a package with a clear price before anything starts. For reference, packages with a website start at $799. A custom website starts at $2,500, or $0 down at $297 a month for 12 months. <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_faq_price_contact" })}>Tell us what you need</a>.</p>,
+    a: <p>It depends on what your business needs. Tell us where you are, and we'll put together a package with a clear price before anything starts. For reference, packages with a website start at $799. A custom website, our Standard Web Package, starts at $2,500, or $0 down at $297 a month for 12 months. <a href="#contact" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "home_faq_price_contact" })}>Tell us what you need</a>.</p>,
   },
   {
     q: "Do I have to sign a long contract?",
-    a: <p>No. You can pay for the website up front. The $0-down plan is $297 a month for 12 months, and if you stop early, the rest of the build price is due before we hand everything over. Care, our ongoing help plan, is month to month.</p>,
+    a: <p>No. You can pay for the website up front. The $0-down plan is $297 a month for 12 months, and if you stop early, the rest of the build price is due before we hand everything over. Website care, our ongoing help plan, is month to month. The Local Growth Package starts with three months, then it's month to month too.</p>,
   },
   {
     q: "Do I own my website?",
@@ -32,7 +32,7 @@ const QUESTIONS: Array<{ q: string; a: ReactNode }> = [
   },
   {
     q: "Can you fix the website I already have?",
-    a: <p>Yes. We start by looking at what you have and agreeing on what to keep, improve or rebuild. If you only need ongoing help and updates, our Care plan starts at $149 a month.</p>,
+    a: <p>Yes. We start by looking at what you have and agreeing on what to keep, improve or rebuild. If you only need ongoing help and updates, website care starts at $149 a month.</p>,
   },
   {
     q: "Do you only work with businesses in San Diego?",
@@ -44,7 +44,7 @@ const QUESTIONS: Array<{ q: string; a: ReactNode }> = [
   },
   {
     q: "What happens after I reach out?",
-    a: <p>Sean reads your message and replies personally within one business day. If it's a fit, you get a written proposal with the price, what's included and the timeline before anything starts.</p>,
+    a: <p>We read your message and reply personally within one business day. If it's a fit, you get a written proposal with the price, what's included and the timeline before anything starts.</p>,
   },
   {
     q: "How does a project work?",

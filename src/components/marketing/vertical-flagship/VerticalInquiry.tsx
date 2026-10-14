@@ -82,7 +82,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
   };
 
   const es = language === "es";
-  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>{es ? "Gracias, guardamos tu consulta." : "Thanks, your inquiry is saved."}</h3><p>{es ? "Una confirmación va en camino a tu correo y Sean responderá personalmente dentro de un día hábil." : "A confirmation is on its way to your inbox and Sean will reply within one business day."}</p></div>;
+  if (status === "success") return <div className="vertical-inquiry-success" role="status"><Check aria-hidden /><h3>{es ? "Gracias, guardamos tu consulta." : "Thanks, your inquiry is saved."}</h3><p>{es ? "Una confirmación va en camino a tu correo y te responderemos personalmente dentro de un día hábil." : "A confirmation is on its way to your inbox and we’ll reply within one business day."}</p></div>;
 
   return (
     <form className="vertical-inquiry-form" onSubmit={onSubmit} noValidate>
@@ -97,7 +97,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
       {error && <p className="vertical-form-error" role="alert">{error}</p>}
       <LegalConsent language={language} />
       <Button type="submit" disabled={status === "submitting"} className="studio-btn studio-btn-primary w-full">{status === "submitting" ? (es ? "Enviando…" : "Sending…") : (es ? "Envía mis prioridades" : "Send my priorities")}</Button>
-      <p className="vertical-form-note">{es ? "Recibirás una confirmación en cuanto llegue y una respuesta personal de Sean dentro de un día hábil." : "You will get a confirmation the moment this lands, and a personal reply from Sean within one business day."}</p>
+      <p className="vertical-form-note">{es ? "Recibirás una confirmación en cuanto llegue y una respuesta personal de nuestro equipo dentro de un día hábil." : "You will get a confirmation the moment this lands, and a personal reply from our team within one business day."}</p>
     </form>
   );
 }

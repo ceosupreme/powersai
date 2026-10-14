@@ -6,7 +6,7 @@ import { ACK_CONTACT_EMAIL, ackEnglishBody, ackSpanishBody } from "../_shared/pr
 
 const Body = z.object({ lead_id: z.string().uuid() });
 const CONTACT_EMAIL = ACK_CONTACT_EMAIL;
-const FROM = `Sean Powers <${CONTACT_EMAIL}>`;
+const FROM = `Supreme Team Media <${CONTACT_EMAIL}>`;
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
   const language = (lead.qualifier_data as Record<string, unknown> | null)?.language === "es" ? "es" : "en";
   const result = await resendEmailAdapter.send({
     channel: "email", to: email, from: FROM, reply_to: replyTo,
-    subject: business ? (language === "es" ? `Recibí tu mensaje sobre ${business}` : `Got your note about ${business}`) : (language === "es" ? "Recibí tu mensaje" : "Got your note"),
+    subject: business ? (language === "es" ? `Recibimos tu mensaje sobre ${business}` : `Got your note about ${business}`) : (language === "es" ? "Recibimos tu mensaje" : "Got your note"),
     body: language === "es" ? spanishBody(firstName, business, bookingUrl) : englishBody(firstName, business, bookingUrl),
     project_id: "owner_notification", queue_id: `prospect_ack:${lead.id}`,
     metadata: { kind: "prospect_acknowledgment", lead_id: lead.id, internal: true },

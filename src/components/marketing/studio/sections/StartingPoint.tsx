@@ -164,11 +164,23 @@ export function StartingPoint() {
     const section = sectionRef.current;
     const svg = boardRef.current;
     if (!section || !svg) return;
-    const draw = () => drawBoard(section, svg);
+    // Drawn once the fonts are in, then again only when the layout really changes size.
+    let drawn = "";
+    let ready = !document.fonts || document.fonts.status === "loaded";
+    const draw = () => {
+      if (!ready) return;
+      const grid = section.querySelector<HTMLElement>(".stm-start-grid");
+      const key = `${section.offsetWidth}x${section.offsetHeight}:${grid?.offsetWidth ?? 0}x${grid?.offsetHeight ?? 0}`;
+      if (key === drawn) return;
+      drawn = key;
+      drawBoard(section, svg);
+    };
+    const start = () => { ready = true; draw(); };
     draw();
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(draw) : null;
     ro?.observe(section);
-    document.fonts?.ready.then(draw).catch(() => {});
+    const fallback = window.setTimeout(start, 1500);
+    document.fonts?.ready.then(start).catch(start);
     // A hovered or focused card lights its own feed.
     const cards = Array.from(section.querySelectorAll<HTMLElement>(".stm-start-card"));
     const hot = (i: number, on: boolean) => svg.querySelector(`.fd[data-i="${i}"]`)?.classList.toggle("hot", on);
@@ -182,7 +194,7 @@ export function StartingPoint() {
       card.addEventListener("focusout", blur);
       return [() => card.removeEventListener("pointerenter", enter), () => card.removeEventListener("pointerleave", leave), () => card.removeEventListener("focusin", enter), () => card.removeEventListener("focusout", blur)];
     });
-    return () => { ro?.disconnect(); offs.forEach((off) => off()); };
+    return () => { ro?.disconnect(); window.clearTimeout(fallback); offs.forEach((off) => off()); };
   }, []);
 
   const runCheckup = (e: FormEvent<HTMLFormElement>) => {
@@ -201,7 +213,7 @@ export function StartingPoint() {
 
   return (
     <section ref={sectionRef} id="start" className="stm-start" aria-labelledby="home-start-title">
-      <svg ref={boardRef} className="stm-start-board" aria-hidden="true" />
+      <svg ref={boardRef} className="stm-start-board" aria-hidden="true" data-drawn="" />
       <div className="stm-start-head">
         <div className="stm-start-eyebrow">Start here</div>
         <h2 id="home-start-title">Where are you <em>starting from?</em></h2>

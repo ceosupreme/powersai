@@ -54,6 +54,10 @@ function StorySlide({ id, variant, mediaKey, lines, line, actions }: {
       section.querySelectorAll("[data-watch]").forEach((el) => el.classList.add("on"));
       return;
     }
+    // Visible by default: the hidden starting states (CSS) only apply once this marks the section,
+    // which it does when the section starts off screen and motion is on.
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && section.getBoundingClientRect().top >= window.innerHeight) section.dataset.armed = "1";
+
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add("on"); io.unobserve(entry.target); }
@@ -135,9 +139,9 @@ export function GetAttention() {
       id="get-attention"
       variant="stm-slide-attention"
       mediaKey="home-get-attention"
-      lines={["We build websites", "that get", <b key="a">attention.</b>]}
+      lines={["We build brands", "that get", <b key="a">attention.</b>]}
       actions={[
-        { label: "See our web design", to: "/services/websites", tone: "gold", track: "get_attention_see_web_design" },
+        { label: "See our brand work", to: "/services/brand", tone: "gold", track: "get_attention_see_brand_work" },
         { label: "Free Business Checkup", to: "/free-audit?src=home-get-attention", tone: "wine", track: "get_attention_free_checkup" },
       ]}
     />

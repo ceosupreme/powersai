@@ -1,11 +1,11 @@
 import { ServicePage, type ServicePageContent } from "@/components/marketing/studio/ServicePage";
 
 const content: ServicePageContent = {
-  eyebrow: "AI & business systems",
+  eyebrow: "Business systems & automation",
   title: "Make the work behind the business easier to run.",
   description: "Reduce the time your team spends chasing information, copying updates, and checking routine work. We start with the business process, then connect tools, data, workflows, reporting, tasks, and AI only where they make the operation easier to run.",
   path: "/services/ai-systems",
-  seoTitle: "AI & Business Systems | Supreme Team Media",
+  seoTitle: "Business Systems & Automation | Supreme Team Media",
   seoDescription: "Practical dashboards, internal tools, CRM workflows, reporting integrations and AI-assisted systems built around real business processes.",
   intent: "ai-systems",
   primaryCta: "Discuss a business system",

@@ -55,7 +55,7 @@ export default function BlogPost() {
     description: post.meta_description || post.excerpt,
     datePublished: post.published_at,
     dateModified: post.updated_at,
-    author: { "@type": "Person", name: post.author },
+    author: post.author === "Supreme Team Media" ? { "@type": "Organization", name: post.author, url: SITE } : { "@type": "Person", name: post.author },
     publisher: { "@type": "Organization", name: "Supreme Team Media", url: SITE },
     mainEntityOfPage: `${SITE}/blog/${post.slug}`,
     ...(post.cover_image ? { image: post.cover_image.startsWith("/") ? `${SITE}${post.cover_image}` : post.cover_image } : {}),

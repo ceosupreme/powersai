@@ -97,7 +97,7 @@
 .stm-studio .pk-hint{margin-top:6px;font:500 14.5px/1.5 Inter,sans-serif;color:#6B7588}
 .stm-studio .pk-pkg ul{max-height:min(52vh,440px);overflow-y:auto;margin-top:16px;padding:0;list-style:none;border-top:1px solid rgba(15,28,55,.08)}
 .stm-studio .pk-pkg li{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid rgba(15,28,55,.08)}
-.stm-studio .pk-pkg li .pk-led{width:8px;height:8px}
+.stm-studio .pk-pkg li .pk-led{width:8px;height:8px;margin-left:6px}
 .stm-studio .pk-pkg li div{min-width:0}
 .stm-studio .pk-pkg li b{display:block;font:700 15.5px/1.3 Inter,sans-serif}
 .stm-studio .pk-pkg li small{display:block;margin-top:1px;font:500 12.5px Inter,sans-serif;color:#6B7588}
@@ -252,4 +252,28 @@
 }
 @media (prefers-reduced-motion:reduce){
   .stm-studio .pk-chip,.stm-studio .pk-chip .pk-dot{transition:none}
+}
+
+/* Starter cards switch on one after another as their row scrolls in (useArmOnScroll; only rows that
+   start off screen are dimmed, and only with JavaScript and full motion). Each card rises in, its
+   top strip sweeps across, the stage bars light one by one and a gold ring flashes once. */
+.stm-studio [data-armed="1"] > .pk-card{opacity:.38;transform:translateY(16px)}
+.stm-studio [data-armed="1"] > .pk-card::before{transform:scaleX(0);transform-origin:left}
+.stm-studio [data-armed="1"] .pk-meter i.on,.stm-studio [data-armed="1"] .pk-meter i.cy{background:#E3E8EF;box-shadow:none}
+.stm-studio [data-armed="1"].is-lit > .pk-card{opacity:1;transform:none;transition:opacity .5s ease calc(var(--i,0)*.17s),transform .65s cubic-bezier(.22,1,.36,1) calc(var(--i,0)*.17s);animation:pkCardOn 1.2s ease-out calc(var(--i,0)*.17s + .3s) backwards}
+.stm-studio [data-armed="1"].is-lit > .pk-card::before{transform:scaleX(1);transition:transform .7s cubic-bezier(.3,.55,.35,1) calc(var(--i,0)*.17s + .15s)}
+.stm-studio [data-armed="1"].is-lit .pk-meter i.on{background:linear-gradient(90deg,#F6B73C,#E8920E);box-shadow:0 0 8px rgba(242,162,15,.55);transition:box-shadow .3s ease calc(var(--i,0)*.17s + .5s + var(--n,0)*.13s),background 0s linear calc(var(--i,0)*.17s + .5s + var(--n,0)*.13s)}
+.stm-studio [data-armed="1"].is-lit .pk-meter i.cy{background:linear-gradient(90deg,#5FD6F5,#14B5E3);box-shadow:0 0 8px rgba(20,181,227,.5);transition:box-shadow .3s ease calc(var(--i,0)*.17s + .5s + var(--n,0)*.13s),background 0s linear calc(var(--i,0)*.17s + .5s + var(--n,0)*.13s)}
+@keyframes pkCardOn{40%{box-shadow:0 0 0 1.5px rgba(232,161,60,.9),0 0 36px rgba(242,162,15,.32),0 26px 50px -34px rgba(15,28,55,.4)}}
+
+/* The signal that runs from a service into "Your package", and the light where it lands. */
+.pk-signal{position:fixed;z-index:80;width:30px;height:4px;margin:-2px 0 0 -15px;border-radius:4px;background:linear-gradient(90deg,rgba(255,201,79,0),#FFC94F 65%,#FFF6DA);box-shadow:0 0 10px 2px rgba(242,162,15,.75);pointer-events:none;will-change:transform,opacity}
+.stm-studio .pk-count.pk-hit{animation:pkHit .65s ease-out}
+.stm-studio .pk-led.pk-hit{animation:pkLedHit .7s ease-out}
+@keyframes pkHit{35%{transform:scale(1.22);box-shadow:0 0 0 6px rgba(242,162,15,.18),0 0 24px rgba(242,162,15,.9)}}
+@keyframes pkLedHit{30%{transform:scale(2);box-shadow:0 0 0 5px rgba(255,197,77,.22),0 0 18px 4px rgba(242,162,15,1)}}
+
+@media (prefers-reduced-motion:reduce){
+  .stm-studio [data-armed="1"] > .pk-card,.stm-studio [data-armed="1"] > .pk-card::before{opacity:1;transform:none;transition:none;animation:none}
+  .stm-studio .pk-count.pk-hit,.stm-studio .pk-led.pk-hit{animation:none}
 }

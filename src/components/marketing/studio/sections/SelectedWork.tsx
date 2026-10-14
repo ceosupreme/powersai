@@ -37,7 +37,7 @@ function BarPulseCard() {
     <div className="stm-work-bp" aria-hidden="true">
       <span className="stm-work-bp-mark"><span><Activity /></span>BarPulse</span>
       <strong>Find the money your bar is leaking.</strong>
-      <svg className="pulse" viewBox="0 0 300 60" preserveAspectRatio="none"><path className="base" d={beat} /><path className="beat" d={beat} /></svg>
+      <svg className="pulse" viewBox="0 0 300 60" preserveAspectRatio="none"><path className="base" d={beat} /><path className="beat-glow" d={beat} /><path className="beat" d={beat} /></svg>
     </div>
   );
 }
@@ -147,6 +147,17 @@ export function SelectedWork() {
     return () => { io.disconnect(); cleanup(); };
   }, [panels.length]);
 
+  // The heartbeat and the LIVE dots rest while the section is off screen.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || !("IntersectionObserver" in window)) return;
+    const r = section.getBoundingClientRect();
+    section.classList.toggle("is-paused", !(r.top < window.innerHeight && r.bottom > 0));
+    const io = new IntersectionObserver(([entry]) => section.classList.toggle("is-paused", !entry.isIntersecting));
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section ref={sectionRef} id="work" className="stm-work" aria-labelledby="home-work-title">
       <span id="proof" aria-hidden="true" />
@@ -187,7 +198,7 @@ export function SelectedWork() {
             );
           })}
         </div>
-        <svg ref={busRef} className="stm-work-bus" aria-hidden="true" />
+        <svg ref={busRef} className="stm-work-bus" aria-hidden="true" data-drawn="" />
       </div>
       <div className="stm-work-foot">
         <Link to="/work" className="stm-work-btn" onClick={() => trackSiteEvent({ event_type: "cta_click", label: "see_all_work" })}>See all our work <ArrowRight aria-hidden /></Link>

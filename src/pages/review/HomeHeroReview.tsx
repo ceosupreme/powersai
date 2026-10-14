@@ -5,8 +5,10 @@ import { LightField } from "@/components/review-hero/LightField";
 import { ReviewDialogs, type DialogKind } from "@/components/review-hero/Dialogs";
 import { SERVICE_LINKS, SERVICE_OBJECTS } from "@/components/review-hero/config";
 import "@/components/review-hero/homeHero.css";
+import { ensureExtraFonts } from "@/lib/extraFonts";
 
 export default function HomeHeroReview() {
+  useEffect(() => { ensureExtraFonts(); }, []);
   const [userPaused, setUserPaused] = useState(false);
   const [reduced, setReduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [idle, setIdle] = useState(false);

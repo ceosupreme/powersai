@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ensureExtraFonts } from "@/lib/extraFonts";
 import { CheckCircle2, MessageSquare, Mic, FormInput } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffectiveQualifierFields, useQualifierConfig } from "@/hooks/useEffectiveQualifierFields";
@@ -22,6 +23,8 @@ interface Props {
  * widgets — no qualifier logic lives here.
  */
 export function QualifierShell({ projectType, brand, tagline, capturedForProjectId }: Props) {
+  // The qualifier pages use Instrument Sans/Serif and IBM Plex Mono, which load on demand.
+  useEffect(() => { ensureExtraFonts(); }, []);
   const fieldsQ = useEffectiveQualifierFields(null, projectType);
   const configQ = useQualifierConfig(projectType);
 

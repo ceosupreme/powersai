@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { ensureExtraFonts } from "@/lib/extraFonts";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { Nav } from "@/components/marketing/site/Nav";
 import { Footer } from "@/components/marketing/sections/Footer";
@@ -50,6 +51,8 @@ export function withSrc(url: string, slug: string): string {
 }
 
 export default function VerticalLanding() {
+  // This older page design uses Instrument Sans/Serif and IBM Plex Mono, which load on demand.
+  useEffect(() => { ensureExtraFonts(); }, []);
   const { slug } = useParams<{ slug: string }>();
   const { data: page, isLoading } = useVerticalLanderBySlug(slug);
   const [params] = useSearchParams();

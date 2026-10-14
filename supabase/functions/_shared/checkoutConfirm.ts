@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-export const PRODUCT_NAMES = { launch_site_deposit: 'Launch Site deposit', launch_site_monthly: 'Launch Site monthly plan', care_seat: 'Care Seat' } as const;
+export const PRODUCT_NAMES = { launch_site_deposit: 'Standard Web Package deposit', launch_site_monthly: 'Standard Web Package monthly plan', care_seat: 'Website care' } as const;
 export type ProductKey = keyof typeof PRODUCT_NAMES;
 
 export const keyMode = (key: string) => (key.startsWith('sk_live_') || key.startsWith('rk_live_') ? 'live' : 'test');

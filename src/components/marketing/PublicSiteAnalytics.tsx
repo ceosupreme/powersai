@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 
-const PUBLIC_PATH = /^(?:\/$|\/(?:about|privacy|terms|free-audit|thank-you|hire|publishing|industries)\/?$|\/work(?:\/[^/]+)?\/?$|\/services\/(?:websites|brand|marketing|ai-systems)\/?$|\/for\/[^/]+\/?$)/;
+const PUBLIC_PATH = /^(?:\/$|\/(?:about|privacy|terms|free-audit|thank-you|hire|publishing|industries|pricing|startups)\/?$|\/(?:work|services|areas|blog)(?:\/[^/]+)?\/?$|\/for\/[^/]+\/?$)/;
 
 export function PublicSiteAnalytics() {
   const { pathname, search } = useLocation();

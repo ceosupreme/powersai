@@ -26,7 +26,7 @@ const FAMILY_INTENT: Record<string, ServiceId> = {
 };
 
 const schema = z.object({
-  name: z.string().trim().min(1, "Add your name so Sean knows who to reply to.").max(200, "Please keep your name under 200 characters."),
+  name: z.string().trim().min(1, "Add your name so we know who to reply to.").max(200, "Please keep your name under 200 characters."),
   email: z.string().trim().email("Add an email address so your price has somewhere to go.").max(255),
   business: z.string().trim().max(200, "Please keep the business name under 200 characters."),
   note: z.string().trim().max(2500, "Please keep the note under 2,500 characters."),
@@ -37,7 +37,7 @@ type Sent = { first: string; labels: string[] };
 /**
  * The send step: the visitor checks their package, adds a name and email, and
  * sends it. It goes through the same lead intake as the contact form
- * (submit-inbound-lead), so they get the usual confirmation email, Sean gets
+ * (submit-inbound-lead), so they get the usual confirmation email, the owner gets
  * the usual new-lead alert, and the lead lands in HQ with the list at the top
  * of the message and saved with the lead (qualifier_data).
  */
@@ -125,7 +125,7 @@ export function PackageSend({ open, onOpenChange, services, starters, src }: {
       const msg = String((fnError as { message?: string } | null)?.message ?? "");
       setError(/429|too many/i.test(msg)
         ? "That's a few sends in a row. Please wait a minute and send again."
-        : `Your package wasn't sent, so nothing has reached Sean yet. Please try again, or email ${CONTACT_EMAIL}.`);
+        : `Your package wasn't sent, so nothing has reached us yet. Please try again, or email ${CONTACT_EMAIL}.`);
       return;
     }
 
@@ -144,7 +144,7 @@ export function PackageSend({ open, onOpenChange, services, starters, src }: {
             <div className="pk-sent" role="status">
               <span className="pk-sent-ok"><Check aria-hidden /></span>
               <Dialog.Title asChild><h2>Got it{sent.first ? `, ${sent.first}` : ""}.</h2></Dialog.Title>
-              <p>Your package is in. Sean will look over your picks, put together your package and a clear price, and reply within one business day. We just sent you an email to confirm.</p>
+              <p>Your package is in. We’ll look over your picks, put together your package and a clear price, and reply within one business day. We just sent you an email to confirm.</p>
               <ul className="pk-mini is-centered">{sent.labels.map((l) => <li key={l}><span className="pk-led-s" aria-hidden="true" />{l}</li>)}</ul>
               <Dialog.Close asChild><button type="button" className="pk-send-btn">Back to the page</button></Dialog.Close>
               <Link className="pk-sent-alt" to="/free-audit?src=packages-sent" onClick={() => { change(false); trackSiteEvent({ event_type: "cta_click", label: "package_sent_checkup" }); }}>
@@ -183,7 +183,7 @@ export function PackageSend({ open, onOpenChange, services, starters, src }: {
               <button type="submit" className="pk-send-btn" disabled={sending || empty}>
                 {sending ? "Sending…" : <>Send my package <ArrowRight aria-hidden /></>}
               </button>
-              <p className="pk-send-fine">No payment now. Sean replies within one business day.</p>
+              <p className="pk-send-fine">No payment now. We reply within one business day.</p>
               <LegalConsent />
             </form>
           )}

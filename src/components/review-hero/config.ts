@@ -17,7 +17,7 @@ export const SERVICE_LINKS = [
   { to: "/services/websites", label: "Websites" },
   { to: "/services/brand", label: "Brand & creative" },
   { to: "/services/marketing", label: "Marketing & growth" },
-  { to: "/services/ai-systems", label: "AI & business systems" },
+  { to: "/services/ai-systems", label: "Business systems & automation" },
   { to: "/publishing", label: "Publishing & launch" },
   { to: "/startups", label: "Startups & founders" },
 ];

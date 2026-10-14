@@ -51,7 +51,7 @@ const LANES: Lane[] = [
   {
     id: "ai-systems",
     shortLabel: "Systems",
-    label: "AI & business systems",
+    label: "Business systems & automation",
     startingPoint: "Too much information lives in separate tools, and the owner is still the follow-up system.",
     actions: ["Map the workflow", "Connect the right systems", "Create the operating view", "Add AI or automation only where useful"],
     ships: ["Dashboard or internal tool", "Integrations", "Workflow and tasks", "Reporting and AI-assisted actions"],

@@ -18,6 +18,10 @@ export function InViewMotionMedia({ slug, poster, alt }: { slug: string; poster:
   useEffect(() => {
     const video = videoRef.current;
     if (!video || reduced || !source) return;
+    // React only sets `muted` as a property, so a page picked up from its saved copy can start with
+    // sound on, and browsers refuse to autoplay that. Mute it here before it ever plays.
+    video.muted = true;
+    video.defaultMuted = true;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) void video.play().catch(() => undefined);
       else video.pause();

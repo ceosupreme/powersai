@@ -36,7 +36,7 @@ const ROWS: {
     tone: "marketing",
   },
   {
-    title: "AI & business systems",
+    title: "Business systems & automation",
     headline: "Make the work behind the business easier to run.",
     body: "Connect tools, data, and workflows so your team spends less time chasing information, copying updates, and checking routine work.",
     cta: "See systems services",

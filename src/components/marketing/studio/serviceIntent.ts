@@ -19,7 +19,7 @@ export const SERVICE_OPTIONS: { id: ServiceId; label: string }[] = [
   { id: "websites-apps", label: "Website or app" },
   { id: "brand-creative", label: "Brand or design" },
   { id: "marketing-growth", label: "Marketing or content" },
-  { id: "ai-systems", label: "AI or business systems" },
+  { id: "ai-systems", label: "Business systems & automation" },
   { id: "publishing-launch", label: "Publishing or launch" },
   { id: "not-sure", label: "Not sure yet" },
 ];

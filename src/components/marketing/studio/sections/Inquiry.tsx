@@ -21,11 +21,11 @@ import {
 const SERVER_MESSAGE_LIMIT = 4000;
 
 const OFFER_CONTEXT = {
-  "launch-site": { label: "Launch Site", service: "websites-apps" },
-  "business-site": { label: "Business Site", service: "websites-apps" },
-  care: { label: "Care", service: "websites-apps" },
-  growth: { label: "Growth", service: "marketing-growth" },
-  "custom-systems": { label: "Custom Systems", service: "ai-systems" },
+  "launch-site": { label: "Standard Web Package", service: "websites-apps" },
+  "business-site": { label: "Website and follow-up", service: "websites-apps" },
+  care: { label: "Website care", service: "websites-apps" },
+  growth: { label: "Ongoing marketing", service: "marketing-growth" },
+  "custom-systems": { label: "Operations Package", service: "ai-systems" },
 } as const satisfies Record<string, { label: string; service: ServiceId }>;
 
 type OfferKey = keyof typeof OFFER_CONTEXT;
@@ -44,7 +44,7 @@ const schema = z.object({
   name: z.string().trim().min(1, "Your name is required").max(200, "Please keep your name under 200 characters"),
   email: z.string().trim().email("Please enter a valid email address").max(255),
   business_name: z.string().trim().max(200, "Please keep this under 200 characters").optional().or(z.literal("")),
-  message: z.string().trim().min(1, "Please tell me about the project"),
+  message: z.string().trim().min(1, "Please tell us about the project"),
 });
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -65,12 +65,23 @@ type Status = "idle" | "submitting" | "success" | "error";
  * when the invoke succeeds AND the server confirms a saved record.
  */
 const PAGE_COPY = {
-  websites: { service: "websites-apps", src: "services-websites", heading: "Talk about your website.", intro: "Tell me what the website needs to do for your business. I’ll reply personally within one business day." },
-  brand: { service: "brand-creative", src: "services-brand", heading: "Talk about your brand.", intro: "Tell me what your business needs to be known for. I’ll reply personally within one business day." },
-  marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell me about your offer and where interested customers drop off. I’ll reply personally within one business day." },
-  systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about your calls, leads and bookings.", intro: "Tell me which tools you use and where calls, leads or requests slip through the cracks. I’ll reply personally within one business day." },
-  publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell me what you’re preparing to release and what is ready so far. I’ll reply personally within one business day." },
+  websites: { service: "websites-apps", src: "services-websites", heading: "Talk about your website.", intro: "Tell us what the website needs to do for your business. We’ll reply personally within one business day." },
+  brand: { service: "brand-creative", src: "services-brand", heading: "Talk about your brand.", intro: "Tell us what your business needs to be known for. We’ll reply personally within one business day." },
+  marketing: { service: "marketing-growth", src: "services-marketing", heading: "Talk about marketing.", intro: "Tell us about your offer and where interested customers drop off. We’ll reply personally within one business day." },
+  systems: { service: "ai-systems", src: "services-ai-systems", heading: "Talk about your calls, leads and bookings.", intro: "Tell us which tools you use and where calls, leads or requests slip through the cracks. We’ll reply personally within one business day." },
+  publishing: { service: "publishing-launch", src: "services-publishing", heading: "Talk about a release.", intro: "Tell us what you’re preparing to release and what is ready so far. We’ll reply personally within one business day." },
 } as const;
+
+/** Choices already picked when the form first appears: the page's own service, and the hiring choice
+ *  on the Hire page. These are the same when the page is saved at publish and when a visitor opens it.
+ *  A link's ?offer= or ?intent= is added by the effects below once the page is running, so the saved
+ *  copy never shows a pick that only some links ask for. */
+function initialServices(pageService?: ServiceId, source?: string): ServiceId[] {
+  const picked: ServiceId[] = [];
+  if (pageService) picked.push(pageService);
+  if (source === "hire") picked.push("hiring-contract");
+  return picked;
+}
 
 /** Pages for one service or one place pass their own section name (service-*, area-*). */
 const PAGE_SECTION = /^(service|area)-[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -79,8 +90,8 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [services, setServices] = useState<ServiceId[]>([]);
-  const [showContext, setShowContext] = useState(false);
+  const [services, setServices] = useState<ServiceId[]>(() => initialServices(pageCopy?.service, source));
+  const [showContext, setShowContext] = useState(source === "hire");
 
   // Controlled fields so nothing is lost on an error re-render.
   const [name, setName] = useState("");
@@ -160,8 +171,10 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
   // Allowlisted intent values only; anything else is ignored.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    // The Hire page opens with the hiring choice already picked.
-    const intent = params.get("intent") ?? (source === "hire" ? "hiring" : null);
+    // The Hire page opens with the hiring choice already picked, unless its link asks for something else.
+    const urlIntent = params.get("intent");
+    if (source === "hire" && urlIntent && urlIntent !== "hiring") setServices((prev) => prev.filter((id) => id !== "hiring-contract"));
+    const intent = urlIntent ?? (source === "hire" ? "hiring" : null);
     if (intent === "hiring") {
       setShowContext(true);
       setServices((prev) => (prev.includes("hiring-contract") ? prev : [...prev, "hiring-contract"]));
@@ -280,7 +293,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
         setError("That's a few submissions in a row. Please wait a minute and send again.");
       } else {
         setError(
-          `Your note wasn't saved, so nothing has reached me yet. Please try again, or email ${CONTACT_EMAIL}.`,
+          `Your note wasn't saved, so nothing has reached us yet. Please try again, or email ${CONTACT_EMAIL}.`,
         );
       }
       return;
@@ -300,10 +313,10 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
           <div id="about" className="lg:col-span-5">
              <Eyebrow>{servicePage ? "A clear next step" : "Start a conversation"}</Eyebrow>
             <h2 className="studio-display mt-5 text-balance" style={{ fontSize: "clamp(2.7rem, 5vw, 4.5rem)" }}>
-               {pageCopy?.heading ?? "Let’s make what’s next work better."}
+               {pageCopy?.heading ?? "Let’s grow your business."}
             </h2>
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
-               {pageCopy?.intro ?? "I’m Sean Powers. I’ve built brands and websites since 2002 and run Supreme Team Media from North County San Diego. Tell me about the business and I’ll reply personally within one business day."}
+               {pageCopy?.intro ?? "We’ve built brands and websites since 2002, from North County San Diego. Tell us about the business and we’ll reply personally within one business day."}
             </p>
              {servicePage && <div className="mt-7"><BookingCta src={pageCopy?.src} /></div>}
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
@@ -321,7 +334,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                     <Check size={20} />
                   </span>
                   <h3 className="studio-display mt-5 text-[1.4rem]">
-                    Thanks, your note is in. Sean will review it and reply by email.
+                    Thanks, your note is in. We’ll review it and reply by email.
                   </h3>
                   <p className="mt-3 text-[0.95rem] text-[hsl(var(--ink-muted))]">
                     Your inquiry is saved. If you don&apos;t hear back, email {CONTACT_EMAIL} directly.
@@ -329,7 +342,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                 </div>
               ) : (
                 <form onSubmit={onSubmit} onFocus={noteStarted} noValidate className="grid grid-cols-1 gap-5">
-                  {callRequested && <p className="text-[0.95rem] text-[hsl(var(--ink-muted))]" role="status">Want a call? Add your phone number to your note and Sean will call you.</p>}
+                  {callRequested && <p className="text-[0.95rem] text-[hsl(var(--ink-muted))]" role="status">Want a call? Add your phone number to your note and we’ll call you.</p>}
                   <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
                     <label>
                       Company website
@@ -364,7 +377,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                   />
 
                   <fieldset className="border-0 p-0">
-                    <legend className="studio-label text-[0.82rem]">What can I help with? (optional)</legend>
+                    <legend className="studio-label text-[0.82rem]">What can we help with? (optional)</legend>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {[...SERVICE_OPTIONS, ...(showContext ? CONTEXT_OPTIONS : [])].map((o) => {
                         const on = services.includes(o.id);
@@ -391,7 +404,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
                   </fieldset>
 
                   <label className="block" htmlFor="inquiry-message">
-                    <span className="studio-label">Tell me about the project</span>
+                    <span className="studio-label">Tell us about the project</span>
                     <textarea
                       id="inquiry-message"
                       name="message"

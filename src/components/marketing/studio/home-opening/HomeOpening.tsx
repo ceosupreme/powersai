@@ -16,7 +16,7 @@ const SERVICE_INDEX = [
     subs: ["Marketing strategy", "Paid ads", "Local SEO", "Google Business Profile", "Social media content", "Performance reporting"] },
   { to: "/services/websites", num: "02", name: "Web Design", slug: "web_design", icon: Monitor,
     line: "Turn your online presence into a business asset.",
-    subs: ["Business websites", "Landing pages", "Site redesigns", "Designs built for phones", "Pages that turn visitors into customers", "Hosting and care plans"] },
+    subs: ["Business websites", "Landing pages", "Site redesigns", "Designs built for phones", "Pages that turn visitors into customers", "Hosting and website care"] },
   { to: "/services#photo-video", num: "03", name: "Media", slug: "media", icon: Play,
     line: "Give people something worth remembering.",
     subs: ["Photography", "Video production", "Content creation", "Social content", "Brand storytelling"] },
@@ -78,7 +78,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
       <div className="stm-opening-shell stm-opening-header-inner">
         <Link to="/" className="stm-opening-brand" aria-label="Supreme Team Media home">
           {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} />}
-          <span><strong>Supreme Team Media</strong><small>MARKETING • WEBSITES • AI SYSTEMS</small></span>
+          <span><strong>Supreme Team Media</strong><small>MARKETING • MEDIA • WEBSITES</small></span>
         </Link>
         <nav aria-label="Primary" className="stm-opening-nav">
           <a href="#services">Services</a>
@@ -86,7 +86,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
             <Button type="button" variant="ghost" aria-expanded={industriesOpen} onClick={() => setIndustriesOpen((value) => !value)}>Industries <ChevronDown aria-hidden /></Button>
             {industriesOpen && <div className="stm-opening-industries-menu">
               <Link to="/industries" onClick={closeMenu}>All industries</Link>
-              {landers.map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
+              {landers.filter((item) => item.sort_order < 100).map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
             </div>}
           </div>
           <Link to="/work">Work</Link><Link to="/pricing">Packages</Link><Link to="/blog">Blog</Link><Link to="/about">About</Link>
@@ -602,7 +602,14 @@ function OpeningServices() {
         if (entry.isIntersecting) { entry.target.classList.add("on"); io.unobserve(entry.target); }
       });
     }, { threshold: 0.2 });
-    section.querySelectorAll("[data-watch]").forEach((el) => io.observe(el));
+    // Visible by default: each part's hidden starting state (CSS) only applies once it is marked here,
+    // which happens when that part starts below the screen and motion is on. This section sits right
+    // under the hero, so its top can already be showing when the page opens; that part stays put.
+    const motion = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    section.querySelectorAll<HTMLElement>("[data-watch]").forEach((el) => {
+      if (motion && el.getBoundingClientRect().top >= window.innerHeight) el.dataset.armed = "1";
+      io.observe(el);
+    });
     return () => io.disconnect();
   }, []);
 
@@ -623,9 +630,24 @@ function OpeningServices() {
       timers.add(id);
     };
 
-    const build = () => drawServiceBoard(section, board);
-    build();
-    if (document.fonts?.ready) document.fonts.ready.then(build).catch(() => undefined);
+    // Draw once the fonts are in (text wrapping moves the cards), then only when
+    // the section or grid actually changes size.
+    let drawn = "";
+    let ready = !document.fonts || document.fonts.status === "loaded";
+    const build = () => {
+      if (!ready) return;
+      const grid = section.querySelector<HTMLElement>(".stm-svc-grid");
+      const key = `${section.offsetWidth}x${section.offsetHeight}:${grid?.offsetWidth ?? 0}x${grid?.offsetHeight ?? 0}`;
+      if (key === drawn) return;
+      drawn = key;
+      drawServiceBoard(section, board);
+    };
+    const start = () => { ready = true; build(); };
+    if (ready) build();
+    else {
+      document.fonts.ready.then(start).catch(start);
+      later(start, 1500);
+    }
     let resizeTimer = 0;
     const schedule = () => { window.clearTimeout(resizeTimer); resizeTimer = window.setTimeout(build, 160); };
     window.addEventListener("resize", schedule);
@@ -741,11 +763,11 @@ function OpeningServices() {
   }, []);
 
   return <section id="services" ref={sectionRef} className="stm-svc" aria-label="Services">
-    <svg className="stm-svc-board" ref={boardRef} aria-hidden="true" />
+    <svg className="stm-svc-board" ref={boardRef} aria-hidden="true" data-drawn="" />
     <div className="stm-svc-head" data-watch>
       <div className="stm-svc-rise"><span><span className="stm-svc-eyebrow">Our services</span></span></div>
       <h2><span className="stm-svc-rise"><span>Built to move your</span></span><span className="stm-svc-rise"><span>business <em>forward.</em></span></span></h2>
-      <p className="stm-svc-sub">Marketing, media and AI systems that work together to get you more customers, more revenue and more control.</p>
+      <p className="stm-svc-sub">Marketing, media and the systems behind them, working together to bring you more customers, more revenue and more control.</p>
     </div>
     <div className="stm-svc-gridwrap">
       <nav className="stm-svc-grid" aria-label="Service menu">

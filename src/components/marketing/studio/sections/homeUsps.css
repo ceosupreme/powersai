@@ -89,3 +89,8 @@
   .stm-studio .stm-stack-hold{height:0}
   .stm-studio .stm-slide-frame,.stm-studio .stm-slide-copy,.stm-studio .stm-slide-tline,.stm-studio .stm-slide-title::after{opacity:1 !important;transform:none !important;transition:none !important}
 }
+
+/* Visible by default: the hidden starting states above only apply once the slide's script marks
+   it (data-armed: it started off screen and motion is on). */
+.stm-studio .stm-slide:not([data-armed]) .stm-slide-frame,.stm-studio .stm-slide:not([data-armed]) .stm-slide-tline,.stm-studio .stm-slide:not([data-armed]) .stm-slide-copy{opacity:1;transform:none}
+.stm-studio .stm-slide:not([data-armed]) .stm-slide-title::after{opacity:1;transform:none}

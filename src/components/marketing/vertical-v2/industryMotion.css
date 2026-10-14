@@ -1,0 +1,38 @@
+/* Motion on the shared industry page design (VerticalV2), in the homepage's gold-and-cyan look.
+   All of it runs once or only on hover, uses opacity and transform where it can, and shows
+   everything still and fully lit under reduced motion or without JavaScript. */
+
+/* The headline lights up word by word as the page opens. CSS only: the words start faint and light
+   in reading order, and the highlighted words glow once as they arrive. */
+.industry-v2 .industry-hero h1 .industry-w { animation: industryWordOn .55s ease-out both; animation-delay: calc(var(--w, 0) * 55ms + 120ms); }
+.industry-v2 .industry-hero h1 em .industry-w { animation-name: industryWordOn, industryWordGlow; animation-duration: .55s, 1.3s; animation-timing-function: ease-out, ease-out; animation-fill-mode: both, none; animation-delay: calc(var(--w, 0) * 55ms + 120ms), calc(var(--w, 0) * 55ms + 380ms); }
+@keyframes industryWordOn { from { opacity: .14; } }
+@keyframes industryWordGlow { 40% { text-shadow: 0 0 22px hsl(var(--industry-accent) / .6); } }
+
+/* "Where a business loses jobs": each card has a light by its number. With motion on, the shared
+   reveal (StudioMotion) brings the cards in; here they arrive one at a time instead of together,
+   each flashing its light on and drawing a gold line under itself. */
+.industry-v2 .industry-leaks-list > article { position: relative; }
+.industry-v2 .industry-leaks-list .industry-number::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 10px; border-radius: 50%; vertical-align: 1px; background: hsl(var(--industry-accent)); box-shadow: 0 0 0 3px hsl(var(--industry-accent) / .16), 0 0 9px hsl(var(--industry-accent) / .75); }
+.industry-v2 .industry-leaks-list > article::after { content: ""; position: absolute; left: 0; right: 16px; bottom: -1px; height: 2px; background: linear-gradient(90deg, hsl(var(--industry-accent)), hsl(var(--industry-accent) / 0)); transform: scaleX(0); transform-origin: left; opacity: 0; pointer-events: none; }
+.industry-v2 .industry-leaks-list.studio-motion-group.studio-motion-enter > .studio-motion-child { animation-delay: calc(var(--i, 0) * .38s); }
+.industry-v2 .industry-leaks-list.studio-motion-enter .industry-number::before { animation: industryLedOn .8s ease-out calc(var(--i, 0) * .38s + .25s) backwards; }
+.industry-v2 .industry-leaks-list.studio-motion-enter > article::after { animation: industryLineOn .8s cubic-bezier(.3, .55, .35, 1) calc(var(--i, 0) * .38s + .3s) both; }
+@keyframes industryLedOn { 35% { transform: scale(1.9); box-shadow: 0 0 0 5px hsl(var(--industry-accent) / .2), 0 0 18px hsl(var(--industry-accent)); } }
+@keyframes industryLineOn { from { transform: scaleX(0); opacity: 1; } to { transform: scaleX(1); opacity: 1; } }
+
+/* "Services that fit": the homepage's hover trace, a gold line running around the card's edge. */
+.industry-v2 .sp-v2-services a.has-trace { position: relative; transition: transform .3s ease, box-shadow .3s ease; }
+.industry-v2 .sp-v2-services a.has-trace:hover, .industry-v2 .sp-v2-services a.has-trace:focus-visible { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(15, 28, 55, .1), 0 18px 34px -24px rgba(15, 28, 55, .5); }
+.industry-v2 .industry-tone-charcoal .sp-v2-services a.has-trace:hover, .industry-v2 .industry-tone-charcoal .sp-v2-services a.has-trace:focus-visible { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), 0 18px 34px -24px rgba(0, 0, 0, .6); }
+.industry-v2 .sp-v2-services .sp-trace { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.industry-v2 .sp-v2-services .sp-trace rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: #E8A13C; stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; filter: drop-shadow(0 0 3px rgba(232, 161, 60, .8)); transition: opacity .25s ease, stroke-dashoffset 0s linear .25s; }
+.industry-v2 .sp-v2-services a.has-trace:hover .sp-trace rect, .industry-v2 .sp-v2-services a.has-trace:focus-visible .sp-trace rect { opacity: 1; stroke-dashoffset: 0; transition: opacity 0s, stroke-dashoffset .65s cubic-bezier(.3, .55, .35, 1); }
+.industry-v2 .sp-v2-services a.has-trace .sp-family-icon { transition: box-shadow .3s ease .25s; }
+.industry-v2 .sp-v2-services a.has-trace:hover .sp-family-icon, .industry-v2 .sp-v2-services a.has-trace:focus-visible .sp-family-icon { box-shadow: 0 0 0 3px #fff, 0 0 18px rgba(242, 162, 15, .45); }
+
+@media (prefers-reduced-motion: reduce) {
+  .industry-v2 .industry-hero h1 .industry-w { animation: none; }
+  .industry-v2 .industry-leaks-list .industry-number::before, .industry-v2 .industry-leaks-list > article::after { animation: none; transition: none; }
+  .industry-v2 .sp-v2-services a.has-trace, .industry-v2 .sp-v2-services .sp-trace rect, .industry-v2 .sp-v2-services a.has-trace .sp-family-icon { transition: none; }
+}

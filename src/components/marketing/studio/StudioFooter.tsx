@@ -43,7 +43,7 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to="/services/websites" className="inline-flex min-h-11 items-center hover:underline">{es ? "Sitios web" : "Websites"}</Link>
             <Link to="/services/brand" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marca y creatividad" : "Brand & creative"}</Link>
             <Link to="/services/marketing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Marketing y crecimiento" : "Marketing & growth"}</Link>
-            <Link to="/services/ai-systems" className="inline-flex min-h-11 items-center hover:underline">{es ? "IA y sistemas" : "AI & systems"}</Link>
+            <Link to="/services/ai-systems" className="inline-flex min-h-11 items-center hover:underline">{es ? "Sistemas de negocio y automatización" : "Business systems & automation"}</Link>
             <Link to="/publishing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Publicación y lanzamiento" : "Publishing & launch"}</Link>
             <Link to="/pricing" className="inline-flex min-h-11 items-center hover:underline">{es ? "Paquetes" : "Packages"}</Link>
             <Link to="/startups" className="inline-flex min-h-11 items-center hover:underline">{es ? "Startups y fundadores" : "Startups & founders"}</Link>
@@ -53,7 +53,6 @@ export function StudioFooter({ language = "en" }: { language?: "en" | "es" }) {
             <Link to={contactHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Habla de un proyecto" : "Discuss a project"}</Link>
             <Link to={auditHref} className="inline-flex min-h-11 items-center hover:underline">{es ? "Revisión gratuita" : "Free business checkup"}</Link>
             <Link to="/industries" className="inline-flex min-h-11 items-center hover:underline">{es ? "Industrias" : "Industries"}</Link>
-            <Link to="/hire" className="inline-flex min-h-11 items-center hover:underline">{es ? "¿Quieres contratar a Sean?" : "Hiring Sean?"}</Link>
             <Link to="/login" className="inline-flex min-h-11 items-center hover:underline">{es ? "Acceso para clientes" : "Client login"}</Link>
             <Link to="/privacy" className="inline-flex min-h-11 items-center hover:underline">{es ? "Privacidad" : "Privacy"}</Link>
             <Link to="/terms" className="inline-flex min-h-11 items-center hover:underline">{es ? "Términos" : "Terms"}</Link>
