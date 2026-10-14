@@ -3009,6 +3009,7 @@
 .industry-v2 .industry-hero-media img[data-media-key="industry-realestate-hero"] { object-position: 58% center; }
 .industry-v2 .industry-hero-media img[data-media-key="industry-dealerships-hero"] { object-position: 57% center; }
 .industry-v2 .industry-hero-media img[data-media-key="industry-legal-hero"] { object-position: 57% center; }
+.industry-v2 .industry-hero-media img[data-media-key="home-industry-medspa"] { object-position: 44% center; }
 
 /* Service heroes: artwork is the visual, native UI remains in the explanatory sections below. */
 .svc-page .svc-hero-media {

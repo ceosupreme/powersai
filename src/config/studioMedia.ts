@@ -6,7 +6,7 @@ import karioVoss from "@/assets/studio/kario-voss.png";
 import homeHeroDevices from "@/assets/studio/home-hero.webp.asset.json";
 import homeIndustryService from "@/assets/studio/home-industry-hvac.webp.asset.json";
 import homeIndustryRestaurant from "@/assets/studio/home-industry-pizza.webp.asset.json";
-import homeIndustryMedspa from "@/assets/studio/home-industry-medspa.webp.asset.json";
+import homeIndustryMedspa from "@/assets/studio/home-industry-medspa-v2.webp";
 import websitesHero from "@/assets/studio/service-websites-hero.webp.asset.json";
 import coastalBeauties from "@/assets/studio/coastal-beauties.png";
 import plumbingHero from "@/assets/studio/industry-plumbing-hero.webp.asset.json";
@@ -16,9 +16,10 @@ import autoHero from "@/assets/studio/industry-auto-hero.webp.asset.json";
 import realEstateHero from "@/assets/studio/industry-realestate-hero.webp.asset.json";
 import dealershipsHero from "@/assets/studio/industry-dealerships-hero.webp.asset.json";
 import legalHero from "@/assets/studio/industry-legal-hero.webp.asset.json";
-import brandMaterials from "@/assets/studio/brand-materials-spread.webp.asset.json";
-import marketingCampaign from "@/assets/studio/marketing-campaign-scene.webp.asset.json";
-import publishingRelease from "@/assets/studio/publishing-release-spread.webp.asset.json";
+import brandHero from "@/assets/studio/brand-hero.webp";
+import marketingHero from "@/assets/studio/marketing-hero.webp";
+import publishingHero from "@/assets/studio/publishing-hero.webp";
+import homePackagesOwner from "@/assets/studio/home-packages-owner.webp";
 import openingChessDesktop from "@/assets/stm-opening/chess-hero-desktop.webp.asset.json";
 import openingChessMedium from "@/assets/stm-opening/chess-hero-1280.webp.asset.json";
 import openingChessMobile from "@/assets/stm-opening/chess-hero-mobile.webp.asset.json";
@@ -158,12 +159,12 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     objectFit: "contain",
   },
   "home-industry-medspa": {
-    src: homeIndustryMedspa.url,
-    alt: "Laptop and phone showing a med spa website with a consultation button, in a bright spa lobby at sunset",
-    aspectRatio: "1672 / 941",
-    width: 1672,
-    height: 941,
-    objectFit: "contain",
+    src: homeIndustryMedspa,
+    alt: "Laptop and phone showing a calm med spa website on a stone counter in a bright lobby at sunset",
+    aspectRatio: "3 / 2",
+    width: 1536,
+    height: 1024,
+    objectFit: "cover",
   },
   "service-websites-hero": {
     src: websitesHero.url,
@@ -180,9 +181,9 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "industry-realestate-hero": { src: realEstateHero.url, alt: "Southern California home with a real estate website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
   "industry-dealerships-hero": { src: dealershipsHero.url, alt: "Independent auto dealership with its inventory website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
   "industry-legal-hero": { src: legalHero.url, alt: "Law office with the Harrington and Blake website shown on laptop and phone", aspectRatio: "1672 / 941", width: 1672, height: 941, objectFit: "cover", objectPosition: "center" },
-  "brand-materials-spread": { src: brandMaterials.url, alt: "Aura and Stone identity system across typography, print, packaging, color and social media", aspectRatio: "75 / 56", width: 1200, height: 896, objectFit: "cover", objectPosition: "center" },
-  "marketing-campaign-scene": { src: marketingCampaign.url, alt: "Coordinated Evergreen Home Care campaign across website, social, email and inquiry materials", aspectRatio: "4 / 3", width: 1448, height: 1086, objectFit: "cover", objectPosition: "center" },
-  "publishing-release-spread": { src: publishingRelease.url, alt: "The Brighter Path release across print book, website, phone and launch materials", aspectRatio: "4 / 3", width: 1448, height: 1086, objectFit: "cover", objectPosition: "center" },
+  "brand-materials-spread": { src: brandHero, alt: "Business cards, a shopping bag, a coffee cup, a sealed envelope and a brass sign, all carrying the same gold mark", aspectRatio: "3 / 2", width: 1536, height: 1024, objectFit: "cover", objectPosition: "60% center" },
+  "marketing-campaign-scene": { src: marketingHero, alt: "A row of quiet shops at dusk, with customers walking into the one storefront that is lit up", aspectRatio: "349 / 256", width: 1396, height: 1024, objectFit: "cover", objectPosition: "58% center" },
+  "publishing-release-spread": { src: publishingHero, alt: "An author lifting the first finished hardcover out of a box of new copies", aspectRatio: "3 / 2", width: 1536, height: 1024, objectFit: "cover", objectPosition: "center" },
   "hero-composition": {
     src: null,
     alt: "Supreme Team Media studio composition",
@@ -294,13 +295,13 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     width: 900,
     height: 1200,
     objectFit: "cover",
-  },  /** Homepage closing section ("Let's build yours"): a licensed photo of a local business owner, picked with the owner. */
+  },  /** Homepage closing section ("Let's build yours"): a local business owner, cropped 5:4 with her on the left so the package card can sit over the lower right. */
   "home-packages-photo": {
-    src: null,
-    alt: "A local business owner at work",
+    src: homePackagesOwner,
+    alt: "A restaurant owner smiling as she looks over her full dining room",
     aspectRatio: "5 / 4",
-    width: 1500,
-    height: 1200,
+    width: 1280,
+    height: 1024,
     objectFit: "cover",
   },
 };

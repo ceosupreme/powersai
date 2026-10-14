@@ -58,11 +58,16 @@ async def render():
     def page_html(body,state,hydrate):
      marks=f' data-saved-path="{html.escape(route,quote=True)}"'+(' data-hydrate=""' if hydrate else '')
      return template[:start]+f'<div id="root"{marks}>{body}</div>'+(f'<script id="stm-query-state" type="application/json">{state}</script>' if state else '')+template[end+6:]
-    page=await open_page()
-    try:
-     await page.goto(url,wait_until="networkidle",timeout=30000);await page.wait_for_selector("#root main",timeout=15000);await page.wait_for_function(LOADED,timeout=15000);await page.evaluate(SETTLED);body=await page.evaluate(MARKUP);state=await page.evaluate(STATE);write(out,page_html(body,state,False))
-    except Exception as error:print(f"[prerender] skipped {route}: {error}");return
-    finally:await page.close()
+    # A slow moment during the publish step (a busy first batch, a slow data reply) gets one more try
+    # before the page is left as a plain fallback.
+    for attempt in (1,2):
+     page=await open_page()
+     try:
+      await page.goto(url,wait_until="networkidle",timeout=30000);await page.wait_for_selector("#root main",timeout=15000);await page.wait_for_function(LOADED,timeout=15000);await page.evaluate(SETTLED);body=await page.evaluate(MARKUP);state=await page.evaluate(STATE);write(out,page_html(body,state,False));break
+     except Exception as error:
+      if attempt==2:print(f"[prerender] skipped {route}: {error}");return
+      print(f"[prerender] retrying {route}: {str(error).splitlines()[0][:120]}");await asyncio.sleep(3)
+     finally:await page.close()
     page=await open_page()
     try:
      # The trial copy is served from memory; the file on disk only changes once the check passes.
