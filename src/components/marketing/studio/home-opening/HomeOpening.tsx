@@ -8,6 +8,7 @@ import { getStudioMedia } from "@/config/studioMedia";
 import { CONTACT_EMAIL } from "@/lib/siteContact";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { sanitizeBiz } from "@/pages/VerticalLanding";
+import { SITE_SERVICES } from "../siteNav";
 import "./homeOpening.css";
 
 const SERVICE_INDEX = [
@@ -40,26 +41,29 @@ const SERVICE_INDEX = [
 const normalizeSlug = (slug: string) => slug === "bars-restaurants" ? "restaurants" : slug === "taquerias" ? "tacos" : slug === "plumbing-hvac" ? "plumbing" : slug;
 
 function OpeningHeader({ onContact }: { onContact: () => void }) {
+  // One desktop menu open at a time; the phone menu has its own fold-out lists.
+  const [menu, setMenu] = useState<null | "services" | "industries" | "about">(null);
   const [open, setOpen] = useState(false);
-  const [industriesOpen, setIndustriesOpen] = useState(false);
+  const [mobileList, setMobileList] = useState<null | "services" | "industries">(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const industriesRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
   const { data: landers = [] } = usePublishedVerticalLanders();
+  const industries = landers.filter((item) => item.sort_order < 100);
 
   useEffect(() => {
-    if (!open && !industriesOpen) return;
+    if (!open && !menu) return;
     const close = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setOpen(false);
-      setIndustriesOpen(false);
+      setMenu(null);
       toggleRef.current?.focus();
     };
     const outside = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (!menuRef.current?.contains(target) && !industriesRef.current?.contains(target)) {
+      if (!menuRef.current?.contains(target) && !headerRef.current?.contains(target)) {
         setOpen(false);
-        setIndustriesOpen(false);
+        setMenu(null);
       }
     };
     document.addEventListener("keydown", close);
@@ -68,36 +72,60 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
       document.removeEventListener("keydown", close);
       document.removeEventListener("pointerdown", outside);
     };
-  }, [open, industriesOpen]);
+  }, [open, menu]);
 
-  const closeMenu = () => { setOpen(false); setIndustriesOpen(false); };
+  const closeMenu = () => { setOpen(false); setMenu(null); setMobileList(null); };
+  const flip = (name: "services" | "industries" | "about") => setMenu((current) => current === name ? null : name);
   const mark = getStudioMedia("home-opening-mark");
 
   return (
-    <header className="stm-opening-header" ref={industriesRef}>
+    <header className="stm-opening-header" ref={headerRef}>
       <div className="stm-opening-shell stm-opening-header-inner">
         <Link to="/" className="stm-opening-brand" aria-label="Supreme Team Media home">
           {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} />}
           <span><strong>Supreme Team Media</strong><small>MARKETING • MEDIA • WEBSITES</small></span>
         </Link>
         <nav aria-label="Primary" className="stm-opening-nav">
-          <a href="#services">Services</a>
           <div className="stm-opening-nav-group">
-            <Button type="button" variant="ghost" aria-expanded={industriesOpen} onClick={() => setIndustriesOpen((value) => !value)}>Industries <ChevronDown aria-hidden /></Button>
-            {industriesOpen && <div className="stm-opening-industries-menu">
-              <Link to="/industries" onClick={closeMenu}>All industries</Link>
-              {landers.filter((item) => item.sort_order < 100).map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
+            <Button type="button" variant="ghost" aria-expanded={menu === "services"} aria-controls="stm-opening-services-menu" onClick={() => flip("services")}>Services <ChevronDown aria-hidden /></Button>
+            {menu === "services" && <div id="stm-opening-services-menu" className="stm-opening-services-menu">
+              {SITE_SERVICES.map((service) => <Link key={service.to} to={service.to} onClick={closeMenu}><strong>{service.label}</strong><small>{service.note}</small></Link>)}
+              <Link to="/services" onClick={closeMenu} className="stm-opening-menu-all">See all services <ArrowRight aria-hidden /></Link>
             </div>}
           </div>
-          <Link to="/work">Work</Link><Link to="/pricing">Packages</Link><Link to="/blog">Blog</Link><Link to="/about">About</Link>
+          <div className="stm-opening-nav-group">
+            <Button type="button" variant="ghost" aria-expanded={menu === "industries"} aria-controls="stm-opening-industries-menu" onClick={() => flip("industries")}>Industries <ChevronDown aria-hidden /></Button>
+            {menu === "industries" && <div id="stm-opening-industries-menu" className="stm-opening-industries-menu">
+              <Link to="/industries" onClick={closeMenu}>All industries</Link>
+              {industries.map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
+            </div>}
+          </div>
+          <Link to="/work">Work</Link><Link to="/pricing">Packages</Link><Link to="/blog">Blog</Link>
+          <div className="stm-opening-nav-group">
+            <Button type="button" variant="ghost" aria-expanded={menu === "about"} aria-controls="stm-opening-about-menu" onClick={() => flip("about")}>About <ChevronDown aria-hidden /></Button>
+            {menu === "about" && <div id="stm-opening-about-menu" className="stm-opening-about-menu">
+              <Link to="/about" onClick={closeMenu}>About us</Link>
+              <Link to="/areas" onClick={closeMenu}>Areas we serve</Link>
+            </div>}
+          </div>
         </nav>
         <div className="stm-opening-header-actions">
           <Button type="button" onClick={onContact} className="stm-opening-contact">Contact Us <ArrowRight aria-hidden /></Button>
-          <Button ref={toggleRef} type="button" variant="outline" size="icon" className="stm-opening-menu-toggle" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</Button>
+          <Button ref={toggleRef} type="button" variant="outline" size="icon" className="stm-opening-menu-toggle" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => { setOpen((value) => !value); setMenu(null); }}>{open ? <X /> : <Menu />}</Button>
         </div>
       </div>
       {open && <div className="stm-opening-mobile-menu" ref={menuRef}>
-        <a href="#services" onClick={closeMenu}>Services</a><Link to="/industries" onClick={closeMenu}>Industries</Link><Link to="/work" onClick={closeMenu}>Work</Link><Link to="/pricing" onClick={closeMenu}>Packages</Link><Link to="/blog" onClick={closeMenu}>Blog</Link><Link to="/about" onClick={closeMenu}>About</Link>
+        <button type="button" className="stm-opening-mobile-toggle" aria-expanded={mobileList === "services"} aria-controls="stm-opening-mobile-services" onClick={() => setMobileList((current) => current === "services" ? null : "services")}>Services <ChevronDown aria-hidden /></button>
+        {mobileList === "services" && <div id="stm-opening-mobile-services" className="stm-opening-mobile-sub">
+          {SITE_SERVICES.map((service) => <Link key={service.to} to={service.to} onClick={closeMenu}>{service.label}</Link>)}
+          <Link to="/services" onClick={closeMenu} className="stm-opening-menu-all">See all services</Link>
+        </div>}
+        <button type="button" className="stm-opening-mobile-toggle" aria-expanded={mobileList === "industries"} aria-controls="stm-opening-mobile-industries" onClick={() => setMobileList((current) => current === "industries" ? null : "industries")}>Industries <ChevronDown aria-hidden /></button>
+        {mobileList === "industries" && <div id="stm-opening-mobile-industries" className="stm-opening-mobile-sub">
+          <Link to="/industries" onClick={closeMenu} className="stm-opening-menu-all">All industries</Link>
+          {industries.map((item) => <Link key={item.slug} to={`/for/${normalizeSlug(item.slug)}`} onClick={closeMenu}>{item.display_name}</Link>)}
+        </div>}
+        <Link to="/work" onClick={closeMenu}>Work</Link><Link to="/pricing" onClick={closeMenu}>Packages</Link><Link to="/blog" onClick={closeMenu}>Blog</Link><Link to="/about" onClick={closeMenu}>About</Link><Link to="/areas" onClick={closeMenu}>Areas we serve</Link>
       </div>}
     </header>
   );
