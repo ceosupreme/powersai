@@ -86,7 +86,8 @@ function initialServices(pageService?: ServiceId, source?: string): ServiceId[] 
 /** Pages for one service or one place pass their own section name (service-*, area-*). */
 const PAGE_SECTION = /^(service|area)-[a-z0-9]+(-[a-z0-9]+)*$/;
 
-export function Inquiry({ servicePage, source, section }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" | "pricing" | "startups"; section?: string }) {
+/** `scene`: the homepage version, with the San Diego map as the section's background. */
+export function Inquiry({ servicePage, source, section, scene }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" | "pricing" | "startups"; section?: string; scene?: boolean }) {
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
   const sanDiego = getStudioMedia("contact-san-diego");
   const [status, setStatus] = useState<Status>("idle");
@@ -308,7 +309,18 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
   };
 
   return (
-     <section id="contact" className={`home-contact studio-section${servicePage ? " websites-contact" : ""}`}>
+     <section id="contact" className={`home-contact studio-section${servicePage ? " websites-contact" : ""}${scene && sanDiego?.src ? " home-contact-scenic" : ""}`}>
+      {/* Homepage: the San Diego map is the section's background. Wide screens:
+          it fills the lower left, running off the left and bottom edges and
+          fading out under the heading and the form, sized so the pin and
+          "San Diego" always sit clear of the form. Phones and tablets: a band
+          across the top, fading into the section. Every other page keeps the
+          small picture under the copy. */}
+      {scene && sanDiego?.src && (
+        <div className="home-contact-mapbg" aria-hidden="true">
+          <img src={sanDiego.src} alt="" width={sanDiego.width} height={sanDiego.height} loading="lazy" decoding="async" />
+        </div>
+      )}
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div id="about" className="lg:col-span-5">
@@ -323,8 +335,8 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
-            <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County and clients anywhere online.</p>
-              {!servicePage && sanDiego?.src && <div className="home-contact-map mt-10"><img src={sanDiego.src} alt={sanDiego.alt} width={sanDiego.width} height={sanDiego.height} loading="lazy" decoding="async" /><p>Based in Carlsbad Village, North County San Diego.</p></div>}
+            <p className="mt-3 text-sm text-muted-foreground">{scene ? "Based in Carlsbad Village, North County San Diego. Serving San Diego County and clients anywhere online." : "Serving San Diego County and clients anywhere online."}</p>
+              {!servicePage && !scene && sanDiego?.src && <div className="home-contact-map mt-10"><img src={sanDiego.src} alt={sanDiego.alt} width={sanDiego.width} height={sanDiego.height} loading="lazy" decoding="async" /><p>Based in Carlsbad Village, North County San Diego.</p></div>}
           </div>
 
           <div className="lg:col-span-7">

@@ -34,7 +34,7 @@ import openingAutomation from "@/assets/stm-opening/automation-gear.png.asset.js
 import openingTrustPeople from "@/assets/stm-opening/trust-people-black.png.asset.json";
 import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json";
 import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
-import contactSanDiego from "@/assets/studio/contact-map.webp.asset.json";
+import contactSanDiego from "@/assets/studio/contact-san-diego-cool.webp";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
@@ -114,10 +114,11 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     objectFit: "cover",
     objectPosition: "72% center",
   },
-  /** Under the contact form on the homepage: the San Diego picture (a drawn map of the city over the coast at sunset). */
+  /** The San Diego map in light grey-blue with a gold pin on downtown: the homepage contact section's
+   *  background (lower left), and the small picture under the copy on other pages' contact sections. */
   "contact-san-diego": {
-    src: contactSanDiego.url,
-    alt: "A drawn map of San Diego with a pin on downtown, over a photo of the coast and palm trees at sunset",
+    src: contactSanDiego,
+    alt: "A light blue-grey map of San Diego with a gold pin on downtown, the coast and palm trees at the lower left",
     aspectRatio: "4 / 3",
     width: 1448,
     height: 1086,

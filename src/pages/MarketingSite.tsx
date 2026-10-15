@@ -77,7 +77,7 @@ export default function MarketingSite() {
         <HomeBlog />
         <HomeFaq />
         <StudioReveal><HomePackages /></StudioReveal>
-        <StudioReveal><Inquiry /></StudioReveal>
+        <StudioReveal><Inquiry scene /></StudioReveal>
       </main>
       <StudioFooter />
     </div>

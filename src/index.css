@@ -1856,6 +1856,35 @@
 .stm-studio .home-contact-map { width: 100%; height: auto; overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px hsl(var(--home-rule)), 0 22px 44px -30px rgba(11, 21, 48, .5); }
 .stm-studio .home-contact-map img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
 .stm-studio .home-contact-map p { margin: 0; padding: 14px 16px; background: hsl(var(--home-soft)); color: hsl(var(--ink-muted)); font-size: .9rem; }
+/* Homepage contact: the San Diego map (light grey-blue, gold pin) is the section's background.
+   Phones and tablets: a band across the top that fades into the section, then the copy and the form.
+   Wide screens (1024px+): it fills the lower left, running off the left and bottom edges and fading
+   out at its top (under the copy) and right (under the form). Its height is set from the screen width
+   so the pin and "San Diego" (the right end of the label sits at 84% of the map's height across)
+   always stay at least 32px clear of the form's left edge:
+     up to 1400px wide, the form starts at about 41.7vw + 36px, so height <= 49.35vw + 4px;
+     wider, the 1400px container centers and the form starts at 50vw - 79px, so height <= 59.22vw - 132px;
+   capped at 860px so the pin always lands below the copy. Above 1800px the map moves in with the
+   centered container instead of hugging the screen edge. */
+.stm-studio .home-contact-scenic { position: relative; overflow: hidden; isolation: isolate; }
+.stm-studio .home-contact-scenic > .studio-container { position: relative; z-index: 1; }
+.stm-studio .home-contact-mapbg { position: relative; z-index: 0; pointer-events: none; }
+.stm-studio .home-contact-mapbg img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 1023px) {
+  .stm-studio .home-contact-scenic { padding-top: 0; }
+  .stm-studio .home-contact-mapbg { width: 100%; height: min(75vw, 460px); margin-bottom: -28px; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%); mask-image: linear-gradient(180deg, #000 70%, transparent 100%); }
+  .stm-studio .home-contact-mapbg img { object-position: 40% 46%; }
+}
+@media (min-width: 1024px) {
+  .stm-studio .home-contact-mapbg { position: absolute; left: 0; bottom: 0; height: min(calc(49.35vw + 4px), calc(59.22vw - 132px), 860px); aspect-ratio: 1448 / 1086;
+    -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 34%); -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, #000 72%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 34%); mask-composite: intersect; }
+}
+@media (min-width: 1800px) {
+  .stm-studio .home-contact-mapbg { left: calc(50vw - 900px);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 72%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 34%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 72%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 34%); }
+}
 .stm-studio .home-contact .studio-inquiry-card { border: 1px solid hsl(var(--home-rule)); box-shadow: 0 20px 65px hsl(var(--home-ink) / .08); }
 .stm-studio .home-contact .studio-btn-primary { background: linear-gradient(135deg, #F6C65A, #E89A2B); color: #101412; box-shadow: 0 12px 26px -10px rgba(232,154,43,.6); }
 @media (max-width: 1023px) { .stm-studio .home-offer-layout { grid-template-columns: 1fr; } .stm-studio .home-walkthrough { position: static; max-width: 650px; } }

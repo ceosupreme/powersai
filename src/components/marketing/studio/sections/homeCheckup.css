@@ -3,8 +3,36 @@
    form on the left, what happens next on the right. Visible by default; the
    script arms a gentle rise-in only while the section is still below the fold. */
 .stm-studio .stm-checkup{position:relative;isolation:isolate;overflow:hidden;padding:clamp(88px,8vw,116px) 0 clamp(92px,8.5vw,124px);color:#fff;background:radial-gradient(120% 140% at 0% 0%,#17284D 0%,#0B1530 46%,#070D1C 100%)}
-.stm-studio .stm-checkup::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(70% 120% at 0% 0%,#000 30%,transparent 80%);mask-image:radial-gradient(70% 120% at 0% 0%,#000 30%,transparent 80%)}
-.stm-studio .stm-checkup::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;pointer-events:none;background:linear-gradient(90deg,#F2A20F,#14B5E3);box-shadow:0 0 16px rgba(242,162,15,.5),0 0 16px rgba(20,181,227,.35)}
+
+/* The board behind it: the services board's circuitry in night colors
+   (drawn in code from the live layout). Engraved lines sit just above the
+   navy, pads are dark discs, the rails glow gold and cyan but softer than
+   on the light board, so the form keeps the eye. */
+.stm-studio .stm-checkup-board{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+.stm-studio .stm-checkup-board .pl{fill:rgba(255,255,255,.028);stroke:rgba(255,255,255,.07);stroke-width:1}
+.stm-studio .stm-checkup-board .pi{fill:none;stroke:rgba(255,255,255,.05);stroke-width:1}
+.stm-studio .stm-checkup-board .dt{fill:rgba(160,180,215,.4)}
+.stm-studio .stm-checkup-board .rg{fill:none;stroke:rgba(160,180,215,.4);stroke-width:1.4}
+.stm-studio .stm-checkup-board .u{fill:none;stroke:rgba(160,180,215,.26);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.stm-studio .stm-checkup-board .pu{fill:#0E1730;stroke:rgba(160,180,215,.48);stroke-width:1.6}
+.stm-studio .stm-checkup-board .jn.gold{fill:#F2A20F}
+.stm-studio .stm-checkup-board .jn.cyan{fill:#14B5E3}
+.stm-studio .stm-checkup-board .lw{fill:none;stroke-width:26;stroke-opacity:.06;stroke-linecap:round;stroke-linejoin:round}
+.stm-studio .stm-checkup-board .lh{fill:none;stroke-width:10;stroke-opacity:.16;stroke-linecap:round;stroke-linejoin:round}
+.stm-studio .stm-checkup-board .lb{fill:none;stroke-width:2.2;stroke-opacity:.78;stroke-linecap:round;stroke-linejoin:round}
+.stm-studio .stm-checkup-board .lc{fill:none;stroke:#FFFFFF;stroke-width:.8;stroke-opacity:.5;stroke-linecap:round;stroke-linejoin:round}
+.stm-studio .stm-checkup-board .gold .lw,.stm-studio .stm-checkup-board .gold .lh,.stm-studio .stm-checkup-board .gold .lb{stroke:#F2A20F}
+.stm-studio .stm-checkup-board .cyan .lw,.stm-studio .stm-checkup-board .cyan .lh,.stm-studio .stm-checkup-board .cyan .lb{stroke:#14B5E3}
+.stm-studio .stm-checkup-board .pin{fill:#0E1730;stroke-width:1.8}
+.stm-studio .stm-checkup-board .pin.gold{stroke:#F2A20F}
+.stm-studio .stm-checkup-board .pin.cyan{stroke:#14B5E3}
+.stm-studio .stm-checkup-board .fr{fill:#0E1730;stroke-width:2.2}
+.stm-studio .stm-checkup-board .gold .fr{stroke:#F2A20F}
+.stm-studio .stm-checkup-board .cyan .fr{stroke:#14B5E3}
+.stm-studio .stm-checkup-board .gold .fc{fill:#F2A20F}
+.stm-studio .stm-checkup-board .cyan .fc{fill:#14B5E3}
+.stm-studio .stm-checkup-in{position:relative;z-index:1}
+.stm-studio .stm-checkup::after{content:"";position:absolute;z-index:2;left:0;right:0;top:0;height:3px;pointer-events:none;background:linear-gradient(90deg,#F2A20F,#14B5E3);box-shadow:0 0 16px rgba(242,162,15,.5),0 0 16px rgba(20,181,227,.35)}
 .stm-studio .stm-checkup-in{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:48px clamp(48px,6vw,96px);align-items:center;width:min(92%,1180px);margin:0 auto}
 .stm-studio .stm-checkup-eyebrow{font:700 14px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#F6C65A}
 .stm-studio .stm-checkup h2{margin-top:16px;font:800 clamp(38px,4.4vw,62px)/1.04 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#fff;text-wrap:balance}
@@ -28,7 +56,7 @@
 .stm-studio .stm-checkup-note[role="alert"]{color:#F6C65A}
 
 /* What happens next: three numbered steps in a frosted panel. */
-.stm-studio .stm-checkup-how{padding:34px 36px 30px;border-radius:22px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.stm-studio .stm-checkup-how{padding:34px 36px 30px;border-radius:22px;background:rgba(17,27,52,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .stm-studio .stm-checkup-how-title{margin-bottom:18px;font:700 13px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#93A3C0}
 .stm-studio .stm-checkup-steps{display:grid;margin:0;padding:0;list-style:none}
 .stm-studio .stm-checkup-steps li{display:grid;grid-template-columns:46px 1fr;gap:18px;align-items:start;padding:18px 0;border-top:1px solid rgba(255,255,255,.1)}
