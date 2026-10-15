@@ -23,9 +23,44 @@ export interface NextTenRow {
   note?: string;
   /** Lane ranking score (dollars per hour) when all four numbers exist. */
   laneValue?: number | null;
+  /** Action rows only: 0 = approved, 1 = proposed/unreviewed. */
+  approvalRank?: number;
+  /** Action rows only: 1 = critical … 4 = low, 5 = unset. */
+  priorityRank?: number;
+  /** Action rows only: ISO due date, used as the tiebreaker after priority. */
+  dueDate?: string | null;
+  /** Action rows only: ISO created_at, the final tiebreaker. */
+  createdAt?: string | null;
 }
 
 const PRODUCT_ADVANCE_FROM = ['needs cover', 'proof ordered', 'ready to upload'];
+
+/**
+ * Rank an action item's priority label so the Next 10 can sort by it.
+ * Handles the HQ labels (P1-Critical … P4-Low) and the older bare words
+ * (critical, high, medium, low). Anything unrecognised sorts last.
+ */
+export function priorityRank(priority: string | null | undefined): number {
+  const p = (priority ?? '').trim().toLowerCase();
+  if (!p) return 5;
+  const m = p.match(/^p([1-4])\b/);
+  if (m) return Number(m[1]);
+  if (p.startsWith('critical') || p.startsWith('urgent')) return 1;
+  if (p.startsWith('high')) return 2;
+  if (p.startsWith('medium') || p.startsWith('normal')) return 3;
+  if (p.startsWith('low')) return 4;
+  return 5;
+}
+
+/** Approved first, then by priority, then earliest due date, then oldest created. */
+export function compareActionRows(a: NextTenRow, b: NextTenRow): number {
+  return (
+    (a.approvalRank ?? 9) - (b.approvalRank ?? 9) ||
+    (a.priorityRank ?? 9) - (b.priorityRank ?? 9) ||
+    (a.dueDate ?? '9999').localeCompare(b.dueDate ?? '9999') ||
+    (a.createdAt ?? '').localeCompare(b.createdAt ?? '')
+  );
+}
 
 const STAGE_ORDER = PRODUCT_STATUSES as readonly string[];
 
@@ -47,10 +82,12 @@ async function buildForProject(
   const products: NextTenRow[] = [];
   const kpis: NextTenRow[] = [];
 
-  // (a)+(b) action items — rows may be keyed on bar_id or venue_id
+  // (a)+(b) action items — rows may be keyed on bar_id or venue_id.
+  // Approved items rank by priority (P1 first), then earliest due date;
+  // proposed/unreviewed items follow, ranked the same way.
   const { data: actions } = await supabase
     .from('action_items')
-    .select('id,title,due_date,approval_status,status,created_at')
+    .select('id,title,due_date,approval_status,status,created_at,priority')
     .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`)
     .neq('status', 'Done');
 
@@ -61,32 +98,28 @@ async function buildForProject(
     seenActionIds.add(a.id);
     return true;
   });
+  const toActionRow = (a: any, approvalRank: number): NextTenRow => ({
+    key: `action-${a.id}`,
+    source: 'Action',
+    step: a.title,
+    projectId,
+    projectName,
+    refId: a.id,
+    approvalRank,
+    priorityRank: priorityRank(a.priority),
+    dueDate: a.due_date ?? null,
+    createdAt: a.created_at ?? null,
+  });
   openActions
     .filter((a: any) => a.approval_status === 'Approved')
-    .sort((a: any, b: any) => (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999'))
-    .forEach((a: any) =>
-      approved.push({
-        key: `action-${a.id}`,
-        source: 'Action',
-        step: a.title,
-        projectId,
-        projectName,
-        refId: a.id,
-      }),
-    );
+    .map((a: any) => toActionRow(a, 0))
+    .sort(compareActionRows)
+    .forEach((row) => approved.push(row));
   openActions
     .filter((a: any) => a.approval_status === 'Proposed' || a.approval_status === 'Unreviewed')
-    .sort((a: any, b: any) => (a.created_at ?? '').localeCompare(b.created_at ?? ''))
-    .forEach((a: any) =>
-      proposed.push({
-        key: `action-${a.id}`,
-        source: 'Action',
-        step: a.title,
-        projectId,
-        projectName,
-        refId: a.id,
-      }),
-    );
+    .map((a: any) => toActionRow(a, 1))
+    .sort(compareActionRows)
+    .forEach((row) => proposed.push(row));
 
   // (c) Money Lanes — critical then high, lanes that are not on yet (missing)
   const { data: venue } = await supabase
@@ -220,10 +253,13 @@ export function useNextTenAcrossProjects(
       );
       const order: NextTenSource[] = ['Action', 'Lane', 'Product', 'KPI'];
       const flat = lists.flat();
-      // Keep the per-project ranking, interleaved by source tier. Lane rows are
-      // ranked across projects by their score, highest first.
+      // Interleave by source tier. Action rows are ranked across all brands
+      // together (approved first, then priority, then due date) rather than
+      // brand by brand, so a P1 item on one brand outranks a P2 on another.
+      // Lane rows are ranked across projects by their score, highest first.
       const ranked = order.flatMap((src) => {
         const rows = flat.filter((r) => r.source === src);
+        if (src === 'Action') return rows.sort(compareActionRows);
         if (src !== 'Lane') return rows;
         return rows.sort((a, b) => (b.laneValue ?? -1) - (a.laneValue ?? -1));
       });
