@@ -1,150 +1,57 @@
-/* Homepage decision block: "Where are you starting from?" Another bay of the
-   services circuit board, so it reads as the same site: the same light board,
-   a gold rail down the left margin and a cyan rail down the right (drawn in
-   code from the live layout), frosted modules with a number and status light,
-   each fed from its rail, and both rails plugging into the checkup console
-   underneath. Visible by default; the script arms a gentle rise-in only while
-   the section is still below the fold. */
-.stm-studio .stm-start{position:relative;isolation:isolate;overflow:hidden;border-top:0;padding:clamp(100px,9vw,128px) 0 clamp(104px,9.5vw,136px);background:radial-gradient(130% 72% at 50% 38%,#F8F9FB 0%,#EFF2F5 52%,#E6EAEF 100%);color:#0B1530}
-
-/* Board */
-/* The section above ends on this same light color, so the rails fade in at the top instead of starting on a hard edge. */
-.stm-studio .stm-start-board{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 110px);mask-image:linear-gradient(180deg,transparent 0,#000 110px)}
-.stm-studio .stm-start-board .u{fill:none;stroke:#C0C8D3;stroke-width:1.7;stroke-linecap:round}
-.stm-studio .stm-start-board .pu{fill:#F1F3F6;stroke:#B1BAC6;stroke-width:1.6}
-.stm-studio .stm-start-board .lw{fill:none;stroke-width:26;stroke-opacity:.07;stroke-linecap:round;stroke-linejoin:round}
-.stm-studio .stm-start-board .lh{fill:none;stroke-width:10;stroke-opacity:.22;stroke-linecap:round;stroke-linejoin:round}
-.stm-studio .stm-start-board .lb{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.stm-studio .stm-start-board .lc{fill:none;stroke:#FFFFFF;stroke-width:.9;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round}
-.stm-studio .stm-start-board .gold .lw,.stm-studio .stm-start-board .gold .lh,.stm-studio .stm-start-board .gold .lb{stroke:#F2A20F}
-.stm-studio .stm-start-board .cyan .lw,.stm-studio .stm-start-board .cyan .lh,.stm-studio .stm-start-board .cyan .lb{stroke:#14B5E3}
-.stm-studio .stm-start-board .jn.gold{fill:#F2A20F}
-.stm-studio .stm-start-board .jn.cyan{fill:#14B5E3}
-.stm-studio .stm-start-board .pin{fill:#FFFFFF;stroke-width:1.6}
-.stm-studio .stm-start-board .pin.gold{stroke:#F2A20F}
-.stm-studio .stm-start-board .pin.cyan{stroke:#14B5E3}
-.stm-studio .stm-start-board .fd{opacity:0;transition:opacity .3s ease}
-.stm-studio .stm-start-board .fd.hot{opacity:1;transition-duration:.12s}
-.stm-studio .stm-start-board .plug{stroke:#FFFFFF;stroke-width:2.5}
-.stm-studio .stm-start-board .plug.gold{fill:#F2A20F;filter:drop-shadow(0 0 6px rgba(242,162,15,.85))}
-.stm-studio .stm-start-board .plug.cyan{fill:#14B5E3;filter:drop-shadow(0 0 6px rgba(20,181,227,.85))}
+/* Homepage decision block: "Where are you starting from?" Four situations as
+   a plain list in big type on the light board: a small number, the situation
+   in bold, then the one line and the next step, with a hairline between rows.
+   No boxes and no circuit, so it reads as its own thing next to the services
+   board. Visible by default; the script arms a gentle rise-in only while the
+   section is still below the fold. */
+.stm-studio .stm-start{position:relative;padding:clamp(96px,9vw,128px) 0 clamp(100px,9.5vw,132px);background:radial-gradient(130% 72% at 50% 38%,#F8F9FB 0%,#EFF2F5 52%,#E6EAEF 100%);color:#0B1530}
 
 /* Head */
-.stm-studio .stm-start-head{position:relative;z-index:2;width:min(92%,1240px);margin:0 auto;text-align:center}
+.stm-studio .stm-start-head{width:min(92%,1180px);margin:0 auto}
 .stm-studio .stm-start-eyebrow{display:inline-flex;align-items:center;gap:16px;font:700 15px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#C97A08}
-.stm-studio .stm-start-eyebrow::before,.stm-studio .stm-start-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
-.stm-studio .stm-start h2{margin:18px auto 0;font:800 clamp(40px,4.8vw,70px)/1.02 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#0B1530}
+.stm-studio .stm-start-eyebrow::after{content:"";width:36px;height:2px;border-radius:2px;background:#E8A13C}
+.stm-studio .stm-start h2{margin-top:18px;font:800 clamp(40px,4.8vw,70px)/1.02 "Inter Tight",sans-serif;letter-spacing:-.03em;color:#0B1530}
 .stm-studio .stm-start h2 em{font-style:normal;padding-right:.04em;background:linear-gradient(95deg,#F2A516 0%,#DE8708 55%,#B9650A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stm-studio .stm-start-sub{margin-top:16px;font:500 clamp(18px,1.5vw,21px)/1.5 Inter,sans-serif;color:#4A5568}
 
-.stm-studio .stm-start-grid{position:relative;z-index:2;width:min(92%,1180px);margin:56px auto 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
-
-/* Modules: frosted cards like the services board's, lit in their rail's color
-   (gold on the left, cyan on the right) when hovered or focused. */
-.stm-studio .stm-start-card{--hl:242,162,15;--d:0s;position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:30px 30px 28px;border:1px solid rgba(255,255,255,.95);border-radius:20px;background:rgba(255,255,255,.95);box-shadow:0 0 0 1px rgba(15,28,55,.06),0 18px 40px -24px rgba(15,28,55,.32),inset 0 1px 0 #fff;transition:transform .35s cubic-bezier(.22,1,.36,1) 0s,box-shadow .35s ease 0s,opacity .6s ease var(--d),translate .75s cubic-bezier(.22,1,.36,1) var(--d)}
-.stm-studio .stm-start-card:nth-child(even){--hl:20,181,227}
-.stm-studio .stm-start-edge{position:absolute;inset:0;z-index:1;width:100%;height:100%;overflow:visible;pointer-events:none}
-.stm-studio .stm-start-edge rect{fill:none;stroke:rgb(var(--hl));stroke-width:1.8;stroke-dasharray:100 100;stroke-dashoffset:100;opacity:0;filter:drop-shadow(0 0 3px rgba(var(--hl),.85));transition:opacity .3s ease,stroke-dashoffset 0s linear .3s}
-.stm-studio .stm-start-card:hover .stm-start-edge rect,.stm-studio .stm-start-card:focus-within .stm-start-edge rect{opacity:1;stroke-dashoffset:0;transition:opacity 0s,stroke-dashoffset .75s cubic-bezier(.3,.55,.35,1) .1s}
-.stm-studio .stm-start-status{position:absolute;top:30px;right:28px;display:flex;align-items:center;gap:10px}
-.stm-studio .stm-start-status span{font:600 20px/1 "Inter Tight",sans-serif;letter-spacing:.02em;color:#A3ACBA}
-.stm-studio .stm-start-status i{width:9px;height:9px;border-radius:50%;background:rgb(var(--hl));box-shadow:0 0 0 3px rgba(var(--hl),.18),0 0 9px rgba(var(--hl),.8)}
-.stm-studio .stm-start[data-armed="1"].is-in .stm-start-status i{animation:stmStartBlink .9s ease-out calc(var(--d,0s) + .55s)}
-@keyframes stmStartBlink{35%{transform:scale(1.8);box-shadow:0 0 0 6px rgba(var(--hl),.22),0 0 22px rgba(var(--hl),1)}}
-.stm-studio .stm-start-chip{display:grid;place-items:center;width:62px;height:62px;border-radius:16px;color:#fff;background:linear-gradient(150deg,#F8B940 0%,#E08A0E 55%,#B35F07 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 6px rgba(0,0,0,.18),0 10px 20px -8px rgba(224,138,14,.6);transition:filter .35s ease,box-shadow .35s ease}
-.stm-studio .stm-start-card[data-tone="cyan"] .stm-start-chip{background:linear-gradient(150deg,#55D3F3 0%,#14B5E3 50%,#0B7FA6 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 6px rgba(0,0,0,.18),0 10px 20px -8px rgba(20,181,227,.55)}
-.stm-studio .stm-start-card[data-tone="wine"] .stm-start-chip{background:linear-gradient(150deg,#C2465E 0%,#8C2F43 55%,#5E1F2E 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 6px rgba(0,0,0,.18),0 10px 20px -8px rgba(140,47,67,.55)}
-.stm-studio .stm-start-card[data-tone="teal"] .stm-start-chip{background:linear-gradient(150deg,#2BB3C6 0%,#14798C 55%,#0C4F5E 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 6px rgba(0,0,0,.18),0 10px 20px -8px rgba(20,121,140,.55)}
-.stm-studio .stm-start-chip svg{width:28px;height:28px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
-.stm-studio .stm-start-card h3{margin-top:22px;font:800 clamp(25px,2.3vw,31px)/1.1 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#0B1530}
-.stm-studio .stm-start-card p{max-width:48ch;margin:10px 0 24px;font:500 17.5px/1.5 Inter,sans-serif;color:#4A5568}
-/* The services board's card link: bold label, gold underline, arrow. The
-   whole card is its hit area. */
-.stm-studio .stm-start-go{margin-top:auto;display:inline-flex;align-items:center;gap:8px;padding-bottom:6px;font:800 16.5px Inter,sans-serif;color:#0B1530;text-decoration:none;background:linear-gradient(90deg,#F6B73C,#E8750B) left bottom/100% 2.5px no-repeat}
+/* The list: one row per situation. The whole row is the link's hit area. */
+.stm-studio .stm-start-list{width:min(92%,1180px);margin:44px auto 0;padding:0;list-style:none;border-top:1px solid rgba(11,21,48,.14)}
+.stm-studio .stm-start-row{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);gap:12px clamp(24px,3vw,48px);align-items:start;padding:36px 0 38px;border-bottom:1px solid rgba(11,21,48,.14);transition:opacity .6s ease var(--d,0s),translate .75s cubic-bezier(.22,1,.36,1) var(--d,0s)}
+.stm-studio .stm-start-row::before{content:"";position:absolute;inset:0 -18px;z-index:0;border-radius:18px;background:#fff;opacity:0;transition:opacity .25s ease}
+.stm-studio .stm-start-row:hover::before,.stm-studio .stm-start-row:focus-within::before{opacity:.85}
+.stm-studio .stm-start-row > *{position:relative;z-index:1}
+.stm-studio .stm-start-num{padding-top:10px;font:800 15px "Inter Tight",sans-serif;letter-spacing:.08em;color:#C97A08}
+.stm-studio .stm-start-row h3{font:800 clamp(26px,2.6vw,36px)/1.12 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#0B1530;text-wrap:balance}
+.stm-studio .stm-start-next p{max-width:46ch;margin:4px 0 0;font:500 18px/1.5 Inter,sans-serif;color:#4A5568;text-wrap:pretty}
+.stm-studio .stm-start-go{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding-bottom:6px;font:800 17px Inter,sans-serif;color:#0B1530;text-decoration:none;background:linear-gradient(90deg,#F6B73C,#E8750B) left bottom/100% 2.5px no-repeat}
 .stm-studio .stm-start-go svg{width:17px;height:17px;transition:transform .25s ease}
-.stm-studio .stm-start-go::after{content:"";position:absolute;inset:0;z-index:2;border-radius:20px}
+.stm-studio .stm-start-go::after{content:"";position:absolute;inset:0 -18px;z-index:2;border-radius:18px}
 .stm-studio .stm-start-go:focus-visible{outline:none}
-.stm-studio .stm-start-card:has(.stm-start-go:focus-visible){outline:2px solid #DE8708;outline-offset:3px}
-.stm-studio .stm-start-card:hover,.stm-studio .stm-start-card:focus-within{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(15,28,55,.07),0 0 34px rgba(var(--hl),.24),0 24px 48px -22px rgba(15,28,55,.4),inset 0 1px 0 #fff}
-.stm-studio .stm-start-card:hover .stm-start-chip,.stm-studio .stm-start-card:focus-within .stm-start-chip{filter:brightness(1.12) saturate(1.1)}
-.stm-studio .stm-start-card:hover .stm-start-go svg,.stm-studio .stm-start-card:focus-within .stm-start-go svg{transform:translateX(4px)}
-
-/* Checkup console: dark like the Work wall, a gold-to-cyan line along its top
-   edge, the rails plugging into its sides, and the form right in it. */
-.stm-studio .stm-start-check{--d:.34s;grid-column:1/-1;position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:40px 58px;align-items:center;margin-top:10px;padding:48px 54px 50px;border-radius:24px;color:#fff;background:radial-gradient(120% 140% at 0% 0%,#17284D 0%,#0B1530 46%,#070D1C 100%);border:1px solid rgba(255,255,255,.07);box-shadow:0 34px 70px -34px rgba(11,21,48,.75);transition:opacity .6s ease var(--d),translate .75s cubic-bezier(.22,1,.36,1) var(--d)}
-.stm-studio .stm-start-check::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(90% 120% at 0% 0%,#000 30%,transparent 80%);mask-image:radial-gradient(90% 120% at 0% 0%,#000 30%,transparent 80%)}
-.stm-studio .stm-start-check::after{content:"";position:absolute;left:28px;right:28px;top:0;height:2px;border-radius:0 0 2px 2px;pointer-events:none;background:linear-gradient(90deg,#F2A20F,#14B5E3);box-shadow:0 0 14px rgba(242,162,15,.5),0 0 14px rgba(20,181,227,.35)}
-.stm-studio .stm-start-check-eyebrow{font:700 14px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#F6C65A}
-.stm-studio .stm-start-check h3{margin-top:14px;font:800 clamp(32px,3.2vw,46px)/1.06 "Inter Tight",sans-serif;letter-spacing:-.025em;color:#fff}
-.stm-studio .stm-start-check-lead{max-width:44ch;margin:12px 0 0;font:500 18.5px/1.5 Inter,sans-serif;color:rgba(255,255,255,.8);text-wrap:pretty}
-
-/* The form: name and city side by side, the button under them. */
-.stm-studio .stm-start-form{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px;margin-top:26px}
-.stm-studio .stm-start-form label{display:grid;gap:8px}
-.stm-studio .stm-start-form label > span{font:700 15px Inter,sans-serif;color:#D3DCEA}
-.stm-studio .stm-start-form input{width:100%;height:58px;padding:0 18px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font:500 18px Inter,sans-serif;outline:none;transition:border-color .2s ease,background .2s ease,box-shadow .2s ease}
-.stm-studio .stm-start-form input::placeholder{color:#8592AA}
-.stm-studio .stm-start-form input:focus{border-color:#14B5E3;background:rgba(20,181,227,.09);box-shadow:0 0 0 3px rgba(20,181,227,.22),0 0 20px rgba(20,181,227,.25)}
-.stm-studio .stm-start-form label.is-missing input{border-color:#F2A20F;box-shadow:0 0 0 3px rgba(242,162,15,.25)}
-.stm-studio .stm-start-check-btn{grid-column:1/-1;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;margin-top:4px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;font:800 18px Inter,sans-serif;box-shadow:0 14px 30px -10px rgba(232,154,43,.65);transition:transform .25s ease,filter .25s ease,box-shadow .25s ease}
-.stm-studio .stm-start-check-btn svg{width:19px;height:19px;transition:transform .25s ease}
-.stm-studio .stm-start-check-btn:hover,.stm-studio .stm-start-check-btn:focus-visible{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 18px 36px -10px rgba(232,154,43,.8)}
-.stm-studio .stm-start-check-btn:hover svg,.stm-studio .stm-start-check-btn:focus-visible svg{transform:translateX(4px)}
-.stm-studio .stm-start-check-btn:focus-visible{outline:3px solid #F6C65A;outline-offset:4px}
-.stm-studio .stm-start-form-note{grid-column:1/-1;margin:2px 0 0;font:500 15.5px/1.45 Inter,sans-serif;color:rgba(255,255,255,.72)}
-.stm-studio .stm-start-form-note[role="alert"]{color:#F6C65A}
-
-/* What happens next */
-.stm-studio .stm-start-how-title{margin-bottom:20px;font:700 13px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#93A3C0}
-.stm-studio .stm-start-steps{display:grid;margin:0;padding:0;list-style:none}
-.stm-studio .stm-start-steps li{display:grid;grid-template-columns:46px 1fr;gap:18px;align-items:start;padding:18px 0;border-top:1px solid rgba(255,255,255,.1)}
-.stm-studio .stm-start-steps li:first-child{padding-top:0;border-top:0}
-.stm-studio .stm-start-steps li:last-child{padding-bottom:0}
-.stm-studio .stm-start-steps b{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(246,198,90,.6);font:800 19px/1 "Inter Tight",sans-serif;color:#F6C65A;box-shadow:0 0 16px rgba(246,198,90,.16)}
-.stm-studio .stm-start-steps li > span{padding-top:9px;font:500 18px/1.5 Inter,sans-serif;color:#E4E9F2;text-wrap:pretty}
+.stm-studio .stm-start-row:has(.stm-start-go:focus-visible){outline:2px solid #DE8708;outline-offset:-2px;border-radius:18px}
+.stm-studio .stm-start-row:hover .stm-start-go svg,.stm-studio .stm-start-row:focus-within .stm-start-go svg{transform:translateX(4px)}
 
 /* Rise-in, only while armed by the script. */
-.stm-studio .stm-start[data-armed="1"] .stm-start-card,.stm-studio .stm-start[data-armed="1"] .stm-start-check{opacity:0;translate:0 18px}
-.stm-studio .stm-start[data-armed="1"].is-in .stm-start-card,.stm-studio .stm-start[data-armed="1"].is-in .stm-start-check{opacity:1;translate:none}
-.stm-studio .stm-start-card:nth-child(2){--d:.08s}
-.stm-studio .stm-start-card:nth-child(3){--d:.16s}
-.stm-studio .stm-start-card:nth-child(4){--d:.24s}
+.stm-studio .stm-start[data-armed="1"] .stm-start-row{opacity:0;translate:0 16px}
+.stm-studio .stm-start[data-armed="1"].is-in .stm-start-row{opacity:1;translate:none}
 
-/* Tablets: the console stacks how it works under the form. */
 @media (max-width:1023px){
-  .stm-studio .stm-start-grid{gap:18px}
-  .stm-studio .stm-start-card{padding:28px 24px 24px}
-  .stm-studio .stm-start-status{top:28px;right:22px}
-  .stm-studio .stm-start-check{grid-template-columns:1fr;gap:34px;padding:42px 36px}
+  .stm-studio .stm-start-row{grid-template-columns:48px minmax(0,1fr);padding:30px 0 32px}
+  .stm-studio .stm-start-next{grid-column:2}
 }
-
-/* Phones: one column of solid cards (no blur, for smooth scrolling), rails at
-   the screen edges, the form stacked. */
 @media (max-width:760px){
-  .stm-studio .stm-start{padding:76px 0 88px}
-  .stm-studio .stm-start-head{width:auto;margin:0 22px}
+  .stm-studio .stm-start{padding:72px 0 80px}
+  .stm-studio .stm-start-head,.stm-studio .stm-start-list{width:auto;margin-left:22px;margin-right:22px}
+  .stm-studio .stm-start-list{margin-top:32px}
   .stm-studio .stm-start-eyebrow{gap:12px;font-size:13px}
-  .stm-studio .stm-start-eyebrow::before,.stm-studio .stm-start-eyebrow::after{width:24px}
-  .stm-studio .stm-start-grid{grid-template-columns:1fr;gap:16px;width:auto;margin:34px 16px 0}
-  .stm-studio .stm-start-card{padding:24px 20px 22px;background:rgba(255,255,255,.95);-webkit-backdrop-filter:none;backdrop-filter:none}
-  .stm-studio .stm-start-status{top:24px;right:18px;gap:8px}
-  .stm-studio .stm-start-status span{font-size:17px}
-  .stm-studio .stm-start-chip{width:54px;height:54px;border-radius:14px}
-  .stm-studio .stm-start-chip svg{width:25px;height:25px}
-  .stm-studio .stm-start-card h3{margin-top:18px;font-size:25px}
-  .stm-studio .stm-start-card p{margin:8px 0 20px;font-size:17px}
-  .stm-studio .stm-start-check{gap:30px;margin-top:6px;padding:32px 20px 28px;border-radius:20px}
-  .stm-studio .stm-start-check::after{left:20px;right:20px}
-  .stm-studio .stm-start-check h3{font-size:31px}
-  .stm-studio .stm-start-check-lead{font-size:17px}
-  .stm-studio .stm-start-form{grid-template-columns:1fr;margin-top:22px}
-  .stm-studio .stm-start-form-note{text-align:center}
-  .stm-studio .stm-start-steps li{grid-template-columns:40px 1fr;gap:14px;padding:16px 0}
-  .stm-studio .stm-start-steps b{width:38px;height:38px;font-size:17px}
-  .stm-studio .stm-start-steps li > span{padding-top:7px;font-size:17px}
+  .stm-studio .stm-start-eyebrow::after{width:24px}
+  .stm-studio .stm-start-row{grid-template-columns:1fr;gap:8px;padding:26px 0 28px}
+  .stm-studio .stm-start-row::before,.stm-studio .stm-start-go::after{inset:0 -10px}
+  .stm-studio .stm-start-num{padding-top:0}
+  .stm-studio .stm-start-next{grid-column:auto}
+  .stm-studio .stm-start-row h3{font-size:25px}
+  .stm-studio .stm-start-next p{font-size:17px}
+  .stm-studio .stm-start-go{margin-top:14px;font-size:16px}
 }
-
 @media (prefers-reduced-motion:reduce){
-  .stm-studio .stm-start-status i{animation:none}
-  .stm-studio .stm-start-card,.stm-studio .stm-start-go svg,.stm-studio .stm-start-check-btn,.stm-studio .stm-start-check-btn svg,.stm-studio .stm-start-edge rect{transition:none}
-  .stm-studio .stm-start-card:hover,.stm-studio .stm-start-card:focus-within,.stm-studio .stm-start-check-btn:hover{transform:none}
+  .stm-studio .stm-start-row,.stm-studio .stm-start-row::before,.stm-studio .stm-start-go svg{transition:none}
 }

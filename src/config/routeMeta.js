@@ -15,7 +15,7 @@ export const ROUTE_META = {
   "/terms": { title: "Terms of Service | Supreme Team Media", description: "The terms for Supreme Team Media websites, creative, marketing, systems and publishing services." },
   "/services": { title: "Marketing, Website and Media Services | Supreme Team Media", description: "Marketing, websites, media and the systems behind them, planned together and built by one team. See every service, real work and starter packages." },
   "/areas": { title: "Areas We Serve | Supreme Team Media", description: "Marketing, websites and follow-up for businesses in every city in San Diego County, from Oceanside and Carlsbad to Chula Vista and El Cajon." },
-  "/blog": { title: "Blog | Supreme Team Media", description: "Straight answers for business owners on websites, Google listings, reviews and getting more calls, in plain English." },
+  "/blog": { title: "Blog | Supreme Team Media", description: "Ideas and answers in plain English on websites, marketing, business systems, publishing and launches, for owners, founders and authors." },
   "/pricing": { title: "Packages | Supreme Team Media", description: "Pick a starter package for where your business is, or build your own from every service we offer. You get a clear price, in writing, before anything starts." },
   "/startups": { title: "Startups & Founders | Supreme Team Media", description: "Turn the idea into something real with a readiness check and practical paths to validate, brand, launch and grow." },
 };

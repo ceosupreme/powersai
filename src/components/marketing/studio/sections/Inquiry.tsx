@@ -88,6 +88,7 @@ const PAGE_SECTION = /^(service|area)-[a-z0-9]+(-[a-z0-9]+)*$/;
 
 export function Inquiry({ servicePage, source, section }: { servicePage?: keyof typeof PAGE_COPY; source?: "work" | "hire" | "pricing" | "startups"; section?: string }) {
   const pageCopy = servicePage ? PAGE_COPY[servicePage] : null;
+  const sanDiego = getStudioMedia("contact-san-diego");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [services, setServices] = useState<ServiceId[]>(() => initialServices(pageCopy?.service, source));
@@ -323,7 +324,7 @@ export function Inquiry({ servicePage, source, section }: { servicePage?: keyof 
               {CONTACT_EMAIL}
             </a>
             <p className="mt-3 text-sm text-muted-foreground">Serving San Diego County and clients anywhere online.</p>
-              {!servicePage && <div className="home-contact-map mt-10"><iframe title="OpenStreetMap view of San Diego County and North County" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-117.65%2C32.53%2C-116.08%2C33.55&layer=mapnik"/><p>Based in Carlsbad Village, North County San Diego. <a href="https://www.openstreetmap.org/#map=9/33.04/-116.87" target="_blank" rel="noreferrer">Open accessible map</a></p></div>}
+              {!servicePage && sanDiego?.src && <div className="home-contact-map mt-10"><img src={sanDiego.src} alt={sanDiego.alt} width={sanDiego.width} height={sanDiego.height} loading="lazy" decoding="async" /><p>Based in Carlsbad Village, North County San Diego.</p></div>}
           </div>
 
           <div className="lg:col-span-7">

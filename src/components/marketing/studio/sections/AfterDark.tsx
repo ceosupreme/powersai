@@ -3,7 +3,6 @@ import { ArrowRight, Bell, CalendarDays, Database, MessageSquare, Phone, Send, S
 import { Link } from "react-router-dom";
 import { getStudioMedia } from "@/config/studioMedia";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
-import { useStackPanel } from "./HomeUsps";
 import "./afterDark.css";
 
 /**
@@ -32,9 +31,6 @@ export function AfterDark() {
   const [slots, setSlots] = useState<number[]>([0, 1, 2, 3]);
   const queueRef = useRef<number[]>(RECEIPTS.map((_, i) => i).slice(4));
   const allLitRef = useRef(false);
-
-  // First panel of the homepage stack: holds while the next slides over it.
-  useStackPanel(sectionRef);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -73,14 +69,12 @@ export function AfterDark() {
       title?.classList.add("lit");
       return;
     }
-    const THRESHOLDS = [0.09, 0.28, 0.47, 0.66];
+    const THRESHOLDS = [0.25, 0.5, 0.75, 1];
     const TITLE_THRESHOLDS = [0.1, 0.45, 0.8];
     let ticking = false;
-    let chipDocTop = 0; // chip row's document-space top, cached while unpinned
     const update = () => {
       ticking = false;
       const vh = window.innerHeight || 1;
-      const scrollY = window.scrollY || 0;
       // Headline lines light as the title climbs the lower half of the screen.
       if (title && titleLines.length > 0) {
         const tr = title.getBoundingClientRect();
@@ -88,23 +82,16 @@ export function AfterDark() {
         titleLines.forEach((line, index) => line.classList.toggle("lit", tp > TITLE_THRESHOLDS[index]));
         title.classList.toggle("lit", tp > TITLE_THRESHOLDS[2]);
       }
-      const rect = chipRow.getBoundingClientRect();
-      // The section pins in the homepage stack, which freezes its rects while
-      // the scroll keeps going. Progress therefore runs on the row's document
-      // position, cached from the last unpinned frame — identical behavior
-      // before the pin, and the late chips still arrive while the scene holds.
-      const sectionRect = section.getBoundingClientRect();
-      const pinTop = Math.min(0, vh - sectionRect.height);
-      const pinned = sectionRect.top <= pinTop + 2;
-      if (!pinned) chipDocTop = rect.top + scrollY;
-      const top = pinned ? chipDocTop - scrollY : rect.top;
-      // 0 once the chip row is fully on screen; the four chips then land
-      // about a fifth of a screen apart while the slide holds in place (the
-      // stack's 110vh hold), the last leaving about half a screen of rest
-      // before the next slide.
-      const progress = (vh * 0.85 - top) / vh;
-      chips.forEach((chip, index) => chip.classList.toggle("lit", progress > THRESHOLDS[index]));
-      allLitRef.current = progress > THRESHOLDS[THRESHOLDS.length - 1];
+      // The four chips land one after another as the row rises through the
+      // lower part of the screen, reversible on the way back up. On wide
+      // screens the row sits along the bottom of the one-screen scene, so the
+      // last chip lands just as the whole scene is in view; on phones the row
+      // follows the picture and lands as it reaches mid-screen.
+      const top = chipRow.getBoundingClientRect().top;
+      const wide = window.innerWidth > 760;
+      const progress = wide ? (vh - top) / (vh * 0.24) : (vh * 0.92 - top) / (vh * 0.35);
+      chips.forEach((chip, index) => chip.classList.toggle("lit", progress >= THRESHOLDS[index]));
+      allLitRef.current = progress >= THRESHOLDS[THRESHOLDS.length - 1];
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
     update();

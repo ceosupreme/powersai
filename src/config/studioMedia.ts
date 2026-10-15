@@ -34,6 +34,7 @@ import openingAutomation from "@/assets/stm-opening/automation-gear.png.asset.js
 import openingTrustPeople from "@/assets/stm-opening/trust-people-black.png.asset.json";
 import openingTrustShield from "@/assets/stm-opening/trust-shield.png.asset.json";
 import openingTrustStar from "@/assets/stm-opening/trust-star.png.asset.json";
+import contactSanDiego from "@/assets/studio/contact-map.webp.asset.json";
 import commandCenterDesktop from "@/assets/stm-opening/command-center-v2-desktop.webp";
 import commandCenterMobile from "@/assets/stm-opening/command-center-v2-mobile.webp";
 import afterDark3am from "@/assets/stm-opening/after-dark-3am.webp";
@@ -112,6 +113,15 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
     height: 941,
     objectFit: "cover",
     objectPosition: "72% center",
+  },
+  /** Under the contact form on the homepage: the San Diego picture (a drawn map of the city over the coast at sunset). */
+  "contact-san-diego": {
+    src: contactSanDiego.url,
+    alt: "A drawn map of San Diego with a pin on downtown, over a photo of the coast and palm trees at sunset",
+    aspectRatio: "4 / 3",
+    width: 1448,
+    height: 1086,
+    objectFit: "cover",
   },
   "home-after-dark": {
     src: afterDark3am,

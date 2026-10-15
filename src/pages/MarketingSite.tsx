@@ -4,8 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { StudioFooter } from "@/components/marketing/studio/StudioFooter";
 import { HomeOpening } from "@/components/marketing/studio/home-opening/HomeOpening";
 import { AfterDark } from "@/components/marketing/studio/sections/AfterDark";
-import { BoostBrands, GetAttention } from "@/components/marketing/studio/sections/HomeUsps";
 import { SelectedWork } from "@/components/marketing/studio/sections/SelectedWork";
+import { HomeCheckup } from "@/components/marketing/studio/sections/HomeCheckup";
 import { StartingPoint } from "@/components/marketing/studio/sections/StartingPoint";
 import { HomeBlog } from "@/components/marketing/studio/sections/HomeBlog";
 import { HomeFaq } from "@/components/marketing/studio/sections/HomeFaq";
@@ -58,37 +58,26 @@ export default function MarketingSite() {
   return (
     <div className="stm-studio relative min-h-screen">
       <main>
-        <HomeOpening />
-        {/* The slide stack, one owner's story: "We build websites that get
-            attention" (the bench), then the 3 AM scene slides up over it ("We
-            build websites that work while you sleep"), then the rooftop ("We
-            boost brands higher, faster").
-            Work follows as its own section, the proof right after the
-            promises: the featured brands switch on as it scrolls in.
-            Then "Where are you starting from?": four situations, each with
-            one next step, and the free checkup for anyone who can't pick.
-            Then the three newest blog posts (hidden until one is published),
-            then the questions owners ask before they reach out (which also
-            cover how a project works, so there's no separate section for it),
-            then "Let's build yours" pointing to packages, then the contact form.
-            Industry pages stay linked from the header and footer. */}
-        <div className="stm-stack">
-          <GetAttention />
-          <div className="stm-stack-hold" aria-hidden="true" />
-          <AfterDark />
-          <div className="stm-stack-hold long" aria-hidden="true" />
-          <BoostBrands />
-          <div className="stm-stack-hold" aria-hidden="true" />
-        </div>
-        <div className="stm-after-stack">
-          <SelectedWork />
-          <Testimonials />
-          <StartingPoint />
-          <HomeBlog />
-          <HomeFaq />
-          <StudioReveal><HomePackages /></StudioReveal>
-          <StudioReveal><Inquiry /></StudioReveal>
-        </div>
+        {/* The opening: header, hero, then the free checkup with the form
+            right on the page, then the services board. After that one promise
+            slide, the 3 AM scene ("We build websites that work while you
+            sleep", with the overnight activity boxes), then the proof: Work,
+            with the featured brands switching on as it scrolls in, and the
+            client reviews. Then "Where are you starting from?": four
+            situations, each with one next step. Then the blog (hidden until a
+            post is published), the questions owners ask before they reach out
+            (which also cover how a project works, so there's no separate
+            section for it), "Let's build yours" pointing to packages, and the
+            contact form. Industry pages stay linked from the header and footer. */}
+        <HomeOpening afterHero={<HomeCheckup />} />
+        <AfterDark />
+        <SelectedWork />
+        <Testimonials />
+        <StartingPoint />
+        <HomeBlog />
+        <HomeFaq />
+        <StudioReveal><HomePackages /></StudioReveal>
+        <StudioReveal><Inquiry /></StudioReveal>
       </main>
       <StudioFooter />
     </div>

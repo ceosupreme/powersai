@@ -1,0 +1,81 @@
+/* The sitewide footer on the navy band: a gold line along the top, who we are
+   and how to reach us on the left, the free checkup card on the right, three
+   short link columns, the industry and city pages folded under two headings,
+   and the legal line. */
+.stm-studio footer.stm-footer{position:relative;padding:clamp(64px,6.5vw,88px) 0 36px;background:#0B1224;color:#F3F6F9}
+.stm-studio .stm-footer::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#F2A20F,#E8920E 50%,#14B5E3);opacity:.9}
+.stm-studio .stm-footer-in{width:min(92%,1180px);margin:0 auto}
+.stm-studio .stm-footer a{color:inherit;text-decoration:none}
+
+/* Top: brand block and the checkup card. */
+.stm-studio .stm-footer-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px clamp(40px,6vw,96px);align-items:start;padding-bottom:clamp(40px,4.5vw,56px);border-bottom:1px solid rgba(255,255,255,.12)}
+.stm-studio .stm-footer-logo{display:inline-flex;align-items:center;gap:14px;font:800 24px "Inter Tight",sans-serif;letter-spacing:-.02em;color:#fff}
+.stm-studio .stm-footer-logo img{width:34px;height:auto}
+.stm-studio .stm-footer-tag{max-width:46ch;margin-top:18px;font:500 17px/1.55 Inter,sans-serif;color:rgba(255,255,255,.74);text-wrap:pretty}
+.stm-studio .stm-footer-facts{display:grid;gap:10px;margin:24px 0 0;padding:0;list-style:none}
+.stm-studio .stm-footer-facts li{display:flex;align-items:center;gap:12px;font:500 16px Inter,sans-serif;color:rgba(255,255,255,.86)}
+.stm-studio .stm-footer-facts svg{width:18px;height:18px;flex:none;color:#F6C65A}
+.stm-studio .stm-footer-facts a{text-decoration:underline;text-decoration-color:rgba(246,198,90,.6);text-underline-offset:4px}
+.stm-studio .stm-footer-facts a:hover{text-decoration-color:#F6C65A}
+.stm-studio .stm-footer-trust{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:22px;font:600 14px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+.stm-studio .stm-footer-trust strong{font:800 17px "Inter Tight",sans-serif;letter-spacing:0;text-transform:none;color:#F6C65A}
+.stm-studio .stm-footer-trust i{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.35)}
+
+.stm-studio .stm-footer-cta{position:relative;overflow:hidden;padding:30px 32px 32px;border-radius:20px;background:radial-gradient(120% 140% at 0% 0%,#1A2C52 0%,#101C38 50%,#0C1529 100%);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 24px 48px -30px rgba(0,0,0,.8)}
+.stm-studio .stm-footer-cta::after{content:"";position:absolute;left:24px;right:24px;top:0;height:2px;background:linear-gradient(90deg,#F2A20F,#14B5E3);box-shadow:0 0 14px rgba(242,162,15,.5)}
+.stm-studio .stm-footer-cta small{display:block;font:700 13px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#F6C65A}
+.stm-studio .stm-footer-cta-title{margin-top:12px;font:800 clamp(24px,2.1vw,30px)/1.12 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#fff;text-wrap:balance}
+.stm-studio .stm-footer-cta p:not(.stm-footer-cta-title){margin-top:10px;font:500 16px/1.5 Inter,sans-serif;color:rgba(255,255,255,.76)}
+.stm-studio .stm-footer-btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;margin-top:20px;padding:0 24px;border-radius:999px;background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;font:800 16px Inter,sans-serif;box-shadow:0 14px 30px -12px rgba(232,154,43,.7);transition:transform .25s ease,filter .25s ease}
+.stm-studio .stm-footer-btn svg{width:17px;height:17px}
+.stm-studio .stm-footer-btn:hover,.stm-studio .stm-footer-btn:focus-visible{transform:translateY(-2px);filter:brightness(1.06)}
+
+/* Link columns. */
+.stm-studio .stm-footer-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px clamp(24px,4vw,64px);padding:clamp(36px,4vw,48px) 0}
+.stm-studio .stm-footer-cols h3{font:700 13px Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.56)}
+.stm-studio .stm-footer-cols ul{display:grid;gap:2px;margin:14px 0 0;padding:0;list-style:none}
+.stm-studio .stm-footer-cols li a{display:inline-flex;align-items:center;min-height:40px;font:600 16px Inter,sans-serif;color:rgba(255,255,255,.88);transition:color .2s ease}
+.stm-studio .stm-footer-cols li a:hover,.stm-studio .stm-footer-cols li a:focus-visible{color:#F6C65A}
+
+/* Industry and city pages, folded under two headings. */
+.stm-studio .stm-footer-more{border-top:1px solid rgba(255,255,255,.12)}
+.stm-studio .stm-footer-more details{border-bottom:1px solid rgba(255,255,255,.12)}
+.stm-studio .stm-footer-more summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px;padding:8px 0;cursor:pointer;list-style:none;font:700 16px Inter,sans-serif;color:rgba(255,255,255,.88)}
+.stm-studio .stm-footer-more summary::-webkit-details-marker{display:none}
+.stm-studio .stm-footer-more summary svg{width:20px;height:20px;flex:none;color:#F6C65A;transition:transform .25s ease}
+.stm-studio .stm-footer-more details[open] summary svg{transform:rotate(180deg)}
+.stm-studio .stm-footer-more summary:hover{color:#F6C65A}
+.stm-studio .stm-footer-more summary:focus-visible{outline:2px solid #F6C65A;outline-offset:2px;border-radius:6px}
+.stm-studio .stm-footer-more-list{display:flex;flex-wrap:wrap;gap:4px 22px;padding:2px 0 18px}
+.stm-studio .stm-footer-more-list a,.stm-studio .stm-footer-more-list span{display:inline-flex;align-items:center;min-height:38px;font:500 15.5px Inter,sans-serif;color:rgba(255,255,255,.74)}
+.stm-studio .stm-footer-more-list a:hover,.stm-studio .stm-footer-more-list a:focus-visible{color:#F6C65A}
+.stm-studio .stm-footer-more-all{gap:6px;font-weight:700 !important;color:#fff !important}
+.stm-studio .stm-footer-more-all svg{width:15px;height:15px}
+
+/* Legal line. */
+.stm-studio .stm-footer-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;padding-top:26px;font:500 14.5px Inter,sans-serif;color:rgba(255,255,255,.56)}
+.stm-studio .stm-footer-bar nav{display:flex;gap:22px}
+.stm-studio .stm-footer-bar nav a{display:inline-flex;align-items:center;min-height:40px;color:rgba(255,255,255,.7)}
+.stm-studio .stm-footer-bar nav a:hover{color:#F6C65A}
+.stm-studio .stm-footer a:focus-visible{outline:2px solid #F6C65A;outline-offset:3px;border-radius:4px}
+
+@media (max-width:1023px){
+  .stm-studio .stm-footer-top{grid-template-columns:1fr}
+  .stm-studio .stm-footer-cta{max-width:560px}
+}
+@media (max-width:760px){
+  .stm-studio .stm-footer{padding:56px 0 28px}
+  .stm-studio .stm-footer-in{width:auto;margin:0 22px}
+  .stm-studio .stm-footer-top{gap:32px;padding-bottom:36px}
+  .stm-studio .stm-footer-logo{font-size:22px}
+  .stm-studio .stm-footer-cta{max-width:none;padding:26px 22px 26px}
+  .stm-studio .stm-footer-btn{width:100%;justify-content:center}
+  .stm-studio .stm-footer-cols{grid-template-columns:1fr 1fr;gap:28px 20px;padding:36px 0}
+  .stm-studio .stm-footer-cols nav:last-child{grid-column:1/-1}
+  .stm-studio .stm-footer-more-list{gap:0 18px}
+  .stm-studio .stm-footer-bar{flex-direction:column;align-items:flex-start;padding-top:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .stm-studio .stm-footer-btn,.stm-studio .stm-footer-more summary svg,.stm-studio .stm-footer-cols li a{transition:none}
+  .stm-studio .stm-footer-btn:hover{transform:none}
+}

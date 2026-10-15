@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, MonitorSmartphone, PhoneMissed, Star, type LucideIcon } from "lucide-react";
 import type { BlogPost } from "@/hooks/useBlogPosts";
@@ -21,11 +22,14 @@ export function postKind(category: string | null) {
 
 export function BlogCard({ post, source }: { post: BlogPost; source: string }) {
   const { icon: Icon, tone } = postKind(post.category);
+  // A cover that fails to load (missing file, offline) falls back to the drawn cover.
+  const [failed, setFailed] = useState(false);
+  const cover = post.cover_image && !failed ? post.cover_image : null;
   return (
     <article className="stm-blog-card" data-tone={tone}>
-      <div className="stm-blog-cover" aria-hidden={!post.cover_image}>
-        {post.cover_image
-          ? <img src={post.cover_image} alt={post.cover_alt ?? ""} loading="lazy" />
+      <div className="stm-blog-cover" aria-hidden={!cover}>
+        {cover
+          ? <img src={cover} alt={post.cover_alt ?? ""} width={1200} height={750} loading="lazy" decoding="async" onError={() => setFailed(true)} />
           : <span className="stm-blog-cover-chip"><Icon /></span>}
       </div>
       <div className="stm-blog-card-body">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, BookOpen, Building2, ChevronDown, Cog, Database, Globe, Mail, MapPin, Megaphone, Menu, Monitor, Play, Star, Tag, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -833,12 +833,15 @@ function OpeningServices() {
   </section>;
 }
 
-export function HomeOpening() {
+/** The homepage opening: its own header, the hero, then (when given) a section
+ *  that sits between the hero and the services board, such as the free checkup. */
+export function HomeOpening({ afterHero }: { afterHero?: ReactNode } = {}) {
   const [contactOpen, setContactOpen] = useState(false);
   const openContact = () => { setContactOpen(true); trackSiteEvent({ event_type: "cta_click", label: "contact_us" }); };
   return <>
     <OpeningHeader onContact={openContact} />
     <OpeningHero onContact={openContact} />
+    {afterHero}
     <OpeningServices />
     <Dialog open={contactOpen} onOpenChange={setContactOpen}><DialogContent className="stm-opening-dialog"><DialogHeader><DialogTitle>Contact Supreme Team Media</DialogTitle><DialogDescription>Email us directly, or use the message form at the bottom of this page.</DialogDescription></DialogHeader><Button asChild className="stm-opening-email"><a href={`mailto:${CONTACT_EMAIL}`}><Mail aria-hidden /> Email Us <span>{CONTACT_EMAIL}</span></a></Button></DialogContent></Dialog>
   </>;
