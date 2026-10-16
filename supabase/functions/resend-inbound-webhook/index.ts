@@ -63,8 +63,9 @@ Deno.serve(async (req) => {
   const emailId = String(evt?.data?.email_id ?? evt?.data?.id ?? "").trim();
   if (!/^[A-Za-z0-9_-]{6,100}$/.test(emailId)) return ok({ ignored: "no id" });
 
-  const apiKey = Deno.env.get("RESEND_API_KEY");
-  if (!apiKey) { console.error("[resend-inbound] RESEND_API_KEY missing"); return ok({ ignored: "no key" }); }
+  // Reading received mail needs a Full access key; the sending key can't. Use the receiving key when set.
+  const apiKey = Deno.env.get("RESEND_RECEIVING_API_KEY") || Deno.env.get("RESEND_API_KEY");
+  if (!apiKey) { console.error("[resend-inbound] no Resend key set"); return ok({ ignored: "no key" }); }
 
   let email: any = null;
   try {
