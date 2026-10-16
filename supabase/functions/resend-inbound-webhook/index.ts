@@ -68,14 +68,16 @@ Deno.serve(async (req) => {
   if (!apiKey) { console.error("[resend-inbound] no Resend key set"); return ok({ ignored: "no key" }); }
 
   let email: any = null;
+  let fetchStatus: number | string = "none";
   try {
     const r = await fetch(`https://api.resend.com/emails/receiving/${encodeURIComponent(emailId)}`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
+    fetchStatus = r.status;
     if (r.ok) email = await r.json();
     else console.warn("[resend-inbound] fetch failed", r.status, (await r.text()).slice(0, 300));
   } catch (e) { console.error("[resend-inbound] fetch error", e); }
-  if (!email || !(email.id || email.from)) return ok({ ignored: "not found" });
+  if (!email || !(email.id || email.from)) return ok({ ignored: "not found", resend_status: fetchStatus, key: Deno.env.get("RESEND_RECEIVING_API_KEY") ? "receiving" : "sending" });
 
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
     auth: { persistSession: false, autoRefreshToken: false },
