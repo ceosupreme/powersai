@@ -107,7 +107,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
     <><StudioMotion /><header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all",
-        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.97)] shadow-sm backdrop-blur" : "border-b border-border bg-[hsl(var(--paper))]",
+        scrolled ? "border-b border-border bg-[hsl(var(--paper)/0.97)] shadow-sm backdrop-blur lg:bg-[hsl(var(--paper)/0.8)] lg:backdrop-blur-md lg:backdrop-saturate-150" : "border-b border-border bg-[hsl(var(--paper))]",
       )}
     >
       <Container className="flex h-[76px] items-center justify-between gap-6">

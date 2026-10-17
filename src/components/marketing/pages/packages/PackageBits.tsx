@@ -25,7 +25,7 @@ export function StarterCard({ pkg, action, picked = false, index = 0 }: { pkg: S
     <article className={`pk-card${picked ? " is-picked" : ""}`} aria-label={pkg.name} style={{ "--i": index } as CSSProperties}>
       <div className="pk-stage"><StageMeter level={pkg.stage_level} /><span>{pkg.stage_label}</span></div>
       <h3>{pkg.name}</h3>
-      {pkg.tagline && <p className="pk-who">{pkg.tagline}</p>}
+      {pkg.tagline && <p className="pk-who"><span className="pk-best">Best for</span>{pkg.tagline}</p>}
       {pkg.items.length > 0 && <ul>{pkg.items.map((item) => <li key={item}><Check aria-hidden />{item}</li>)}</ul>}
       <div className="pk-card-foot">
         <p className="pk-price">{pkg.price_label}<strong>{pkg.price}</strong>{pkg.price_note && <small>{pkg.price_note}</small>}</p>

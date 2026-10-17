@@ -2,9 +2,9 @@
    section, and the starter packages on industry and service pages. Same light
    boards, dark windows and gold lights as the service and city pages. */
 
-.stm-studio .pk-led{display:inline-block;flex:none;width:9px;height:9px;border-radius:50%;background:#FFC94F;box-shadow:0 0 0 2.5px rgba(255,197,77,.2),0 0 12px 2px rgba(242,162,15,.8)}
-.stm-studio .pk-led.cy{background:#5FD6F5;box-shadow:0 0 0 2.5px rgba(95,214,245,.18),0 0 12px 2px rgba(20,181,227,.75)}
-.stm-studio .pk-led.gr{background:#3FE08A;box-shadow:0 0 0 2.5px rgba(63,224,138,.18),0 0 10px 1px rgba(63,224,138,.7)}
+.stm-studio .pk-led{display:inline-block;flex:none;width:9px;height:9px;border-radius:50%;background:#F2B544;box-shadow:0 0 0 2.5px rgba(242,181,68,.16)}
+.stm-studio .pk-led.cy{background:#5FC3E0;box-shadow:0 0 0 2.5px rgba(95,195,224,.16)}
+.stm-studio .pk-led.gr{background:#3FD27F;box-shadow:0 0 0 2.5px rgba(63,210,127,.16)}
 
 /* 1. The top */
 .stm-studio .pk-hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:56px;align-items:center}
@@ -46,8 +46,8 @@
 .stm-studio .pk-stage{display:flex;align-items:center;gap:12px;font:700 14px Inter,sans-serif;color:#5A6478}
 .stm-studio .pk-meter{display:flex;gap:4px}
 .stm-studio .pk-meter i{width:16px;height:7px;border-radius:3px;background:#E3E8EF}
-.stm-studio .pk-meter i.on{background:linear-gradient(90deg,#F6B73C,#E8920E);box-shadow:0 0 8px rgba(242,162,15,.55)}
-.stm-studio .pk-meter i.cy{background:linear-gradient(90deg,#5FD6F5,#14B5E3);box-shadow:0 0 8px rgba(20,181,227,.5)}
+.stm-studio .pk-meter i.on{background:linear-gradient(90deg,#F6B73C,#E8920E)}
+.stm-studio .pk-meter i.cy{background:linear-gradient(90deg,#5FD6F5,#14B5E3)}
 .stm-studio .pk-card h3{margin-top:16px;font:800 26px/1.08 "Inter Tight",sans-serif;letter-spacing:-.02em;color:#0B1530}
 .stm-studio .pk-card .pk-who{margin-top:10px;font:500 16px/1.5 Inter,sans-serif;color:#4A5568}
 .stm-studio .pk-card ul{display:grid;gap:11px;margin-top:20px;padding:0;list-style:none}
@@ -83,8 +83,8 @@
 .stm-studio .pk-chip .pk-pm svg{width:100%;height:100%;stroke-width:2.6}
 .stm-studio .pk-chip:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
 .stm-studio .pk-chip:focus-visible{outline:2px solid #F6B73C;outline-offset:2px}
-.stm-studio .pk-chip[aria-pressed="true"]{background:linear-gradient(180deg,rgba(246,183,60,.2),rgba(242,162,15,.09));box-shadow:inset 0 0 0 1.5px rgba(246,183,60,.85),0 10px 24px -14px rgba(242,162,15,.9);color:#fff}
-.stm-studio .pk-chip[aria-pressed="true"] .pk-dot{background:#FFD36B;box-shadow:0 0 0 2.5px rgba(255,197,77,.22),0 0 12px 3px rgba(242,162,15,.85)}
+.stm-studio .pk-chip[aria-pressed="true"]{background:rgba(246,183,60,.12);box-shadow:inset 0 0 0 1.5px rgba(246,183,60,.75);color:#fff}
+.stm-studio .pk-chip[aria-pressed="true"] .pk-dot{background:#F2B544;box-shadow:0 0 0 2.5px rgba(242,181,68,.2)}
 .stm-studio .pk-chip[aria-pressed="true"] .pk-pm{color:#FFC54D}
 .stm-studio .pk-state{padding:30px 0;font:600 17px Inter,sans-serif;color:rgba(255,255,255,.78)}
 
@@ -276,4 +276,15 @@
 @media (prefers-reduced-motion:reduce){
   .stm-studio [data-armed="1"] > .pk-card,.stm-studio [data-armed="1"] > .pk-card::before{opacity:1;transform:none;transition:none;animation:none}
   .stm-studio .pk-count.pk-hit,.stm-studio .pk-led.pk-hit{animation:none}
+}
+
+/* Starter packages as clear tier cards: a "Best for" label over who it suits,
+   and the price set off below a divider so it reads at a glance. Desktop adds
+   more lift and a gentle rise on hover. */
+.stm-studio .pk-card .pk-best{display:block;margin-bottom:4px;font:800 12px Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#B9650A}
+.stm-studio .pk-price strong{font-size:27px}
+.stm-studio .pk-card ul{margin-bottom:24px}
+@media (hover:hover) and (min-width:1024px){
+  .stm-studio .pk-card{padding:30px 26px 26px;box-shadow:0 0 0 1px rgba(15,28,55,.08),0 30px 60px -32px rgba(15,28,55,.45);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s ease}
+  .stm-studio .pk-card:hover{transform:translateY(-6px);box-shadow:0 0 0 1px rgba(232,161,60,.45),0 38px 70px -30px rgba(15,28,55,.5)}
 }

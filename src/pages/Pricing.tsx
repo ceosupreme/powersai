@@ -23,43 +23,16 @@ const questions = [
   ["Are other costs included?", "You’ll know what is included, what it costs and what happens next before anything starts. Any outside costs, like your domain name or ad spend, are listed in your written price."],
 ] as const;
 
-/** Switching a service on sends a short signal from it into "Your package": the side panel on wide
- *  screens, the bar at the bottom on phones. It runs once per tap and never under reduced motion. */
-function sendSignal(from: HTMLElement, slug: string) {
+/** Switching a service on gives the count in "Your package" (the side panel on wide screens, the bar
+ *  at the bottom on phones) a small bump, so the visitor sees it was added. Never under reduced motion. */
+function sendSignal(_from: HTMLElement, _slug: string) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const target = [...document.querySelectorAll<HTMLElement>(".pk-pkg .pk-count, .pk-bar .pk-count")].find((el) => el.getClientRects().length > 0);
-  if (!target || typeof from.animate !== "function") return;
-  const a = (from.querySelector(".pk-dot") ?? from).getBoundingClientRect();
-  const b = target.getBoundingClientRect();
-  const x = a.left + a.width / 2, y = a.top + a.height / 2;
-  const dx = b.left + b.width / 2 - x, dy = b.top + b.height / 2 - y;
-  const distance = Math.hypot(dx, dy);
-  if (distance < 12) return;
-  const turn = `rotate(${Math.atan2(dy, dx).toFixed(3)}rad)`;
-  const spark = document.createElement("span");
-  spark.className = "pk-signal";
-  spark.setAttribute("aria-hidden", "true");
-  spark.style.left = `${x}px`;
-  spark.style.top = `${y}px`;
-  document.body.appendChild(spark);
-  const flight = spark.animate([
-    { transform: `translate(0px, 0px) ${turn} scaleX(.3)`, opacity: 0 },
-    { transform: `translate(${(dx * 0.12).toFixed(1)}px, ${(dy * 0.12).toFixed(1)}px) ${turn} scaleX(1)`, opacity: 1, offset: 0.15 },
-    { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) ${turn} scaleX(.5)`, opacity: 0.85 },
-  ], { duration: Math.min(720, 280 + distance * 0.45), easing: "cubic-bezier(.45,.05,.4,1)" });
-  const land = () => {
-    spark.remove();
-    const led = document.querySelector<HTMLElement>(`.pk-pkg li[data-slug="${slug}"] .pk-led`);
-    for (const el of [target, led]) {
-      if (!el) continue;
-      el.classList.remove("pk-hit");
-      void el.offsetWidth;
-      el.classList.add("pk-hit");
-      window.setTimeout(() => el.classList.remove("pk-hit"), 700);
-    }
-  };
-  flight.onfinish = land;
-  flight.oncancel = () => spark.remove();
+  if (!target) return;
+  target.classList.remove("pk-hit");
+  void target.offsetWidth;
+  target.classList.add("pk-hit");
+  window.setTimeout(() => target.classList.remove("pk-hit"), 700);
 }
 
 /** Shown in the top card until the visitor switches something on. */

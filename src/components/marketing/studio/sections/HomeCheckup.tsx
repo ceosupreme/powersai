@@ -29,7 +29,7 @@ const openAtTop = () => requestAnimationFrame(() => window.scrollTo({ top: 0, le
 /**
  * The board behind the section, drawn in code from the live layout so it
  * stays seated at every width: the services board's circuitry in night
- * colors. A lit rail runs down each margin (gold left, cyan right), each
+ * colors, all muted blue-gray. A quiet rail runs down each margin, each
  * plugging into its half of the section (the form on the left, the steps on
  * the right) with an engraved stub, a joint and a pin. Three traces come in
  * off the top edge on each side and bend toward the content, the middle one
@@ -160,8 +160,8 @@ function drawCheckupBoard(section: HTMLElement, svg: SVGSVGElement) {
 
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = `<defs>
-    <radialGradient id="stm-ck-gold"><stop offset="0" stop-color="#FFD25E" stop-opacity="1"/><stop offset=".4" stop-color="#FFAE1A" stop-opacity=".5"/><stop offset="1" stop-color="#FFAE1A" stop-opacity="0"/></radialGradient>
-    <radialGradient id="stm-ck-cyan"><stop offset="0" stop-color="#9AEBFF" stop-opacity="1"/><stop offset=".4" stop-color="#1CC0EE" stop-opacity=".48"/><stop offset="1" stop-color="#1CC0EE" stop-opacity="0"/></radialGradient>
+    <radialGradient id="stm-ck-gold"><stop offset="0" stop-color="#4A5F86" stop-opacity=".55"/><stop offset="1" stop-color="#4A5F86" stop-opacity="0"/></radialGradient>
+    <radialGradient id="stm-ck-cyan"><stop offset="0" stop-color="#4A5F86" stop-opacity=".55"/><stop offset="1" stop-color="#4A5F86" stop-opacity="0"/></radialGradient>
   </defs>${plates.join("")}${decor.join("")}${unlit.join("")}${lit.join("")}${pads.join("")}`;
 }
 

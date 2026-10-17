@@ -90,11 +90,27 @@
   .stm-studio .stm-dark-actions{justify-content:flex-start;margin-top:clamp(18px,3vh,28px);gap:clamp(10px,1vw,14px)}
   .stm-studio .stm-dark-btn{font-size:clamp(14px,1.1vw,16px);padding:0 clamp(18px,1.8vw,26px)}
 }
+/* Desktop: the receipts become live-activity cards. Frosted glass over the
+   scene, a fine light edge instead of the heavy blue glow, larger text, and
+   a status light that pulses like a live feed. Phones keep the solid chips. */
+@media (min-width:1024px){
+  .stm-studio .stm-dark-chips li{gap:14px;padding:18px 20px 18px 18px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 40px -18px rgba(0,8,22,.75),inset 0 1px 0 rgba(255,255,255,.25);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}
+  .stm-studio .stm-dark-chips li::after{top:14px;right:14px;width:8px;height:8px;background:#4ADE80;box-shadow:0 0 0 0 rgba(74,222,128,.6),0 0 8px rgba(74,222,128,.9);animation:stmLivePulse 2.2s ease-out infinite}
+  .stm-studio .stm-dark-chip-ic{width:44px;height:44px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);box-shadow:none;color:#fff}
+  .stm-studio .stm-dark-chip-tx strong{font-size:15.5px;color:#fff}
+  .stm-studio .stm-dark-chip-tx small{font-size:13px;color:rgba(225,236,250,.78)}
+}
+@keyframes stmLivePulse{
+  0%{box-shadow:0 0 0 0 rgba(74,222,128,.55),0 0 8px rgba(74,222,128,.9)}
+  70%{box-shadow:0 0 0 9px rgba(74,222,128,0),0 0 8px rgba(74,222,128,.9)}
+  100%{box-shadow:0 0 0 0 rgba(74,222,128,0),0 0 8px rgba(74,222,128,.9)}
+}
 @media (prefers-reduced-motion: reduce){
   .stm-studio .stm-dark-frame,.stm-studio .stm-dark-copy,.stm-studio .stm-dark-tline{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-dark-title::after{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-dark-chips li{opacity:1 !important;transform:none !important;transition:none !important}
   .stm-studio .stm-dark-trace rect{animation:none !important;opacity:0 !important}
+  .stm-studio .stm-dark-chips li::after{animation:none !important}
 }
 
 /* Visible by default: the hidden starting states above only apply once the section's script marks
