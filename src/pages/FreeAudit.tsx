@@ -87,7 +87,7 @@ export default function FreeAudit() {
     : nameMissing ? 'Add your business name to run the checkup.'
     : cityMissing ? 'Add your city to run the checkup.' : null;
   const showMissing = triedSubmit && !!missingMessage;
-  const errorRing = 'border-[hsl(var(--stm-loss))] ring-2 ring-[hsl(var(--stm-loss))]/30';
+  const errorRing = '!border-2 !border-[#D93B2B] !bg-[#FFF5F4]';
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
   const currentStageIdx = audit.status ? ORDER[audit.status] : -1;
   const firstFinding = audit.full?.results[0];
@@ -243,7 +243,7 @@ export default function FreeAudit() {
                 <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">About two minutes</span>
               </div>
               {showMissing && (
-                <p role="alert" className="mt-5 rounded-xl border border-[hsl(var(--stm-loss))]/40 bg-[hsl(var(--stm-loss))]/10 px-4 py-3 text-base font-semibold text-[hsl(var(--stm-loss))]">{missingMessage}</p>
+                <p role="alert" className="mt-5 rounded-xl border border-[#D93B2B]/40 bg-[#FDECEA] px-4 py-3 text-base font-semibold text-[#B42318]">{missingMessage}</p>
               )}
               {audit.error && <p className="mt-4 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>}
             </form>
