@@ -220,7 +220,7 @@ export function Inquiry({ servicePage, source, section, scene }: { servicePage?:
     setError(null);
 
     const form = new FormData(e.currentTarget);
-    if (String(form.get("hp_ref_code") ?? "")) {
+    if (String(form.get("company_website") ?? "")) {
       // Honeypot hit: drop silently. Not a submission, not a conversion.
       setStatus("idle");
       return;
@@ -356,9 +356,10 @@ export function Inquiry({ servicePage, source, section, scene }: { servicePage?:
               ) : (
                 <form onSubmit={onSubmit} onFocus={noteStarted} noValidate className="grid grid-cols-1 gap-5">
                   {callRequested && <p className="text-[0.95rem] text-[hsl(var(--ink-muted))]" role="status">Want a call? Add your phone number to your note and we’ll call you.</p>}
-                  <div hidden aria-hidden="true">
+                  <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
                     <label>
-                      <input type="text" name="hp_ref_code" tabIndex={-1} autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
+                      Company website
+                      <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
                     </label>
                   </div>
 

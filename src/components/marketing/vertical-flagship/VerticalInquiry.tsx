@@ -39,7 +39,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
     event.preventDefault();
     if (status === "submitting") return;
     setError("");
-    const honeypot = String(new FormData(event.currentTarget).get("hp_ref_code") ?? "");
+    const honeypot = String(new FormData(event.currentTarget).get("company_website") ?? "");
     if (honeypot) return;
     const parsed = schema.safeParse({ name, email, business, note });
     if (!parsed.success) { setStatus("error"); setError(language === "es" ? "Revisa tu nombre, correo y negocio antes de enviar." : (parsed.error.issues[0]?.message ?? "Please check your details")); return; }
@@ -86,7 +86,7 @@ export function VerticalInquiry({ config, segment, initialNeeds = [], biz, langu
 
   return (
     <form className="vertical-inquiry-form" onSubmit={onSubmit} noValidate>
-      <div hidden aria-hidden="true"><input name="hp_ref_code" tabIndex={-1} autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" /></div>
+      <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden"><label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" /></label></div>
       <div className="vertical-form-grid">
         <Field label={es ? "Nombre" : "Name"} value={name} setValue={setName} autoComplete="name" />
         <Field label={es ? "Correo electrónico" : "Email"} value={email} setValue={setEmail} type="email" autoComplete="email" />

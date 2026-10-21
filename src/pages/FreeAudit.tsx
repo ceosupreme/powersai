@@ -213,18 +213,16 @@ export default function FreeAudit() {
                 </div>
               </div>
 
-              {/* Spam trap. Kept fully out of the page (display: none) so phones,
-                  autofill and password managers never fill it in for a real person. */}
-              <div hidden aria-hidden="true">
-                <input
-                  type="text"
-                  name="hp_ref_code"
-                  tabIndex={-1}
-                  autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                />
-              </div>
+              {/* Honeypot */}
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                className="pointer-events-none absolute h-0 w-0 opacity-0"
+                aria-hidden="true"
+              />
 
               <div className="mt-8 flex items-center justify-between">
                 <button
@@ -236,7 +234,7 @@ export default function FreeAudit() {
                 </button>
                 <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">About two minutes</span>
               </div>
-              {audit.error && <p role="alert" className="mt-5 rounded-xl border border-[hsl(var(--stm-loss))]/30 bg-[hsl(var(--stm-loss))]/10 px-4 py-3 text-base font-medium text-[hsl(var(--stm-loss))]">{audit.error}</p>}
+              {audit.error && <p className="mt-4 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>}
             </form>
           )}
 

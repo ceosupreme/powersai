@@ -133,12 +133,7 @@ export function usePublicAudit() {
         ...normalized,
         context: { src: context.src ?? null, source_vertical: context.sourceVertical ?? null, biz: context.biz ?? input.business_name },
       } });
-      if (e) {
-        const httpStatus = (e as { context?: { status?: number } }).context?.status;
-        throw new Error(httpStatus === 429
-          ? 'Too many checkups have run from this internet connection in the last hour. Please try again in a few minutes, or switch from Wi-Fi to cell data.'
-          : "The checkup couldn't start. Please check the business name and city, then tap the button again.");
-      }
+      if (e) throw new Error(e.message);
       trackSiteEvent({ event_type: 'audit_start', label: 'free_audit', vertical: context.sourceVertical ?? undefined, src: context.src ?? undefined });
       const t = (data as { token: string }).token;
       setToken(t);
@@ -146,7 +141,7 @@ export function usePublicAudit() {
       pollOnce(t);
       timerRef.current = setInterval(() => pollOnce(t), 3000);
     } catch (err: any) {
-      setError(err instanceof Error && err.message && !/fetch|network|load failed/i.test(err.message) ? err.message : "The checkup couldn't start because the connection dropped. Please tap the button again.");
+      setError(err?.message ?? 'We could not start the checkup. Please try again.');
     } finally {
       setSubmitting(false);
     }

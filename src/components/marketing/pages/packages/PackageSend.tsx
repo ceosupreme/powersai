@@ -75,7 +75,7 @@ export function PackageSend({ open, onOpenChange, services, starters, src }: {
     e.preventDefault();
     if (sending) return;
     setError(null);
-    if (String(new FormData(e.currentTarget).get("hp_ref_code") ?? "")) return; // honeypot: drop silently
+    if (String(new FormData(e.currentTarget).get("company_website") ?? "")) return; // honeypot: drop silently
     if (empty) { setError("Pick a starter package or switch on at least one service first."); return; }
     const parsed = schema.safeParse({ name, email, business, note });
     if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? "Please check your entries."); return; }
@@ -178,7 +178,7 @@ export function PackageSend({ open, onOpenChange, services, starters, src }: {
               <label className="pk-field"><span>Email</span><input name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} required /></label>
               <label className="pk-field"><span>Business name (optional)</span><input name="business" autoComplete="organization" value={business} onChange={(e) => setBusiness(e.target.value)} maxLength={200} /></label>
               <label className="pk-field"><span>Anything we should know? (optional)</span><textarea name="note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={2500} placeholder="Like your timing, or what's not working now" /></label>
-              <div hidden aria-hidden="true"><input name="hp_ref_code" tabIndex={-1} autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" /></div>
+              <div className="pk-hp" aria-hidden="true"><label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" /></label></div>
               {error && <p className="pk-send-error" role="alert">{error}</p>}
               <button type="submit" className="pk-send-btn" disabled={sending || empty}>
                 {sending ? "Sending…" : <>Send my package <ArrowRight aria-hidden /></>}

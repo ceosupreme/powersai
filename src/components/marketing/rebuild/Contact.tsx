@@ -58,7 +58,7 @@ export function Contact() {
     setError(null);
 
     const form = new FormData(e.currentTarget);
-    const honeypot = String(form.get("hp_ref_code") ?? "");
+    const honeypot = String(form.get("company_website") ?? "");
     if (honeypot) {
       setStatus("success");
       return;
@@ -188,9 +188,10 @@ export function Contact() {
                 </div>
 
                 {/* Honeypot */}
-                <div hidden aria-hidden="true">
+                <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
                   <label>
-                    <input type="text" name="hp_ref_code" tabIndex={-1} autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
+                    Company website
+                    <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
                   </label>
                 </div>
 
