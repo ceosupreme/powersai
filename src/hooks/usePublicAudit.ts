@@ -49,6 +49,9 @@ export interface SiteFeatures {
 /** Google listing and ranking summaries the report's score uses (results
  *  from version 2 on; missing on older results). */
 export interface ListingSummaryResult {
+  /** The Google listing that was checked (results from version 5 on). */
+  name?: string | null;
+  address?: string | null;
   rating: number | null;
   review_count: number | null;
   hours_set: boolean | null;
@@ -65,8 +68,19 @@ export interface GoogleSummaryResult {
   searched_near?: boolean;
 }
 
+/** No Google listing matched the name they typed (version 5 on). The
+ *  closest listing Google returned, if any, is offered instead. */
+export interface NotFoundResult {
+  typed_name: string;
+  typed_city: string;
+  closest: { name: string; address: string | null; place_id: string } | null;
+  reason: 'none' | 'name' | 'state';
+}
+
 export interface RedactedResult {
   result_version?: number;
+  /** Set instead of a report when no listing matched; the other fields are then absent. */
+  not_found?: NotFoundResult | null;
   listing?: ListingSummaryResult | null;
   google?: GoogleSummaryResult | null;
   total_monthly_dollars: number | null;
@@ -115,7 +129,25 @@ export interface RunInput {
   city: string;
   website_url?: string;
   operation_footprint: OperationFootprint;
+  /** The closest listing they confirmed is theirs, checked by its id. */
+  place_id?: string;
   company_website?: string; // honeypot
+}
+
+/** An error whose message is written for the visitor (anything else is
+ *  replaced with a plain message before it's shown). */
+class ShownError extends Error {}
+
+type ErrorBody = { error?: string; details?: { email?: string[] } } | null;
+
+/** The HTTP status and JSON body behind a functions error, when there is one
+ *  (the functions client puts the response on the error's context). */
+async function errorDetails(e: unknown): Promise<{ status: number | null; body: ErrorBody }> {
+  const ctx = (e as { context?: unknown } | null)?.context as { status?: unknown; json?: () => Promise<unknown> } | undefined;
+  const status = typeof ctx?.status === 'number' ? ctx.status : null;
+  let body: ErrorBody = null;
+  try { if (ctx && typeof ctx.json === 'function') body = (await ctx.json()) as ErrorBody; } catch { /* not JSON */ }
+  return { status, body };
 }
 
 export interface AuditContext {
@@ -178,15 +210,21 @@ export function usePublicAudit() {
         ...normalized,
         context: { src: context.src ?? null, source_vertical: context.sourceVertical ?? null, biz: context.biz ?? input.business_name },
       } });
-      if (e) throw new Error(e.message);
+      if (e) {
+        const { status } = await errorDetails(e);
+        throw new ShownError(status === 429
+          ? "You've run several checkups in the last hour. Give it a little while, then try again."
+          : "We couldn't start the checkup. Check your connection and try again.");
+      }
+      const t = (data as { token?: string } | null)?.token;
+      if (!t) throw new ShownError("We couldn't start the checkup. Please try again.");
       trackSiteEvent({ event_type: 'audit_start', label: 'free_audit', vertical: context.sourceVertical ?? undefined, src: context.src ?? undefined });
-      const t = (data as { token: string }).token;
       setToken(t);
       setStatus('queued');
       pollOnce(t);
       timerRef.current = setInterval(() => pollOnce(t), 3000);
-    } catch (err: any) {
-      setError(err?.message ?? 'We could not start the checkup. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof ShownError ? err.message : "We couldn't start the checkup. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -201,20 +239,16 @@ export function usePublicAudit() {
         body: { token, email, name, phone },
       });
       if (e) {
-        // Supabase functions client surfaces the response body under context.
-        const ctx: any = (e as any).context;
-        let msg = e.message || 'We could not send the full list. Please try again.';
-        try {
-          const parsed = ctx?.body ? JSON.parse(ctx.body) : ctx;
-          if (parsed?.error === 'invalid_email') msg = 'Enter a valid email address.';
-          else if (parsed?.details?.email?.length) msg = 'Enter a valid email address.';
-        } catch { /* ignore */ }
-        throw new Error(msg);
+        // The functions client puts the response under context.
+        const { status, body } = await errorDetails(e);
+        const badEmail = status === 400 && (body?.error === 'invalid_email' || body?.details?.email?.length);
+        throw new ShownError(badEmail ? 'Enter a valid email address.' : "We couldn't open the full list. Please try again.");
       }
-      const payload = data as { full_result: FullResult };
+      const payload = data as { full_result?: FullResult } | null;
+      if (!payload?.full_result) throw new ShownError("We couldn't open the full list. Please try again.");
       setFull(payload.full_result);
-    } catch (err: any) {
-      setError(err?.message ?? 'We could not send the full list. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof ShownError ? err.message : "We couldn't open the full list. Please try again.");
     } finally {
       setUnlocking(false);
     }

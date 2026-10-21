@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 
   let query = supabase
     .from('venues')
-    .select('id, name, address, google_place_id, gbp_place_mappings(place_id, manual_only)')
+    .select('id, name, address, google_place_id, is_prospect_shell, gbp_place_mappings(place_id, manual_only)')
     .eq('is_active', true);
   if (onlyVenueId) {
     query = query.eq('id', onlyVenueId);
@@ -111,6 +111,13 @@ Deno.serve(async (req) => {
       }
 
       const fields = buildSnapshotFields(fetchRes.data, scope, venueRec);
+      // A prospect's record is just the name someone typed into the checkup,
+      // not their real details, so there's nothing to compare the listing to.
+      if (v.is_prospect_shell) {
+        fields.nap_match_name = null;
+        fields.nap_match_address = null;
+        fields.nap_match_phone = null;
+      }
       const { error: insErr } = await supabase.from('gbp_snapshots').insert({
         venue_id: v.id,
         source: 'automated',

@@ -117,8 +117,11 @@ export const localVisibilityGapAnalyzer: AnalyzerModule = {
         if (inserted) result.inserted++; else result.updated++;
       }
 
-      // 2. Missing business description — High.
-      if (snap.description == null || snap.description.trim().length < 30) {
+      // 2. Missing business description — High. Only from a manual snapshot:
+      // Google's API doesn't return the owner's description (an automated
+      // snapshot's description is Google's own summary, often absent), so an
+      // empty one there doesn't mean the owner never wrote one.
+      if (snap.source === 'manual' && (snap.description == null || snap.description.trim().length < 30)) {
         const sk = 'gbp:missing_description';
         currentKeys.push(sk);
         const { inserted } = await upsertFinding(supabase, venueId, sk, {
@@ -149,9 +152,12 @@ export const localVisibilityGapAnalyzer: AnalyzerModule = {
         if (inserted) result.inserted++; else result.updated++;
       }
 
-      // 4. No recent posts — Medium.
+      // 4. No recent posts — Medium. Posts aren't in Google's API; they're known
+      // only when entered by hand (a post count or last post date). With
+      // neither, "never posted" would be a guess.
       const lastPostAge = snap.last_post_at ? ageDays(snap.last_post_at) : Infinity;
-      if (lastPostAge > 30 && snap.last_post_at !== undefined) {
+      const postsKnown = snap.post_count != null || snap.last_post_at != null;
+      if (postsKnown && lastPostAge > 30) {
         const sk = 'gbp:no_recent_posts:30d';
         currentKeys.push(sk);
         const { inserted } = await upsertFinding(supabase, venueId, sk, {

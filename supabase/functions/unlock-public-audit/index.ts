@@ -25,6 +25,53 @@ const Body = z.object({
   phone: z.string().trim().max(40).optional().nullable(),
 });
 
+const SIZE_LABEL: Record<string, string> = {
+  solo_owner: 'Solo',
+  small_crew_2_5: '2 to 5 people',
+  crew_6_plus: '6 or more people',
+  multi_location: 'Multi-location',
+};
+
+const money = (n: unknown) =>
+  typeof n === 'number' && Number.isFinite(n) ? `$${Math.round(n).toLocaleString('en-US')}` : null;
+
+/** The lead note (it's the body of the owner's alert email): what the
+ *  checkup found, so a follow-up can start from it. Older results without
+ *  the listing or ranking summaries just skip those lines. */
+// deno-lint-ignore no-explicit-any
+function leadNote(row: any, redacted: Record<string, unknown>): string {
+  // deno-lint-ignore no-explicit-any
+  const full = (row.full_result ?? {}) as Record<string, any>;
+  const lines = [`Free business checkup unlocked for ${row.business_name ?? 'a business'}${row.city ? ` (${row.city})` : ''}.`];
+  const listing = full.listing;
+  if (listing?.name) {
+    lines.push(`Google listing checked: ${listing.name}${listing.address ? `, ${String(listing.address).replace(/,\s*USA$/, '')}` : ''}`);
+  }
+  const rank = full.google ?? full.competitor_block;
+  if (rank?.keyword) {
+    lines.push(`Google rank: ${rank.you_rank != null ? `#${rank.you_rank}` : 'not in the top 20'} for "${rank.keyword}"${full.google?.searched_near ? ', searched from their location' : ''}`);
+  }
+  if (listing && (listing.rating != null || listing.review_count != null)) {
+    lines.push(`Reviews: ${listing.rating != null ? `${Number(listing.rating).toFixed(1)} stars` : 'no rating'} from ${Number(listing.review_count ?? 0).toLocaleString('en-US')} reviews`);
+  }
+  if (full.website?.url) {
+    const status: Record<string, string> = { none: 'no website', social: 'a social page, not a website', unreachable: "didn't open", blocked: 'security screen' };
+    lines.push(`Website: ${full.website.url}${status[full.website.status] ? ` (${status[full.website.status]})` : ''}`);
+  }
+  if (row.operation_footprint && SIZE_LABEL[row.operation_footprint]) lines.push(`Size: ${SIZE_LABEL[row.operation_footprint]}`);
+  const results = Array.isArray(full.results) ? full.results : [];
+  const gaps = results.length || Number(redacted.leak_count ?? 0);
+  const total = money(full.total_monthly_dollars ?? redacted.total_monthly_dollars);
+  if (full.project_type_resolution?.path === 'default') {
+    lines.push(`No cost estimates for this type of business${full.project_type_resolution?.gbp_category ? ` (Google category: ${full.project_type_resolution.gbp_category})` : ''}.`);
+  } else if (total && gaps) {
+    // deno-lint-ignore no-explicit-any
+    const names = results.map((r: any) => r?.name).filter(Boolean).join('; ');
+    lines.push(`Estimated ${total} a month across ${gaps} gap${gaps === 1 ? '' : 's'}${names ? `: ${names}` : ''}.`);
+  }
+  return lines.join('\n');
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') {
@@ -76,7 +123,7 @@ Deno.serve(async (req) => {
     business_name: req_row.business_name,
     email: parsed.data.email,
     phone: parsed.data.phone ?? null,
-    message: `Free business checkup unlocked for ${req_row.business_name ?? 'a business'}${req_row.city ? ` (${req_row.city})` : ''}. Estimated $${redacted.total_monthly_dollars ?? '—'} a month across ${redacted.leak_count ?? '—'} gaps.`,
+    message: leadNote(req_row, redacted),
     // inbound_leads only accepts voice/chat/form/phone; the checkup unlock is a
     // web form ('public_audit' was rejected, so these leads were never saved).
     // source 'free-audit' and qualifier_data.source tell them apart.

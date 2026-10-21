@@ -52,6 +52,8 @@ export const gbpNapCheck: FoundationCheck = {
     const s = await latestGbp(supabase, venueId);
     if (!s) return null;
     const checks = [s.nap_match_name, s.nap_match_address, s.nap_match_phone];
+    // Nothing compared (no record to compare the listing to): unknown, not consistent.
+    if (checks.every((v: any) => v == null)) return null;
     const failed = checks.filter((v: any) => v === false).length;
     if (failed === 0) return { status: 'satisfied' };
     if (failed === checks.length) return { status: 'missing' };

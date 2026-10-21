@@ -10,7 +10,7 @@ import { StudioFooter } from '@/components/marketing/studio/StudioFooter';
 import { useStudioHead } from '@/components/marketing/studio/useStudioHead';
 import { ROUTE_META } from '@/config/routeMeta';
 import { ScoreCard } from '@/components/marketing/checkup/ScoreCard';
-import { computeOnlineScore, findingCopy, findingTitle } from '@/components/marketing/checkup/checkupReport';
+import { computeOnlineScore, findingCopy, findingTitle, shortAddress } from '@/components/marketing/checkup/checkupReport';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Finding your Google Business Profile' },
@@ -58,7 +58,11 @@ export default function FreeAudit() {
   const [email, setEmail] = useState('');
   const [unlockName, setUnlockName] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
+  const [unlockTried, setUnlockTried] = useState(false);
   const emailValid = EMAIL_RE.test(email.trim());
+  // Red note under the email box: after they press the button, or after they
+  // leave the box with something typed that isn't an email address.
+  const showEmailError = !emailValid && (unlockTried || (emailTouched && email.trim().length > 0));
 
   const nameMissing = businessName.trim().length === 0;
   const cityMissing = city.trim().length === 0;
@@ -79,10 +83,12 @@ export default function FreeAudit() {
   const unknownType = shown?.project_type_resolution?.path === 'default';
   const categoryLabel = shown?.project_type_resolution?.gbp_category ?? shown?.listing?.category ?? null;
   const unknownTypeLine = `We don't have cost estimates for your type of business yet${categoryLabel ? ` (Google lists you as ${categoryLabel})` : ''}.`;
-  const score = shown && Number(shown.result_version ?? 0) >= 2
+  const score = shown && !audit.redacted?.not_found && Number(shown.result_version ?? 0) >= 2
     ? computeOnlineScore({ listing: shown.listing, google: shown.google, website: shown.website, matchedKey })
     : null;
   const estimateNote = 'These dollar figures are estimates based on typical numbers for a business your type and size, not your books.';
+  const notFound = audit.redacted?.not_found ?? null;
+  const alertClass = 'mt-5 rounded-xl border border-[#D93B2B]/40 bg-[#FDECEA] px-4 py-3 text-base font-semibold text-[#B42318]';
 
   // Started from the homepage checkup form (?start=1 with a name and city):
   // run the same check this page's own form runs, once, then drop the flag
@@ -115,13 +121,17 @@ export default function FreeAudit() {
   useEffect(() => {
     if (audit.status !== 'complete' || completionLogged.current) return;
     completionLogged.current = true;
-    trackSiteEvent({ event_type: 'audit_complete', label: 'free_audit', vertical: sourceVertical ?? undefined, src: src ?? undefined });
+    trackSiteEvent({ event_type: 'audit_complete', label: audit.redacted?.not_found ? 'free_audit_not_found' : 'free_audit', vertical: sourceVertical ?? undefined, src: src ?? undefined });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audit.status, sourceVertical, src]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (honeypot) return; // bot
     if (!canSubmit) { setTriedSubmit(true); return; }
+    setUnlockTried(false);
+    setEmailTouched(false);
+    completionLogged.current = false;
     audit.run({
       business_name: businessName.trim(),
       city: city.trim(),
@@ -133,11 +143,34 @@ export default function FreeAudit() {
 
   async function onUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (!emailValid) {
-      setEmailTouched(true);
-      return;
-    }
+    setUnlockTried(true);
+    if (!emailValid) return;
     await audit.unlock(email.trim(), unlockName.trim() || undefined);
+  }
+
+  // Back to the form with what they typed, to check a different business.
+  function checkAnother() {
+    audit.reset();
+    setUnlockTried(false);
+    setEmailTouched(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // They confirmed the closest listing we offered is theirs: check that one.
+  function checkClosest(closest: { name: string; place_id: string }) {
+    setBusinessName(closest.name);
+    setUnlockTried(false);
+    setEmailTouched(false);
+    completionLogged.current = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    audit.run({
+      business_name: closest.name,
+      city: city.trim(),
+      website_url: websiteUrl.trim() || undefined,
+      operation_footprint: footprint,
+      place_id: closest.place_id,
+      company_website: '',
+    }, { src, sourceVertical, biz: closest.name });
   }
 
   return (
@@ -230,9 +263,9 @@ export default function FreeAudit() {
                 <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">About two minutes</span>
               </div>
               {showMissing && (
-                <p role="alert" className="mt-5 rounded-xl border border-[#D93B2B]/40 bg-[#FDECEA] px-4 py-3 text-base font-semibold text-[#B42318]">{missingMessage}</p>
+                <p role="alert" className={alertClass}>{missingMessage}</p>
               )}
-              {audit.error && <p className="mt-4 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>}
+              {audit.error && <p role="alert" className={alertClass}>{audit.error}</p>}
             </form>
           )}
 
@@ -290,10 +323,56 @@ export default function FreeAudit() {
             </div>
           )}
 
-          {/* Redacted result: the free part, before the email ask. */}
-          {audit.redacted && !audit.full && (
+          {/* No listing matched the name: say so, offer the closest listing, or another try. */}
+          {notFound && (
             <div className="check-results mt-2 space-y-8">
-              {score && <ScoreCard score={score} />}
+              <section className="check-notfound rounded-2xl border border-[#D2D8E1] bg-white p-6 md:p-10" aria-labelledby="checkup-notfound-title">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8A5A08]">Your Google listing</p>
+                <h2 id="checkup-notfound-title" className="mt-3 font-display text-3xl md:text-4xl leading-[1.1] text-[#0B1530]">
+                  We couldn't find {notFound.typed_name} on Google.
+                </h2>
+                {notFound.closest ? (
+                  <>
+                    <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[#334155]">
+                      {notFound.reason === 'state'
+                        ? 'The closest listing Google has is in a different state from the one you typed, so we didn’t check it:'
+                        : 'The closest listing Google has doesn’t look like the same business, so we didn’t check it:'}
+                    </p>
+                    <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#E6EAF0] bg-[#F5F7FA] p-4">
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="#C97A08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z" />
+                        <circle cx="12" cy="9.5" r="2.5" />
+                      </svg>
+                      <div className="min-w-0">
+                        <p className="text-lg font-bold leading-snug text-[#0B1530]">{notFound.closest.name}</p>
+                        {shortAddress(notFound.closest.address) && <p className="mt-0.5 text-base text-[#4A5568]">{shortAddress(notFound.closest.address)}</p>}
+                      </div>
+                    </div>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button type="button" onClick={() => checkClosest(notFound.closest!)} className="check-btn-primary">That's mine. Check this listing</button>
+                      <button type="button" onClick={checkAnother} className="check-btn-secondary">Try a different name</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[#334155]">No Google listing came up for that name in {notFound.typed_city}.</p>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button type="button" onClick={checkAnother} className="check-btn-primary">Try a different name</button>
+                    </div>
+                  </>
+                )}
+                <p className="mt-7 max-w-2xl border-t border-[#E6EAF0] pt-5 text-base leading-relaxed text-[#334155]">
+                  Type your business name the way it shows on Google Maps. If you don't have a Google listing yet, that's the first thing to set up: without one, you don't show up when people search Google Maps for a business like yours.
+                </p>
+                <div className="mt-5"><BookingCta src={src} biz={businessName} /></div>
+              </section>
+            </div>
+          )}
+
+          {/* Redacted result: the free part, before the email ask. */}
+          {audit.redacted && !notFound && !audit.full && (
+            <div className="check-results mt-2 space-y-8">
+              {score && <ScoreCard score={score} listing={shown?.listing} onWrongBusiness={checkAnother} />}
 
               {unknownType ? (
                 <div className="check-interpretation"><span className="home-eyebrow">First read</span>
@@ -345,62 +424,75 @@ export default function FreeAudit() {
               {/* Their website: free to see, before the email ask. */}
               {audit.redacted.website && <WebsiteCheckCard site={audit.redacted.website} typeKey={unknownType ? null : matchedKey} />}
 
-              {/* Locked rows — only render if there are real remaining leaks beyond the top-3 tease. */}
+              {/* The gaps past the three named above, shown locked until the email step. */}
               {!unknownType && (() => {
                 const remaining = Math.max(0, audit.redacted.leak_count - audit.redacted.top_leaks.length);
                 if (remaining === 0) return null;
                 return (
-                  <div className="rounded-2xl border border-dashed border-[hsl(var(--stm-ink))]/15 bg-white/50 p-6">
-                    <p className="mb-3 font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/50">
-                      + {remaining} more gap{remaining === 1 ? '' : 's'} in the full list
+                  <section className="check-locked rounded-2xl border border-[#D2D8E1] bg-white p-6 md:p-8" aria-label={`${remaining} more gap${remaining === 1 ? '' : 's'} in the full list`}>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8A5A08]">
+                      {remaining} more gap{remaining === 1 ? '' : 's'} in the full list
                     </p>
-                    <div className="h-16 rounded bg-gradient-to-b from-[hsl(var(--stm-ink))]/5 to-transparent" aria-hidden="true" />
-                  </div>
+                    <ul className="mt-4 space-y-3" aria-hidden="true">
+                      {Array.from({ length: Math.min(remaining, 3) }).map((_, i) => (
+                        <li key={i} className="flex items-center gap-4 rounded-xl border border-[#E6EAF0] bg-[#F5F7FA] px-4 py-4">
+                          <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="#8A94A6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="5" y="11" width="14" height="9" rx="2" />
+                            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                          </svg>
+                          <span className="h-3 rounded-full bg-[#D9DEE6]" style={{ width: `${[58, 46, 52][i]}%` }} />
+                          <span className="ml-auto h-3 w-16 shrink-0 rounded-full bg-[#E6EAF0]" />
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-base text-[#334155]">What {remaining === 1 ? 'it is' : 'each one is'}, what it may be costing you and what fixes it. Add your email below to see {remaining === 1 ? 'it' : 'them'}.</p>
+                  </section>
                 );
               })()}
 
               {/* Unlock */}
-              <form onSubmit={onUnlock} className="rounded-2xl bg-[hsl(var(--stm-ink))] p-8 text-[hsl(var(--stm-bg))] shadow-lg md:p-10">
-                <h3 className="font-display text-3xl md:text-4xl">{unknownType ? 'See the full report.' : 'See the full list.'}</h3>
-                <p className="mt-2 text-[hsl(var(--stm-bg))]/70">{unknownType ? 'How you rank against the top 3 near you on Google, shown right here.' : 'Every gap, what it means and what fixes it, shown right here.'}</p>
-                <div className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-                  <input
-                    type="text"
-                    value={unlockName}
-                    onChange={(e) => setUnlockName(e.target.value)}
-                    placeholder="Name (optional)"
-                    className="rounded-lg border border-[hsl(var(--stm-bg))]/20 bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
-                    maxLength={200}
-                  />
-                  <input
-                    type="email"
-                    required
-                    inputMode="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onBlur={() => setEmailTouched(true)}
-                    placeholder="you@business.com"
-                    className={`rounded-lg border bg-transparent px-3 py-2.5 text-[hsl(var(--stm-bg))] placeholder-[hsl(var(--stm-bg))]/40 focus:outline-none ${
-                      emailTouched && email && !emailValid
-                        ? 'border-[hsl(var(--stm-loss))] focus:border-[hsl(var(--stm-loss))]'
-                        : 'border-[hsl(var(--stm-bg))]/20 focus:border-[hsl(var(--stm-cobalt))]'
-                    }`}
-                    maxLength={255}
-                  />
+              <form onSubmit={onUnlock} noValidate className="check-unlock rounded-2xl p-6 md:p-10">
+                <h3 className="font-display text-3xl md:text-4xl text-white">{unknownType ? 'See the full report.' : 'See the full list.'}</h3>
+                <p className="mt-2 text-lg text-[#C9D2E0]">{unknownType ? 'How you rank against the top 3 near you on Google, shown right here.' : 'Every gap, what it means and what fixes it, shown right here.'}</p>
+                <div className="mt-6 grid items-end gap-4 md:grid-cols-[1fr_1fr_auto]">
+                  <label className="block">
+                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-[#C9D2E0]">Your name (optional)</span>
+                    <input
+                      type="text"
+                      value={unlockName}
+                      onChange={(e) => setUnlockName(e.target.value)}
+                      autoComplete="name"
+                      className="check-unlock-input"
+                      maxLength={200}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-[#C9D2E0]">Email *</span>
+                    <input
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => setEmailTouched(true)}
+                      aria-invalid={showEmailError}
+                      className={`check-unlock-input ${showEmailError ? 'is-error' : ''}`}
+                      maxLength={255}
+                    />
+                  </label>
                   <button
                     type="submit"
-                    disabled={audit.unlocking || !emailValid}
-                    className="rounded-full bg-[hsl(var(--stm-cobalt))] px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                    disabled={audit.unlocking}
+                    className="min-h-[48px] rounded-full px-6 py-3 text-base font-semibold disabled:opacity-70"
                   >
-                    {audit.unlocking ? 'Sending…' : unknownType ? 'Show me the full report' : 'Show me the full list'}
+                    {audit.unlocking ? 'Opening…' : unknownType ? 'Show me the full report' : 'Show me the full list'}
                   </button>
                 </div>
-                {emailTouched && email && !emailValid && (
-                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">Enter a valid email address.</p>
+                {showEmailError && (
+                  <p role="alert" className={alertClass}>{email.trim() ? 'Enter a valid email address.' : `Add your email to see the full ${unknownType ? 'report' : 'list'}.`}</p>
                 )}
                 {audit.error && (
-                  <p className="mt-3 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>
+                  <p role="alert" className={alertClass}>{audit.error}</p>
                 )}
               </form>
             </div>
@@ -409,7 +501,7 @@ export default function FreeAudit() {
           {/* Full result */}
           {audit.full && (
             <div className="check-results mt-2 space-y-8">
-              {score && <ScoreCard score={score} />}
+              {score && <ScoreCard score={score} listing={shown?.listing} onWrongBusiness={checkAnother} />}
 
               <div className="check-interpretation"><span className="home-eyebrow">What this means</span><p>{unknownType
                 ? `${unknownTypeLine} Below is how you rank against the top 3 near you and how your website checks out. On a short call we'll put numbers on what's costing you customers.`
@@ -476,7 +568,7 @@ export default function FreeAudit() {
                 const reviewsText = (rating: number | null | undefined, count: number | null | undefined) =>
                   rating == null && count == null ? '' : `${rating != null ? `${rating.toFixed(1)} stars` : ''}${rating != null && count != null ? ' · ' : ''}${count != null ? `${count.toLocaleString('en-US')} review${count === 1 ? '' : 's'}` : ''}`;
                 const rows = [
-                  { key: 'you', name: `You (${businessName || 'your business'})`, rank: cb.you_rank, reviews: reviewsText(audit.full.listing?.rating, audit.full.listing?.review_count), you: true },
+                  { key: 'you', name: `You (${audit.full.listing?.name || businessName || 'your business'})`, rank: cb.you_rank, reviews: reviewsText(audit.full.listing?.rating, audit.full.listing?.review_count), you: true },
                   ...(cb.top_competitors || []).slice(0, 3).map((c, i) => ({ key: `c${i}`, name: c.name ?? `Competitor ${i + 1}`, rank: c.rank ?? i + 1, reviews: reviewsText(c.rating, c.review_count), you: false })),
                 ];
                 return (
@@ -504,7 +596,7 @@ export default function FreeAudit() {
                 <p className="font-display text-2xl md:text-3xl leading-snug">Want this fixed?</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-3">
                   <Link to={recommendationHref} className="studio-btn studio-btn-primary">Get my recommendation</Link>
-                  <BookingCta src={src} biz={businessName} className="border-[hsl(var(--stm-bg))] text-[hsl(var(--stm-bg))]" />
+                  <BookingCta src={src} biz={businessName} className="check-cta-call" />
                 </div>
               </div>
             </div>

@@ -39,7 +39,7 @@ export function BookingCta({ className, src: srcOverride, biz: bizOverride }: { 
   };
 
   return (
-    <Button type="button" onClick={activate} className={cn("studio-btn studio-btn-outline", className)}>
+    <Button type="button" onClick={activate} className={cn("studio-btn studio-btn-outline booking-cta", className)}>
       <CalendarDays aria-hidden size={16} /> {bookingUrl ? "Book 15 minutes" : "Request a call"}
     </Button>
   );

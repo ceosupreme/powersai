@@ -1,4 +1,4 @@
-import type { OnlineScore } from './checkupReport';
+import { shortAddress, type OnlineScore } from './checkupReport';
 
 /** Green when a part is strong, gold when it's middling, red when it's weak. */
 function tone(share: number) {
@@ -8,11 +8,38 @@ function tone(share: number) {
 }
 
 /** The online score at the top of the checkup report: one big number out of
- *  100 and the three parts it's made of, each with the reason in plain words. */
-export function ScoreCard({ score }: { score: OnlineScore }) {
+ *  100 and the three parts it's made of, each with the reason in plain words.
+ *  When the listing is known, the card opens with which Google listing was
+ *  checked, so a visitor can tell right away if it's the wrong business. */
+export function ScoreCard({ score, listing, onWrongBusiness }: {
+  score: OnlineScore;
+  listing?: { name?: string | null; address?: string | null } | null;
+  onWrongBusiness?: () => void;
+}) {
   const overall = tone(score.total / 100);
+  const address = shortAddress(listing?.address);
   return (
     <section aria-labelledby="checkup-score-title" className="rounded-2xl border border-[#D2D8E1] bg-white p-6 md:p-10">
+      {listing?.name && (
+        <div className="mb-7 flex flex-wrap items-start justify-between gap-x-6 gap-y-3 border-b border-[#E6EAF0] pb-5">
+          <div className="flex min-w-0 items-start gap-3">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="#C97A08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z" />
+              <circle cx="12" cy="9.5" r="2.5" />
+            </svg>
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#4A5568]">Google listing we checked</p>
+              <p className="mt-1 text-lg font-bold leading-snug text-[#0B1530]">{listing.name}</p>
+              {address && <p className="mt-0.5 text-base text-[#4A5568]">{address}</p>}
+            </div>
+          </div>
+          {onWrongBusiness && (
+            <button type="button" onClick={onWrongBusiness} className="check-wrong-biz shrink-0 text-base font-semibold text-[#8A5A08] underline underline-offset-4 hover:text-[#0B1530]">
+              Not your business?
+            </button>
+          )}
+        </div>
+      )}
       <p id="checkup-score-title" className="text-xs font-bold uppercase tracking-[0.2em] text-[#8A5A08]">Your online score</p>
       <div className="mt-3 flex flex-wrap items-end gap-x-5 gap-y-2">
         <p className="font-display leading-none text-[#0B1530]">

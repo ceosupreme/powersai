@@ -319,3 +319,9 @@ export function computeOnlineScore(input: {
 
   return { total, parts, summary };
 }
+
+/** A Google address without the trailing country, for display. */
+export function shortAddress(address: string | null | undefined): string | null {
+  if (!address) return null;
+  return address.replace(/,\s*(USA|United States)$/i, '').trim() || null;
+}

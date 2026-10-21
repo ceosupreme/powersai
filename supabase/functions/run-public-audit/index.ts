@@ -10,7 +10,9 @@
 //        the miner already knows place_id and upserts gbp_place_mappings)
 //     3. gbp-sync-weekly
 //     4. compute-leak-stack  ← the leak numbers
-//   steps only THIS public path runs: website-resolve-url + the website
+//   steps only THIS public path runs: the name check on the resolved listing
+//   (_shared/name-match.ts; a listing that isn't theirs ends the run with
+//   not_found and the closest listing), website-resolve-url + the website
 //   quick check (_shared/website-quick-check.ts), map-pack-run,
 //   extract-review-themes, foundation-audit-refresh, growth-audit-refresh.
 //   See the header of checkup-prospect for why the internal batch path
@@ -51,6 +53,7 @@ import { z } from 'npm:zod@3.23.8';
 import {
   checkWebsite, displayUrl, emptyWebsiteBlock, normalizeSiteInput, type WebsiteBlock,
 } from '../_shared/website-quick-check.ts';
+import { namesMatch, statesConflict } from '../_shared/name-match.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -70,7 +73,10 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // could mark a working https site "not secure"), so version-2 results aren't reused.
 // 4: ranking searched from the business's location, top-3 ratings, homepage
 // features, size-scaled estimates.
-const RESULT_VERSION = 4;
+// 5: the listing summary names the Google listing that was checked (name and
+// address), and a listing whose name doesn't match what was typed is no
+// longer reported on (the visitor is shown the closest listing instead).
+const RESULT_VERSION = 5;
 
 const IP_HITS = new Map<string, { n: number; reset: number }>();
 const IP_LIMIT = 5;
@@ -81,6 +87,9 @@ const Body = z.object({
   city: z.string().trim().min(1).max(120),
   website_url: z.string().trim().max(500).optional().nullable(),
   operation_footprint: z.enum(['solo_owner', 'small_crew_2_5', 'crew_6_plus', 'multi_location']),
+  // Set when the visitor picks the closest listing we showed them ("Check
+  // <name> instead"), so that exact listing is checked.
+  place_id: z.string().trim().regex(/^[A-Za-z0-9_-]{10,300}$/).optional().nullable(),
   context: z.object({
     src: z.string().trim().max(80).nullable().optional(),
     source_vertical: z.string().trim().max(40).nullable().optional(),
@@ -250,8 +259,35 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     const resolveRes = await invoke('gbp-resolve-place', {
       venue_id: shellVenueId,
       query: resolveQuery,
-      url: input.website_url ?? undefined,
+      // A listing they picked from the closest match is checked by its id.
+      url: input.place_id ? `place_id:${input.place_id}` : (input.website_url ?? undefined),
     }, { timeoutMs: 30_000 });
+
+    // No listing (or only someone else's): say so and stop, rather than
+    // reporting on another business. Google's text search always returns its
+    // closest place, so the name (and state, when typed) is checked first.
+    const finishNotFound = async (
+      closest: { name: string; address: string | null; place_id: string } | null,
+      reason: 'none' | 'name' | 'state',
+    ) => {
+      const notFound = {
+        result_version: RESULT_VERSION,
+        not_found: { typed_name: input.business_name, typed_city: input.city, closest, reason },
+        request_context: input.context ?? null,
+      };
+      await log(closest
+        ? `No Google listing matched "${input.business_name}" (${reason}). Closest: ${closest.name}, ${closest.address ?? 'no address'}.`
+        : `No Google listing found for "${input.business_name}" in ${input.city}.`);
+      await admin.from('public_audit_requests').update({
+        status: 'complete',
+        redacted_result: notFound,
+        full_result: notFound,
+        shell_venue_id: null,
+        status_detail: detail,
+      }).eq('id', requestId);
+      // Nothing but this run references the shell yet; its rows go with it.
+      await admin.from('venues').delete().eq('id', shellVenueId);
+    };
 
     let placeId: string | null = null;
     let gbpPrimary: string | null = null;
@@ -259,9 +295,25 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     let placesKeyActive = true;
     if (resolveRes.ok && typeof resolveRes.data === 'object' && resolveRes.data) {
       placeId = (resolveRes.data as any).place_id ?? null;
+      const foundName = String((resolveRes.data as any).name ?? '');
+      const foundAddress = ((resolveRes.data as any).address ?? null) as string | null;
+      const picked = !!input.place_id && placeId === input.place_id;
+      if (placeId && !picked) {
+        const nameCheck = namesMatch(input.business_name, foundName, input.city);
+        const otherState = statesConflict(input.city, foundAddress);
+        if (!nameCheck.match || otherState) {
+          console.log(`[run-public-audit] listing rejected: "${input.business_name}" vs "${foundName}" — ${otherState ? 'other state' : nameCheck.reason}`);
+          await finishNotFound({ name: foundName, address: foundAddress, place_id: placeId }, otherState ? 'state' : 'name');
+          return;
+        }
+      }
     } else {
       const errStr = String((resolveRes.data as any)?.error ?? '').toLowerCase();
       const status = resolveRes.status;
+      if (status === 404 && errStr === 'no results') {
+        await finishNotFound(null, 'none');
+        return;
+      }
       if (errStr.includes('not configured') || status === 500 && errStr.includes('google_places_api_key')) {
         placesKeyActive = false;
         await log('Google Places lookup unavailable — using general local-business benchmarks. Your dollar figures will sharpen automatically once the key is active.');
@@ -512,7 +564,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     // nothing new is fetched here). Null fields mean "not available".
     const { data: listingSnap } = await admin
       .from('gbp_snapshots')
-      .select('raw, hours_complete, photo_count, website, gbp_phone, primary_category')
+      .select('raw, hours_complete, photo_count, website, gbp_phone, primary_category, gbp_name, gbp_address')
       .eq('venue_id', shellVenueId)
       .order('captured_at', { ascending: false })
       .limit(1)
@@ -520,6 +572,9 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     const listingRaw = ((listingSnap as any)?.raw ?? {}) as Record<string, any>;
     const listing = listingSnap
       ? {
+          // Which listing this is, so the visitor can see it's theirs.
+          name: (listingSnap as any).gbp_name ?? listingRaw.displayName?.text ?? null,
+          address: (listingSnap as any).gbp_address ?? listingRaw.formattedAddress ?? null,
           rating: typeof listingRaw.rating === 'number' ? listingRaw.rating : null,
           review_count: typeof listingRaw.userRatingCount === 'number' ? listingRaw.userRatingCount : (listingRaw.rating != null ? 0 : null),
           hours_set: (listingSnap as any).hours_complete ?? null,
