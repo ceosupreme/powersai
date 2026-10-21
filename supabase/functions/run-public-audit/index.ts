@@ -66,7 +66,9 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // Results built by this version carry the Google listing summary (rating,
 // review count, hours, phone, photos) and the ranking summary the report's
 // score is built from. The 7-day dedupe only reuses results at this version.
-const RESULT_VERSION = 2;
+// 3: the website check tries the secure address first (results before that
+// could mark a working https site "not secure"), so version-2 results aren't reused.
+const RESULT_VERSION = 3;
 
 const IP_HITS = new Map<string, { n: number; reset: number }>();
 const IP_LIMIT = 5;
