@@ -171,7 +171,7 @@ export function HomeCheckup() {
   const navigate = useNavigate();
   const [bizName, setBizName] = useState("");
   const [city, setCity] = useState("");
-  const [missing, setMissing] = useState<"name" | "city" | null>(null);
+  const [missing, setMissing] = useState<"name" | "city" | "both" | null>(null);
 
   // Visible by default. Only when motion is allowed and the section starts
   // fully off screen does it arm, so the two halves rise in as it scrolls into
@@ -221,8 +221,11 @@ export function HomeCheckup() {
     const name = cleanName(bizName);
     const place = cleanCity(city);
     const field = (key: string) => (e.currentTarget.elements.namedItem(key) as HTMLInputElement | null)?.focus();
-    if (!name) { setMissing("name"); field("business"); return; }
-    if (!place) { setMissing("city"); field("city"); return; }
+    if (!name || !place) {
+      setMissing(!name && !place ? "both" : !name ? "name" : "city");
+      field(!name ? "business" : "city");
+      return;
+    }
     setMissing(null);
     trackSiteEvent({ event_type: "cta_click", label: "home_checkup_form" });
     const params = new URLSearchParams({ biz: name, city: place, src: "home-checkup", start: "1" });
@@ -239,21 +242,21 @@ export function HomeCheckup() {
           <h2 id="home-checkup-title">See what's costing you <em>customers.</em></h2>
           <p className="stm-checkup-lead">Type in your business name and city. In about two minutes you get a free report on how your business shows up on Google, and the top things to fix.</p>
           <form className="stm-checkup-form" onSubmit={runCheckup} noValidate>
-            <label className={missing === "name" ? "is-missing" : undefined}>
+            <label className={missing === "name" || missing === "both" ? "is-missing" : undefined}>
               <span>Business name</span>
-              <input type="text" name="business" autoComplete="organization" placeholder="e.g. Joe's Pizza" maxLength={40} value={bizName}
-                onChange={(e) => { setBizName(e.target.value); if (missing === "name") setMissing(null); }}
-                aria-invalid={missing === "name"} aria-describedby={missing === "name" ? "stm-checkup-missing" : undefined} />
+              <input type="text" name="business" autoComplete="organization" maxLength={40} value={bizName}
+                onChange={(e) => { setBizName(e.target.value); if (missing === "name") setMissing(null); else if (missing === "both") setMissing("city"); }}
+                aria-invalid={missing === "name" || missing === "both"} aria-describedby={missing === "name" || missing === "both" ? "stm-checkup-missing" : undefined} />
             </label>
-            <label className={missing === "city" ? "is-missing" : undefined}>
+            <label className={missing === "city" || missing === "both" ? "is-missing" : undefined}>
               <span>City</span>
               <input type="text" name="city" autoComplete="address-level2" maxLength={60} value={city}
-                onChange={(e) => { setCity(e.target.value); if (missing === "city") setMissing(null); }}
-                aria-invalid={missing === "city"} aria-describedby={missing === "city" ? "stm-checkup-missing" : undefined} />
+                onChange={(e) => { setCity(e.target.value); if (missing === "city") setMissing(null); else if (missing === "both") setMissing("name"); }}
+                aria-invalid={missing === "city" || missing === "both"} aria-describedby={missing === "city" || missing === "both" ? "stm-checkup-missing" : undefined} />
             </label>
             <button type="submit" className="stm-checkup-btn">Get my free report <ArrowRight aria-hidden /></button>
-            <p className="stm-checkup-note" id="stm-checkup-missing" role={missing ? "alert" : undefined}>
-              {missing === "name" ? "Add your business name so we can find you on Google." : missing === "city" ? "Add your city so we can compare you with businesses near you." : "Your report shows up on screen. No phone call needed."}
+            <p className={`stm-checkup-note${missing ? " is-error" : ""}`} id="stm-checkup-missing" role={missing ? "alert" : undefined}>
+              {missing === "both" ? "Add your business name and city to run the checkup." : missing === "name" ? "Add your business name so we can find you on Google." : missing === "city" ? "Add your city so we can compare you with businesses near you." : "Your report shows up on screen. No phone call needed."}
             </p>
           </form>
         </div>

@@ -36,14 +36,15 @@
 .stm-studio .stm-checkup-form input{width:100%;height:58px;padding:0 18px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font:500 18px Inter,sans-serif;outline:none;transition:border-color .2s ease,background .2s ease,box-shadow .2s ease}
 .stm-studio .stm-checkup-form input::placeholder{color:#8592AA}
 .stm-studio .stm-checkup-form input:focus{border-color:#14B5E3;background:rgba(20,181,227,.09);box-shadow:0 0 0 3px rgba(20,181,227,.22),0 0 20px rgba(20,181,227,.25)}
-.stm-studio .stm-checkup-form label.is-missing input{border-color:#F2A20F;box-shadow:0 0 0 3px rgba(242,162,15,.25)}
+.stm-studio .stm-checkup-form label.is-missing input{border-color:#FF6B5B;box-shadow:0 0 0 3px rgba(255,107,91,.3)}
+.stm-studio .stm-checkup-form label.is-missing > span{color:#FF8A7D}
 .stm-studio .stm-checkup-btn{grid-column:1/-1;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;margin-top:4px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;background:linear-gradient(135deg,#F6C65A,#E89A2B);color:#101412;font:800 18px Inter,sans-serif;box-shadow:0 14px 30px -10px rgba(232,154,43,.65);transition:transform .25s ease,filter .25s ease,box-shadow .25s ease}
 .stm-studio .stm-checkup-btn svg{width:19px;height:19px;transition:transform .25s ease}
 .stm-studio .stm-checkup-btn:hover,.stm-studio .stm-checkup-btn:focus-visible{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 18px 36px -10px rgba(232,154,43,.8)}
 .stm-studio .stm-checkup-btn:hover svg,.stm-studio .stm-checkup-btn:focus-visible svg{transform:translateX(4px)}
 .stm-studio .stm-checkup-btn:focus-visible{outline:3px solid #F6C65A;outline-offset:4px}
 .stm-studio .stm-checkup-note{grid-column:1/-1;margin:2px 0 0;font:500 15.5px/1.45 Inter,sans-serif;color:rgba(255,255,255,.72)}
-.stm-studio .stm-checkup-note[role="alert"]{color:#F6C65A}
+.stm-studio .stm-checkup-note.is-error{padding:12px 16px;border-radius:12px;border:1px solid rgba(255,107,91,.55);background:rgba(225,60,45,.16);font-weight:700;font-size:16.5px;color:#FFB4AA;text-align:left}
 
 /* What happens next: three numbered steps in a frosted panel. */
 .stm-studio .stm-checkup-how{padding:34px 36px 30px;border-radius:22px;background:rgba(17,27,52,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}

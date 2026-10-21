@@ -73,12 +73,21 @@ export default function FreeAudit() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [footprint, setFootprint] = useState<OperationFootprint>('small_crew_2_5');
   const [honeypot, setHoneypot] = useState('');
+  const [triedSubmit, setTriedSubmit] = useState(false);
   const [email, setEmail] = useState('');
   const [unlockName, setUnlockName] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const emailValid = EMAIL_RE.test(email.trim());
 
-  const canSubmit = businessName.trim().length > 0 && city.trim().length > 0 && !audit.submitting;
+  const nameMissing = businessName.trim().length === 0;
+  const cityMissing = city.trim().length === 0;
+  const canSubmit = !nameMissing && !cityMissing && !audit.submitting;
+  const missingMessage = nameMissing && cityMissing
+    ? 'Add your business name and city to run the checkup.'
+    : nameMissing ? 'Add your business name to run the checkup.'
+    : cityMissing ? 'Add your city to run the checkup.' : null;
+  const showMissing = triedSubmit && !!missingMessage;
+  const errorRing = 'border-[hsl(var(--stm-loss))] ring-2 ring-[hsl(var(--stm-loss))]/30';
   const running = audit.status && audit.status !== 'complete' && audit.status !== 'failed';
   const currentStageIdx = audit.status ? ORDER[audit.status] : -1;
   const firstFinding = audit.full?.results[0];
@@ -123,7 +132,7 @@ export default function FreeAudit() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (honeypot) return; // bot
-    if (!canSubmit) return;
+    if (!canSubmit) { setTriedSubmit(true); return; }
     audit.run({
       business_name: businessName.trim(),
       city: city.trim(),
@@ -156,7 +165,7 @@ export default function FreeAudit() {
 
           {/* Intake */}
           {!running && !audit.redacted && (
-            <form onSubmit={onSubmit} className="check-form rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8 shadow-sm">
+            <form onSubmit={onSubmit} noValidate className="check-form rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8 shadow-sm">
               <div className="grid gap-5 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-1.5 block font-mono text-xs uppercase tracking-wider text-[hsl(var(--stm-ink))]/60">Business name *</span>
@@ -164,8 +173,8 @@ export default function FreeAudit() {
                     required
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
-                    className="w-full rounded-lg border border-[hsl(var(--stm-ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
-                    placeholder="Acme Plumbing"
+                    aria-invalid={showMissing && nameMissing}
+                    className={`w-full rounded-lg border bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none ${showMissing && nameMissing ? errorRing : 'border-[hsl(var(--stm-ink))]/15'}`}
                     maxLength={200}
                   />
                 </label>
@@ -175,7 +184,8 @@ export default function FreeAudit() {
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full rounded-lg border border-[hsl(var(--stm-ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
+                    aria-invalid={showMissing && cityMissing}
+                    className={`w-full rounded-lg border bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none ${showMissing && cityMissing ? errorRing : 'border-[hsl(var(--stm-ink))]/15'}`}
                     maxLength={120}
                   />
                 </label>
@@ -186,7 +196,6 @@ export default function FreeAudit() {
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
                     className="w-full rounded-lg border border-[hsl(var(--stm-ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
-                    placeholder="acmeplumbing.com"
                     maxLength={500}
                   />
                   <p className="mt-1.5 text-xs text-[hsl(var(--stm-ink))]/50">Just the domain is fine. Leave it blank and we’ll use the one on your Google listing.</p>
@@ -226,13 +235,16 @@ export default function FreeAudit() {
               <div className="mt-8 flex items-center justify-between">
                 <button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={audit.submitting}
                   className="inline-flex items-center gap-2 rounded-full bg-[hsl(var(--stm-cobalt))] px-7 py-3.5 text-sm font-medium text-[hsl(var(--stm-bg))] transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60"
                 >
                   {audit.submitting ? 'Starting…' : "Show me what I'm missing"}
                 </button>
                 <span className="hidden font-mono text-xs text-[hsl(var(--stm-ink))]/50 md:inline">About two minutes</span>
               </div>
+              {showMissing && (
+                <p role="alert" className="mt-5 rounded-xl border border-[hsl(var(--stm-loss))]/40 bg-[hsl(var(--stm-loss))]/10 px-4 py-3 text-base font-semibold text-[hsl(var(--stm-loss))]">{missingMessage}</p>
+              )}
               {audit.error && <p className="mt-4 text-sm text-[hsl(var(--stm-loss))]">{audit.error}</p>}
             </form>
           )}
