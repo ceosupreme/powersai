@@ -1063,6 +1063,10 @@ interface DeterministicInsert {
   week_id: string | null;
   source_metric?: string | null;
   _venue_name?: string | null;
+  _metric_label?: string | null;
+  _current_value?: number | null;
+  _sanity_for_date?: string | null;
+  dedupe_hash?: string | null;
   period_start?: string | null;
   period_end?: string | null;
   period_label?: string | null;
