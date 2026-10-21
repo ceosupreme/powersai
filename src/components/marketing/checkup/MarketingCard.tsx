@@ -1,4 +1,6 @@
-import { CircleCheck, CircleHelp, CircleX } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, CircleCheck, CircleHelp, CircleX } from 'lucide-react';
+import { trackSiteEvent } from '@/lib/studioAnalytics';
 import { marketingGapCount, type MarketingSection, type MarketingTone } from './marketingReport';
 
 const ICON: Record<MarketingTone, { Icon: typeof CircleCheck; color: string }> = {
@@ -51,6 +53,19 @@ export function MarketingCard({ sections }: { sections: MarketingSection[] }) {
           </div>
         ))}
       </div>
+      {gaps > 0 && (
+        <Link
+          to="/services/marketing"
+          onClick={() => {
+            trackSiteEvent({ event_type: 'cta_click', label: 'audit_marketing_card' });
+            // The site doesn't reset scroll between pages; open the next one at its top.
+            requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior }));
+          }}
+          className="mt-8 inline-flex items-center gap-2 text-base font-semibold text-[#8A5A08] underline-offset-4 hover:underline"
+        >
+          See how we fix this <ArrowRight className="h-4 w-4" aria-hidden />
+        </Link>
+      )}
     </section>
   );
 }
