@@ -2688,6 +2688,12 @@
 .check-page .check-form { background: hsl(var(--home-light)); border-color: hsl(var(--home-rule)); }
 .check-page .check-form input { border-radius: 4px; background: hsl(var(--home-ivory)); border-color: hsl(var(--home-rule)); color: hsl(var(--home-ink)); }
 .check-page .check-form button[type="button"] { border-radius: 100px; }
+/* Size of the operation: one choice at a time. The picked one is solid navy with a check mark; the rest are white with a light outline. */
+.check-page .check-form .check-size { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; border: 1.5px solid hsl(var(--home-rule)); background: #fff; color: hsl(var(--home-ink)); font-weight: 600; transition: border-color .2s ease, background .2s ease, color .2s ease; }
+.check-page .check-form .check-size:hover { border-color: hsl(var(--home-ink) / .55); }
+.check-page .check-form .check-size[aria-pressed="true"] { border-color: hsl(var(--home-ink)); background: hsl(var(--home-ink)); color: #fff; }
+.check-page .check-form .check-size:focus-visible { outline: 3px solid #E89A2B; outline-offset: 2px; }
+.check-page .check-form .check-size-tick { font-weight: 800; color: #F6C65A; }
 .check-page .check-form button[type="submit"], .check-page .check-progress button, .check-page .check-results button[type="submit"], .check-page .check-results .studio-btn-primary { border-radius: 100px; background: linear-gradient(135deg, #F6C65A, #E89A2B); color: #101412; box-shadow: none; }
 .check-page .check-progress { border-radius: 6px; background: hsl(var(--home-charcoal)); color: hsl(var(--home-light)); box-shadow: none; }
 .check-page .check-progress pre { overflow-wrap: anywhere; }

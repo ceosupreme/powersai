@@ -207,13 +207,11 @@ export default function FreeAudit() {
                       <button
                         key={f.value}
                         type="button"
+                        aria-pressed={footprint === f.value}
                         onClick={() => setFootprint(f.value)}
-                        className={`rounded-full px-4 py-2 text-sm transition ${
-                          footprint === f.value
-                            ? 'bg-[hsl(var(--stm-cobalt))] text-[hsl(var(--stm-bg))]'
-                            : 'border border-[hsl(var(--stm-ink))]/15 bg-white text-[hsl(var(--stm-ink))] hover:border-[hsl(var(--stm-cobalt))]'
-                        }`}
+                        className="check-size rounded-full px-4 py-2 text-sm"
                       >
+                        {footprint === f.value && <span aria-hidden="true" className="check-size-tick">✓</span>}
                         {f.label}
                       </button>
                     ))}
