@@ -11,6 +11,8 @@ import { useStudioHead } from '@/components/marketing/studio/useStudioHead';
 import { ROUTE_META } from '@/config/routeMeta';
 import { ScoreCard } from '@/components/marketing/checkup/ScoreCard';
 import { computeOnlineScore, findingCopy, findingTitle, shortAddress } from '@/components/marketing/checkup/checkupReport';
+import { MarketingCard } from '@/components/marketing/checkup/MarketingCard';
+import { marketingSections } from '@/components/marketing/checkup/marketingReport';
 
 const STAGES: { key: AuditStatus; label: string }[] = [
   { key: 'resolving', label: 'Finding your Google Business Profile' },
@@ -88,6 +90,10 @@ export default function FreeAudit() {
     : null;
   const estimateNote = 'These dollar figures are estimates based on typical numbers for a business your type and size, not your books.';
   const notFound = audit.redacted?.not_found ?? null;
+  // Your marketing: searches, Google listing, online orders, ad tags, search results (version 6 on).
+  const marketing = shown && !notFound
+    ? marketingSections({ website: shown.website, listing: shown.listing, google: shown.google, matchedKey, unknownType })
+    : [];
   const alertClass = 'mt-5 rounded-xl border border-[#D93B2B]/40 bg-[#FDECEA] px-4 py-3 text-base font-semibold text-[#B42318]';
 
   // Started from the homepage checkup form (?start=1 with a name and city):
@@ -421,7 +427,8 @@ export default function FreeAudit() {
                 </div>
               )}
 
-              {/* Their website: free to see, before the email ask. */}
+              {/* Their marketing and website: free to see, before the email ask. */}
+              <MarketingCard sections={marketing} />
               {audit.redacted.website && <WebsiteCheckCard site={audit.redacted.website} typeKey={unknownType ? null : matchedKey} />}
 
               {/* The gaps past the three named above, shown locked until the email step. */}
@@ -590,6 +597,7 @@ export default function FreeAudit() {
                 );
               })()}
 
+              <MarketingCard sections={marketing} />
               {audit.full.website && <WebsiteCheckCard site={audit.full.website} typeKey={unknownType ? null : matchedKey} />}
 
               <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">

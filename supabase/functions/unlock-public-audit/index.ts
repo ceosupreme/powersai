@@ -35,6 +35,54 @@ const SIZE_LABEL: Record<string, string> = {
 const money = (n: unknown) =>
   typeof n === 'number' && Number.isFinite(n) ? `$${Math.round(n).toLocaleString('en-US')}` : null;
 
+/** The marketing gaps the checkup found, in a few words each, for the
+ *  owner's follow-up (results from version 6 on; older ones give none). */
+// deno-lint-ignore no-explicit-any
+function marketingGaps(full: Record<string, any>): string[] {
+  const out: string[] = [];
+  const w = full.website ?? {};
+  const f = w.features ?? null;
+  const tags = w.marketing?.tags ?? null;
+  const search = w.marketing?.search ?? null;
+  const listing = full.listing ?? {};
+  const google = full.google ?? {};
+  const food = full.project_type_resolution?.matched_key === 'bars_restaurants' && full.project_type_resolution?.path !== 'default';
+  if (w.status === 'unreachable' && /for sale/i.test(String(w.problem ?? ''))) out.push('website address shows a "domain for sale" page');
+  if (f && food && Array.isArray(f.ordering_apps) && f.ordering_apps.length && !f.ordering_direct) {
+    const bigTwo = f.ordering_apps.some((a: string) => a === 'DoorDash' || a === 'Uber Eats');
+    out.push(`online orders only through ${f.ordering_apps.join(' and ')}${bigTwo ? ' (15% to 30% commission on delivery orders)' : ''}`);
+  }
+  if (tags) {
+    if (tags.meta_pixel === false) out.push('no Facebook ad pixel');
+    if (tags.old_google_analytics_only) out.push('only the old Google Analytics (stopped working July 2023)');
+    else if (tags.google_analytics === false) out.push('no Google Analytics');
+  }
+  const special: string[] = Array.isArray(listing.special_hours) ? listing.special_hours : [];
+  if (f && food && f.happy_hour && !special.includes('HAPPY_HOUR') && Array.isArray(listing.special_hours)) out.push("happy hour isn't on the Google listing");
+  if (f && food && f.brunch && !special.includes('BRUNCH') && Array.isArray(listing.special_hours)) out.push("brunch hours aren't on the Google listing");
+  for (const s of Array.isArray(google.searches) ? google.searches : []) {
+    if (s?.you_rank == null) out.push(`not in the top 20 for "${s.keyword}"`);
+    else if (s.you_rank > 3) out.push(`#${s.you_rank} for "${s.keyword}"`);
+  }
+  if (typeof google.top3_avg_reviews === 'number' && typeof listing.review_count === 'number' && listing.review_count < google.top3_avg_reviews * 0.75) {
+    out.push(`${listing.review_count.toLocaleString('en-US')} reviews vs ${google.top3_avg_reviews.toLocaleString('en-US')} average for the top 3`);
+  }
+  if (f && food) {
+    if (!f.loyalty) out.push('no rewards program');
+    if (!f.text_club) out.push('no text club');
+    if (!f.email_signup) out.push('no email signup');
+  }
+  if (search) {
+    if (search.title_says_where === false && search.title_says_what === false) out.push("page title doesn't say what or where they are");
+    else if (search.title_says_where === false) out.push("page title doesn't say where they are");
+    else if (search.title_says_what === false) out.push("page title doesn't say what they are");
+    if (search.description === false) out.push('no search description');
+    if (search.share_image === false) out.push('no share picture for links');
+    if (search.business_schema === false) out.push('no business details code (schema)');
+  }
+  return out;
+}
+
 /** The lead note (it's the body of the owner's alert email): what the
  *  checkup found, so a follow-up can start from it. Older results without
  *  the listing or ranking summaries just skip those lines. */
@@ -59,6 +107,8 @@ function leadNote(row: any, redacted: Record<string, unknown>): string {
     lines.push(`Website: ${full.website.url}${status[full.website.status] ? ` (${status[full.website.status]})` : ''}`);
   }
   if (row.operation_footprint && SIZE_LABEL[row.operation_footprint]) lines.push(`Size: ${SIZE_LABEL[row.operation_footprint]}`);
+  const marketing = marketingGaps(full);
+  if (marketing.length) lines.push(`Marketing gaps: ${marketing.join('; ')}.`);
   const results = Array.isArray(full.results) ? full.results : [];
   const gaps = results.length || Number(redacted.leak_count ?? 0);
   const total = money(full.total_monthly_dollars ?? redacted.total_monthly_dollars);

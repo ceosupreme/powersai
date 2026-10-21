@@ -40,6 +40,9 @@ const FIELD_MASKS: Record<FetchScope, string> = {
     'types',
     'photos',
     'regularOpeningHours',
+    // Happy hour, brunch and other special hours set on the listing (same
+    // billing tier as the opening hours above, so no added cost).
+    'regularSecondaryOpeningHours',
     // Where the business is, so the ranking search runs around it.
     'location',
   ].join(','),

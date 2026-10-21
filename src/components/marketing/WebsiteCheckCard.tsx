@@ -55,8 +55,12 @@ function featureList(f: SiteFeatures, typeKey: string | null | undefined): Featu
         { label: 'Happy hour info', found: f.happy_hour },
         { label: 'An events page', found: f.events },
         { label: 'Online ordering', found: f.online_ordering },
+        ...(typeof f.catering === 'boolean' ? [{ label: 'Catering', found: f.catering }] : []),
         { label: 'Gift cards', found: f.gift_cards },
+        ...(typeof f.hours === 'boolean' ? [{ label: 'Your hours', found: f.hours }] : []),
         email,
+        ...(typeof f.text_club === 'boolean' ? [{ label: 'A text club', found: f.text_club }] : []),
+        ...(typeof f.loyalty === 'boolean' ? [{ label: 'A rewards program', found: f.loyalty }] : []),
         social,
       ];
     case 'auto':

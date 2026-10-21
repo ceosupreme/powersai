@@ -26,6 +26,8 @@ export interface WebsiteCheck {
   speed_score: number | null;
   /** What the homepage links to or shows (results from version 4 on). */
   features?: SiteFeatures | null;
+  /** Ad and analytics tags and search appearance (results from version 6 on). */
+  marketing?: SiteMarketing | null;
 }
 
 export interface SiteFeatures {
@@ -44,6 +46,39 @@ export interface SiteFeatures {
   service_areas: boolean;
   emergency: boolean;
   social: string[];
+  // Version 6 on:
+  ordering_direct?: boolean;
+  ordering_apps?: string[];
+  loyalty?: boolean;
+  text_club?: boolean;
+  catering?: boolean;
+  brunch?: boolean;
+  hours?: boolean;
+}
+
+/** null means "couldn't tell" (a tag manager or the site builder can load tags later). */
+export interface MarketingTags {
+  meta_pixel: boolean | null;
+  google_analytics: boolean | null;
+  old_google_analytics_only: boolean;
+  google_ads: boolean;
+  tiktok_pixel: boolean;
+  tag_manager: boolean;
+  source: 'page' | 'browser';
+}
+
+export interface SearchAppearance {
+  title: string | null;
+  title_says_where?: boolean | null;
+  title_says_what?: boolean | null;
+  description: boolean;
+  share_image: boolean;
+  business_schema: boolean;
+}
+
+export interface SiteMarketing {
+  tags: MarketingTags;
+  search: SearchAppearance;
 }
 
 /** Google listing and ranking summaries the report's score uses (results
@@ -59,6 +94,8 @@ export interface ListingSummaryResult {
   website: boolean | null;
   photos: number | null;
   category: string | null;
+  /** Special hours set on the listing, e.g. ["HAPPY_HOUR", "BRUNCH"] (version 6 on). */
+  special_hours?: string[];
 }
 export interface GoogleSummaryResult {
   keyword: string;
@@ -66,6 +103,10 @@ export interface GoogleSummaryResult {
   in_map_pack: boolean | null;
   /** The search ran from the business's own location (version 4 on). */
   searched_near?: boolean;
+  /** Other searches people use for what they offer (version 6 on). */
+  searches?: Array<{ keyword: string; you_rank: number | null }>;
+  /** Average Google review count of the top 3 for the main search (version 6 on). */
+  top3_avg_reviews?: number | null;
 }
 
 /** No Google listing matched the name they typed (version 5 on). The

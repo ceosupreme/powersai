@@ -54,6 +54,7 @@ import {
   checkWebsite, displayUrl, emptyWebsiteBlock, normalizeSiteInput, type WebsiteBlock,
 } from '../_shared/website-quick-check.ts';
 import { namesMatch, statesConflict } from '../_shared/name-match.ts';
+import { rankFor, type SearchRank } from '../_shared/rank-search.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -76,7 +77,11 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // 5: the listing summary names the Google listing that was checked (name and
 // address), and a listing whose name doesn't match what was typed is no
 // longer reported on (the visitor is shown the closest listing instead).
-const RESULT_VERSION = 5;
+// 6: marketing checks: ad and analytics tags, search appearance, where online
+// orders go (own ordering or delivery apps), rewards, text club, catering,
+// hours, special hours on Google, other searches, reviews vs the top 3, and
+// parked "domain for sale" websites.
+const RESULT_VERSION = 6;
 
 const IP_HITS = new Map<string, { n: number; reset: number }>();
 const IP_LIMIT = 5;
@@ -160,6 +165,48 @@ function resolveProjectType(gbpTypes: string[] | null, gbpPrimary: string | null
     path: 'default',
     caveat: "We couldn't confirm your business category from Google yet, so these use general local-business benchmarks — your numbers will sharpen everything.",
   };
+}
+
+// Words that say what kind of business it is, by type (besides the words
+// of their Google category).
+const TYPE_WORDS: Record<string, string[]> = {
+  bars_restaurants: ['restaurant', 'restaurants', 'dining', 'bar', 'bars', 'pub', 'grill', 'kitchen', 'eatery', 'cafe', 'bistro',
+    'tavern', 'lounge', 'brewery', 'brewing', 'taproom', 'cocktail', 'cocktails', 'wine', 'pizza', 'pizzeria', 'tacos', 'taco',
+    'sushi', 'burgers', 'burger', 'bbq', 'barbecue', 'seafood', 'diner', 'food', 'cuisine', 'steakhouse', 'cantina', 'brunch',
+    'breakfast', 'speakeasy', 'deli', 'bakery', 'coffee', 'ramen', 'pho', 'thai', 'italian', 'mexican', 'chinese', 'japanese', 'indian'],
+  home_services: ['plumber', 'plumbing', 'hvac', 'heating', 'cooling', 'air', 'electrician', 'electric', 'electrical', 'roofing',
+    'roofer', 'contractor', 'remodeling', 'landscaping', 'cleaning', 'handyman', 'painting', 'painter', 'pest', 'locksmith', 'repair'],
+  plumbing: ['plumber', 'plumbing', 'drain', 'sewer', 'water heater'],
+  hvac: ['hvac', 'heating', 'cooling', 'air conditioning', 'furnace', 'ac'],
+  auto: ['auto', 'car', 'cars', 'repair', 'mechanic', 'automotive', 'tires', 'tire', 'body shop', 'collision', 'dealer'],
+  carpet_cleaning: ['carpet', 'cleaning', 'upholstery', 'rug'],
+  moving_hauling: ['moving', 'movers', 'mover', 'hauling', 'junk', 'storage'],
+};
+
+/** Does the page title say where the business is (city, its initials like
+ *  "SD", or the listing's city) and what it is (category or type words)? */
+function titleSays(title: string, typedCity: string, address: string | null, category: string | null, typeKey: string, unknownType: boolean): { where: boolean; what: boolean | null } {
+  const t = ` ${title.toLowerCase().replace(/[^a-z0-9]+/g, ' ')} `;
+  const has = (w: string) => !!w && t.includes(` ${w.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `);
+  const places = new Set<string>();
+  const typed = typedCity.split(',')[0].trim();
+  if (typed) places.add(typed);
+  // "2001 Kettner Blvd, San Diego, CA 92101, USA" → "San Diego"
+  const parts = (address ?? '').split(',').map((s) => s.trim());
+  if (parts.length >= 3) places.add(parts[parts.length - 3]);
+  let where = false;
+  for (const p of places) {
+    if (!p) continue;
+    if (has(p)) where = true;
+    const initials = p.split(/\s+/).filter(Boolean).map((w) => w[0]).join('');
+    if (initials.length >= 2 && has(initials)) where = true;
+  }
+  if (unknownType && !category) return { where, what: null };
+  const words = new Set<string>([...(TYPE_WORDS[typeKey] ?? [])]);
+  for (const w of (category ?? '').toLowerCase().split(/[^a-z]+/)) if (w.length >= 4) words.add(w);
+  let what = false;
+  for (const w of words) if (has(w) || (w.length >= 5 && has(`${w}s`))) { what = true; break; }
+  return { where, what };
 }
 
 function makeToken(): string {
@@ -520,6 +567,31 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       await log(`Map-pack ranking check degraded. (${detail.slice(0, 220)})`);
     }
 
+    // Special hours on their Google listing (happy hour, brunch…).
+    const specialHours: string[] = Array.isArray((gbpSnap as any)?.raw?.regularSecondaryOpeningHours)
+      ? (gbpSnap as any).raw.regularSecondaryOpeningHours.map((h: any) => String(h?.secondaryHoursType ?? '')).filter(Boolean)
+      : [];
+
+    // Bars and restaurants: where they come up for the other searches people
+    // use for what they offer (happy hour, private dining, brunch, catering),
+    // asked from around the business. Runs while the audits below run.
+    const placesKey = (Deno.env.get('GOOGLE_PLACES_API_KEY') || '').replace(/[^\x20-\x7E]/g, '').trim();
+    const extraSearches: Promise<SearchRank[]> = (async () => {
+      if (!placeId || !placesKey || ptRes.matched_key !== 'bars_restaurants') return [];
+      const f = website?.features ?? null;
+      const typeBag = [gbpPrimary, ...(gbpTypes ?? [])].filter(Boolean).join(' ').toLowerCase();
+      const barish = /\bbar\b|_bar\b|\bpub\b|brew|night_?club|wine|cocktail|lounge|tavern|beer/.test(typeBag);
+      const restaurantish = /restaurant|cafe|diner|bistro|eatery|grill|kitchen/.test(typeBag);
+      const topics: string[] = [];
+      if (f?.happy_hour || barish || specialHours.includes('HAPPY_HOUR')) topics.push('happy hour');
+      if (f?.private_events) topics.push(restaurantish ? 'private dining' : 'private event space');
+      if (f?.brunch || specialHours.includes('BRUNCH') || /brunch|breakfast/.test(typeBag)) topics.push('brunch');
+      if (f?.catering) topics.push('catering');
+      const lat = typeof loc?.latitude === 'number' ? loc.latitude : null;
+      const lng = typeof loc?.longitude === 'number' ? loc.longitude : null;
+      return Promise.all(topics.slice(0, 3).map((t) => rankFor(placesKey, `${t} ${input.city}`.trim(), placeId!, lat, lng)));
+    })().catch(() => []);
+
     // ── 4. Audits (parallel, cold_only) ───────────────────────────────────
     await setStatus(admin, requestId, { status: 'auditing' });
     await log('Running foundation + growth checks…');
@@ -582,11 +654,37 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
           website: Boolean((listingSnap as any).website || listingRaw.websiteUri),
           photos: typeof (listingSnap as any).photo_count === 'number' ? (listingSnap as any).photo_count : (Array.isArray(listingRaw.photos) ? listingRaw.photos.length : null),
           category: (listingSnap as any).primary_category ?? null,
+          // Special hours set on the listing, e.g. ["HAPPY_HOUR", "BRUNCH"].
+          special_hours: Array.isArray(listingRaw.regularSecondaryOpeningHours)
+            ? listingRaw.regularSecondaryOpeningHours.map((h: any) => String(h?.secondaryHoursType ?? '')).filter(Boolean)
+            : [],
         }
       : null;
+    // The other searches (bars and restaurants), and how many reviews the top
+    // 3 for the main search have on average, to compare with theirs.
+    const searches = (await extraSearches).filter((s) => !s.error).map((s) => ({ keyword: s.keyword, you_rank: s.you_rank }));
+    const topComps = Array.isArray((mapSnap as any)?.top_competitors) ? (mapSnap as any).top_competitors.slice(0, 3) : [];
+    const compCounts = topComps.map((c: any) => c?.review_count).filter((n: unknown) => typeof n === 'number') as number[];
+    const top3AvgReviews = compCounts.length === 3 ? Math.round(compCounts.reduce((a, b) => a + b, 0) / 3) : null;
     const google = mapSnap
-      ? { keyword: (mapSnap as any).keyword, you_rank: (mapSnap as any).rank, in_map_pack: (mapSnap as any).in_map_pack, searched_near: (mapSnap as any).query_lat != null }
+      ? {
+          keyword: (mapSnap as any).keyword,
+          you_rank: (mapSnap as any).rank,
+          in_map_pack: (mapSnap as any).in_map_pack,
+          searched_near: (mapSnap as any).query_lat != null,
+          searches,
+          top3_avg_reviews: top3AvgReviews,
+        }
       : null;
+
+    // Does the page title (the blue link in Google) say where they are and
+    // what they are? Compared with the city typed, the listing's city and the
+    // listing's category.
+    if (website?.marketing?.search?.title) {
+      const says = titleSays(website.marketing.search.title, input.city, listing?.address ?? null, listing?.category ?? null, ptRes.matched_key, ptRes.path === 'default');
+      website.marketing.search.title_says_where = says.where;
+      website.marketing.search.title_says_what = says.what;
+    }
 
     // Scale the starting numbers by the size they picked. Every number on a
     // public checkup is a default for the business type; without this, a solo
