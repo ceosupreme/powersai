@@ -1,5 +1,5 @@
 // Admin-only: invites a client approver and grants project access.
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 
@@ -18,7 +18,7 @@ const ELEVATED_ROLES = new Set([
   "admin", "owner", "gm", "lead", "staff", "shift_lead", "foh", "boh",
 ]);
 
-async function findExistingUserId(sb: ReturnType<typeof createClient>, email: string): Promise<string | null> {
+async function findExistingUserId(sb: SupabaseClient, email: string): Promise<string | null> {
   const lower = email.toLowerCase();
   const { data: prof } = await sb
     .from("profiles")

@@ -1061,6 +1061,8 @@ interface DeterministicInsert {
   insight_mode: string;
   status: string;
   week_id: string | null;
+  source_metric?: string | null;
+  _venue_name?: string | null;
   period_start?: string | null;
   period_end?: string | null;
   period_label?: string | null;
