@@ -82,7 +82,7 @@ export default function FreeAudit() {
   const score = shown && Number(shown.result_version ?? 0) >= 2
     ? computeOnlineScore({ listing: shown.listing, google: shown.google, website: shown.website, matchedKey })
     : null;
-  const estimateNote = 'These dollar figures are estimates based on typical numbers for a business like yours, not your books.';
+  const estimateNote = 'These dollar figures are estimates based on typical numbers for a business your type and size, not your books.';
 
   // Started from the homepage checkup form (?start=1 with a name and city):
   // run the same check this page's own form runs, once, then drop the flag
@@ -343,7 +343,7 @@ export default function FreeAudit() {
               )}
 
               {/* Their website: free to see, before the email ask. */}
-              {audit.redacted.website && <WebsiteCheckCard site={audit.redacted.website} />}
+              {audit.redacted.website && <WebsiteCheckCard site={audit.redacted.website} typeKey={unknownType ? null : matchedKey} />}
 
               {/* Locked rows — only render if there are real remaining leaks beyond the top-3 tease. */}
               {!unknownType && (() => {
@@ -470,30 +470,35 @@ export default function FreeAudit() {
                 </ul>
               )}
 
-              {audit.full.competitor_block && (
-                <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8">
-                  <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">You vs the top 3 near you</p>
-                  <p className="mb-4 text-sm text-[hsl(var(--stm-ink))]/60">Search: <span className="font-mono">{audit.full.competitor_block.keyword}</span></p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex justify-between border-b border-[hsl(var(--stm-ink))]/10 pb-2">
-                      <span className="font-medium">You ({businessName || 'your business'})</span>
-                      <span className="font-mono">
-                        {audit.full.competitor_block.you_rank == null
-                          ? 'not ranking'
-                          : `#${audit.full.competitor_block.you_rank}`}
-                      </span>
-                    </li>
-                    {(audit.full.competitor_block.top_competitors || []).slice(0, 3).map((c: any, i) => (
-                      <li key={i} className="flex justify-between border-b border-[hsl(var(--stm-ink))]/10 pb-2 text-[hsl(var(--stm-ink))]/70">
-                        <span>{c.name ?? c.place_id ?? `Competitor ${i + 1}`}</span>
-                        <span className="font-mono">#{c.rank ?? i + 1}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {audit.full.competitor_block && (() => {
+                const cb = audit.full.competitor_block;
+                const near = audit.full.google?.searched_near;
+                const reviewsText = (rating: number | null | undefined, count: number | null | undefined) =>
+                  rating == null && count == null ? '' : `${rating != null ? `${rating.toFixed(1)} stars` : ''}${rating != null && count != null ? ' · ' : ''}${count != null ? `${count.toLocaleString('en-US')} review${count === 1 ? '' : 's'}` : ''}`;
+                const rows = [
+                  { key: 'you', name: `You (${businessName || 'your business'})`, rank: cb.you_rank, reviews: reviewsText(audit.full.listing?.rating, audit.full.listing?.review_count), you: true },
+                  ...(cb.top_competitors || []).slice(0, 3).map((c, i) => ({ key: `c${i}`, name: c.name ?? `Competitor ${i + 1}`, rank: c.rank ?? i + 1, reviews: reviewsText(c.rating, c.review_count), you: false })),
+                ];
+                return (
+                  <div className="rounded-2xl border border-[hsl(var(--stm-ink))]/10 bg-white p-6 md:p-8">
+                    <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[hsl(var(--stm-cobalt))]">You vs the top 3 near you</p>
+                    <p className="mb-5 text-base text-[#4A5568]">Google search: <span className="font-semibold text-[#0B1530]">{cb.keyword}</span>{near ? ', searched from your location' : ''}</p>
+                    <ul className="divide-y divide-[#E6EAF0]">
+                      {rows.map((r) => (
+                        <li key={r.key} className="flex items-center justify-between gap-4 py-3">
+                          <div className="min-w-0">
+                            <p className={`text-lg leading-snug ${r.you ? 'font-bold text-[#0B1530]' : 'font-medium text-[#0B1530]'}`}>{r.name}</p>
+                            {r.reviews && <p className="mt-0.5 text-base text-[#4A5568]">{r.reviews}</p>}
+                          </div>
+                          <span className={`shrink-0 text-lg font-bold ${r.rank == null ? 'text-[#B42318]' : 'text-[#0B1530]'}`}>{r.rank == null ? 'Not in the top 20' : `#${r.rank}`}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
 
-              {audit.full.website && <WebsiteCheckCard site={audit.full.website} />}
+              {audit.full.website && <WebsiteCheckCard site={audit.full.website} typeKey={unknownType ? null : matchedKey} />}
 
               <div className="mt-4 rounded-2xl bg-[hsl(var(--stm-cobalt))] p-8 text-center text-[hsl(var(--stm-bg))] shadow-lg md:p-12">
                 <p className="font-display text-2xl md:text-3xl leading-snug">Want this fixed?</p>

@@ -131,7 +131,7 @@ export const aiSearchVisibilityGapAnalyzer: AnalyzerModule = {
         }
         if (gbpGaps.length) diagnosisParts.push(`Likely contributing factors: ${gbpGaps.join(', ')}.`);
 
-        if (webSnap && !webSnap.has_localbusiness_schema) {
+        if (webSnap && webSnap.has_localbusiness_schema === false) {
           diagnosisParts.push('Website is missing LocalBusiness schema markup — LLMs rely on this to surface venues.');
         }
 
@@ -161,7 +161,7 @@ export const aiSearchVisibilityGapAnalyzer: AnalyzerModule = {
           recommended_action: action,
           evidence: { summary: `${mentions}/${total} engines mentioned the venue.`, sources },
           revenue_upside: upside,
-          ease: gbpGaps.length || (webSnap && !webSnap.has_localbusiness_schema) ? 4 : 3,
+          ease: gbpGaps.length || (webSnap && webSnap.has_localbusiness_schema === false) ? 4 : 3,
           confidence: total >= 3 ? 4 : 3,
           operational_risk: 1,
           is_traffic_driving: true,

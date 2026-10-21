@@ -68,7 +68,9 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // score is built from. The 7-day dedupe only reuses results at this version.
 // 3: the website check tries the secure address first (results before that
 // could mark a working https site "not secure"), so version-2 results aren't reused.
-const RESULT_VERSION = 3;
+// 4: ranking searched from the business's location, top-3 ratings, homepage
+// features, size-scaled estimates.
+const RESULT_VERSION = 4;
 
 const IP_HITS = new Map<string, { n: number; reset: number }>();
 const IP_LIMIT = 5;
@@ -334,11 +336,19 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     // and the map-pack keyword, and the website their listing links to.
     const { data: gbpSnap } = await admin
       .from('gbp_snapshots')
-      .select('primary_category, secondary_categories, website, fetch_error')
+      .select('primary_category, secondary_categories, website, fetch_error, raw')
       .eq('venue_id', shellVenueId)
       .order('captured_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+    // Save where the business is, so the ranking search (map-pack-run) runs
+    // around it. Without it Google answers for the whole city, and the rank
+    // changes with how the city was typed.
+    const loc = (gbpSnap as any)?.raw?.location;
+    if (loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number') {
+      const { error: locErr } = await admin.from('venues').update({ lat: loc.latitude, lng: loc.longitude }).eq('id', shellVenueId);
+      if (locErr) console.error(`[run-public-audit] venue location update failed: ${locErr.message}`);
+    }
     if (gbpSnap) {
       gbpPrimary = (gbpSnap as any).primary_category ?? null;
       gbpTypes = Array.isArray((gbpSnap as any).secondary_categories)
@@ -492,7 +502,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
     // Competitor block from latest map-pack snapshot (may be missing).
     const { data: mapSnap } = await admin
       .from('map_pack_snapshots')
-      .select('rank, in_map_pack, top_competitors, keyword, checked_at')
+      .select('rank, in_map_pack, top_competitors, keyword, checked_at, query_lat')
       .eq('venue_id', shellVenueId)
       .order('checked_at', { ascending: false })
       .limit(1)
@@ -520,18 +530,40 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
         }
       : null;
     const google = mapSnap
-      ? { keyword: (mapSnap as any).keyword, you_rank: (mapSnap as any).rank, in_map_pack: (mapSnap as any).in_map_pack }
+      ? { keyword: (mapSnap as any).keyword, you_rank: (mapSnap as any).rank, in_map_pack: (mapSnap as any).in_map_pack, searched_near: (mapSnap as any).query_lat != null }
       : null;
 
-    const results = Array.isArray((leakRun as any).results) ? (leakRun as any).results : [];
+    // Scale the starting numbers by the size they picked. Every number on a
+    // public checkup is a default for the business type; without this, a solo
+    // shop and a multi-location group got the same dollars. Only applied when
+    // every input is a default (never to numbers measured from real data).
+    const FOOTPRINT_SCALE: Record<string, number> = { solo_owner: 0.5, small_crew_2_5: 1, crew_6_plus: 1.75, multi_location: 3 };
+    const sizeScale = FOOTPRINT_SCALE[input.operation_footprint] ?? 1;
+    const rawResults = Array.isArray((leakRun as any).results) ? (leakRun as any).results : [];
+    const allDefaults = rawResults.length > 0 && rawResults.every((r: any) =>
+      Array.isArray(r.inputs) && r.inputs.length > 0 && r.inputs.every((i: any) => i.source === 'vertical_default'));
+    const scaleBySize = allDefaults && sizeScale !== 1;
+    const results = scaleBySize
+      ? rawResults.map((r: any) => ({
+          ...r,
+          // The first input is the volume (calls, requests, customers...).
+          inputs: r.inputs.map((inp: any, idx: number) => idx === 0 && typeof inp.value === 'number'
+            ? { ...inp, value: Math.round(inp.value * sizeScale * 10) / 10, scaled_by_size: sizeScale }
+            : inp),
+          monthly_dollars: typeof r.monthly_dollars === 'number' ? Math.round(r.monthly_dollars * sizeScale) : r.monthly_dollars,
+        }))
+      : rawResults;
+    const totalMonthly = scaleBySize ? Math.round(Number((leakRun as any).total_monthly_dollars ?? 0) * sizeScale) : (leakRun as any).total_monthly_dollars;
+    const totalRisk = scaleBySize ? Math.round(Number((leakRun as any).total_risk_exposure_dollars ?? 0) * sizeScale) : (leakRun as any).total_risk_exposure_dollars;
     const topThree = results.slice(0, 3).map((r: any) => r.name).filter(Boolean);
 
     const full_result = {
       result_version: RESULT_VERSION,
       listing,
       google,
-      total_monthly_dollars: (leakRun as any).total_monthly_dollars,
-      total_risk_exposure_dollars: (leakRun as any).total_risk_exposure_dollars,
+      total_monthly_dollars: totalMonthly,
+      total_risk_exposure_dollars: totalRisk,
+      size_scale: scaleBySize ? sizeScale : 1,
       results,
       inputs_basis: (leakRun as any).inputs_basis ?? null,
       project_type_resolution: ptRes,
@@ -554,7 +586,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       result_version: RESULT_VERSION,
       listing,
       google,
-      total_monthly_dollars: (leakRun as any).total_monthly_dollars,
+      total_monthly_dollars: totalMonthly,
       leak_count: results.length,
       top_leaks: topThree,
       project_type_resolution: ptRes,

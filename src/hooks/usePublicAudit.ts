@@ -24,6 +24,26 @@ export interface WebsiteCheck {
   phone_load_seconds: number | null;
   speed: 'fast' | 'ok' | 'slow' | null;
   speed_score: number | null;
+  /** What the homepage links to or shows (results from version 4 on). */
+  features?: SiteFeatures | null;
+}
+
+export interface SiteFeatures {
+  menu: boolean;
+  menu_pdf_only: boolean;
+  happy_hour: boolean;
+  reservations: boolean;
+  reservations_provider: string | null;
+  private_events: boolean;
+  events: boolean;
+  online_ordering: boolean;
+  gift_cards: boolean;
+  email_signup: boolean;
+  booking_or_quote: boolean;
+  financing: boolean;
+  service_areas: boolean;
+  emergency: boolean;
+  social: string[];
 }
 
 /** Google listing and ranking summaries the report's score uses (results
@@ -41,6 +61,8 @@ export interface GoogleSummaryResult {
   keyword: string;
   you_rank: number | null;
   in_map_pack: boolean | null;
+  /** The search ran from the business's own location (version 4 on). */
+  searched_near?: boolean;
 }
 
 export interface RedactedResult {
@@ -81,7 +103,7 @@ export interface FullResult {
     keyword: string;
     you_rank: number | null;
     in_map_pack: boolean | null;
-    top_competitors: Array<{ name?: string; rank?: number; place_id?: string }>;
+    top_competitors: Array<{ name?: string; rank?: number; place_id?: string; rating?: number | null; review_count?: number | null }>;
   } | null;
   project_type_resolution: RedactedResult['project_type_resolution'];
   inputs_basis: Record<string, unknown> | null;

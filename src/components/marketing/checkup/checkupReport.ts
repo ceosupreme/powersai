@@ -175,6 +175,7 @@ export interface GoogleSummary {
   keyword: string;
   you_rank: number | null;
   in_map_pack: boolean | null;
+  searched_near?: boolean;
 }
 
 export interface ScorePart {
@@ -245,11 +246,12 @@ export function computeOnlineScore(input: {
     const missing = listing
       ? [listing.hours_set === false && 'hours', listing.phone === false && 'phone number', listing.website === false && 'website', listing.photos != null && listing.photos < 10 && 'photos'].filter(Boolean) as string[]
       : [];
+    const near = google.searched_near ? ' near your location' : '';
     const rankLine = google.you_rank == null
-      ? `You don't show up in the top 20 for "${google.keyword}".`
+      ? `You don't show up in the top 20 when people search "${google.keyword}"${near}.`
       : google.you_rank <= 3
-        ? `You're #${google.you_rank} for "${google.keyword}", in the top 3 people see first.`
-        : `You're #${google.you_rank} for "${google.keyword}". The top 3 get seen first.`;
+        ? `You're #${google.you_rank} when people search "${google.keyword}"${near}, in the top 3 people see first.`
+        : `You're #${google.you_rank} when people search "${google.keyword}"${near}. The top 3 get seen first.`;
     const listingLine = !listing ? '' : missing.length ? ` Your Google listing is missing: ${missing.join(', ')}.` : ' Your Google listing has hours, phone, website and photos.';
     googlePart = { key: 'google', label: 'Found on Google', max: 40, points: Math.round((t.earned / t.possible) * 40), reason: rankLine + listingLine };
   } else {

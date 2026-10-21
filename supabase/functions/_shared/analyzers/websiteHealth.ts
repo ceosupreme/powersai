@@ -54,6 +54,11 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
         // still allow PSI-only alerts to fire below
       }
 
+      // Menu, events and happy hour only apply to restaurants and bars.
+      const { data: venueRow } = await supabase.from('venues').select('project_type').eq('id', venueId).maybeSingle();
+      const restaurant = (venueRow as any)?.project_type === 'bars_restaurants';
+
+      // A field that wasn't checked is null. Only an explicit false is a gap.
       const gaps: Gap[] = [];
       const httpsEnabled = (psi?.https_enabled ?? weekly?.https_enabled);
       if (httpsEnabled === false) {
@@ -78,7 +83,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
       }
 
       if (weekly) {
-        if (weekly.menu_is_pdf_only) {
+        if (restaurant && weekly.menu_is_pdf_only === true) {
           gaps.push({
             key: 'website_health:menu_pdf_only',
             severity: 'High',
@@ -87,7 +92,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
             action: 'Publish your menu as an HTML page (one section per category). Keep the PDF for download but make HTML the primary version.',
             upside: 4, ease: 3,
           });
-        } else if (!weekly.has_menu_page) {
+        } else if (restaurant && weekly.has_menu_page === false) {
           gaps.push({
             key: 'website_health:missing_menu',
             severity: 'Critical',
@@ -97,7 +102,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
             upside: 5, ease: 3,
           });
         }
-        if (!weekly.has_localbusiness_schema) {
+        if (weekly.has_localbusiness_schema === false) {
           gaps.push({
             key: 'website_health:missing_schema',
             severity: 'High',
@@ -107,7 +112,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
             upside: 3, ease: 4,
           });
         }
-        if (!weekly.has_contact_page) {
+        if (weekly.has_contact_page === false) {
           gaps.push({
             key: 'website_health:missing_contact',
             severity: 'High',
@@ -117,7 +122,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
             upside: 3, ease: 5,
           });
         }
-        if (!weekly.has_events_page) {
+        if (restaurant && weekly.has_events_page === false) {
           gaps.push({
             key: 'website_health:missing_events',
             severity: 'High',
@@ -127,7 +132,7 @@ export const websiteHealthAnalyzer: AnalyzerModule = {
             upside: 3, ease: 4,
           });
         }
-        if (!weekly.has_happy_hour_page) {
+        if (restaurant && weekly.has_happy_hour_page === false) {
           gaps.push({
             key: 'website_health:missing_happy_hour',
             severity: 'Medium',

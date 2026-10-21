@@ -27,7 +27,9 @@ const json = (status: number, body: unknown) =>
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const TEXT_SEARCH_URL = 'https://places.googleapis.com/v1/places:searchText';
-const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress';
+// Rating and review count come back in the same search, so the report can
+// compare a business with the top 3 without extra lookups.
+const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount';
 const PER_KEYWORD_DELAY_MS = 1000;
 const PER_VENUE_DELAY_MS = 30_000;
 const MANUAL_RATE_LIMIT_MS = 60 * 60 * 1000; // 1 hour
@@ -48,7 +50,7 @@ async function queryPlace(
   keyword: string,
   lat: number | null,
   lng: number | null,
-): Promise<{ places: Array<{ id: string; name: string; address: string }>; error?: string }> {
+): Promise<{ places: Array<{ id: string; name: string; address: string; rating: number | null; review_count: number | null }>; error?: string }> {
   const reqBody: any = {
     textQuery: keyword,
     maxResultCount: MAX_RESULTS_TO_SCAN,
@@ -76,6 +78,8 @@ async function queryPlace(
     id: p.id,
     name: p.displayName?.text ?? '',
     address: p.formattedAddress ?? '',
+    rating: typeof p.rating === 'number' ? p.rating : null,
+    review_count: typeof p.userRatingCount === 'number' ? p.userRatingCount : null,
   }));
   return { places };
 }
@@ -90,7 +94,7 @@ async function processKeyword(
   const { places, error } = await queryPlace(apiKey, kw.keyword, venue.lat, venue.lng);
 
   let rank: number | null = null;
-  let competitors: Array<{ place_id: string; name: string; rank: number }> = [];
+  let competitors: Array<{ place_id: string; name: string; rank: number; rating: number | null; review_count: number | null }> = [];
 
   if (!error && places.length) {
     if (placeId) {
@@ -104,6 +108,8 @@ async function processKeyword(
         place_id: p.id,
         name: p.name,
         rank: places.indexOf(p) + 1,
+        rating: p.rating,
+        review_count: p.review_count,
       }));
   }
 

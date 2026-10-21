@@ -40,6 +40,8 @@ const FIELD_MASKS: Record<FetchScope, string> = {
     'types',
     'photos',
     'regularOpeningHours',
+    // Where the business is, so the ranking search runs around it.
+    'location',
   ].join(','),
   weekly_full: [
     'id',

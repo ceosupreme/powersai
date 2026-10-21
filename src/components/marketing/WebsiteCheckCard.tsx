@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CircleAlert, CircleCheck, CircleX } from 'lucide-react';
-import type { WebsiteCheck } from '@/hooks/usePublicAudit';
+import type { SiteFeatures, WebsiteCheck } from '@/hooks/usePublicAudit';
 import { trackSiteEvent } from '@/lib/studioAnalytics';
 
 /**
@@ -36,6 +36,43 @@ export function websiteRows(site: WebsiteCheck): Row[] {
   return rows;
 }
 
+/** What the homepage offers, by business type. Read from the homepage and
+ *  its links only, so a missing item says "not on your homepage". */
+type Feature = { label: string; found: boolean; note?: string };
+
+function featureList(f: SiteFeatures, typeKey: string | null | undefined): Feature[] {
+  const social = f.social.length ? { label: `Links to ${f.social.join(', ')}`, found: true } : { label: 'Links to your social pages', found: false };
+  const email = { label: 'An email signup', found: f.email_signup };
+  const book = { label: 'A way to book or ask for a quote online', found: f.booking_or_quote };
+  switch (typeKey) {
+    case 'bars_restaurants':
+      return [
+        f.menu && f.menu_pdf_only
+          ? { label: 'Your menu', found: true, note: "only as a PDF, which is hard to read on a phone and hard for Google to read" }
+          : { label: 'Your menu', found: f.menu },
+        { label: f.reservations_provider ? `Online reservations (${f.reservations_provider})` : 'Reservations', found: f.reservations },
+        { label: 'A private events page', found: f.private_events },
+        { label: 'Happy hour info', found: f.happy_hour },
+        { label: 'An events page', found: f.events },
+        { label: 'Online ordering', found: f.online_ordering },
+        { label: 'Gift cards', found: f.gift_cards },
+        email,
+        social,
+      ];
+    case 'auto':
+      return [{ label: 'A way to book service or ask for a quote online', found: f.booking_or_quote }, { label: 'Financing info', found: f.financing }, email, social];
+    case 'home_services':
+    case 'hvac':
+    case 'plumbing':
+      return [book, { label: 'Pages for the areas you serve', found: f.service_areas }, { label: 'Emergency or 24/7 service', found: f.emergency }, { label: 'Financing info', found: f.financing }, social];
+    case 'carpet_cleaning':
+    case 'moving_hauling':
+      return [book, { label: 'Pages for the areas you serve', found: f.service_areas }, email, social];
+    default:
+      return [book, email, social];
+  }
+}
+
 function heading(site: WebsiteCheck, fixes: number): { title: string; sub?: string } {
   if (site.status === 'none') {
     return { title: 'No website on your Google listing', sub: 'People who find you on Google have nowhere to click through to.' };
@@ -62,8 +99,11 @@ const TONE_COLOR: Record<Tone, string> = {
   bad: 'hsl(var(--stm-loss, 9 72% 59%))',
 };
 
-export function WebsiteCheckCard({ site }: { site: WebsiteCheck }) {
+export function WebsiteCheckCard({ site, typeKey }: { site: WebsiteCheck; typeKey?: string | null }) {
   const rows = websiteRows(site);
+  const features = site.features ? featureList(site.features, typeKey) : [];
+  const found = features.filter((x) => x.found);
+  const missing = features.filter((x) => !x.found);
   const fixes = rows.filter((r) => r.tone !== 'ok').length;
   const { title, sub } = heading(site, fixes);
   const showCta = site.status === 'none' || site.status === 'social' || site.status === 'unreachable' || fixes > 0;
@@ -90,6 +130,39 @@ export function WebsiteCheckCard({ site }: { site: WebsiteCheck }) {
             );
           })}
         </ul>
+      )}
+      {features.length > 0 && (
+        <div className="mt-8 border-t border-[#E6EAF0] pt-6">
+          <p className="text-lg font-bold text-[#0B1530]">What your homepage offers visitors</p>
+          <p className="mt-1 text-base text-[#4A5568]">We read your homepage and the links on it.</p>
+          <div className="mt-4 grid gap-6 md:grid-cols-2">
+            {found.length > 0 && (
+              <ul className="space-y-3">
+                {found.map((x) => (
+                  <li key={x.label} className="flex items-start gap-3 text-lg leading-snug text-[#0B1530]">
+                    {x.note
+                      ? <CircleAlert className="mt-0.5 h-6 w-6 shrink-0" style={{ color: TONE_COLOR.warn }} aria-hidden />
+                      : <CircleCheck className="mt-0.5 h-6 w-6 shrink-0" style={{ color: TONE_COLOR.ok }} aria-hidden />}
+                    <span>{x.label}{x.note ? `, ${x.note}` : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {missing.length > 0 && (
+              <div>
+                <p className="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-[#8A5A08]">Not on your homepage</p>
+                <ul className="space-y-3">
+                  {missing.map((x) => (
+                    <li key={x.label} className="flex items-start gap-3 text-lg leading-snug text-[#334155]">
+                      <CircleX className="mt-0.5 h-6 w-6 shrink-0" style={{ color: '#94A3B8' }} aria-hidden />
+                      <span>{x.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
       )}
       {showCta && (
         <Link

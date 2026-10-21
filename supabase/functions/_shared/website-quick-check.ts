@@ -30,6 +30,29 @@ export type WebsiteBlock = {
   phone_load_seconds: number | null;
   speed: 'fast' | 'ok' | 'slow' | null;
   speed_score: number | null;
+  /** What the homepage links to or shows (null: couldn't read the page). */
+  features: SiteFeatures | null;
+};
+
+/** What the homepage links to or shows. Read from the homepage only: a
+ *  false means "no link or sign of it on the homepage". */
+export type SiteFeatures = {
+  menu: boolean;
+  menu_pdf_only: boolean;
+  happy_hour: boolean;
+  reservations: boolean;
+  reservations_provider: string | null;
+  private_events: boolean;
+  events: boolean;
+  online_ordering: boolean;
+  gift_cards: boolean;
+  email_signup: boolean;
+  booking_or_quote: boolean;
+  financing: boolean;
+  service_areas: boolean;
+  emergency: boolean;
+  /** Social profiles it links to, e.g. ["Facebook", "Instagram"]. */
+  social: string[];
 };
 
 /** Columns for the shell venue's website_snapshots row. */
@@ -46,6 +69,16 @@ export type WebsiteSnapshotFields = {
   lcp_ms: number | null;
   cms_detected: string | null;
   fetch_error: string | null;
+  has_menu_page?: boolean | null;
+  menu_is_pdf_only?: boolean | null;
+  has_happy_hour_page?: boolean | null;
+  has_events_page?: boolean | null;
+  has_private_party_page?: boolean | null;
+  private_party_linked_from_home?: boolean | null;
+  has_reservations_page?: boolean | null;
+  has_email_signup?: boolean | null;
+  has_social_links?: boolean | null;
+  raw?: Record<string, unknown> | null;
 };
 
 const PHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
@@ -230,7 +263,32 @@ export type HtmlFindings = {
   /** People can call, message or book from the homepage (null: couldn't tell). */
   contact: boolean | null;
   cms: string | null;
+  features: SiteFeatures | null;
+  social_links: Array<{ label: string; url: string }>;
 };
+
+const SOCIAL_SITES: Array<[string, RegExp]> = [
+  ['Facebook', /(^|\.)facebook\.com|(^|\.)fb\.com/i],
+  ['Instagram', /(^|\.)instagram\.com/i],
+  ['TikTok', /(^|\.)tiktok\.com/i],
+  ['YouTube', /(^|\.)youtube\.com|(^|\.)youtu\.be/i],
+  ['Yelp', /(^|\.)yelp\.com/i],
+  ['LinkedIn', /(^|\.)linkedin\.com/i],
+  ['X', /(^|\.)twitter\.com|(^|\.)x\.com/i],
+  ['Pinterest', /(^|\.)pinterest\.com/i],
+];
+
+const RESERVATION_PROVIDERS: Array<[string, RegExp]> = [
+  ['OpenTable', /opentable\./i],
+  ['Resy', /resy\.com/i],
+  ['Tock', /exploretock\.com/i],
+  ['SevenRooms', /sevenrooms\.com/i],
+  ['Yelp', /yelp\.com\/reservations/i],
+];
+
+function hostOf(href: string): string {
+  try { return new URL(href, 'https://x.invalid').hostname.toLowerCase(); } catch { return ''; }
+}
 
 export function analyzeHtml(html: string): HtmlFindings {
   const doc = html.slice(0, MAX_HTML);
@@ -267,6 +325,55 @@ export function analyzeHtml(html: string): HtmlFindings {
   let cms: string | null = null;
   for (const [name, rx] of CMS_SIGNATURES) if (rx.test(doc)) { cms = name; break; }
 
+  // Links on the homepage: where they go and what they say.
+  const anchors: Array<{ href: string; text: string }> = [];
+  for (const m of doc.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const hrefM = m[1].match(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+    const href = (hrefM ? (hrefM[1] ?? hrefM[2] ?? hrefM[3] ?? '') : '').trim();
+    const aria = m[1].match(/\baria-label\s*=\s*["']([^"']*)["']/i)?.[1] ?? '';
+    const label = m[2].replace(/<[^>]+>/g, ' ').replace(/&amp;/gi, '&').replace(/\s+/g, ' ').trim();
+    anchors.push({ href, text: `${label} ${aria}`.trim() });
+    if (anchors.length >= 800) break;
+  }
+  const realLinks = anchors.filter((a) => a.href && a.href !== '#' && !/^javascript:/i.test(a.href));
+  const linkHit = (rx: RegExp) => realLinks.some((a) => rx.test(a.href) || rx.test(a.text));
+
+  const socialLinks: Array<{ label: string; url: string }> = [];
+  for (const a of realLinks) {
+    const host = hostOf(a.href);
+    if (!host) continue;
+    for (const [label, rx] of SOCIAL_SITES) {
+      if (rx.test(host) && !socialLinks.some((x) => x.label === label)) socialLinks.push({ label, url: a.href });
+    }
+  }
+
+  let features: SiteFeatures | null = null;
+  if (readable || realLinks.length >= 5) {
+    const menuLinks = realLinks.filter((a) => /menu/i.test(a.href) || /\bmenus?\b/i.test(a.text));
+    let provider: string | null = null;
+    for (const [name, rx] of RESERVATION_PROVIDERS) if (rx.test(doc)) { provider = name; break; }
+    const hasEmailInput = /<input\b[^>]*\btype\s*=\s*["']?email\b/i.test(doc);
+    features = {
+      menu: menuLinks.length > 0 || /\b(?:view|see|our|full) (?:dinner |lunch |brunch |food |drink )?menus?\b/i.test(text),
+      menu_pdf_only: menuLinks.length > 0 && menuLinks.every((a) => /\.pdf(?:[?#]|$)/i.test(a.href)),
+      happy_hour: linkHit(/happy[\s_-]?hour/i) || /\bhappy hour\b/i.test(text),
+      reservations: !!provider || linkHit(/reserv|book[\s_-]?a[\s_-]?table/i),
+      reservations_provider: provider,
+      private_events: linkHit(/private[\s_-]?(?:event|dining|part(?:y|ies))|buy[\s_-]?outs?\b|catering|group[\s_-]?dining|banquet/i),
+      events: realLinks.some((a) => (/(?:^|\/)(?:events?|calendar)(?:[\/?#.-]|$)|live[\s_-]?music|trivia/i.test(a.href) || /\b(?:events?|calendar|live music|trivia)\b/i.test(a.text))
+        && !/private|catering|buy[\s_-]?out/i.test(`${a.href} ${a.text}`)),
+      online_ordering: linkHit(/order[\s_-]?online|online[\s_-]?order|order[\s_-]?now|toasttab\.com|chownow|doordash|ubereats|grubhub|\bolo\.com|slicelife|order\.online|beyondmenu|menufy/i),
+      gift_cards: linkHit(/gift[\s_-]?cards?|giftcard|gift[\s_-]?certificates?|egift/i),
+      email_signup: (hasEmailInput && /subscribe|newsletter|mailing list|sign up for|join (?:our )?(?:email|mailing|list|vip|club)/i.test(text))
+        || (/list-manage\.com|klaviyo|mailchimp/i.test(doc) && /subscribe|newsletter/i.test(text)),
+      booking_or_quote: booking || contactLink,
+      financing: linkHit(/financ/i) || /\bfinancing\b/i.test(text),
+      service_areas: linkHit(/service[\s_-]?areas?|areas[\s_-]?(?:we[\s_-]?)?serve|cities[\s_-]?we[\s_-]?serve/i) || /\b(?:service areas?|areas we serve|proudly serving)\b/i.test(text),
+      emergency: /\b24\/7\b|\b24 hours\b|\bemergency\b/i.test(text),
+      social: socialLinks.map((x) => x.label),
+    };
+  }
+
   return {
     phone_ready: phoneReady,
     readable,
@@ -278,6 +385,8 @@ export function analyzeHtml(html: string): HtmlFindings {
     phone_visible: phoneVisible,
     contact: anyWay ? true : readable ? false : null,
     cms,
+    features,
+    social_links: socialLinks,
   };
 }
 
@@ -285,7 +394,7 @@ export function analyzeHtml(html: string): HtmlFindings {
 
 type Speed = { lcp_ms: number | null; score: number | null; viewport_ok: boolean | null; final_url: string | null };
 
-async function psiOnce(url: string, key: string | null, timeoutMs: number): Promise<{ ok: boolean; status: number | null; speed: Speed | null }> {
+async function psiOnce(url: string, key: string | null, timeoutMs: number): Promise<{ ok: boolean; status: number | null; speed: Speed | null; reason?: string }> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -293,12 +402,13 @@ async function psiOnce(url: string, key: string | null, timeoutMs: number): Prom
     if (key) params.set('key', key);
     const res = await fetch(`${PSI_URL}?${params}`, { signal: ctrl.signal });
     if (!res.ok) {
-      await res.body?.cancel();
-      return { ok: false, status: res.status, speed: null };
+      let reason = '';
+      try { reason = ((await res.json())?.error?.message ?? '').toString().slice(0, 160); } catch { /* not json */ }
+      return { ok: false, status: res.status, speed: null, reason };
     }
     const data = await res.json();
     const lh = data?.lighthouseResult;
-    if (!lh || lh.runtimeError) return { ok: false, status: res.status, speed: null };
+    if (!lh || lh.runtimeError) return { ok: false, status: res.status, speed: null, reason: lh?.runtimeError?.code ?? 'no result' };
     const lcp = lh.audits?.['largest-contentful-paint']?.numericValue;
     const perf = lh.categories?.performance?.score;
     const viewport = lh.audits?.viewport?.score;
@@ -312,24 +422,29 @@ async function psiOnce(url: string, key: string | null, timeoutMs: number): Prom
         final_url: typeof lh.finalDisplayedUrl === 'string' ? lh.finalDisplayedUrl : typeof lh.finalUrl === 'string' ? lh.finalUrl : null,
       },
     };
-  } catch {
-    return { ok: false, status: null, speed: null };
+  } catch (e) {
+    return { ok: false, status: null, speed: null, reason: ctrl.signal.aborted ? 'timed out' : String(e).slice(0, 160) };
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function phoneSpeed(url: string, key: string | null, budgetMs: number): Promise<Speed | null> {
+const describe = (r: { status: number | null; reason?: string }) => `${r.status == null ? 'no answer' : `HTTP ${r.status}`}${r.reason ? `: ${r.reason}` : ''}`;
+
+/** Google's phone speed test, plus a plain reason when it gave no result
+ *  (saved with the website snapshot so a missing speed can be explained). */
+async function phoneSpeed(url: string, key: string | null, budgetMs: number): Promise<{ speed: Speed | null; problem: string | null }> {
   const started = Date.now();
   const first = await psiOnce(url, key, budgetMs);
-  if (first.ok) return first.speed;
+  if (first.ok) return { speed: first.speed, problem: null };
   // A key that isn't switched on for the speed test fails fast; try once without it.
   const left = budgetMs - (Date.now() - started);
   if (key && (first.status === 400 || first.status === 403) && left > 15_000) {
     const second = await psiOnce(url, null, left);
-    if (second.ok) return second.speed;
+    if (second.ok) return { speed: second.speed, problem: `with key: ${describe(first)}; worked without key` };
+    return { speed: null, problem: `with key: ${describe(first)}; without key: ${describe(second)}` };
   }
-  return null;
+  return { speed: null, problem: `${key ? 'with key' : 'no key'}: ${describe(first)}` };
 }
 
 // ── The check ───────────────────────────────────────────────────────────────
@@ -357,6 +472,7 @@ export function emptyWebsiteBlock(status: WebsiteStatus, patch: Partial<WebsiteB
     phone_load_seconds: null,
     speed: null,
     speed_score: null,
+    features: null,
     ...patch,
   };
 }
@@ -368,10 +484,11 @@ export async function checkWebsite(url: string, opts: WebsiteCheckOptions): Prom
   const social = socialLabel(url);
   if (social) return { block: emptyWebsiteBlock('social', { ...base, social_label: social }), snapshot: null };
 
-  const [page, speed] = await Promise.all([
+  const [page, speedRes] = await Promise.all([
     fetchHomepage(url),
     phoneSpeed(url, opts.psiKey ?? null, opts.psiBudgetMs ?? 45_000),
   ]);
+  const speed = speedRes.speed;
 
   const speedPatch: Partial<WebsiteBlock> = speed && speed.lcp_ms != null
     ? {
@@ -394,8 +511,10 @@ export async function checkWebsite(url: string, opts: WebsiteCheckOptions): Prom
       secure: finalUrl.startsWith('https://'),
       phone_ready: speed?.viewport_ok ?? f.phone_ready,
       contact: f.contact,
+      features: f.features,
       ...speedPatch,
     });
+    const ft = f.features;
     return {
       block,
       snapshot: {
@@ -410,6 +529,18 @@ export async function checkWebsite(url: string, opts: WebsiteCheckOptions): Prom
         cms_detected: f.cms,
         fetch_error: null,
         ...speedCols,
+        ...(ft ? {
+          has_menu_page: ft.menu,
+          menu_is_pdf_only: ft.menu_pdf_only,
+          has_happy_hour_page: ft.happy_hour,
+          has_events_page: ft.events,
+          has_private_party_page: ft.private_events,
+          private_party_linked_from_home: ft.private_events,
+          has_reservations_page: ft.reservations,
+          has_email_signup: ft.email_signup,
+          has_social_links: ft.social.length > 0,
+        } : {}),
+        raw: { features: ft, social_links: f.social_links, speed_problem: speedRes.problem, checked: 'homepage' },
       },
     };
   }
@@ -439,6 +570,7 @@ export async function checkWebsite(url: string, opts: WebsiteCheckOptions): Prom
         cms_detected: null,
         fetch_error: page.blocked ? `security screen (HTTP ${page.status})` : page.problem,
         ...speedCols,
+        raw: { speed_problem: speedRes.problem, checked: 'speed test only' },
       },
     };
   }
@@ -458,6 +590,7 @@ export async function checkWebsite(url: string, opts: WebsiteCheckOptions): Prom
       cms_detected: null,
       fetch_error: page.problem,
       ...speedCols,
+      raw: { speed_problem: speedRes.problem, checked: 'did not open' },
     },
   };
 }
