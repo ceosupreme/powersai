@@ -210,7 +210,7 @@ async function generateWeeklyInsights(
       .map((s: string) => normalizeForMatch(s))
       .filter((s: string) => s.length > 0);
     return { id: r.id, canonical: full, tokens };
-  }).filter((r) => r.tokens.length > 0);
+  }).filter((r: any) => r.tokens.length > 0);
 
   // ── Fetch all logs for the week (gm + lead + shift) ──
   const weekLogs = await fetchWeekLogs(supabase, barId, weekStart, weekEnd);

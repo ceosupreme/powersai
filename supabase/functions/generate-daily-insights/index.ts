@@ -1048,6 +1048,7 @@ function mergeLogSections(
 
 interface DeterministicInsert {
   bar_id: string;
+  venue_id?: string | null;
   pillar: string;
   insight_type: string;
   severity: string;
@@ -2279,7 +2280,7 @@ async function processBar(
       .map((s: string) => normalizeForMatch(s))
       .filter((s: string) => s.length > 0);
     return { id: r.id, canonical: full, tokens };
-  }).filter((r) => r.tokens.length > 0);
+  }).filter((r: any) => r.tokens.length > 0);
   console.log(`[ROSTER] Bar ${barId}: ${employeeRoster.length} employees loaded for tagging`);
 
   // Fetch venue leadership contacts for GM/lead names
