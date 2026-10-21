@@ -50,6 +50,9 @@ export type WebsiteSnapshotFields = {
 
 const PHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
 const PAGE_TIMEOUT_MS = 15_000;
+// Short wait for the secure version of an http link; sites without https
+// usually refuse quickly, so this rarely adds time.
+const SECURE_PROBE_TIMEOUT_MS = 6_000;
 const MAX_HTML = 1_500_000;
 const PSI_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const NOT_FOUND = "the web address doesn't lead anywhere";
@@ -172,6 +175,15 @@ async function fetchOnce(url: string, timeoutMs: number): Promise<PageFetch> {
 /** The homepage, trying the www. and plain-http versions a browser would land on. */
 async function fetchHomepage(url: string): Promise<PageFetch> {
   const answered = (p: PageFetch) => p.ok || p.blocked || p.status != null;
+  // Browsers try the secure address first, even when a link (like the one on
+  // a Google listing) says http. Do the same, so a site that works on https
+  // isn't marked "not secure" just because its listing links to http.
+  if (/^http:\/\//i.test(url)) {
+    const secureUrl = new URL(url);
+    secureUrl.protocol = 'https:';
+    const secure = await fetchOnce(secureUrl.toString(), SECURE_PROBE_TIMEOUT_MS);
+    if (secure.ok) return secure;
+  }
   const first = await fetchOnce(url, PAGE_TIMEOUT_MS);
   if (answered(first) || first.problem === TOO_SLOW) return first;
   const u = new URL(url);
