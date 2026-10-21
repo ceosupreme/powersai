@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     business_name: req_row.business_name,
     email: parsed.data.email,
     phone: parsed.data.phone ?? null,
-    message: `Public leak audit unlocked. Estimated $${redacted.total_monthly_dollars ?? '—'}/mo across ${redacted.leak_count ?? '—'} leaks.`,
+    message: `Free business checkup unlocked for ${req_row.business_name ?? 'a business'}${req_row.city ? ` (${req_row.city})` : ''}. Estimated $${redacted.total_monthly_dollars ?? '—'} a month across ${redacted.leak_count ?? '—'} gaps.`,
     conversation_channel: 'public_audit',
     route_to: 'self',
     is_ready: true,
@@ -94,10 +94,22 @@ Deno.serve(async (req) => {
     },
   };
 
-  const { error: leadErr } = await admin.from('inbound_leads').insert(leadPayload);
+  const { data: lead, error: leadErr } = await admin.from('inbound_leads').insert(leadPayload).select('id').maybeSingle();
   if (leadErr) {
     console.error('[unlock-public-audit] inbound_leads insert failed:', leadErr.message);
     // Non-fatal — we still return the full result so the prospect isn't blocked.
+  }
+
+  // Alert the owner, the same way contact-form leads do (submit-inbound-lead).
+  // A notification failure never blocks the prospect's full result.
+  if (lead?.id) {
+    const notify = fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/notify-owner-inquiry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` },
+      body: JSON.stringify({ lead_id: lead.id }),
+    }).catch((e) => console.error('[unlock-public-audit] owner notify error', e));
+    const runtime = (globalThis as any).EdgeRuntime;
+    if (runtime?.waitUntil) runtime.waitUntil(notify); else await notify;
   }
 
   await admin

@@ -63,6 +63,11 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 // Per-IP hourly cap. Best-effort in-memory (edge functions are stateless
 // across cold starts) + a DB-side count as a durable backstop.
+// Results built by this version carry the Google listing summary (rating,
+// review count, hours, phone, photos) and the ranking summary the report's
+// score is built from. The 7-day dedupe only reuses results at this version.
+const RESULT_VERSION = 2;
+
 const IP_HITS = new Map<string, { n: number; reset: number }>();
 const IP_LIMIT = 5;
 const IP_WINDOW_MS = 60 * 60 * 1000;
@@ -284,7 +289,7 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      if (prior?.full_result) {
+      if (prior?.full_result && Number((prior.full_result as any).result_version ?? 0) >= RESULT_VERSION) {
         await log('Recent audit found for this business — reusing cached result.');
         await admin.from('public_audit_requests').update({
           status: 'complete',
@@ -491,10 +496,38 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       .limit(1)
       .maybeSingle();
 
+    // Google listing summary from this run's snapshot (already collected above;
+    // nothing new is fetched here). Null fields mean "not available".
+    const { data: listingSnap } = await admin
+      .from('gbp_snapshots')
+      .select('raw, hours_complete, photo_count, website, gbp_phone, primary_category')
+      .eq('venue_id', shellVenueId)
+      .order('captured_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const listingRaw = ((listingSnap as any)?.raw ?? {}) as Record<string, any>;
+    const listing = listingSnap
+      ? {
+          rating: typeof listingRaw.rating === 'number' ? listingRaw.rating : null,
+          review_count: typeof listingRaw.userRatingCount === 'number' ? listingRaw.userRatingCount : (listingRaw.rating != null ? 0 : null),
+          hours_set: (listingSnap as any).hours_complete ?? null,
+          phone: Boolean((listingSnap as any).gbp_phone || listingRaw.nationalPhoneNumber || listingRaw.internationalPhoneNumber),
+          website: Boolean((listingSnap as any).website || listingRaw.websiteUri),
+          photos: typeof (listingSnap as any).photo_count === 'number' ? (listingSnap as any).photo_count : (Array.isArray(listingRaw.photos) ? listingRaw.photos.length : null),
+          category: (listingSnap as any).primary_category ?? null,
+        }
+      : null;
+    const google = mapSnap
+      ? { keyword: (mapSnap as any).keyword, you_rank: (mapSnap as any).rank, in_map_pack: (mapSnap as any).in_map_pack }
+      : null;
+
     const results = Array.isArray((leakRun as any).results) ? (leakRun as any).results : [];
     const topThree = results.slice(0, 3).map((r: any) => r.name).filter(Boolean);
 
     const full_result = {
+      result_version: RESULT_VERSION,
+      listing,
+      google,
       total_monthly_dollars: (leakRun as any).total_monthly_dollars,
       total_risk_exposure_dollars: (leakRun as any).total_risk_exposure_dollars,
       results,
@@ -513,8 +546,12 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
       request_context: input.context ?? null,
     };
 
-    // The website check is free to see (no email), so it rides in both.
+    // The website check, listing summary and ranking summary are free to see
+    // (no email) because the score at the top of the report uses them.
     const redacted_result = {
+      result_version: RESULT_VERSION,
+      listing,
+      google,
       total_monthly_dollars: (leakRun as any).total_monthly_dollars,
       leak_count: results.length,
       top_leaks: topThree,

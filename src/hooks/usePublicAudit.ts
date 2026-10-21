@@ -26,7 +26,27 @@ export interface WebsiteCheck {
   speed_score: number | null;
 }
 
+/** Google listing and ranking summaries the report's score uses (results
+ *  from version 2 on; missing on older results). */
+export interface ListingSummaryResult {
+  rating: number | null;
+  review_count: number | null;
+  hours_set: boolean | null;
+  phone: boolean | null;
+  website: boolean | null;
+  photos: number | null;
+  category: string | null;
+}
+export interface GoogleSummaryResult {
+  keyword: string;
+  you_rank: number | null;
+  in_map_pack: boolean | null;
+}
+
 export interface RedactedResult {
+  result_version?: number;
+  listing?: ListingSummaryResult | null;
+  google?: GoogleSummaryResult | null;
   total_monthly_dollars: number | null;
   leak_count: number;
   top_leaks: string[];
@@ -51,6 +71,9 @@ export interface LeakResult {
 }
 
 export interface FullResult {
+  result_version?: number;
+  listing?: ListingSummaryResult | null;
+  google?: GoogleSummaryResult | null;
   total_monthly_dollars: number;
   total_risk_exposure_dollars: number;
   results: LeakResult[];
