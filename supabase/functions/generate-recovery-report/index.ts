@@ -2,7 +2,7 @@
 // Dispatcher (no body / {}) fans out per active project; per-project mode
 // aggregates from existing tables, computes a conservative dollar estimate,
 // and writes one recovery_reports row with status='draft'. Never sends.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { callAI } from "../_shared/ai-models.ts";
 
 const corsHeaders = {
@@ -69,7 +69,7 @@ interface EstimateBasis {
 }
 
 async function aggregateProject(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   projectId: string,
   weekStart: string,
   weekEnd: string,
@@ -288,7 +288,7 @@ Write a 3–5 sentence internal summary.`;
 }
 
 async function processProject(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   projectId: string,
   weekStart: string,
   weekEnd: string,

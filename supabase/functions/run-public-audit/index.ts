@@ -48,7 +48,7 @@
 // created shell (nothing references it yet). run_id from prior audits
 // stays linked to the original shell, which is fine.
 
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3.23.8';
 import {
   checkWebsite, displayUrl, emptyWebsiteBlock, normalizeSiteInput, type WebsiteBlock,
@@ -207,7 +207,7 @@ async function invoke(fn: string, body: unknown, opts: { timeoutMs?: number } = 
 }
 
 async function setStatus(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient,
   id: string,
   patch: Record<string, unknown>,
 ) {
