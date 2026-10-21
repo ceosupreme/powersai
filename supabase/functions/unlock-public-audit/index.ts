@@ -77,7 +77,10 @@ Deno.serve(async (req) => {
     email: parsed.data.email,
     phone: parsed.data.phone ?? null,
     message: `Free business checkup unlocked for ${req_row.business_name ?? 'a business'}${req_row.city ? ` (${req_row.city})` : ''}. Estimated $${redacted.total_monthly_dollars ?? '—'} a month across ${redacted.leak_count ?? '—'} gaps.`,
-    conversation_channel: 'public_audit',
+    // inbound_leads only accepts voice/chat/form/phone; the checkup unlock is a
+    // web form ('public_audit' was rejected, so these leads were never saved).
+    // source 'free-audit' and qualifier_data.source tell them apart.
+    conversation_channel: 'form',
     route_to: 'self',
     is_ready: true,
     source: 'free-audit',
