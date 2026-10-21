@@ -64,7 +64,7 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // Per-IP hourly cap. Best-effort in-memory (edge functions are stateless
 // across cold starts) + a DB-side count as a durable backstop.
 const IP_HITS = new Map<string, { n: number; reset: number }>();
-const IP_LIMIT = 5;
+const IP_LIMIT = 20; // matches the durable hourly backstop below; 5 blocked demos on shared Wi-Fi and cell networks
 const IP_WINDOW_MS = 60 * 60 * 1000;
 
 const Body = z.object({
