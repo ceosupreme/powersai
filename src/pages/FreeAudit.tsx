@@ -176,7 +176,6 @@ export default function FreeAudit() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full rounded-lg border border-[hsl(var(--stm-ink))]/15 bg-white px-3 py-2.5 text-base focus:border-[hsl(var(--stm-cobalt))] focus:outline-none"
-                    placeholder="San Diego, CA"
                     maxLength={120}
                   />
                 </label>

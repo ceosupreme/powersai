@@ -247,7 +247,7 @@ export function HomeCheckup() {
             </label>
             <label className={missing === "city" ? "is-missing" : undefined}>
               <span>City</span>
-              <input type="text" name="city" autoComplete="address-level2" placeholder="e.g. San Diego, CA" maxLength={60} value={city}
+              <input type="text" name="city" autoComplete="address-level2" maxLength={60} value={city}
                 onChange={(e) => { setCity(e.target.value); if (missing === "city") setMissing(null); }}
                 aria-invalid={missing === "city"} aria-describedby={missing === "city" ? "stm-checkup-missing" : undefined} />
             </label>
