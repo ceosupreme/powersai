@@ -3,7 +3,7 @@
 // AI Gateway narrative, finding_campaign_links write-back, optional Asana comment.
 // Mock mode preserved for demos via ?analyzeMock=1 / mode:'mock'.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -172,7 +172,7 @@ function mockAnalyze(c: AnyRec, generatedBy: 'auto' | 'manual') {
 // ──────────────────────────────────────────────────────────────────────────────
 // LIVE mode.
 async function liveAnalyze(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient,
   c: AnyRec, generatedBy: 'auto' | 'manual',
 ) {
   if (!c.start_date || !c.end_date) {
@@ -479,7 +479,7 @@ function buildResults(args: AnyRec) {
 // Auto-resolve uses Tier 2 revenue achievement as primary signal (per Phase B
 // clarification). Tier 1 redemptions are evidence, not threshold (units mismatch).
 async function writeFindingLink(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient,
   c: AnyRec, results: AnyRec, findingType: string | null,
 ) {
   if (!c.originating_finding_id) return;
@@ -525,7 +525,7 @@ async function writeFindingLink(
 // ──────────────────────────────────────────────────────────────────────────────
 // Optional Asana write-back.
 async function maybePostAsanaComment(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient,
   c: AnyRec, results: AnyRec, authHeader: string,
 ) {
   const ext = c.execution_adapter?.external_id;

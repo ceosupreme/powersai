@@ -57,7 +57,7 @@ export const reputationRiskAnalyzer: AnalyzerModule = {
         if (!FIXABLE_CATEGORIES.has(t.theme_category) && !CRITICAL_CATEGORIES.has(t.theme_category)) continue;
         const ctx = t.context && TIME_CONTEXTS.has(t.context) ? t.context : null;
         const key = ctx ? `${t.theme_label}|${ctx}` : t.theme_label;
-        const a = agg.get(key) ?? {
+        const a: Agg = agg.get(key) ?? {
           label: t.theme_label, category: t.theme_category, context: ctx,
           count30: 0, count90: 0, excerpts: [],
         };

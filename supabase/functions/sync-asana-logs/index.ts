@@ -203,6 +203,7 @@ function parseAsanaTaskAuthor(taskName: string | null | undefined): string | nul
   const candidate = m[1].trim();
   // Reject all-uppercase 2+ char tokens that look like venue codes.
   if (candidate.length < 2) return null;
+  return candidate;
 }
 
 // ── Lead Log rating extractor ────────────────────────────────────────────────
@@ -471,7 +472,7 @@ async function syncFromProject(
   // is only used when caller explicitly opts into the aggregate path via
   // logType==='shift_aggregate'.
   const targetTable = tableForLogType(logType);
-  if (logType !== 'shift_aggregate') {
+  if ((logType as string) !== 'shift_aggregate') {
     const sinceThreshold = backfillSince
       ? `${backfillSince}T00:00:00Z`
       : `${date}T00:00:00Z`;

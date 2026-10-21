@@ -221,20 +221,18 @@ export function buildTools(supabase: SB, scope: ToolScope): AITool[] {
         required: ["week_start"],
       },
       execute: async ({ week_start }) => {
-        const [sc, core] = await Promise.all([
-          supabase
-            .from("weekly_scorecard")
-            .select("week_id, week_label, overall_score, overall_grade, sales_score, labor_score, guest_score, ops_score, drivers")
-            .eq("bar_id", scope.venueId)
-            .eq("week_label", week_start)
-            .maybeSingle(),
-          supabase
-            .from("weekly_core")
-            .select("week_id, net_sales, labor_pct, splh, tip_pct, void_rate, overtime_rate, weekly_guests, schedule_variance_pct, task_completion_pct, last_year_net_sales, yoy_change_pct")
-            .eq("bar_id", scope.venueId)
-            .eq("week_id", (sc.data as any)?.week_id ?? "00000000-0000-0000-0000-000000000000")
-            .maybeSingle(),
-        ]);
+        const sc = await supabase
+          .from("weekly_scorecard")
+          .select("week_id, week_label, overall_score, overall_grade, sales_score, labor_score, guest_score, ops_score, drivers")
+          .eq("bar_id", scope.venueId)
+          .eq("week_label", week_start)
+          .maybeSingle();
+        const core = await supabase
+          .from("weekly_core")
+          .select("week_id, net_sales, labor_pct, splh, tip_pct, void_rate, overtime_rate, weekly_guests, schedule_variance_pct, task_completion_pct, last_year_net_sales, yoy_change_pct")
+          .eq("bar_id", scope.venueId)
+          .eq("week_id", (sc.data as any)?.week_id ?? "00000000-0000-0000-0000-000000000000")
+          .maybeSingle();
         return {
           venue: scope.venueName,
           week_start,

@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
       .select("display_name,role_type,is_primary,is_active,profile:profiles(email,phone,full_name)")
       .eq("venue_id", projectId)
       .eq("is_active", true);
-    const rows = (contacts ?? []) as Array<{
+    const rows = (contacts ?? []) as unknown as Array<{
       display_name: string | null;
       role_type: string | null;
       is_primary: boolean | null;

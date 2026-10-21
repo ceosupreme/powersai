@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -138,7 +138,7 @@ function jsonLit(v: unknown) {
   return `${quoteLit(JSON.stringify(v))}::jsonb`;
 }
 
-async function countCopies(admin: ReturnType<typeof createClient>, new_id: string) {
+async function countCopies(admin: SupabaseClient, new_id: string) {
   const [a, b, c, d] = await Promise.all([
     admin.from('pillar_templates').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
     admin.from('project_type_leak_vectors').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
@@ -154,7 +154,7 @@ async function countCopies(admin: ReturnType<typeof createClient>, new_id: strin
 }
 
 async function sequentialCopy(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient,
   source: any,
   new_id: string,
   new_label: string,

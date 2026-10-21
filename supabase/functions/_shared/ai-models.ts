@@ -221,7 +221,7 @@ async function callAnthropic(entry: ModelEntry, input: CallAIInput): Promise<Cal
   // Initial message array — content stays string-typed for the first turn.
   const messages: Array<{ role: "user" | "assistant"; content: any }> = input.messages
     .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({ role: m.role, content: m.content }));
+    .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
   const hasTools = (input.tools?.length ?? 0) > 0;
   const toolsForApi = hasTools
@@ -378,7 +378,7 @@ async function streamAnthropic(entry: ModelEntry, input: CallAIStreamInput): Pro
   const system = [systemFromInput, systemFromMessages].filter(Boolean).join("\n\n");
   const messages: Array<{ role: "user" | "assistant"; content: any }> = input.messages
     .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({ role: m.role, content: m.content }));
+    .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
   const started = performance.now();
   const hasTools = (input.tools?.length ?? 0) > 0;

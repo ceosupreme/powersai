@@ -1048,6 +1048,7 @@ function mergeLogSections(
 
 interface DeterministicInsert {
   bar_id: string;
+  venue_id?: string | null;
   pillar: string;
   insight_type: string;
   severity: string;
@@ -1060,6 +1061,12 @@ interface DeterministicInsert {
   insight_mode: string;
   status: string;
   week_id: string | null;
+  source_metric?: string | null;
+  _venue_name?: string | null;
+  _metric_label?: string | null;
+  _current_value?: number | null;
+  _sanity_for_date?: string | null;
+  dedupe_hash?: string | null;
   period_start?: string | null;
   period_end?: string | null;
   period_label?: string | null;
@@ -2279,7 +2286,7 @@ async function processBar(
       .map((s: string) => normalizeForMatch(s))
       .filter((s: string) => s.length > 0);
     return { id: r.id, canonical: full, tokens };
-  }).filter((r) => r.tokens.length > 0);
+  }).filter((r: any) => r.tokens.length > 0);
   console.log(`[ROSTER] Bar ${barId}: ${employeeRoster.length} employees loaded for tagging`);
 
   // Fetch venue leadership contacts for GM/lead names

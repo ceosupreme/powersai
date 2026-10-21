@@ -72,7 +72,7 @@ export const reputationThemeOpportunityAnalyzer: AnalyzerModule = {
       const agg = new Map<string, Agg>();
       for (const t of themes) {
         if (!MARKETABLE_CATEGORIES.has(t.theme_category)) continue;
-        const a = agg.get(t.theme_label) ?? {
+        const a: Agg = agg.get(t.theme_label) ?? {
           label: t.theme_label, category: t.theme_category,
           positive: 0, negative: 0, neutral: 0, count30: 0, excerpts: [],
         };
