@@ -3,6 +3,7 @@ import bigPawsClub from "@/assets/studio/big-paws-club.png";
 import supremeWellnessClub from "@/assets/studio/supreme-wellness-club.png";
 import barpulse from "@/assets/studio/barpulse.png";
 import karioVoss from "@/assets/studio/kario-voss.png";
+import djRedlite from "@/assets/studio/dj-redlite.webp";
 import homeHeroDevices from "@/assets/studio/home-hero.webp.asset.json";
 import homeIndustryService from "@/assets/studio/home-industry-hvac.webp.asset.json";
 import homeIndustryRestaurant from "@/assets/studio/home-industry-pizza.webp.asset.json";
@@ -262,6 +263,15 @@ export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
   "work-supreme-wellness-club": {
     src: supremeWellnessClub,
     alt: "Screenshot of the Supreme Wellness Club wellness brand website",
+    aspectRatio: "16 / 9",
+    width: 1920,
+    height: 1080,
+    objectFit: "cover",
+    objectPosition: "top center",
+  },
+  "work-dj-redlite": {
+    src: djRedlite,
+    alt: "Screenshot of the DJ Redlite booking website",
     aspectRatio: "16 / 9",
     width: 1920,
     height: 1080,

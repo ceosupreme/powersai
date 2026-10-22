@@ -171,6 +171,29 @@ export const EDITORIAL_CASES: EditorialCase[] = [
   },
   {
     enabled: true,
+    order: 4.5,
+    slug: "dj-redlite",
+    title: "DJ Redlite",
+    classification: "DJ booking website & business system",
+    categories: ["websites-apps", "ai-systems", "marketing-growth"],
+    summary:
+      "A booking website and back office for a working San Diego DJ: instant price estimates, an availability calendar, booking requests, and an admin side that drafts replies with AI.",
+    role: "Strategy, copy, interface design, build, and back-end setup.",
+    brief:
+      "Turn a DJ's scattered links into one site that books private parties, company events and venue nights, and runs the business behind it.",
+    work:
+      "Responsive site design, rewritten copy, price estimate tool, availability calendar, booking, song-request and planning forms, an admin dashboard with quotes and exports, AI-drafted replies, a blog, and a creative-services storefront.",
+    demonstrates:
+      "Lead capture and follow-up for a small service business, AI built into everyday operations, and a full working system shipped on real content.",
+    statusNote: "Live website.",
+    mediaKey: "work-dj-redlite",
+    imageUrl: null,
+    externalUrl: "https://djredlite.com",
+    bodyText: null,
+    plateTone: "sand",
+  },
+  {
+    enabled: true,
     order: 5,
     slug: "kario-voss",
     title: "Kario Voss",
