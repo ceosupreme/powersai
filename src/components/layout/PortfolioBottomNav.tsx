@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { BarChart3, Lightbulb, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { PHONE_PRIMARY } from '@/config/ownerNav';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { MoreSheet } from './MoreSheet';
 
-const primaryItems = [
-  { to: '/portfolio', icon: BarChart3, label: 'Portfolio' },
-  { to: '/insights', icon: Lightbulb, label: 'Insights' },
-];
-const PRIMARY_ROUTES = primaryItems.map((i) => i.to);
+const PRIMARY_ROUTES = PHONE_PRIMARY.map((i) => i.path);
 
 export const PortfolioBottomNav = () => {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const { canAccessPage } = useAuth();
+  const primaryItems = PHONE_PRIMARY.filter((i) => canAccessPage(i.pageKey)).map((i) => ({
+    to: i.path,
+    icon: i.icon,
+    label: i.label,
+  }));
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-secondary/95 backdrop-blur-lg border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] safe-bottom">

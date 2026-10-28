@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Download, Loader2 } from 'lucide-react';
+import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNextTen, useCompleteNextTenRow, NextTenRow } from '@/hooks/useNextTen';
 import { useProjectKpis, useUpsertProjectKpiValue } from '@/hooks/useProjectKpis';
@@ -26,7 +26,9 @@ export const NextTenSection = ({
   projectId: string;
   projectName: string;
 }) => {
-  const { data: rows = [], isLoading } = useNextTen(projectId, projectName);
+  const { data, isLoading, isError, error, refetch } = useNextTen(projectId, projectName);
+  const rows = data?.rows ?? [];
+  const unavailable = data?.unavailable ?? [];
   const { data: kpiDefs = [] } = useProjectKpis(projectId);
   const complete = useCompleteNextTenRow();
   const upsertKpi = useUpsertProjectKpiValue();
@@ -115,7 +117,7 @@ export const NextTenSection = ({
     const maxWidth = 440;
     rows.forEach((r) => {
       doc.rect(left, y - 10, 12, 12);
-      const lines = doc.splitTextToSize(`${r.step}  (${r.source})`, maxWidth);
+      const lines = doc.splitTextToSize(`${r.step}${r.note ? `  (${r.note})` : ''}  [${r.source}]`, maxWidth);
       doc.text(lines, left + 24, y);
       y += Math.max(24, lines.length * 16 + 10);
     });
@@ -143,9 +145,30 @@ export const NextTenSection = ({
       <CardContent className="pt-1">
         {isLoading ? (
           <p className="text-xs text-muted-foreground">Loading steps…</p>
-        ) : rows.length === 0 ? (
+        ) : isError ? (
+          <div className="flex items-start gap-2 text-sm text-destructive">
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <p>Could not check this project, so this list is not trustworthy right now.</p>
+              <p className="text-xs text-muted-foreground mt-1">{(error as any)?.message}</p>
+              <Button size="sm" variant="outline" className="mt-2 h-7 text-xs" onClick={() => refetch()}>
+                Try again
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+          {unavailable.length > 0 && (
+            <div className="flex items-start gap-2 text-xs text-amber-600 mb-2">
+              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>Could not check {unavailable.join(', ')}. Items from those sources may be missing below.</span>
+            </div>
+          )}
+          {rows.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            Nothing outstanding right now — add an action, a KPI target or a money lane.
+            {unavailable.length > 0
+              ? 'Nothing could be loaded.'
+              : 'Nothing outstanding right now — add an action, a KPI target or a money lane.'}
           </p>
         ) : (
           <ul>
@@ -159,7 +182,9 @@ export const NextTenSection = ({
                     aria-label={
                       row.source === 'KPI'
                         ? `Enter this week's number for ${row.step}`
-                        : `Mark done: ${row.step}`
+                        : row.source === 'Lane'
+                          ? `Mark on: ${row.step}`
+                          : `Mark done: ${row.step}`
                     }
                     onCheckedChange={() => onCheck(row)}
                   />
@@ -199,6 +224,8 @@ export const NextTenSection = ({
               </li>
             ))}
           </ul>
+        )}
+          </>
         )}
       </CardContent>
     </Card>

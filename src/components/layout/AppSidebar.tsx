@@ -56,6 +56,7 @@ import {
   Target,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { OWNER_NAV_GROUPS, type OwnerNavGroup, type OwnerNavItem } from '@/config/ownerNav';
 import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -79,80 +80,10 @@ import { usePreview } from '@/context/PreviewContext';
 import { UserRole, ROLE_LABELS } from '@/types/roles';
 import { NotificationPanel } from '@/components/staff/NotificationPanel';
 
-type NavItem = {
-  path: string;
-  label: string;
-  icon: typeof LayoutDashboard;
-  pageKey: PageKey;
-  hasBadge?: 'tasks' | 'chat';
-  adminOnly?: boolean;
-};
+type NavItem = OwnerNavItem;
 
-type NavGroup = { label: string; items: NavItem[] };
-
-// Single source of truth for the operator sidebar (admin/owner/gm layouts).
-const navGroups: NavGroup[] = [
-  {
-    label: 'Workspace',
-    items: [
-      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
-      { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
-      { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
-      { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
-      { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' },
-    ],
-  },
-  {
-    label: 'Clients & Leads',
-    items: [
-      { path: '/crm', label: 'CRM', icon: Briefcase, pageKey: 'crm' },
-      { path: '/inbox', label: 'Capture Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
-      { path: '/automations/inbox', label: 'Automation Inbox', icon: Zap, pageKey: 'automation_inbox' },
-      { path: '/automations/reactivation', label: 'Reactivation', icon: Sparkles, pageKey: 'reactivation' },
-      { path: '/automations/recovery-reports', label: 'Recovery Reports', icon: FileText, pageKey: 'recovery_reports' },
-    ],
-  },
-  {
-    label: 'Growth & Marketing',
-    items: [
-      { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
-      { path: '/leak-stack', label: 'Leak Stack', icon: Activity, pageKey: 'leak_stack' },
-      { path: '/prospects', label: 'Prospect Dock', icon: Target, pageKey: 'prospect_dock' },
-      { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
-      { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
-      { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
-      { path: '/production-board', label: 'Production Board', icon: Film, pageKey: 'content_pipeline', adminOnly: true },
-      { path: '/answer-bank', label: 'Answer Bank', icon: HelpCircle, pageKey: 'content_pipeline', adminOnly: true },
-      { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
-    ],
-  },
-  {
-    label: 'Brand & Assets',
-    items: [
-      { path: '/brand-kit', label: 'Brand Kit', icon: Palette, pageKey: 'brand_kit' },
-      { path: '/offers', label: 'Offers', icon: Tag, pageKey: 'offers' },
-      { path: '/products', label: 'Products', icon: Package, pageKey: 'products' },
-      { path: '/affiliate-programs', label: 'Affiliate Programs', icon: Link2, pageKey: 'affiliate_programs' },
-    ],
-  },
-  {
-    label: 'Tools',
-    items: [
-      { path: '/tasks', label: 'Tasks', icon: CheckSquare, hasBadge: 'tasks', pageKey: 'tasks' },
-      { path: '/logs', label: 'Logs', icon: ClipboardList, pageKey: 'logs' },
-      { path: '/chat', label: 'Chat', icon: MessageCircle, hasBadge: 'chat', pageKey: 'chat' },
-      { path: '/templates', label: 'Outreach Templates', icon: MessageSquare, pageKey: 'outreach_templates' },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      { path: '/help', label: 'Help', icon: HelpCircle, pageKey: 'dashboard' },
-      { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' },
-      { path: '/admin', label: 'Admin Panel', icon: Settings, pageKey: 'dashboard', adminOnly: true },
-    ],
-  },
-];
+// Single source of truth for the operator navigation lives in src/config/ownerNav.ts.
+const navGroups: OwnerNavGroup[] = OWNER_NAV_GROUPS;
 
 // Dev Tools removed - role preview handled by role system
 

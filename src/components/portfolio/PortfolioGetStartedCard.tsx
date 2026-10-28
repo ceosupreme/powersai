@@ -39,7 +39,7 @@ export function PortfolioGetStartedCard() {
             <Button
               variant="default"
               className="justify-start"
-              onClick={() => navigate("/admin?tab=projects")}
+              onClick={() => navigate("/admin?tab=settings&subtab=bars")}
             >
               <Building2 className="h-4 w-4" />
               Set up first project

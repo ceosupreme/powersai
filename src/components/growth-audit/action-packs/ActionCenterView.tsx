@@ -69,25 +69,10 @@ export const ActionCenterView = () => {
     return m;
   }, [campaigns]);
 
-  if (!selectedBar) {
-    return (
-      <Card className="p-10 text-center bg-card/30 border-dashed">
-        <Inbox className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
-        <p className="text-sm text-muted-foreground mt-1">Choose a project to see its Action Center inbox.</p>
-      </Card>
-    );
-  }
-
-  const venueCtx: VenueContext = {
-    venueId: selectedBar.id,
-    venueName: selectedBar.bar_name,
-    city: selectedBar.city,
-  };
-
-  const assets = selectAssetsForVenue(selectedBar.id);
-  const findingsQ = useFindings(selectedBar.id);
-  const { primary } = useGrowthScores(selectedBar.id);
+  const venueId = selectedBar?.id ?? null;
+  const assets = venueId ? selectAssetsForVenue(venueId) : [];
+  const findingsQ = useFindings(venueId);
+  const { primary } = useGrowthScores(venueId);
   const findingById = useMemo(() => {
     const map = new Map<string, Finding>();
     (findingsQ.data ?? []).forEach(f => map.set(f.id, f));
@@ -125,6 +110,22 @@ export const ActionCenterView = () => {
     filtered.forEach(a => map.get(sectionForKind(a.kind))?.push(a));
     return map;
   }, [filtered]);
+
+  if (!selectedBar) {
+    return (
+      <Card className="p-10 text-center bg-card/30 border-dashed">
+        <Inbox className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+        <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
+        <p className="text-sm text-muted-foreground mt-1">Choose a project to see its Action Center inbox.</p>
+      </Card>
+    );
+  }
+
+  const venueCtx: VenueContext = {
+    venueId: selectedBar.id,
+    venueName: selectedBar.bar_name,
+    city: selectedBar.city,
+  };
 
   const toggle = <T,>(set: Set<T>, v: T, setter: (s: Set<T>) => void) => {
     const next = new Set(set);

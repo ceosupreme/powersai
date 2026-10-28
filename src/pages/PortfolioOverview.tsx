@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { BarChart3, ChevronDown, LayoutGrid, Table2 } from 'lucide-react';
 import {
   Bar,
@@ -640,9 +640,14 @@ export default function PortfolioOverview() {
             </div>
           ) : nonClientCards.length === 0 ? (
             <div className="bg-card border border-dashed border-border rounded-lg p-8 text-center text-sm text-muted-foreground">
-              {group === 'brands'
-                ? 'No own-brand projects yet.'
-                : 'No prospect projects yet.'}
+              {group === 'brands' ? (
+                'No own-brand projects yet.'
+              ) : (
+                <>
+                  Prospects live on the Prospect Dock, where each one carries its checkup, ranking and first-touch draft.{' '}
+                  <Link to="/prospects" className="text-primary underline">Open Prospect Dock</Link>
+                </>
+              )}
             </div>
           ) : (
             <div className="space-y-4">

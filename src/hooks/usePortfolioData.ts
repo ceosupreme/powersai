@@ -364,12 +364,14 @@ export function weightedPillarOverall(
 ): number | null {
   const tracked = pillars.filter((p) => p.score != null);
   if (tracked.length === 0) return null;
-  let totalW = tracked.reduce((s, p) => s + (p.weight ?? 0), 0);
-  if (totalW <= 0) totalW = tracked.length;
-  const num = tracked.reduce(
-    (s, p) => s + (p.score as number) * ((p.weight ?? 0) > 0 ? p.weight : 1),
-    0,
-  );
+  // Use each pillar's weight in BOTH the numerator and the denominator. When no
+  // tracked pillar carries a weight, fall back to a plain average. (Mixing a
+  // weight of 0 with real weights used to inflate the result above 100.)
+  const totalW = tracked.reduce((s, p) => s + Math.max(0, p.weight ?? 0), 0);
+  if (totalW <= 0) {
+    return Math.round(tracked.reduce((s, p) => s + (p.score as number), 0) / tracked.length);
+  }
+  const num = tracked.reduce((s, p) => s + (p.score as number) * Math.max(0, p.weight ?? 0), 0);
   return Math.round(num / totalW);
 }
 

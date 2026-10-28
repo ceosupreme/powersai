@@ -248,7 +248,7 @@ export function useSuggestions() {
             ? `Last backup was ${daysAgo(lastBackupAt)} days ago`
             : "No backup on record",
           body: "Export a backup so your authored data is safe.",
-          href: "/admin?tab=backup",
+          href: "/admin?tab=settings&subtab=backup",
           ctaLabel: "Export backup",
         });
       }
@@ -260,7 +260,7 @@ export function useSuggestions() {
             dismissKey: `sugg:no-project-type:${p.id}`,
             title: `${p.name}: no project type set`,
             body: "Pick a vertical so the right pillars and qualifier questions apply.",
-            href: `/admin?tab=projects&project=${p.id}`,
+            href: `/admin?tab=settings&subtab=bars`,
             ctaLabel: "Set type",
             scope: { kind: "project", id: p.id },
           });
@@ -282,7 +282,7 @@ export function useSuggestions() {
           dismissKey: `sugg:no-qualifier-fields:${p.project_type}`,
           title: `No qualifier questions for "${p.project_type}"`,
           body: "Add fields so the Lead Qualifier knows what to ask for this vertical.",
-          href: "/admin?tab=settings&subtab=qualifier",
+          href: "/admin?tab=pillars",
           ctaLabel: "Configure",
         });
       }
@@ -415,7 +415,7 @@ export function useSuggestions() {
             dismissKey: `sugg:no-automation-bundle:${p.id}`,
             title: `${p.name}: no automations enrolled yet`,
             body: "Apply an Automation Bundle in Admin so AI starts drafting customer messages.",
-            href: "/admin?tab=automation-bundles",
+            href: "/admin?tab=settings&subtab=bundles",
             ctaLabel: "Apply a bundle",
             scope: { kind: "project", id: p.id },
           });

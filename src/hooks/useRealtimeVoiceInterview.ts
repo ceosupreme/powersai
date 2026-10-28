@@ -72,7 +72,8 @@ export function useRealtimeVoiceInterview({
 
       // Build WebSocket URL with log context
       const fieldsParam = encodeURIComponent(JSON.stringify(fields));
-      const wsUrl = `wss://coucprydwkljhibezqjp.supabase.co/functions/v1/openai-realtime-proxy?logType=${logType}&fields=${fieldsParam}`;
+      const wsBase = (import.meta.env.VITE_SUPABASE_URL as string).replace(/^http/, 'ws');
+      const wsUrl = `${wsBase}/functions/v1/openai-realtime-proxy?logType=${logType}&fields=${fieldsParam}`;
       
       console.log('Connecting to voice interview...');
       const ws = new WebSocket(wsUrl);

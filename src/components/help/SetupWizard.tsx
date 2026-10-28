@@ -51,7 +51,7 @@ const STEPS: Step[] = [
         set its type.
       </>
     ),
-    actionHref: "/admin?tab=projects",
+    actionHref: "/admin?tab=settings&subtab=bars",
     actionLabel: "Open Projects admin",
   },
   {
@@ -63,7 +63,7 @@ const STEPS: Step[] = [
         for this vertical. Edit them and the live agent updates — no deploy.
       </>
     ),
-    actionHref: "/admin?tab=settings&subtab=qualifier",
+    actionHref: "/admin?tab=pillars",
     actionLabel: "Open Qualifier Fields",
   },
   {
@@ -76,7 +76,7 @@ const STEPS: Step[] = [
         still work without it.
       </>
     ),
-    actionHref: "/admin?tab=integrations",
+    actionHref: "/admin?tab=settings&subtab=bars",
     actionLabel: "Open Integrations",
   },
   {
@@ -126,7 +126,7 @@ const STEPS: Step[] = [
         for the project.
       </>
     ),
-    actionHref: "/admin?tab=automation-bundles",
+    actionHref: "/admin?tab=settings&subtab=bundles",
     actionLabel: "Open Automation Bundles",
   },
   {

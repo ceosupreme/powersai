@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useNextTenAcrossProjects,
@@ -27,7 +27,9 @@ export const AllProjectsNextTen = ({
 }: {
   projects: { id: string; name: string }[];
 }) => {
-  const { data: rows = [], isLoading } = useNextTenAcrossProjects(projects);
+  const { data, isLoading, isError, error, refetch } = useNextTenAcrossProjects(projects);
+  const rows = data?.rows ?? [];
+  const unavailable = data?.unavailable ?? [];
   const complete = useCompleteNextTenRow();
   const upsertKpi = useUpsertProjectKpiValue();
   const weekStart = useMemo(() => currentWeekRange().week_start, []);
@@ -85,63 +87,90 @@ export const AllProjectsNextTen = ({
       <CardContent className="pt-1">
         {isLoading ? (
           <p className="text-xs text-muted-foreground">Loading steps…</p>
-        ) : rows.length === 0 ? (
-          <p className="text-xs text-muted-foreground">
-            Nothing outstanding right now — add an action, a KPI target or a money lane.
-          </p>
+        ) : isError ? (
+          <div className="flex items-start gap-2 text-sm text-destructive">
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <p>Could not check your projects, so this list is not trustworthy right now.</p>
+              <p className="text-xs text-muted-foreground mt-1">{(error as any)?.message}</p>
+              <Button size="sm" variant="outline" className="mt-2 h-7 text-xs" onClick={() => refetch()}>
+                Try again
+              </Button>
+            </div>
+          </div>
         ) : (
-          <ul>
-            {rows.map((row) => (
-              <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    className="mt-0.5"
-                    checked={false}
-                    disabled={busy === row.key}
-                    aria-label={
-                      row.source === 'KPI'
-                        ? `Enter this week's number for ${row.step}`
-                        : `Mark done: ${row.step}`
-                    }
-                    onCheckedChange={() => onCheck(row)}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-foreground">{row.step}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {row.projectName}
-                      {row.note ? ` · ${row.note}` : ''}
-                    </p>
-                    {kpiOpen === row.key && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <Input
-                          type="number"
-                          step="any"
-                          className="h-8 w-32"
-                          autoFocus
-                          value={kpiValue}
-                          onChange={(e) => setKpiValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveKpi(row);
-                            if (e.key === 'Escape') setKpiOpen(null);
-                          }}
-                          aria-label="This week's actual"
-                        />
-                        <Button size="sm" className="h-8" disabled={busy === row.key} onClick={() => saveKpi(row)}>
-                          {busy === row.key ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8" onClick={() => setKpiOpen(null)}>
-                          Cancel
-                        </Button>
+          <>
+            {unavailable.length > 0 && (
+              <div className="flex items-start gap-2 text-xs text-amber-600 mb-2">
+                <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                <span>
+                  Could not check {unavailable.join(', ')} for at least one project. Items from those sources may be missing below.
+                </span>
+              </div>
+            )}
+            {rows.length === 0 ? (
+              <p className="text-xs text-muted-foreground">
+                {unavailable.length > 0
+                  ? 'Nothing could be loaded.'
+                  : 'Nothing outstanding right now — add an action, a KPI target or a money lane.'}
+              </p>
+            ) : (
+              <ul>
+                {rows.map((row) => (
+                  <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        className="mt-0.5"
+                        checked={false}
+                        disabled={busy === row.key}
+                        aria-label={
+                          row.source === 'KPI'
+                            ? `Enter this week's number for ${row.step}`
+                            : row.source === 'Lane'
+                              ? `Mark on: ${row.step}`
+                              : `Mark done: ${row.step}`
+                        }
+                        onCheckedChange={() => onCheck(row)}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-foreground">{row.step}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {row.projectName}
+                          {row.note ? ` · ${row.note}` : ''}
+                        </p>
+                        {kpiOpen === row.key && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <Input
+                              type="number"
+                              step="any"
+                              className="h-8 w-32"
+                              autoFocus
+                              value={kpiValue}
+                              onChange={(e) => setKpiValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveKpi(row);
+                                if (e.key === 'Escape') setKpiOpen(null);
+                              }}
+                              aria-label="This week's actual"
+                            />
+                            <Button size="sm" className="h-8" disabled={busy === row.key} onClick={() => saveKpi(row)}>
+                              {busy === row.key ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-8" onClick={() => setKpiOpen(null)}>
+                              Cancel
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <Badge variant="outline" className={`text-[10px] shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
-                    {row.source}
-                  </Badge>
-                </div>
-              </li>
-            ))}
-          </ul>
+                      <Badge variant="outline" className={`text-[10px] shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
+                        {row.source}
+                      </Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

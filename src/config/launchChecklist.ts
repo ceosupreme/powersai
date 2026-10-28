@@ -18,19 +18,19 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:pick-project-type",
     title: "Pick the project's type (vertical)",
     description: "The project type decides which pillars, leak vectors, and qualifier questions apply. Open the project in Admin and set its type — that's how you 'choose a vertical'.",
-    link: { to: "/admin?tab=projects", label: "Open Projects admin" },
+    link: { to: "/admin?tab=settings&subtab=bars", label: "Open Projects admin" },
   },
   {
     key: "setup:review-pillars",
     title: "Review pillars for that type",
     description: "Settings → Pillars shows the pillar template per type. Edit or add pillars; per-project overrides REPLACE the template when set.",
-    link: { to: "/admin?tab=settings&subtab=pillars", label: "Open Pillars editor" },
+    link: { to: "/admin?tab=pillars", label: "Open Pillars editor" },
   },
   {
     key: "setup:review-qualifier-fields",
     title: "Review the qualifier questions for that type",
     description: "Settings → Qualifier Fields shows the questions the Lead Qualifier will ask for this vertical. Change them here and the live qualifier updates — no code change.",
-    link: { to: "/admin?tab=settings&subtab=qualifier", label: "Open Qualifier Fields" },
+    link: { to: "/admin?tab=pillars", label: "Open Qualifier Fields" },
   },
   {
     key: "setup:try-qualifier",
@@ -42,7 +42,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:connect-data",
     title: "Connect data sources (optional)",
     description: "Admin → Integrations is where you wire up external data (POS, scheduling, reviews, etc.). Skip if there's nothing to connect for this vertical yet — most features still work without it.",
-    link: { to: "/admin?tab=integrations", label: "Open Integrations" },
+    link: { to: "/admin?tab=settings&subtab=bars", label: "Open Integrations" },
   },
   {
     key: "setup:weekly-review",
@@ -60,7 +60,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:apply-automation-bundle",
     title: "Apply an Automation Bundle to the project",
     description: "Bundles are a packaged set of automations (follow-up, reactivation, review requests). Apply one in Admin → Automation Bundles so AI starts drafting messages for this project.",
-    link: { to: "/admin?tab=automation-bundles", label: "Open Automation Bundles" },
+    link: { to: "/admin?tab=settings&subtab=bundles", label: "Open Automation Bundles" },
     inline: "apply_bundle",
   },
   {

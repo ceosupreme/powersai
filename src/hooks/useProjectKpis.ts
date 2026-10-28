@@ -82,6 +82,10 @@ export function useUpsertProjectKpiValue() {
     },
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ['project-kpi-values', v.project_id, v.week_start] });
+      qc.invalidateQueries({ queryKey: ['project-pillar-scores', v.project_id] });
+      qc.invalidateQueries({ queryKey: ['next-ten', v.project_id] });
+      qc.invalidateQueries({ queryKey: ['next-ten-all'] });
+      qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
     },
   });
 }

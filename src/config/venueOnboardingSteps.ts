@@ -106,7 +106,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     icon: Bell,
     required: true,
     manualOnly: true,
-    href: () => `/admin?tab=settings&subtab=notifications`,
+    href: () => `/crm?tab=inbound`,
   },
 
   // -------- PHASE 3 — Full Configuration (tracked, non-gating) --------
@@ -172,7 +172,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Execution adapter',
     description: 'Wire how this client executes tasks (Asana / native / read-only).',
     icon: Plug,
-    href: () => `/admin?tab=settings&subtab=adapter`,
+    href: () => `/admin?tab=settings&subtab=bars`,
     detector: async ({ venueId }) =>
       exists('venue_execution_adapters', (q) => q.eq('venue_id', venueId)),
   },
@@ -182,7 +182,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Programming context',
     description: 'Recurring events, promotions, and ops cadence the AI should know about.',
     icon: BookOpen,
-    href: () => `/admin?tab=settings&subtab=programming`,
+    href: () => `/admin?tab=settings&subtab=bars`,
     detector: async ({ venueId }) =>
       exists('venue_programming_context', (q) => q.eq('venue_id', venueId)),
   },
@@ -202,7 +202,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Google Business Profile',
     description: 'Map this client to their GBP Place ID for ratings and map-pack data.',
     icon: MapPin,
-    href: () => `/admin?tab=settings&subtab=gbp`,
+    href: () => `/admin?tab=settings&subtab=google-ratings`,
     detector: async ({ venueId }) =>
       exists('gbp_place_mappings', (q) => q.eq('venue_id', venueId)),
   },
@@ -212,7 +212,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Map-pack keywords',
     description: 'Keywords to track ranking on in the local 3-pack.',
     icon: Search,
-    href: () => `/admin?tab=settings&subtab=map-pack`,
+    href: () => `/growth-audit?subtab=data-sources`,
     detector: async ({ venueId }) =>
       exists('map_pack_keywords', (q) => q.eq('venue_id', venueId)),
   },
@@ -222,7 +222,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'AI search queries',
     description: 'Queries to track AI/LLM-search visibility (Perplexity, ChatGPT, etc.).',
     icon: Sparkles,
-    href: () => `/admin?tab=settings&subtab=ai-search`,
+    href: () => `/growth-audit?subtab=data-sources`,
     detector: async ({ venueId }) =>
       exists('ai_search_queries', (q) => q.eq('venue_id', venueId)),
   },
@@ -232,7 +232,7 @@ export const VENUE_ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Website mapping',
     description: 'Site URL + crawl config for SEO and content audit.',
     icon: Globe,
-    href: () => `/admin?tab=settings&subtab=website`,
+    href: () => `/growth-audit?subtab=data-sources`,
     detector: async ({ venueId }) =>
       exists('website_mappings', (q) => q.eq('venue_id', venueId)),
   },
