@@ -134,6 +134,13 @@ It aborts rather than discarding data if `venues.toast_client_secret` or
 `venue_profiles.safe_combo` has acquired a nonempty value. Only then are the
 formerly empty columns removed. Toast handlers now use server environment secrets.
 
+Correction (2026-10-29): those columns, plus `venues.toast_client_id`,
+`venue_profiles.wifi_password` and `venue_profiles.alarm_code`, were already
+dropped live on 2026-10-28 (all empty at the time). The column-drop block above
+is guarded by `IF EXISTS` and will simply skip; the vault job-token and scoped
+cron steps of this migration are still pending and still require the guarded
+functions to be deployed first.
+
 It creates random function-scoped credentials in Supabase Vault and stores only
 hashes/references in the private job table. The service-only dispatcher accepts
 registered function names and builds a fixed project URL; it is not an arbitrary

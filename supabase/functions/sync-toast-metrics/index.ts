@@ -614,7 +614,7 @@ serve(async (req) => {
     // Active venues with a Toast restaurant GUID
     let venueQuery = supabase
       .from('venues')
-      .select('id, bar_code, toast_restaurant_guid, toast_client_id')
+      .select('id, bar_code, toast_restaurant_guid')
       .eq('is_active', true)
       .eq('toast_api_enabled', true)
       .not('toast_restaurant_guid', 'is', null)
@@ -1110,7 +1110,8 @@ serve(async (req) => {
           let ordersTurnSamples = 0;
           let ordersTurnFetched = false;
           {
-            const ordersClientId = (venue as any).toast_client_id || Deno.env.get('TOAST_CLIENT_ID');
+            // Toast credentials live in server secrets; the per-venue column was removed.
+            const ordersClientId = Deno.env.get('TOAST_CLIENT_ID');
             const ordersClientSecret = Deno.env.get('TOAST_CLIENT_SECRET');
             if (ordersClientId && ordersClientSecret) {
               try {

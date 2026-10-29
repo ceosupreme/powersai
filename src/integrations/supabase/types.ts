@@ -11027,7 +11027,6 @@ export type Database = {
       }
       venue_profiles: {
         Row: {
-          alarm_code: string | null
           bar_seats: number | null
           brunch_hours: string | null
           business_license_expiry: string | null
@@ -11084,10 +11083,8 @@ export type Database = {
           walk_in_location: string | null
           water_shutoff_location: string | null
           wifi_network: string | null
-          wifi_password: string | null
         }
         Insert: {
-          alarm_code?: string | null
           bar_seats?: number | null
           brunch_hours?: string | null
           business_license_expiry?: string | null
@@ -11144,10 +11141,8 @@ export type Database = {
           walk_in_location?: string | null
           water_shutoff_location?: string | null
           wifi_network?: string | null
-          wifi_password?: string | null
         }
         Update: {
-          alarm_code?: string | null
           bar_seats?: number | null
           brunch_hours?: string | null
           business_license_expiry?: string | null
@@ -11204,7 +11199,6 @@ export type Database = {
           walk_in_location?: string | null
           water_shutoff_location?: string | null
           wifi_network?: string | null
-          wifi_password?: string | null
         }
         Relationships: [
           {
@@ -11417,7 +11411,6 @@ export type Database = {
           task_source: string | null
           timezone: string | null
           toast_api_enabled: boolean
-          toast_client_id: string | null
           toast_restaurant_guid: string | null
           updated_at: string
           venue_name: string | null
@@ -11469,7 +11462,6 @@ export type Database = {
           task_source?: string | null
           timezone?: string | null
           toast_api_enabled?: boolean
-          toast_client_id?: string | null
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null
@@ -11521,7 +11513,6 @@ export type Database = {
           task_source?: string | null
           timezone?: string | null
           toast_api_enabled?: boolean
-          toast_client_id?: string | null
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null

@@ -137,7 +137,7 @@ async function fetchAllToastEmployees(token: string, restaurantGuid: string): Pr
 
 async function syncVenueEmployees(
   supabase: any,
-  venue: { id: string; name: string; toast_restaurant_guid: string; toast_client_id: string | null },
+  venue: { id: string; name: string; toast_restaurant_guid: string },
 ): Promise<{ runId: string; created: number; updated: number; matched: number; oneSided: number; ambiguous: number }> {
   const { data: run, error: runErr } = await supabase
     .from("sync_runs")
@@ -153,7 +153,7 @@ async function syncVenueEmployees(
   const runId = run.id;
 
   try {
-    const creds = credsFor(venue.id, { client_id: venue.toast_client_id, client_secret: Deno.env.get("TOAST_CLIENT_SECRET") });
+    const creds = credsFor(venue.id);
     const token = await getToastToken(creds);
     const [employees, jobMap] = await Promise.all([
       fetchAllToastEmployees(token, venue.toast_restaurant_guid),
@@ -304,7 +304,7 @@ serve(async (req) => {
 
     let venueQuery = supabase
       .from("venues")
-      .select("id, name, toast_restaurant_guid, toast_client_id")
+      .select("id, name, toast_restaurant_guid")
       .eq("is_active", true)
       .eq("toast_api_enabled", true)
       .not("toast_restaurant_guid", "is", null);

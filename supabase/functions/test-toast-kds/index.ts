@@ -53,13 +53,13 @@ serve(async (req) => {
     if (venueId) {
       const { data: venue } = await supabaseAdmin
         .from('venues')
-        .select('name, toast_restaurant_guid, toast_client_id')
+        .select('name, toast_restaurant_guid')
         .eq('id', venueId)
         .single();
       
       if (venue) {
         restaurantGuid = venue.toast_restaurant_guid || undefined;
-        toastClientId = venue.toast_client_id || undefined;
+        toastClientId = Deno.env.get('TOAST_CLIENT_ID') || undefined;
         toastClientSecret = Deno.env.get('TOAST_CLIENT_SECRET');
         console.log(`[KDS-DIAG] Venue: ${venue.name}, GUID: ${restaurantGuid}`);
       }

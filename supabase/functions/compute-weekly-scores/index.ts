@@ -195,7 +195,7 @@ async function processBar(
 
   const { data: barRow } = await supabase
     .from("venues")
-    .select("name, bar_code, asana_project_gid, asana_score_section_gid, asana_score_assignee_gid, task_source, seven_shifts_location_id, timezone, toast_restaurant_guid, toast_client_id")
+    .select("name, bar_code, asana_project_gid, asana_score_section_gid, asana_score_assignee_gid, task_source, seven_shifts_location_id, timezone, toast_restaurant_guid")
     .eq("id", barId)
     .single();
 
@@ -524,7 +524,7 @@ async function processBar(
       console.log(`[G5] Skipping KDS fetch for ${barRow?.name || barId} — venue has no KDS data`);
     } else {
       const toastGuid = barRow?.toast_restaurant_guid || Deno.env.get("TOAST_RESTAURANT_GUID");
-      const toastClientId = barRow?.toast_client_id || Deno.env.get("TOAST_CLIENT_ID");
+      const toastClientId = Deno.env.get("TOAST_CLIENT_ID");
       const toastClientSecret = Deno.env.get("TOAST_CLIENT_SECRET");
 
       if (toastClientId && toastClientSecret && toastGuid) {
