@@ -20,7 +20,7 @@ part of validation.
 | Claude's initial Phase 1 changes and data cleanup | Preserved | Base commit above; live inspection confirmed cleanup and removal of the two ineffective cron jobs |
 | Phase 2 database prerequisites | Live | Migration `20261029010000` applied and recorded transactionally after a real-schema rollback preflight |
 | Phase 2b database prerequisites | Live | Migration `20261029020000` applied and recorded in the same transaction |
-| Frontend continuation | Built and locally verified; production release pending | Build, TypeScript and behavioral checks; update this row after publishing |
+| Frontend continuation | Published and public smoke check verified | Release commit `d3d708ee43a4023b8582e7aae89d66b68078353c`; production loads verified `index-B97P0J7V.js`; signed-out `/workspace` redirects to `/auth` |
 | Protected server functions and Phase 2b workers | Code ready; not deployed | Deploy all 119 handlers and matching shared modules/config through authenticated backend deployment |
 | Secret-column removal and scoped scheduler credentials | Pending coordinated deployment | Apply exact migration `20261029011000` only after the corresponding functions and frontend are live |
 | Internal numbers collector | Live and initial run verified | Migration `20261029030000`; 127 definitions checked, 15 supported measurements, 112 explicitly unsupported, no source failures |
@@ -64,7 +64,7 @@ field changes, and require admin for brand-kit writes. Anonymous and authenticat
 callers cannot execute the arbitrary HTTP/advisory-lock helpers or private worker
 RPCs. New internal tables have RLS and explicit grants.
 
-The edge manifest classifies every current handler. The shared guard validates
+The undeployed edge implementation classifies every current handler. Its shared guard validates
 real user sessions and server-owned roles, restricts project operators, accepts
 only exact service credentials or function-scoped job credentials, and fails
 closed when authorization dependencies fail. Public funnels retain bounded,
@@ -148,6 +148,12 @@ represented as its approved contents.
 ## Verification record
 
 The final combined frontend TypeScript check and production Vite build passed.
+[Pull request #1](https://github.com/ceosupreme/powersai/pull/1) was merged, Lovable
+synchronized the exact merge commit, and the frontend was published. A live browser
+loaded `https://supremeteammedia.com/` with the same `index-B97P0J7V.js` bundle as the
+verified local production build. A signed-out visit to `/workspace` redirected to
+the rendered `/auth` login screen. This is a public/signed-out smoke check, not an
+authenticated owner/client browser verification.
 The public-route metadata build completed. Full local browser prerender remains
 unverified: the environment initially lacked Playwright and the isolated browser
 runtime subsequently failed to launch. Public-data network fetches also used the

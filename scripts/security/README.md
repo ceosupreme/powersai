@@ -7,9 +7,11 @@ The coordinating agent executed both prerequisites (`20261029010000` security an
 that preflight left no tables or migration records, then applied and recorded both
 transactionally. Those database protections and supporting RPCs are live.
 
-The guarded edge code, matching frontend, provider secret verification and
-`20261029011000` cutover remain pending deployment. The deployment plugin connection
-was declined/unavailable in this session. A passing local build or these database
+The matching frontend is published from commit
+`d3d708ee43a4023b8582e7aae89d66b68078353c`; its production bundle and signed-out login
+boundary were checked in a live browser. The guarded edge code, provider secret
+verification and `20261029011000` cutover remain pending. The available connections
+do not provide an authenticated backend deployment capability. A passing local build or these database
 migrations alone does not establish that all public endpoints are secured. Existing
 public handlers still need the code deployment for durable admission, atomic unlock,
 and mandatory webhook signature behavior to take effect.
@@ -63,8 +65,8 @@ caller-scoped instead of being blanket revoked.
 The signup trigger creates a profile but grants no role to self-signups, even if
 raw user metadata claims `invited_role=admin`. Role creation requires Auth's real
 `invited_at` provenance and a recognized invited role. Existing users are not
-deleted or downgraded. The administrator create/invite endpoints now always
-upsert the requested role using the existing `user_roles(user_id)` unique key.
+deleted or downgraded. The new, undeployed administrator create/invite endpoint code always
+upserts the requested role using the existing `user_roles(user_id)` unique key.
 Also disable public signup in the Auth dashboard/provider settings; the trigger
 is a second boundary, not a reason to keep unwanted account creation enabled.
 
@@ -111,8 +113,8 @@ migrations. See the [official deployment guide](https://supabase.com/docs/guides
 3. Deploy all 119 guarded edge handlers and their shared modules/config together.
    Set/verify the real `RESEND_WEBHOOK_SECRET` through the provider's secret store.
    Do not put it in git or a browser. Verify service environment variables exist.
-4. Deploy the frontend that uses the private voice subprotocol and no longer reads
-   or submits the removed secret fields. Verify actual admin, assigned client,
+4. Verify the already published frontend uses the private voice subprotocol and no
+   longer reads or submits the removed secret fields. Verify actual admin, assigned client,
    assigned manager, unrelated manager, and signed-out sessions.
 5. Apply the cutover migration below promptly so the scheduler and DB triggers send
    the newly accepted scoped job credentials. A legacy anon-key cron is deliberately
