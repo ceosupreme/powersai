@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // gbp-sync-daily — pulls a lightweight GBP snapshot for every venue
 // that has a place_id configured. Runs daily at 06:30 PT.
 //
@@ -16,6 +17,9 @@ const corsHeaders = {
 const STAGGER_MS = 30_000;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'gbp-sync-daily');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   const apiKey = (Deno.env.get('GOOGLE_PLACES_API_KEY') || '').trim();

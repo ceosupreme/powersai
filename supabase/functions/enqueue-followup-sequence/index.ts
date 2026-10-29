@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Enqueue a follow-up sequence for a single inbound lead.
 // - Idempotent on lead_id (followup_sequence_runs has unique(lead_id))
 // - Drafts an opener + day-N touches per configured channel via Lovable AI
@@ -25,6 +26,9 @@ function json(body: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'enqueue-followup-sequence');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   let payload: { lead_id?: string } = {};

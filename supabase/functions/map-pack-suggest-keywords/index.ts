@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // map-pack-suggest-keywords — admin-only.
 // Returns 10–15 AI-suggested keywords for a venue, leveraging GBP categories
 // and review themes when present. Does not write anything.
@@ -16,6 +17,9 @@ const json = (status: number, body: unknown) =>
   });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'map-pack-suggest-keywords');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');

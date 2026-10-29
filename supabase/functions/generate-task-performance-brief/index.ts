@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { callAI } from "../_shared/ai-models.ts";
@@ -38,6 +39,9 @@ const fmtPct = (v: number | null | undefined) =>
   v == null ? '—' : `${Math.round(v * 100)}%`;
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'generate-task-performance-brief');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

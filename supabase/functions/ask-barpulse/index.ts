@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ============================================================================
 // ask-barpulse — global tool-aware assistant.
 //
@@ -41,6 +42,9 @@ function detectVenueMention(question: string, venues: any[]): any | null {
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'ask-barpulse');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

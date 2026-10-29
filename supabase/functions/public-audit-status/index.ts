@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // public-audit-status
 // PUBLIC (verify_jwt=false). Poll target for the /free-audit progress theater.
 // Returns { status, status_detail, redacted_result | null } — NEVER
@@ -15,6 +16,9 @@ const corsHeaders = {
 const Body = z.object({ token: z.string().trim().min(8).max(64) });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'public-audit-status');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {

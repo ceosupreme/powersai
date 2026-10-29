@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ============================================================================
 // compliance-audit — read-only diagnostic for Admin UI
 // ============================================================================
@@ -26,6 +27,9 @@ function shiftDate(d: string, delta: number): string {
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'compliance-audit');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {

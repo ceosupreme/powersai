@@ -61,7 +61,7 @@ export async function fetchEffectiveFoundationCategories(
   projectId: string,
   projectType: string,
 ): Promise<EffectiveFoundationCategory[]> {
-  const [{ data: overrides }, { data: templates }] = await Promise.all([
+  const [overridesResult, templatesResult] = await Promise.all([
     supabase
       .from('project_foundation_category_overrides')
       .select(`${CATEGORY_COLUMNS},is_hidden`)
@@ -74,8 +74,10 @@ export async function fetchEffectiveFoundationCategories(
       .order('sort_order', { ascending: true }),
   ]);
 
-  const overrideRows = (overrides ?? []) as any[];
-  const templateRows = (templates ?? []) as any[];
+  if (overridesResult.error) throw overridesResult.error;
+  if (templatesResult.error) throw templatesResult.error;
+  const overrideRows = (overridesResult.data ?? []) as any[];
+  const templateRows = (templatesResult.data ?? []) as any[];
 
   if (projectType === CLIENT_PROJECT_TYPE) {
     if (overrideRows.length > 0) {
@@ -126,7 +128,7 @@ export async function fetchEffectiveFoundationItems(
   projectId: string,
   projectType: string,
 ): Promise<EffectiveFoundationItem[]> {
-  const [{ data: overrides }, { data: templates }] = await Promise.all([
+  const [overridesResult, templatesResult] = await Promise.all([
     supabase
       .from('project_foundation_item_overrides')
       .select(`${ITEM_COLUMNS},is_hidden`)
@@ -139,8 +141,10 @@ export async function fetchEffectiveFoundationItems(
       .order('sort_order', { ascending: true }),
   ]);
 
-  const overrideRows = (overrides ?? []) as any[];
-  const templateRows = (templates ?? []) as any[];
+  if (overridesResult.error) throw overridesResult.error;
+  if (templatesResult.error) throw templatesResult.error;
+  const overrideRows = (overridesResult.data ?? []) as any[];
+  const templateRows = (templatesResult.data ?? []) as any[];
 
   const shape = (row: any, source: 'template' | 'override'): EffectiveFoundationItem => ({
     category_key: row.category_key,

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Reactivation campaign: drafts a per-segment win-back message and queues
 // one row per member. Operator approves in the queue UI.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -12,6 +13,9 @@ function json(body: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'reactivation-generate');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const authHeader = req.headers.get("Authorization") ?? "";

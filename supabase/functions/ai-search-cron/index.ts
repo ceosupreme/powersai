@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ai-search-cron — weekly fan-out wrapper. Calls ai-search-run with no body
 // so it iterates every venue with active queries.
 
@@ -12,6 +13,9 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'ai-search-cron');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);

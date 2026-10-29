@@ -1,21 +1,359 @@
 project_id = "llanezccussjtzzrbrtq"
 
-[functions.duplicate-project-type]
+# Authentication is enforced by guardEdgeRequest and the explicit edge-policies manifest.
+[functions.ai-search-cron]
 verify_jwt = false
 
-[functions.delete-project-type]
+[functions.ai-search-queries-upsert]
 verify_jwt = false
 
-[functions.mine-prospects]
+[functions.ai-search-run]
+verify_jwt = false
+
+[functions.ai-search-suggest-queries]
+verify_jwt = false
+
+[functions.alert-emergency-lead]
+verify_jwt = false
+
+[functions.alert-sync-failures]
+verify_jwt = false
+
+[functions.apply-automation-bundle]
+verify_jwt = false
+
+[functions.asana-proxy]
+verify_jwt = false
+
+[functions.ask-barpulse]
+verify_jwt = false
+
+[functions.automation-queue-sweeper]
+verify_jwt = false
+
+[functions.automation-send-approved]
+verify_jwt = false
+
+[functions.automation-stop-condition-sweep]
+verify_jwt = false
+
+[functions.backfill-bev-sales]
+verify_jwt = false
+
+[functions.capture-classify]
 verify_jwt = false
 
 [functions.checkup-prospect]
 verify_jwt = false
 
+[functions.classify-insight-sentiment]
+verify_jwt = false
+
+[functions.client-approval-stale-digest]
+verify_jwt = false
+
+[functions.compliance-audit]
+verify_jwt = false
+
+[functions.compliance-sweep]
+verify_jwt = false
+
+[functions.compute-leak-stack]
+verify_jwt = false
+
+[functions.compute-weekly-scores]
+verify_jwt = false
+
+[functions.content-publish-automation]
+verify_jwt = false
+
+[functions.content-publish-automation-undo]
+verify_jwt = false
+
+[functions.context-programming-suggest]
+verify_jwt = false
+
+[functions.context-sources-pull]
+verify_jwt = false
+
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.create-user]
+verify_jwt = false
+
+[functions.crm-analyze-lead]
+verify_jwt = false
+
+[functions.crm-generate-outreach]
+verify_jwt = false
+
+[functions.cron-marketing-asana-pull]
+verify_jwt = false
+
+[functions.delete-project-type]
+verify_jwt = false
+
+[functions.delete-user]
+verify_jwt = false
+
+[functions.detect-sculpture-report]
+verify_jwt = false
+
+[functions.discover-toast-restaurants]
+verify_jwt = false
+
+[functions.duplicate-project-type]
+verify_jwt = false
+
+[functions.enqueue-followup-sequence]
+verify_jwt = false
+
+[functions.enqueue-review-request]
+verify_jwt = false
+
+[functions.extract-review-themes]
+verify_jwt = false
+
+[functions.followup-cadence-tick]
+verify_jwt = false
+
+[functions.foundation-audit-refresh]
+verify_jwt = false
+
+[functions.gbp-admin-upsert-mapping]
+verify_jwt = false
+
+[functions.gbp-resolve-place]
+verify_jwt = false
+
+[functions.gbp-sync-daily]
+verify_jwt = false
+
+[functions.gbp-sync-weekly]
+verify_jwt = false
+
+[functions.generate-daily-insights]
+verify_jwt = false
+
+[functions.generate-employee-performance-brief]
+verify_jwt = false
+
+[functions.generate-monday-briefing]
+verify_jwt = false
+
+[functions.generate-recovery-report]
+verify_jwt = false
+
+[functions.generate-task-performance-brief]
+verify_jwt = false
+
+[functions.get-shared-recovery-report]
+verify_jwt = false
+
+[functions.growth-audit-action-pack]
+verify_jwt = false
+
+[functions.growth-audit-cron]
+verify_jwt = false
+
+[functions.growth-audit-refresh]
+verify_jwt = false
+
+[functions.growth-score-snapshot]
+verify_jwt = false
+
+[functions.insight-deep-dive]
+verify_jwt = false
+
+[functions.invite-client-approver]
+verify_jwt = false
+
+[functions.invite-user]
+verify_jwt = false
+
+[functions.lead-to-project-proposal]
+verify_jwt = false
+
+[functions.map-pack-cron]
+verify_jwt = false
+
+[functions.map-pack-keywords-upsert]
+verify_jwt = false
+
+[functions.map-pack-run]
+verify_jwt = false
+
+[functions.map-pack-suggest-keywords]
+verify_jwt = false
+
+[functions.marketing-asana-comment]
+verify_jwt = false
+
+[functions.marketing-asana-pull]
+verify_jwt = false
+
+[functions.marketing-asana-push]
+verify_jwt = false
+
+[functions.marketing-asana-setup]
+verify_jwt = false
+
+[functions.marketing-auto-analyze]
+verify_jwt = false
+
+[functions.marketing-campaign-analyze]
+verify_jwt = false
+
+[functions.metric-interpretation]
+verify_jwt = false
+
+[functions.mine-prospects]
+verify_jwt = false
+
+[functions.notify-owner-inquiry]
+verify_jwt = false
+
+[functions.openai-realtime-proxy]
+verify_jwt = false
+
+[functions.openai-realtime-qualifier]
+verify_jwt = false
+
+[functions.parse-cost-fluctuation-csv]
+verify_jwt = false
+
+[functions.parse-drink-mix-csv]
+verify_jwt = false
+
+[functions.parse-intelipar-csv]
+verify_jwt = false
+
+[functions.parse-inventory-csv]
+verify_jwt = false
+
+[functions.parse-inventory-csv-v2]
+verify_jwt = false
+
+[functions.parse-kds-csv]
+verify_jwt = false
+
+[functions.parse-labor-zip]
+verify_jwt = false
+
+[functions.parse-logs]
+verify_jwt = false
+
+[functions.parse-summary-variance-csv]
+verify_jwt = false
+
+[functions.parse-toast-csv]
+verify_jwt = false
+
+[functions.parse-toast-zip]
+verify_jwt = false
+
 [functions.prospect-first-touch]
 verify_jwt = false
-[functions.resend-inbound-webhook]
+
+[functions.public-audit-status]
+verify_jwt = false
+
+[functions.qualifier-chat]
+verify_jwt = false
+
+[functions.qualifier-session]
+verify_jwt = false
+
+[functions.reactivation-generate]
+verify_jwt = false
+
+[functions.reap-sync-runs]
 verify_jwt = false
 
 [functions.reconcile-checkouts]
+verify_jwt = false
+
+[functions.resend-inbound-webhook]
+verify_jwt = false
+
+[functions.resolve-venue-by-slug]
+verify_jwt = false
+
+[functions.run-public-audit]
+verify_jwt = false
+
+[functions.search-google-place]
+verify_jwt = false
+
+[functions.send-adapter-status]
+verify_jwt = false
+
+[functions.send-prospect-acknowledgment]
+verify_jwt = false
+
+[functions.seven-shifts-proxy]
+verify_jwt = false
+
+[functions.submit-inbound-lead]
+verify_jwt = false
+
+[functions.sync-asana-gm-tasks]
+verify_jwt = false
+
+[functions.sync-asana-logs]
+verify_jwt = false
+
+[functions.sync-asana-task-status]
+verify_jwt = false
+
+[functions.sync-google-ratings]
+verify_jwt = false
+
+[functions.sync-seven-shifts]
+verify_jwt = false
+
+[functions.sync-toast-employees]
+verify_jwt = false
+
+[functions.sync-toast-metrics]
+verify_jwt = false
+
+[functions.sync-toast-time-entries]
+verify_jwt = false
+
+[functions.test-asana-connection]
+verify_jwt = false
+
+[functions.test-engage-dump]
+verify_jwt = false
+
+[functions.test-toast-kds]
+verify_jwt = false
+
+[functions.test-toast-labor]
+verify_jwt = false
+
+[functions.toast-data]
+verify_jwt = false
+
+[functions.transcribe-audio]
+verify_jwt = false
+
+[functions.unlock-public-audit]
+verify_jwt = false
+
+[functions.verify-checkout]
+verify_jwt = false
+
+[functions.website-crawl-dispatcher]
+verify_jwt = false
+
+[functions.website-crawl-weekly]
+verify_jwt = false
+
+[functions.website-pagespeed-daily]
+verify_jwt = false
+
+[functions.website-resolve-url]
 verify_jwt = false

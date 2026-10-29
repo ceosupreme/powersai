@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Pushes a Marketing Hub campaign to its venue's Asana board.
 // Supports dry_run preview (no writes) and live writes (gated by
@@ -46,6 +47,9 @@ type CampaignPayload = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'marketing-asana-push');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('asana', corsHeaders);

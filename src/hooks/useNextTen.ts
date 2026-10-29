@@ -43,6 +43,32 @@ export interface NextTenResult {
   rows: NextTenRow[];
   /** Human labels of sources whose query failed ("action items", "money lanes"…). */
   unavailable: string[];
+  /** Successful project/source checks, including sources with zero open rows. */
+  checkedSources: number;
+}
+
+export function nextTenEmptyMessage(result: NextTenResult | undefined): string {
+  if (result?.unavailable.length) {
+    return result.checkedSources === 0
+      ? 'No sources could be checked. Try again to see what needs attention.'
+      : 'No open steps in the sources checked. Other sources are unavailable.';
+  }
+  return 'Nothing outstanding right now — add an action, a KPI target or a money lane.';
+}
+
+/** Shared products/actions appear once across brands because they complete once. */
+export function mergeNextTenResults(lists: NextTenResult[]): NextTenResult {
+  const seen = new Set<string>();
+  const rows = lists.flatMap((list) => list.rows).sort(compareRows).filter((row) => {
+    if (seen.has(row.key)) return false;
+    seen.add(row.key);
+    return true;
+  }).slice(0, 10);
+  return {
+    rows,
+    unavailable: [...new Set(lists.flatMap(list => list.unavailable))],
+    checkedSources: lists.reduce((count, list) => count + list.checkedSources, 0),
+  };
 }
 
 const PRODUCT_ADVANCE_FROM = ['needs cover', 'proof ordered', 'ready to upload'];
@@ -88,9 +114,13 @@ const DAY_MS = 86_400_000;
 
 function daysUntil(iso: string | null | undefined, now = Date.now()): number | null {
   if (!iso) return null;
-  const t = new Date(iso).getTime();
-  if (!Number.isFinite(t)) return null;
-  return Math.round((t - now) / DAY_MS);
+  // Due dates are calendar dates, not UTC instants. Count whole calendar days
+  // so an item due today does not become overdue at noon or shift at DST.
+  const due = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso);
+  if (!Number.isFinite(due.getTime())) return null;
+  const today = new Date(now);
+  const calendarDay = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((calendarDay(due) - calendarDay(today)) / DAY_MS);
 }
 
 /**
@@ -171,7 +201,7 @@ const withRank = (row: Omit<NextTenRow, 'rank'>, now: number): NextTenRow => ({
   rank: rankScore(row, now),
 });
 
-async function buildForProject(
+export async function fetchNextTenForProject(
   projectId: string,
   projectName: string,
   weekStart: string,
@@ -183,17 +213,15 @@ async function buildForProject(
   // (a) action items — rows may be keyed on bar_id or venue_id. Every open,
   // non-rejected, non-snoozed item counts, whatever its approval state;
   // approval only affects the ranking (approved items get a small bonus).
-  const actionsRes = await supabase
-    .from('action_items')
-    .select('id,title,due_date,approval_status,status,created_at,priority,snoozed_until')
-    .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`)
-    .neq('status', 'Done');
-  if (actionsRes.error) {
-    unavailable.push('action items');
-  } else {
+  try {
+    const actionsRes = await supabase
+      .from('action_items')
+      .select('id,title,due_date,approval_status,status,created_at,priority,snoozed_until')
+      .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
+    if (actionsRes.error) throw actionsRes.error;
     const seen = new Set<string>();
     for (const a of (actionsRes.data ?? []) as any[]) {
-      if (a.approval_status === 'Rejected') continue;
+      if (a.status === 'Done' || a.approval_status === 'Rejected') continue;
       if (seen.has(a.id)) continue;
       seen.add(a.id);
       if (isSnoozed(a.snoozed_until, now)) continue;
@@ -219,6 +247,8 @@ async function buildForProject(
         ),
       );
     }
+  } catch {
+    unavailable.push('action items');
   }
 
   // (b) Money Lanes — lanes that are not on yet (missing), critical and high only.
@@ -312,7 +342,7 @@ async function buildForProject(
     const [defsRes, valuesRes] = await Promise.all([
       supabase
         .from('project_kpis')
-        .select('pillar_key,kpi_key,kpi_label,target,sort_order')
+        .select('pillar_key,kpi_key,kpi_label,target,sort_order,source')
         .eq('project_id', projectId)
         .eq('is_active', true)
         .not('target', 'is', null),
@@ -330,6 +360,7 @@ async function buildForProject(
         .map((v) => `${v.pillar_key}:${v.kpi_key}`),
     );
     ((defsRes.data ?? []) as any[])
+      .filter((d) => d.source !== 'auto')
       .filter((d) => !haveActual.has(`${d.pillar_key}:${d.kpi_key}`))
       .forEach((d) =>
         rows.push(
@@ -352,7 +383,7 @@ async function buildForProject(
     unavailable.push('KPIs');
   }
 
-  return { rows: rows.sort(compareRows), unavailable };
+  return { rows: rows.sort(compareRows), unavailable, checkedSources: 4 - unavailable.length };
 }
 
 /** Next 10 for a single project. */
@@ -362,8 +393,8 @@ export function useNextTen(projectId: string | null | undefined, projectName = '
     queryKey: ['next-ten', projectId, weekStart],
     enabled: !!projectId,
     queryFn: async (): Promise<NextTenResult> => {
-      const r = await buildForProject(projectId!, projectName, weekStart);
-      return { rows: r.rows.slice(0, 10), unavailable: r.unavailable };
+      const r = await fetchNextTenForProject(projectId!, projectName, weekStart);
+      return { ...r, rows: r.rows.slice(0, 10) };
     },
   });
 }
@@ -379,11 +410,9 @@ export function useNextTenAcrossProjects(
     enabled: projects.length > 0,
     queryFn: async (): Promise<NextTenResult> => {
       const lists = await Promise.all(
-        projects.map((p) => buildForProject(p.id, p.name, weekStart)),
+        projects.map((p) => fetchNextTenForProject(p.id, p.name, weekStart)),
       );
-      const rows = lists.flatMap((l) => l.rows).sort(compareRows).slice(0, 10);
-      const unavailable = [...new Set(lists.flatMap((l) => l.unavailable))];
-      return { rows, unavailable };
+      return mergeNextTenResults(lists);
     },
   });
 }

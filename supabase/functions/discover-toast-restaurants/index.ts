@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Probe the Toast ANALYTICS API (/era/v1) to enumerate every restaurant
 // in the management group. Uses the shared analytics credentials.
@@ -32,6 +33,9 @@ async function getAnalyticsToken(): Promise<string> {
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'discover-toast-restaurants');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('toast', corsHeaders);

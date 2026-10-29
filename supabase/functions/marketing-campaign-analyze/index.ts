@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Post-Event Measurement Loop — analyzer.
 // Phase B: live mode against daily_metrics + promo_redemptions + top_items,
 // AI Gateway narrative, finding_campaign_links write-back, optional Asana comment.
@@ -569,6 +570,9 @@ async function maybePostAsanaComment(
 
 // ──────────────────────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'marketing-campaign-analyze');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

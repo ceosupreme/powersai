@@ -2,12 +2,11 @@ import { ReactNode, useRef, useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useRole } from '@/context/RoleContext';
-import { usePreview } from '@/context/PreviewContext';
 import { UserRole, getRoleHome } from '@/types/roles';
 import { getAllowedRoles } from '@/config/routes';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { toast } from 'sonner';
-import { PageKey } from '@/types/permissions';
+import { PageKey, pageKeyForPath } from '@/types/permissions';
 import { Button } from '@/components/ui/button';
 
 interface ProtectedRouteProps {
@@ -17,9 +16,8 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRouteProps) => {
-  const { user, isLoading, isAdmin, canAccessPage, signOut } = useAuth();
+  const { user, isLoading, permissionsError, isAdmin, canAccessPage, signOut, refreshProfile } = useAuth();
   const { currentRole, isLoading: roleLoading } = useRole();
-  const { isPreview } = usePreview();
   const location = useLocation();
   const toastShownRef = useRef<string | null>(null);
   const [timedOut, setTimedOut] = useState(false);
@@ -45,10 +43,15 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
     setRoleSettleTimedOut(false);
   }, [isLoading, roleLoading, user, currentRole]);
 
-  if ((isLoading || roleLoading) && !timedOut) {
+  if (isLoading || roleLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingState message="Loading..." />
+        {timedOut ? (
+          <div className="max-w-md text-center space-y-3 px-6">
+            <p>We could not finish verifying your access. Please try again.</p>
+            <Button variant="outline" onClick={() => window.location.reload()}>Try again</Button>
+          </div>
+        ) : <LoadingState message="Loading..." />}
       </div>
     );
   }
@@ -59,6 +62,21 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
 
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  if (permissionsError && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-md text-center space-y-4">
+          <h1 className="text-xl font-semibold">Access could not be verified</h1>
+          <p className="text-sm text-muted-foreground">{permissionsError}</p>
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => void refreshProfile()}>Try again</Button>
+            <Button variant="outline" onClick={() => void signOut()}>Sign out</Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // User is present but role hasn't populated yet — hold the loading state
@@ -121,12 +139,25 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
   }
 
   // Per-page permission gate (admin already returned above)
-  if (pageKey && !canAccessPage(pageKey)) {
+  const resolvedPageKey = pageKey ?? pageKeyForPath(location.pathname);
+  if (!resolvedPageKey || !canAccessPage(resolvedPageKey)) {
     if (toastShownRef.current !== location.pathname) {
       toastShownRef.current = location.pathname;
       toast.error("You don't have access to this page");
     }
-    return <Navigate to={getRoleHome(currentRole)} replace />;
+    const home = getRoleHome(currentRole);
+    const homeKey = pageKeyForPath(home);
+    if (home === location.pathname || !homeKey || !canAccessPage(homeKey)) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="max-w-md text-center space-y-4">
+            <p>This account does not have permission to open this page. Contact your admin for access.</p>
+            <Button variant="outline" onClick={() => void signOut()}>Sign out</Button>
+          </div>
+        </div>
+      );
+    }
+    return <Navigate to={home} replace />;
   }
 
   return <>{children}</>;

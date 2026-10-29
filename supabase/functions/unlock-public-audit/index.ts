@@ -1,8 +1,8 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // unlock-public-audit
 // PUBLIC (verify_jwt=false). Captures the prospect's email in inbound_leads
-// (reusing the submit-inbound-lead column contract via a direct service-role
-// write — the anon rate-limit/honeypot gates on that public function don't
-// apply here) and returns the full leak ledger.
+// using an atomic, replay-safe service RPC and returns the full leak ledger.
+// The shared guard enforces durable public limits before any database work.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3.23.8';
@@ -123,6 +123,9 @@ function leadNote(row: any, redacted: Record<string, unknown>): string {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'unlock-public-audit');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
@@ -167,57 +170,41 @@ Deno.serve(async (req) => {
 
   const redacted = (req_row.redacted_result ?? {}) as Record<string, unknown>;
 
-  // Direct inbound_leads insert (reusing submit-inbound-lead's schema).
-  const leadPayload = {
-    name: parsed.data.name ?? parsed.data.email.split('@')[0],
-    business_name: req_row.business_name,
-    email: parsed.data.email,
-    phone: parsed.data.phone ?? null,
-    message: leadNote(req_row, redacted),
-    // inbound_leads only accepts voice/chat/form/phone; the checkup unlock is a
-    // web form ('public_audit' was rejected, so these leads were never saved).
-    // source 'free-audit' and qualifier_data.source tell them apart.
-    conversation_channel: 'form',
-    route_to: 'self',
-    is_ready: true,
-    source: 'free-audit',
-    qualifier_data: {
-      source: 'public_audit',
-      token: parsed.data.token,
-      operation_footprint: req_row.operation_footprint,
-      redacted_summary: redacted,
-      leak_count: (redacted as any).leak_count ?? null,
-      top_leaks: (redacted as any).top_leaks ?? [],
-      project_type_resolution: (redacted as any).project_type_resolution ?? null,
-      place_id: req_row.place_id,
-      city: req_row.city,
-    },
-  };
-
-  const { data: lead, error: leadErr } = await admin.from('inbound_leads').insert(leadPayload).select('id').maybeSingle();
-  if (leadErr) {
-    console.error('[unlock-public-audit] inbound_leads insert failed:', leadErr.message);
-    // Non-fatal — we still return the full result so the prospect isn't blocked.
+  // The database locks this token and inserts the lead + capture marker in one
+  // transaction. Concurrent retries receive the result without a second lead.
+  const { data: capture, error: captureError } = await admin.rpc('unlock_public_audit_once', {
+    p_token: parsed.data.token,
+    p_email: parsed.data.email,
+    p_name: parsed.data.name ?? parsed.data.email.split('@')[0],
+    p_phone: parsed.data.phone ?? null,
+    p_message: leadNote(req_row, redacted),
+  });
+  if (captureError) {
+    console.error('[unlock-public-audit] atomic capture failed');
+    return new Response(JSON.stringify({ error: 'Could not save unlock. Please retry.' }), {
+      status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  if (capture?.error) {
+    return new Response(JSON.stringify({ error: capture.error }), {
+      status: capture.error === 'not_found' ? 404 : 409,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   // Alert the owner, the same way contact-form leads do (submit-inbound-lead).
   // A notification failure never blocks the prospect's full result.
-  if (lead?.id) {
+  if (capture?.new_capture === true && capture.lead_id) {
     const notify = fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/notify-owner-inquiry`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` },
-      body: JSON.stringify({ lead_id: lead.id }),
+      body: JSON.stringify({ lead_id: capture.lead_id }),
     }).catch((e) => console.error('[unlock-public-audit] owner notify error', e));
     const runtime = (globalThis as any).EdgeRuntime;
     if (runtime?.waitUntil) runtime.waitUntil(notify); else await notify;
   }
 
-  await admin
-    .from('public_audit_requests')
-    .update({ email: parsed.data.email, email_captured_at: new Date().toISOString() })
-    .eq('id', req_row.id);
-
-  return new Response(JSON.stringify({ full_result: req_row.full_result }), {
+  return new Response(JSON.stringify({ full_result: capture.full_result }), {
     status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 });

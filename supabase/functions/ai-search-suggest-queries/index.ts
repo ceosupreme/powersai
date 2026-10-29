@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ai-search-suggest-queries — admin-only.
 // Generates 8-12 natural-language questions a real customer might ask an LLM
 // when looking for a venue like this one. Reuses Map Pack keywords + GBP +
@@ -17,6 +18,9 @@ const json = (status: number, body: unknown) =>
   });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'ai-search-suggest-queries');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');

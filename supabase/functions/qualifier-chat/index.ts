@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Text-chat qualifier fallback. Stateless turn endpoint: the client sends the
 // full prior message list + new user text; we call Lovable AI Gateway with
 // the shared qualifier system prompt + submit_qualified_lead tool, and
@@ -19,11 +20,14 @@ const Body = z.object({
   project_type: z.string().min(1).max(80),
   messages: z.array(z.object({
     role: z.enum(["user", "assistant"]),
-    content: z.string(),
+    content: z.string().max(4000),
   })).max(50),
 });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'qualifier-chat');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (!LOVABLE_API_KEY) {
     return new Response(JSON.stringify({ error: "AI gateway not configured" }), {
@@ -70,6 +74,7 @@ Deno.serve(async (req) => {
       tools,
       tool_choice: "auto",
       temperature: 0.7,
+      max_tokens: 1000,
     }),
   });
 

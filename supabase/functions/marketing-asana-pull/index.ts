@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Pulls Asana state back into BarPulse.
 //
@@ -72,6 +73,9 @@ async function listSectionTasks(token: string, sectionGid: string, hardCap = 500
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'marketing-asana-pull');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('asana', corsHeaders);

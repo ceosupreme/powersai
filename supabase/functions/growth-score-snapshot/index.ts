@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Daily score snapshot writer (Prompt 23).
 // Iterates all venues with growth_findings rows and upserts today's snapshot
 // into growth_score_snapshots, computed from the current open-finding state.
@@ -53,6 +54,9 @@ const computeScores = (findings: Array<{ category: string; severity: string }>) 
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'growth-score-snapshot');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const supabase = createClient(

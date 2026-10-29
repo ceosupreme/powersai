@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -15,6 +16,9 @@ interface CreateUserRequest {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'create-user');
+  if (__authDenied) return __authDenied;
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -56,7 +60,8 @@ Deno.serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', callerUser.id)
-      .single();
+      .eq('role', 'admin')
+      .maybeSingle();
 
     if (callerRole?.role !== 'admin') {
       return new Response(
@@ -75,7 +80,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Creating user: ${email} with role: ${role}`);
+    if (!['admin', 'manager', 'staff', 'owner', 'gm', 'shift_lead', 'client'].includes(role)) {
+      return new Response(JSON.stringify({ error: 'Invalid role' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+
 
     // Create the user
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -98,18 +109,15 @@ Deno.serve(async (req) => {
     const userId = newUser.user.id;
     console.log(`User created with ID: ${userId}`);
 
-    // Wait briefly for the trigger to create profile + role rows
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Upsert the role (trigger creates default 'staff', so update if different)
-    if (role !== 'staff') {
-      const { error: roleError } = await supabaseAdmin
-        .from('user_roles')
-        .upsert({ user_id: userId, role }, { onConflict: 'user_id' });
-
-      if (roleError) {
-        console.error('Error upserting role:', roleError);
-      }
+    // Public signup creates no role. Only this verified administrator grants it.
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .upsert({ user_id: userId, role }, { onConflict: 'user_id' });
+    if (roleError) {
+      console.error('Could not assign created user role');
+      return new Response(JSON.stringify({ error: 'User created but role assignment failed; retry role assignment in admin settings', user_id: userId }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Update profile with bar assignment if provided

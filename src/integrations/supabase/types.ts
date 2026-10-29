@@ -11072,7 +11072,6 @@ export type Database = {
           public_transit: string | null
           quirks_and_notes: string | null
           reservation_system: string | null
-          safe_combo: string | null
           scheduling_system: string | null
           seating_capacity_indoor: number | null
           seating_capacity_outdoor: number | null
@@ -11133,7 +11132,6 @@ export type Database = {
           public_transit?: string | null
           quirks_and_notes?: string | null
           reservation_system?: string | null
-          safe_combo?: string | null
           scheduling_system?: string | null
           seating_capacity_indoor?: number | null
           seating_capacity_outdoor?: number | null
@@ -11194,7 +11192,6 @@ export type Database = {
           public_transit?: string | null
           quirks_and_notes?: string | null
           reservation_system?: string | null
-          safe_combo?: string | null
           scheduling_system?: string | null
           seating_capacity_indoor?: number | null
           seating_capacity_outdoor?: number | null
@@ -11421,7 +11418,6 @@ export type Database = {
           timezone: string | null
           toast_api_enabled: boolean
           toast_client_id: string | null
-          toast_client_secret: string | null
           toast_restaurant_guid: string | null
           updated_at: string
           venue_name: string | null
@@ -11474,7 +11470,6 @@ export type Database = {
           timezone?: string | null
           toast_api_enabled?: boolean
           toast_client_id?: string | null
-          toast_client_secret?: string | null
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null
@@ -11527,7 +11522,6 @@ export type Database = {
           timezone?: string | null
           toast_api_enabled?: boolean
           toast_client_id?: string | null
-          toast_client_secret?: string | null
           toast_restaurant_guid?: string | null
           updated_at?: string
           venue_name?: string | null

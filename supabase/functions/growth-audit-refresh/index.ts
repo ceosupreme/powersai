@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // growth-audit-refresh
 // Real audit engine. Dispatches to all registered analyzers for a venue,
 // catches per-analyzer failures, persists a summary row in growth_audit_runs.
@@ -16,6 +17,9 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'growth-audit-refresh');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const t0 = Date.now();

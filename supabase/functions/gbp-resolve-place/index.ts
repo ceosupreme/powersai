@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // gbp-resolve-place — admin-triggered helper to resolve a venue's
 // Google Business Profile to a Places API id, given either a Google Maps
 // URL (place_id query string) or a free-text query.
@@ -15,6 +16,9 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'gbp-resolve-place');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   const apiKey = (Deno.env.get('GOOGLE_PLACES_API_KEY') || '').trim();

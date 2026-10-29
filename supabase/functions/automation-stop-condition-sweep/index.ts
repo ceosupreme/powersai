@@ -1,9 +1,13 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Daily sweep — cancels pending/approved queue rows tied to halted, replied,
 // booked, or opted_out leads (follow-up sequences only).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'automation-stop-condition-sweep');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const sb = createClient(

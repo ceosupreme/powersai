@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // growth-audit-action-pack
 // Generates per-finding marketing assets via the Lovable AI Gateway.
 // Modes:
@@ -141,6 +142,9 @@ async function callGateway(body: unknown): Promise<any> {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'growth-audit-action-pack');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {

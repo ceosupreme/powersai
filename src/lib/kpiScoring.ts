@@ -31,6 +31,10 @@ export interface KpiValue {
   actual: number | null;
   score: number | null;
   note: string | null;
+  updated_at?: string | null;
+  observed_at?: string | null;
+  window_end?: string | null;
+  measurement_kind?: string | null;
 }
 
 /** Returns 0–100, or null when the KPI is not tracked. */

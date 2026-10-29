@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -23,6 +24,9 @@ interface Body {
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'metric-interpretation');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

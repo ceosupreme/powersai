@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Owner-only notification for general website inquiries (including hiring).
 // - Server-to-server only; invoked fire-and-forget by submit-inbound-lead.
 // - Skips client-captured leads (captured_for_project_id set) and anything not
@@ -40,6 +41,9 @@ function listOf(v: unknown): string {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'notify-owner-inquiry');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 

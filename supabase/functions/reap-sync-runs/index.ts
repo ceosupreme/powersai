@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Standalone reaper for sync_runs hygiene.
 //
 // Phase 2 companion to sync-toast-metrics' per-cycle reaper. This runs on a
@@ -19,6 +20,9 @@ const corsHeaders = {
 const STALE_MINUTES = 10;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'reap-sync-runs');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const url = Deno.env.get('SUPABASE_URL')!;

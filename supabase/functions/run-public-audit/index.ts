@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // run-public-audit
 //
 // ── SHARED CHAIN — KEEP IN SYNC WITH checkup-prospect ─────────────────────
@@ -765,6 +766,9 @@ async function runPipeline(requestId: string, token: string, input: z.infer<type
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'run-public-audit');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {

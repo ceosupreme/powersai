@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useApp } from '@/context/AppContext';
 import { getGradeFromScore } from '@/utils/scoring';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEffectivePillars } from '@/lib/effectivePillars';
 import {
   fetchEffectiveFoundationCategories,
@@ -10,6 +10,8 @@ import {
 } from '@/lib/effectiveFoundation';
 import { deriveFoundationScores } from '@/components/foundation-audit/deriveFoundationScores';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { deriveScoreCoverage, type ScoreCoverage } from '@/lib/scoreCoverage';
+import { fetchScoreReportingWeek, priorScoreWeek, scoreReportingWeekKey } from '@/lib/scoreReportingWeek';
 
 export interface PortfolioVenue {
   id: string;
@@ -345,6 +347,7 @@ export interface NonClientCardData {
   pillars: NonClientPillarBar[];
   monthRevenue: number | null;
   potential: number | null;
+  coverage: ScoreCoverage;
 }
 
 /** First letters of each word in a pillar label — "Brand Presence" -> "BP". */
@@ -385,29 +388,31 @@ function monthStartISO(d = new Date()) {
  * change, this month's channel_revenue, and the Money Lanes Potential percent.
  */
 export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
-  const weekStart = currentWeekRange().week_start;
-  const priorWeekStart = useMemo(() => {
-    const [y, m, d] = weekStart.split('-').map(Number);
-    const dt = new Date(y, m - 1, d - 7);
-    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-  }, [weekStart]);
+  const currentWeek = currentWeekRange().week_start;
+  const qc = useQueryClient();
   const monthStart = monthStartISO();
   const ids = projects.map((p) => p.id).join(',');
 
   return useQuery({
-    queryKey: ['non-client-portfolio', ids, weekStart, monthStart],
+    queryKey: ['non-client-portfolio', ids, currentWeek, monthStart],
     enabled: projects.length > 0,
     staleTime: 60_000,
     queryFn: async (): Promise<NonClientCardData[]> =>
       Promise.all(
         projects.map(async (p) => {
           const type = p.project_type ?? 'client';
-          const [pillars, scoresRes, revenueRes, categories, items, statusesRes] =
+          const weekStart = await qc.fetchQuery({
+            queryKey: scoreReportingWeekKey(p.id, currentWeek),
+            queryFn: () => fetchScoreReportingWeek(p.id, currentWeek),
+            staleTime: 60_000,
+          });
+          const priorWeekStart = priorScoreWeek(weekStart);
+          const [pillars, scoresRes, revenueRes, categories, items, statusesRes, definitionsRes, valuesRes] =
             await Promise.all([
               fetchEffectivePillars(p.id, type),
               supabase
                 .from('project_pillar_scores')
-                .select('pillar_key,score,week_start')
+                .select('pillar_key,score,week_start,updated_at')
                 .eq('project_id', p.id)
                 .in('week_start', [weekStart, priorWeekStart]),
               supabase
@@ -421,6 +426,16 @@ export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
                 .from('venue_foundation_item_status')
                 .select('item_key,status,evidence_url,notes,source,detected_at,updated_at')
                 .eq('venue_id', p.id),
+              supabase
+                .from('project_kpis')
+                .select('pillar_key,kpi_key,target')
+                .eq('project_id', p.id)
+                .eq('is_active', true),
+              supabase
+                .from('project_kpi_values')
+                .select('*')
+                .eq('project_id', p.id)
+                .eq('week_start', weekStart),
             ]);
 
           const rows = (scoresRes.data ?? []) as any[];
@@ -466,6 +481,12 @@ export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
             pillars: bars,
             monthRevenue,
             potential: foundation.overall,
+            coverage: deriveScoreCoverage(
+              definitionsRes.data ?? [], valuesRes.data ?? [], pillars,
+              rows.filter((r) => r.week_start === weekStart),
+              !!(definitionsRes.error || valuesRes.error || scoresRes.error),
+              weekStart,
+            ),
           };
         }),
       ),

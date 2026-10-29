@@ -4,6 +4,8 @@
 // and writes one recovery_reports row with status='draft'. Never sends.
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { callAI } from "../_shared/ai-models.ts";
+import { guardEdgeRequest } from "../_shared/auth-guard.ts";
+import { reportIsProtected } from "../_shared/automation-state.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -293,11 +295,17 @@ async function processProject(
   weekStart: string,
   weekEnd: string,
 ) {
-  const { data: venue } = await supabase
+  const { data: venue, error: venueError } = await supabase
     .from("venues")
-    .select("id, name")
+    .select("id, name, is_active")
     .eq("id", projectId)
     .maybeSingle();
+  if (venueError) return { project_id: projectId, status: "error", error: "project_lookup_failed" };
+  if (!venue || venue.is_active !== true) return { project_id: projectId, status: "skipped", reason: "project_inactive" };
+  const { data: existing, error: existingError } = await supabase.from("recovery_reports")
+    .select("id,status,narrative_edited,reviewed_at,sent_at").eq("project_id", projectId).eq("period_start", weekStart).maybeSingle();
+  if (existingError) return { project_id: projectId, status: "error", error: "report_lookup_failed" };
+  if (reportIsProtected(existing)) return { project_id: projectId, status: "skipped", reason: "edited_or_reviewed_report_preserved" };
   const venueName = (venue as any)?.name ?? "this project";
 
   const { metrics, basis, dollars } = await aggregateProject(
@@ -317,31 +325,23 @@ async function processProject(
     dollars,
   );
 
-  const { error } = await supabase
-    .from("recovery_reports")
-    .upsert(
-      {
-        project_id: projectId,
-        period_start: weekStart,
-        period_end: weekEnd,
-        metrics,
-        estimated_dollars: dollars,
-        estimate_basis: basis,
-        narrative,
-        narrative_edited: false,
-        status: "draft",
-        generated_at: new Date().toISOString(),
-      },
-      { onConflict: "project_id,period_start" },
-    );
+  // The database re-checks under the conflict row lock, so an edit made during
+  // narrative generation cannot be overwritten by this worker.
+  const { data: saved, error } = await supabase.rpc("hq_save_recovery_draft", {
+    p_project_id: projectId, p_start: weekStart, p_end: weekEnd,
+    p_metrics: metrics, p_dollars: dollars, p_basis: basis, p_narrative: narrative,
+  });
   if (error) {
     console.error("[recovery-report] upsert failed", projectId, error);
     return { project_id: projectId, status: "error", error: error.message };
   }
+  if (!saved) return { project_id: projectId, status: "skipped", reason: "concurrent_edit_preserved" };
   return { project_id: projectId, status: "ok", dollars, metrics };
 }
 
 Deno.serve(async (req) => {
+  const denied = await guardEdgeRequest(req, "generate-recovery-report");
+  if (denied) return denied;
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const supabase = createClient(
@@ -351,6 +351,9 @@ Deno.serve(async (req) => {
 
   let body: any = {};
   try { body = await req.json(); } catch { /* empty */ }
+  if (body.week_start && (!/^\d{4}-\d{2}-\d{2}$/.test(body.week_start) || !Number.isFinite(Date.parse(body.week_start)))) {
+    return new Response(JSON.stringify({ error: "invalid_week_start" }), { status: 400, headers: corsHeaders });
+  }
 
   const { weekStart, weekEnd } = body.week_start
     ? { weekStart: body.week_start, weekEnd: addDays(body.week_start, 6) }
@@ -360,14 +363,16 @@ Deno.serve(async (req) => {
   if (body.project_id) {
     const result = await processProject(supabase, body.project_id, weekStart, weekEnd);
     return new Response(JSON.stringify(result), {
+      status: result.status === "error" ? 503 : 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   // Dispatcher: active projects = those with any automation enrollment row.
-  const { data: enrolled = [] } = await supabase
+  const { data: enrolled = [], error: enrollmentError } = await supabase
     .from("project_automation_enrollments")
-    .select("project_id");
+    .select("project_id,venues!inner(is_active)").eq("enabled", true).eq("venues.is_active", true);
+  if (enrollmentError) return new Response(JSON.stringify({ error: "enrollment_lookup_failed" }), { status: 503, headers: corsHeaders });
   const projectIds = Array.from(
     new Set((enrolled ?? []).map((r: any) => r.project_id).filter(Boolean)),
   );
@@ -377,20 +382,21 @@ Deno.serve(async (req) => {
   );
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const fnUrl = `${supabaseUrl}/functions/v1/generate-recovery-report`;
 
   const dispatched: string[] = [];
   for (const pid of projectIds) {
     try {
-      await supabase.rpc("net_http_post", {
+      const { error: dispatchError } = await supabase.rpc("net_http_post", {
         url: fnUrl,
         headers_json: JSON.stringify({
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${anonKey}`,
+          "Authorization": `Bearer ${serviceKey}`,
         }),
         body_json: JSON.stringify({ project_id: pid, week_start: weekStart }),
       });
+      if (dispatchError) throw dispatchError;
       dispatched.push(pid);
     } catch (e) {
       console.warn("[recovery-report] dispatch fail", pid, e);

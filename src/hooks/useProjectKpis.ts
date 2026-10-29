@@ -37,7 +37,9 @@ export function useProjectKpiValues(
     queryFn: async (): Promise<KpiValue[]> => {
       const { data, error } = await supabase
         .from('project_kpi_values')
-        .select('pillar_key,kpi_key,actual,score,note')
+        // '*' keeps legacy databases compatible while accepting additive
+        // observed_at/window provenance from the numbers collector.
+        .select('*')
         .eq('project_id', projectId!)
         .eq('week_start', weekStart!);
       if (error) throw error;
@@ -86,6 +88,7 @@ export function useUpsertProjectKpiValue() {
       qc.invalidateQueries({ queryKey: ['next-ten', v.project_id] });
       qc.invalidateQueries({ queryKey: ['next-ten-all'] });
       qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
+      qc.invalidateQueries({ queryKey: ['project-score-week', v.project_id] });
     },
   });
 }

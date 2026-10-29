@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ============================================================================
 // insight-deep-dive — two modes in ONE function:
 //   mode: 'initial'   — pre-resolves source records server-side, emits them
@@ -112,6 +113,9 @@ function summarizeSource(toolResult: any): string {
 // ── Main ────────────────────────────────────────────────────────────────────
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'insight-deep-dive');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

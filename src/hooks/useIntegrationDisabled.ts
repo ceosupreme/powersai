@@ -9,9 +9,12 @@ async function fetchDisabledList(): Promise<string[]> {
     .select('value')
     .eq('key', 'integrations_disabled')
     .maybeSingle();
-  if (error) return [];
+  if (error) throw error;
   const value = data?.value;
-  return Array.isArray(value) ? (value as string[]) : [];
+  if (!Array.isArray(value) || !value.every(item => typeof item === 'string')) {
+    throw new Error('Integration configuration unavailable');
+  }
+  return value as string[];
 }
 
 export function useDisabledIntegrations() {
@@ -22,7 +25,14 @@ export function useDisabledIntegrations() {
   });
 }
 
+/** Unknown availability must not briefly start a disabled provider while the
+ * configuration query loads or recovers. This is also the safe deployment pause
+ * for private voice until its matching authenticated proxy is available. */
+export function integrationIsDisabled(name: string, list: readonly string[] | undefined, unavailable = false): boolean {
+  return unavailable || !list || list.includes(name);
+}
+
 export function useIntegrationDisabled(name: string): boolean {
-  const { data } = useDisabledIntegrations();
-  return !!data?.includes(name);
+  const { data, isError } = useDisabledIntegrations();
+  return integrationIsDisabled(name, data, isError);
 }

@@ -1,3 +1,5 @@
+import { publicVoiceEvent } from '../_shared/public-voice-events.ts';
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Realtime voice qualifier — sibling of openai-realtime-proxy. Reuses the same
 // WS bridge to OpenAI Realtime but builds its system prompt + tool schema
 // from the per-vertical qualifier config (project_type_qualifier_fields +
@@ -11,6 +13,9 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const OPENAI_REALTIME_URL = "wss://api.openai.com/v1/realtime?model=gpt-realtime";
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'openai-realtime-qualifier');
+  if (__authDenied) return __authDenied;
+
   const upgrade = req.headers.get("upgrade") || "";
   if (upgrade.toLowerCase() !== "websocket") {
     return new Response("Expected WebSocket upgrade", { status: 426 });
@@ -37,6 +42,14 @@ serve(async (req) => {
   const { socket: client, response } = Deno.upgradeWebSocket(req);
   let openai: WebSocket | null = null;
   let configured = false;
+  let receivedBytes = 0;
+  let requestedResponses = 0;
+  const closeSession = () => {
+    if (client.readyState === WebSocket.OPEN) client.close(1000, 'Session ended');
+    if (openai && (openai.readyState === WebSocket.OPEN || openai.readyState === WebSocket.CONNECTING)) openai.close();
+  };
+  // Connection admission is durable; lifetime and payload caps bound one session.
+  const lifetime = setTimeout(closeSession, 5 * 60_000);
 
   const configure = () => {
     if (!openai || openai.readyState !== WebSocket.OPEN) return;
@@ -103,20 +116,26 @@ serve(async (req) => {
     };
     openai.onerror = (e) => console.error("[realtime-qualifier] OpenAI ws error", e);
     openai.onclose = (e) => {
+      clearTimeout(lifetime);
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({ type: "connection.closed", reason: e.reason || "closed" }));
+        client.close();
       }
     };
   };
 
   client.onopen = () => connectOpenAI();
   client.onmessage = (event) => {
-    if (openai && openai.readyState === WebSocket.OPEN) openai.send(event.data);
+    const safe = publicVoiceEvent(event.data);
+    receivedBytes += typeof event.data === 'string' ? event.data.length : 131_073;
+    if (safe?.includes('"type":"response.create"')) requestedResponses++;
+    if (!safe || receivedBytes > 32 * 1024 * 1024 || requestedResponses > 30) {
+      closeSession(); return;
+    }
+    if (openai && openai.readyState === WebSocket.OPEN) openai.send(safe);
   };
-  client.onclose = () => {
-    if (openai && openai.readyState === WebSocket.OPEN) openai.close();
-  };
-  client.onerror = (e) => console.error("[realtime-qualifier] client ws error", e);
+  client.onclose = () => { clearTimeout(lifetime); closeSession(); };
+  client.onerror = () => { clearTimeout(lifetime); closeSession(); };
 
   return response;
 });

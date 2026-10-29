@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-employees — pulls the employee roster from Toast for every venue
 // with toast_api_enabled=true and upserts into employee_profiles. Runs the
@@ -136,7 +137,7 @@ async function fetchAllToastEmployees(token: string, restaurantGuid: string): Pr
 
 async function syncVenueEmployees(
   supabase: any,
-  venue: { id: string; name: string; toast_restaurant_guid: string; toast_client_id: string | null; toast_client_secret: string | null },
+  venue: { id: string; name: string; toast_restaurant_guid: string; toast_client_id: string | null },
 ): Promise<{ runId: string; created: number; updated: number; matched: number; oneSided: number; ambiguous: number }> {
   const { data: run, error: runErr } = await supabase
     .from("sync_runs")
@@ -152,7 +153,7 @@ async function syncVenueEmployees(
   const runId = run.id;
 
   try {
-    const creds = credsFor(venue.id, { client_id: venue.toast_client_id, client_secret: venue.toast_client_secret });
+    const creds = credsFor(venue.id, { client_id: venue.toast_client_id, client_secret: Deno.env.get("TOAST_CLIENT_SECRET") });
     const token = await getToastToken(creds);
     const [employees, jobMap] = await Promise.all([
       fetchAllToastEmployees(token, venue.toast_restaurant_guid),
@@ -285,6 +286,9 @@ async function syncVenueEmployees(
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'sync-toast-employees');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('toast', corsHeaders);
@@ -300,7 +304,7 @@ serve(async (req) => {
 
     let venueQuery = supabase
       .from("venues")
-      .select("id, name, toast_restaurant_guid, toast_client_id, toast_client_secret")
+      .select("id, name, toast_restaurant_guid, toast_client_id")
       .eq("is_active", true)
       .eq("toast_api_enabled", true)
       .not("toast_restaurant_guid", "is", null);

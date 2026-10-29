@@ -4,6 +4,7 @@ import { getGradeFromScore, getGradeColor } from '@/utils/scoring';
 import { formatCurrency } from '@/utils/formatting';
 import { cn } from '@/lib/utils';
 import type { NonClientCardData } from '@/hooks/usePortfolioData';
+import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
 
 /**
  * Overview card for a non-client project (own brand / prospect):
@@ -62,6 +63,8 @@ export function BrandProjectCard({
           <span className="text-3xl font-bold text-muted-foreground">--</span>
         )}
       </div>
+
+      <ScoreDataStatus coverage={data.coverage} className="mb-3" />
 
       <div className="mb-3 text-sm">
         <span className="text-foreground">

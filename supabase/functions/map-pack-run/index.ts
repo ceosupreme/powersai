@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // map-pack-run — query Google Places Text Search for active keywords and
 // persist a snapshot row per (venue, keyword). Used by both the weekly cron
 // and the admin "Trigger Now" button.
@@ -135,6 +136,9 @@ async function processKeyword(
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'map-pack-run');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

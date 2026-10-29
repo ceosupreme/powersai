@@ -354,14 +354,14 @@ export default function PortfolioOverview() {
   const { venues, gmRankings, isLoading } = usePortfolioData();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [group, setGroup] = useState<PortfolioGroup>('brands');
-  const { data: directory = [] } = useProjectDirectory();
+  const { data: directory = [], isError: directoryError, refetch: refetchDirectory } = useProjectDirectory();
 
   const groupRows = useMemo<ProjectDirectoryRow[]>(
     () => directory.filter((row) => row.group === group),
     [directory, group],
   );
   const nonClientRows = group === 'clients' ? [] : groupRows;
-  const { data: nonClientCards = [], isLoading: nonClientLoading } =
+  const { data: nonClientCards = [], isLoading: nonClientLoading, isError: nonClientError, refetch: refetchCards } =
     useNonClientPortfolio(nonClientRows);
 
   const activeCards = useMemo(
@@ -634,7 +634,12 @@ export default function PortfolioOverview() {
         </div>
 
         {!showClientBlocks ? (
-          nonClientLoading && nonClientCards.length === 0 ? (
+          directoryError || nonClientError ? (
+            <div role="status" className="rounded-lg border border-amber-500/40 bg-card p-6 text-sm">
+              <p>Project scores could not be loaded. The portfolio may be incomplete.</p>
+              <button className="mt-2 text-primary underline" onClick={() => { void refetchDirectory(); void refetchCards(); }}>Try again</button>
+            </div>
+          ) : nonClientLoading && nonClientCards.length === 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-56" />)}
             </div>

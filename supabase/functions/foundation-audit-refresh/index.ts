@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // foundation-audit-refresh
 // Runs every registered foundation check for a venue, upserts auto-source
 // statuses into venue_foundation_item_status without clobbering manual rows,
@@ -23,6 +24,9 @@ function json(body: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'foundation-audit-refresh');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const t0 = Date.now();

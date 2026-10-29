@@ -36,10 +36,12 @@ import {
 import { useProjectType, useEffectivePillars } from '@/hooks/useEffectivePillars';
 import { useProjectPillarScores } from '@/hooks/useProjectPillarScores';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
-import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { useScoreReportingWeek } from '@/hooks/useScoreReportingWeek';
 import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import { AllProjectsNextTen } from '@/components/workspace/AllProjectsNextTen';
 import { WaitingOnMe } from '@/components/workspace/WaitingOnMe';
+import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
+import { useProjectScoreCoverage } from '@/hooks/useProjectScoreCoverage';
 
 const fmtScore = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toString());
 
@@ -79,7 +81,7 @@ const Workspace = () => {
   const refresh = useRefreshAudit(venueId);
 
   // Non-client project layer (own brands) — the client path below is untouched.
-  const { data: directory = [] } = useProjectDirectory();
+  const { data: directory = [], isLoading: directoryLoading, isError: directoryError, refetch: refetchDirectory } = useProjectDirectory();
   const myActiveBrands = useMemo(
     () =>
       directory
@@ -89,8 +91,9 @@ const Workspace = () => {
   );
   const projectType = useProjectType(venueId);
   const isNonClient = !!projectType.data && projectType.data !== CLIENT_PROJECT_TYPE;
-  const projectWeekStart = useMemo(() => currentWeekRange().week_start, []);
-  const { data: effectivePillars = [] } = useEffectivePillars(
+  const reportingWeek = useScoreReportingWeek(isNonClient ? venueId : null);
+  const projectWeekStart = reportingWeek.weekStart;
+  const { data: effectivePillars = [], isError: pillarsError } = useEffectivePillars(
     isNonClient ? venueId : null,
     projectType.data ?? undefined,
   );
@@ -109,6 +112,7 @@ const Workspace = () => {
     );
   }, [isNonClient, effectivePillars, pillarScoreRows]);
   const projectPotential = foundation.result?.overall ?? null;
+  const coverageState = useProjectScoreCoverage(isNonClient ? venueId : null, projectWeekStart, effectivePillars, reportingWeek.isError || pillarsError);
 
   // Local UI state
   const [newCampaignOpen, setNewCampaignOpen] = useState(false);
@@ -129,7 +133,14 @@ const Workspace = () => {
           </div>
         </div>
 
-        {myActiveBrands.length === 0 ? (
+        {directoryLoading ? (
+          <p className="text-sm text-muted-foreground">Loading projects…</p>
+        ) : directoryError ? (
+          <Card className="p-6 space-y-2">
+            <p role="status" className="text-sm text-amber-600">Your projects could not be checked, so today's attention list is unavailable.</p>
+            <Button variant="outline" size="sm" onClick={() => void refetchDirectory()}>Try again</Button>
+          </Card>
+        ) : myActiveBrands.length === 0 ? (
           <Card className="p-10 text-center bg-card/30 border-dashed">
             <h2 className="text-lg font-semibold text-foreground">Select a project</h2>
             <p className="text-sm text-muted-foreground mt-1">Pick a project from the global header to see your workspace.</p>
@@ -228,6 +239,7 @@ const Workspace = () => {
             icon={Activity} label="Project score"
             value={fmtScore(projectOverall)}
             hint="Weighted across this project's pillars"
+            footer={<ScoreDataStatus coverage={coverageState.coverage} isLoading={coverageState.isLoading || reportingWeek.isLoading} />}
           />
         ) : (
           <Tile

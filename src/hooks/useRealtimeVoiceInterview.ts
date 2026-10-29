@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   AudioRecorder, 
   AudioQueue, 
@@ -76,7 +77,9 @@ export function useRealtimeVoiceInterview({
       const wsUrl = `${wsBase}/functions/v1/openai-realtime-proxy?logType=${logType}&fields=${fieldsParam}`;
       
       console.log('Connecting to voice interview...');
-      const ws = new WebSocket(wsUrl);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.access_token) throw new Error('Sign in again to start a voice interview.');
+      const ws = new WebSocket(wsUrl, ['hq-realtime', `hq-auth.${session.access_token}`]);
       wsRef.current = ws;
 
       // Set up audio queue for playback

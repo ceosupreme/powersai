@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Operator alert path for emergency-classified inbound leads.
 // - Dispatches through the shared send-adapter interface (manual_log today,
 //   Twilio SMS drops in later without changes here).
@@ -20,6 +21,9 @@ function json(data: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'alert-emergency-lead');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 

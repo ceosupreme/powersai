@@ -16,11 +16,12 @@ export function useProjectPillarScores(
     queryKey: ['project-pillar-scores', projectId, weekStart],
     enabled: !!projectId && !!weekStart,
     queryFn: async (): Promise<ProjectPillarScoreRow[]> => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('project_pillar_scores')
         .select('pillar_key,score,note,updated_at')
         .eq('project_id', projectId!)
         .eq('week_start', weekStart!);
+      if (error) throw error;
       return (data || []) as ProjectPillarScoreRow[];
     },
   });
@@ -56,6 +57,8 @@ export function useUpsertProjectPillarScore() {
       qc.invalidateQueries({
         queryKey: ['project-pillar-scores', v.project_id, v.week_start],
       });
+      qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
+      qc.invalidateQueries({ queryKey: ['project-score-week', v.project_id] });
     },
   });
 }

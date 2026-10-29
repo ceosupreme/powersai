@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -91,6 +92,9 @@ function simpleSum(rows: any[], metricField: string): number | null {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'compute-weekly-scores');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -191,7 +195,7 @@ async function processBar(
 
   const { data: barRow } = await supabase
     .from("venues")
-    .select("name, bar_code, asana_project_gid, asana_score_section_gid, asana_score_assignee_gid, task_source, seven_shifts_location_id, timezone, toast_restaurant_guid, toast_client_id, toast_client_secret")
+    .select("name, bar_code, asana_project_gid, asana_score_section_gid, asana_score_assignee_gid, task_source, seven_shifts_location_id, timezone, toast_restaurant_guid, toast_client_id")
     .eq("id", barId)
     .single();
 
@@ -521,7 +525,7 @@ async function processBar(
     } else {
       const toastGuid = barRow?.toast_restaurant_guid || Deno.env.get("TOAST_RESTAURANT_GUID");
       const toastClientId = barRow?.toast_client_id || Deno.env.get("TOAST_CLIENT_ID");
-      const toastClientSecret = barRow?.toast_client_secret || Deno.env.get("TOAST_CLIENT_SECRET");
+      const toastClientSecret = Deno.env.get("TOAST_CLIENT_SECRET");
 
       if (toastClientId && toastClientSecret && toastGuid) {
         try {

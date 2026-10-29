@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // map-pack-cron — weekly fan-out wrapper. Calls map-pack-run (no body) which
 // already iterates every venue with active keywords. Kept as a separate
 // entrypoint so pg_cron can target a stable URL and we have isolated logs.
@@ -13,6 +14,9 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'map-pack-cron');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);

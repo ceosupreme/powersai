@@ -1,10 +1,11 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Classifies a capture_items row into a suggested project + type via
 // Lovable AI Gateway (utility_classification → google/gemini-2.5-flash).
 // Reads & writes as SERVICE ROLE — bypasses RLS so suggestions land cleanly.
 // Gated by app_config.integrations_disabled["capture_ai_routing"]: ships disabled.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { isDisabled, disabledResponse } from "../_shared/integration-disabled.ts";
+import { guardIntegration } from "../_shared/integration-disabled.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,10 +17,14 @@ const MODEL = "google/gemini-2.5-flash"; // utility_classification tier
 const ROUTED_TYPES = ["task", "idea", "note", "brand_asset", "crm_lead", "content_idea"] as const;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'capture-classify');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   // Flag gate — ships disabled.
-  if (await isDisabled(FLAG)) return disabledResponse(FLAG, corsHeaders);
+  const integrationDenied = await guardIntegration(FLAG, corsHeaders);
+  if (integrationDenied) return integrationDenied;
 
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
   if (!apiKey) {

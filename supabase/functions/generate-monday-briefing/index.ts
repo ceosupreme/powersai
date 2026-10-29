@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { runWeeklyLaborAlerts } from "../_shared/labor-compliance-alerts.ts";
 
@@ -958,6 +959,9 @@ PENDING ACTION ITEMS: ${pendingActions ?? 0}`;
 // ── Main handler ──────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'generate-monday-briefing');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
 

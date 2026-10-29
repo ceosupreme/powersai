@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // prospect-first-touch — template-bounded outreach drafting for a mined
 // prospect. Mirrors the crm-generate-outreach pattern (Lovable AI Gateway).
 // Drafting ONLY — nothing is ever sent from this system.
@@ -23,6 +24,9 @@ const json = (body: unknown, status = 200) =>
 const MODEL = 'google/gemini-2.5-flash';
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'prospect-first-touch');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -45,8 +49,8 @@ Deno.serve(async (req) => {
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
   const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', userId);
-  const isOperator = (roles ?? []).some((r: { role: string }) => r.role !== 'client');
-  if (!isOperator) return json({ error: 'forbidden' }, 403);
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin');
+  if (!isAdmin) return json({ error: 'forbidden' }, 403);
 
   let body: any = {};
   try { body = await req.json(); } catch { /* empty */ }

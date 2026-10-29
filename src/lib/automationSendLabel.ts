@@ -16,28 +16,46 @@ export interface DeliveryLabel {
 export function deliveryLabel(item: {
   status: QueueStatus;
   send_result: Record<string, unknown> | null;
+  delivery_status?: QueueItem["delivery_status"];
 }): DeliveryLabel {
-  if (item.status !== "sent") {
-    return { label: item.status, tone: "default", providerMsgId: null, provider: null };
-  }
   const result = (item.send_result ?? {}) as Record<string, unknown>;
   const provider = typeof result.provider === "string" ? result.provider : null;
-  const providerMsgId = typeof result.id === "string" ? result.id : null;
-  if (provider === "resend") {
-    return { label: "sent", tone: "success", providerMsgId, provider };
+  const providerMsgId = typeof result.provider_message_id === "string" ? result.provider_message_id : typeof result.id === "string" ? result.id : null;
+  const state = item.delivery_status ?? result.delivery_status;
+  if (item.status === "approved" || item.status === "sending") {
+    return { label: item.status === "approved" ? "queued (approved)" : "sending", tone: "default", providerMsgId, provider };
   }
-  if (provider === "manual_log") {
+  if (state === "unconfirmed" || (item.status === "failed" && String(result.error ?? "").startsWith("stranded"))) {
+    return { label: "unconfirmed — verify before retry", tone: "destructive", providerMsgId, provider };
+  }
+  if (state === "bounced") return { label: "bounced", tone: "destructive", providerMsgId, provider };
+  if (item.status !== "sent") return { label: item.status, tone: item.status === "failed" ? "destructive" : "default", providerMsgId, provider };
+  if (state === "delivered") return { label: "delivered", tone: "success", providerMsgId, provider };
+  if (state === "logged" || provider === "manual_log") {
     return { label: "logged (not delivered)", tone: "muted", providerMsgId: null, provider };
   }
-  return { label: "sent (unverified)", tone: "muted", providerMsgId: null, provider };
+  if (state === "provider_accepted" || provider === "resend") {
+    return { label: "provider accepted · delivery unconfirmed", tone: "default", providerMsgId, provider };
+  }
+  return { label: "delivery unconfirmed", tone: "muted", providerMsgId, provider };
 }
 
-export function isRealDelivery(item: Pick<QueueItem, "status" | "send_result">): boolean {
-  return item.status === "sent" && (item.send_result as any)?.provider === "resend";
+export function isRealDelivery(item: Pick<QueueItem, "status" | "send_result" | "delivery_status">): boolean {
+  return item.status === "sent" && (item.delivery_status ?? item.send_result?.delivery_status) === "delivered";
+}
+
+export function isProviderAccepted(item: Pick<QueueItem, "status" | "send_result" | "delivery_status">): boolean {
+  return item.status === "sent" && !isRealDelivery(item) && (item.delivery_status === "provider_accepted" || item.send_result?.provider === "resend");
 }
 
 export function isLoggedOnly(item: Pick<QueueItem, "status" | "send_result">): boolean {
   return item.status === "sent" && (item.send_result as any)?.provider === "manual_log";
+}
+
+export function canRetryDelivery(item: Pick<QueueItem, "status" | "send_result" | "delivery_status">): boolean {
+  const state = item.delivery_status ?? item.send_result?.delivery_status;
+  return item.status === "failed" && state !== "unconfirmed" && state !== "bounced"
+    && !String(item.send_result?.error ?? "").startsWith("stranded");
 }
 
 export function shortMsgId(id: string | null | undefined): string | null {

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -31,6 +32,9 @@ async function getCompanyId(token: string): Promise<number> {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'seven-shifts-proxy');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

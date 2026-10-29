@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole, LayoutType, Venue, UserVenueRole, roleToLayout } from '@/types/roles';
@@ -16,15 +16,29 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, role: verifiedRole, isLoading: authLoading } = useAuth();
   const [currentRole, setCurrentRole] = useState<UserRole | null>(null);
   const [currentVenue, setCurrentVenueState] = useState<Venue | null>(null);
   const [allVenueRoles, setAllVenueRoles] = useState<UserVenueRole[]>([]);
   const [layout, setLayout] = useState<LayoutType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const userId = user?.id;
+  const requestRef = useRef(0);
+  const identityRef = useRef(userId);
+  identityRef.current = userId;
 
   const loadRoles = useCallback(async () => {
-    if (!user) {
+    const request = ++requestRef.current;
+    const isCurrent = () => requestRef.current === request && identityRef.current === userId;
+    setCurrentRole(null);
+    setCurrentVenueState(null);
+    setAllVenueRoles([]);
+    setLayout(null);
+    if (authLoading) {
+      setIsLoading(true);
+      return;
+    }
+    if (!userId || !verifiedRole) {
       setCurrentRole(null);
       setCurrentVenueState(null);
       setAllVenueRoles([]);
@@ -33,13 +47,25 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
+    // Global client authority wins over legacy venue-role labels. A designated
+    // client may have membership in either assignment table, but never receives
+    // an operator layout or home route from an old venue role.
+    if (verifiedRole === 'client') {
+      setCurrentRole('client');
+      setLayout('client');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // Fetch venue roles - cast to work around types not being regenerated yet
       const { data: roles, error } = await (supabase
         .from('user_venue_roles' as any)
         .select('*')
-        .eq('user_id', user.id)) as { data: UserVenueRole[] | null; error: any };
+        .eq('user_id', userId)) as { data: UserVenueRole[] | null; error: any };
 
+      if (!isCurrent()) return;
       if (error) {
         console.error('Error fetching venue roles:', error);
         setIsLoading(false);
@@ -48,23 +74,16 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (!roles || roles.length === 0) {
         // No venue roles assigned - map legacy role to a valid UserRole
-        const { data: legacyRole } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (legacyRole?.role) {
-          const legacyMap: Record<string, { role: UserRole; layout: LayoutType }> = {
-            admin: { role: 'owner', layout: 'portfolio' },
-            owner: { role: 'owner', layout: 'portfolio' },
-            gm: { role: 'gm', layout: 'venue-leadership' },
-            manager: { role: 'gm', layout: 'venue-leadership' },
-            shift_lead: { role: 'lead', layout: 'shift-execution' },
-            lead: { role: 'lead', layout: 'shift-execution' },
-            client: { role: 'client', layout: 'client' },
-          };
-          const mapped = legacyMap[legacyRole.role] || { role: 'foh' as UserRole, layout: 'shift-execution' as LayoutType };
+        const legacyMap: Partial<Record<typeof verifiedRole, { role: UserRole; layout: LayoutType }>> = {
+          admin: { role: 'owner', layout: 'portfolio' },
+          owner: { role: 'owner', layout: 'portfolio' },
+          gm: { role: 'gm', layout: 'venue-leadership' },
+          manager: { role: 'gm', layout: 'venue-leadership' },
+          shift_lead: { role: 'lead', layout: 'shift-execution' },
+          staff: { role: 'foh', layout: 'shift-execution' },
+        };
+        const mapped = legacyMap[verifiedRole];
+        if (mapped) {
           setCurrentRole(mapped.role);
           setLayout(mapped.layout);
         }
@@ -102,19 +121,25 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .eq('id', primaryRole.venue_id)
           .maybeSingle();
 
-        if (venue) {
+        if (isCurrent() && venue) {
           setCurrentVenueState(venue as Venue);
         }
       }
     } catch (err) {
+      if (!isCurrent()) return;
       console.error('Error in loadRoles:', err);
+      setCurrentRole(null);
+      setAllVenueRoles([]);
+      setCurrentVenueState(null);
+      setLayout(null);
     } finally {
-      setIsLoading(false);
+      if (isCurrent()) setIsLoading(false);
     }
-  }, [user]);
+  }, [userId, verifiedRole, authLoading]);
 
   useEffect(() => {
-    loadRoles();
+    void loadRoles();
+    return () => { requestRef.current += 1; };
   }, [loadRoles]);
 
   const setCurrentVenue = useCallback(async (venueId: string | null) => {
@@ -127,13 +152,15 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
+    const userId = identityRef.current;
+    if (!userId) return;
     const { data: venue } = await supabase
       .from('venues')
       .select('id, name, address')
       .eq('id', venueId)
       .maybeSingle();
 
-    if (venue) {
+    if (identityRef.current === userId && venue) {
       setCurrentVenueState(venue as Venue);
       // Owner drilling into a venue gets venue-leadership layout
       if (currentRole === 'owner') {

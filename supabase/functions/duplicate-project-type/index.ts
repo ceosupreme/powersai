@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -21,6 +22,9 @@ function json(status: number, payload: unknown) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'duplicate-project-type');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   // 1) Caller resolution — hard-fail if we can't identify the user.
@@ -79,79 +83,9 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!source) return json(404, { error: 'source_not_found' });
 
-  // 4) Deep-copy via a plpgsql block so it's atomic.
-  const sql = `
-DO $dup$
-DECLARE
-  next_sort int;
-BEGIN
-  SELECT COALESCE(MAX(sort_order), 0) + 1 INTO next_sort FROM public.project_types;
-
-  INSERT INTO public.project_types (id, label, description, is_vertical, display_defaults, sort_order, slug)
-  VALUES (${quoteLit(new_id)}, ${quoteLit(new_label)}, ${nullOr(source.description)},
-          ${is_vertical ? 'true' : 'false'},
-          ${jsonLit(source.display_defaults)},
-          next_sort,
-          ${quoteLit(new_id)});
-
-  INSERT INTO public.pillar_templates
-    (project_type, pillar_key, pillar_label, weight, sort_order, data_source)
-  SELECT ${quoteLit(new_id)}, pillar_key, pillar_label, weight, sort_order, data_source
-  FROM public.pillar_templates WHERE project_type = ${quoteLit(source_id)};
-
-  INSERT INTO public.project_type_leak_vectors
-    (project_type, name, detect_signal, dollarize_formula, benchmark, severity, sort_order, risk_type, risk_multiplier)
-  SELECT ${quoteLit(new_id)}, name, detect_signal, dollarize_formula, benchmark, severity, sort_order, risk_type, risk_multiplier
-  FROM public.project_type_leak_vectors WHERE project_type = ${quoteLit(source_id)};
-
-  INSERT INTO public.project_type_qualifier_fields
-    (project_type, field_key, field_label, field_type, is_shared, channel, sort_order)
-  SELECT ${quoteLit(new_id)}, field_key, field_label, field_type, is_shared, channel, sort_order
-  FROM public.project_type_qualifier_fields WHERE project_type = ${quoteLit(source_id)};
-
-  INSERT INTO public.project_type_qualifier_config
-    (project_type, ready_definition, primary_channel, urgency_options, operation_footprint_options)
-  SELECT ${quoteLit(new_id)}, ready_definition, primary_channel, urgency_options, operation_footprint_options
-  FROM public.project_type_qualifier_config WHERE project_type = ${quoteLit(source_id)};
-END $dup$;
-`;
-  const { error: sqlErr } = await admin.rpc('exec_sql' as any, { sql }).single();
-  // exec_sql may not exist — fall back to running via pg through PostgREST is impossible.
-  // Instead, do sequential inserts wrapped in try/catch with manual rollback via delete.
-  if (sqlErr) {
-    // Fallback path: run sequential inserts, then compensate on failure.
-    return await sequentialCopy(admin, source, new_id, new_label, is_vertical);
-  }
-
-  const counts = await countCopies(admin, new_id);
-  return json(200, { ok: true, id: new_id, copied: counts });
+  // Copy through the typed table APIs. There is deliberately no arbitrary-SQL RPC.
+  return await sequentialCopy(admin, source, new_id, new_label, is_vertical);
 });
-
-function quoteLit(s: string) {
-  return `'${String(s).replace(/'/g, "''")}'`;
-}
-function nullOr(v: string | null | undefined) {
-  return v == null ? 'NULL' : quoteLit(v);
-}
-function jsonLit(v: unknown) {
-  if (v == null) return 'NULL';
-  return `${quoteLit(JSON.stringify(v))}::jsonb`;
-}
-
-async function countCopies(admin: SupabaseClient, new_id: string) {
-  const [a, b, c, d] = await Promise.all([
-    admin.from('pillar_templates').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
-    admin.from('project_type_leak_vectors').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
-    admin.from('project_type_qualifier_fields').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
-    admin.from('project_type_qualifier_config').select('*', { count: 'exact', head: true }).eq('project_type', new_id),
-  ]);
-  return {
-    pillar_templates: a.count ?? 0,
-    project_type_leak_vectors: b.count ?? 0,
-    project_type_qualifier_fields: c.count ?? 0,
-    project_type_qualifier_config: d.count ?? 0,
-  };
-}
 
 async function sequentialCopy(
   admin: SupabaseClient,
