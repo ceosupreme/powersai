@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { passesSanityCheck, resolveSanityMetric } from '../_shared/sanity-check.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -3539,6 +3540,9 @@ async function processWithConcurrency<T>(
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'generate-daily-insights');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

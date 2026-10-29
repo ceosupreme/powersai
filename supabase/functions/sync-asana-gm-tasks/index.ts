@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Syncs each venue's GM Asana task workload into asana_gm_tasks cache.
 // Strategy: completed_since=now-14d returns ALL incomplete tasks (any age) +
@@ -75,6 +76,9 @@ async function fetchGmTasks(
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'sync-asana-gm-tasks');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

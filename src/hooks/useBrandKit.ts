@@ -52,7 +52,9 @@ export function useBrandKitData(projectId: string | null | undefined, opts: { in
       .insert({ project_id: projectId!, created_by: uid })
       .select('*').single();
     if (error) throw error;
-    qc.setQueryData(['brand-kit', projectId], data);
+    // A late mutation may outlive its signed-in tree. Refetch under the current
+    // session instead of putting the old response into the shared cache.
+    void qc.invalidateQueries({ queryKey: ['brand-kit', projectId] });
     return (data as BrandKit).id;
   };
 
@@ -190,8 +192,9 @@ export function useSaveKit(projectId: string | null | undefined) {
       if (error) throw error;
       return data as BrandKit;
     },
-    onSuccess: (data) => {
-      qc.setQueryData(['brand-kit', projectId], data);
+    onSuccess: () => {
+      // Refetch with the current session; never cache an old identity's response.
+      void qc.invalidateQueries({ queryKey: ['brand-kit', projectId] });
       toast.success('Saved');
     },
     onError: (e: any) => toast.error(e.message ?? 'Save failed'),

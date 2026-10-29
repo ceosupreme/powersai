@@ -29,21 +29,23 @@ export async function fetchEffectivePillars(
   projectId: string,
   projectType: ProjectType,
 ): Promise<EffectivePillar[]> {
-  const { data: overrides } = await supabase
+  const { data: overrides, error: overridesError } = await supabase
     .from('project_pillar_overrides')
     .select('pillar_key,pillar_label,weight,sort_order,data_source')
     .eq('project_id', projectId)
     .order('sort_order', { ascending: true });
+  if (overridesError) throw overridesError;
 
   if (overrides && overrides.length > 0) {
     return overrides.map((o) => ({ ...o, source: 'override' as const }));
   }
 
-  const { data: templates } = await supabase
+  const { data: templates, error: templatesError } = await supabase
     .from('pillar_templates')
     .select('pillar_key,pillar_label,weight,sort_order,data_source')
     .eq('project_type', projectType)
     .order('sort_order', { ascending: true });
+  if (templatesError) throw templatesError;
 
   return (templates || []).map((t) => ({ ...t, source: 'template' as const }));
 }

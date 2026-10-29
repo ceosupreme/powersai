@@ -1,40 +1,53 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
-import { confirmSession, isSessionActive, serviceClient, validKey } from '../_shared/checkoutConfirm.ts';
+import { confirmSession, isSessionActive, serviceClient, validKey, keyMode, PRODUCT_NAMES } from '../_shared/checkoutConfirm.ts';
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
+import { claimWorker } from '../_shared/worker-lease.ts';
+import { scanCheckoutPages, type CheckoutCheckpoint } from '../_shared/checkout-scan.ts';
 
 const json = (d: unknown, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
-/**
- * Who may run the payment backup check: the hourly database schedule (cron job reconcile-checkouts-hourly),
- * which sends the job token kept in the database vault, or anyone holding the service key for a manual run.
- * The token is checked in the database (verify_job_token), so its value never has to live in this function.
- */
-async function allowed(req: Request) {
-  const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-  if (!service) return false;
-  const bearer = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
-  if (bearer === service) return true;
-  const token = req.headers.get('x-job-token') ?? '';
-  if (token.length < 32) return false;
-  const { data, error } = await serviceClient().rpc('verify_job_token', { p_job: 'reconcile-checkouts', p_token: token });
-  if (error) console.error('[reconcile] token check', error.message);
-  return data === true;
-}
-
+// The shared guard verifies admins, the service key, and scoped Vault job tokens.
+// It retains the existing verify_job_token fallback during the cron cutover.
 Deno.serve(async (req) => {
+  const denied = await guardEdgeRequest(req, 'reconcile-checkouts');
+  if (denied) return denied;
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  if (!(await allowed(req))) return json({ error: 'Unauthorized' }, 401);
   const key = Deno.env.get('STRIPE_SECRET_KEY');
   if (!validKey(key)) return json({ error: 'Checkout unavailable' }, 503);
-  const since = Math.floor(Date.now() / 1000) - 48 * 3600;
-  const url = `https://api.stripe.com/v1/checkout/sessions?created[gte]=${since}&limit=50&expand[]=data.payment_intent&expand[]=data.subscription`;
-  const r = await fetch(url, { headers: { Authorization: `Bearer ${key}` } });
-  if (!r.ok) { console.error('[reconcile] stripe', r.status); return json({ error: 'Stripe list failed' }, 502); }
-  const list = await r.json();
-  let checked = 0, confirmed = 0;
-  for (const s of list.data ?? []) {
-    checked++;
-    if (!isSessionActive(s)) continue;
-    try { if ((await confirmSession(s)).confirmed) confirmed++; } catch (e) { console.error('[reconcile]', s.id, e); }
+  const sb = serviceClient();
+  let lease: Awaited<ReturnType<typeof claimWorker>> = null;
+  let confirmed = 0;
+  try {
+    lease = await claimWorker(sb, `reconcile-checkouts:${keyMode(key)}`);
+    if (!lease) return json({ ok: true, skipped: 'already_running' });
+    const scan = await scanCheckoutPages<any>({
+      state: lease.state as CheckoutCheckpoint, now: Math.floor(Date.now() / 1000), maxPages: 5,
+      save: async (state) => { await lease!.save({ ...state }); },
+      fetchPage: async ({ window_start, window_end, starting_after }) => {
+        const params = new URLSearchParams({ 'created[gte]': String(window_start), 'created[lte]': String(window_end), limit: '100' });
+        params.append('expand[]', 'data.payment_intent'); params.append('expand[]', 'data.subscription');
+        if (starting_after) params.set('starting_after', starting_after);
+        const r = await fetch(`https://api.stripe.com/v1/checkout/sessions?${params}`, {
+          headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(20_000),
+        });
+        if (!r.ok) throw new Error(`stripe_list_failed:${r.status}`);
+        return await r.json();
+      },
+      process: async (s) => {
+        if (!isSessionActive(s) || !Object.hasOwn(PRODUCT_NAMES, s.metadata?.product_key ?? '')) return;
+        const result = await confirmSession(s);
+        if (!result.confirmed) throw new Error(`confirmation_failed:${s.id}`);
+        // confirmSession's public path can tolerate a lead-write error. The checkpoint cannot.
+        const { data: order, error } = await sb.from('site_orders').select('lead_id').eq('stripe_session_id', s.id).single();
+        if (error || !order?.lead_id) throw new Error(`confirmation_incomplete:${s.id}`);
+        confirmed++;
+      },
+    });
+    return json({ ok: true, ...scan, confirmed, resume_required: !scan.complete });
+  } catch (e) {
+    console.error('[reconcile] checkpoint retained for retry', String(e));
+    return json({ ok: false, error: 'reconciliation_incomplete', confirmed }, 503);
+  } finally {
+    if (lease) await lease.release();
   }
-  return json({ ok: true, checked, confirmed });
 });

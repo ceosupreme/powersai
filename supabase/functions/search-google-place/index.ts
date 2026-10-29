@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -6,6 +7,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'search-google-place');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

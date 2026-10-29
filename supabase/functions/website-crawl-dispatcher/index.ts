@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // website-crawl-dispatcher — fan out per-venue weekly crawl OR daily PSI calls
 // with stagger. Cron invokes this once; this function enqueues the per-venue
 // invocations via background HTTP calls (fire-and-forget) so each one runs in
@@ -11,6 +12,9 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'website-crawl-dispatcher');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   let body: { mode?: 'weekly' | 'daily'; stagger_ms?: number } = {};

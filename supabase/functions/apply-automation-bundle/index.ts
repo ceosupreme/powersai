@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Batch-applies an automation bundle to a project. Writes project_automation_enrollments rows.
 // Non-destructive by default (skip existing); overwrite='replace' updates configs.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -11,6 +12,9 @@ function json(body: unknown, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'apply-automation-bundle');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const auth = req.headers.get("Authorization") ?? "";

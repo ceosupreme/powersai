@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import {
   useNextTenAcrossProjects,
   useCompleteNextTenRow,
+  nextTenEmptyMessage,
   type NextTenRow,
 } from '@/hooks/useNextTen';
 import { useUpsertProjectKpiValue } from '@/hooks/useProjectKpis';
@@ -56,7 +57,7 @@ export const AllProjectsNextTen = ({
 
   const saveKpi = async (row: NextTenRow) => {
     const num = kpiValue.trim() === '' ? null : Number(kpiValue);
-    if (num == null || Number.isNaN(num)) return toast.error('Enter a number');
+    if (num == null || !Number.isFinite(num)) return toast.error('Enter a finite number');
     setBusy(row.key);
     try {
       await upsertKpi.mutateAsync({
@@ -104,15 +105,14 @@ export const AllProjectsNextTen = ({
               <div className="flex items-start gap-2 text-xs text-amber-600 mb-2">
                 <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                 <span>
-                  Could not check {unavailable.join(', ')} for at least one project. Items from those sources may be missing below.
+                  Could not check {unavailable.join(', ')} for at least one project. Items from those sources may be missing below.{' '}
+                  <button className="underline" onClick={() => void refetch()}>Try again</button>
                 </span>
               </div>
             )}
             {rows.length === 0 ? (
               <p className="text-xs text-muted-foreground">
-                {unavailable.length > 0
-                  ? 'Nothing could be loaded.'
-                  : 'Nothing outstanding right now — add an action, a KPI target or a money lane.'}
+                {nextTenEmptyMessage(data)}
               </p>
             ) : (
               <ul>

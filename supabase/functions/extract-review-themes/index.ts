@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // extract-review-themes
 // Reads google_reviews rows that have not yet been processed (no row in
 // review_extraction_runs) and asks Lovable AI to extract normalized themes
@@ -92,6 +93,9 @@ function normalizeLabel(s: string): string {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'extract-review-themes');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');

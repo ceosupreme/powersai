@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ============================================================================
 // compliance-sweep — daily rolling labor compliance pass
 // ============================================================================
@@ -33,6 +34,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'compliance-sweep');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {

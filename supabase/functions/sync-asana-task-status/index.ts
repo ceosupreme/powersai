@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Polls Asana for status of approved action_items and writes back.
 // Triggered every 15 minutes via pg_cron.
@@ -46,6 +47,9 @@ async function fetchAsanaTask(token: string, gid: string): Promise<AsanaTask | n
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'sync-asana-task-status');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('asana', corsHeaders);

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -6,6 +7,9 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'delete-user');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

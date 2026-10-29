@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -18,6 +19,9 @@ function simpleHash(str: string): string {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'sync-google-ratings');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

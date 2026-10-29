@@ -15,7 +15,7 @@ import {
 import { type AutomationKey, useAutomationEnrollments } from "@/hooks/useAutomationEnrollments";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
-import { deliveryLabel, isRealDelivery, isLoggedOnly, shortMsgId, describeSendError } from "@/lib/automationSendLabel";
+import { deliveryLabel, isRealDelivery, isProviderAccepted, isLoggedOnly, shortMsgId, describeSendError, canRetryDelivery } from "@/lib/automationSendLabel";
 
 const AUTOMATION_LABELS: Record<AutomationKey, string> = {
   followup_sequence: "Follow-up",
@@ -28,7 +28,7 @@ export default function AutomationInbox() {
   const projectId = selectedBar?.id ?? null;
   const [automation, setAutomation] = useState<AutomationKey | "all">("all");
   const [status, setStatus] = useState<QueueStatus | "all">("pending_review");
-  const [sentSubFilter, setSentSubFilter] = useState<"all" | "delivered" | "logged">("all");
+  const [sentSubFilter, setSentSubFilter] = useState<"all" | "accepted" | "delivered" | "logged">("all");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
 
   const { data: rawItems = [], isLoading } = useAutomationQueue({
@@ -40,7 +40,7 @@ export default function AutomationInbox() {
   const items = useMemo(() => {
     if (status !== "sent" || sentSubFilter === "all") return rawItems;
     return rawItems.filter((i) =>
-      sentSubFilter === "delivered" ? isRealDelivery(i) : isLoggedOnly(i),
+      sentSubFilter === "delivered" ? isRealDelivery(i) : sentSubFilter === "accepted" ? isProviderAccepted(i) : isLoggedOnly(i),
     );
   }, [rawItems, status, sentSubFilter]);
   const { data: enrollments = [] } = useAutomationEnrollments(projectId);
@@ -54,6 +54,7 @@ export default function AutomationInbox() {
       pending_review: src.filter((i) => i.status === "pending_review").length,
       approved: src.filter((i) => i.status === "approved").length,
       delivered: src.filter((i) => isRealDelivery(i)).length,
+      accepted: src.filter((i) => isProviderAccepted(i)).length,
       logged: src.filter((i) => isLoggedOnly(i)).length,
     };
   }, [rawItems]);
@@ -78,6 +79,7 @@ export default function AutomationInbox() {
           <Badge variant="outline">Pending: {counts.pending_review}</Badge>
           <Badge variant="outline">Approved: {counts.approved}</Badge>
           <Badge variant="outline">Delivered: {counts.delivered}</Badge>
+          <Badge variant="outline">Provider accepted: {counts.accepted}</Badge>
           <Badge variant="outline" className="text-muted-foreground">
             Logged: {counts.logged}
           </Badge>
@@ -104,7 +106,7 @@ export default function AutomationInbox() {
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="pending_review">Pending review</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="sent">Sent / logged</SelectItem>
+            <SelectItem value="sent">Accepted / delivered / logged</SelectItem>
             <SelectItem value="failed">Failed</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>
             <SelectItem value="canceled">Canceled</SelectItem>
@@ -114,7 +116,8 @@ export default function AutomationInbox() {
           <Select value={sentSubFilter} onValueChange={(v) => setSentSubFilter(v as any)}>
             <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All sent / logged</SelectItem>
+              <SelectItem value="all">All processed</SelectItem>
+              <SelectItem value="accepted">Provider accepted only</SelectItem>
               <SelectItem value="delivered">Delivered only</SelectItem>
               <SelectItem value="logged">Logged only</SelectItem>
             </SelectContent>
@@ -153,7 +156,7 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
       ? "text-emerald-600 font-medium"
       : label.tone === "muted"
       ? "text-muted-foreground italic"
-      : "";
+      : label.tone === "destructive" ? "text-destructive font-medium" : "";
 
   return (
     <Card className="p-4 space-y-3">
@@ -212,7 +215,7 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
       )}
       {item.status === "approved" && (
         <div className="flex justify-end">
-          <Button size="sm" onClick={async () => {
+          <Button size="sm" disabled={!!item.scheduled_for && new Date(item.scheduled_for).getTime() > Date.now()} onClick={async () => {
             try { await sendNow.mutateAsync(item.id); toast.success("Send attempted"); }
             catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
           }}>Send now</Button>
@@ -232,7 +235,7 @@ function QueueRow({ item, isClientMode }: { item: QueueItem; isClientMode: boole
               } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
             }}>Suppress recipient</Button>
           )}
-          <Button size="sm" onClick={async () => {
+          <Button size="sm" disabled={!canRetryDelivery(item)} title={!canRetryDelivery(item) ? "Verify the provider outcome before retrying." : undefined} onClick={async () => {
             try { await retry.mutateAsync(item.id); toast.success("Re-queued for sending"); }
             catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
           }}>Retry</Button>

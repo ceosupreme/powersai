@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Reads an inbound_lead and returns a structured project-setup proposal.
 // Direct fields are extracted deterministically; interpreted fields come from
 // Lovable AI Gateway (google/gemini-2.5-flash, strict JSON). NEVER writes config.
@@ -64,6 +65,9 @@ function inferTimezoneFromAddress(addr: string | null): string | null {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'lead-to-project-proposal');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {

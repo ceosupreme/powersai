@@ -34,9 +34,8 @@ const PRIORITY_TONE: Record<number, string> = {
 export const waitingOnMeKey = (ids: string[]) => ['waiting-on-me', ids.join(',')] as const;
 
 /**
- * Open action items across the given projects. Decisions (Proposed, Unreviewed,
- * Pending or no approval state) rank first; completed items never show; snoozed
- * items are returned separately so they can be un-snoozed.
+ * Decisions awaiting the owner. Approved work stays in Next 10; snoozed open
+ * work is returned separately so it can still be restored.
  */
 export function useWaitingOnMe(projects: { id: string; name: string }[]) {
   const ids = projects.map((p) => p.id);
@@ -51,7 +50,6 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
         .from('action_items')
         .select('id,title,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
-        .neq('status', 'Done')
         .order('created_at', { ascending: true });
       if (error) throw error;
 
@@ -81,14 +79,14 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
           } as WaitingRow;
         });
       return {
-        open: rows.filter((r) => !isSnoozed(r.snoozed_until, now)),
+        open: rows.filter((r) => needsDecision(r.approval_status) && !isSnoozed(r.snoozed_until, now)),
         snoozed: rows.filter((r) => isSnoozed(r.snoozed_until, now)),
       };
     },
   });
 }
 
-type WaitingAction = 'approve' | 'reject' | 'snooze' | 'unsnooze' | 'complete';
+type WaitingAction = 'approve' | 'reject' | 'snooze' | 'unsnooze';
 
 function useWaitingMutation(ids: string[]) {
   const qc = useQueryClient();
@@ -105,8 +103,6 @@ function useWaitingMutation(ids: string[]) {
         patch = { snoozed_until: new Date(Date.now() + 7 * 86400_000).toISOString() };
       } else if (action === 'unsnooze') {
         patch = { snoozed_until: null };
-      } else {
-        patch = { status: 'Done', completed_at: nowIso, completed_by: user?.id ?? null };
       }
       const { error } = await supabase.from('action_items').update(patch).eq('id', id);
       if (error) throw error;
@@ -123,9 +119,7 @@ function useWaitingMutation(ids: string[]) {
             ? 'Rejected'
             : v.action === 'snooze'
               ? 'Snoozed for a week'
-              : v.action === 'unsnooze'
-                ? 'Back on the list'
-                : 'Marked done',
+              : 'Back on the list',
       );
     },
     onError: (e: any) => toast.error(e?.message ?? 'Could not update that item'),
@@ -164,9 +158,6 @@ function RowActions({
           Snooze
         </Button>
       )}
-      <Button size="sm" variant="outline" className="h-7 text-xs" disabled={busy} onClick={() => onRun('complete')}>
-        Complete
-      </Button>
     </div>
   );
 }
@@ -177,7 +168,7 @@ const fmtDate = (iso: string | null) => {
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 };
 
-/** "Waiting on me" — decisions first, then open work across the chosen projects. */
+/** "Waiting on me" contains decisions; approved execution lives in Next 10. */
 export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string }[] }) => {
   const ids = projects.map((p) => p.id);
   const { data, isLoading, isError, error, refetch } = useWaitingOnMe(projects);
@@ -246,7 +237,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           Waiting on me
           {!isLoading && !isError && open.length > 0 && (
             <span className="ml-2 normal-case tracking-normal text-xs text-muted-foreground">
-              {decisions} to decide · {open.length - decisions} to do
+              {decisions} to decide
             </span>
           )}
         </CardTitle>
@@ -266,7 +257,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             </div>
           </div>
         ) : open.length === 0 && snoozed.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Nothing waiting on you right now.</p>
+          <p className="text-xs text-muted-foreground">No decisions waiting on you right now.</p>
         ) : (
           <>
             {top.length > 0 && (

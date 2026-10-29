@@ -8,12 +8,16 @@ import { scoreKpisForPillar, ScoredKpi } from '@/lib/kpiScoring';
 import { EffectivePillar } from '@/lib/effectivePillars';
 import { ManualPillarCard } from './ManualPillarCard';
 import { ProjectOneGlance } from './ProjectOneGlance';
+import { ScoreDataStatus } from './ScoreDataStatus';
+import { useProjectScoreCoverage } from '@/hooks/useProjectScoreCoverage';
 
 interface Props {
   projectId: string;
   weekStart: string;
   pillars: EffectivePillar[];
   canEdit: boolean;
+  dataUnavailable?: boolean;
+  isLoading?: boolean;
   /** Hide the one-glance sections (e.g. when embedded in a page that has them). */
   showOneGlance?: boolean;
 }
@@ -29,6 +33,8 @@ export const NonClientPillarsDashboard = ({
   weekStart,
   pillars,
   canEdit,
+  dataUnavailable = false,
+  isLoading = false,
   showOneGlance = true,
 }: Props) => {
   const { data: scoreRows = [] } = useProjectPillarScores(projectId, weekStart);
@@ -36,6 +42,7 @@ export const NonClientPillarsDashboard = ({
   const { data: kpiValues = [] } = useProjectKpiValues(projectId, weekStart);
   const upsertPillar = useUpsertProjectPillarScore();
   const syncedRef = useRef<Set<string>>(new Set());
+  const coverageState = useProjectScoreCoverage(projectId, weekStart, pillars, dataUnavailable);
 
   const byKey = new Map(scoreRows.map((r) => [r.pillar_key, r]));
 
@@ -53,7 +60,7 @@ export const NonClientPillarsDashboard = ({
 
   // Keep project_pillar_scores in sync so every screen reading it keeps working.
   useEffect(() => {
-    if (!projectId || !weekStart) return;
+    if (!canEdit || coverageState.coverage.unavailable || coverageState.isLoading || isLoading || !projectId || !weekStart) return;
     for (const [pillarKey, { pillarScore }] of kpiByPillar) {
       if (pillarScore == null) continue;
       const existing = byKey.get(pillarKey)?.score;
@@ -68,10 +75,10 @@ export const NonClientPillarsDashboard = ({
         pillar_key: pillarKey,
         score: rounded,
         note: byKey.get(pillarKey)?.note ?? null,
-      });
+      }, { onError: () => syncedRef.current.delete(marker) });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, weekStart, kpiByPillar, scoreRows]);
+  }, [projectId, weekStart, kpiByPillar, scoreRows, canEdit, coverageState.coverage.unavailable, coverageState.isLoading, isLoading]);
 
   // Weighted overall across pillars with a score (computed wins over manual)
   const scored = pillars
@@ -109,6 +116,7 @@ export const NonClientPillarsDashboard = ({
             fabricated number.
           </p>
         </div>
+        <ScoreDataStatus coverage={coverageState.coverage} isLoading={coverageState.isLoading || isLoading} className="mt-3" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,7 +133,7 @@ export const NonClientPillarsDashboard = ({
               weight={Number(p.weight)}
               currentScore={row?.score ?? null}
               note={row?.note ?? null}
-              canEdit={canEdit}
+              canEdit={canEdit && !dataUnavailable && !isLoading}
               kpis={kpi?.kpis ?? []}
               computedScore={kpi?.pillarScore ?? null}
             />

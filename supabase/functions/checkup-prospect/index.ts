@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // checkup-prospect — runs the cold checkup for ONE mined prospect and stores
 // the leak totals back on the prospects row. Called sequentially (one prospect
 // per invocation, with a client-side delay between calls) so a single slow or
@@ -87,6 +88,9 @@ function slugify(s: string): string {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'checkup-prospect');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
@@ -103,8 +107,8 @@ Deno.serve(async (req) => {
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
   const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', userId);
-  const isOperator = (roles ?? []).some((r: { role: string }) => r.role !== 'client');
-  if (!isOperator) return json({ error: 'forbidden' }, 403);
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin');
+  if (!isAdmin) return json({ error: 'forbidden' }, 403);
 
   let body: any = {};
   try { body = await req.json(); } catch { /* empty */ }

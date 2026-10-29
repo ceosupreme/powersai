@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Per-venue setup: ensures the "Marketing Efforts" section + 10 marketing
 // custom fields exist on the venue's quarterly Asana project, persists their
@@ -19,6 +20,9 @@ import {
 const ASANA_BASE = "https://app.asana.com/api/1.0";
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'marketing-asana-setup');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('asana', corsHeaders);

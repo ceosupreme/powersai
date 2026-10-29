@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -25,6 +26,9 @@ async function getToastToken(clientId?: string, clientSecret?: string): Promise<
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'test-toast-kds');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -49,14 +53,14 @@ serve(async (req) => {
     if (venueId) {
       const { data: venue } = await supabaseAdmin
         .from('venues')
-        .select('name, toast_restaurant_guid, toast_client_id, toast_client_secret')
+        .select('name, toast_restaurant_guid, toast_client_id')
         .eq('id', venueId)
         .single();
       
       if (venue) {
         restaurantGuid = venue.toast_restaurant_guid || undefined;
         toastClientId = venue.toast_client_id || undefined;
-        toastClientSecret = venue.toast_client_secret || undefined;
+        toastClientSecret = Deno.env.get('TOAST_CLIENT_SECRET');
         console.log(`[KDS-DIAG] Venue: ${venue.name}, GUID: ${restaurantGuid}`);
       }
     }

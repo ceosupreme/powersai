@@ -1,16 +1,81 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ChatMessageWithProfile } from '@/types/chat';
 import { useAuth } from '@/context/AuthContext';
+
+export const messageQueryKey = (channelId: string | null, userId: string | null | undefined) =>
+  ['chat-messages', channelId, userId] as const;
+
+/** Cleanup also invalidates callbacks already awaiting a message lookup. Removing
+ * the realtime subscription alone does not cancel those pending continuations. */
+export function subscribeToMessages(queryClient: QueryClient, channelId: string, userId: string): () => void {
+  let active = true;
+  const abort = new AbortController();
+  const channel = supabase
+    .channel(`messages:${userId}:${channelId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'chat_messages',
+        filter: `channel_id=eq.${channelId}`,
+      },
+      async (payload) => {
+        if (!active) return;
+        if (payload.eventType === 'INSERT') {
+          // Fetch the new message with profile
+          const { data } = await supabase
+            .from('chat_messages')
+            .select(`
+              *,
+              profile:profiles!chat_messages_user_id_fkey(id, full_name, email, avatar_url)
+            `)
+            .eq('id', payload.new.id)
+            .abortSignal(abort.signal)
+            .single();
+
+          if (active && data) {
+            queryClient.setQueryData<ChatMessageWithProfile[]>(
+              messageQueryKey(channelId, userId),
+              (old) => [...(old || []), data as ChatMessageWithProfile]
+            );
+          }
+        } else if (payload.eventType === 'UPDATE') {
+          queryClient.setQueryData<ChatMessageWithProfile[]>(
+            messageQueryKey(channelId, userId),
+            (old) =>
+              old?.map((msg) =>
+                msg.id === payload.new.id
+                  ? { ...msg, ...payload.new, is_edited: true }
+                  : msg
+              ) || []
+          );
+        } else if (payload.eventType === 'DELETE') {
+          queryClient.setQueryData<ChatMessageWithProfile[]>(
+            messageQueryKey(channelId, userId),
+            (old) => old?.filter((msg) => msg.id !== payload.old.id) || []
+          );
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    active = false;
+    abort.abort();
+    void supabase.removeChannel(channel);
+  };
+}
 
 export const useMessages = (channelId: string | null) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const messagesQuery = useQuery({
-    queryKey: ['chat-messages', channelId],
-    queryFn: async (): Promise<ChatMessageWithProfile[]> => {
+    queryKey: messageQueryKey(channelId, user?.id),
+    queryFn: async ({ signal }): Promise<ChatMessageWithProfile[]> => {
       if (!channelId) return [];
 
       const { data, error } = await supabase
@@ -21,7 +86,8 @@ export const useMessages = (channelId: string | null) => {
         `)
         .eq('channel_id', channelId)
         .order('created_at', { ascending: true })
-        .limit(100);
+        .limit(100)
+        .abortSignal(signal);
 
       if (error) throw error;
       return (data || []) as ChatMessageWithProfile[];
@@ -29,62 +95,10 @@ export const useMessages = (channelId: string | null) => {
     enabled: !!channelId && !!user,
   });
 
-  // Real-time subscription for new messages
   useEffect(() => {
-    if (!channelId || !user) return;
-
-    const channel = supabase
-      .channel(`messages:${channelId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'chat_messages',
-          filter: `channel_id=eq.${channelId}`,
-        },
-        async (payload) => {
-          if (payload.eventType === 'INSERT') {
-            // Fetch the new message with profile
-            const { data } = await supabase
-              .from('chat_messages')
-              .select(`
-                *,
-                profile:profiles!chat_messages_user_id_fkey(id, full_name, email, avatar_url)
-              `)
-              .eq('id', payload.new.id)
-              .single();
-
-            if (data) {
-              queryClient.setQueryData<ChatMessageWithProfile[]>(
-                ['chat-messages', channelId],
-                (old) => [...(old || []), data as ChatMessageWithProfile]
-              );
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            queryClient.setQueryData<ChatMessageWithProfile[]>(
-              ['chat-messages', channelId],
-              (old) =>
-                old?.map((msg) =>
-                  msg.id === payload.new.id
-                    ? { ...msg, ...payload.new, is_edited: true }
-                    : msg
-                ) || []
-            );
-          } else if (payload.eventType === 'DELETE') {
-            queryClient.setQueryData<ChatMessageWithProfile[]>(
-              ['chat-messages', channelId],
-              (old) => old?.filter((msg) => msg.id !== payload.old.id) || []
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [channelId, user, queryClient]);
+    if (!channelId || !user?.id) return;
+    return subscribeToMessages(queryClient, channelId, user.id);
+  }, [channelId, user?.id, queryClient]);
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // gbp-admin-upsert-mapping — admin-only edge function to upsert a venue's
 // GBP place mapping. Bypasses RLS via service role after verifying the
 // caller is authenticated AND has the 'admin' app role.
@@ -17,6 +18,9 @@ const json = (status: number, body: unknown) =>
   });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'gbp-admin-upsert-mapping');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');

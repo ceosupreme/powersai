@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // map-pack-keywords-upsert — admin-only CRUD for map_pack_keywords.
 // Body: { venue_id, keywords: [{ id?, keyword, priority, is_active? }], delete_ids?: [...] }
 // Replaces nothing; adds/updates supplied rows and soft-removes any in delete_ids.
@@ -17,6 +18,9 @@ const json = (status: number, body: unknown) =>
   });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'map-pack-keywords-upsert');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');

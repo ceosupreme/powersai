@@ -1,8 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Task, CreateTaskInput, UpdateTaskInput, TaskFilters, TaskSort } from '@/types/tasks';
 import { toast } from '@/hooks/use-toast';
+
+/** Keep every task surface consistent after creation, reassignment or completion. */
+export function invalidateTaskQueries(queryClient: QueryClient, taskId?: string) {
+  for (const key of ['tasks', 'my-tasks', 'task-counts', 'task-badge-count']) {
+    void queryClient.invalidateQueries({ queryKey: [key] });
+  }
+  if (taskId) {
+    void queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+    void queryClient.invalidateQueries({ queryKey: ['task-activity', taskId] });
+  }
+}
 
 // Fetch tasks with filters
 export const useTasks = (filters?: TaskFilters, sort?: TaskSort) => {
@@ -42,7 +55,7 @@ export const useTasks = (filters?: TaskFilters, sort?: TaskSort) => {
       if (filters?.dueDate && filters.dueDate !== 'all') {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const todayStr = today.toISOString().split('T')[0];
+        const todayStr = format(today, 'yyyy-MM-dd');
 
         if (filters.dueDate === 'overdue') {
           query = query.lt('due_date', todayStr).neq('status', 'Done');
@@ -51,7 +64,7 @@ export const useTasks = (filters?: TaskFilters, sort?: TaskSort) => {
         } else if (filters.dueDate === 'this-week') {
           const weekEnd = new Date(today);
           weekEnd.setDate(weekEnd.getDate() + 7);
-          query = query.gte('due_date', todayStr).lte('due_date', weekEnd.toISOString().split('T')[0]);
+          query = query.gte('due_date', todayStr).lte('due_date', format(weekEnd, 'yyyy-MM-dd'));
         }
       }
 
@@ -139,7 +152,7 @@ export const useCreateTask = () => {
       return data as Task;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      invalidateTaskQueries(queryClient);
       toast({ title: 'Task created', description: 'Your task has been created successfully.' });
     },
     onError: (error) => {
@@ -193,8 +206,7 @@ export const useUpdateTask = () => {
       return data as Task;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['task', data.id] });
+      invalidateTaskQueries(queryClient, data.id);
     },
     onError: (error) => {
       console.error('Failed to update task:', error);
@@ -212,8 +224,8 @@ export const useDeleteTask = () => {
       const { error } = await supabase.from('tasks').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    onSuccess: (_data, taskId) => {
+      invalidateTaskQueries(queryClient, taskId);
       toast({ title: 'Task deleted', description: 'The task has been removed.' });
     },
     onError: (error) => {
@@ -258,7 +270,7 @@ export const useTaskCounts = () => {
   return useQuery({
     queryKey: ['task-counts', session?.user?.id],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
+      const today = format(new Date(), 'yyyy-MM-dd');
 
       const [totalResult, todoResult, inProgressResult, doneResult, overdueResult] = await Promise.all([
         supabase.from('tasks').select('id', { count: 'exact', head: true }),
@@ -267,6 +279,9 @@ export const useTaskCounts = () => {
         supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('status', 'Done'),
         supabase.from('tasks').select('id', { count: 'exact', head: true }).lt('due_date', today).neq('status', 'Done'),
       ]);
+
+      const failed = [totalResult, todoResult, inProgressResult, doneResult, overdueResult].find(result => result.error);
+      if (failed?.error) throw failed.error;
 
       return {
         total: totalResult.count || 0,

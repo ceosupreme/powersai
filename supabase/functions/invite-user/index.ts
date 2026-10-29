@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -15,6 +16,9 @@ interface InviteRequest {
 }
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'invite-user');
+  if (__authDenied) return __authDenied;
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -53,7 +57,8 @@ serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', requestingUser.id)
-      .single()
+      .eq('role', 'admin')
+      .maybeSingle()
 
     if (roleData?.role !== 'admin') {
       return new Response(
@@ -70,6 +75,12 @@ serve(async (req) => {
         JSON.stringify({ error: 'Email and name are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    if (!['admin', 'manager', 'staff', 'owner', 'gm', 'shift_lead', 'client'].includes(role)) {
+      return new Response(JSON.stringify({ error: 'Invalid role' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     // Check if user already exists
@@ -110,12 +121,13 @@ serve(async (req) => {
 
     // Update the user's role (the profile is created by the trigger, but we need to set the role)
     if (inviteData.user) {
-      // Update role if not default staff
-      if (role !== 'staff') {
-        await adminClient
-          .from('user_roles')
-          .update({ role })
-          .eq('user_id', inviteData.user.id)
+      // Do not depend on a default staff grant from the signup trigger.
+      const { error: roleError } = await adminClient.from('user_roles')
+        .upsert({ user_id: inviteData.user.id, role }, { onConflict: 'user_id' })
+      if (roleError) {
+        return new Response(JSON.stringify({ error: 'Invite sent but role assignment failed; retry in admin settings', user_id: inviteData.user.id }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
       // Update profile with bar assignment and name

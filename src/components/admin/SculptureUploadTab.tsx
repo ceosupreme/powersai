@@ -65,6 +65,11 @@ export const SculptureUploadTab = () => {
       </div>
     );
   }
+  return <SculptureUploadEnabled />;
+};
+
+/** Mount the upload hooks only when this integration is enabled. */
+const SculptureUploadEnabled = () => {
   const { data: venues = [] } = useVenues();
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // marketing-auto-analyze
 // Cron-driven sweep that runs the post-event analyzer on Ended campaigns where
 // auto_analysis_enabled=true and either no results yet OR inputsHash mismatch.
@@ -20,6 +21,9 @@ const json = (body: unknown, status = 200) =>
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'marketing-auto-analyze');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {

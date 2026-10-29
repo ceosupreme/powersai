@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // sync-toast-metrics — writes daily_metrics from the Toast Analytics API.
 //
@@ -195,9 +196,8 @@ async function fetchCheckDay(
 // ── Toast Orders API: per-day turn time (paidDate − openedDate) ──
 //
 // Uses the standard Toast OAuth flow (TOAST_MACHINE_CLIENT) — distinct from
-// the Analytics OAuth used for /era/v1/* reports. Per-venue credentials
-// (`venues.toast_client_id` / `toast_client_secret`) win, env fallback for
-// venues that share the management-group app.
+// the Analytics OAuth used for /era/v1/* reports. Client IDs may vary by
+// venue; the credential is server-only in TOAST_CLIENT_SECRET.
 //
 // Token cache keyed by clientId so the 8-day backfill loop reuses one token
 // per venue across all dates.
@@ -559,6 +559,9 @@ function eodPlusGraceUtc(dateStr: string): Date {
 // ── Main handler ─────────────────────────────────────────────
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'sync-toast-metrics');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -611,7 +614,7 @@ serve(async (req) => {
     // Active venues with a Toast restaurant GUID
     let venueQuery = supabase
       .from('venues')
-      .select('id, bar_code, toast_restaurant_guid, toast_client_id, toast_client_secret')
+      .select('id, bar_code, toast_restaurant_guid, toast_client_id')
       .eq('is_active', true)
       .eq('toast_api_enabled', true)
       .not('toast_restaurant_guid', 'is', null)
@@ -1108,7 +1111,7 @@ serve(async (req) => {
           let ordersTurnFetched = false;
           {
             const ordersClientId = (venue as any).toast_client_id || Deno.env.get('TOAST_CLIENT_ID');
-            const ordersClientSecret = (venue as any).toast_client_secret || Deno.env.get('TOAST_CLIENT_SECRET');
+            const ordersClientSecret = Deno.env.get('TOAST_CLIENT_SECRET');
             if (ordersClientId && ordersClientSecret) {
               try {
                 const result = await fetchOrdersTurnTime(ordersClientId, ordersClientSecret, restaurantGuid, singleDate);

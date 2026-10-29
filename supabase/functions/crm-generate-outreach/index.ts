@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Generates outreach drafts from a saved CRM lead analysis via Lovable AI Gateway.
 // Mirrors capture-classify pattern. Drafting only — nothing sent.
 
@@ -27,6 +28,9 @@ const CHANNEL_NOTES: Record<Channel, string> = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'crm-generate-outreach');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const apiKey = Deno.env.get("LOVABLE_API_KEY");

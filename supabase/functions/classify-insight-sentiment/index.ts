@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Classifies an insight's sentiment as positive | neutral | negative.
 // Modes:
 //   - { insight_id }: classify a single insight (used right after generation)
@@ -91,6 +92,9 @@ async function classifyOne(row: InsightRow): Promise<Sentiment> {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'classify-insight-sentiment');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const supabase = createClient(

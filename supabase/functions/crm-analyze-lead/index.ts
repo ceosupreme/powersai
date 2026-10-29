@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Analyzes a CRM lead from a URL or pasted text via Lovable AI Gateway.
 // Mirrors the capture-classify pattern: service-role writes, strict JSON output,
 // google/gemini-2.5-flash. URL fetch failures degrade gracefully — never throw.
@@ -55,6 +56,9 @@ async function fetchUrlText(url: string): Promise<{ ok: true; text: string } | {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'crm-analyze-lead');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const apiKey = Deno.env.get("LOVABLE_API_KEY");

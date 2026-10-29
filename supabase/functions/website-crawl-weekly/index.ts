@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // website-crawl-weekly — full website audit for ONE venue per invocation.
 // Mirrors the gbp-sync-weekly cadence: dispatcher loops venues with stagger.
 
@@ -12,6 +13,9 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'website-crawl-weekly');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   let body: { venue_id?: string } = {};

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // gbp-sync-weekly — heavier audit (categories, attributes, descriptions,
 // service options). Runs Mondays 07:00 PT. Same fan-out pattern as daily.
 
@@ -12,6 +13,9 @@ const corsHeaders = {
 const STAGGER_MS = 30_000;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'gbp-sync-weekly');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   const apiKey = (Deno.env.get('GOOGLE_PLACES_API_KEY') || '').trim();

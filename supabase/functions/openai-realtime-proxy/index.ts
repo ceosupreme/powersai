@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -5,6 +6,9 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const OPENAI_REALTIME_URL = "wss://api.openai.com/v1/realtime?model=gpt-realtime";
 
 serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'openai-realtime-proxy');
+  if (__authDenied) return __authDenied;
+
   const __disabled = await guardIntegration('openai_voice', {});
   if (__disabled) return __disabled;
   // Handle WebSocket upgrade
@@ -41,7 +45,7 @@ serve(async (req) => {
   console.log(`Starting voice interview for ${logType} with ${fields.length} fields`);
 
   // Upgrade to WebSocket
-  const { socket: clientSocket, response } = Deno.upgradeWebSocket(req);
+  const { socket: clientSocket, response } = Deno.upgradeWebSocket(req, { protocol: 'hq-realtime' });
 
   // Connect to OpenAI
   let openaiSocket: WebSocket | null = null;

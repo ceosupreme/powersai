@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ai-search-run — query each enabled engine (ChatGPT, Claude, Gemini,
 // Perplexity) for active queries and persist a snapshot per (engine, query).
 // Used by the weekly cron and the admin "Trigger Now" button.
@@ -122,6 +123,9 @@ async function callPerplexity(apiKey: string, model: string, query: string): Pro
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'ai-search-run');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

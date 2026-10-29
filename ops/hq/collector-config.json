@@ -1,0 +1,268 @@
+{
+  "version": "internal-v1",
+  "generated_on": "2026-10-29",
+  "migration": "20261029030000_hq_numbers_collector.sql",
+  "activation": "manual application and schedule activation by the owning operator; this file does not activate anything",
+  "reporting_timezone": "America/Los_Angeles",
+  "default_flow_period": "last completed Monday\u2013Sunday week",
+  "snapshot_period": "observed current week only",
+  "recommended_schedule": {
+    "day": "Sunday",
+    "time": "23:55",
+    "timezone": "America/Los_Angeles",
+    "explicit_current_week": true,
+    "partial_period": "window_end is capped at actual observation time"
+  },
+  "expected_definition_count": 127,
+  "expected_internal_mapped_count": 15,
+  "mapped_flow_count": 7,
+  "mapped_snapshot_count": 8,
+  "coverage_rule": "Evaluate coverage per value_week_start and measurement_kind. The overall definition count is not a single-week coverage denominator.",
+  "internal_mappings": [
+    {
+      "project_id": "6bc3478f-cd2c-4350-b209-40ec17f4b307",
+      "name": "Allmighty Supreme",
+      "pillar_key": "content",
+      "kpi_key": "daily_short",
+      "kpi_label": "Daily short-form posts shipped this week",
+      "unit": "posts",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:content_items+verified_content_placements:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "formats": [
+        "short",
+        "reel"
+      ]
+    },
+    {
+      "project_id": "6bc3478f-cd2c-4350-b209-40ec17f4b307",
+      "name": "Allmighty Supreme",
+      "pillar_key": "products",
+      "kpi_key": "books_live",
+      "kpi_label": "Books live",
+      "unit": "books",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:product_listings+channel_product_channels:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "outlets": [
+        "Amazon KDP",
+        "Kindle"
+      ],
+      "limitation": "Other book classifications are not mapped."
+    },
+    {
+      "project_id": "3561a251-f669-4d5e-a34b-6c8479e034fa",
+      "name": "Big Paws Club",
+      "pillar_key": "catalog",
+      "kpi_key": "products_live",
+      "kpi_label": "Products live, books and digital",
+      "unit": "products",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:product_listings+channel_product_channels:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "3561a251-f669-4d5e-a34b-6c8479e034fa",
+      "name": "Big Paws Club",
+      "pillar_key": "content_engine",
+      "kpi_key": "videos_reels",
+      "kpi_label": "Videos and reels shipped per week",
+      "unit": "videos",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:content_items+verified_content_placements:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "formats": [
+        "long_form",
+        "short",
+        "reel"
+      ]
+    },
+    {
+      "project_id": "3561a251-f669-4d5e-a34b-6c8479e034fa",
+      "name": "Big Paws Club",
+      "pillar_key": "content_engine",
+      "kpi_key": "repurposed_pieces",
+      "kpi_label": "Repurposed pieces shipped",
+      "unit": "pieces",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:content_items+verified_content_placements:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "formats": null
+    },
+    {
+      "project_id": "3561a251-f669-4d5e-a34b-6c8479e034fa",
+      "name": "Big Paws Club",
+      "pillar_key": "foundation",
+      "kpi_key": "oldest_waiting_days",
+      "kpi_label": "Oldest item waiting on me, in days",
+      "unit": "days",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:open_owner_decisions:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "fa710cf6-09fc-45ad-97da-fa50dceec37d",
+      "name": "Coastal Beauties",
+      "pillar_key": "foundation",
+      "kpi_key": "oldest_waiting_days",
+      "kpi_label": "Oldest item waiting on me, in days",
+      "unit": "days",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:open_owner_decisions:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "ef99303a-5af3-419c-875b-000c3b7f2db1",
+      "name": "Kario Voss",
+      "pillar_key": "content",
+      "kpi_key": "short_videos",
+      "kpi_label": "Short videos shipped per week",
+      "unit": "videos",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:content_items+verified_content_placements:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "formats": [
+        "short",
+        "reel"
+      ]
+    },
+    {
+      "project_id": "44fbf77c-cd9c-4f19-b704-09ca773c5107",
+      "name": "Supreme Survival",
+      "pillar_key": "catalog_app",
+      "kpi_key": "products_live",
+      "kpi_label": "Products live",
+      "unit": "products",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:product_listings+channel_product_channels:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "44fbf77c-cd9c-4f19-b704-09ca773c5107",
+      "name": "Supreme Survival",
+      "pillar_key": "foundation",
+      "kpi_key": "oldest_waiting_days",
+      "kpi_label": "Oldest item waiting on me, in days",
+      "unit": "days",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:open_owner_decisions:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "34cb1836-6ead-4478-915c-0a9dc552a554",
+      "name": "Supreme Team Media",
+      "pillar_key": "marketing_machine",
+      "kpi_key": "content_posts",
+      "kpi_label": "Content posts shipped",
+      "unit": "posts",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:content_items+verified_content_placements:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "formats": [
+        "post",
+        "carousel",
+        "pin",
+        "story",
+        "short",
+        "reel",
+        "long_form",
+        "community"
+      ]
+    },
+    {
+      "project_id": "34cb1836-6ead-4478-915c-0a9dc552a554",
+      "name": "Supreme Team Media",
+      "pillar_key": "marketing_machine",
+      "kpi_key": "audit_requests",
+      "kpi_label": "Trade-page visitors who request an audit",
+      "unit": "requests",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:site_events.audit_start:trade_attributed_sessions:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "34cb1836-6ead-4478-915c-0a9dc552a554",
+      "name": "Supreme Team Media",
+      "pillar_key": "pipeline",
+      "kpi_key": "inbound_leads",
+      "kpi_label": "Inbound leads from the site and trade pages",
+      "unit": "leads",
+      "measurement_kind": "flow",
+      "period": "requested Pacific week, ending no later than observation",
+      "source_ref": "hq:inbound_leads:scoped+fixture_filtered:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "30c26808-a5b0-4da5-ba8c-51ec54ab4acd",
+      "name": "Supreme Wellness",
+      "pillar_key": "catalog",
+      "kpi_key": "listings_live",
+      "kpi_label": "Listings live, by marketplace",
+      "unit": "listings",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:product_listings+channel_product_channels:v1",
+      "scope": "HQ records only; not reconciled with external providers."
+    },
+    {
+      "project_id": "30c26808-a5b0-4da5-ba8c-51ec54ab4acd",
+      "name": "Supreme Wellness",
+      "pillar_key": "catalog",
+      "kpi_key": "kdp_titles",
+      "kpi_label": "KDP titles live",
+      "unit": "titles",
+      "measurement_kind": "snapshot",
+      "period": "observed instant in the current Pacific week",
+      "source_ref": "hq:product_listings+channel_product_channels:v1",
+      "scope": "HQ records only; not reconciled with external providers.",
+      "outlets": [
+        "Amazon KDP",
+        "Kindle"
+      ],
+      "limitation": "Other book classifications are not mapped."
+    }
+  ],
+  "external_sources": [
+    {
+      "provider": "shopify",
+      "project_id": "3561a251-f669-4d5e-a34b-6c8479e034fa",
+      "project": "Big Paws Club",
+      "account_ref": "big-paws-tested-zoi7f-uamjq3d2.myshopify.com",
+      "account_mapping_status": "Matched to Big Paws project knowledge during root verification",
+      "metric_mapping_status": "Each exact KPI/source/window still requires an explicit verified mapping and query receipt before ingress",
+      "revenue_ledger": "not written by the collector or observation ingress"
+    },
+    {
+      "provider": "stripe",
+      "status": "Not accessible through an approved connection in this session; no observations invented"
+    },
+    {
+      "provider": "metricool",
+      "status": "Not accessible through an approved connection in this session; no observations invented"
+    },
+    {
+      "provider": "lovable",
+      "status": "Only explicitly mapped project analytics with a completed source read qualify for external ingress"
+    }
+  ],
+  "targets": {
+    "existing_targets_preserved": 21,
+    "null_targets_preserved": 106,
+    "new_target_application": false,
+    "review_file": "kpi-target-review.json"
+  },
+  "revenue_ledger_writes": false,
+  "public_or_client_execution": false
+}

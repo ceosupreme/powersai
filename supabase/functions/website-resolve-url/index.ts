@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // website-resolve-url — admin/owner-triggered. Validates a venue's website URL
 // is reachable, follows redirects to a canonical URL, and detects the CMS.
 
@@ -10,6 +11,9 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'website-resolve-url');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   let body: { venue_id?: string; website_url?: string; persist?: boolean } = {};

@@ -38,15 +38,17 @@ export type PageKey =
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
 
 // Roles that use the full sidebar layout
-export const FULL_PORTAL_ROLES: AppRole[] = ['admin', 'owner', 'gm'];
+export const FULL_PORTAL_ROLES: AppRole[] = ['admin', 'owner', 'gm', 'manager'];
 
 // Role display names
 export const ROLE_LABELS: Record<AppRole, string> = {
   admin: 'Admin',
   owner: 'Owner',
   gm: 'GM',
+  manager: 'Manager',
   shift_lead: 'Shift Lead',
   staff: 'Staff',
+  client: 'Client',
 };
 
 // Role hierarchy levels
@@ -54,8 +56,10 @@ export const ROLE_HIERARCHY: Record<AppRole, number> = {
   admin: 5,
   owner: 4,
   gm: 3,
+  manager: 3,
   shift_lead: 2,
   staff: 1,
+  client: 0,
 };
 
 export interface PagePermission {
@@ -99,12 +103,17 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'prospect_dock', label: 'Prospect Dock', canDisable: true },
   { key: 'outreach_templates', label: 'Outreach Templates', canDisable: true },
   { key: 'project_home', label: 'Project Home', canDisable: true },
+  { key: 'client_approvals', label: 'Client Approvals', canDisable: true },
 ];
 
 // Map route paths to page keys
 export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/': 'dashboard',
   '/dashboard': 'dashboard',
+  '/workspace': 'dashboard',
+  '/portfolio': 'dashboard',
+  '/help': 'dashboard',
+  '/launch': 'project_home',
   '/weekly-review': 'weekly_review',
   '/insights': 'insights',
   '/sales': 'sales',
@@ -135,4 +144,21 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/leak-stack': 'leak_stack',
   '/prospects': 'prospect_dock',
   '/templates': 'outreach_templates',
+  '/approvals': 'client_approvals',
+  '/project': 'project_home',
+  '/production-board': 'content_pipeline',
+  '/answer-bank': 'content_pipeline',
+  '/staff/tasks': 'tasks',
+  '/staff/chat': 'chat',
+  '/staff/logs': 'logs',
+  '/staff/shift': 'dashboard',
+  '/staff/my-shift': 'dashboard',
 };
+
+/** Resolve dynamic routes without requiring every caller to repeat its page key. */
+export function pageKeyForPath(pathname: string): PageKey | undefined {
+  const path = Object.keys(ROUTE_TO_PAGE_KEY)
+    .sort((a, b) => b.length - a.length)
+    .find((route) => pathname === route || (route !== '/' && pathname.startsWith(`${route}/`)));
+  return path ? ROUTE_TO_PAGE_KEY[path] : undefined;
+}

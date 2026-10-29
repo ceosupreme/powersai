@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3.23.8';
 import { keyMode, serviceClient, validKey } from '../_shared/checkoutConfirm.ts';
@@ -18,6 +19,9 @@ const hits = new Map<string, { n: number; reset: number }>();
 const json = (d: unknown, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'create-checkout-session');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown', now = Date.now(), h = hits.get(ip);

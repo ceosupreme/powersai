@@ -3,6 +3,7 @@
 // RESEND_EMAIL delivers real email via the Resend API when RESEND_API_KEY
 // is present. SMS/DM adapters drop in the same way.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import type { DeliveryState } from "./automation-state.ts";
 
 export type AutomationChannel = "email" | "sms" | "linkedin_dm" | "instagram_dm" | "review_reply";
 
@@ -16,6 +17,8 @@ export interface SendInput {
   project_id: string;
   queue_id: string;
   metadata?: Record<string, unknown>;
+  /** Called immediately before the external request, after all lookups. */
+  beforeSend?: () => Promise<boolean>;
 }
 
 export interface SendResult {
@@ -24,6 +27,7 @@ export interface SendResult {
   provider_message_id?: string;
   error?: string;
   raw?: unknown;
+  delivery_status?: DeliveryState;
 }
 
 export interface SendAdapter {
@@ -37,10 +41,11 @@ export const manualLogAdapter: SendAdapter = {
   name: "manual_log",
   supports: () => true,
   async send(input) {
+    if (input.beforeSend && !(await input.beforeSend())) return { ok: false, provider: "manual_log", error: "send_gate_closed", delivery_status: "queued" };
     console.log("[manual_log adapter] would send:", {
       channel: input.channel, to: input.to, queue_id: input.queue_id,
     });
-    return { ok: true, provider: "manual_log" };
+    return { ok: true, provider: "manual_log", delivery_status: "logged" };
   },
 };
 
@@ -96,22 +101,10 @@ export const resendEmailAdapter: SendAdapter = {
 
     // Suppression check — customer sends only.
     if (!internal) {
-      const { data: sup } = await sb
-        .from("email_suppressions")
-        .select("reason")
-        .eq("project_id", input.project_id)
-        .filter("email", "eq", to) // stored lowercase-normalized by adapter/UI
-        .limit(1);
-      // Defensive re-check using RPC-style lower() semantics: also match any
-      // legacy row that wasn't normalized on insert.
-      let suppressed = (sup ?? []).length > 0;
-      if (!suppressed) {
-        const { data: sup2 } = await sb
-          .from("email_suppressions")
-          .select("email, reason")
-          .eq("project_id", input.project_id);
-        suppressed = (sup2 ?? []).some((r: any) => String(r.email ?? "").trim().toLowerCase() === to);
-      }
+      const { data: suppressed, error: suppressionError } = await sb.rpc("hq_is_email_suppressed", {
+        p_project_id: input.project_id, p_email: to,
+      });
+      if (suppressionError) return { ok: false, provider: "resend", error: "suppression_check_failed", delivery_status: "failed" };
       if (suppressed) {
         return { ok: false, provider: "resend", error: "suppressed" };
       }
@@ -121,12 +114,13 @@ export const resendEmailAdapter: SendAdapter = {
     const automationKey = String((input.metadata as any)?.automation_key ?? "");
     let enrConfig: Record<string, unknown> | null = null;
     if (automationKey) {
-      const { data: enr } = await sb
+      const { data: enr, error: enrollmentError } = await sb
         .from("project_automation_enrollments")
         .select("config")
         .eq("project_id", input.project_id)
         .eq("automation_key", automationKey)
         .maybeSingle();
+      if (enrollmentError) return { ok: false, provider: "resend", error: "enrollment_check_failed", delivery_status: "failed" };
       enrConfig = (enr?.config ?? null) as Record<string, unknown> | null;
     }
 
@@ -156,6 +150,8 @@ export const resendEmailAdapter: SendAdapter = {
     const subject = deriveSubject(input);
     const text = `${input.body}${footer}`;
 
+    if (input.beforeSend && !(await input.beforeSend())) return { ok: false, provider: "resend", error: "send_gate_closed", delivery_status: "queued" };
+
     let resp: Response;
     try {
       resp = await fetch("https://api.resend.com/emails", {
@@ -163,23 +159,27 @@ export const resendEmailAdapter: SendAdapter = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
+          "Idempotency-Key": `hq:${input.queue_id}`,
         },
         body: JSON.stringify({ from, to, subject, text, ...(input.reply_to ? { reply_to: input.reply_to } : {}) }),
+        signal: AbortSignal.timeout(20_000),
       });
     } catch (e) {
-      return { ok: false, provider: "resend", error: `network: ${String(e)}` };
+      return { ok: false, provider: "resend", error: `network: ${String(e)}`, delivery_status: "unconfirmed" };
     }
 
     let raw: any = null;
     try { raw = await resp.json(); } catch { /* noop */ }
     if (!resp.ok) {
       const msg = raw?.message ?? raw?.error ?? `http_${resp.status}`;
-      return { ok: false, provider: "resend", error: String(msg), raw };
+      return { ok: false, provider: "resend", error: String(msg), raw, delivery_status: resp.status >= 500 ? "unconfirmed" : "failed" };
     }
+    if (typeof raw?.id !== "string" || !raw.id) return { ok: false, provider: "resend", error: "provider_receipt_missing", delivery_status: "unconfirmed" };
     return {
       ok: true,
       provider: "resend",
       provider_message_id: raw?.id ?? undefined,
+      delivery_status: "provider_accepted",
       raw,
     };
   },

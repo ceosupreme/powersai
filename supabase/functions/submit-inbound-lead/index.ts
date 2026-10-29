@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Public marketing-site contact form intake.
 // Anonymous visitors POST here; this function inserts into public.inbound_leads
 // using the service role (bypassing RLS). The table is NOT writable by anon.
@@ -18,9 +19,9 @@ const Body = z.object({
   not_ready_reason: z.string().trim().max(500).optional().nullable(),
   transcript: z.array(z.object({
     role: z.enum(["user", "assistant", "system"]),
-    text: z.string(),
+    text: z.string().max(4000),
     at: z.string().optional(),
-  })).optional().nullable(),
+  })).max(50).optional().nullable(),
   conversation_channel: z.enum(["voice", "chat", "form", "phone"]).optional().nullable(),
   route_to: z.enum(["self", "operator", "client"]).optional().nullable(),
   // When intake happened on a client-specific qualifier URL (/q/:venueSlug),
@@ -43,39 +44,18 @@ function normalizeUrgency(v: unknown): string | null {
   return typeof v === "string" && CANONICAL_URGENCY.has(v) ? v : null;
 }
 
-// NOTE: Best-effort, per-process rate limit. Edge functions are stateless and
-// can scale horizontally, so this counter resets across cold starts / instances.
-// It is NOT durable protection — the honeypot field above is the primary
-// first line of defense. Do not mistake this for hard rate limiting.
-const RATE: Map<string, { n: number; reset: number }> = new Map();
-const LIMIT = 5;
-const WINDOW_MS = 60_000;
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const cur = RATE.get(ip);
-  if (!cur || cur.reset < now) {
-    RATE.set(ip, { n: 1, reset: now + WINDOW_MS });
-    return false;
-  }
-  cur.n += 1;
-  return cur.n > LIMIT;
-}
+// Durable per-address, global and recipient limits run in guardEdgeRequest.
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'submit-inbound-lead');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
-  const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
-  if (rateLimited(ip)) {
-    return new Response(JSON.stringify({ error: "Too many requests" }), {
-      status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 

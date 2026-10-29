@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Public lookup: resolve a venue (client) by its URL-safe slug.
 // Used by the per-client qualifier page (/q/:venueSlug). Returns only the
 // minimal fields needed to render the intake page — id, slug, name,
@@ -6,6 +7,9 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'resolve-venue-by-slug');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {

@@ -49,7 +49,6 @@ export const BarsTab = () => {
     seven_shifts_location_id: '',
     toast_restaurant_guid: '',
     toast_client_id: '',
-    toast_client_secret: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [testingProject, setTestingProject] = useState(false);
@@ -94,7 +93,7 @@ export const BarsTab = () => {
 
   const openAddDialog = () => {
     setEditingBar(null);
-    setFormData({ name: '', address: '', asana_project_gid: '', asana_gm_log_task_gid: '', asana_lead_log_task_gid: '', asana_score_section_gid: '', asana_score_assignee_gid: '', asana_write_project_gid: '', asana_write_section_gid: '', seven_shifts_location_id: '', toast_restaurant_guid: '', toast_client_id: '', toast_client_secret: '' });
+    setFormData({ name: '', address: '', asana_project_gid: '', asana_gm_log_task_gid: '', asana_lead_log_task_gid: '', asana_score_section_gid: '', asana_score_assignee_gid: '', asana_write_project_gid: '', asana_write_section_gid: '', seven_shifts_location_id: '', toast_restaurant_guid: '', toast_client_id: '' });
     setProjectTestResult(null);
     setGmTestResult(null);
     setLeadTestResult(null);
@@ -116,7 +115,6 @@ export const BarsTab = () => {
       seven_shifts_location_id: bar.seven_shifts_location_id || '',
       toast_restaurant_guid: bar.toast_restaurant_guid || '',
       toast_client_id: (bar as any).toast_client_id || '',
-      toast_client_secret: (bar as any).toast_client_secret || '',
     });
     setProjectTestResult(null);
     setGmTestResult(null);
@@ -187,7 +185,6 @@ export const BarsTab = () => {
         seven_shifts_location_id: formData.seven_shifts_location_id.trim() || null,
         toast_restaurant_guid: formData.toast_restaurant_guid.trim() || null,
         toast_client_id: formData.toast_client_id.trim() || null,
-        toast_client_secret: formData.toast_client_secret.trim() || null,
       };
 
       if (editingBar) {
@@ -420,18 +417,9 @@ export const BarsTab = () => {
                       className="bg-background border-border h-10 font-mono text-xs"
                     />
                   </div>
-                  <div className="space-y-2 mt-3">
-                    <Label htmlFor="toast_client_secret">Client Secret (optional override)</Label>
-                    <Input
-                      id="toast_client_secret"
-                      type="password"
-                      value={formData.toast_client_secret}
-                      onChange={(e) => setFormData((p) => ({ ...p, toast_client_secret: e.target.value }))}
-                      placeholder="Leave blank to use global credentials"
-                      className="bg-background border-border h-10 font-mono text-xs"
-                    />
-                    <p className="text-xs text-muted-foreground">Only set these if this project uses different Toast API credentials than the global default.</p>
-                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Toast credentials are configured in server secrets. Contact your administrator to update them.
+                  </p>
                 </div>
 
                 {/* 7shifts Section */}

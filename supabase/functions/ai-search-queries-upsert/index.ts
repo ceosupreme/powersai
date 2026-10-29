@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // ai-search-queries-upsert — admin-only CRUD for ai_search_queries.
 // Body: { venue_id, queries: [{ id?, query, priority, source_keyword_id?, is_active? }], delete_ids?: [...] }
 
@@ -15,6 +16,9 @@ const json = (status: number, body: unknown) =>
   });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'ai-search-queries-upsert');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');

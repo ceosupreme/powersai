@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { guardIntegration } from '../_shared/integration-disabled.ts'; // __PHASE1_INTEGRATION_GUARD__
 // Scheduled background sync for Asana → BarPulse. Runs every 2h during
 // business hours via pg_cron. Per-venue try/catch so one failure doesn't
@@ -13,6 +14,9 @@ const corsHeaders = {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'cron-marketing-asana-pull');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __disabled = await guardIntegration('asana', corsHeaders);

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Public endpoint that returns the qualifier field list + ready_definition
 // for a given project_type. Used by the landing page to render the chat /
 // form fallbacks (the realtime voice agent loads context server-side).
@@ -18,6 +19,9 @@ async function resolveProjectType(req: URL): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'qualifier-session');
+  if (__authDenied) return __authDenied;
+
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const url = new URL(req.url);

@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // growth-audit-cron
 // Scheduled fan-out to growth-audit-refresh for every venue with
 // growth_audit_enabled=true on its execution adapter.
@@ -15,6 +16,9 @@ const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'growth-audit-cron');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {

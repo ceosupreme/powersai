@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // mine-prospects — Lane A of The Miner. Operator-triggered (button only; no
 // cron in this phase). Queries Google Places v1 Text Search for a niche + city,
 // filters to real operating businesses, upserts public.prospects (dedupe on
@@ -33,6 +34,9 @@ const Body = z.object({
 const MIN_REVIEWS = 3;
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'mine-prospects');
+  if (__authDenied) return __authDenied;
+
   // ── CORS preflight, before ANY auth work ──────────────────────────────
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -59,8 +63,8 @@ Deno.serve(async (req) => {
     .select('role')
     .eq('user_id', userId);
   if (roleErr) return json({ error: roleErr.message }, 500);
-  const isOperator = (roles ?? []).some((r: { role: string }) => r.role !== 'client');
-  if (!isOperator) return json({ error: 'forbidden' }, 403);
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin');
+  if (!isAdmin) return json({ error: 'forbidden' }, 403);
 
   // ── Input ─────────────────────────────────────────────────────────────
   let raw: unknown = {};

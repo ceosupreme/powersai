@@ -1,9 +1,13 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Reports which server-side send adapters have credentials configured.
 // Read-only, no user data. Used by the client to disable Live-mode toggles
 // when the corresponding provider key is missing.
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
-Deno.serve((req) => {
+Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'send-adapter-status');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

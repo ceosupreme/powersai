@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useNextTen, useCompleteNextTenRow, NextTenRow } from '@/hooks/useNextTen';
+import { useNextTen, useCompleteNextTenRow, NextTenRow, nextTenEmptyMessage } from '@/hooks/useNextTen';
 import { useProjectKpis, useUpsertProjectKpiValue } from '@/hooks/useProjectKpis';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
 import { scoreKpi } from '@/lib/kpiScoring';
@@ -56,7 +56,7 @@ export const NextTenSection = ({
 
   const saveKpi = async (row: NextTenRow) => {
     const num = kpiValue.trim() === '' ? null : Number(kpiValue);
-    if (num == null || Number.isNaN(num)) return toast.error('Enter a number');
+    if (num == null || !Number.isFinite(num)) return toast.error('Enter a finite number');
     const def = kpiDefs.find(
       (d) => d.pillar_key === row.pillarKey && d.kpi_key === row.kpiKey,
     );
@@ -115,6 +115,11 @@ export const NextTenSection = ({
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
     const maxWidth = 440;
+    if (unavailable.length) {
+      const warning = doc.splitTextToSize(`Incomplete list: could not check ${unavailable.join(', ')}.`, maxWidth);
+      doc.text(warning, left, y);
+      y += warning.length * 16 + 16;
+    }
     rows.forEach((r) => {
       doc.rect(left, y - 10, 12, 12);
       const lines = doc.splitTextToSize(`${r.step}${r.note ? `  (${r.note})` : ''}  [${r.source}]`, maxWidth);
@@ -124,7 +129,7 @@ export const NextTenSection = ({
 
     if (rows.length === 0) {
       doc.setTextColor(110);
-      doc.text('Nothing outstanding right now.', left, y);
+      doc.text(doc.splitTextToSize(nextTenEmptyMessage(data), maxWidth), left, y);
     }
 
     doc.save(
@@ -138,7 +143,7 @@ export const NextTenSection = ({
         <CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">
           Next 10
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={downloadPdf}>
+        <Button variant="outline" size="sm" onClick={downloadPdf} disabled={isLoading || isError}>
           <Download className="h-4 w-4 mr-1" /> Download PDF
         </Button>
       </CardHeader>
@@ -161,14 +166,14 @@ export const NextTenSection = ({
           {unavailable.length > 0 && (
             <div className="flex items-start gap-2 text-xs text-amber-600 mb-2">
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-              <span>Could not check {unavailable.join(', ')}. Items from those sources may be missing below.</span>
+              <span>Could not check {unavailable.join(', ')}. Items from those sources may be missing below.{' '}
+                <button className="underline" onClick={() => void refetch()}>Try again</button>
+              </span>
             </div>
           )}
           {rows.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            {unavailable.length > 0
-              ? 'Nothing could be loaded.'
-              : 'Nothing outstanding right now — add an action, a KPI target or a money lane.'}
+            {nextTenEmptyMessage(data)}
           </p>
         ) : (
           <ul>

@@ -24,7 +24,8 @@ import { ProposalsListCard } from '@/components/proposals/ProposalsListCard';
 import { useVenueOnboardingDetectors } from '@/hooks/useVenueOnboardingDetectors';
 import { useVenueLiveStatus } from '@/hooks/useVenueLiveStatus';
 import { useEffectivePillars } from '@/hooks/useEffectivePillars';
-import { useEnsureCurrentWeek, currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { useEnsureCurrentWeek } from '@/hooks/useEnsureCurrentWeek';
+import { useScoreReportingWeek } from '@/hooks/useScoreReportingWeek';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
 import { NextTenSection } from '@/components/pillar/NextTenSection';
 import { Input } from '@/components/ui/input';
@@ -153,11 +154,12 @@ export default function ProjectHome() {
 
   // Non-client projects get the one-glance view; client projects are untouched.
   const isNonClient = !!meta && (meta.project_type ?? CLIENT_PROJECT_TYPE) !== CLIENT_PROJECT_TYPE;
-  const { data: pillars = [] } = useEffectivePillars(
+  const { data: pillars = [], isError: pillarsError } = useEffectivePillars(
     isNonClient ? venueId : null,
     meta?.project_type ?? undefined,
   );
-  const weekStart = useMemo(() => currentWeekRange().week_start, []);
+  const reportingWeek = useScoreReportingWeek(isNonClient ? venueId : null);
+  const weekStart = reportingWeek.weekStart;
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
   const [setupOpen, setSetupOpen] = useState(false);
 
@@ -457,12 +459,17 @@ export default function ProjectHome() {
       )}
 
       {/* One-glance project view (non-client projects only) */}
+      {isNonClient && (reportingWeek.isError || pillarsError) && (
+        <p role="status" className="text-sm text-amber-600">The reporting week or score setup could not be verified. Please reload to check this project's scores.</p>
+      )}
       {isNonClient && venueId && pillars.length > 0 && (
         <NonClientPillarsDashboard
           projectId={venueId}
           weekStart={weekStart}
           pillars={pillars}
           canEdit={canRunWizard}
+          dataUnavailable={reportingWeek.isError || pillarsError}
+          isLoading={reportingWeek.isLoading}
         />
       )}
 

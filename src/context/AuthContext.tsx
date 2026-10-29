@@ -3,7 +3,8 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { queryClient } from '@/lib/queryClient';
 import { Profile, AppRole } from '@/types/auth';
-import { PageKey, PAGE_CONFIG, STAFF_PORTAL_ROLES, ROLE_HIERARCHY } from '@/types/permissions';
+import { resolvePageAccess } from '@/lib/pageAccess';
+import { PageKey, PAGE_CONFIG, STAFF_PORTAL_ROLES } from '@/types/permissions';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +14,7 @@ interface AuthContextType {
   assignedBarIds: string[];
   accessiblePages: PageKey[];
   isLoading: boolean;
+  permissionsError: string | null;
   isAdmin: boolean;
   isOwner: boolean;
   isGM: boolean;
@@ -44,13 +46,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [assignedBarIds, setAssignedBarIds] = useState<string[]>([]);
-  const [accessiblePages, setAccessiblePages] = useState<PageKey[]>(PAGE_CONFIG.map(p => p.key));
+  const [accessiblePages, setAccessiblePages] = useState<PageKey[]>([]);
+  const [permissionsError, setPermissionsError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchCounterRef = useRef(0);
+  const identityRef = useRef<string | null | undefined>(undefined);
+
+  const resetPrivateState = useCallback(() => {
+    // Clearing also cancels cached queries. Results from the previous session
+    // must never populate a page whose query key is not scoped by user ID.
+    queryClient.clear();
+    fetchCounterRef.current += 1;
+    setProfile(null);
+    setRole(null);
+    setAssignedBarIds([]);
+    setAccessiblePages([]);
+    setPermissionsError(null);
+  }, []);
 
   const fetchProfile = useCallback(async (userId: string, userEmail?: string) => {
+    if (identityRef.current !== userId) return;
     const thisCall = ++fetchCounterRef.current;
+    const isCurrent = () => fetchCounterRef.current === thisCall && identityRef.current === userId;
 
     try {
       const [profileResult, roleResult, barResult] = await Promise.all([
@@ -58,112 +76,98 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(),
         supabase.from('user_bar_assignments').select('bar_id').eq('user_id', userId),
       ]);
+      if (!isCurrent()) return;
+      if (roleResult.error) throw roleResult.error;
 
-      // Stale call — a newer one superseded us
-      if (fetchCounterRef.current !== thisCall) return;
-
-      // Profile
-      if (profileResult.error) {
-        console.error('Error fetching profile:', profileResult.error);
-      }
-      setProfile(profileResult.data ?? makeFallbackProfile(userId, userEmail));
-
-      // Role
-      const userRole = (roleResult.data?.role as AppRole) || 'staff';
-      if (roleResult.error) {
-        console.error('Error fetching role:', roleResult.error);
-      }
-      setRole(userRole);
-
-      // Bar assignments
-      if (barResult.error) {
-        console.error('Error fetching bar assignments:', barResult.error);
-        setAssignedBarIds([]);
-      } else {
-        setAssignedBarIds(barResult.data?.map(a => a.bar_id) || []);
-      }
-
-      // Page access
+      const verifiedRoles: AppRole[] = ['admin', 'owner', 'gm', 'manager', 'shift_lead', 'staff', 'client'];
+      const rawRole = roleResult.data?.role as AppRole | undefined;
+      const userRole = rawRole && verifiedRoles.includes(rawRole) ? rawRole : null;
+      let pages: PageKey[] = [];
+      let accessError: string | null = null;
       if (userRole === 'admin') {
-        setAccessiblePages(PAGE_CONFIG.map(p => p.key));
-      } else {
-        const { data: roleDefaults, error: defaultsError } = await supabase
+        pages = resolvePageAccess(userRole, [], PAGE_CONFIG.map(p => p.key));
+      } else if (userRole) {
+        const { data, error } = await supabase
           .from('role_page_defaults')
           .select('page_key, enabled')
           .eq('role', userRole);
-
-        if (fetchCounterRef.current !== thisCall) return;
-
-        if (defaultsError) {
-          console.error('Error fetching role page defaults:', defaultsError);
-          setAccessiblePages(PAGE_CONFIG.map(p => p.key));
-        } else if (roleDefaults && roleDefaults.length > 0) {
-          setAccessiblePages(roleDefaults.filter(d => d.enabled).map(d => d.page_key as PageKey));
-        } else {
-          setAccessiblePages(PAGE_CONFIG.map(p => p.key));
+        if (!isCurrent()) return;
+        pages = resolvePageAccess(userRole, data, PAGE_CONFIG.map(p => p.key), !!error);
+        if (error) {
+          console.error('Error fetching role page defaults:', error);
+          accessError = 'Could not verify your page permissions. Try again or contact your admin.';
+        } else if (!pages.length) {
+          accessError = 'No pages have been assigned to this account. Contact your admin for access.';
         }
       }
+      if (!isCurrent()) return;
+      if (profileResult.error) console.error('Error fetching profile:', profileResult.error);
+      if (barResult.error) console.error('Error fetching bar assignments:', barResult.error);
+      // Commit permissions together, only for the identity that requested them.
+      setProfile(profileResult.data ?? makeFallbackProfile(userId, userEmail));
+      setRole(userRole);
+      setAssignedBarIds(barResult.error ? [] : (barResult.data ?? []).map(a => a.bar_id));
+      setAccessiblePages(pages);
+      setPermissionsError(accessError);
     } catch (err) {
-      if (fetchCounterRef.current !== thisCall) return;
+      if (!isCurrent()) return;
       console.error('Error in fetchProfile:', err);
       setProfile(makeFallbackProfile(userId, userEmail));
-      setRole('staff');
+      setRole(null);
       setAssignedBarIds([]);
-      setAccessiblePages(PAGE_CONFIG.map(p => p.key));
+      setAccessiblePages([]);
+      setPermissionsError('Could not verify your account access. Try again or contact your admin.');
     } finally {
-      if (fetchCounterRef.current === thisCall) {
-        setIsLoading(false);
-      }
+      if (isCurrent()) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setRole(null);
-          setAssignedBarIds([]);
-          setAccessiblePages(PAGE_CONFIG.map(p => p.key));
-          setIsLoading(false);
-          return;
-        }
-
-        if (event === 'TOKEN_REFRESHED' && !newSession) {
-          console.warn('Token refresh returned null session, keeping existing state');
-          return;
-        }
-
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-
-        if (newSession?.user) {
-          if (event === 'TOKEN_REFRESHED') {
-            queryClient.invalidateQueries();
-          }
-          // Defer async work outside the callback per Supabase best practices
-          const userId = newSession.user.id;
-          const userEmail = newSession.user.email;
-          setTimeout(() => fetchProfile(userId, userEmail), 0);
-        }
+    let active = true;
+    let authEventReceived = false;
+    const applySession = (newSession: Session | null, event?: string) => {
+      if (!active) return;
+      const nextId = newSession?.user.id ?? null;
+      if (identityRef.current !== nextId) {
+        // The initial anonymous session has no private identity to clear. Keep
+        // its in-flight public-site queries attached to their observers.
+        if (identityRef.current !== undefined || nextId !== null) resetPrivateState();
+        identityRef.current = nextId;
+        setIsLoading(!!nextId);
+        try {
+          const savedIdentity = localStorage.getItem('hq_session_identity');
+          if (!nextId || savedIdentity !== nextId) localStorage.removeItem('barpulse_selectedBar');
+          if (nextId) localStorage.setItem('hq_session_identity', nextId);
+          else localStorage.removeItem('hq_session_identity');
+        } catch { /* Storage can be disabled by the browser. */ }
       }
-    );
-
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-
-      if (s?.user) {
-        fetchProfile(s.user.id, s.user.email);
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      if (newSession?.user) {
+        if (event === 'TOKEN_REFRESHED') void queryClient.invalidateQueries();
+        // Run Supabase queries outside the auth event callback.
+        const { id, email } = newSession.user;
+        setTimeout(() => { if (active && identityRef.current === id) void fetchProfile(id, email); }, 0);
       } else {
         setIsLoading(false);
       }
+    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      authEventReceived = true;
+      applySession(newSession, event);
     });
-
-    return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+    void supabase.auth.getSession().then(({ data: { session: initial }, error }) => {
+      // A late initial-session read may not replace a newer sign-in/sign-out.
+      if (active && !authEventReceived) applySession(error ? null : initial);
+    }).catch(() => {
+      if (active && !authEventReceived) applySession(null);
+    });
+    return () => {
+      active = false;
+      fetchCounterRef.current += 1;
+      subscription.unsubscribe();
+    };
+  }, [fetchProfile, resetPrivateState]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -187,12 +191,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
-    setRole(null);
-    setAssignedBarIds([]);
-    setAccessiblePages(PAGE_CONFIG.map(p => p.key));
-    try { localStorage.removeItem('barpulse_selectedBar'); } catch {}
+    // Local state disappears immediately even if the network sign-out is slow.
+    identityRef.current = null;
+    resetPrivateState();
+    setSession(null);
+    setUser(null);
+    setIsLoading(false);
+    try {
+      localStorage.removeItem('barpulse_selectedBar');
+      localStorage.removeItem('hq_session_identity');
+    } catch { /* Storage can be disabled by the browser. */ }
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   };
 
   const refreshProfile = async () => {
@@ -201,26 +211,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const isAdmin = role === 'admin';
+  const isAdmin = !!user && !isLoading && role === 'admin';
   const isOwner = role === 'owner';
-  const isGM = role === 'gm';
+  const isGM = role === 'gm' || role === 'manager';
   const isShiftLead = role === 'shift_lead';
   const isStaffPortal = role !== null && STAFF_PORTAL_ROLES.includes(role);
 
   const canAccessPage = useCallback((pageKey: PageKey): boolean => {
-    if (isAdmin) return true;
-    return accessiblePages.includes(pageKey);
-  }, [accessiblePages, isAdmin]);
+    if (!user || isLoading || !role) return false;
+    return isAdmin || accessiblePages.includes(pageKey);
+  }, [accessiblePages, isAdmin, user, isLoading, role]);
 
   return (
     <AuthContext.Provider
       value={{
         user, session, profile, role, assignedBarIds, accessiblePages,
-        isLoading, isAdmin, isOwner, isGM, isShiftLead, isStaffPortal,
+        isLoading, permissionsError, isAdmin, isOwner, isGM, isShiftLead, isStaffPortal,
         canAccessPage, signIn, signUp, signOut, refreshProfile,
       }}
     >
-      {children}
+      <React.Fragment key={user?.id ?? 'signed-out'}>{children}</React.Fragment>
     </AuthContext.Provider>
   );
 };

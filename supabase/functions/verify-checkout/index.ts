@@ -1,3 +1,4 @@
+import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3.23.8';
 import { confirmSession, retrieveSession, validKey } from '../_shared/checkoutConfirm.ts';
@@ -6,6 +7,9 @@ const Body = z.object({ session_id: z.string().regex(/^cs_(test_|live_)?[A-Za-z0
 const json = (d: unknown, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
 Deno.serve(async (req) => {
+  const __authDenied = await guardEdgeRequest(req, 'verify-checkout');
+  if (__authDenied) return __authDenied;
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
   let raw; try { raw = await req.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }

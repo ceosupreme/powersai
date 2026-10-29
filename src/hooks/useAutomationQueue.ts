@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { AutomationKey } from "./useAutomationEnrollments";
+import { canRetryDelivery } from "@/lib/automationSendLabel";
 
 export type QueueStatus =
   | "pending_review" | "approved" | "sending" | "sent" | "rejected" | "failed" | "canceled";
@@ -19,6 +20,7 @@ export interface QueueItem {
   scheduled_for: string | null;
   reject_reason: string | null;
   send_result: Record<string, unknown> | null;
+  delivery_status?: "queued" | "logged" | "provider_accepted" | "delivered" | "failed" | "bounced" | "cancelled" | "unconfirmed";
   approved_by: string | null;
   approved_at: string | null;
   flagged_for_operator: boolean;
@@ -119,6 +121,7 @@ export function useQueueMutations() {
         body: { queue_id: id },
       });
       if (error) throw error;
+      if (data?.ok !== true) throw new Error(data?.reason ?? data?.error ?? "Send not completed. Check this message's delivery state.");
       return data;
     },
     onSuccess: invalidate,
@@ -126,17 +129,22 @@ export function useQueueMutations() {
 
   const retry = useMutation({
     mutationFn: async (id: string) => {
+      const current = await (supabase as any).from("automation_message_queue")
+        .select("status,delivery_status,send_result").eq("id", id).single();
+      if (current.error) throw current.error;
+      if (!canRetryDelivery(current.data)) throw new Error("Verify the provider receipt before retrying an unconfirmed or bounced message.");
       const { data: { user } } = await (supabase as any).auth.getUser();
       const { error } = await (supabase as any)
         .from("automation_message_queue")
         .update({
           status: "approved",
+          delivery_status: "queued",
           send_result: null,
           approved_at: new Date().toISOString(),
           approved_by: user?.id ?? null,
         })
         .eq("id", id)
-        .eq("status", "failed");
+        .eq("status", "failed").select("id").single();
       if (error) throw error;
     },
     onSuccess: invalidate,
