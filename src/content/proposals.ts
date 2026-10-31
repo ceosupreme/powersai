@@ -3,7 +3,7 @@
  *
  * Each record is the full content of one proposal, so a new proposal is a new
  * record here (and nothing else). The page renders every section from the
- * record, logs views to site_events, and sends an acceptance through the same
+ * record, logs views to site_events, and sends an agreement request through the same
  * submit-inbound-lead intake the public contact form uses, so the owner alert
  * and the CRM record fire with no extra backend.
  *
@@ -44,16 +44,23 @@ export type ProposalRecord = {
     email: string;
     site: string;
   };
-  /** A YouTube, Loom or Vimeo share link. Empty string hides the video block. */
+  /** Optional hosted-player share link. A named studio-media MP4 takes priority. */
   videoUrl: string;
+  videoMediaKey?: string;
+  videoTranscript?: string;
   /** Path to a downloadable PDF under /public, or empty to hide the button. */
   pdfUrl: string;
   /** Three short facts shown big at the top. */
   headlineFacts: { label: string; value: string }[];
   /** The opening note to the client, in the sender's words. */
   opening: string[];
+  journey: {
+    title: string;
+    steps: { label: string; title: string; body: string; handoff: string }[];
+  };
   outcomes: { label: string; title: string; body: string }[];
   blocks: ProposalBlock[];
+  monthly: { value: string; label: string }[];
   markets: {
     title: string;
     body: string;
@@ -63,7 +70,7 @@ export type ProposalRecord = {
   };
   pricing: {
     title: string;
-    lines: { label: string; amount: string; body: string }[];
+    lines: { label: string; amount: string; cadence: string; body: string }[];
     plainRules: string[];
   };
   pilot: {
@@ -85,7 +92,7 @@ export type ProposalRecord = {
     confirmationTitle: string;
     confirmationBody: string;
   };
-  /** Appears in the acceptance record so the owner alert reads clearly. */
+  /** Appears in the request record so the owner alert reads clearly. */
   internalLabel: string;
 };
 
@@ -99,151 +106,101 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       contact: "Erik Green",
       location: "Boston and the markets your team travels to",
     },
-    preparedOn: "October 31, 2026",
+    preparedOn: "October 30, 2026",
     preparedBy: {
-      name: "Sean Mayo",
+      name: "Allmighty Supreme Mayo",
       company: "Supreme Team Media",
       email: "supremeteammedia@gmail.com",
       site: "supremeteammedia.com",
     },
     videoUrl: "",
+    videoMediaKey: "proposal-cpn-explainer",
+    videoTranscript: "CPN wants more suitable timeshare owners at its presentations, without adding routine scheduling and follow-up to the team's day. Supreme Team Media proposes an appointment program built around that goal, with exclusive inquiries and assets that belong to CPN. We start with one primary paid channel, covering Boston and up to three active travel markets around your presentation calendar. Owners learn what to expect, complete screening, choose a session, and receive confirmations and reminders. Questions needing judgment go to your team, while we handle routine coordination. Monthly content keeps the message current. Reporting tracks spend, qualified bookings, attendance, and the sales CPN reports, so decisions follow the numbers. The pilot covers sixty live days. At day thirty, you can continue, adjust, or stop before the second monthly program fee. The proposal below explains the scope, responsibilities, investment, and first-month assurance. Review it, and request the agreement when you're ready to take the next step.",
     pdfUrl: "",
     headlineFacts: [
-      { label: "One monthly fee", value: "$3,000 a month" },
-      { label: "Judge it on results", value: "60-day pilot" },
-      { label: "Nothing hidden", value: "No percentage, no per-lead charges" },
+      { label: "Included markets", value: "Boston + up to 3 travel markets" },
+      { label: "Pilot", value: "60 live days" },
+      { label: "Your decision", value: "Continue, adjust or stop at day 30" },
     ],
     opening: [
-      "Erik, thanks for the time on Friday. You said you want more of the right people at your presentations, in Boston and wherever the team is presenting that week, and that you are open to video, social and ads if they produce.",
-      "This is one program that covers it, with a clear division of work, a defined scope, and a pilot you can judge on results. Everything is on this page, and you can print it or save it as a PDF for your team from the bottom of the page.",
+      "Erik, the goal is more suitable timeshare owners in the room, in Boston and wherever your team is presenting, without adding routine scheduling and follow-up to your day.",
+      "Supreme Team Media builds and manages the appointment program around your calendar. We introduce owners to your team, explain what to expect, and handle screening, booking and reminders. Your team handles the presentations and personal conversations.",
     ],
+    journey: {
+      title: "From first impression to presentation day.",
+      steps: [
+        { label: "Discover", title: "Reach owners in the right market.", body: "A campaign on one primary paid channel introduces owners to CPN in the locations where your team is presenting.", handoff: "STM manages the campaign. CPN approves the advertising budget." },
+        { label: "Understand", title: "Help owners know what to expect.", body: "A main video featuring your team, short ads and answer clips explain the consultation before an owner books.", handoff: "CPN supplies the expertise. STM produces the content." },
+        { label: "Qualify", title: "Screen for the people you can help.", body: "A short screening step uses the criteria we agree with your team before launch. Inquiries are exclusive to CPN.", handoff: "STM manages screening. Questions needing judgment go to your named contact." },
+        { label: "Book", title: "Connect each owner to a session.", body: "Market-specific campaign pages show the presentation dates and venues that match your calendar.", handoff: "CPN confirms the dates. STM maintains the booking process." },
+        { label: "Attend", title: "Keep the appointment moving.", body: "Confirmations, reminders and rescheduling reduce routine coordination. Reporting connects spend to qualified bookings, attendance and CPN-reported sales.", handoff: "STM handles routine follow-up. CPN leads the personal conversation." },
+      ],
+    },
     outcomes: [
-      {
-        label: "Now",
-        title: "More qualified households in the room",
-        body: "Timeshare owners booked, reminded and attending your presentations, in Boston and in each market you travel to, with the screening, scheduling and chasing handled.",
-      },
-      {
-        label: "Lasting",
-        title: "A channel you own",
-        body: "An acquisition channel that can be pointed at a new city in a day. Your video, your pages, your ad and social accounts, and your lead records stay yours, so the foundation keeps working and can grow if the results justify it.",
-      },
+      { label: "The immediate goal", title: "More suitable households attending", body: "Owners understand the consultation, complete screening and book into the sessions on your calendar." },
+      { label: "The lasting value", title: "A channel that belongs to CPN", body: "Your finished videos, campaign pages, advertising and social accounts, and lead records stay yours. The foundation can support future venues and markets." },
     ],
     blocks: [
-      {
-        number: "01",
-        title: "The video, plus monthly clips",
-        body: "One produced video that explains how the process works and invites owners to a presentation, shot once with you or one of your agents. Every ad and clip comes from that one shoot, and a defined set of short clips each month keeps the ads and the social channels fresh.",
-      },
-      {
-        number: "02",
-        title: "Campaign page, screening and booking",
-        body: "One campaign page template with a city version for each market you present in. It carries the video, plain answers to the questions owners ask, and a short qualifier: where they live, which resort or developer, years owned, paid off or financed, annual fees, what they have tried, and what they want. A booking calendar shows the presentations and venues for that market, with a phone or video option for people who will not come to a group.",
-      },
-      {
-        number: "03",
-        title: "Advertising that follows your calendar",
-        body: "The primary paid channel to start is Meta and Instagram, aimed at timeshare owners where your team will be, with retargeting of people who engaged. Google is added once eligibility is confirmed. You set the advertising budget and pay the platforms directly, so every dollar is visible to you, market by market.",
-      },
-      {
-        number: "04",
-        title: "Weekly content on channels in your name",
-        body: "Social channels set up in your name and kept active with weekly content cut from the same shoot, so the people who look you up after a mailer or an ad find a business that is present and current.",
-      },
-      {
-        number: "05",
-        title: "Follow-up and attendance handled",
-        body: "Everything after the click runs itself: confirmation, reminders, a courtesy call with a human option, rebooking for no-shows, and follow-up for the people who are interested but not ready. Your team never calls anyone to chase an appointment.",
-      },
-      {
-        number: "06",
-        title: "Managed and improved every month",
-        body: "A dashboard you can open any time and a Monday report on bookings, attendance, and what is working, so budget decisions are made on numbers. The campaign is tuned against attendance, not clicks.",
-        note: "Nothing in the video or the ads promises an exit, implies a government program or a connection to any resort, or pressures anyone with today-only language. The campaign invites owners to understand their options and book a conversation with your team.",
-      },
+      { number: "01", title: "Prepare owners before arrival", body: "A main video featuring your team, supported by short ads and answer clips, introduces CPN and explains what to expect from the consultation." },
+      { number: "02", title: "Book into your sessions", body: "Market-specific pages, short screening and booking connect suitable owners to your presentation dates and venues. Boston plus up to three travel markets can be active at once." },
+      { number: "03", title: "Reduce routine follow-up", body: "Confirmations, reminders and rescheduling keep appointments moving. Questions that need judgment go to a named CPN contact. Your inquiries are exclusive, never shared or resold." },
+      { number: "04", title: "Build your own channel", body: "CPN keeps the finished videos, campaign pages, advertising and social accounts, and lead records. The work creates a foundation you can reuse for future venues and markets." },
+    ],
+    monthly: [
+      { value: "6–8", label: "clips from a monthly recording" },
+      { value: "2–3", label: "ad variations each month" },
+      { value: "Weekly", label: "Facebook, Instagram and YouTube posting" },
+      { value: "Managed", label: "campaigns, booking, follow-up and reporting" },
     ],
     markets: {
-      title: "Boston, and every market the team travels to",
-      body: "The program follows your presentation calendar, not a radius. A mail drop for an event in another city has to be printed and in the mail weeks ahead. A campaign for that same event is a geography change and a venue line on the calendar, running from the same video and page.",
-      home: "Boston runs continuously as the home market.",
-      travelNote: "Each travel market gets its own campaign window that opens two to three weeks before your presentations there and closes the day after, aimed at owners who live where the team will be. The where-they-live answer on the page routes each person to the right calendar.",
-      scopeNote: "Included scope: the home market plus up to three travel markets active at any one time. If your calendar runs hotter than that, we agree on the extra before adding it.",
+      title: "Built around your presentation calendar.",
+      body: "Start with one primary paid channel. Activate markets according to your presentation dates and the budget you approve, with local pages and booking details for each selected location.",
+      home: "Boston is the home market.",
+      travelNote: "Up to three travel markets may be active alongside Boston. We agree on which markets to activate as your calendar develops.",
+      scopeNote: "Extra channels and mail-response integration can be scoped later, before that work is added.",
     },
     pricing: {
-      title: "What it costs",
+      title: "The investment",
       lines: [
-        {
-          label: "Foundation",
-          amount: "$3,000",
-          body: "Paid in two halves, half to start and half at launch. Covers the video production, the campaign page template with the Boston version, the booking calendar, the follow-up system and the dashboard.",
-        },
-        {
-          label: "Program",
-          amount: "$3,000 a month",
-          body: "Starts the day the campaign goes live, not the day we sign. Covers the campaigns, the monthly clips, the weekly content, the follow-up and the Monday report.",
-        },
-        {
-          label: "Advertising",
-          amount: "You set it",
-          body: "Paid by you directly to the platforms, so every dollar is visible to you, market by market.",
-        },
+        { label: "Foundation", amount: "$3,000", cadence: "one-time setup", body: "$1,500 to begin; $1,500 when the launch deliverables are ready. Includes the main video and launch content, page, screening and booking, tested follow-up and reporting setup." },
+        { label: "Program", amount: "$3,000", cadence: "per month, starting at launch", body: "Campaign management, monthly recording and content, weekly posting, booking and follow-up upkeep, plus a dashboard and weekly report." },
+        { label: "Advertising", amount: "$3,000–$5,000", cadence: "per month · initial planning range", body: "Total across the selected markets. CPN approves the budget and pays the advertising platforms directly. This is separate from the program fee." },
       ],
-      plainRules: [
-        "No percentage of your sales.",
-        "No per-lead charges.",
-        "Your video, pages, accounts and lead records stay yours.",
-      ],
+      plainRules: ["No percentage of sales.", "No per-lead fee.", "Your finished assets, accounts and lead records stay yours."],
     },
     pilot: {
-      title: "How the pilot works",
+      title: "The launch and pilot",
       phases: [
-        {
-          when: "Days 1 to 10",
-          title: "Build",
-          body: "Campaign page template and the Boston version, qualifier, booking calendar on your presentations, confirmations and reminders, social channels, tracking and dashboard. The video is shot and cut in this window.",
-        },
-        {
-          when: "Week 3",
-          title: "Live",
-          body: "The campaign goes live and the monthly fee starts. The first appointments can be on your calendar within three weeks of the start.",
-        },
-        {
-          when: "Live weeks 2 to 8",
-          title: "Optimize",
-          body: "Tune against bookings and attendance, scale the budget on what is working, open the first travel-market windows against your calendar, add Google once eligibility is confirmed.",
-        },
-        {
-          when: "Day 30",
-          title: "Decision point",
-          body: "You see the first month's numbers and decide: continue, adjust, or stop at the end of the 60 days.",
-        },
+        { when: "Before launch", title: "Build the foundation", body: "Confirm screening, calendar, materials and access. Target launch within three weeks once these are in place, with timely approvals." },
+        { when: "Live days 1–30", title: "Manage and measure", body: "Run the campaign and appointment process. Report spend, qualified bookings, attendance and CPN-reported sales each week." },
+        { when: "Day 30", title: "Make a real decision", body: "Review qualified attendance, acquisition cost and early sales. Continue, adjust or stop before the second monthly fee." },
+        { when: "Live days 31–60", title: "Continue if it makes sense", body: "Use the first month's results to guide the next month of the pilot if you decide to continue." },
       ],
       assurance: {
-        title: "The assurance",
-        body: "If the first live month produces zero qualified attending households while the campaign is funded and your presentation dates are available, the first month's program fee is refunded.",
+        title: "A clear first-month assurance",
+        body: "If the first 30 live days produce zero qualified attending households, we refund that month's $3,000 program fee and pause, provided the agreed advertising funding and presentation dates are available.",
       },
       definition: {
-        title: "What counts",
-        body: "A qualified attending household is one that lives in a market where you have a presentation scheduled in the campaign window, owns a timeshare or decides for the household that does, meets the screening answers your team can work with, booked a presentation, and attended. Each household counts once.",
+        title: "Agree on qualified attendance before launch",
+        body: "We agree on the screening criteria with your team before the campaign goes live, so the results are measured against a shared definition.",
       },
-      after: "After the 60 days the program runs month to month. A performance arrangement is available once there are real numbers to base it on.",
+      after: "After the pilot, the program continues month to month with 30 days' notice.",
     },
     afterAccept: {
-      title: "What happens after you accept",
-      intro: "You get the one-page agreement and the foundation invoice the same day. Build starts the day the first half clears. To start, I will ask you for:",
+      title: "Let's build your next source of appointments.",
+      intro: "Request the agreement and $1,500 starting invoice. Then we confirm the presentations, arrange the first recording and begin the build.",
       items: [
-        "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
-        "Logo and brand files, and fifteen minutes with you or one of your agents on camera.",
-        "A copy of your current client agreement, so the video and the page describe the process exactly as it works.",
-        "Your business name and address for the agreement, and the email for the invoice.",
+        "Confirm presentation dates, venues and the first markets to activate.",
+        "Agree on screening criteria and name the CPN contact for questions that need judgment.",
+        "Gather the materials and account access, arrange the first recording and begin the build.",
       ],
     },
     accept: {
-      title: "Ready to start?",
-      body: "Accept here and the agreement and invoice go out today. Questions first are welcome, by email or a quick call.",
-      buttonLabel: "Accept and start",
-      confirmationTitle: "Accepted. Thank you, Erik.",
-      confirmationBody: "The one-page agreement and the foundation invoice are on their way to the email you entered, today. Sean will reach out at the number you gave to set the kickoff and collect the calendar.",
+      title: "Ready for the next step?",
+      body: "Send your details so Allmighty can prepare the agreement and $1,500 starting invoice. Questions are welcome before you decide.",
+      buttonLabel: "Request the agreement",
+      confirmationTitle: "Your request is saved.",
+      confirmationBody: "Allmighty will follow up using the details you provided to send the agreement and $1,500 starting invoice.",
     },
     internalLabel: "Appointment Growth Program, CPN Boston",
   },

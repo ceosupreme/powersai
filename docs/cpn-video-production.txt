@@ -1,0 +1,100 @@
+CPN PROPOSAL VIDEO — PRODUCTION PACK
+
+STATUS: Production brief; video not yet rendered.
+
+Purpose: A short introduction to the CPN proposal on Supreme Team Media's website.
+Audience: CPN's decision makers reviewing the proposed program.
+Format: Landscape 16:9, 1080p; approximately 75–85 seconds within a 60–90-second limit.
+Narration: 154 words, counted by whitespace. Timing is a production target, not a rendered duration.
+Route: Generate a first draft in the user's existing InVideo account, review it, then export an MP4 for the proposal page. No signed-in account has been accessed and no generation, upload, or send has occurred.
+
+1. INVIDEO PROMPT
+
+Paste this prompt and the narration block below into InVideo. Include the scene directions if the tool accepts them in the same brief.
+
+Create a professional 60–90-second proposal explainer for CPN from Supreme Team Media. Use exactly the narration between NARRATION START and NARRATION END. Do not rewrite, extend, summarize, or add spoken words. Target a calm, natural delivery of approximately 75–85 seconds. Pronounce CPN as the individual letters C, P, N; retain CPN in captions.
+
+Use one natural narrator, restrained background music below the voice, readable synchronized captions, and simple transitions. Use supplied STM branding where available, clean typography, process diagrams, and clearly illustrative graphics. Use stock only when it meaningfully explains the narration. Format the video in landscape 16:9 for 1080p export. Follow the six scene directions below without narrating the directions or labels.
+
+Do not add services, prices, testimonials, statistics, guarantees, or promises of timeshare cancellation. Do not imply a real CPN or STM office, staff, customer, event, or case study through generated or stock imagery. Do not portray dashboards or calendar entries as actual results. Keep the focus on the proposed process. Do not invent logos, travel cities, venues, or presentation dates. Keep prices and detailed commercial terms on the webpage.
+
+2. EXACT NARRATION FOR REVIEW
+
+NARRATION START
+
+CPN wants more suitable timeshare owners at its presentations, without adding routine scheduling and follow-up to the team's day.
+
+Supreme Team Media proposes an appointment program built around that goal, with exclusive inquiries and assets that belong to CPN.
+
+We start with one primary paid channel, covering Boston and up to three active travel markets around your presentation calendar.
+
+Owners learn what to expect, complete screening, choose a session, and receive confirmations and reminders. Questions needing judgment go to your team, while we handle routine coordination.
+
+Monthly content keeps the message current. Reporting tracks spend, qualified bookings, attendance, and the sales CPN reports, so decisions follow the numbers.
+
+The pilot covers sixty live days. At day thirty, you can continue, adjust, or stop before the second monthly program fee.
+
+The proposal below explains the scope, responsibilities, investment, and first-month assurance. Review it, and request the agreement when you're ready to take the next step.
+
+NARRATION END
+
+3. SCENE DIRECTIONS
+
+Timing is approximate. Let the exact narration determine the final cuts; keep the finished video under 90 seconds without rushing the voice.
+
+Scene 1 | Opening and ownership | Approximately 0–17 seconds
+Narration: First two paragraphs.
+Visual: A clean title, "CPN | Appointment Growth Program," followed by household icons moving toward a presentation icon. Add a simple ownership card, "Exclusive leads. Assets owned by CPN."
+Use abstract illustrations. No attendee counts, success indicators, invented testimonials, or footage implying a real client event.
+
+Scene 2 | Markets and channel | Approximately 17–30 seconds
+Narration: Boston, travel markets, and one primary paid channel.
+Visual: Boston label beside three optional travel-market cards and a calendar symbol. Use "Boston + up to 3 active travel markets" and "One primary paid channel."
+Do not label additional cities or imply several paid channels are included at launch.
+
+Scene 3 | Prospect journey | Approximately 30–45 seconds
+Narration: Education through attendance support.
+Visual: Reveal four stages in sequence: "Education → Screening → Booking → Reminders." Place them inside a simple campaign-page outline, then end with a presentation icon.
+Use illustrative interface shapes, not fabricated booking confirmations or actual household information.
+
+Scene 4 | Monthly operation | Approximately 45–57 seconds
+Narration: Monthly content and reporting.
+Visual: A content calendar beside a simple report outline. Labels: "Monthly content," "Bookings," and "Attending households."
+Do not invent metrics, upward trend charts, performance targets, or results. Mark any detailed interface mockup "Illustrative."
+
+Scene 5 | Pilot and decision | Approximately 57–69 seconds
+Narration: Sixty live days and the day-thirty decision point.
+Visual: A simple timeline labeled "Launch," "Live day 30: Review," and "Live day 60: Pilot complete." Distinguish live campaign days from setup time.
+Do not invent a launch date or imply that setup is included in the sixty live days.
+
+Scene 6 | Proposal handoff | Approximately 69–82 seconds
+Narration: Final paragraph.
+Visual: Clean STM end card with "Review the proposal below" and the labels "Scope · Investment · First-month assurance."
+Keep the action on the existing proposal page. No automatic acceptance message, payment prompt, new booking link, or spoken price.
+
+4. PRONUNCIATION AND DELIVERY
+
+- CPN: Speak the three letters "C, P, N" (see–pee–en). Display "CPN" in captions and graphics.
+- Supreme Team Media: Say the full company name naturally; do not replace it with an acronym.
+- Boston: Use the ordinary place-name pronunciation.
+- Speak "sixty live days" and "day thirty" clearly. On-screen labels may use 60 and 30.
+- Use a calm, clear, professional voice with brief pauses between ideas. Keep music quiet enough that every word remains intelligible on phone speakers.
+
+5. REVIEW AND EXPORT CHECKLIST
+
+[ ] Confirm the current InVideo workspace, available credits, and export settings before generating. Do not assume the account's plan or watermark policy, and do not purchase an upgrade automatically.
+[ ] Listen to the entire first draft. Compare narration word for word with section 2; remove any additions or rewritten claims.
+[ ] Verify CPN pronunciation, captions, company names, and all numbers. Check that the final runtime is 60–90 seconds with natural pacing.
+[ ] Check that "up to three travel markets" and "one primary paid channel" remain accurate in both voice and visuals.
+[ ] Confirm that the pilot is sixty LIVE days and that the day-thirty marker is a review/decision point.
+[ ] Remove invented staff, offices, customers, real-looking results, event details, guarantees, and unsupported claims. Keep all prices on the webpage.
+[ ] Check captions at phone size, avoid text under player controls, and ensure narration is clear over music.
+[ ] Export a clean 1920 × 1080 H.264 MP4 with synchronized audio and readable captions. Use watermark-free settings available under the actual account/workspace; verify the downloaded file itself.
+[ ] Play the exported file from start to finish, then provide it for the existing proposal page's video slot. The page should remain fully usable without playing the video.
+[ ] Replace this status only after a real render exists. Do not label a placeholder or script as a completed video, and do not send or publish the proposal from this production brief.
+
+Official workflow references checked October 31, 2026:
+- Script to video: https://info.invideo.io/ai-text-script-to-full-video
+- Editor MP4 export: https://help.invideo.io/en/articles/16920230-how-to-export-video-audio-or-a-png-still-from-invideo-editor
+- Current Editor credit/export distinction: https://invideo.io/faq/is-invideo-editor-free-when-i-use-an-ai-editing-agent/
+- AI export watermark guidance: https://help.invideo.io/en/articles/9387948-why-are-there-still-watermarks-on-my-video-if-i-m-on-a-paid-plan

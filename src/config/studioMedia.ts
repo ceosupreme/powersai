@@ -77,9 +77,21 @@ export type StudioMediaSlot = {
   mobileSrc?: string | null;
   videoSrc?: string | null;
   posterSrc?: string | null;
+  captionsSrc?: string | null;
 };
 
 export const STUDIO_MEDIA: Record<string, StudioMediaSlot> = {
+  "proposal-cpn-explainer": {
+    src: null,
+    videoSrc: null,
+    posterSrc: null,
+    captionsSrc: null,
+    alt: "Overview of the proposed CPN Appointment Growth Program",
+    aspectRatio: "16 / 9",
+    width: 1920,
+    height: 1080,
+    objectFit: "contain",
+  },
   "home-opening-command-center": {
     src: commandCenterDesktop,
     mobileSrc: commandCenterMobile,
