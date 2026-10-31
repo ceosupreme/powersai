@@ -160,7 +160,11 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 <span className="proposal-cal-name">Travel market C</span>
                 <div className="proposal-cal-track"><i className="proposal-cal-bar" style={{ gridColumn: "6 / 9" }}>Window</i><b className="proposal-cal-dot" style={{ gridColumn: "8" }} aria-label="Presentations" /></div>
               </div>
-              <p className="proposal-cal-key"><i className="proposal-cal-bar is-home" /> Always on <i className="proposal-cal-bar" /> Opens two to three weeks before the presentations, closes the day after <b className="proposal-cal-dot" /> Presentation days</p>
+              <p className="proposal-cal-key">
+                <span><i className="proposal-cal-bar is-home" /> Always on</span>
+                <span><i className="proposal-cal-bar" /> Opens two to three weeks before the presentations, closes the day after</span>
+                <span><b className="proposal-cal-dot" /> Presentation days</span>
+              </p>
             </figure>
           </div>
         </section>

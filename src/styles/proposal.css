@@ -59,9 +59,10 @@
 .proposal-page .proposal-cal-bar { grid-row: 1; display: flex; align-items: center; padding-inline: 10px; height: 26px; margin-inline: 3px; border-radius: 6px; background: hsl(var(--gold-bright) / .35); font-style: normal; font-size: .72rem; font-weight: 700; white-space: nowrap; overflow: hidden; }
 .proposal-page .proposal-cal-bar.is-home { background: hsl(var(--gold-bright)); color: #101412; }
 .proposal-page .proposal-cal-dot { grid-row: 1; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px hsl(var(--navy)); }
-.proposal-page .proposal-cal-key { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 18px; font-size: .78rem; color: hsl(var(--navy-text) / .75); }
-.proposal-page .proposal-cal-key .proposal-cal-bar { display: inline-block; width: 26px; height: 12px; padding: 0; margin: 0; }
-.proposal-page .proposal-cal-key .proposal-cal-dot { display: inline-block; }
+.proposal-page .proposal-cal-key { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 18px; font-size: .78rem; color: hsl(var(--navy-text) / .75); }
+.proposal-page .proposal-cal-key > span { display: inline-flex; align-items: center; gap: 8px; }
+.proposal-page .proposal-cal-key .proposal-cal-bar { display: inline-block; flex: none; width: 26px; height: 12px; padding: 0; margin: 0; }
+.proposal-page .proposal-cal-key .proposal-cal-dot { display: inline-block; flex: none; box-shadow: none; }
 
 /* Pricing band */
 .proposal-page .proposal-pricing { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-top: 0 !important; }

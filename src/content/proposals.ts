@@ -115,7 +115,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     ],
     opening: [
       "Erik, thanks for the time on Friday. You said you want more of the right people at your presentations, in Boston and wherever the team is presenting that week, and that you are open to video, social and ads if they produce.",
-      "This is one program that covers it, with a clear division of work, a defined scope, and a pilot you can judge on results. The short version is on this page. The two-page version is attached for your team.",
+      "This is one program that covers it, with a clear division of work, a defined scope, and a pilot you can judge on results. Everything is on this page, and you can print it or save it as a PDF for your team from the bottom of the page.",
     ],
     outcomes: [
       {
