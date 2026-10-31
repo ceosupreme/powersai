@@ -1,0 +1,159 @@
+/* Unlisted client proposal pages (/proposal/:slug). Scoped to .proposal-page inside the public .stm-studio surface. */
+.stm-studio.proposal-page { --gold: var(--cobalt); --gold-bright: var(--home-amber); --navy: var(--home-charcoal); --navy-text: var(--home-light); }
+.proposal-page .proposal-wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+.proposal-page .proposal-eyebrow { display: block; color: hsl(var(--gold)); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.proposal-page .proposal-h2 { margin-top: 14px; font-family: "Inter Tight", "Instrument Sans", sans-serif; font-size: clamp(1.9rem, 3.6vw, 3rem); font-weight: 800; line-height: 1.08; letter-spacing: -.02em; }
+.proposal-page section + section { border-top: 1px solid hsl(var(--rule)); }
+
+/* Top bar: brand only, no site menu. */
+.proposal-page .proposal-topbar { background: hsl(var(--surface)); border-bottom: 1px solid hsl(var(--rule)); }
+.proposal-page .proposal-topbar-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+.proposal-page .proposal-brand { display: inline-flex; align-items: center; gap: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em; color: hsl(var(--ink)); }
+.proposal-page .proposal-brand img { width: 30px; height: auto; }
+.proposal-page .proposal-topbar-for { font-size: .9rem; color: hsl(var(--ink-muted)); text-align: right; }
+
+/* Hero */
+.proposal-page .proposal-hero { padding-block: clamp(44px, 7vw, 96px) clamp(40px, 6vw, 72px); }
+.proposal-page .proposal-title { margin-top: 14px; font-family: "Inter Tight", "Instrument Sans", sans-serif; font-size: clamp(2.7rem, 7vw, 5.4rem); font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+.proposal-page .proposal-subtitle { margin-top: 18px; max-width: 760px; font-size: clamp(1.2rem, 2.3vw, 1.6rem); line-height: 1.4; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-video { position: relative; margin-top: 32px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 18px; background: hsl(var(--navy)); box-shadow: 0 28px 60px -30px rgba(11, 18, 40, .55); }
+.proposal-page .proposal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.proposal-page .proposal-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 32px; padding: 0; list-style: none; }
+.proposal-page .proposal-facts li { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.proposal-page .proposal-fact-label { font-size: .82rem; font-weight: 600; color: hsl(var(--ink-muted)); text-transform: uppercase; letter-spacing: .06em; }
+.proposal-page .proposal-fact-value { font-family: "Inter Tight", sans-serif; font-size: clamp(1.35rem, 2.2vw, 1.75rem); font-weight: 800; line-height: 1.15; color: hsl(var(--ink)); }
+
+/* Opening note and the two outcomes */
+.proposal-page .proposal-opening { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--surface)); }
+.proposal-page .proposal-opening-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.proposal-page .proposal-opening-note p { font-size: clamp(1.1rem, 1.6vw, 1.3rem); line-height: 1.6; }
+.proposal-page .proposal-opening-note p + p { margin-top: 18px; }
+.proposal-page .proposal-sign { font-weight: 700; color: hsl(var(--ink)); }
+.proposal-page .proposal-outcomes { display: grid; gap: 16px; }
+.proposal-page .proposal-outcome { padding: 24px 26px; border-left: 4px solid hsl(var(--gold)); background: hsl(var(--paper)); border-radius: 0 16px 16px 0; }
+.proposal-page .proposal-outcome h2 { margin-top: 8px; font-family: "Inter Tight", sans-serif; font-size: 1.45rem; font-weight: 800; line-height: 1.15; }
+.proposal-page .proposal-outcome p { margin-top: 10px; color: hsl(var(--ink-muted)); }
+
+/* The six blocks */
+.proposal-page .proposal-blocks { padding-block: clamp(44px, 6vw, 88px); }
+.proposal-page .proposal-block-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 36px; }
+.proposal-page .proposal-block { position: relative; padding: 28px 28px 30px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 18px; }
+.proposal-page .proposal-block-num { display: inline-block; font-family: "Inter Tight", sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1; color: hsl(var(--gold)); }
+.proposal-page .proposal-block h3 { margin-top: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.35rem; font-weight: 800; line-height: 1.15; }
+.proposal-page .proposal-block p { margin-top: 12px; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-block-note { padding-top: 14px; border-top: 1px dashed hsl(var(--rule)); font-size: .92rem; }
+
+/* Markets and the calendar figure */
+.proposal-page .proposal-markets { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
+.proposal-page .proposal-markets-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; align-items: center; }
+.proposal-page .proposal-markets p { margin-top: 16px; }
+.proposal-page .proposal-scope { padding: 14px 18px; background: hsl(var(--cobalt-pale)); border-radius: 12px; font-size: .95rem; }
+.proposal-page .proposal-calendar { margin: 0; padding: 24px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 18px; }
+.proposal-page .proposal-calendar figcaption { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold-bright)); }
+.proposal-page .proposal-cal-weeks { display: grid; grid-template-columns: 112px repeat(8, minmax(0, 1fr)); margin-top: 16px; font-size: .72rem; color: hsl(var(--navy-text) / .55); }
+.proposal-page .proposal-cal-weeks span { text-align: center; }
+.proposal-page .proposal-cal-weeks span:first-child { grid-column: 2; }
+.proposal-page .proposal-cal-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 0; margin-top: 12px; }
+.proposal-page .proposal-cal-name { font-size: .82rem; font-weight: 600; line-height: 1.2; padding-right: 10px; }
+.proposal-page .proposal-cal-track { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); align-items: center; height: 34px; background: hsl(var(--navy-text) / .06); border-radius: 8px; }
+.proposal-page .proposal-cal-bar { grid-row: 1; display: flex; align-items: center; padding-inline: 10px; height: 26px; margin-inline: 3px; border-radius: 6px; background: hsl(var(--gold-bright) / .35); font-style: normal; font-size: .72rem; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.proposal-page .proposal-cal-bar.is-home { background: hsl(var(--gold-bright)); color: #101412; }
+.proposal-page .proposal-cal-dot { grid-row: 1; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px hsl(var(--navy)); }
+.proposal-page .proposal-cal-key { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 18px; font-size: .78rem; color: hsl(var(--navy-text) / .75); }
+.proposal-page .proposal-cal-key .proposal-cal-bar { display: inline-block; width: 26px; height: 12px; padding: 0; margin: 0; }
+.proposal-page .proposal-cal-key .proposal-cal-dot { display: inline-block; }
+
+/* Pricing band */
+.proposal-page .proposal-pricing { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-top: 0 !important; }
+.proposal-page .proposal-pricing .proposal-eyebrow { color: hsl(var(--gold-bright)); }
+.proposal-page .proposal-pricing .proposal-h2 { max-width: 820px; }
+.proposal-page .proposal-price-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 36px; }
+.proposal-page .proposal-price { padding: 26px 26px 28px; background: hsl(var(--navy-text) / .06); border: 1px solid hsl(var(--navy-text) / .14); border-radius: 18px; }
+.proposal-page .proposal-price-label { display: block; font-size: .82rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--navy-text) / .7); }
+.proposal-page .proposal-price-amount { display: block; margin-top: 10px; font-family: "Inter Tight", sans-serif; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 800; line-height: 1; letter-spacing: -.02em; color: hsl(var(--gold-bright)); }
+.proposal-page .proposal-price p { margin-top: 14px; color: hsl(var(--navy-text) / .8); }
+.proposal-page .proposal-rules { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 28px 0 0; padding: 0; list-style: none; font-size: 1.05rem; font-weight: 600; }
+.proposal-page .proposal-rules li { display: inline-flex; align-items: center; gap: 10px; }
+.proposal-page .proposal-rules svg { color: hsl(var(--gold-bright)); }
+
+/* Pilot timeline, assurance and definition */
+.proposal-page .proposal-pilot { padding-block: clamp(44px, 6vw, 88px); }
+.proposal-page .proposal-phases { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 36px 0 0; padding: 0; list-style: none; }
+.proposal-page .proposal-phases li { position: relative; padding: 22px 22px 24px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.proposal-page .proposal-phase-step { position: absolute; top: -14px; left: 20px; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: hsl(var(--gold)); color: #fff; font-size: .85rem; font-weight: 800; }
+.proposal-page .proposal-phase-when { display: block; margin-top: 4px; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-phases h3 { margin-top: 6px; font-family: "Inter Tight", sans-serif; font-size: 1.3rem; font-weight: 800; }
+.proposal-page .proposal-phases p { margin-top: 8px; font-size: .97rem; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-assurance-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 18px; margin-top: 22px; }
+.proposal-page .proposal-assurance { padding: 26px 28px; border: 2px solid hsl(var(--gold)); background: hsl(var(--cobalt-pale)); border-radius: 18px; }
+.proposal-page .proposal-assurance h3, .proposal-page .proposal-definition h3 { font-family: "Inter Tight", sans-serif; font-size: 1.2rem; font-weight: 800; }
+.proposal-page .proposal-assurance p { margin-top: 10px; font-size: 1.08rem; font-weight: 600; line-height: 1.5; }
+.proposal-page .proposal-definition { padding: 26px 28px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 18px; }
+.proposal-page .proposal-definition p { margin-top: 10px; font-size: .97rem; color: hsl(var(--ink-muted)); }
+
+/* After you accept */
+.proposal-page .proposal-after { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--surface)); }
+.proposal-page .proposal-after-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px; align-items: start; }
+.proposal-page .proposal-after-grid > div p { margin-top: 16px; }
+.proposal-page .proposal-after-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.proposal-page .proposal-after-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px 18px; background: hsl(var(--paper)); border-radius: 14px; }
+.proposal-page .proposal-after-list span { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--navy)); color: hsl(var(--gold-bright)); font-weight: 800; }
+
+/* Accept */
+.proposal-page .proposal-accept { padding-block: clamp(48px, 7vw, 96px); }
+.proposal-page .proposal-accept-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: start; }
+.proposal-page .proposal-accept-intro p { margin-top: 16px; }
+.proposal-page .proposal-side-actions { display: grid; gap: 10px; margin-top: 26px; }
+.proposal-page .proposal-side-actions a, .proposal-page .proposal-side-actions button { display: inline-flex; align-items: center; gap: 10px; padding: 0; background: none; border: 0; font: inherit; font-weight: 600; color: hsl(var(--ink)); cursor: pointer; text-align: left; }
+.proposal-page .proposal-side-actions svg { color: hsl(var(--gold)); }
+.proposal-page .proposal-signature { display: grid; gap: 2px; margin-top: 34px; padding-top: 22px; border-top: 1px solid hsl(var(--rule)); font-style: normal; }
+.proposal-page .proposal-signature strong { font-family: "Inter Tight", sans-serif; font-size: 1.2rem; }
+.proposal-page .proposal-signature a { color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-form { display: grid; gap: 16px; padding: 28px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 20px; box-shadow: 0 30px 60px -36px rgba(11, 18, 40, .5); }
+.proposal-page .proposal-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.proposal-page .proposal-form label { display: grid; gap: 6px; font-size: .92rem; font-weight: 600; }
+.proposal-page .proposal-form input:not([type="checkbox"]) { width: 100%; height: 50px; padding: 0 14px; font: inherit; font-size: 1rem; color: hsl(var(--ink)); background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 12px; }
+.proposal-page .proposal-form input:focus { outline: 2px solid hsl(var(--gold)); outline-offset: 1px; }
+.proposal-page .proposal-check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: hsl(var(--paper)); border-radius: 12px; font-weight: 500 !important; }
+.proposal-page .proposal-check input { width: 22px; height: 22px; margin-top: 2px; accent-color: hsl(var(--gold)); }
+.proposal-page .proposal-form-error { padding: 12px 14px; background: hsl(0 84% 95%); color: hsl(0 60% 35%); border-radius: 10px; font-size: .95rem; }
+.proposal-page .proposal-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 26px; font: inherit; font-size: 1.1rem; font-weight: 800; color: #101412; background: linear-gradient(135deg, #F6C65A, #E89A2B); border: 0; border-radius: 14px; box-shadow: 0 12px 26px -10px rgba(232, 154, 43, .6); cursor: pointer; }
+.proposal-page .proposal-btn:disabled { opacity: .7; cursor: default; }
+.proposal-page .proposal-form-fine { font-size: .85rem; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-honeypot { position: absolute; left: -9999px; width: 0; height: 0; overflow: hidden; }
+.proposal-page .proposal-form-done { padding: 36px 32px; }
+.proposal-page .proposal-done-mark { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: hsl(var(--cobalt-pale)); color: hsl(var(--gold)); }
+.proposal-page .proposal-form-done h3 { font-family: "Inter Tight", sans-serif; font-size: 1.6rem; font-weight: 800; }
+.proposal-page .proposal-form-done p { color: hsl(var(--ink-muted)); }
+
+/* Footer strip */
+.proposal-page .proposal-footer { background: hsl(var(--navy)); color: hsl(var(--navy-text) / .8); }
+.proposal-page .proposal-footer-in { display: grid; gap: 12px; padding-block: 28px; font-size: .9rem; }
+.proposal-page .proposal-footer-more { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.proposal-page .proposal-footer-more a { color: hsl(var(--gold-bright)); font-weight: 600; }
+.proposal-page .proposal-footer-legal { color: hsl(var(--navy-text) / .55); }
+
+/* Phones and narrow screens */
+@media (max-width: 900px) {
+  .proposal-page .proposal-opening-grid, .proposal-page .proposal-markets-grid, .proposal-page .proposal-assurance-grid, .proposal-page .proposal-after-grid, .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .proposal-page .proposal-block-grid, .proposal-page .proposal-price-grid { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .proposal-page .proposal-wrap { width: min(1120px, 100% - 32px); }
+  .proposal-page .proposal-topbar-for { display: none; }
+  .proposal-page .proposal-facts { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-phases, .proposal-page .proposal-form-row { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-cal-weeks { grid-template-columns: 84px repeat(8, minmax(0, 1fr)); }
+  .proposal-page .proposal-cal-row { grid-template-columns: 84px minmax(0, 1fr); }
+  .proposal-page .proposal-cal-bar { font-size: 0; }
+  .proposal-page .proposal-form { padding: 20px; }
+}
+
+/* Print: a clean document, no site chrome, no form controls. */
+@media print {
+  .proposal-page .proposal-topbar, .proposal-page .proposal-footer, .proposal-page .proposal-video, .proposal-page .proposal-side-actions, .proposal-page .proposal-form { display: none !important; }
+  .proposal-page section { break-inside: avoid; padding-block: 22px !important; }
+  .proposal-page .proposal-pricing, .proposal-page .proposal-calendar, .proposal-page .proposal-after-list span { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); }
+}

@@ -97,6 +97,8 @@ import AreasHub from "./pages/AreasHub";
 import AreaDetail from "./pages/AreaDetail";
 import Startups from "./pages/Startups";
 const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
+// Unlisted client proposals (content in src/content/proposals.ts); never prerendered or indexed.
+const Proposal = lazy(() => import("./pages/Proposal"));
 // The HQ app loads in its own pieces, so visitors to the public site only download the public pages.
 const LazyAppLayout = lazy(() => import("@/components/layout/AppLayout").then((m) => ({ default: m.AppLayout })));
 const SetupWizard = lazy(() => import("@/components/help/SetupWizard").then((m) => ({ default: m.SetupWizard })));
@@ -183,6 +185,8 @@ const App = () => {
                 <Route path="/q/:venueSlug" element={<Waiting><QualifyForVenue /></Waiting>} />
                 {/* Public shared Recovery Report — no auth, integrity-gated by the edge function. */}
                 <Route path="/r/:token" element={<Waiting><PublicRecoveryReport /></Waiting>} />
+                {/* Unlisted client proposal pages — no auth; the link is the access. */}
+                <Route path="/proposal/:slug" element={<Waiting><Proposal /></Waiting>} />
                 <Route path="/portfolio" element={
                   <ProtectedRoute allowedRoles={['owner']}>
                     <AppLayout><PortfolioOverview /></AppLayout>

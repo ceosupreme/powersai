@@ -1,16 +1,21 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /proposal/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /proposal/
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /proposal/
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /proposal/
 
 User-agent: *
 Allow: /
+Disallow: /proposal/
 
 Sitemap: https://supremeteammedia.com/sitemap.xml
