@@ -136,8 +136,8 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     blocks: [
       {
         number: "01",
-        title: "The video, plus monthly clips",
-        body: "One produced video that explains how the process works and invites owners to a presentation, shot once with you or one of your agents. Every ad and clip comes from that one shoot, and a defined set of short clips each month keeps the ads and the social channels fresh.",
+        title: "The video and the ads, produced by us",
+        body: "We write, produce and cut the main video and the ad clips in-house, with professional voiceover, motion graphics and licensed footage, so nothing in the program waits on your team being filmed. The video explains how the process works and invites owners to a presentation, and a fresh set of clips each month keeps the ads and the social channels current. If you'd like your team to appear, we can add that with a short remote recording, but the program doesn't depend on it.",
       },
       {
         number: "02",
@@ -152,7 +152,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       {
         number: "04",
         title: "Weekly content on channels in your name",
-        body: "Social channels set up in your name and kept active with weekly content cut from the same shoot, so the people who look you up after a mailer or an ad find a business that is present and current.",
+        body: "Social channels set up in your name and kept active with weekly content we produce, so the people who look you up after a mailer or an ad find a business that is present and current.",
       },
       {
         number: "05",
@@ -167,7 +167,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       },
     ],
     monthly: [
-      { value: "6 to 8", label: "short clips from one monthly recording" },
+      { value: "6 to 8", label: "new short clips produced each month" },
       { value: "2 to 3", label: "new ad variations each month" },
       { value: "Weekly", label: "posting on Facebook, Instagram and YouTube" },
       { value: "Monday", label: "report on spend, bookings and attendance" },
@@ -175,7 +175,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     whoDoesWhat: {
       title: "Who does what",
       us: [
-        "Produce the video, the monthly clips and the ads",
+        "Produce the video, the monthly clips and the ads, with no filming required from your team",
         "Build and run the campaign pages, screening and booking",
         "Manage the campaigns inside the budget you approve",
         "Handle confirmations, reminders, rescheduling and follow-up",
@@ -185,7 +185,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       them: [
         "Share the presentation dates and venues for each market",
         "Approve the advertising budget and pay the platforms directly",
-        "Give fifteen minutes on camera with you or an agent",
+        "Approve the video and the first ads before anything runs",
         "Name one person for questions that need judgment",
         "Run the presentations and the personal conversations",
       ],
@@ -228,7 +228,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         {
           when: "Before launch",
           title: "Build",
-          body: "Calendar, screening answers and materials confirmed; the campaign page and Boston version, booking calendar, confirmations and reminders, social channels, tracking and dashboard built; the video shot and cut. Live within three weeks of the start, with timely approvals.",
+          body: "Calendar, screening answers and materials confirmed; the campaign page and Boston version, booking calendar, confirmations and reminders, social channels, tracking and dashboard built; the video and first ads produced and approved by you. Live within three weeks of the start, with timely approvals.",
         },
         {
           when: "Live days 1 to 30",
@@ -261,7 +261,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       intro: "Sean sends the one-page agreement and the $1,500 starting invoice the same day you accept. Build starts the day it clears. To start, he will ask you for:",
       items: [
         "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
-        "Logo and brand files, and fifteen minutes with you or one of your agents on camera.",
+        "Logo and brand files, plus anything you already use: mailers, photos, and the questions your agents hear most.",
         "A copy of your current client agreement, so the video and the page describe the process exactly as it works.",
         "Your business name and address for the agreement, and the email for the invoice.",
       ],
