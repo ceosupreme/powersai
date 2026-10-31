@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
-import { getProposal, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
+import { getProposal, isVideoFile, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
 import NotFound from "./NotFound";
 import "@/styles/proposal.css";
 
@@ -50,6 +50,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
 
   const mark = getStudioMedia("home-opening-mark");
   const embed = toEmbedUrl(p.videoUrl);
+  const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
 
   return (
@@ -73,14 +74,21 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             <h1 className="proposal-title">{p.title}</h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
 
-            {embed && (
+            {(embed || videoFile) && (
               <div className="proposal-video">
-                <iframe
-                  src={embed}
-                  title={`${p.preparedBy.name} walks through the ${p.title}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
+                {videoFile ? (
+                  <video controls playsInline preload="metadata" aria-label={`${p.preparedBy.name} walks through the ${p.title}`}>
+                    <source src={videoFile} />
+                    <a href={videoFile}>Open the walkthrough video</a>
+                  </video>
+                ) : (
+                  <iframe
+                    src={embed ?? undefined}
+                    title={`${p.preparedBy.name} walks through the ${p.title}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                )}
               </div>
             )}
 
@@ -126,6 +134,31 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                   {b.note && <p className="proposal-block-note">{b.note}</p>}
                 </article>
               ))}
+            </div>
+            <ul className="proposal-monthly" aria-label="What you get every month">
+              {p.monthly.map((m) => (
+                <li key={m.label}>
+                  <strong>{m.value}</strong>
+                  <span>{m.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="proposal-who">
+          <div className="proposal-wrap">
+            <span className="proposal-eyebrow">{p.whoDoesWhat.title}</span>
+            <h2 className="proposal-h2">A clear division of work.</h2>
+            <div className="proposal-who-grid">
+              <div className="proposal-who-col">
+                <h3>{p.preparedBy.company}</h3>
+                <ul>{p.whoDoesWhat.us.map((item) => <li key={item}><Check aria-hidden size={18} /> {item}</li>)}</ul>
+              </div>
+              <div className="proposal-who-col is-client">
+                <h3>{p.client.company}</h3>
+                <ul>{p.whoDoesWhat.them.map((item) => <li key={item}><Check aria-hidden size={18} /> {item}</li>)}</ul>
+              </div>
             </div>
           </div>
         </section>
@@ -319,7 +352,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     ].join("\n");
 
     setStatus("submitting");
-    const { error: fnError } = await supabase.functions.invoke("submit-inbound-lead", {
+    const { data, error: fnError } = await supabase.functions.invoke("submit-inbound-lead", {
       body: {
         name,
         business_name: company,
@@ -343,7 +376,8 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
       },
     });
 
-    if (fnError) {
+    const saved = !fnError && data && (data as { ok?: boolean; id?: string }).ok === true && typeof (data as { id?: string }).id === "string";
+    if (!saved) {
       setStatus("error");
       setError(`Something went wrong on our side. Please email ${p.preparedBy.email} with the word ACCEPT and we will take it from there.`);
       return;

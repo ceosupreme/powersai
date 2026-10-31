@@ -44,7 +44,7 @@ export type ProposalRecord = {
     email: string;
     site: string;
   };
-  /** A YouTube, Loom or Vimeo share link. Empty string hides the video block. */
+  /** A YouTube, Loom or Vimeo share link, or a direct .mp4/.webm file URL. Empty string hides the video block. */
   videoUrl: string;
   /** Path to a downloadable PDF under /public, or empty to hide the button. */
   pdfUrl: string;
@@ -54,6 +54,10 @@ export type ProposalRecord = {
   opening: string[];
   outcomes: { label: string; title: string; body: string }[];
   blocks: ProposalBlock[];
+  /** What the program produces each month, shown as four big figures. */
+  monthly: { value: string; label: string }[];
+  /** The division of work, two columns. */
+  whoDoesWhat: { title: string; us: string[]; them: string[] };
   markets: {
     title: string;
     body: string;
@@ -153,15 +157,39 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       {
         number: "05",
         title: "Follow-up and attendance handled",
-        body: "Everything after the click runs itself: confirmation, reminders, a courtesy call with a human option, rebooking for no-shows, and follow-up for the people who are interested but not ready. Your team never calls anyone to chase an appointment.",
+        body: "Everything after the click is handled for you: confirmation, reminders, a courtesy call with a human option, rebooking for no-shows, and follow-up for the people who are interested but not ready. Your team doesn't chase appointments; anything that needs judgment goes to a named person on your side. Every inquiry is exclusive to CPN, never shared or resold.",
       },
       {
         number: "06",
         title: "Managed and improved every month",
-        body: "A dashboard you can open any time and a Monday report on bookings, attendance, and what is working, so budget decisions are made on numbers. The campaign is tuned against attendance, not clicks.",
+        body: "A dashboard you can open any time and a Monday report on spend, bookings, attendance, what is working and, when you share them, the sales that came from it, so budget decisions are made on numbers. The campaign is tuned against attendance, not clicks.",
         note: "Nothing in the video or the ads promises an exit, implies a government program or a connection to any resort, or pressures anyone with today-only language. The campaign invites owners to understand their options and book a conversation with your team.",
       },
     ],
+    monthly: [
+      { value: "6 to 8", label: "short clips from one monthly recording" },
+      { value: "2 to 3", label: "new ad variations each month" },
+      { value: "Weekly", label: "posting on Facebook, Instagram and YouTube" },
+      { value: "Monday", label: "report on spend, bookings and attendance" },
+    ],
+    whoDoesWhat: {
+      title: "Who does what",
+      us: [
+        "Produce the video, the monthly clips and the ads",
+        "Build and run the campaign pages, screening and booking",
+        "Manage the campaigns inside the budget you approve",
+        "Handle confirmations, reminders, rescheduling and follow-up",
+        "Keep the social channels posted weekly",
+        "Report every Monday and tune against attendance",
+      ],
+      them: [
+        "Share the presentation dates and venues for each market",
+        "Approve the advertising budget and pay the platforms directly",
+        "Give fifteen minutes on camera with you or an agent",
+        "Name one person for questions that need judgment",
+        "Run the presentations and the personal conversations",
+      ],
+    },
     markets: {
       title: "Boston, and every market the team travels to",
       body: "The program follows your presentation calendar, not a radius. A mail drop for an event in another city has to be printed and in the mail weeks ahead. A campaign for that same event is a geography change and a venue line on the calendar, running from the same video and page.",
@@ -175,7 +203,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         {
           label: "Foundation",
           amount: "$3,000",
-          body: "Paid in two halves, half to start and half at launch. Covers the video production, the campaign page template with the Boston version, the booking calendar, the follow-up system and the dashboard.",
+          body: "$1,500 to start and $1,500 at launch. Covers the video production, the campaign page template with the Boston version, the booking calendar, the follow-up system and the dashboard.",
         },
         {
           label: "Program",
@@ -184,8 +212,8 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         },
         {
           label: "Advertising",
-          amount: "You set it",
-          body: "Paid by you directly to the platforms, so every dollar is visible to you, market by market.",
+          amount: "$3,000 to $5,000 a month",
+          body: "Initial planning range, total across the active markets, and separate from the program fee. You approve the budget and pay the platforms directly, so every dollar is visible to you, market by market.",
         },
       ],
       plainRules: [
@@ -198,39 +226,39 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       title: "How the pilot works",
       phases: [
         {
-          when: "Days 1 to 10",
+          when: "Before launch",
           title: "Build",
-          body: "Campaign page template and the Boston version, qualifier, booking calendar on your presentations, confirmations and reminders, social channels, tracking and dashboard. The video is shot and cut in this window.",
+          body: "Calendar, screening answers and materials confirmed; the campaign page and Boston version, booking calendar, confirmations and reminders, social channels, tracking and dashboard built; the video shot and cut. Live within three weeks of the start, with timely approvals.",
         },
         {
-          when: "Week 3",
-          title: "Live",
-          body: "The campaign goes live and the monthly fee starts. The first appointments can be on your calendar within three weeks of the start.",
-        },
-        {
-          when: "Live weeks 2 to 8",
-          title: "Optimize",
-          body: "Tune against bookings and attendance, scale the budget on what is working, open the first travel-market windows against your calendar, add Google once eligibility is confirmed.",
+          when: "Live days 1 to 30",
+          title: "Run and measure",
+          body: "The campaign goes live and the monthly fee starts. Every Monday you see spend, qualified bookings, attendance and what is working.",
         },
         {
           when: "Day 30",
-          title: "Decision point",
-          body: "You see the first month's numbers and decide: continue, adjust, or stop at the end of the 60 days.",
+          title: "Your decision",
+          body: "With the first month's numbers in hand, you continue, adjust, or stop before the second monthly program fee.",
+        },
+        {
+          when: "Live days 31 to 60",
+          title: "Second month",
+          body: "Scale the budget on what is working, open the first travel-market windows against your calendar, add Google once eligibility is confirmed.",
         },
       ],
       assurance: {
         title: "The assurance",
-        body: "If the first live month produces zero qualified attending households while the campaign is funded and your presentation dates are available, the first month's program fee is refunded.",
+        body: "If the first 30 live days produce zero qualified attending households while the agreed advertising budget is funded and your presentation dates are available, the first month's $3,000 program fee is refunded and the program pauses.",
       },
       definition: {
         title: "What counts",
-        body: "A qualified attending household is one that lives in a market where you have a presentation scheduled in the campaign window, owns a timeshare or decides for the household that does, meets the screening answers your team can work with, booked a presentation, and attended. Each household counts once.",
+        body: "A qualified attending household is one that lives in a market where you have a presentation scheduled in the campaign window, owns a timeshare or decides for the household that does, meets the screening answers your team can work with, booked a presentation, and attended. Each household counts once. The screening answers are agreed with your team before launch, so results are measured against a shared definition.",
       },
-      after: "After the 60 days the program runs month to month. A performance arrangement is available once there are real numbers to base it on.",
+      after: "After the 60 days the program continues month to month with 30 days' notice. A performance arrangement is available once there are real numbers to base it on.",
     },
     afterAccept: {
       title: "What happens after you accept",
-      intro: "You get the one-page agreement and the foundation invoice the same day. Build starts the day the first half clears. To start, I will ask you for:",
+      intro: "Sean sends the one-page agreement and the $1,500 starting invoice the same day you accept. Build starts the day it clears. To start, he will ask you for:",
       items: [
         "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
         "Logo and brand files, and fifteen minutes with you or one of your agents on camera.",
@@ -240,10 +268,10 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     accept: {
       title: "Ready to start?",
-      body: "Accept here and the agreement and invoice go out today. Questions first are welcome, by email or a quick call.",
-      buttonLabel: "Accept and start",
+      body: "Accept here and Sean sends the one-page agreement and the $1,500 starting invoice today. Questions first are welcome, by email or a quick call.",
+      buttonLabel: "Accept the proposal",
       confirmationTitle: "Accepted. Thank you, Erik.",
-      confirmationBody: "The one-page agreement and the foundation invoice are on their way to the email you entered, today. Sean will reach out at the number you gave to set the kickoff and collect the calendar.",
+      confirmationBody: "Your acceptance is recorded. Sean will send the one-page agreement and the $1,500 starting invoice to the email you entered today, and will call the number you gave to set the kickoff and collect the calendar.",
     },
     internalLabel: "Appointment Growth Program, CPN Boston",
   },
@@ -254,9 +282,14 @@ export function getProposal(slug: string | undefined): ProposalRecord | null {
   return PROPOSALS[slug] ?? null;
 }
 
+/** True when the video link is a direct media file rather than a hosted player. */
+export function isVideoFile(url: string): boolean {
+  return /\.(mp4|webm|mov)(\?|#|$)/i.test(url);
+}
+
 /** Turns a share link into an embeddable player URL. Returns null for anything unrecognized. */
 export function toEmbedUrl(url: string): string | null {
-  if (!url) return null;
+  if (!url || isVideoFile(url)) return null;
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "");

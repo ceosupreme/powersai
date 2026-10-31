@@ -17,7 +17,7 @@
 .proposal-page .proposal-title { margin-top: 14px; font-family: "Inter Tight", "Instrument Sans", sans-serif; font-size: clamp(2.7rem, 7vw, 5.4rem); font-weight: 800; line-height: 1; letter-spacing: -.03em; }
 .proposal-page .proposal-subtitle { margin-top: 18px; max-width: 760px; font-size: clamp(1.2rem, 2.3vw, 1.6rem); line-height: 1.4; color: hsl(var(--ink-muted)); }
 .proposal-page .proposal-video { position: relative; margin-top: 32px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 18px; background: hsl(var(--navy)); box-shadow: 0 28px 60px -30px rgba(11, 18, 40, .55); }
-.proposal-page .proposal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.proposal-page .proposal-video iframe, .proposal-page .proposal-video video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
 .proposal-page .proposal-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 32px; padding: 0; list-style: none; }
 .proposal-page .proposal-facts li { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
 .proposal-page .proposal-fact-label { font-size: .82rem; font-weight: 600; color: hsl(var(--ink-muted)); text-transform: uppercase; letter-spacing: .06em; }
@@ -42,6 +42,22 @@
 .proposal-page .proposal-block h3 { margin-top: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.35rem; font-weight: 800; line-height: 1.15; }
 .proposal-page .proposal-block p { margin-top: 12px; color: hsl(var(--ink-muted)); }
 .proposal-page .proposal-block-note { padding-top: 14px; border-top: 1px dashed hsl(var(--rule)); font-size: .92rem; }
+
+/* Monthly output strip, under the six blocks */
+.proposal-page .proposal-monthly { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 18px 0 0; padding: 0; list-style: none; }
+.proposal-page .proposal-monthly li { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 16px; }
+.proposal-page .proposal-monthly strong { font-family: "Inter Tight", sans-serif; font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 800; line-height: 1; color: hsl(var(--gold-bright)); }
+.proposal-page .proposal-monthly span { font-size: .92rem; color: hsl(var(--navy-text) / .8); }
+
+/* Who does what */
+.proposal-page .proposal-who { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--surface)); }
+.proposal-page .proposal-who-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 32px; }
+.proposal-page .proposal-who-col { padding: 26px 28px; border: 1px solid hsl(var(--rule)); border-radius: 18px; background: hsl(var(--paper)); }
+.proposal-page .proposal-who-col.is-client { background: hsl(var(--cobalt-pale)); border-color: hsl(var(--gold) / .4); }
+.proposal-page .proposal-who-col h3 { font-family: "Inter Tight", sans-serif; font-size: 1.25rem; font-weight: 800; }
+.proposal-page .proposal-who-col ul { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.proposal-page .proposal-who-col li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; line-height: 1.45; }
+.proposal-page .proposal-who-col svg { margin-top: 4px; color: hsl(var(--gold)); }
 
 /* Markets and the calendar figure */
 .proposal-page .proposal-markets { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
@@ -137,7 +153,8 @@
 /* Phones and narrow screens */
 @media (max-width: 900px) {
   .proposal-page .proposal-opening-grid, .proposal-page .proposal-markets-grid, .proposal-page .proposal-assurance-grid, .proposal-page .proposal-after-grid, .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  .proposal-page .proposal-block-grid, .proposal-page .proposal-price-grid { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-block-grid, .proposal-page .proposal-price-grid, .proposal-page .proposal-who-grid { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-monthly { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .proposal-page .proposal-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
