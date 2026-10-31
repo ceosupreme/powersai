@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Check, FileDown, Mail, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,12 +13,12 @@ import "@/styles/proposal.css";
  * Unlisted client proposal page: /proposal/:slug
  *
  * Content comes from src/content/proposals.ts. Views are logged to site_events
- * (path = this page), and an acceptance goes through the live
+ * (path = this page), and an agreement request goes through the live
  * submit-inbound-lead intake, which emails the owner and files the lead in the
  * CRM. The lead's email column is left empty on purpose: the intake sends the
  * generic "got your note" acknowledgment to any lead that carries an email,
- * and that message is wrong for someone who just accepted a program. The
- * signer's email travels in the note and in qualifier_data instead, and the
+ * and that message promises an initial recommendation, not an agreement. The
+ * requester's email travels in the note and in qualifier_data instead, and the
  * page shows the confirmation on screen.
  */
 export default function Proposal() {
@@ -35,13 +35,19 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
     path: `/proposal/${p.slug}`,
   });
 
-  // Keep the page out of search engines; it is a private link, not a public page.
+  // Discourage search indexing. This is an unlisted page, not access control.
   useEffect(() => {
-    const meta = document.createElement("meta");
+    const existing = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    const meta = existing ?? document.createElement("meta");
+    const previous = meta.getAttribute("content");
     meta.setAttribute("name", "robots");
     meta.setAttribute("content", "noindex, nofollow");
-    document.head.appendChild(meta);
-    return () => { meta.remove(); };
+    if (!existing) document.head.appendChild(meta);
+    return () => {
+      if (!existing) meta.remove();
+      else if (previous === null) meta.removeAttribute("content");
+      else meta.setAttribute("content", previous);
+    };
   }, []);
 
   useEffect(() => {
@@ -49,38 +55,60 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
   }, [p.slug]);
 
   const mark = getStudioMedia("home-opening-mark");
+  const video = getStudioMedia(p.videoMediaKey);
   const embed = toEmbedUrl(p.videoUrl);
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
 
   return (
     <div className="stm-studio proposal-page min-h-screen">
+      <a href="#proposal-main" className="proposal-skip-link">Skip to the proposal</a>
       <header className="proposal-topbar">
         <div className="proposal-wrap proposal-topbar-in">
           <Link to="/" className="proposal-brand" aria-label={`${p.preparedBy.company} home`} onClick={() => track("proposal_brand")}>
-            {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} />}
+            {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} onError={(event) => { event.currentTarget.style.display = "none"; }} />}
             <span>{p.preparedBy.company}</span>
           </Link>
-          <span className="proposal-topbar-for">Proposal for {p.client.company}</span>
+          <nav className="proposal-jump-nav" aria-label="Proposal sections">
+            <a href="#investment">Investment</a>
+            <a href="#pilot">Pilot</a>
+            <a href="#request-agreement">Request agreement <ArrowRight size={15} aria-hidden /></a>
+          </nav>
         </div>
       </header>
 
-      <main>
+      <main id="proposal-main">
         <section className="proposal-hero">
           <div className="proposal-wrap">
-            <p className="proposal-eyebrow">
-              Prepared for {p.client.contact}, {p.client.company} · {p.preparedOn}
-            </p>
-            <h1 className="proposal-title">{p.title}</h1>
-            <p className="proposal-subtitle">{p.subtitle}</p>
+            <div className="proposal-hero-grid">
+              <div className="proposal-hero-copy">
+                <p className="proposal-eyebrow">Prepared for {p.client.contact} · {p.client.company}</p>
+                <h1 className="proposal-title">{p.title}</h1>
+                <p className="proposal-subtitle">{p.subtitle}</p>
+                <div className="proposal-hero-actions">
+                  <a className="proposal-btn" href="#investment" onClick={() => track("proposal_view_investment")}>
+                    Explore the proposal <ArrowRight size={18} aria-hidden />
+                  </a>
+                  <a className="proposal-text-link" href="#request-agreement">Request the agreement</a>
+                </div>
+              </div>
+              <ProposalJourney journey={p.journey} />
+            </div>
 
-            {embed && (
-              <div className="proposal-video">
-                <iframe
-                  src={embed}
-                  title={`${p.preparedBy.name} walks through the ${p.title}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
+            {(video?.videoSrc || embed) && (
+              <div className="proposal-video-section">
+                <h2 className="proposal-video-heading">Watch the program overview</h2>
+                <div className="proposal-video">
+                  {video?.videoSrc ? (
+                    <video controls playsInline preload="metadata" poster={video.posterSrc ?? undefined} aria-label="Overview of the proposed appointment program">
+                      <source src={video.videoSrc} type="video/mp4" />
+                      {video.captionsSrc && <track kind="captions" src={video.captionsSrc} srcLang="en" label="English" default />}
+                      <a href={video.videoSrc}>Open the proposal video</a>
+                    </video>
+                  ) : (
+                    <iframe src={embed!} loading="lazy" title={`Overview of the ${p.title}`} allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+                  )}
+                </div>
+                {p.videoTranscript && <details className="proposal-transcript"><summary>Read the narration</summary><p>{p.videoTranscript}</p></details>}
               </div>
             )}
 
@@ -116,7 +144,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-blocks">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">What is in the program</span>
-            <h2 className="proposal-h2">Six parts, one system, run for you every month.</h2>
+            <h2 className="proposal-h2">A clear path from interest to attendance.</h2>
             <div className="proposal-block-grid">
               {p.blocks.map((b) => (
                 <article key={b.number} className="proposal-block">
@@ -126,6 +154,9 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                   {b.note && <p className="proposal-block-note">{b.note}</p>}
                 </article>
               ))}
+            </div>
+            <div className="proposal-monthly-strip" aria-label="Included each month">
+              {p.monthly.map((item) => <div key={item.value}><strong>{item.value}</strong><span>{item.label}</span></div>)}
             </div>
           </div>
         </section>
@@ -139,14 +170,14 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
               <p><strong>{p.markets.home}</strong> {p.markets.travelNote}</p>
               <p className="proposal-scope">{p.markets.scopeNote}</p>
             </div>
-            <figure className="proposal-calendar" aria-label="Example of eight live weeks: the home market runs the whole time and each travel market gets its own window">
-              <figcaption>Example: eight live weeks</figcaption>
+            <figure className="proposal-calendar" aria-label="Illustrative market schedule: Boston and three travel markets across eight weeks. Actual timing is agreed at kickoff.">
+              <figcaption>One program. Up to four active markets.</figcaption>
               <div className="proposal-cal-weeks" aria-hidden>
                 {Array.from({ length: 8 }, (_, i) => <span key={i}>W{i + 1}</span>)}
               </div>
               <div className="proposal-cal-row">
                 <span className="proposal-cal-name">Boston, home market</span>
-                <div className="proposal-cal-track"><i className="proposal-cal-bar is-home" style={{ gridColumn: "1 / 9" }}>Runs continuously</i></div>
+                <div className="proposal-cal-track"><i className="proposal-cal-bar is-home" style={{ gridColumn: "1 / 9" }}>Home market</i></div>
               </div>
               <div className="proposal-cal-row">
                 <span className="proposal-cal-name">Travel market A</span>
@@ -160,24 +191,21 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 <span className="proposal-cal-name">Travel market C</span>
                 <div className="proposal-cal-track"><i className="proposal-cal-bar" style={{ gridColumn: "6 / 9" }}>Window</i><b className="proposal-cal-dot" style={{ gridColumn: "8" }} aria-label="Presentations" /></div>
               </div>
-              <p className="proposal-cal-key">
-                <span><i className="proposal-cal-bar is-home" /> Always on</span>
-                <span><i className="proposal-cal-bar" /> Opens two to three weeks before the presentations, closes the day after</span>
-                <span><b className="proposal-cal-dot" /> Presentation days</span>
-              </p>
+              <p className="proposal-cal-key">Illustrative schedule. Timing and budget follow your agreed presentation calendar.</p>
             </figure>
           </div>
         </section>
 
-        <section className="proposal-pricing">
+        <section className="proposal-pricing" id="investment">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pricing.title}</span>
-            <h2 className="proposal-h2">One fee for the work. The advertising budget is yours to set.</h2>
+            <h2 className="proposal-h2">Clear setup. Managed monthly. Your advertising budget.</h2>
             <div className="proposal-price-grid">
               {p.pricing.lines.map((l) => (
                 <article key={l.label} className="proposal-price">
                   <span className="proposal-price-label">{l.label}</span>
                   <strong className="proposal-price-amount">{l.amount}</strong>
+                  <span className="proposal-price-cadence">{l.cadence}</span>
                   <p>{l.body}</p>
                 </article>
               ))}
@@ -190,7 +218,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-pilot">
+        <section className="proposal-pilot" id="pilot">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pilot.title}</span>
             <h2 className="proposal-h2">Sixty live days, with a decision point at thirty.</h2>
@@ -233,10 +261,10 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-accept" id="accept">
+        <section className="proposal-accept" id="request-agreement">
           <div className="proposal-wrap proposal-accept-grid">
             <div className="proposal-accept-intro">
-              <span className="proposal-eyebrow">Accept</span>
+              <span className="proposal-eyebrow">The next step</span>
               <h2 className="proposal-h2">{p.accept.title}</h2>
               <p>{p.accept.body}</p>
               <div className="proposal-side-actions">
@@ -259,7 +287,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 <a href={`https://${p.preparedBy.site}`}>{p.preparedBy.site}</a>
               </address>
             </div>
-            <AcceptForm proposal={p} />
+            <AgreementRequestForm proposal={p} />
           </div>
         </section>
       </main>
@@ -272,84 +300,115 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             <Link to="/services/marketing" onClick={() => track("proposal_footer_marketing")}>Marketing</Link>
             <Link to="/services/ai-systems" onClick={() => track("proposal_footer_systems")}>Business systems and automation</Link>
             <Link to="/work" onClick={() => track("proposal_footer_work")}>Our work</Link>
+            <Link to="/about" onClick={() => track("proposal_footer_about")}>About STM</Link>
           </p>
-          <p className="proposal-footer-legal">© {new Date().getFullYear()} {p.preparedBy.company}. This proposal was prepared for {p.client.company} and is not an offer to the public.</p>
+          <p className="proposal-footer-legal">Prepared {p.preparedOn} for {p.client.company}. © {new Date().getFullYear()} {p.preparedBy.company}.</p>
         </div>
       </footer>
     </div>
   );
 }
 
+function ProposalJourney({ journey }: { journey: ProposalRecord["journey"] }) {
+  const [active, setActive] = useState(0);
+  const step = journey.steps[active];
+  return (
+    <aside className="proposal-journey" aria-label="Explore the appointment journey">
+      <p className="proposal-journey-eyebrow">How the program works</p>
+      <h2>{journey.title}</h2>
+      <div className="proposal-journey-steps" role="group" aria-label="Choose a step">
+        {journey.steps.map((item, i) => (
+          <button type="button" key={item.label} aria-pressed={active === i} aria-controls="proposal-journey-detail" aria-label={`Step ${i + 1}: ${item.label}`} onClick={() => setActive(i)}>
+            <span aria-hidden>{String(i + 1).padStart(2, "0")}</span>{item.label}
+          </button>
+        ))}
+      </div>
+      <div className="proposal-journey-detail" id="proposal-journey-detail" aria-live="polite" aria-atomic="true">
+        <span className="proposal-journey-count">{String(active + 1).padStart(2, "0")} / {String(journey.steps.length).padStart(2, "0")}</span>
+        <h3>{step.title}</h3>
+        <p>{step.body}</p>
+        <p className="proposal-journey-handoff">{step.handoff}</p>
+      </div>
+      <p className="proposal-journey-footnote">Select a step to explore the proposed process.</p>
+    </aside>
+  );
+}
+
 type Status = "idle" | "submitting" | "success" | "error";
 
-function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
+function AgreementRequestForm({ proposal: p }: { proposal: ProposalRecord }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [agreed, setAgreed] = useState(false);
+  const submitting = useRef(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitting.current) return;
     setError(null);
     const form = new FormData(e.currentTarget);
-    if (String(form.get("company_website") ?? "")) { setStatus("success"); return; } // honeypot: a bot filled it
+    if (String(form.get("company_website") ?? "")) { setStatus("success"); return; }
 
     const name = String(form.get("name") ?? "").trim();
-    const title = String(form.get("title") ?? "").trim();
     const company = String(form.get("company") ?? "").trim();
     const phone = String(form.get("phone") ?? "").trim();
     const email = String(form.get("email") ?? "").trim();
 
-    if (name.length < 2) return setError("Please enter your full name.");
-    if (company.length < 2) return setError("Please enter the company name.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("Please enter the best phone number to reach you.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter the email the agreement and invoice should go to.");
-    if (!agreed) return setError("Please tick the box to accept the program as described on this page.");
+    if (name.length < 2 || name.length > 200) return setError("Please enter your full name, up to 200 characters.");
+    if (company.length < 2 || company.length > 200) return setError("Please enter the company name, up to 200 characters.");
+    if (phone.replace(/\D/g, "").length < 10 || phone.length > 40) return setError("Please enter the best phone number to reach you.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return setError("Please enter the email the agreement and invoice should go to.");
 
-    const acceptedAt = new Date();
-    const terms = p.pricing.lines.map((l) => `${l.label}: ${l.amount}`).join("; ");
+    const requestedAt = new Date();
+    const terms = p.pricing.lines.map((l) => `${l.label}: ${l.amount} (${l.cadence})`).join("; ");
     const note = [
-      `PROPOSAL ACCEPTED: ${p.internalLabel}`,
-      `Accepted by: ${name}${title ? `, ${title}` : ""}`,
+      `AGREEMENT REQUEST: ${p.internalLabel}`,
+      `Requested by: ${name}`,
       `Company: ${company}`,
       `Phone: ${phone}`,
       `Email for the agreement and invoice: ${email}`,
-      `Accepted on: ${acceptedAt.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} Pacific`,
-      `Terms shown on the page: ${terms}. ${p.pricing.plainRules.join(" ")}`,
-      `Page: ${window.location.href}`,
+      `Requested on: ${requestedAt.toISOString()}`,
+      `Proposal prepared: ${p.preparedOn}`,
+      `Investment shown: ${terms}.`,
+      "This is a request for the agreement and starting invoice, not a signed acceptance or payment.",
+      `Page: ${window.location.origin}${window.location.pathname}`,
     ].join("\n");
 
+    submitting.current = true;
     setStatus("submitting");
-    const { error: fnError } = await supabase.functions.invoke("submit-inbound-lead", {
-      body: {
-        name,
-        business_name: company,
-        phone,
-        // email intentionally not set here; see the note at the top of this file.
-        message: note,
-        project_type: "proposal_acceptance",
-        conversation_channel: "form",
-        qualifier_data: {
-          proposal: p.slug,
-          proposal_title: p.title,
-          intent: `Proposal accepted: ${p.title}`,
-          services: [p.title],
-          signer_title: title || null,
-          agreement_email: email,
-          accepted_terms: true,
-          accepted_at: acceptedAt.toISOString(),
-          page_url: window.location.href,
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("submit-inbound-lead", {
+        body: {
+          name,
+          business_name: company,
+          phone,
+          // Suppress the generic first-inquiry email; agreement_email is in the owner note.
+          message: note,
+          project_type: "proposal_request",
+          conversation_channel: "form",
+          qualifier_data: {
+            proposal: p.slug,
+            proposal_title: p.title,
+            intent: `Agreement requested: ${p.title}`,
+            services: [p.title],
+            agreement_email: email,
+            requested_at: requestedAt.toISOString(),
+            proposal_prepared_on: p.preparedOn,
+            page_url: `${window.location.origin}${window.location.pathname}`,
+          },
+          company_website: "",
         },
-        company_website: "",
-      },
-    });
-
-    if (fnError) {
+      });
+      if (fnError || data?.ok !== true || typeof data?.id !== "string" || !data.id.trim()) {
+        throw new Error("The request was not confirmed saved.");
+      }
+      trackSiteEvent({ event_type: "form_success", label: "proposal_agreement_request" });
+      setStatus("success");
+    } catch {
       setStatus("error");
-      setError(`Something went wrong on our side. Please email ${p.preparedBy.email} with the word ACCEPT and we will take it from there.`);
-      return;
+      setError(`We could not confirm your request was saved. Your details are still here. Please try again or email ${p.preparedBy.email} to request the agreement.`);
+    } finally {
+      submitting.current = false;
     }
-    trackSiteEvent({ event_type: "form_success", label: "proposal_accept" });
-    setStatus("success");
   };
 
   if (status === "success") {
@@ -364,43 +423,33 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
   }
 
   return (
-    <form className="proposal-form" onSubmit={onSubmit} noValidate>
+    <form className="proposal-form" onSubmit={onSubmit} noValidate aria-label="Request the agreement" aria-busy={status === "submitting"}>
       <div aria-hidden className="proposal-honeypot">
         <label>Company website<input type="text" name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>
-      <div className="proposal-form-row">
-        <label>
-          <span>Your full name</span>
-          <input name="name" type="text" autoComplete="name" required />
-        </label>
-        <label>
-          <span>Title</span>
-          <input name="title" type="text" autoComplete="organization-title" placeholder="Optional" />
-        </label>
-      </div>
+      <label>
+        <span>Your full name</span>
+        <input name="name" type="text" autoComplete="name" maxLength={200} required />
+      </label>
       <label>
         <span>Company</span>
-        <input name="company" type="text" autoComplete="organization" defaultValue={p.client.company} required />
+        <input name="company" type="text" autoComplete="organization" defaultValue={p.client.company} maxLength={200} required />
       </label>
       <div className="proposal-form-row">
         <label>
           <span>Best phone number</span>
-          <input name="phone" type="tel" autoComplete="tel" required />
+          <input name="phone" type="tel" autoComplete="tel" maxLength={40} required />
         </label>
         <label>
-          <span>Email for the agreement and invoice</span>
-          <input name="email" type="email" autoComplete="email" required />
+          <span>Email for the agreement</span>
+          <input name="email" type="email" autoComplete="email" maxLength={255} required />
         </label>
       </div>
-      <label className="proposal-check">
-        <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-        <span>I accept the {p.title} for {p.client.company} as described on this page, and I understand the agreement and the foundation invoice will follow by email.</span>
-      </label>
       {error && <p className="proposal-form-error" role="alert">{error}</p>}
       <button type="submit" className="proposal-btn" disabled={status === "submitting"}>
         {status === "submitting" ? "Sending…" : p.accept.buttonLabel} <ArrowRight aria-hidden size={18} />
       </button>
-      <p className="proposal-form-fine">Your typed name and the date are recorded as your acceptance. Nothing is charged on this page.</p>
+      <p className="proposal-form-fine">This requests the agreement for review. You are not signing an agreement or making a payment here.</p>
     </form>
   );
 }
