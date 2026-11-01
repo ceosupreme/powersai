@@ -25,6 +25,7 @@ import { useFoundationScores } from '@/components/foundation-audit/useFoundation
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
 import { laneScore } from '@/lib/effectiveFoundation';
 import { getSignedUrl } from '@/hooks/useBrandKit';
+import { BrandKitLink } from './BrandKitLink';
 import { PRIORITY_CHIP } from '@/components/portfolio/AllBrandsWaitingStrip';
 import {
   dimensionShelf, isChannelStale, pipelineHref, platformLabel, relativeTime,
@@ -806,7 +807,7 @@ function AssetsTab({ projectId }: { projectId: string }) {
     <div className="space-y-6">
       <section>
         <h3 className="text-lg font-semibold mb-2">Files</h3>
-        {!kit.data?.kit ? <p className="text-sm text-muted-foreground">No brand kit yet. <Link to="/brand-kit" className="underline">Open Brand kit</Link></p> :
+        {!kit.data?.kit ? <p className="text-sm text-muted-foreground">No brand kit yet. <BrandKitLink projectId={projectId} /></p> :
           kit.data.assets.length === 0 ? <p className="text-sm text-muted-foreground">No files in the brand kit yet.</p> : (
             <ul className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
               {kit.data.assets.map((a: any) => (

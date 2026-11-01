@@ -22,7 +22,7 @@ export const TYPE_CHIPS: { key: string; label: string; type: string | null }[] =
 ];
 
 export interface ChannelStat { total: number; live: number; followers: number }
-export interface SetupStat { inPlace: number; needed: number; gaps: number }
+export interface SetupStat { inPlace: number; needed: number; gaps: number; gate?: string | null }
 interface SortCard { id: string; name: string; overall: number | null; monthRevenue: number | null; potential: number | null }
 
 /** Highest first, empty values last. */

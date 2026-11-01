@@ -87,7 +87,7 @@ export function BrandProjectCard({
 
       {setup && setup.needed > 0 && (
         <p className="mb-3 text-sm text-foreground">
-          Setup: {setup.inPlace} of {setup.needed} in place{setup.gaps > 0 ? `, ${setup.gaps} to set up` : ''}
+          Setup: {setup.inPlace} of {setup.needed} in place{setup.gate ? `, ${setup.gate}` : setup.gaps > 0 ? `, ${setup.gaps} to set up` : ''}
         </p>
       )}
 

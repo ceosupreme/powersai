@@ -13,7 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, ExternalLink, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  BRAND_PROFILES, STATE_WORDS, buildSetupBrief, byPriority, channelStatusWord, groupRows, minutesText,
+  BRAND_PROFILES, SETUP_SCORE_NOTE, STATE_WORDS, isFoundation, buildSetupBrief, byPriority, channelStatusWord, groupRows, minutesText,
   profileLabel, topMissing, totalMinutes, whyLine, type AssetMapRow,
 } from '@/lib/brandSetup';
 import { platformLabel, pipelineHref } from '@/lib/ownerWork';
@@ -21,6 +21,7 @@ import {
   clearDecision, recordExisting, saveBrandProfile, setDecision, startSetup, useAssetMap, useBrandProfile,
   useOpenSetupJobs, usePlaybookIds, useSetupRefresh, useSetupSummary,
 } from '@/hooks/useBrandSetup';
+import { BrandKitLink, useOpenBrandKit } from './BrandKitLink';
 
 const T = (t: string) => (supabase as any).from(t);
 
@@ -44,6 +45,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
   const playbooks = usePlaybookIds(rows.map((r) => r.playbook_key ?? ''));
   const refresh = useSetupRefresh(projectId);
   const navigate = useNavigate();
+  const openBrandKit = useOpenBrandKit(projectId);
   const [busy, setBusy] = useState<string | null>(null);
   const [haveIt, setHaveIt] = useState<AssetMapRow | null>(null);
   const [skip, setSkip] = useState<AssetMapRow | null>(null);
@@ -108,6 +110,12 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
         <h2 className="text-lg font-semibold text-foreground">
           Setup: {s?.in_place ?? 0} of {s?.needed_count ?? 0} in place, {s?.gaps ?? 0} to set up
         </h2>
+        {s?.setup_score != null && (
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium text-foreground">Setup score {s.setup_score}, {s.setup_gate ?? '—'}</p>
+            <p className="text-xs text-muted-foreground">{SETUP_SCORE_NOTE}</p>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted-foreground">Brand type:</span>
           {(profile.data ?? []).length ? (profile.data ?? []).map((p) => <Badge key={p} variant="secondary">{profileLabel(p)}</Badge>)
@@ -132,12 +140,14 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 <p className="text-xs text-muted-foreground">{minutesText(r.setup_minutes)} {playbookLink(r)}</p>
                 {canEdit && (
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {r.channel_id && openJobs.get(r.channel_id) ? (
+                    {isFoundation(r) ? (
+                      <Button size="sm" onClick={openBrandKit}>Set it up</Button>
+                    ) : r.channel_id && openJobs.get(r.channel_id) ? (
                       <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, openJobs.get(r.channel_id)!)}>Open setup job</Link></Button>
                     ) : (
                       <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>
                     )}
-                    <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>
+                    {!isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                     <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => run(`later-${r.asset_key}`, () => setDecision(projectId, r.asset_key, 'later'), `${r.label} moved to Later`)}>Later</Button>
                     <Button size="sm" variant="ghost" onClick={() => setSkip(r)}>Skip</Button>
                   </div>
@@ -156,9 +166,10 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
               {r.handle && <p className="text-xs text-muted-foreground">{r.handle}</p>}
               {canEdit && (
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Open setup job</Link></Button>
+                  {isFoundation(r) ? <Button size="sm" onClick={openBrandKit}>Set it up</Button>
+                    : job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Open setup job</Link></Button>
                     : <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>}
-                  {r.state === 'planned' && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
+                  {r.state === 'planned' && !isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                 </div>
               )}
             </Row>
@@ -170,7 +181,10 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
         {groupRows(by('on_file')).map((g) => (
           <Group key={g.grp} title={g.grp}>
             {g.rows.map((r) => (
-              <Row key={r.asset_key} title={r.label} badge={channelStatusWord(r.channel_status)}>
+              <Row key={r.asset_key} title={r.label} badge={isFoundation(r) ? STATE_WORDS.on_file : channelStatusWord(r.channel_status)}>
+                {isFoundation(r) ? (
+                  <p className="text-sm text-foreground">On the Brand kit page. <BrandKitLink projectId={projectId} /></p>
+                ) : (<>
                 <p className="text-sm text-foreground break-words">
                   {r.handle || (r.channel_platform ? platformLabel(r.channel_platform) : '—')}
                   {r.url && <a href={r.url} target="_blank" rel="noreferrer" className="ml-2 inline-flex items-center text-xs underline text-primary">Open <ExternalLink className="ml-0.5 h-3 w-3" /></a>}
@@ -178,6 +192,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 <p className="text-xs text-muted-foreground">
                   {r.followers == null ? 'No follower count yet' : `${r.followers.toLocaleString()} followers${r.follower_date ? ` on ${r.follower_date}` : ''}`}
                 </p>
+                </>)}
               </Row>
             ))}
           </Group>
