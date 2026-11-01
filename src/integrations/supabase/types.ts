@@ -7678,6 +7678,65 @@ export type Database = {
           },
         ]
       }
+      playbook_sources: {
+        Row: {
+          added_by: string
+          content: string | null
+          created_at: string
+          drive_file_id: string | null
+          id: string
+          kind: string
+          merge_notes: string | null
+          merged_version: string | null
+          playbook_id: string | null
+          status: string
+          suggested_keys: string[]
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          added_by?: string
+          content?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          id?: string
+          kind?: string
+          merge_notes?: string | null
+          merged_version?: string | null
+          playbook_id?: string | null
+          status?: string
+          suggested_keys?: string[]
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          added_by?: string
+          content?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          id?: string
+          kind?: string
+          merge_notes?: string | null
+          merged_version?: string | null
+          playbook_id?: string | null
+          status?: string
+          suggested_keys?: string[]
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playbook_sources_playbook_id_fkey"
+            columns: ["playbook_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_base"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_items: {
         Row: {
           case_study_body: string | null
