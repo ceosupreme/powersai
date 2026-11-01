@@ -52,7 +52,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
 
   const openJobs = jobs.data ?? new Map<string, string>();
   const by = (st: string) => rows.filter((r) => r.state === st).sort(byPriority);
-  const top = useMemo(() => topMissing(rows, openJobs), [rows, openJobs]);
+  const top = useMemo(() => topMissing(rows, new Set(openJobs.keys())), [rows, openJobs]);
 
   const run = async (key: string, fn: () => Promise<unknown>, ok?: string) => {
     setBusy(key);
