@@ -15,7 +15,7 @@ export const BRAND_PROFILES: { value: string; label: string }[] = [
 ];
 export const profileLabel = (v: string) => BRAND_PROFILES.find((p) => p.value === v)?.label ?? v;
 
-export const ASSET_GROUPS = ['Home base', 'Social', 'Video and audio', 'Stores and marketplaces', 'Money accounts', 'Local', 'Software'];
+export const ASSET_GROUPS = ['Foundation', 'Home base', 'Social', 'Video and audio', 'Stores and marketplaces', 'Money accounts', 'Local', 'Software'];
 
 export interface AssetMapRow {
   venue_id: string; brand: string | null; asset_key: string; label: string; grp: string;
@@ -25,8 +25,38 @@ export interface AssetMapRow {
   decision: string | null; decision_reason: string | null;
   channel_id: string | null; channel_platform: string | null; channel_status: string | null;
   handle: string | null; url: string | null; followers: number | null; follower_date: string | null;
-  state: string;
+  state: string; found_in?: string | null;
 }
+
+/** Foundation rows (the brand kit) live on the HQ Brand kit page, not in a setup job. */
+export const isFoundation = (r: Pick<AssetMapRow, 'asset_key' | 'grp'>) => r.asset_key === 'brand_kit' || r.grp === 'Foundation';
+
+export const SETUP_SCORE_NOTE =
+  "Each item counts by how much it matters; an account that needs access counts half; skipped items don't count. It is 20 percent of the brand's overall score.";
+
+export interface TrafficAsset { key: string; label: string; method_keys: string[] | null }
+export interface TrafficGap { key: string; title: string; labels: string[] }
+
+/** For each monetization/promotion playbook, the assets that serve it; a gap when none of them is on file for the brand. Warn only. */
+export function trafficGaps(
+  methods: { key: string; title: string }[],
+  assets: TrafficAsset[],
+  map: Pick<AssetMapRow, 'asset_key' | 'state'>[],
+): TrafficGap[] {
+  const onFile = new Set(map.filter((r) => r.state === 'on_file').map((r) => r.asset_key));
+  const seen = new Set<string>();
+  const out: TrafficGap[] = [];
+  for (const m of methods) {
+    if (!m.key || seen.has(m.key)) continue;
+    seen.add(m.key);
+    const needs = assets.filter((a) => (a.method_keys ?? []).includes(m.key));
+    if (!needs.length || needs.some((a) => onFile.has(a.key))) continue;
+    out.push({ key: m.key, title: m.title, labels: needs.map((a) => a.label) });
+  }
+  return out;
+}
+export const trafficNoticeText = (g: TrafficGap) =>
+  `Before this drives traffic: ${g.title} needs ${g.labels.length === 1 ? g.labels[0] : `one of: ${g.labels.join(', ')}`}, which isn't set up for this brand yet.`;
 
 export const STATE_WORDS: Record<string, string> = {
   on_file: 'In place', needs_access: 'Exists, needs access', planned: 'Planned, not set up',
@@ -69,7 +99,7 @@ export function groupRows(rows: AssetMapRow[]): { grp: string; rows: AssetMapRow
 
 /** The three highest-priority missing assets without an open setup job. */
 export function topMissing(rows: AssetMapRow[], openJobChannelIds: Set<string>, n = 3): AssetMapRow[] {
-  return rows.filter((r) => r.state === 'missing' && !(r.channel_id && openJobChannelIds.has(r.channel_id))).sort(byPriority).slice(0, n);
+  return rows.filter((r) => r.state === 'missing' && !isFoundation(r) && !(r.channel_id && openJobChannelIds.has(r.channel_id))).sort(byPriority).slice(0, n);
 }
 export const totalMinutes = (rows: AssetMapRow[]) => rows.reduce((s, r) => s + (r.setup_minutes ?? 0), 0);
 
@@ -113,7 +143,8 @@ export function buildSetupBrief(a: {
   if (a.inUse.length) for (const c of a.inUse) lines.push(`- ${c.label}: ${c.handle || c.url || 'no handle recorded'}`);
   else lines.push('- none yet');
   lines.push('', 'To set up:');
-  a.gaps.forEach((g, i) => {
+  if (a.gaps.some(isFoundation)) lines.push('Brand kit: fill it in on the HQ Brand kit page.');
+  a.gaps.filter((g) => !isFoundation(g)).forEach((g, i) => {
     const pid = g.playbook_key ? a.playbookIdByKey.get(g.playbook_key) : undefined;
     lines.push(`${i + 1}. ${g.label} (${STATE_WORDS[g.state] ?? g.state})`);
     if (g.unlocks) lines.push(`   What it is: ${g.unlocks}`);
