@@ -493,6 +493,9 @@ export function useCompleteNextTenRow() {
       qc.invalidateQueries({ queryKey: ['channel-products'] });
       qc.invalidateQueries({ queryKey: foundationStatusKey(row.projectId) });
       qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
+      qc.invalidateQueries({ queryKey: ['pipeline-job'] });
+      qc.invalidateQueries({ queryKey: ['brand-workspace'] });
+      qc.invalidateQueries({ queryKey: ['brand-work-summary'] });
     },
   });
 }
