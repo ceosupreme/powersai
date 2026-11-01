@@ -11,7 +11,7 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
-const MODEL = 'google/gemini-2.5-flash';
+const MODEL = 'google/gemini-3.8-flash';
 const PLATFORMS = ['facebook_page', 'facebook_profile', 'instagram', 'threads', 'tiktok', 'youtube', 'pinterest', 'x', 'linkedin', 'twitch', 'spotify', 'website', 'other'];
 const NUM_FIELDS = ['followers', 'following', 'posts', 'videos', 'views', 'likes'] as const;
 const MAX_IMAGE_CHARS = 8_000_000;
