@@ -61,7 +61,7 @@ function usePipelineJob(jobId: string | undefined) {
           : job.target_type === 'channel_products' && job.target_id
             ? T('channel_products').select('id,name,status,price,monthly_sales').eq('id', job.target_id).maybeSingle()
             : job.target_type === 'knowledge_base' && job.target_id
-              ? T('knowledge_base').select('id,title,status,expiry_date,full_text,tags,key_points').eq('id', job.target_id).maybeSingle()
+              ? T('knowledge_base').select('id,title,status,expiry_date,full_text,tags,key_points,subcategory,summary').eq('id', job.target_id).maybeSingle()
               : Promise.resolve({ data: null, error: null }),
       ]);
       for (const r of [stepsRes, venueRes, kitRes, nicheRes, targetRes] as any[]) if (r.error) throw r.error;
