@@ -133,6 +133,7 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/growth-audit': 'growth_audit',
   '/inbox': 'capture_inbox',
   '/content': 'content_pipeline',
+  '/radar': 'content_pipeline',
   '/revenue': 'revenue',
   '/affiliate-programs': 'affiliate_programs',
   '/products': 'products',

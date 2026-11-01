@@ -51,6 +51,7 @@ const RolePreview = lazy(() => import("./pages/RolePreview"));
 const Workspace = lazy(() => import("./pages/Workspace"));
 const BrandKit = lazy(() => import("./pages/BrandKit"));
 const ContentPipeline = lazy(() => import("./pages/ContentPipeline"));
+const Radar = lazy(() => import("./pages/Radar"));
 const ProductionBoard = lazy(() => import("./pages/ProductionBoard"));
 const AnswerBank = lazy(() => import("./pages/AnswerBank"));
 const ChannelRevenue = lazy(() => import("./pages/ChannelRevenue"));
@@ -297,6 +298,11 @@ const App = () => {
                 <Route path="/production-board" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ProductionBoard /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/radar" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><Radar /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/answer-bank" element={
