@@ -77,7 +77,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             {(embed || videoFile) && (
               <div className="proposal-video">
                 {videoFile ? (
-                  <video controls playsInline preload="metadata" aria-label={`${p.preparedBy.name} walks through the ${p.title}`}>
+                  <video controls playsInline preload="metadata" poster={videoFile.replace(/\.mp4$/, "-poster.jpg")} aria-label={`${p.preparedBy.name} walks through the ${p.title}`}>
                     <source src={videoFile} />
                     <a href={videoFile}>Open the walkthrough video</a>
                   </video>
