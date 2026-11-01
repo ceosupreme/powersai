@@ -25,6 +25,7 @@ import {
 } from '@/hooks/usePortfolioData';
 import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
 import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
+import { PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat } from '@/lib/portfolioSort';
 import { AllBrandsWaitingStrip } from '@/components/portfolio/AllBrandsWaitingStrip';
 import { useRole } from '@/context/RoleContext';
 import { useApp } from '@/context/AppContext';
@@ -371,21 +372,52 @@ export default function PortfolioOverview() {
     [nonClientCards],
   );
   const { data: workById } = useBrandWorkSummaries(workProjects);
-  // Active brands: most waiting on you first, then score.
+  const typeById = useMemo(() => new Map(groupRows.map((r) => [r.id, r.project_type ?? null])), [groupRows]);
+  const [sortKey, setSortKey] = useState<PortfolioSortKey>(() => {
+    try { const v = localStorage.getItem(SORT_STORAGE_KEY); if (v && SORT_OPTIONS.some((o) => o.value === v)) return v as PortfolioSortKey; } catch { /* storage blocked */ }
+    return 'waiting';
+  });
+  const changeSort = (v: string) => {
+    setSortKey(v as PortfolioSortKey);
+    try { localStorage.setItem(SORT_STORAGE_KEY, v); } catch { /* storage blocked */ }
+  };
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const cardIds = useMemo(() => nonClientCards.map((c) => c.id), [nonClientCards]);
+  const { data: channelStats } = useQuery({
+    queryKey: ['portfolio-brand-channels', cardIds.join(',')],
+    enabled: cardIds.length > 0 && group === 'brands',
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from('brand_channels').select('project_id,status,followers').in('project_id', cardIds);
+      if (error) throw error;
+      const m = new Map<string, ChannelStat>();
+      for (const r of (data ?? []) as { project_id: string; status: string; followers: number | null }[]) {
+        const cur = m.get(r.project_id) ?? { total: 0, live: 0, followers: 0 };
+        cur.total += 1;
+        if (r.status === 'live') cur.live += 1;
+        cur.followers += Number(r.followers ?? 0);
+        m.set(r.project_id, cur);
+      }
+      return m;
+    },
+  });
+  const typeCounts = useMemo(() => {
+    const c: Record<string, number> = { all: nonClientCards.length };
+    for (const t of TYPE_CHIPS) if (t.type) c[t.key] = nonClientCards.filter((x) => typeById.get(x.id) === t.type).length;
+    return c;
+  }, [nonClientCards, typeById]);
+  const typed = useMemo(() => {
+    const t = TYPE_CHIPS.find((x) => x.key === typeFilter)?.type;
+    return t && group === 'brands' ? nonClientCards.filter((c) => typeById.get(c.id) === t) : nonClientCards;
+  }, [nonClientCards, typeFilter, typeById, group]);
+  const sorter = useMemo(() => portfolioSorter(sortKey, workById, channelStats), [sortKey, workById, channelStats]);
   const activeCards = useMemo(
-    () =>
-      nonClientCards
-        .filter((c) => c.focusStatus !== 'parked')
-        .sort(
-          (a, b) =>
-            (workById?.get(b.id)?.waitingCount ?? -1) - (workById?.get(a.id)?.waitingCount ?? -1) ||
-            (b.overall ?? -1) - (a.overall ?? -1),
-        ),
-    [nonClientCards, workById],
+    () => typed.filter((c) => c.focusStatus !== 'parked').sort(sorter),
+    [typed, sorter],
   );
   const parkedCards = useMemo(
-    () => nonClientCards.filter((c) => c.focusStatus === 'parked'),
-    [nonClientCards],
+    () => typed.filter((c) => c.focusStatus === 'parked').sort(sorter),
+    [typed, sorter],
   );
   const monthRevenueRows = useMemo(
     () =>
@@ -671,6 +703,26 @@ export default function PortfolioOverview() {
             </div>
           ) : (
             <div className="space-y-4">
+              {group === 'brands' && (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div role="group" aria-label="Filter by type" className="flex flex-wrap gap-1.5">
+                    {TYPE_CHIPS.map((t) => (
+                      <button key={t.key} type="button" aria-pressed={typeFilter === t.key} onClick={() => setTypeFilter(t.key)}
+                        className={cn('min-h-9 rounded-full border px-3 py-1 text-xs',
+                          typeFilter === t.key ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground')}>
+                        {t.label} {typeCounts[t.key] ?? 0}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    Sort
+                    <Select value={sortKey} onValueChange={changeSort}>
+                      <SelectTrigger className="h-9 w-48 text-sm text-foreground" aria-label="Sort brands"><SelectValue /></SelectTrigger>
+                      <SelectContent>{SORT_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </label>
+                </div>
+              )}
               <AllBrandsWaitingStrip
                 cards={activeCards.map((c) => ({ id: c.id, name: c.name }))}
                 workById={workById}
@@ -682,6 +734,7 @@ export default function PortfolioOverview() {
                     key={card.id}
                     data={card}
                     work={workById?.get(card.id)}
+                    channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
                     onClick={() => handleProjectDrillIn(card.id)}
                   />
                 ))}
@@ -699,6 +752,7 @@ export default function PortfolioOverview() {
                           key={card.id}
                           data={card}
                           work={workById?.get(card.id)}
+                          channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
                           onClick={() => handleProjectDrillIn(card.id)}
                         />
                       ))}
