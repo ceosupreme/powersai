@@ -191,9 +191,11 @@ function OverviewTab({
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" disabled={complete.isPending} onClick={() => markDone(a.id)}>Done</Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link to={a.jobId ? pipelineHref(projectId, a.jobId) : '/actions'}>Open</Link>
-                      </Button>
+                      {a.jobId && (
+                        <Button size="sm" variant="outline" asChild>
+                          <Link to={pipelineHref(projectId, a.jobId)}>Open</Link>
+                        </Button>
+                      )}
                     </div>
                   </li>
                 ))}
@@ -423,7 +425,7 @@ function ChannelDrawer({ channel, method, onClose }: { channel: BrandChannel | n
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k} className="min-w-0">
                   <dt className="text-xs text-muted-foreground">{k}</dt>
-                  <dd className="text-foreground break-words capitalize-first">{v}</dd>
+                  <dd className="text-foreground break-words">{v}</dd>
                 </div>
               ))}
             </dl>

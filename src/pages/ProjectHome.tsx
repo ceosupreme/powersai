@@ -28,6 +28,9 @@ import { useEnsureCurrentWeek } from '@/hooks/useEnsureCurrentWeek';
 import { useScoreReportingWeek } from '@/hooks/useScoreReportingWeek';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
 import { NextTenSection } from '@/components/pillar/NextTenSection';
+import { BrandWorkspace } from '@/components/brand-workspace/BrandWorkspace';
+import { useNonClientPortfolio, projectGroup, type ProjectDirectoryRow } from '@/hooks/usePortfolioData';
+import { useBrandKitData } from '@/hooks/useBrandKit';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
@@ -162,6 +165,19 @@ export default function ProjectHome() {
   const weekStart = reportingWeek.weekStart;
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
   const [setupOpen, setSetupOpen] = useState(false);
+
+  // Overall score: the same weighted current-week number the Portfolio card shows.
+  const scoreRows = useMemo<ProjectDirectoryRow[]>(
+    () => (isNonClient && meta ? [{
+      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: false,
+      focus_status: meta.focus_status ?? 'active',
+      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: false }),
+    }] : []),
+    [isNonClient, meta],
+  );
+  const { data: scoreCards } = useNonClientPortfolio(scoreRows);
+  const { kit: brandKit } = useBrandKitData(isNonClient ? venueId : null) as any;
+  const contentMode: string | null = (brandKit as any)?.content_mode ?? null;
 
   // "Ultimate goal" inline edit (admins only)
   const [goalEditing, setGoalEditing] = useState(false);
