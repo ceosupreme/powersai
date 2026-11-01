@@ -41,6 +41,7 @@ export type Database = {
           created_at_manual: string | null
           created_by_id: string | null
           day_id: string | null
+          depends_on: string | null
           detail: string | null
           due_date: string | null
           effort_level: string | null
@@ -54,9 +55,13 @@ export type Database = {
           insight_summary: string | null
           insight_title: string | null
           is_manual: boolean
+          job_id: string | null
           last_synced_at: string | null
           mention_gids: string[]
+          method_id: string | null
           outcome_rating: number | null
+          output_url: string | null
+          owner_kind: string | null
           pillar: string | null
           priority: string | null
           problem_detail: string | null
@@ -67,6 +72,7 @@ export type Database = {
           source: string
           source_insight_id: string | null
           status: string
+          step_order: number | null
           suggested_assignee: string | null
           synced_to_asana_at: string | null
           title: string
@@ -99,6 +105,7 @@ export type Database = {
           created_at_manual?: string | null
           created_by_id?: string | null
           day_id?: string | null
+          depends_on?: string | null
           detail?: string | null
           due_date?: string | null
           effort_level?: string | null
@@ -112,9 +119,13 @@ export type Database = {
           insight_summary?: string | null
           insight_title?: string | null
           is_manual?: boolean
+          job_id?: string | null
           last_synced_at?: string | null
           mention_gids?: string[]
+          method_id?: string | null
           outcome_rating?: number | null
+          output_url?: string | null
+          owner_kind?: string | null
           pillar?: string | null
           priority?: string | null
           problem_detail?: string | null
@@ -125,6 +136,7 @@ export type Database = {
           source?: string
           source_insight_id?: string | null
           status?: string
+          step_order?: number | null
           suggested_assignee?: string | null
           synced_to_asana_at?: string | null
           title: string
@@ -157,6 +169,7 @@ export type Database = {
           created_at_manual?: string | null
           created_by_id?: string | null
           day_id?: string | null
+          depends_on?: string | null
           detail?: string | null
           due_date?: string | null
           effort_level?: string | null
@@ -170,9 +183,13 @@ export type Database = {
           insight_summary?: string | null
           insight_title?: string | null
           is_manual?: boolean
+          job_id?: string | null
           last_synced_at?: string | null
           mention_gids?: string[]
+          method_id?: string | null
           outcome_rating?: number | null
+          output_url?: string | null
+          owner_kind?: string | null
           pillar?: string | null
           priority?: string | null
           problem_detail?: string | null
@@ -183,6 +200,7 @@ export type Database = {
           source?: string
           source_insight_id?: string | null
           status?: string
+          step_order?: number | null
           suggested_assignee?: string | null
           synced_to_asana_at?: string | null
           title?: string
@@ -198,10 +216,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "action_items_depends_on_fkey"
+            columns: ["depends_on"]
+            isOneToOne: false
+            referencedRelation: "action_items"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "action_items_insight_id_fkey"
             columns: ["insight_id"]
             isOneToOne: false
             referencedRelation: "insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_items_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "production_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_items_method_id_fkey"
+            columns: ["method_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_base"
             referencedColumns: ["id"]
           },
           {
@@ -1089,6 +1128,81 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      brand_channels: {
+        Row: {
+          account_label: string | null
+          cadence_target: number | null
+          content_level: number
+          created_at: string
+          destination_method_id: string | null
+          follower_date: string | null
+          followers: number | null
+          handle: string | null
+          id: string
+          last_post_at: string | null
+          notes: string | null
+          platform: string
+          project_id: string
+          scheduler: string | null
+          status: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          account_label?: string | null
+          cadence_target?: number | null
+          content_level?: number
+          created_at?: string
+          destination_method_id?: string | null
+          follower_date?: string | null
+          followers?: number | null
+          handle?: string | null
+          id?: string
+          last_post_at?: string | null
+          notes?: string | null
+          platform: string
+          project_id: string
+          scheduler?: string | null
+          status?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          account_label?: string | null
+          cadence_target?: number | null
+          content_level?: number
+          created_at?: string
+          destination_method_id?: string | null
+          follower_date?: string | null
+          followers?: number | null
+          handle?: string | null
+          id?: string
+          last_post_at?: string | null
+          notes?: string | null
+          platform?: string
+          project_id?: string
+          scheduler?: string | null
+          status?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_channels_destination_method_id_fkey"
+            columns: ["destination_method_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_base"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brand_kit_assets: {
         Row: {
@@ -7670,6 +7784,87 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "channel_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_jobs: {
+        Row: {
+          created_at: string
+          created_by: string
+          current_step: number | null
+          id: string
+          kind: string
+          level: number
+          money_destination: string | null
+          owner_minutes_actual: number | null
+          owner_minutes_est: number | null
+          parent_job_id: string | null
+          project_id: string
+          recipe: Json
+          result_links: Json
+          status: string
+          target_id: string | null
+          target_key: string | null
+          target_type: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          current_step?: number | null
+          id?: string
+          kind: string
+          level?: number
+          money_destination?: string | null
+          owner_minutes_actual?: number | null
+          owner_minutes_est?: number | null
+          parent_job_id?: string | null
+          project_id: string
+          recipe?: Json
+          result_links?: Json
+          status?: string
+          target_id?: string | null
+          target_key?: string | null
+          target_type?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          current_step?: number | null
+          id?: string
+          kind?: string
+          level?: number
+          money_destination?: string | null
+          owner_minutes_actual?: number | null
+          owner_minutes_est?: number | null
+          parent_job_id?: string | null
+          project_id?: string
+          recipe?: Json
+          result_links?: Json
+          status?: string
+          target_id?: string | null
+          target_key?: string | null
+          target_type?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_jobs_parent_job_id_fkey"
+            columns: ["parent_job_id"]
+            isOneToOne: false
+            referencedRelation: "production_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]

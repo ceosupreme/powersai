@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { pipelineHref } from '@/lib/ownerWork';
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -133,7 +135,13 @@ export const AllProjectsNextTen = ({
                         onCheckedChange={() => onCheck(row)}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm text-foreground">{row.step}</p>
+                        {row.jobId ? (
+                          <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
+                            {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
+                          </Link>
+                        ) : (
+                          <p className="text-sm text-foreground">{row.step}</p>
+                        )}
                         <p className="text-[11px] text-muted-foreground">
                           {row.projectName}
                           {row.note ? ` · ${row.note}` : ''}

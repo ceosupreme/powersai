@@ -28,6 +28,9 @@ import { useEnsureCurrentWeek } from '@/hooks/useEnsureCurrentWeek';
 import { useScoreReportingWeek } from '@/hooks/useScoreReportingWeek';
 import { NonClientPillarsDashboard } from '@/components/pillar/NonClientPillarsDashboard';
 import { NextTenSection } from '@/components/pillar/NextTenSection';
+import { BrandWorkspace } from '@/components/brand-workspace/BrandWorkspace';
+import { useNonClientPortfolio, projectGroup, type ProjectDirectoryRow } from '@/hooks/usePortfolioData';
+import { useBrandKitAssetsView } from '@/hooks/useBrandWorkspace';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
@@ -162,6 +165,19 @@ export default function ProjectHome() {
   const weekStart = reportingWeek.weekStart;
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
   const [setupOpen, setSetupOpen] = useState(false);
+
+  // Overall score: the same weighted current-week number the Portfolio card shows.
+  const scoreRows = useMemo<ProjectDirectoryRow[]>(
+    () => (isNonClient && meta ? [{
+      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: false,
+      focus_status: meta.focus_status ?? 'active',
+      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: false }),
+    }] : []),
+    [isNonClient, meta],
+  );
+  const { data: scoreCards } = useNonClientPortfolio(scoreRows);
+  const { data: kitView } = useBrandKitAssetsView(isNonClient ? venueId : null);
+  const contentMode: string | null = kitView?.kit?.content_mode ?? null;
 
   // "Ultimate goal" inline edit (admins only)
   const [goalEditing, setGoalEditing] = useState(false);
@@ -365,7 +381,18 @@ export default function ProjectHome() {
             {isNonClient && !isAdmin && meta.focus_status === 'parked' && (
               <Badge variant="outline" className="text-[10px] uppercase tracking-wide">Parked</Badge>
             )}
+            {isNonClient && contentMode && (
+              <Badge variant="outline" className="text-[10px] uppercase tracking-wide" title="Brand kit content mode">
+                Content: {contentMode}
+              </Badge>
+            )}
           </div>
+          {isNonClient && (
+            <div className="pt-2 flex gap-3 text-sm">
+              <Link to="/logs/new" className="text-primary underline-offset-2 hover:underline">Log an idea</Link>
+              <Link to="/brand-kit" className="text-primary underline-offset-2 hover:underline">Brand kit</Link>
+            </div>
+          )}
           {isNonClient && (
             <div className="pt-2 space-y-1">
               <div className="flex items-start gap-2 flex-wrap">
@@ -454,39 +481,44 @@ export default function ProjectHome() {
         </Card>
       )}
 
-      {isNonClient && venueId && (
-        <NextTenSection projectId={venueId} projectName={meta.name} />
-      )}
-
-      {/* One-glance project view (non-client projects only) */}
-      {isNonClient && (reportingWeek.isError || pillarsError) && (
-        <p role="status" className="text-sm text-amber-600">The reporting week or score setup could not be verified. Please reload to check this project's scores.</p>
-      )}
-      {isNonClient && venueId && pillars.length > 0 && (
-        <NonClientPillarsDashboard
+      {isNonClient && venueId ? (
+        <BrandWorkspace
           projectId={venueId}
-          weekStart={weekStart}
-          pillars={pillars}
-          canEdit={canRunWizard}
-          dataUnavailable={reportingWeek.isError || pillarsError}
-          isLoading={reportingWeek.isLoading}
+          isAdmin={isAdmin}
+          overallScore={scoreCards?.[0]?.overall}
+          nextTen={<NextTenSection projectId={venueId} projectName={meta.name} />}
+          pillars={
+            <>
+              {(reportingWeek.isError || pillarsError) && (
+                <p role="status" className="text-sm text-amber-600">The reporting week or score setup could not be verified. Please reload to check this project's scores.</p>
+              )}
+              {pillars.length > 0 && (
+                <NonClientPillarsDashboard
+                  projectId={venueId}
+                  weekStart={weekStart}
+                  pillars={pillars}
+                  canEdit={canRunWizard}
+                  dataUnavailable={reportingWeek.isError || pillarsError}
+                  isLoading={reportingWeek.isLoading}
+                />
+              )}
+            </>
+          }
+          setup={
+            <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  <span>Setup</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
+            </Collapsible>
+          }
         />
-      )}
-
-      {isNonClient ? (
-        <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
-              <span>Setup</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
-        </Collapsible>
       ) : (
         setupBlocks
       )}
-
 
       {canRunWizard && wizardOpen && venueId && (
         <VenueOnboardingWizard

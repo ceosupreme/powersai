@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
+import { fetchActionStatusMap, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
+import { isOwnerVisible } from '@/lib/ownerWork';
 
 export interface WaitingRow {
   id: string;
@@ -48,18 +49,20 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id')
+        .select('id,title,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
 
       const now = Date.now();
       const seen = new Set<string>();
+      const statusById = await fetchActionStatusMap((data ?? []) as any[]);
       const rows = ((data ?? []) as any[])
         .filter((a) => {
           if (seen.has(a.id)) return false;
           seen.add(a.id);
           if (a.approval_status === 'Rejected') return false;
+          if (!isOwnerVisible(a, statusById)) return false;
           return a.status !== 'Done';
         })
         .map((a) => {

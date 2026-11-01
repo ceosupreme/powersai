@@ -24,6 +24,8 @@ import {
   type ProjectDirectoryRow,
 } from '@/hooks/usePortfolioData';
 import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
+import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
+import { AllBrandsWaitingStrip } from '@/components/portfolio/AllBrandsWaitingStrip';
 import { useRole } from '@/context/RoleContext';
 import { useApp } from '@/context/AppContext';
 import { getGradeFromScore, getGradeColor } from '@/utils/scoring';
@@ -364,9 +366,22 @@ export default function PortfolioOverview() {
   const { data: nonClientCards = [], isLoading: nonClientLoading, isError: nonClientError, refetch: refetchCards } =
     useNonClientPortfolio(nonClientRows);
 
-  const activeCards = useMemo(
-    () => nonClientCards.filter((c) => c.focusStatus !== 'parked'),
+  const workProjects = useMemo(
+    () => nonClientCards.map((c) => ({ id: c.id, name: c.name })),
     [nonClientCards],
+  );
+  const { data: workById } = useBrandWorkSummaries(workProjects);
+  // Active brands: most waiting on you first, then score.
+  const activeCards = useMemo(
+    () =>
+      nonClientCards
+        .filter((c) => c.focusStatus !== 'parked')
+        .sort(
+          (a, b) =>
+            (workById?.get(b.id)?.waitingCount ?? -1) - (workById?.get(a.id)?.waitingCount ?? -1) ||
+            (b.overall ?? -1) - (a.overall ?? -1),
+        ),
+    [nonClientCards, workById],
   );
   const parkedCards = useMemo(
     () => nonClientCards.filter((c) => c.focusStatus === 'parked'),
@@ -656,17 +671,23 @@ export default function PortfolioOverview() {
             </div>
           ) : (
             <div className="space-y-4">
+              <AllBrandsWaitingStrip
+                cards={activeCards.map((c) => ({ id: c.id, name: c.name }))}
+                workById={workById}
+                onOpenProject={handleProjectDrillIn}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {activeCards.map((card) => (
                   <BrandProjectCard
                     key={card.id}
                     data={card}
+                    work={workById?.get(card.id)}
                     onClick={() => handleProjectDrillIn(card.id)}
                   />
                 ))}
               </div>
               {parkedCards.length > 0 && (
-                <Collapsible>
+                <Collapsible defaultOpen>
                   <CollapsibleTrigger className="w-full bg-card border border-dashed border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <ChevronDown className="w-4 h-4" />
                     <span>Parked ({parkedCards.length})</span>
@@ -677,6 +698,7 @@ export default function PortfolioOverview() {
                         <BrandProjectCard
                           key={card.id}
                           data={card}
+                          work={workById?.get(card.id)}
                           onClick={() => handleProjectDrillIn(card.id)}
                         />
                       ))}
