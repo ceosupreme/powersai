@@ -21,6 +21,8 @@ export interface ComposeInput {
   lane_item_key?: string | null;
   /** Channel setup jobs: the channel's governing method. */
   channel_method_id?: string | null;
+  /** Niche playbook ids: context only, never steps. */
+  niche_ids?: string[];
 }
 
 export interface MethodRow {
@@ -30,6 +32,8 @@ export interface MethodRow {
 
 export interface KeyPoints {
   kind?: string;
+  /** Money paths: setup steps for the lane itself. Production jobs use only adds. */
+  setup?: { n?: number; title: string; owner?: string; check?: string }[];
   steps?: { n?: number; title: string; owner?: string; check?: string }[];
   adds?: { title: string; owner?: string }[];
   planned?: boolean;
@@ -155,6 +159,11 @@ export const recipeVersionString = (recipe: { key: string; version: string }[]) 
 
 const KB_COLS = 'id,title,version,status,tags,key_points,subcategory';
 
+/** Recipe order: brand rules, niches, product type, destinations, monetization, promotion. */
+export function orderRecipe(brandRules: MethodRow | null, niches: MethodRow[], rest: (MethodRow | null)[]): MethodRow[] {
+  return [brandRules, ...niches, ...rest].filter(Boolean) as MethodRow[];
+}
+
 async function methodsByKeys(keys: string[]): Promise<Map<string, MethodRow>> {
   const out = new Map<string, MethodRow>();
   const list = [...new Set(keys.filter(Boolean))];
@@ -176,6 +185,14 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
   if (brRes.error) throw brRes.error;
   const brandRules: MethodRow | null = (brRes.data ?? [])[0] ?? null;
 
+  let niches: MethodRow[] = [];
+  if (input.niche_ids?.length) {
+    const nr = await T('knowledge_base').select(KB_COLS).in('id', input.niche_ids).eq('subcategory', 'niche');
+    if (nr.error) throw nr.error;
+    const byId = new Map(((nr.data ?? []) as MethodRow[]).map((r) => [r.id, r]));
+    niches = input.niche_ids.map((id) => byId.get(id)).filter(Boolean) as MethodRow[];
+  }
+
   let recipeRows: MethodRow[] = [];
   let steps: PlannedStep[];
 
@@ -190,7 +207,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     const statusBy = new Map(((st.data ?? []) as any[]).map((r) => [r.item_key, r.status]));
     const open = items.filter((i) => !i.item_key.startsWith('lane_') && statusBy.get(i.item_key) !== 'satisfied');
     const detail = open.length ? `Setup items not on yet:\n${open.map((i) => `- ${i.label}`).join('\n')}` : 'All setup items are on.';
-    recipeRows = [brandRules, dest].filter(Boolean) as MethodRow[];
+    recipeRows = orderRecipe(brandRules, niches, [dest]);
     steps = laneSteps(brandRules, dest, detail);
   } else if (input.kind === 'channel_setup') {
     let ch: MethodRow | null = null;
@@ -199,7 +216,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
       if (r.error) throw r.error;
       ch = r.data ?? null;
     }
-    recipeRows = [brandRules, ch].filter(Boolean) as MethodRow[];
+    recipeRows = orderRecipe(brandRules, niches, [ch]);
     steps = channelSetupSteps(brandRules, ch);
   } else {
     const keys = [input.product_type ?? '', ...(input.destinations ?? []), ...(input.monetization ?? []), ...(input.promotion ?? [])];
@@ -207,7 +224,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     const pick = (ks: string[] = []) => ks.map((k) => by.get(k)).filter(Boolean) as MethodRow[];
     const pt = input.product_type ? by.get(input.product_type) ?? null : null;
     const dest = pick(input.destinations), mon = pick(input.monetization), pro = pick(input.promotion);
-    recipeRows = [brandRules, pt, ...dest, ...mon, ...pro].filter(Boolean) as MethodRow[];
+    recipeRows = orderRecipe(brandRules, niches, [pt, ...dest, ...mon, ...pro]);
     steps = buildRecipeSteps(brandRules, pt, dest, mon, pro);
   }
 
@@ -293,7 +310,7 @@ export function buildStarterPrompt(a: {
     `Job: ${a.jobTitle}`,
     `Money destination: ${a.moneyDestination || 'not set'}`,
     `Step ${a.stepOrder ?? '?'}: ${a.stepTitle}`,
-    `Method: ${a.method ? `${a.method.title}${a.method.version ? ` v${a.method.version}` : ''}` : 'none'}`,
+    `Playbook: ${a.method ? `${a.method.title}${a.method.version ? ` v${a.method.version}` : ''}` : 'none'}`,
     `Skill to load: ${skillOf(a.method?.tags) ?? 'none listed'}`,
     `Inputs: ${(f.inputs ?? []).length ? (f.inputs ?? []).map(String).join('; ') : 'none listed'}`,
     `Expected output: ${f.expected_output || 'not specified'}`,
