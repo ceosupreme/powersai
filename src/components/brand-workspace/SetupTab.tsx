@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +43,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
   const rows = map.data ?? [];
   const playbooks = usePlaybookIds(rows.map((r) => r.playbook_key ?? ''));
   const refresh = useSetupRefresh(projectId);
+  const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
   const [haveIt, setHaveIt] = useState<AssetMapRow | null>(null);
   const [skip, setSkip] = useState<AssetMapRow | null>(null);
@@ -62,7 +63,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
 
   const setUp = (r: AssetMapRow) => run(`setup-${r.asset_key}`, async () => {
     const jobId = await startSetup(projectId, r);
-    toast.success(`Setup started for ${r.label}`, { action: { label: 'Open pipeline', onClick: () => { window.location.assign(pipelineHref(projectId, jobId)); } } });
+    toast.success(`Setup started for ${r.label}`, { action: { label: 'Open pipeline', onClick: () => navigate(pipelineHref(projectId, jobId)) } });
   });
 
   const copyBrief = async () => {
