@@ -10,9 +10,10 @@ const CLOSED_JOB = ['done', 'complete', 'completed', 'cancelled', 'canceled', 'a
 export interface SetupSummary { needed_count: number; in_place: number; gaps: number; missing: number; planned: number; needs_access: number; later: number; skipped: number; extra_on_file: number; setup_score: number | null; setup_gate: string | null }
 export interface ChannelStatRow { id: string; channel_id: string; captured_on: string; followers: number | null; following: number | null; posts: number | null; videos: number | null; views: number | null; likes: number | null; source: string; source_ref: string | null }
 
-export function useAssetMap(projectId: string) {
+export function useAssetMap(projectId: string, enabled = true) {
   return useQuery({
     queryKey: ['brand-setup', 'map', projectId],
+    enabled: enabled && !!projectId,
     queryFn: async (): Promise<AssetMapRow[]> => {
       const { data, error } = await T('v_brand_asset_map').select('*').eq('venue_id', projectId);
       if (error) throw error;
