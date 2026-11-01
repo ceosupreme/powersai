@@ -69,3 +69,25 @@ test('Setup gaps sort puts most gaps first', () => {
   const setup = new Map([['a', { gaps: 2 }], ['b', { gaps: 9 }]]);
   assert.deepEqual([...cards].sort(sort.portfolioSorter('gaps', null, null, setup)).map((c) => c.id), ['b', 'a', 'c']);
 });
+
+test('traffic check warns when no asset for a playbook is on file', () => {
+  const assets = [
+    { key: 'website', label: 'Website', method_keys: ['lead_magnet'] },
+    { key: 'email_list', label: 'Email list', method_keys: ['lead_magnet', 'affiliate'] },
+    { key: 'amazon_associates', label: 'Amazon Associates', method_keys: ['affiliate'] },
+  ];
+  const methods = [{ key: 'lead_magnet', title: 'Lead magnet' }, { key: 'affiliate', title: 'Affiliate' }, { key: 'direct_sale', title: 'Direct sale' }];
+  const gaps = s.trafficGaps(methods, assets, [{ asset_key: 'email_list', state: 'missing' }, { asset_key: 'website', state: 'needs_access' }]);
+  assert.deepEqual(gaps.map((g) => g.key), ['lead_magnet', 'affiliate']);
+  assert.equal(s.trafficNoticeText(gaps[0]), "Before this drives traffic: Lead magnet needs one of: Website, Email list, which isn't set up for this brand yet.");
+  assert.equal(s.trafficNoticeText({ key: 'x', title: 'X', labels: ['Website'] }), "Before this drives traffic: X needs Website, which isn't set up for this brand yet.");
+  assert.deepEqual(s.trafficGaps(methods, assets, [{ asset_key: 'email_list', state: 'on_file' }]), []);
+});
+
+test('foundation rows stay out of the top 3 and the brief points to the Brand kit page', () => {
+  const rows = [row({ asset_key: 'brand_kit', grp: 'Foundation', priority: 100 }), row({ asset_key: 'b', priority: 10 })];
+  assert.deepEqual(s.topMissing(rows, new Set()).map((r) => r.asset_key), ['b']);
+  const brief = s.buildSetupBrief({ brand: 'B', niche: null, kit: null, inUse: [], gaps: rows, playbookIdByKey: new Map() });
+  assert.ok(brief.includes('Brand kit: fill it in on the HQ Brand kit page.'));
+  assert.ok(brief.includes('1. A (To set up)'));
+});
