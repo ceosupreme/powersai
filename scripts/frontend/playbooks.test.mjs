@@ -24,21 +24,44 @@ after(() => rm(dir, { recursive: true, force: true }));
 const T = '2026-11-01';
 const steps = (n) => JSON.stringify({ steps: Array.from({ length: n }, (_, i) => ({ n: i + 1, title: `s${i}` })) });
 
-test('draft is Planned', () => assert.equal(ps.playbookStatus({ status: 'draft', expiry_date: null }, T), 'Planned'));
-test('active with 1,500-char full text is Written', () => assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, full_text: 'x'.repeat(1500) }, T), 'Written'));
-test('active with 1,499 chars and nothing else is Thin', () => assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, full_text: 'x'.repeat(1499) }, T), 'Thin'));
+const row = (over = {}) => ({ status: 'active', expiry_date: null, subcategory: null, summary: null, ...over });
+test('draft is Planned', () => assert.equal(ps.playbookStatus(row({ status: 'draft' }), T), 'Planned'));
+test('active with 1,500-char full text is Written', () => assert.equal(ps.playbookStatus(row({ full_text: 'x'.repeat(1500) }), T), 'Written'));
+test('active with 1,499 chars and nothing else is Thin', () => assert.equal(ps.playbookStatus(row({ full_text: 'x'.repeat(1499) }), T), 'Thin'));
 test('skill or pack tag makes it Written', () => {
-  assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, tags: ['skill:etsy-lister'] }, T), 'Written');
-  assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, tags: ['pack:kdp'] }, T), 'Written');
+  assert.equal(ps.playbookStatus(row({ tags: ['skill:etsy-lister'] }), T), 'Written');
+  assert.equal(ps.playbookStatus(row({ tags: ['pack:kdp'] }), T), 'Written');
 });
 test('5 steps Written, 4 steps Thin', () => {
-  assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, key_points: steps(5) }, T), 'Written');
-  assert.equal(ps.playbookStatus({ status: 'active', expiry_date: null, key_points: steps(4) }, T), 'Thin');
+  assert.equal(ps.playbookStatus(row({ key_points: steps(5) }), T), 'Written');
+  assert.equal(ps.playbookStatus(row({ key_points: steps(4) }), T), 'Thin');
 });
 test('past review-by date makes a deep playbook Thin; today still counts', () => {
-  const deep = { status: 'active', full_text: 'x'.repeat(2000) };
-  assert.equal(ps.playbookStatus({ ...deep, expiry_date: '2026-10-31' }, T), 'Thin');
-  assert.equal(ps.playbookStatus({ ...deep, expiry_date: T }, T), 'Written');
+  const deep = { full_text: 'x'.repeat(2000) };
+  assert.equal(ps.playbookStatus(row({ ...deep, expiry_date: '2026-10-31' }), T), 'Thin');
+  assert.equal(ps.playbookStatus(row({ ...deep, expiry_date: T }), T), 'Written');
+});
+const shortForm = (over = {}) => row({ subcategory: 'platform_requirement', ...over });
+test('Rules and Promotion rows read Written when they carry their one-liner', () => {
+  assert.equal(ps.playbookStatus(shortForm({ summary: 'No medical claims in listings.' }), T), 'Written');
+  assert.equal(ps.playbookStatus(shortForm({ subcategory: 'brand_rules', summary: 'Voice matches the kit.' }), T), 'Written');
+  assert.equal(ps.playbookStatus(shortForm({ subcategory: 'promotion', summary: '   ', key_points: JSON.stringify({ adds: [{ title: 'Pin to listing' }] }) }), T), 'Written');
+  assert.equal(ps.playbookStatus(shortForm({ key_points: JSON.stringify({ checks: ['Disclosure present'] }) }), T), 'Written');
+  assert.equal(ps.playbookStatus(shortForm({ key_points: JSON.stringify({ steps: [{ title: 'Post' }] }) }), T), 'Written');
+});
+test('Rules and Promotion rows stay Thin with nothing in them or a passed review date', () => {
+  assert.equal(ps.playbookStatus(shortForm(), T), 'Thin');
+  assert.equal(ps.playbookStatus(shortForm({ summary: '   ' }), T), 'Thin');
+  assert.equal(ps.playbookStatus(shortForm({ summary: '', key_points: JSON.stringify({ steps: [], adds: [], checks: [] }) }), T), 'Thin');
+  assert.equal(ps.playbookStatus(shortForm({ summary: 'A real rule.', expiry_date: '2026-10-31' }), T), 'Thin');
+  assert.equal(ps.playbookStatus(shortForm({ status: 'draft', summary: 'A real rule.' }), T), 'Planned');
+});
+test('the short-form rule does not leak into other shelves', () => {
+  assert.equal(ps.playbookStatus(row({ subcategory: 'niche', summary: 'A niche with a one-liner.', key_points: JSON.stringify({ steps: [{ title: 'x' }] }) }), T), 'Thin');
+  assert.equal(ps.playbookStatus(row({ subcategory: 'destination', summary: 'A destination one-liner.' }), T), 'Thin');
+});
+test('shelf counts use the same short-form rule', () => {
+  assert.deepEqual(ps.countWords([shortForm({ summary: 'A rule.' }), shortForm()], T), { Written: 1, Thin: 1, Planned: 0 });
 });
 test('superseded and archived are hidden', () => {
   assert.equal(ps.isHiddenPlaybook({ status: 'superseded' }), true);
