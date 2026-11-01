@@ -23,6 +23,19 @@
 .proposal-page .proposal-fact-label { font-size: .82rem; font-weight: 600; color: hsl(var(--ink-muted)); text-transform: uppercase; letter-spacing: .06em; }
 .proposal-page .proposal-fact-value { font-family: "Inter Tight", sans-serif; font-size: clamp(1.35rem, 2.2vw, 1.75rem); font-weight: 800; line-height: 1.15; color: hsl(var(--ink)); }
 
+/* Note under the facts, and the jump links */
+.proposal-page .proposal-facts-note { margin-top: 12px; font-size: .92rem; color: hsl(var(--ink-muted)); }
+.proposal-page .proposal-jump { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 18px; }
+.proposal-page .proposal-jump a { display: inline-flex; align-items: center; min-height: 38px; padding: 0 14px; border: 1px solid hsl(var(--rule)); border-radius: 999px; background: hsl(var(--surface)); font-size: .9rem; font-weight: 600; color: hsl(var(--ink)); }
+
+/* How it works: five steps in a row */
+.proposal-page .proposal-journey { padding-block: clamp(40px, 6vw, 72px); }
+.proposal-page .proposal-journey-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 30px 0 0; padding: 0; list-style: none; counter-reset: none; }
+.proposal-page .proposal-journey-steps li { position: relative; padding: 20px 18px 22px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.proposal-page .proposal-journey-num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: hsl(var(--navy)); color: hsl(var(--gold-bright)); font-weight: 800; font-size: .9rem; }
+.proposal-page .proposal-journey-steps strong { display: block; margin-top: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.2rem; font-weight: 800; }
+.proposal-page .proposal-journey-steps p { margin-top: 6px; font-size: .95rem; color: hsl(var(--ink-muted)); line-height: 1.45; }
+
 /* Opening note and the two outcomes */
 .proposal-page .proposal-opening { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--surface)); }
 .proposal-page .proposal-opening-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; align-items: start; }
@@ -155,13 +168,16 @@
   .proposal-page .proposal-opening-grid, .proposal-page .proposal-markets-grid, .proposal-page .proposal-assurance-grid, .proposal-page .proposal-after-grid, .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .proposal-page .proposal-block-grid, .proposal-page .proposal-price-grid, .proposal-page .proposal-who-grid { grid-template-columns: minmax(0, 1fr); }
   .proposal-page .proposal-monthly { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .proposal-page .proposal-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .proposal-page .proposal-phases, .proposal-page .proposal-journey-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .proposal-page .proposal-wrap { width: min(1120px, 100% - 32px); }
   .proposal-page .proposal-topbar-for { display: none; }
   .proposal-page .proposal-facts { grid-template-columns: minmax(0, 1fr); }
-  .proposal-page .proposal-phases, .proposal-page .proposal-form-row { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-phases, .proposal-page .proposal-form-row, .proposal-page .proposal-journey-steps { grid-template-columns: minmax(0, 1fr); }
+  .proposal-page .proposal-journey-steps li { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 12px; align-items: start; }
+  .proposal-page .proposal-journey-steps strong { margin-top: 3px; }
+  .proposal-page .proposal-journey-steps p { grid-column: 2; }
   .proposal-page .proposal-cal-weeks { grid-template-columns: 84px repeat(8, minmax(0, 1fr)); }
   .proposal-page .proposal-cal-row { grid-template-columns: 84px minmax(0, 1fr); }
   .proposal-page .proposal-cal-bar { font-size: 0; }

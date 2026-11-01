@@ -100,6 +100,14 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 </li>
               ))}
             </ul>
+            <p className="proposal-facts-note">{p.factsNote}</p>
+            <nav className="proposal-jump" aria-label="Jump to a section">
+              <a href="#how-it-works">How it works</a>
+              <a href="#who-does-what">Who does what</a>
+              <a href="#what-it-costs">What it costs</a>
+              <a href="#the-pilot">The pilot</a>
+              <a href="#accept">Accept</a>
+            </nav>
           </div>
         </section>
 
@@ -118,6 +126,22 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="proposal-journey" id="how-it-works">
+          <div className="proposal-wrap">
+            <span className="proposal-eyebrow">How it works</span>
+            <h2 className="proposal-h2">{p.journey.title}</h2>
+            <ol className="proposal-journey-steps">
+              {p.journey.steps.map((st, i) => (
+                <li key={st.label}>
+                  <span className="proposal-journey-num">{i + 1}</span>
+                  <strong>{st.label}</strong>
+                  <p>{st.body}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
@@ -146,7 +170,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-who">
+        <section className="proposal-who" id="who-does-what">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.whoDoesWhat.title}</span>
             <h2 className="proposal-h2">A clear division of work.</h2>
@@ -202,7 +226,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-pricing">
+        <section className="proposal-pricing" id="what-it-costs">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pricing.title}</span>
             <h2 className="proposal-h2">One fee for the work. The advertising budget is yours to set.</h2>
@@ -223,7 +247,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-pilot">
+        <section className="proposal-pilot" id="the-pilot">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pilot.title}</span>
             <h2 className="proposal-h2">Sixty live days, with a decision point at thirty.</h2>

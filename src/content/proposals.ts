@@ -50,6 +50,10 @@ export type ProposalRecord = {
   pdfUrl: string;
   /** Three short facts shown big at the top. */
   headlineFacts: { label: string; value: string }[];
+  /** One line under the facts that qualifies them. */
+  factsNote: string;
+  /** The system in five short steps, shown before the detail. */
+  journey: { title: string; steps: { label: string; body: string }[] };
   /** The opening note to the client, in the sender's words. */
   opening: string[];
   outcomes: { label: string; title: string; body: string }[];
@@ -113,10 +117,21 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     videoUrl: "",
     pdfUrl: "",
     headlineFacts: [
-      { label: "One monthly fee", value: "$3,000 a month" },
+      { label: "Monthly program fee", value: "$3,000 a month" },
       { label: "Judge it on results", value: "60-day pilot" },
       { label: "Nothing hidden", value: "No percentage, no per-lead charges" },
     ],
+    factsNote: "The one-time foundation and the advertising budget are separate. Full terms are under What it costs.",
+    journey: {
+      title: "Five steps, run for you.",
+      steps: [
+        { label: "Reach", body: "Ads find timeshare owners where your team is presenting." },
+        { label: "Screen", body: "A short qualifier sorts the people you can help." },
+        { label: "Book", body: "They pick a presentation date and venue on your calendar." },
+        { label: "Remind", body: "Confirmations, reminders, rebooking and follow-up, handled." },
+        { label: "Measure", body: "A Monday report on spend, bookings and attendance tunes the campaign." },
+      ],
+    },
     opening: [
       "Erik, thanks for the time on Friday. You said you want more of the right people at your presentations, in Boston and wherever the team is presenting that week, and that you are open to video, social and ads if they produce.",
       "This is one program that covers it, with a clear division of work, a defined scope, and a pilot you can judge on results. Everything is on this page, and you can print it or save it as a PDF for your team from the bottom of the page.",
@@ -136,51 +151,50 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     blocks: [
       {
         number: "01",
-        title: "The video and the ads, produced by us",
-        body: "We write, produce and cut the main video and the ad clips in-house, with professional voiceover, motion graphics and licensed footage, so nothing in the program waits on your team being filmed. The video explains how the process works and invites owners to a presentation, and a fresh set of clips each month keeps the ads and the social channels current. If you'd like your team to appear, we can add that with a short remote recording, but the program doesn't depend on it.",
+        title: "Campaign pages, screening and booking",
+        body: "A campaign page for each market you present in, carrying the video, plain answers to the questions owners ask, and a short qualifier: where they live, which resort or developer, years owned, paid off or financed, annual fees, and what they want. A booking calendar shows the presentations and venues for that market, with a phone or video option for people who won't come to a group.",
       },
       {
         number: "02",
-        title: "Campaign page, screening and booking",
-        body: "One campaign page template with a city version for each market you present in. It carries the video, plain answers to the questions owners ask, and a short qualifier: where they live, which resort or developer, years owned, paid off or financed, annual fees, what they have tried, and what they want. A booking calendar shows the presentations and venues for that market, with a phone or video option for people who will not come to a group.",
+        title: "Advertising that follows your calendar",
+        body: "One primary paid channel to start, Meta and Instagram, aimed at timeshare owners where your team will be, with retargeting of people who engaged. You set the advertising budget and pay the platforms directly, so every dollar is visible to you, market by market. Google can be added as a second channel once eligibility is confirmed and we agree on it.",
       },
       {
         number: "03",
-        title: "Advertising that follows your calendar",
-        body: "The primary paid channel to start is Meta and Instagram, aimed at timeshare owners where your team will be, with retargeting of people who engaged. Google is added once eligibility is confirmed. You set the advertising budget and pay the platforms directly, so every dollar is visible to you, market by market.",
-      },
-      {
-        number: "04",
-        title: "Weekly content on channels in your name",
-        body: "Social channels set up in your name and kept active with weekly content we produce, so the people who look you up after a mailer or an ad find a business that is present and current.",
-      },
-      {
-        number: "05",
         title: "Follow-up and attendance handled",
         body: "Everything after the click is handled for you: confirmation, reminders, a courtesy call with a human option, rebooking for no-shows, and follow-up for the people who are interested but not ready. Your team doesn't chase appointments; anything that needs judgment goes to a named person on your side. Every inquiry is exclusive to CPN, never shared or resold.",
       },
       {
-        number: "06",
-        title: "Managed and improved every month",
+        number: "04",
+        title: "Managed and measured every month",
         body: "A dashboard you can open any time and a Monday report on spend, bookings, attendance, what is working and, when you share them, the sales that came from it, so budget decisions are made on numbers. The campaign is tuned against attendance, not clicks.",
         note: "Nothing in the video or the ads promises an exit, implies a government program or a connection to any resort, or pressures anyone with today-only language. The campaign invites owners to understand their options and book a conversation with your team.",
       },
+      {
+        number: "05",
+        title: "The video and the ads, produced by us",
+        body: "We write, produce and cut the main video and the ad clips in-house, with professional voiceover, motion graphics and licensed footage. The video explains how the process works and invites owners to a presentation, and fresh clips each month keep the ads and the channels current. Nothing waits on your team being filmed; if you'd like your team to appear, we can add that with a short remote recording.",
+      },
+      {
+        number: "06",
+        title: "Weekly content on channels in your name",
+        body: "Social channels set up in your name and kept active with weekly content we produce, so the people who look you up after a mailer or an ad find a business that is present and current.",
+      },
     ],
     monthly: [
+      { value: "Every day", label: "new inquiries screened, booked and reminded" },
+      { value: "Monday", label: "report on spend, bookings and attendance" },
       { value: "6 to 8", label: "new short clips produced each month" },
       { value: "2 to 3", label: "new ad variations each month" },
-      { value: "Weekly", label: "posting on Facebook, Instagram and YouTube" },
-      { value: "Monday", label: "report on spend, bookings and attendance" },
     ],
     whoDoesWhat: {
       title: "Who does what",
       us: [
-        "Produce the video, the monthly clips and the ads, with no filming required from your team",
-        "Build and run the campaign pages, screening and booking",
+        "Build and run the appointment system: campaign pages, screening, booking, confirmations, reminders and follow-up",
         "Manage the campaigns inside the budget you approve",
-        "Handle confirmations, reminders, rescheduling and follow-up",
-        "Keep the social channels posted weekly",
         "Report every Monday and tune against attendance",
+        "Produce the video, the monthly clips and the ads, with no filming required from your team",
+        "Keep the social channels posted weekly",
       ],
       them: [
         "Share the presentation dates and venues for each market",
@@ -243,7 +257,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         {
           when: "Live days 31 to 60",
           title: "Second month",
-          body: "Scale the budget on what is working, open the first travel-market windows against your calendar, add Google once eligibility is confirmed.",
+          body: "Scale the budget on what is working, open the first travel-market windows against your calendar, and decide together whether to add Google as a second channel.",
         },
       ],
       assurance: {
@@ -258,7 +272,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     afterAccept: {
       title: "What happens after you accept",
-      intro: "Sean sends the one-page agreement and the $1,500 starting invoice the same day you accept. Build starts the day it clears. To start, he will ask you for:",
+      intro: "Sean sends the one-page agreement and the $1,500 starting invoice the same business day you accept. Build starts the day it clears. To start, he will ask you for:",
       items: [
         "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
         "Logo and brand files, plus anything you already use: mailers, photos, and the questions your agents hear most.",
@@ -268,10 +282,10 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     accept: {
       title: "Ready to start?",
-      body: "Accept here and Sean sends the one-page agreement and the $1,500 starting invoice today. Questions first are welcome, by email or a quick call.",
+      body: "Accept here and Sean sends the one-page agreement and the $1,500 starting invoice the same business day. Questions first are welcome, by email or a quick call.",
       buttonLabel: "Accept the proposal",
       confirmationTitle: "Accepted. Thank you, Erik.",
-      confirmationBody: "Your acceptance is recorded. Sean will send the one-page agreement and the $1,500 starting invoice to the email you entered today, and will call the number you gave to set the kickoff and collect the calendar.",
+      confirmationBody: "Your acceptance is recorded. Sean will send the one-page agreement and the $1,500 starting invoice to the email you entered the same business day, and will call the number you gave to set the kickoff and collect the calendar.",
     },
     internalLabel: "Appointment Growth Program, CPN Boston",
   },
