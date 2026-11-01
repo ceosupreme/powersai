@@ -53,7 +53,7 @@ export const fetchRadarSources = (sourceType: 'niche_profile' | 'radar_dimension
     .eq('source_type', sourceType).order('updated_at', { ascending: false }).order('id').range(from, to));
 
 export const fetchRadarBriefs = () => allRows((from, to) =>
-  supabase.from('content_items').select('id,project_id,title,idea_score,stage,hook,primary_keyword,idea_evidence,venues(name)')
+  supabase.from('content_items').select('id,project_id,title,idea_score,stage,hook,primary_keyword,idea_evidence,format,recipe_version,venues(name)')
     .like('purpose', 'Radar brief%').order('idea_score', { ascending: false, nullsFirst: false }).order('id').range(from, to));
 
 export const fetchRadarRuns = () => allRows((from, to) =>
