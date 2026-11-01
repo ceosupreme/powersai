@@ -93,13 +93,11 @@ export type ProposalRecord = {
     items: string[];
   };
   accept: {
-    title: string;
-    body: string;
     buttonLabel: string;
     confirmationTitle: string;
     confirmationBody: string;
   };
-  /** Appears in the acceptance record so the owner alert reads clearly. */
+  /** Appears in the agreement-request record so the owner alert reads clearly. */
   internalLabel: string;
 };
 
@@ -128,7 +126,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       { label: "Convert", value: "Inquiries into booked, attended seats" },
       { label: "Improve", value: "Managed and tuned every month" },
     ],
-    factsNote: "Customized, run and improved for CPN by Supreme Team Media. Your investment is under Your investment, with no percentage and no per-lead charges.",
+    factsNote: "Customized, run and improved for CPN by Supreme Team Media, for fixed fees with no percentage of sales and no per-lead charges.",
     journey: {
       title: "One connected path from interest to attendance.",
       steps: [
@@ -177,16 +175,6 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         body: "We write, produce and cut the video, the ad variations and the weekly social content that support the campaign, with professional voiceover, motion graphics and licensed footage. No monthly filming obligation: your team can appear when it adds value, but production does not depend on it.",
         note: "Nothing in the video or the ads promises an exit, implies a government program or a connection to any resort, or pressures anyone with today-only language. The campaign invites owners to understand their options and book a conversation with your team.",
       },
-      {
-        number: "05",
-        title: "Campaigns that follow your team",
-        body: "Boston stays the home market. Selected travel markets get focused campaigns around the presentation calendar, supported by the same reusable pages, creative and booking system, so a new city is a geography change and a venue line, not a rebuild.",
-      },
-      {
-        number: "06",
-        title: "A managed service, not a one-time setup",
-        body: "We review campaign performance, refresh creative, maintain the automations and refine the path to attendance. A dashboard you can open any time and a Monday report keep the work and the results visible, and the campaign is tuned against attendance, not clicks.",
-      },
     ],
     monthly: [
       { value: "6 to 8", label: "short clips produced by STM each month" },
@@ -196,7 +184,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     ],
     growthLoop: {
       title: "The system does the routine work. We keep improving the results.",
-      intro: "Your monthly fee pays for active marketing management, not software access and a report.",
+      intro: "Your monthly fee pays for active marketing management, not software access and a report. Every change is judged by attendance, not clicks, and you can open the dashboard any time between Monday reports.",
       steps: [
         { title: "Test the message", body: "Compare creative and campaign approaches to learn what attracts suitable owners in each market." },
         { title: "Follow the outcome", body: "Track spend, qualified bookings, attendance and, when you share them, the sales that came from it." },
@@ -285,7 +273,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     afterAccept: {
       title: "Your next source of appointments starts here.",
-      intro: "Approve the plan and request the agreement below. Sean sends the one-page agreement and the $1,500 starting invoice the same business day, and build starts the day it clears. To start, he will ask you for:",
+      intro: "Approve the plan and request the agreement with the form. Sean sends the one-page agreement and the $1,500 starting invoice the same business day, and build starts the day it clears. To start, he will ask you for:",
       items: [
         "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
         "Logo and brand files, plus anything you already use: mailers, photos, and the questions your agents hear most.",
@@ -294,8 +282,6 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       ],
     },
     accept: {
-      title: "Ready to put the plan in motion?",
-      body: "Request the agreement below, or arrange a short proposal review first. Sean confirms the next step with you directly.",
       buttonLabel: "Approve the plan and request the agreement",
       confirmationTitle: "Thank you, Erik. The agreement is on its way.",
       confirmationBody: "Sean will send the one-page agreement and the $1,500 starting invoice to the email you entered the same business day, and will call the number you gave to set the kickoff and collect the calendar.",

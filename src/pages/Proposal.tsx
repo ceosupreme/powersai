@@ -17,7 +17,7 @@ import "@/styles/proposal.css";
  * submit-inbound-lead intake, which emails the owner and files the lead in the
  * CRM. The lead's email column is left empty on purpose: the intake sends the
  * generic "got your note" acknowledgment to any lead that carries an email,
- * and that message is wrong for someone who just accepted a program. The
+ * and that message is wrong for someone who just requested an agreement. The
  * signer's email travels in the note and in qualifier_data instead, and the
  * page shows the confirmation on screen.
  */
@@ -295,27 +295,17 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-after">
-          <div className="proposal-wrap proposal-after-grid">
-            <div>
-              <span className="proposal-eyebrow">Getting started</span>
-              <h2 className="proposal-h2">{p.afterAccept.title}</h2>
-              <p>{p.afterAccept.intro}</p>
-            </div>
-            <ol className="proposal-after-list">
-              {p.afterAccept.items.map((item, i) => (
-                <li key={i}><span>{i + 1}</span>{item}</li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
         <section className="proposal-accept" id="accept">
           <div className="proposal-wrap proposal-accept-grid">
             <div className="proposal-accept-intro">
-              <span className="proposal-eyebrow">Your next step</span>
-              <h2 className="proposal-h2">{p.accept.title}</h2>
-              <p>{p.accept.body}</p>
+              <span className="proposal-eyebrow">Getting started</span>
+              <h2 className="proposal-h2">{p.afterAccept.title}</h2>
+              <p>{p.afterAccept.intro}</p>
+              <ol className="proposal-after-list">
+                {p.afterAccept.items.map((item, i) => (
+                  <li key={i}><span>{i + 1}</span>{item}</li>
+                ))}
+              </ol>
               <div className="proposal-side-actions">
                 <a href={`mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.client.company}: proposal review`)}&body=${encodeURIComponent("I would like to review the program together. Please send a few available times.")}`} onClick={() => track("proposal_review")}>
                   <Mail aria-hidden size={18} /> Arrange a quick proposal review
@@ -346,7 +336,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
 
       <nav className="proposal-mobile-actions" aria-label="Proposal actions">
         <a href="#what-it-costs" onClick={() => track("proposal_mobile_investment")}>Your investment</a>
-        <a href="#accept" onClick={() => track("proposal_mobile_accept")}>Request the agreement <ArrowRight aria-hidden size={16} /></a>
+        <a href="#agreement-form" onClick={() => track("proposal_mobile_accept")}>Request the agreement <ArrowRight aria-hidden size={16} /></a>
       </nav>
 
       <footer className="proposal-footer">
@@ -388,7 +378,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     if (phone.replace(/\D/g, "").length < 10) return setError("Please enter the best phone number to reach you.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter the email the agreement and invoice should go to.");
 
-    const acceptedAt = new Date();
+    const requestedAt = new Date();
     const terms = p.pricing.lines.map((l) => `${l.label}: ${l.amount}`).join("; ");
     const note = [
       `PLAN APPROVED, AGREEMENT REQUESTED: ${p.internalLabel}`,
@@ -396,7 +386,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
       `Company: ${company}`,
       `Phone: ${phone}`,
       `Email for the agreement and invoice: ${email}`,
-      `Requested on: ${acceptedAt.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} Pacific`,
+      `Requested on: ${requestedAt.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} Pacific`,
       `Terms shown on the page: ${terms}. ${p.pricing.plainRules.join(" ")}`,
       `Page: ${window.location.href}`,
     ].join("\n");
@@ -409,7 +399,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
         phone,
         // email intentionally not set here; see the note at the top of this file.
         message: note,
-        project_type: "proposal_acceptance",
+        project_type: "agreement_request",
         conversation_channel: "form",
         qualifier_data: {
           proposal: p.slug,
@@ -419,7 +409,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
           signer_title: title || null,
           agreement_email: email,
           agreement_requested: true,
-          accepted_at: acceptedAt.toISOString(),
+          requested_at: requestedAt.toISOString(),
           page_url: window.location.href,
         },
         company_website: "",
@@ -429,10 +419,10 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     const saved = !fnError && data && (data as { ok?: boolean; id?: string }).ok === true && typeof (data as { id?: string }).id === "string";
     if (!saved) {
       setStatus("error");
-      setError(`Something went wrong on our side. Please email ${p.preparedBy.email} with the word ACCEPT and we will take it from there.`);
+      setError(`Something went wrong on our side. Please email ${p.preparedBy.email} and we will send the agreement the same business day.`);
       return;
     }
-    trackSiteEvent({ event_type: "form_success", label: "proposal_accept" });
+    trackSiteEvent({ event_type: "form_success", label: "proposal_agreement_request" });
     setStatus("success");
   };
 
@@ -448,7 +438,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
   }
 
   return (
-    <form className="proposal-form" onSubmit={onSubmit} noValidate>
+    <form className="proposal-form" id="agreement-form" onSubmit={onSubmit} noValidate>
       <div aria-hidden className="proposal-honeypot">
         <label>Company website<input type="text" name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>

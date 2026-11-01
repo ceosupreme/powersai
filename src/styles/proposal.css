@@ -121,12 +121,9 @@
 .proposal-page .proposal-definition { padding: 26px 28px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 18px; }
 .proposal-page .proposal-definition p { margin-top: 10px; font-size: .97rem; color: hsl(var(--ink-muted)); }
 
-/* After you accept */
-.proposal-page .proposal-after { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--surface)); }
-.proposal-page .proposal-after-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px; align-items: start; }
-.proposal-page .proposal-after-grid > div p { margin-top: 16px; }
-.proposal-page .proposal-after-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.proposal-page .proposal-after-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px 18px; background: hsl(var(--paper)); border-radius: 14px; }
+/* Getting started: what Sean asks for, shown beside the agreement form */
+.proposal-page .proposal-after-list { display: grid; gap: 12px; margin: 22px 0 0; padding: 0; list-style: none; }
+.proposal-page .proposal-after-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px 18px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 14px; }
 .proposal-page .proposal-after-list span { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--navy)); color: hsl(var(--gold-bright)); font-weight: 800; }
 
 /* Accept */
@@ -165,7 +162,7 @@
 
 /* Phones and narrow screens */
 @media (max-width: 900px) {
-  .proposal-page .proposal-opening-grid, .proposal-page .proposal-markets-grid, .proposal-page .proposal-assurance-grid, .proposal-page .proposal-after-grid, .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .proposal-page .proposal-opening-grid, .proposal-page .proposal-markets-grid, .proposal-page .proposal-assurance-grid, .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .proposal-page .proposal-block-grid, .proposal-page .proposal-price-grid, .proposal-page .proposal-who-grid { grid-template-columns: minmax(0, 1fr); }
   .proposal-page .proposal-monthly { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .proposal-page .proposal-phases, .proposal-page .proposal-journey-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -223,3 +220,8 @@
   .proposal-page .proposal-mobile-actions a:last-child { background: hsl(var(--gold)); color: #101a2c; }
 }
 @media print { .proposal-page .proposal-mobile-actions { display: none !important; } }
+
+/* Desktop: keep the agreement form in view while the reader scans the start-up list beside it. */
+@media (min-width: 901px) {
+  .proposal-page .proposal-accept-grid > .proposal-form { position: sticky; top: 24px; }
+}
