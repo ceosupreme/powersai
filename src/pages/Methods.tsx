@@ -110,7 +110,7 @@ export default function Methods() {
                 {open.external_url && (
                   <Button asChild className="w-full"><a href={open.external_url} target="_blank" rel="noreferrer">Open source</a></Button>
                 )}
-                {isAdmin && <AdminEditor row={open} onSaved={() => qc.invalidateQueries({ queryKey: ['methods-library'] })} />}
+                {isAdmin && <AdminEditor key={open.id} row={open} onSaved={() => qc.invalidateQueries({ queryKey: ['methods-library'] })} />}
               </div>
             </>
           )}
