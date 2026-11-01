@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import type { NonClientCardData } from '@/hooks/usePortfolioData';
 import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
 import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
-import type { ChannelStat } from '@/lib/portfolioSort';
+import type { ChannelStat, SetupStat } from '@/lib/portfolioSort';
 import { compactNumber } from '@/lib/playbookStatus';
 
 /**
@@ -18,6 +18,7 @@ export function BrandProjectCard({
   data,
   work,
   channels,
+  setup,
   onClick,
 }: {
   data: NonClientCardData;
@@ -25,6 +26,8 @@ export function BrandProjectCard({
   work?: BrandWorkCard | null;
   /** Live channels and followers from brand_channels; undefined while loading or not shown. */
   channels?: ChannelStat;
+  /** Setup coverage from v_brand_setup_summary. */
+  setup?: SetupStat;
   onClick: () => void;
 }) {
   const grade = data.overall != null ? getGradeFromScore(data.overall) : null;
@@ -79,6 +82,12 @@ export function BrandProjectCard({
         <p className="mb-3 text-sm text-foreground">
           {channels.total === 0 ? <span className="text-muted-foreground">No channels on file</span>
             : <>{channels.live} live channel{channels.live === 1 ? '' : 's'} · {compactNumber(channels.followers)} followers</>}
+        </p>
+      )}
+
+      {setup && setup.needed > 0 && (
+        <p className="mb-3 text-sm text-foreground">
+          Setup: {setup.inPlace} of {setup.needed} in place{setup.gaps > 0 ? `, ${setup.gaps} to set up` : ''}
         </p>
       )}
 

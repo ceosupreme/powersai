@@ -139,3 +139,6 @@
 - [x] Homepage hero: new chess background, callouts Marketing/Web Design/Automation repositioned
 
 - [x] Build 3: Playbooks page, material intake, brand Playbooks tab, niche context in composer, Portfolio sorting
+
+## Brand Setup (Build 4)
+- [x] Setup tab, screenshot stats with read-channel-screenshot, channel numbers, Portfolio setup line and Setup gaps sort

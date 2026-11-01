@@ -31,10 +31,14 @@ import {
 } from '@/lib/ownerWork';
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
 import { PlaybooksTab } from './PlaybooksTab';
+import { SetupLine, SetupTab } from './SetupTab';
+import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
+import { useChannelStats } from '@/hooks/useBrandSetup';
 import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
   { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
+  { key: 'setup', label: 'Setup', accent: 'border-primary text-primary' },
   { key: 'channels', label: 'Channels', accent: 'border-signal-green text-signal-green' },
   { key: 'avenues', label: 'Avenues', accent: 'border-gold text-gold' },
   { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
@@ -97,8 +101,9 @@ export function BrandWorkspace({
       </nav>
 
       {tab === 'overview' && (
-        <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} />
+        <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
       )}
+      {tab === 'setup' && <SetupTab projectId={projectId} canEdit={isAdmin} />}
       {tab === 'channels' && <ChannelsTab projectId={projectId} isAdmin={isAdmin} />}
       {tab === 'avenues' && <AvenuesTab projectId={projectId} canEdit={isAdmin} />}
       {tab === 'products' && <ProductsTab projectId={projectId} />}
@@ -123,8 +128,8 @@ function LoadError({ onRetry }: { onRetry: () => void }) {
 
 // ---------------- Overview ----------------
 function OverviewTab({
-  projectId, overallScore, nextTen, pillars, setup,
-}: { projectId: string; overallScore: number | null | undefined; nextTen: ReactNode; pillars: ReactNode; setup: ReactNode }) {
+  projectId, overallScore, nextTen, pillars, setup, onOpenSetup,
+}: { projectId: string; overallScore: number | null | undefined; nextTen: ReactNode; pillars: ReactNode; setup: ReactNode; onOpenSetup: () => void }) {
   const summary = useBrandWorkSummary(projectId);
   const listSize = useQuery({
     queryKey: ['brand-workspace', 'list-size', projectId],
@@ -166,6 +171,7 @@ function OverviewTab({
 
   return (
     <div className="space-y-6">
+      <SetupLine projectId={projectId} onOpen={onOpenSetup} />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {tiles.map((t) => (
           <div key={t.label} className="rounded-xl border border-primary/25 bg-card p-4">
@@ -269,13 +275,21 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
   const [open, setOpen] = useState<BrandChannel | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [req, setReq] = useState<PipelineRequest | null>(null);
+  const [shots, setShots] = useState(false);
+  const stats = useChannelStats(data.map((c) => c.id));
 
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
-  if (!data.length) return <p className="text-sm text-muted-foreground">No channels recorded for this brand.</p>;
 
   return (
     <>
+      {isAdmin && (
+        <div className="mb-3">
+          <Button size="sm" variant="outline" onClick={() => setShots(true)}>Update from screenshots</Button>
+        </div>
+      )}
+      <ScreenshotStatsDialog open={shots} onClose={() => setShots(false)} projectId={projectId} channels={data} />
+      {!data.length && <p className="text-sm text-muted-foreground">No channels recorded for this brand.</p>}
       <ul className="space-y-2">
         {data.map((c) => {
           const stale = isChannelStale(c);
@@ -292,6 +306,9 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
                 <div className="min-w-0">
                   <p className="font-semibold text-foreground">{platformLabel(c.platform)}</p>
                   <p className="text-xs text-muted-foreground truncate">{c.handle || c.account_label || '—'}</p>
+                  {latestLine(stats.data?.get(c.id)?.[0]) && (
+                    <p className="text-xs text-foreground">{latestLine(stats.data?.get(c.id)?.[0])}</p>
+                  )}
                 </div>
                 <div className="text-sm">
                   <span className="capitalize">{c.status.replace(/_/g, ' ')}</span>
@@ -322,7 +339,7 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
           );
         })}
       </ul>
-      <ChannelDrawer channel={open} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)}
+      <ChannelDrawer channel={open} stats={open ? stats.data?.get(open.id) ?? [] : []} canEdit={isAdmin} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)}
         onSetUp={(c) => { setOpen(null); setReq({ projectId, kind: 'channel_setup', title: `Set up ${platformLabel(c.platform)}`, targetKey: c.id, channelMethodId: c.destination_method_id }); }} />
       <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
     </>
@@ -392,7 +409,7 @@ function ChannelEditor({ channel, onDone }: { channel: BrandChannel; onDone: () 
   );
 }
 
-function ChannelDrawer({ channel, method, onClose, onSetUp }: { channel: BrandChannel | null; method: KnowledgeRow | null; onClose: () => void; onSetUp: (c: BrandChannel) => void }) {
+function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { channel: BrandChannel | null; stats: import('@/hooks/useBrandSetup').ChannelStatRow[]; canEdit: boolean; method: KnowledgeRow | null; onClose: () => void; onSetUp: (c: BrandChannel) => void }) {
   const placements = useQuery({
     queryKey: ['brand-workspace', 'channel-placements', channel?.id],
     enabled: !!channel,
@@ -447,6 +464,9 @@ function ChannelDrawer({ channel, method, onClose, onSetUp }: { channel: BrandCh
                 </div>
               ) : <p className="text-sm text-muted-foreground">No governing method set.</p>}
             </div>
+            {canEdit ? <StatsHistory channelId={channel.id} rows={stats} /> : (
+              <ul className="mt-5 space-y-1 text-sm">{stats.slice(0, 5).map((r) => <li key={r.id}>{latestLine(r)}</li>)}</ul>
+            )}
             <div className="mt-5">
               <h4 className="text-sm font-semibold">Recent placements</h4>
               {placements.isLoading ? <Loading /> : (placements.data ?? []).length === 0 ? (

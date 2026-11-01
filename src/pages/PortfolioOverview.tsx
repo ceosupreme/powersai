@@ -25,7 +25,7 @@ import {
 } from '@/hooks/usePortfolioData';
 import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
 import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
-import { type PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat } from '@/lib/portfolioSort';
+import { type PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat, type SetupStat } from '@/lib/portfolioSort';
 import { AllBrandsWaitingStrip } from '@/components/portfolio/AllBrandsWaitingStrip';
 import { useRole } from '@/context/RoleContext';
 import { useApp } from '@/context/AppContext';
@@ -402,6 +402,18 @@ export default function PortfolioOverview() {
       return m;
     },
   });
+  const { data: setupStats } = useQuery({
+    queryKey: ['portfolio-brand-setup', cardIds.join(',')],
+    enabled: cardIds.length > 0 && group === 'brands',
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from('v_brand_setup_summary').select('venue_id,in_place,needed_count,gaps').in('venue_id', cardIds);
+      if (error) throw error;
+      const m = new Map<string, SetupStat>();
+      for (const r of (data ?? []) as any[]) m.set(r.venue_id, { inPlace: Number(r.in_place ?? 0), needed: Number(r.needed_count ?? 0), gaps: Number(r.gaps ?? 0) });
+      return m;
+    },
+  });
   const typeCounts = useMemo(() => {
     const c: Record<string, number> = { all: nonClientCards.length };
     for (const t of TYPE_CHIPS) if (t.type) c[t.key] = nonClientCards.filter((x) => typeById.get(x.id) === t.type).length;
@@ -411,7 +423,7 @@ export default function PortfolioOverview() {
     const t = TYPE_CHIPS.find((x) => x.key === typeFilter)?.type;
     return t && group === 'brands' ? nonClientCards.filter((c) => typeById.get(c.id) === t) : nonClientCards;
   }, [nonClientCards, typeFilter, typeById, group]);
-  const sorter = useMemo(() => portfolioSorter(sortKey, workById, channelStats), [sortKey, workById, channelStats]);
+  const sorter = useMemo(() => portfolioSorter(sortKey, workById, channelStats, setupStats), [sortKey, workById, channelStats, setupStats]);
   const activeCards = useMemo(
     () => typed.filter((c) => c.focusStatus !== 'parked').sort(sorter),
     [typed, sorter],
@@ -736,6 +748,7 @@ export default function PortfolioOverview() {
                     data={card}
                     work={workById?.get(card.id)}
                     channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
+                    setup={group === 'brands' ? setupStats?.get(card.id) : undefined}
                     onClick={() => handleProjectDrillIn(card.id)}
                   />
                 ))}
@@ -754,6 +767,7 @@ export default function PortfolioOverview() {
                           data={card}
                           work={workById?.get(card.id)}
                           channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
+                    setup={group === 'brands' ? setupStats?.get(card.id) : undefined}
                           onClick={() => handleProjectDrillIn(card.id)}
                         />
                       ))}

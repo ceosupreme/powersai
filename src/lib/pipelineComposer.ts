@@ -21,6 +21,10 @@ export interface ComposeInput {
   lane_item_key?: string | null;
   /** Channel setup jobs: the channel's governing method. */
   channel_method_id?: string | null;
+  /** Channel setup jobs: playbook key used when no method id is given. */
+  channel_method_key?: string | null;
+  /** Replace the standard steps (e.g. the media kit setup). */
+  custom_steps?: PlannedStep[] | null;
   /** Niche playbook ids: context only, never steps. */
   niche_ids?: string[];
 }
@@ -215,9 +219,13 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
       const r = await T('knowledge_base').select(KB_COLS).eq('id', input.channel_method_id).maybeSingle();
       if (r.error) throw r.error;
       ch = r.data ?? null;
+    } else if (input.channel_method_key) {
+      ch = (await methodsByKeys([input.channel_method_key])).get(input.channel_method_key) ?? null;
     }
     recipeRows = orderRecipe(brandRules, niches, [ch]);
-    steps = channelSetupSteps(brandRules, ch);
+    steps = input.custom_steps?.length
+      ? input.custom_steps.map((s) => ({ ...s, method_id: s.method_id ?? ch?.id ?? null, method_key: s.method_key ?? (ch ? methodKey(ch) : null) }))
+      : channelSetupSteps(brandRules, ch);
   } else {
     const keys = [input.product_type ?? '', ...(input.destinations ?? []), ...(input.monetization ?? []), ...(input.promotion ?? [])];
     const by = await methodsByKeys(keys);
