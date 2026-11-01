@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Radar reads existing research tables through paginated, RLS-respecting queries and shares the content_pipeline permission; it never writes research data or introduces a separate permission model.
+
 - Public-site media replacements use named entries in `src/config/studioMedia.ts`; do not build media-management UI or storage because the owner replaces assets through conversation uploads.
 - Published version-2 industry navigation reads through `usePublishedVerticalLanders`; do not maintain a second hard-coded market list because database rows are authoritative.
 - Pricing (/pricing, shown as Packages) owns the starter packages and the build-your-own service menu, read from starter_packages and service_pages rows; package sends use the shared submit-inbound-lead intake and online checkout stays on industry pages. Websites and Home link to it so pricing stays consistent.

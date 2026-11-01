@@ -1,5 +1,9 @@
 # Roadmap
 
+## Radar
+- [x] Add read-only research page and shared owner navigation entry using existing tables
+- [x] Verify data rules, signed-in desktop/phone views, and preview
+
 ## Public studio website (STM build pack)
 
 - [x] Approved production homepage opening: dedicated header, chess hero, credibility strip, and simple Services cards; later sections preserved (preview only)
