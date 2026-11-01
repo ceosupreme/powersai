@@ -14,27 +14,17 @@ import { cn } from '@/lib/utils';
 import { parseKeyPoints, skillOf } from '@/lib/pipelineComposer';
 import {
   NICHE_GROUPS, SHELVES, appliesToBrand, countWords, countsLine, isHiddenPlaybook, nicheGroupLabel,
-  playbookStatus, sourceKindWord, sourceStatusWord, todayPT, venueTags, type PlaybookWord,
+  playbookStatus, sourceKindWord, sourceStatusWord, todayPT, venueTags,
 } from '@/lib/playbookStatus';
 import {
   jobStatusWord, keyOf, parseNiche, usePlaybookJobs, usePlaybookLibrary, usePlaybookSources, type PlaybookRow,
 } from '@/hooks/usePlaybooks';
+import { PlaybookWordBadge } from '@/components/playbooks/PlaybookWordBadge';
 import { AddMaterialDialog, INBOX_URL } from '@/components/playbooks/AddMaterialDialog';
 
 const STATUSES = ['draft', 'active', 'under_review', 'superseded', 'archived'];
 const STATUS_OPTION_WORD: Record<string, string> = { draft: 'Planned', active: 'Active', under_review: 'Under review', superseded: 'Superseded', archived: 'Archived' };
 const PLAYS_EMPTY = 'Plays are proven combinations. They appear here when a 30-day check shows something worked.';
-
-export const WORD_TONE: Record<PlaybookWord, string> = {
-  Written: 'border-signal-green/60 text-signal-green',
-  Thin: 'border-gold/60 text-gold',
-  Planned: 'border-border text-muted-foreground',
-  Superseded: 'border-border text-muted-foreground',
-  Archived: 'border-border text-muted-foreground',
-};
-export function PlaybookWordBadge({ word }: { word: PlaybookWord }) {
-  return <Badge variant="outline" className={cn('text-[10px]', WORD_TONE[word])}>{word}</Badge>;
-}
 
 const nicheBrands = (r: PlaybookRow) => {
   const b = parseNiche(r.key_points).brands ?? [];

@@ -5,7 +5,7 @@ import { useApproveItem } from '@/hooks/useContentProduction';
 import { buildStarterPrompt } from '@/lib/pipelineComposer';
 import { playbookStatus } from '@/lib/playbookStatus';
 import { jobStatusWord } from '@/hooks/usePlaybooks';
-import { PlaybookWordBadge } from '@/pages/Playbooks';
+import { PlaybookWordBadge } from '@/components/playbooks/PlaybookWordBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
