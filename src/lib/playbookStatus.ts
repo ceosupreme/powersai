@@ -4,9 +4,11 @@ export type PlaybookWord = 'Planned' | 'Written' | 'Thin' | 'Superseded' | 'Arch
 export interface PlaybookStatusInput {
   status: string | null;
   expiry_date: string | null;
+  subcategory: string | null;
   full_text?: string | null;
   tags?: string[] | null;
   key_points?: string | null;
+  summary: string | null;
 }
 
 export const todayPT = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
@@ -21,12 +23,30 @@ const stepCount = (raw: string | null | undefined) => {
   } catch { return 0; }
 };
 
+/** Rules and Promotion rows are one-liners by design, so the depth test never fits them. */
+const SHORT_BY_DESIGN: readonly string[] = ['platform_requirement', 'brand_rules', 'promotion'];
+
+const hasEntry = (raw: string | null | undefined, keys: string[]) => {
+  if (!raw) return false;
+  try {
+    const v = JSON.parse(raw);
+    if (Array.isArray(v)) return v.length > 0;
+    if (!v || typeof v !== 'object') return false;
+    return keys.some((k) => Array.isArray(v[k]) && v[k].length > 0);
+  } catch { return false; }
+};
+
+/** A short-by-design row counts as content when it carries its one-liner. */
+const hasShortFormContent = (r: PlaybookStatusInput) =>
+  hasEntry(r.key_points, ['steps', 'adds', 'checks']) || !!r.summary?.trim();
+
 export function playbookStatus(r: PlaybookStatusInput, today = todayPT()): PlaybookWord {
   if (r.status === 'superseded') return 'Superseded';
   if (r.status === 'archived') return 'Archived';
   if (r.status === 'draft') return 'Planned';
   if (r.status !== 'active') return 'Thin';
   const current = !r.expiry_date || r.expiry_date >= today;
+  if (SHORT_BY_DESIGN.includes(r.subcategory ?? '')) return current && hasShortFormContent(r) ? 'Written' : 'Thin';
   const deep = (r.full_text?.length ?? 0) >= 1500
     || (r.tags ?? []).some((t) => t.startsWith('skill:') || t.startsWith('pack:'))
     || stepCount(r.key_points) >= 5;
