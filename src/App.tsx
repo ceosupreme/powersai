@@ -83,6 +83,7 @@ const RecoveryReports = lazy(() => import("./pages/RecoveryReports"));
 const PublicRecoveryReport = lazy(() => import("./pages/PublicRecoveryReport"));
 const FoundationAudit = lazy(() => import("./pages/FoundationAudit"));
 const ProjectHome = lazy(() => import("./pages/ProjectHome"));
+const PipelineJob = lazy(() => import("./pages/PipelineJob"));
 import { ThemeSync } from "@/components/layout/ThemeSync";
 import { PublicSiteAnalytics } from "@/components/marketing/PublicSiteAnalytics";
 import { ScrollToTopOnNavigate } from "@/components/ScrollToTopOnNavigate";
@@ -196,6 +197,11 @@ const App = () => {
                 <Route path="/project/:venueId" element={
                   <ProtectedRoute allowedRoles={['owner']} pageKey="project_home">
                     <AppLayout><ProjectHome /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/project/:venueId/jobs/:jobId" element={
+                  <ProtectedRoute allowedRoles={['owner']}>
+                    <AppLayout><PipelineJob /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/dashboard" element={
