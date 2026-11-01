@@ -194,3 +194,32 @@
 
 /* The site runs in a dark color scheme; this page is light, so form controls (the accept checkbox) must render light too. */
 .proposal-page, .proposal-page input, .proposal-page select, .proposal-page textarea { color-scheme: light; }
+
+/* Benefit headline above the program name */
+.proposal-page .proposal-program-name { margin-top: 28px; color: #b7c0ce; font-size: 0.9rem; letter-spacing: 0.04em; }
+.proposal-page .proposal-title span { display: block; }
+.proposal-page .proposal-title-accent { color: hsl(var(--gold)); }
+/* Growth loop: what the monthly fee pays for */
+.proposal-page .proposal-growth-loop { background: hsl(var(--navy)); color: hsl(var(--navy-text)); }
+.proposal-page .proposal-growth-loop .proposal-eyebrow { color: hsl(var(--gold)); }
+.proposal-page .proposal-growth-loop .proposal-h2 { max-width: 900px; }
+.proposal-page .proposal-section-intro { max-width: 720px; margin-top: 18px; font-size: 1.08rem; opacity: 0.85; }
+.proposal-page .proposal-loop-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px; margin-top: 35px; }
+.proposal-page .proposal-loop-num { color: hsl(var(--gold)); font-size: 0.88rem; font-weight: 750; }
+.proposal-page .proposal-loop-steps h3 { margin-top: 12px; }
+.proposal-page .proposal-loop-steps p { margin-top: 12px; opacity: 0.85; font-size: 0.97rem; }
+.proposal-page .proposal-growth-loop .proposal-monthly { margin-top: 34px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.18); }
+/* Investment summary and inline CTA */
+.proposal-page .proposal-budget-summary { max-width: 900px; font-size: 0.92rem; opacity: 0.85; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 20px; }
+.proposal-page .proposal-pricing-cta { margin-top: 23px; }
+.proposal-page .proposal-form-title { font-size: 1.15rem; font-weight: 750; }
+/* Sticky actions on phones */
+.proposal-page .proposal-mobile-actions { display: none; }
+@media (max-width: 640px) {
+  .stm-studio.proposal-page { padding-bottom: 78px; }
+  .proposal-page .proposal-loop-steps { grid-template-columns: 1fr; gap: 25px; }
+  .proposal-page .proposal-mobile-actions { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; background: #fff; border-top: 1px solid hsl(var(--line, 220 10% 88%)); display: flex; justify-content: center; gap: 14px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); }
+  .proposal-page .proposal-mobile-actions a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 43px; font-size: 0.8rem; font-weight: 700; padding: 8px 12px; border-radius: 7px; color: hsl(var(--navy)); }
+  .proposal-page .proposal-mobile-actions a:last-child { background: hsl(var(--gold)); color: #101a2c; }
+}
+@media print { .proposal-page .proposal-mobile-actions { display: none !important; } }

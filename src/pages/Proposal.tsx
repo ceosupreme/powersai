@@ -71,7 +71,8 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             <p className="proposal-eyebrow">
               Prepared for {p.client.contact}, {p.client.company} · {p.preparedOn}
             </p>
-            <h1 className="proposal-title">{p.title}</h1>
+            <p className="proposal-program-name">{p.title}</p>
+            <h1 className="proposal-title">{p.headline.map((line, i) => <span key={i} className={i === p.headline.length - 1 ? "proposal-title-accent" : undefined}>{line}</span>)}</h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
 
             {(embed || videoFile) && (
@@ -92,7 +93,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
               </div>
             )}
 
-            <ul className="proposal-facts" aria-label="Key terms">
+            <ul className="proposal-facts" aria-label="What the program does">
               {p.headlineFacts.map((f) => (
                 <li key={f.label}>
                   <span className="proposal-fact-label">{f.label}</span>
@@ -104,9 +105,9 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             <nav className="proposal-jump" aria-label="Jump to a section">
               <a href="#how-it-works">How it works</a>
               <a href="#who-does-what">Who does what</a>
-              <a href="#what-it-costs">What it costs</a>
+              <a href="#what-it-costs">Your investment</a>
               <a href="#the-pilot">The pilot</a>
-              <a href="#accept">Accept</a>
+              <a href="#accept">Get started</a>
             </nav>
           </div>
         </section>
@@ -147,8 +148,8 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
 
         <section className="proposal-blocks">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">What is in the program</span>
-            <h2 className="proposal-h2">Six parts, one system, run for you every month.</h2>
+            <span className="proposal-eyebrow">Your managed program</span>
+            <h2 className="proposal-h2">Marketing, automation and follow-up, working together.</h2>
             <div className="proposal-block-grid">
               {p.blocks.map((b) => (
                 <article key={b.number} className="proposal-block">
@@ -159,7 +160,24 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 </article>
               ))}
             </div>
-            <ul className="proposal-monthly" aria-label="What you get every month">
+          </div>
+        </section>
+
+        <section className="proposal-growth-loop" id="ongoing-management">
+          <div className="proposal-wrap">
+            <span className="proposal-eyebrow">What you're paying us to do every month</span>
+            <h2 className="proposal-h2">{p.growthLoop.title}</h2>
+            <p className="proposal-section-intro">{p.growthLoop.intro}</p>
+            <div className="proposal-loop-steps">
+              {p.growthLoop.steps.map((st, i) => (
+                <article key={st.title}>
+                  <span className="proposal-loop-num">0{i + 1}</span>
+                  <h3>{st.title}</h3>
+                  <p>{st.body}</p>
+                </article>
+              ))}
+            </div>
+            <ul className="proposal-monthly" aria-label="Included monthly production and reporting">
               {p.monthly.map((m) => (
                 <li key={m.label}>
                   <strong>{m.value}</strong>
@@ -173,7 +191,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-who" id="who-does-what">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.whoDoesWhat.title}</span>
-            <h2 className="proposal-h2">A clear division of work.</h2>
+            <h2 className="proposal-h2">We run the marketing. You run the presentations.</h2>
             <div className="proposal-who-grid">
               <div className="proposal-who-col">
                 <h3>{p.preparedBy.company}</h3>
@@ -229,7 +247,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-pricing" id="what-it-costs">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pricing.title}</span>
-            <h2 className="proposal-h2">One fee for the work. The advertising budget is yours to set.</h2>
+            <h2 className="proposal-h2">Build the foundation. Then put it to work.</h2>
             <div className="proposal-price-grid">
               {p.pricing.lines.map((l) => (
                 <article key={l.label} className="proposal-price">
@@ -244,13 +262,15 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 <li key={r}><Check aria-hidden size={18} /> {r}</li>
               ))}
             </ul>
+            <p className="proposal-budget-summary">{p.pricing.summary}</p>
+            <a href="#accept" className="proposal-btn proposal-pricing-cta" onClick={() => track("proposal_pricing_cta")}>Approve the plan <ArrowRight aria-hidden size={18} /></a>
           </div>
         </section>
 
         <section className="proposal-pilot" id="the-pilot">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pilot.title}</span>
-            <h2 className="proposal-h2">Sixty live days, with a decision point at thirty.</h2>
+            <h2 className="proposal-h2">Sixty live days. A real decision at day thirty.</h2>
             <ol className="proposal-phases">
               {p.pilot.phases.map((ph, i) => (
                 <li key={ph.when}>
@@ -278,7 +298,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-after">
           <div className="proposal-wrap proposal-after-grid">
             <div>
-              <span className="proposal-eyebrow">Next</span>
+              <span className="proposal-eyebrow">Getting started</span>
               <h2 className="proposal-h2">{p.afterAccept.title}</h2>
               <p>{p.afterAccept.intro}</p>
             </div>
@@ -293,10 +313,13 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-accept" id="accept">
           <div className="proposal-wrap proposal-accept-grid">
             <div className="proposal-accept-intro">
-              <span className="proposal-eyebrow">Accept</span>
+              <span className="proposal-eyebrow">Your next step</span>
               <h2 className="proposal-h2">{p.accept.title}</h2>
               <p>{p.accept.body}</p>
               <div className="proposal-side-actions">
+                <a href={`mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.client.company}: proposal review`)}&body=${encodeURIComponent("I would like to review the program together. Please send a few available times.")}`} onClick={() => track("proposal_review")}>
+                  <Mail aria-hidden size={18} /> Arrange a quick proposal review
+                </a>
                 <a href={`mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.title}: a question`)}`} onClick={() => track("proposal_question")}>
                   <Mail aria-hidden size={18} /> Ask {p.preparedBy.name.split(" ")[0]} a question
                 </a>
@@ -321,6 +344,11 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         </section>
       </main>
 
+      <nav className="proposal-mobile-actions" aria-label="Proposal actions">
+        <a href="#what-it-costs" onClick={() => track("proposal_mobile_investment")}>Your investment</a>
+        <a href="#accept" onClick={() => track("proposal_mobile_accept")}>Request the agreement <ArrowRight aria-hidden size={16} /></a>
+      </nav>
+
       <footer className="proposal-footer">
         <div className="proposal-wrap proposal-footer-in">
           <p className="proposal-footer-more">
@@ -342,7 +370,6 @@ type Status = "idle" | "submitting" | "success" | "error";
 function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [agreed, setAgreed] = useState(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -360,17 +387,16 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     if (company.length < 2) return setError("Please enter the company name.");
     if (phone.replace(/\D/g, "").length < 10) return setError("Please enter the best phone number to reach you.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter the email the agreement and invoice should go to.");
-    if (!agreed) return setError("Please tick the box to accept the program as described on this page.");
 
     const acceptedAt = new Date();
     const terms = p.pricing.lines.map((l) => `${l.label}: ${l.amount}`).join("; ");
     const note = [
-      `PROPOSAL ACCEPTED: ${p.internalLabel}`,
-      `Accepted by: ${name}${title ? `, ${title}` : ""}`,
+      `PLAN APPROVED, AGREEMENT REQUESTED: ${p.internalLabel}`,
+      `Requested by: ${name}${title ? `, ${title}` : ""}`,
       `Company: ${company}`,
       `Phone: ${phone}`,
       `Email for the agreement and invoice: ${email}`,
-      `Accepted on: ${acceptedAt.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} Pacific`,
+      `Requested on: ${acceptedAt.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} Pacific`,
       `Terms shown on the page: ${terms}. ${p.pricing.plainRules.join(" ")}`,
       `Page: ${window.location.href}`,
     ].join("\n");
@@ -388,11 +414,11 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
         qualifier_data: {
           proposal: p.slug,
           proposal_title: p.title,
-          intent: `Proposal accepted: ${p.title}`,
+          intent: `Plan approved, agreement requested: ${p.title}`,
           services: [p.title],
           signer_title: title || null,
           agreement_email: email,
-          accepted_terms: true,
+          agreement_requested: true,
           accepted_at: acceptedAt.toISOString(),
           page_url: window.location.href,
         },
@@ -426,6 +452,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
       <div aria-hidden className="proposal-honeypot">
         <label>Company website<input type="text" name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>
+      <h3 className="proposal-form-title">Request your agreement</h3>
       <div className="proposal-form-row">
         <label>
           <span>Your full name</span>
@@ -450,15 +477,11 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
           <input name="email" type="email" autoComplete="email" required />
         </label>
       </div>
-      <label className="proposal-check">
-        <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-        <span>I accept the {p.title} for {p.client.company} as described on this page, and I understand the agreement and the foundation invoice will follow by email.</span>
-      </label>
       {error && <p className="proposal-form-error" role="alert">{error}</p>}
       <button type="submit" className="proposal-btn" disabled={status === "submitting"}>
         {status === "submitting" ? "Sending…" : p.accept.buttonLabel} <ArrowRight aria-hidden size={18} />
       </button>
-      <p className="proposal-form-fine">Your typed name and the date are recorded as your acceptance. Nothing is charged on this page.</p>
+      <p className="proposal-form-fine">We send the agreement for your review. Nothing is charged on this page.</p>
     </form>
   );
 }
