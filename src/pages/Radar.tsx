@@ -67,12 +67,12 @@ export default function Radar() {
     </section>
 
     <section aria-labelledby="radar-dimensions" className="space-y-5 border-t border-border pt-8">
-      <h2 id="radar-dimensions" className="flex items-center gap-3 text-2xl font-semibold md:text-3xl"><Library className="h-6 w-6 shrink-0 text-warning" />Dimension Library</h2>
+      <h2 id="radar-dimensions" className="flex items-center gap-3 text-2xl font-semibold md:text-3xl"><Library className="h-6 w-6 shrink-0 text-gold" />Dimension Library</h2>
       <SectionState loading={dimensions.isLoading} error={dimensions.isError} empty={!dimensions.data?.length} />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{dimensions.data?.map(dimension => {
         const shelf = radarShelf(dimension.title);
         return <Card key={dimension.id} className="min-w-0 bg-muted/40"><CardContent className="space-y-4 p-5">
-          <Badge variant="outline" className={shelf === 'PROVEN' ? 'border-signal-green/30 bg-signal-green/10 text-signal-green' : shelf === 'EMERGING' ? 'border-warning/30 bg-warning/10 text-warning' : 'text-muted-foreground'}>{shelf}</Badge>
+          <Badge variant="outline" className={shelf === 'PROVEN' ? 'border-signal-green/30 bg-signal-green/10 text-signal-green' : shelf === 'EMERGING' ? 'border-gold/30 bg-gold/10 text-gold' : 'text-muted-foreground'}>{shelf}</Badge>
           <h3 className="break-words text-lg font-semibold">{dimension.title}</h3><Summary text={dimension.summary} /><ResearchLink url={dimension.url}>Evidence</ResearchLink>
         </CardContent></Card>;
       })}</div>
