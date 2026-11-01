@@ -14,6 +14,8 @@ import {
   composePipeline, methodKey, platformToDestination, recipeVersionString, type JobKind,
 } from '@/lib/pipelineComposer';
 
+import { TrafficNotice } from './TrafficNotice';
+
 const T = (t: string) => (supabase as any).from(t);
 
 export interface PipelineRequest {
@@ -209,6 +211,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
               <MultiPick label="Destinations" options={by.destination} value={dest} onChange={setDest} />
               <MultiPick label="Monetization" options={by.monetization} value={mon} onChange={setMon} />
               <MultiPick label="Promotion" options={by.promotion} value={pro} onChange={setPro} />
+              {request && <TrafficNotice projectId={request.projectId}
+                methods={[...by.monetization.filter((o) => mon.includes(o.key)), ...by.promotion.filter((o) => pro.includes(o.key))]} />}
             </>
           )}
           <div className="grid grid-cols-2 gap-3">

@@ -751,6 +751,7 @@ export type Database = {
           key: string
           label: string
           lane_keys: string[]
+          method_keys: string[]
           niche_groups: string[]
           niche_keys: string[]
           notes: string | null
@@ -767,6 +768,7 @@ export type Database = {
           key: string
           label: string
           lane_keys?: string[]
+          method_keys?: string[]
           niche_groups?: string[]
           niche_keys?: string[]
           notes?: string | null
@@ -783,6 +785,7 @@ export type Database = {
           key?: string
           label?: string
           lane_keys?: string[]
+          method_keys?: string[]
           niche_groups?: string[]
           niche_keys?: string[]
           notes?: string | null
@@ -15305,6 +15308,7 @@ export type Database = {
           decision_reason: string | null
           follower_date: string | null
           followers: number | null
+          found_in: string | null
           grp: string | null
           handle: string | null
           label: string | null
@@ -15332,6 +15336,8 @@ export type Database = {
           needed_count: number | null
           needs_access: number | null
           planned: number | null
+          setup_gate: string | null
+          setup_score: number | null
           skipped: number | null
           venue_id: string | null
         }
@@ -15438,6 +15444,7 @@ export type Database = {
         Args: { p_run_key?: string; p_week_start?: string }
         Returns: Json
       }
+      compute_setup_scores: { Args: never; Returns: number }
       consume_public_rate_limit: {
         Args: {
           p_key: string

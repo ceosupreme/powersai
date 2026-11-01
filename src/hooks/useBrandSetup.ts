@@ -1,18 +1,19 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { composePipeline, methodKey } from '@/lib/pipelineComposer';
-import { MEDIA_KIT_STEPS, type AssetMapRow } from '@/lib/brandSetup';
+import { MEDIA_KIT_STEPS, type AssetMapRow, type TrafficAsset } from '@/lib/brandSetup';
 
 const T = (t: string) => (supabase as any).from(t);
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
 const CLOSED_JOB = ['done', 'complete', 'completed', 'cancelled', 'canceled', 'archived'];
 
-export interface SetupSummary { needed_count: number; in_place: number; gaps: number; missing: number; planned: number; needs_access: number; later: number; skipped: number; extra_on_file: number }
+export interface SetupSummary { needed_count: number; in_place: number; gaps: number; missing: number; planned: number; needs_access: number; later: number; skipped: number; extra_on_file: number; setup_score: number | null; setup_gate: string | null }
 export interface ChannelStatRow { id: string; channel_id: string; captured_on: string; followers: number | null; following: number | null; posts: number | null; videos: number | null; views: number | null; likes: number | null; source: string; source_ref: string | null }
 
-export function useAssetMap(projectId: string) {
+export function useAssetMap(projectId: string, enabled = true) {
   return useQuery({
     queryKey: ['brand-setup', 'map', projectId],
+    enabled: enabled && !!projectId,
     queryFn: async (): Promise<AssetMapRow[]> => {
       const { data, error } = await T('v_brand_asset_map').select('*').eq('venue_id', projectId);
       if (error) throw error;
@@ -29,7 +30,7 @@ export function useSetupSummary(projectId: string) {
       if (error) throw error;
       if (!data) return null;
       const n = (k: string) => Number(data[k] ?? 0);
-      return { needed_count: n('needed_count'), in_place: n('in_place'), gaps: n('gaps'), missing: n('missing'), planned: n('planned'), needs_access: n('needs_access'), later: n('later'), skipped: n('skipped'), extra_on_file: n('extra_on_file') };
+      return { needed_count: n('needed_count'), in_place: n('in_place'), gaps: n('gaps'), missing: n('missing'), planned: n('planned'), needs_access: n('needs_access'), later: n('later'), skipped: n('skipped'), extra_on_file: n('extra_on_file'), setup_score: data.setup_score == null ? null : Number(data.setup_score), setup_gate: data.setup_gate ?? null };
     },
   });
 }
@@ -165,4 +166,18 @@ export async function startSetup(projectId: string, row: AssetMapRow): Promise<s
     custom_steps: row.asset_key === 'media_kit' ? MEDIA_KIT_STEPS : null,
   });
   return jobId;
+}
+
+/** Assets that monetization/promotion playbooks depend on (asset_types.method_keys). */
+export function useTrafficAssets(enabled = true) {
+  return useQuery({
+    queryKey: ['brand-setup', 'traffic-assets'],
+    enabled,
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<TrafficAsset[]> => {
+      const { data, error } = await T('asset_types').select('key,label,method_keys').not('method_keys', 'eq', '{}');
+      if (error) throw error;
+      return (data ?? []) as TrafficAsset[];
+    },
+  });
 }

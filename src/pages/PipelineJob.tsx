@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { TrafficNotice } from '@/components/pipeline/TrafficNotice';
 import { useApproveItem } from '@/hooks/useContentProduction';
 import { buildStarterPrompt } from '@/lib/pipelineComposer';
 import { playbookStatus } from '@/lib/playbookStatus';
@@ -218,6 +219,7 @@ export default function PipelineJob() {
           ))}
           {(job.recipe ?? []).length === 0 && <span className="text-sm text-muted-foreground">No playbooks listed.</span>}
         </div>
+        <div className="mt-3"><TrafficNotice projectId={job.project_id} methods={(job.recipe ?? []).map((r: any) => ({ key: r.key ?? '', title: r.title }))} /></div>
       </section>
 
       <Card>
