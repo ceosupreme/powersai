@@ -48,9 +48,8 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     client: { company: "Consumer Protection Networks", contact: "Erik Green", location: "Boston and selected travel markets" },
     preparedOn: "November 1, 2026",
     preparedBy: { name: "Allmighty Supreme Mayo", company: "Supreme Team Media", email: "supremeteammedia@gmail.com", site: "supremeteammedia.com" },
-    // Add the approved, hosted video URL here after the revised cut is exported.
-    // Keep empty until then: no fake player, broken media, or old video presented as the new cut.
-    videoUrl: "",
+    // Preserve the existing hosted cut until the revised video is exported.
+    videoUrl: "/proposal-media/cpn-boston.mp4",
     pdfUrl: "",
     headlineFacts: [
       { label: "Attract", value: "Interested local owners" },

@@ -33,7 +33,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
   const reviewMail = `mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.client.company}: proposal review`)}&body=${encodeURIComponent("I would like to review the growth program together. Please send a few available times.")}`;
 
   return (
-    <div className="stm-studio proposal-page min-h-screen">
+    <div className="stm-studio proposal-page min-h-screen" style={{ colorScheme: "light" }}>
       <header className="proposal-topbar">
         <div className="proposal-wrap proposal-topbar-in">
           <Link to="/" className="proposal-brand" aria-label={`${p.preparedBy.company} home`}>
@@ -62,7 +62,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
         {(videoFile || embed) && <section className="proposal-video-section" id="proposal-video"><div className="proposal-wrap"><div className="proposal-video">
-          {videoFile ? <video controls playsInline preload="metadata" aria-label={`${p.title}: proposal overview`}><source src={videoFile} /><a href={videoFile}>Open the proposal video</a></video> : <iframe src={embed ?? undefined} title={`${p.title}: proposal overview`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />}
+          {videoFile ? <video controls playsInline preload="metadata" poster={videoFile.replace(/\.mp4$/, "-poster.jpg")} aria-label={`${p.title}: proposal overview`}><source src={videoFile} /><a href={videoFile}>Open the proposal video</a></video> : <iframe src={embed ?? undefined} title={`${p.title}: proposal overview`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />}
         </div></div></section>}
 
         <section className="proposal-opening">
