@@ -1,5 +1,8 @@
 # Roadmap
 
+## Brand workspace (Build 1 of 2)
+- [x] Owner filters for Next 10 / Waiting on me, Portfolio card workload, brand workspace tabs, pipeline page
+
 ## Radar
 - [x] Add read-only research page and shared owner navigation entry using existing tables
 - [x] Verify data rules, signed-in desktop/phone views, and preview
