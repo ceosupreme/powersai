@@ -101,6 +101,7 @@ export const EDGE_POLICIES: Readonly<Record<string, EdgePolicy>> = {
   "qualifier-chat": {"mode": "public", "limit": 30, "windowSeconds": 3600, "dailyGlobalLimit": 1500, "rationale": "Public AI qualifier; bounded messages and durable spend limits."},
   "qualifier-session": {"mode": "public", "limit": 120, "windowSeconds": 60, "dailyGlobalLimit": 10000, "rationale": "Public qualifier configuration.", "methods": ["GET"]},
   "reactivation-generate": {"mode": "project-manager", "resource": {"field": "list_id", "table": "project_customer_lists", "projectColumn": "project_id"}, "rationale": "Verified operator role and project management permission; clients are denied."},
+  "read-channel-screenshot": ADMIN,
   "reap-sync-runs": ADMIN,
   "reconcile-checkouts": ADMIN,
   "resend-inbound-webhook": { mode: "signed-webhook", rationale: "Resend signature verification is mandatory in the handler; a service key never substitutes for the signature." },
