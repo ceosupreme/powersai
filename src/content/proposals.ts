@@ -114,7 +114,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       email: "supremeteammedia@gmail.com",
       site: "supremeteammedia.com",
     },
-    videoUrl: "",
+    videoUrl: "/proposal-media/cpn-boston.mp4",
     pdfUrl: "",
     headlineFacts: [
       { label: "Monthly program fee", value: "$3,000 a month" },

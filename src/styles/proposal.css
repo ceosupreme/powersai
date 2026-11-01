@@ -191,3 +191,6 @@
   .proposal-page .proposal-pricing, .proposal-page .proposal-calendar, .proposal-page .proposal-after-list span { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .proposal-page .proposal-accept-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The site runs in a dark color scheme; this page is light, so form controls (the accept checkbox) must render light too. */
+.proposal-page, .proposal-page input, .proposal-page select, .proposal-page textarea { color-scheme: light; }
