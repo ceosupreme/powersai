@@ -25,7 +25,7 @@ import {
 } from '@/hooks/usePortfolioData';
 import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
 import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
-import { PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat } from '@/lib/portfolioSort';
+import { type PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat } from '@/lib/portfolioSort';
 import { AllBrandsWaitingStrip } from '@/components/portfolio/AllBrandsWaitingStrip';
 import { useRole } from '@/context/RoleContext';
 import { useApp } from '@/context/AppContext';
