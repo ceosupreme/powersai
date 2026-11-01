@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useApproveItem } from '@/hooks/useContentProduction';
 import { buildStarterPrompt } from '@/lib/pipelineComposer';
+import { playbookStatus } from '@/lib/playbookStatus';
+import { jobStatusWord } from '@/hooks/usePlaybooks';
+import { PlaybookWordBadge } from '@/pages/Playbooks';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,7 +60,9 @@ function usePipelineJob(jobId: string | undefined) {
           ? T('content_items').select('id,title,brief,idea_score,performance,quality_score,quality_fails,approved_at').eq('id', job.target_id).maybeSingle()
           : job.target_type === 'channel_products' && job.target_id
             ? T('channel_products').select('id,name,status,price,monthly_sales').eq('id', job.target_id).maybeSingle()
-            : Promise.resolve({ data: null, error: null }),
+            : job.target_type === 'knowledge_base' && job.target_id
+              ? T('knowledge_base').select('id,title,status,expiry_date,full_text,tags,key_points').eq('id', job.target_id).maybeSingle()
+              : Promise.resolve({ data: null, error: null }),
       ]);
       for (const r of [stepsRes, venueRes, kitRes, nicheRes, targetRes] as any[]) if (r.error) throw r.error;
       let revenue: any[] = [];
@@ -127,6 +132,7 @@ export default function PipelineJob() {
 
   const { job, steps, brandName, kit, niche, target } = data;
   const results = job.result_links ?? [];
+  const isPlaybookJob = job.kind === 'playbook';
 
   const markDone = async (s: Step) => {
     try {
@@ -179,11 +185,25 @@ export default function PipelineJob() {
         <p className="text-xs uppercase tracking-wide text-muted-foreground">{brandName} · {job.kind.replace(/_/g, ' ')}</p>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">{job.title}</h1>
         <div className="flex flex-wrap gap-1.5">
-          <Badge variant="outline" className="capitalize">{job.status.replace(/_/g, ' ')}</Badge>
-          {job.level != null && <Badge variant="outline">Level {job.level}</Badge>}
-          {job.money_destination && <Badge variant="secondary">Money to: {job.money_destination}</Badge>}
+          <Badge variant="outline">{jobStatusWord(job.status)}</Badge>
+          {!isPlaybookJob && job.level != null && <Badge variant="outline">Level {job.level}</Badge>}
+          {!isPlaybookJob && job.money_destination && <Badge variant="secondary">Money to: {job.money_destination}</Badge>}
           <Badge variant="outline">Your time: {job.owner_minutes_est ?? '—'} min est · {job.owner_minutes_actual ?? '—'} min actual</Badge>
         </div>
+        {isPlaybookJob && (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm space-y-1">
+            <p className="flex flex-wrap items-center gap-2">
+              <span className="text-muted-foreground">Playbook:</span>
+              {target ? (
+                <>
+                  <Link className="font-medium text-primary underline" to={`/playbooks?open=${target.id}`}>{target.title}</Link>
+                  <PlaybookWordBadge word={playbookStatus(target)} />
+                </>
+              ) : <span>{(job as any).target_key ?? '—'}</span>}
+            </p>
+            {job.money_destination && <p>{/^feeds:/i.test(job.money_destination) ? job.money_destination : `Feeds: ${job.money_destination}`}</p>}
+          </div>
+        )}
       </header>
 
       <section>
@@ -196,14 +216,14 @@ export default function PipelineJob() {
               {r.status === 'draft' && <span className="ml-1 text-muted-foreground">· planned</span>}
             </button>
           ))}
-          {(job.recipe ?? []).length === 0 && <span className="text-sm text-muted-foreground">No methods listed.</span>}
+          {(job.recipe ?? []).length === 0 && <span className="text-sm text-muted-foreground">No playbooks listed.</span>}
         </div>
       </section>
 
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-base">Inputs</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">
-          {target ? (
+          {target && !isPlaybookJob ? (
             job.target_type === 'content_items' ? (
               <div>
                 <p className="font-medium">{target.title}</p>
@@ -216,7 +236,7 @@ export default function PipelineJob() {
                 <p className="text-xs text-muted-foreground capitalize">{target.status ?? '—'} · {target.price == null ? 'No price' : formatCurrency(Number(target.price))}</p>
               </div>
             )
-          ) : <p className="text-muted-foreground">No linked item.</p>}
+          ) : !isPlaybookJob && <p className="text-muted-foreground">No linked item.</p>}
           <p><span className="text-muted-foreground">Brand kit: </span>{kit?.bio_short || kit?.brand_voice || '—'}</p>
           <p>
             <span className="text-muted-foreground">Niche profile: </span>
@@ -338,7 +358,7 @@ export default function PipelineJob() {
                 </SheetDescription>
               </SheetHeader>
               {kb.isLoading ? <Loader2 className="mt-6 h-5 w-5 animate-spin" /> : !methodRow ? (
-                <p className="mt-4 text-sm text-muted-foreground">This method is not in the library yet.</p>
+                <p className="mt-4 text-sm text-muted-foreground">This playbook is not on the shelf yet.</p>
               ) : (
                 <div className="mt-4 space-y-4 text-sm">
                   <p className="whitespace-pre-wrap">{methodRow.summary ?? 'No summary yet.'}</p>
@@ -349,7 +369,7 @@ export default function PipelineJob() {
                   )}
                   <p className="text-muted-foreground">Review by {methodRow.expiry_date ?? '—'}</p>
                   {(methodRow.external_url || methodRow.attachment_url) && (
-                    <Button asChild className="w-full"><a href={(methodRow.external_url || methodRow.attachment_url)!} target="_blank" rel="noreferrer">Open method</a></Button>
+                    <Button asChild className="w-full"><a href={(methodRow.external_url || methodRow.attachment_url)!} target="_blank" rel="noreferrer">Open playbook</a></Button>
                   )}
                 </div>
               )}
@@ -371,7 +391,7 @@ export default function PipelineJob() {
                 {stepFacts?.text && <pre className="whitespace-pre-wrap text-xs bg-muted/40 p-3 rounded">{stepFacts.text}</pre>}
                 {stepFacts?.facts && (
                   <>
-                    {stepFacts.facts.method && <p><span className="text-muted-foreground">Method: </span>{stepFacts.facts.method}</p>}
+                    {stepFacts.facts.method && <p><span className="text-muted-foreground">Playbook: </span>{stepFacts.facts.method}</p>}
                     {(stepFacts.facts.inputs ?? []).length > 0 && (
                       <div><p className="font-semibold">Inputs</p><ul className="list-disc pl-5">{stepFacts.facts.inputs!.map((x, i) => <li key={i}>{String(x)}</li>)}</ul></div>
                     )}
