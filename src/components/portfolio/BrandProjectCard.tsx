@@ -5,6 +5,7 @@ import { formatCurrency } from '@/utils/formatting';
 import { cn } from '@/lib/utils';
 import type { NonClientCardData } from '@/hooks/usePortfolioData';
 import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
+import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
 
 /**
  * Overview card for a non-client project (own brand / prospect):
@@ -13,9 +14,12 @@ import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
  */
 export function BrandProjectCard({
   data,
+  work,
   onClick,
 }: {
   data: NonClientCardData;
+  /** Workload numbers; undefined while loading. */
+  work?: BrandWorkCard | null;
   onClick: () => void;
 }) {
   const grade = data.overall != null ? getGradeFromScore(data.overall) : null;
@@ -105,6 +109,36 @@ export function BrandProjectCard({
         </div>
         <Progress value={data.potential ?? 0} className="h-1.5" />
       </div>
+
+      <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-3 text-xs">
+        <div className="col-span-2 flex items-baseline justify-between">
+          <dt className="text-muted-foreground">Waiting on you</dt>
+          <dd className="text-lg font-bold text-foreground">{work ? work.waitingCount : '—'}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Channels live</dt>
+          <dd className="text-foreground font-medium">
+            {work ? `${work.channelsLive} of ${work.channelsTotal}` : '—'}
+            {work && work.channelsStale > 0 && <span className="ml-1 text-destructive">· {work.channelsStale} stale</span>}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Products listed</dt>
+          <dd className="text-foreground font-medium">{work ? `${work.productsListed} of ${work.productsTotal}` : '—'}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Published this month</dt>
+          <dd className="text-foreground font-medium">{work ? work.publishedThisMonth : '—'}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Revenue this month</dt>
+          <dd className="text-foreground font-medium">{work?.revenueMonth != null ? formatCurrency(work.revenueMonth) : '—'}</dd>
+        </div>
+        <div className="col-span-2">
+          <dt className="text-muted-foreground">Next move</dt>
+          <dd className="text-foreground line-clamp-2">{work?.nextMove ?? '—'}</dd>
+        </div>
+      </dl>
 
       <div className="mt-3 text-primary text-sm font-medium">View →</div>
     </button>
