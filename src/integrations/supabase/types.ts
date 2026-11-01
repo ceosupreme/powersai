@@ -806,6 +806,33 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_delivery_events: {
+        Row: {
+          delivery_status: string
+          event_id: string
+          event_type: string
+          occurred_at: string
+          provider_message_id: string
+          received_at: string
+        }
+        Insert: {
+          delivery_status: string
+          event_id: string
+          event_type: string
+          occurred_at: string
+          provider_message_id: string
+          received_at?: string
+        }
+        Update: {
+          delivery_status?: string
+          event_id?: string
+          event_type?: string
+          occurred_at?: string
+          provider_message_id?: string
+          received_at?: string
+        }
+        Relationships: []
+      }
       automation_message_queue: {
         Row: {
           approved_at: string | null
@@ -816,6 +843,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           dedupe_key: string | null
+          delivery_status: string
           edited_body: string | null
           flagged_for_operator: boolean
           id: string
@@ -842,6 +870,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           dedupe_key?: string | null
+          delivery_status?: string
           edited_body?: string | null
           flagged_for_operator?: boolean
           id?: string
@@ -868,6 +897,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           dedupe_key?: string | null
+          delivery_status?: string
           edited_body?: string | null
           flagged_for_operator?: boolean
           id?: string
@@ -902,6 +932,7 @@ export type Database = {
           body: string | null
           channel: Database["public"]["Enums"]["automation_channel"]
           created_at: string
+          dedupe_key: string | null
           error: string | null
           id: string
           ok: boolean
@@ -918,6 +949,7 @@ export type Database = {
           body?: string | null
           channel: Database["public"]["Enums"]["automation_channel"]
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           id?: string
           ok: boolean
@@ -934,6 +966,7 @@ export type Database = {
           body?: string | null
           channel?: Database["public"]["Enums"]["automation_channel"]
           created_at?: string
+          dedupe_key?: string | null
           error?: string | null
           id?: string
           ok?: boolean
@@ -5042,10 +5075,323 @@ export type Database = {
           },
         ]
       }
+      hq_edge_job_tokens: {
+        Row: {
+          created_at: string
+          function_name: string
+          secret_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          secret_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          secret_id?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      hq_external_metric_mappings: {
+        Row: {
+          account_ref: string
+          currency: string | null
+          enabled: boolean
+          id: string
+          kpi_key: string
+          mapping_version: number
+          measurement_kind: string
+          pillar_key: string
+          project_id: string
+          provider: string
+          source_ref: string
+          verification_ref: string
+          verified_actor: string
+          verified_at: string
+          verified_by: string | null
+          window_basis: string
+        }
+        Insert: {
+          account_ref: string
+          currency?: string | null
+          enabled?: boolean
+          id?: string
+          kpi_key: string
+          mapping_version?: number
+          measurement_kind: string
+          pillar_key: string
+          project_id: string
+          provider: string
+          source_ref: string
+          verification_ref: string
+          verified_actor: string
+          verified_at: string
+          verified_by?: string | null
+          window_basis: string
+        }
+        Update: {
+          account_ref?: string
+          currency?: string | null
+          enabled?: boolean
+          id?: string
+          kpi_key?: string
+          mapping_version?: number
+          measurement_kind?: string
+          pillar_key?: string
+          project_id?: string
+          provider?: string
+          source_ref?: string
+          verification_ref?: string
+          verified_actor?: string
+          verified_at?: string
+          verified_by?: string | null
+          window_basis?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hq_external_metric_mappings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hq_external_observations: {
+        Row: {
+          accepted_at: string
+          accepted_by: string | null
+          actual: number
+          evidence: Json
+          id: string
+          idempotency_key: string
+          mapping_id: string
+          mapping_version: number
+          observed_at: string
+          receipt_ref: string
+          request_payload: Json
+          result: Json
+          status: string
+          week_start: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          accepted_at?: string
+          accepted_by?: string | null
+          actual: number
+          evidence: Json
+          id?: string
+          idempotency_key: string
+          mapping_id: string
+          mapping_version: number
+          observed_at: string
+          receipt_ref: string
+          request_payload: Json
+          result?: Json
+          status: string
+          week_start: string
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          accepted_at?: string
+          accepted_by?: string | null
+          actual?: number
+          evidence?: Json
+          id?: string
+          idempotency_key?: string
+          mapping_id?: string
+          mapping_version?: number
+          observed_at?: string
+          receipt_ref?: string
+          request_payload?: Json
+          result?: Json
+          status?: string
+          week_start?: string
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hq_external_observations_mapping_id_fkey"
+            columns: ["mapping_id"]
+            isOneToOne: false
+            referencedRelation: "hq_external_metric_mappings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hq_number_collector_checks: {
+        Row: {
+          actual: number | null
+          coverage: Json
+          kpi_key: string
+          measurement_kind: string | null
+          pillar_key: string
+          project_id: string
+          reason: string | null
+          run_id: string
+          source_provider: string | null
+          source_ref: string | null
+          status: string
+          value_week_start: string | null
+        }
+        Insert: {
+          actual?: number | null
+          coverage?: Json
+          kpi_key: string
+          measurement_kind?: string | null
+          pillar_key: string
+          project_id: string
+          reason?: string | null
+          run_id: string
+          source_provider?: string | null
+          source_ref?: string | null
+          status: string
+          value_week_start?: string | null
+        }
+        Update: {
+          actual?: number | null
+          coverage?: Json
+          kpi_key?: string
+          measurement_kind?: string | null
+          pillar_key?: string
+          project_id?: string
+          reason?: string | null
+          run_id?: string
+          source_provider?: string | null
+          source_ref?: string | null
+          status?: string
+          value_week_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hq_number_collector_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hq_number_collector_checks_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "hq_number_collector_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hq_number_collector_runs: {
+        Row: {
+          collector_version: string
+          finished_at: string | null
+          id: string
+          observed_at: string
+          period_complete: boolean
+          reporting_timezone: string
+          run_key: string
+          started_at: string
+          status: string
+          summary: Json
+          triggered_by: string | null
+          week_start: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          collector_version?: string
+          finished_at?: string | null
+          id?: string
+          observed_at: string
+          period_complete: boolean
+          reporting_timezone?: string
+          run_key: string
+          started_at?: string
+          status: string
+          summary?: Json
+          triggered_by?: string | null
+          week_start: string
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          collector_version?: string
+          finished_at?: string | null
+          id?: string
+          observed_at?: string
+          period_complete?: boolean
+          reporting_timezone?: string
+          run_key?: string
+          started_at?: string
+          status?: string
+          summary?: Json
+          triggered_by?: string | null
+          week_start?: string
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      hq_public_rate_limits: {
+        Row: {
+          bucket_key: string
+          expires_at: string
+          hits: number
+          scope: string
+          window_start: string
+        }
+        Insert: {
+          bucket_key: string
+          expires_at: string
+          hits: number
+          scope: string
+          window_start: string
+        }
+        Update: {
+          bucket_key?: string
+          expires_at?: string
+          hits?: number
+          scope?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      hq_worker_checkpoints: {
+        Row: {
+          job_key: string
+          lease_token: string | null
+          leased_until: string | null
+          state: Json
+          updated_at: string
+        }
+        Insert: {
+          job_key: string
+          lease_token?: string | null
+          leased_until?: string | null
+          state?: Json
+          updated_at?: string
+        }
+        Update: {
+          job_key?: string
+          lease_token?: string | null
+          leased_until?: string | null
+          state?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inbound_emails: {
         Row: {
           attachments: Json | null
           created_at: string
+          forward_attempts: number
+          forward_first_attempt_at: string | null
+          forward_next_attempt_at: string | null
           forwarded_at: string | null
           forwarded_error: string | null
           from_email: string | null
@@ -5064,6 +5410,9 @@ export type Database = {
         Insert: {
           attachments?: Json | null
           created_at?: string
+          forward_attempts?: number
+          forward_first_attempt_at?: string | null
+          forward_next_attempt_at?: string | null
           forwarded_at?: string | null
           forwarded_error?: string | null
           from_email?: string | null
@@ -5082,6 +5431,9 @@ export type Database = {
         Update: {
           attachments?: Json | null
           created_at?: string
+          forward_attempts?: number
+          forward_first_attempt_at?: string | null
+          forward_next_attempt_at?: string | null
           forwarded_at?: string | null
           forwarded_error?: string | null
           from_email?: string | null
@@ -7620,44 +7972,82 @@ export type Database = {
       project_kpi_values: {
         Row: {
           actual: number | null
+          collector_run_id: string | null
           created_at: string | null
+          external_observation_id: string | null
           id: string
           kpi_key: string
+          measurement_kind: string | null
           note: string | null
+          observed_at: string | null
           pillar_key: string
           project_id: string
           score: number | null
+          source_provider: string | null
+          source_ref: string | null
           updated_at: string | null
           updated_by: string | null
           week_start: string
+          window_end: string | null
+          window_start: string | null
         }
         Insert: {
           actual?: number | null
+          collector_run_id?: string | null
           created_at?: string | null
+          external_observation_id?: string | null
           id?: string
           kpi_key: string
+          measurement_kind?: string | null
           note?: string | null
+          observed_at?: string | null
           pillar_key: string
           project_id: string
           score?: number | null
+          source_provider?: string | null
+          source_ref?: string | null
           updated_at?: string | null
           updated_by?: string | null
           week_start: string
+          window_end?: string | null
+          window_start?: string | null
         }
         Update: {
           actual?: number | null
+          collector_run_id?: string | null
           created_at?: string | null
+          external_observation_id?: string | null
           id?: string
           kpi_key?: string
+          measurement_kind?: string | null
           note?: string | null
+          observed_at?: string | null
           pillar_key?: string
           project_id?: string
           score?: number | null
+          source_provider?: string | null
+          source_ref?: string | null
           updated_at?: string | null
           updated_by?: string | null
           week_start?: string
+          window_end?: string | null
+          window_start?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "project_kpi_values_collector_run_id_fkey"
+            columns: ["collector_run_id"]
+            isOneToOne: false
+            referencedRelation: "hq_number_collector_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_kpi_values_external_observation_id_fkey"
+            columns: ["external_observation_id"]
+            isOneToOne: false
+            referencedRelation: "hq_external_observations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_kpi_values_project_id_fkey"
             columns: ["project_id"]
@@ -13043,6 +13433,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      collect_hq_numbers: {
+        Args: { p_run_key?: string; p_week_start?: string }
+        Returns: Json
+      }
+      consume_public_rate_limit: {
+        Args: {
+          p_key: string
+          p_limit: number
+          p_scope: string
+          p_window_seconds: number
+        }
+        Returns: Json
+      }
       get_grade: {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["grade_letter"]
@@ -13061,6 +13464,95 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      hq_apply_inbound_reply: {
+        Args: { p_inbound_id: string }
+        Returns: number
+      }
+      hq_can_inspect_user: { Args: { _user_id: string }; Returns: boolean }
+      hq_claim_automation_send: {
+        Args: { p_expected_attempted_at?: string; p_queue_id: string }
+        Returns: Json
+      }
+      hq_claim_worker: {
+        Args: { p_key: string; p_lease_seconds?: number }
+        Returns: Json
+      }
+      hq_finish_automation_send: {
+        Args: {
+          p_attempted_at: string
+          p_queue_id: string
+          p_result: Json
+          p_to: string
+        }
+        Returns: Json
+      }
+      hq_is_email_suppressed: {
+        Args: { p_email: string; p_project_id: string }
+        Returns: boolean
+      }
+      hq_numbers_fixture_lead: {
+        Args: { p_data: Json; p_email: string; p_source: string }
+        Returns: boolean
+      }
+      hq_numbers_reporting_window: {
+        Args: { p_observed_at?: string; p_week_start?: string }
+        Returns: {
+          current_week_start: string
+          period_complete: boolean
+          week_start: string
+          window_end: string
+          window_start: string
+        }[]
+      }
+      hq_record_delivery_event: {
+        Args: {
+          p_event_id: string
+          p_message_id: string
+          p_occurred_at: string
+          p_state: string
+          p_type: string
+        }
+        Returns: undefined
+      }
+      hq_save_recovery_draft: {
+        Args: {
+          p_basis: Json
+          p_dollars: number
+          p_end: string
+          p_metrics: Json
+          p_narrative: string
+          p_project_id: string
+          p_start: string
+        }
+        Returns: string
+      }
+      hq_save_worker: {
+        Args: {
+          p_key: string
+          p_release?: boolean
+          p_state: Json
+          p_token: string
+        }
+        Returns: boolean
+      }
+      hq_verify_job_token: {
+        Args: { p_function: string; p_token: string }
+        Returns: boolean
+      }
+      ingest_hq_external_observation: {
+        Args: {
+          p_actual: number
+          p_evidence: Json
+          p_idempotency_key?: string
+          p_mapping_id: string
+          p_observed_at: string
+          p_receipt_ref: string
+          p_week_start: string
+          p_window_end: string
+          p_window_start: string
+        }
+        Returns: Json
       }
       is_channel_member: {
         Args: { _channel_id: string; _user_id: string }
@@ -13084,12 +13576,30 @@ export type Database = {
           parent_id: string
         }[]
       }
+      unlock_public_audit_once: {
+        Args: {
+          p_email: string
+          p_message: string
+          p_name: string
+          p_phone: string
+          p_token: string
+        }
+        Returns: Json
+      }
       user_can_access_kit: { Args: { _kit_id: string }; Returns: boolean }
       user_can_access_page: {
         Args: { _page_key: string; _user_id: string }
         Returns: boolean
       }
       user_can_access_project: {
+        Args: { _project_id: string }
+        Returns: boolean
+      }
+      user_can_approve_project_message: {
+        Args: { _automation_key: string; _project_id: string }
+        Returns: boolean
+      }
+      user_can_manage_project: {
         Args: { _project_id: string }
         Returns: boolean
       }
@@ -13105,6 +13615,22 @@ export type Database = {
         Returns: boolean
       }
       user_venue_ids: { Args: never; Returns: string[] }
+      verify_hq_external_metric_mapping: {
+        Args: {
+          p_account_ref: string
+          p_currency?: string
+          p_enabled?: boolean
+          p_kpi_key: string
+          p_measurement_kind: string
+          p_pillar_key: string
+          p_project_id: string
+          p_provider: string
+          p_source_ref: string
+          p_verification_ref: string
+          p_window_basis: string
+        }
+        Returns: Json
+      }
       verify_job_token: {
         Args: { p_job: string; p_token: string }
         Returns: boolean
