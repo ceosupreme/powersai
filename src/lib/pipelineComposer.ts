@@ -274,3 +274,33 @@ export function productTypeForName(name: string): string {
   if (/guide|ebook|book/.test(n)) return 'written_book';
   return 'printable';
 }
+
+export const skillOf = (tags: string[] | null | undefined) => {
+  const t = (tags ?? []).find((x) => x.startsWith('skill:') || x.startsWith('pack:'));
+  return t ? t.slice(t.indexOf(':') + 1) : null;
+};
+
+/** Plain-text starter prompt for a Claude step. */
+export function buildStarterPrompt(a: {
+  brand: string; jobId: string; jobTitle: string; moneyDestination: string | null;
+  stepOrder: number | null; stepTitle: string;
+  method: { title: string; version: string | null; tags?: string[] | null } | null;
+  facts: { inputs?: unknown[]; expected_output?: string; checks?: unknown[]; links?: Record<string, unknown> } | null;
+}): string {
+  const f = a.facts ?? {};
+  const lines = [
+    `Brand: ${a.brand}`,
+    `Job: ${a.jobTitle}`,
+    `Money destination: ${a.moneyDestination || 'not set'}`,
+    `Step ${a.stepOrder ?? '?'}: ${a.stepTitle}`,
+    `Method: ${a.method ? `${a.method.title}${a.method.version ? ` v${a.method.version}` : ''}` : 'none'}`,
+    `Skill to load: ${skillOf(a.method?.tags) ?? 'none listed'}`,
+    `Inputs: ${(f.inputs ?? []).length ? (f.inputs ?? []).map(String).join('; ') : 'none listed'}`,
+    `Expected output: ${f.expected_output || 'not specified'}`,
+    `Checks: ${(f.checks ?? []).length ? (f.checks ?? []).map(String).join('; ') : 'none listed'}`,
+    `Links: ${f.links && Object.keys(f.links).length ? Object.entries(f.links).map(([k, v]) => `${k}: ${v}`).join('; ') : 'none'}`,
+    '',
+    `Write the result back to Supreme Team HQ: mark step ${a.stepOrder ?? '?'} of job ${a.jobId} Done with the output link.`,
+  ];
+  return lines.join('\n');
+}

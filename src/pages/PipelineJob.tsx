@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useApproveItem } from '@/hooks/useContentProduction';
+import { buildStarterPrompt } from '@/lib/pipelineComposer';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,7 +54,7 @@ function usePipelineJob(jobId: string | undefined) {
         T('brand_kits').select('bio_short,brand_voice,content_mode').eq('project_id', job.project_id).eq('archived', false).maybeSingle(),
         T('content_sources').select('id,title').eq('project_id', job.project_id).eq('source_type', 'niche_profile').order('updated_at', { ascending: false }).limit(1),
         job.target_type === 'content_items' && job.target_id
-          ? T('content_items').select('id,title,brief,idea_score,performance').eq('id', job.target_id).maybeSingle()
+          ? T('content_items').select('id,title,brief,idea_score,performance,quality_score,quality_fails,approved_at').eq('id', job.target_id).maybeSingle()
           : job.target_type === 'channel_products' && job.target_id
             ? T('channel_products').select('id,name,status,price,monthly_sales').eq('id', job.target_id).maybeSingle()
             : Promise.resolve({ data: null, error: null }),
@@ -97,6 +99,8 @@ export default function PipelineJob() {
   const stepMethodIds = useMemo(() => (data?.steps ?? []).map((s) => s.method_id), [data]);
   const kb = useKnowledgeRows([...recipeIds, ...stepMethodIds]);
   const complete = useCompleteNextTenRow();
+  const approve = useApproveItem();
+  const [busyStep, setBusyStep] = useState<string | null>(null);
   const [methodOpen, setMethodOpen] = useState<{ id: string; title: string; version: string; status: string } | null>(null);
   const [stepOpen, setStepOpen] = useState<Step | null>(null);
   const scrolled = useRef(false);
@@ -128,9 +132,38 @@ export default function PipelineJob() {
     try {
       await complete.mutateAsync({ key: `action-${s.id}`, source: 'Action', step: s.title, projectId: job.project_id, projectName: brandName, refId: s.id, rank: 0 });
       toast.success('Step done');
+      refetch();
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     }
+  };
+
+  const updateStep = async (s: Step, patch: Record<string, unknown>, ok: string) => {
+    setBusyStep(s.id);
+    const { error } = await supabase.from('action_items').update(patch as any).eq('id', s.id);
+    setBusyStep(null);
+    if (error) return toast.error(error.message);
+    toast.success(ok);
+    refetch();
+  };
+  const queueStep = (s: Step) => {
+    const { facts } = parseFacts(s.facts);
+    const merged = { ...(facts ?? (s.facts ? { note: s.facts } : {})), queued: true, queued_at: new Date().toISOString() };
+    return updateStep(s, { facts: JSON.stringify(merged) }, 'Queued for the next run');
+  };
+  const handToClaude = (s: Step) => updateStep(s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' }, 'Handed to Claude');
+  const copyPrompt = async (s: Step) => {
+    const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
+    const text = buildStarterPrompt({
+      brand: brandName, jobId: job.id, jobTitle: job.title, moneyDestination: job.money_destination ?? null,
+      stepOrder: s.step_order, stepTitle: s.title, method: m, facts: parseFacts(s.facts).facts as any,
+    });
+    try { await navigator.clipboard.writeText(text); toast.success('Prompt copied'); }
+    catch { toast.error('Could not copy. Your browser blocked the clipboard.'); }
+  };
+  const approveTarget = async () => {
+    try { await approve.mutateAsync(target.id); toast.success('Approved'); refetch(); }
+    catch (e: any) { toast.error(e?.message ?? 'The database refused the approval'); }
   };
 
   const methodRow: KnowledgeRow | undefined = methodOpen ? kb.data?.get(methodOpen.id) : undefined;
@@ -211,6 +244,8 @@ export default function PipelineJob() {
             const method = s.method_id ? kb.data?.get(s.method_id) : null;
             const current = s.step_order != null && s.step_order === job.current_step;
             const canDone = s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
+            const queued = !!(facts as any)?.queued;
+            const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
               <li key={s.id} id={s.step_order != null ? `step-${s.step_order}` : undefined}
                 className={cn('rounded-lg border bg-card p-4 scroll-mt-24', current ? 'border-primary ring-1 ring-primary/40' : 'border-border', st === 'done' && 'opacity-80')}>
@@ -228,7 +263,23 @@ export default function PipelineJob() {
                       <Button size="sm" variant="outline" onClick={() => setStepOpen(s)}>View instructions</Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
                       {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done</Button>}
+                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Hand to Claude</Button>}
+                      {s.owner_kind === 'claude' && st !== 'done' && (
+                        queued
+                          ? <span className="self-center text-xs text-muted-foreground">Queued for the next run</span>
+                          : <Button size="sm" variant="outline" disabled={busyStep === s.id} onClick={() => queueStep(s)}>Queue</Button>
+                      )}
+                      {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy prompt</Button>}
                     </div>
+                    {isGate && target && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md bg-muted/40 p-2 text-xs">
+                        <span>Quality score <span className="font-semibold">{target.quality_score ?? '—'}</span></span>
+                        <span>Fails: {(target.quality_fails ?? []).length ? target.quality_fails.join(', ') : 'none'}</span>
+                        {target.approved_at ? <span className="font-semibold">Approved</span> : (
+                          <Button size="sm" className="h-7" disabled={approve.isPending} onClick={approveTarget}>Approve</Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </li>
