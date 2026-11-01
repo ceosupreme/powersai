@@ -30,6 +30,7 @@ import {
   dimensionShelf, isChannelStale, pipelineHref, platformLabel, relativeTime,
 } from '@/lib/ownerWork';
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
+import { PlaybooksTab } from './PlaybooksTab';
 import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
@@ -39,6 +40,7 @@ export const WORKSPACE_TABS = [
   { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
   { key: 'content', label: 'Content', accent: 'border-blue-500 text-blue-600' },
   { key: 'intel', label: 'Intel', accent: 'border-accent-foreground text-accent-foreground' },
+  { key: 'playbooks', label: 'Playbooks', accent: 'border-foreground text-foreground' },
   { key: 'assets', label: 'Assets', accent: 'border-muted-foreground text-muted-foreground' },
 ] as const;
 type TabKey = (typeof WORKSPACE_TABS)[number]['key'];
@@ -102,6 +104,7 @@ export function BrandWorkspace({
       {tab === 'products' && <ProductsTab projectId={projectId} />}
       {tab === 'content' && <ContentTab projectId={projectId} />}
       {tab === 'intel' && <IntelTab projectId={projectId} />}
+      {tab === 'playbooks' && <PlaybooksTab projectId={projectId} />}
       {tab === 'assets' && <AssetsTab projectId={projectId} />}
     </div>
   );
