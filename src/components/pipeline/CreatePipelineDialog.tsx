@@ -51,7 +51,7 @@ function MultiPick({ label, options, value, onChange }: { label: string; options
   return (
     <fieldset className="space-y-1.5">
       <legend className="text-sm font-medium">{label}</legend>
-      {options.length === 0 ? <p className="text-xs text-muted-foreground">None in the library.</p> : (
+      {options.length === 0 ? <p className="text-xs text-muted-foreground">None on the shelf.</p> : (
         <div className="flex flex-wrap gap-1.5">
           {options.map((o) => {
             const on = value.includes(o.key);
@@ -96,6 +96,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const [pro, setPro] = useState<string[]>([]);
   const [level, setLevel] = useState('2');
   const [money, setMoney] = useState('');
+  const [nicheIds, setNicheIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [seeded, setSeeded] = useState(false);
 
@@ -114,6 +115,29 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
     setDest([...new Set(keys)]);
     setSeeded(true);
   }, [request, channels.data, seeded]);
+
+  const niches = useQuery({
+    queryKey: ['pipeline-composer', 'niches', request?.projectId],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await T('knowledge_base').select('id,title,status,tags,key_points')
+        .eq('subcategory', 'niche').in('status', ['active', 'draft'])
+        .contains('tags', [`venue:${request!.projectId}`]).order('title');
+      if (error) throw error;
+      return (data ?? []) as { id: string; title: string; status: string | null; tags: string[] | null; key_points: string | null }[];
+    },
+  });
+  const nicheOpts: MethodOpt[] = useMemo(() => (niches.data ?? []).map((n) => ({ id: n.id, title: n.title, status: n.status, subcategory: 'niche', key: n.id })), [niches.data]);
+  useEffect(() => {
+    if (!request || !niches.data) return;
+    const core = niches.data.filter((n) => {
+      try {
+        const b = JSON.parse(n.key_points ?? '{}')?.brands;
+        return Array.isArray(b) && b.some((x: any) => x?.venue_id === request.projectId && x?.role === 'core');
+      } catch { return false; }
+    }).map((n) => n.id);
+    setNicheIds(core);
+  }, [request, niches.data]);
 
   const by = useMemo(() => {
     const g: Record<string, MethodOpt[]> = { product_type: [], destination: [], monetization: [], promotion: [] };
@@ -137,6 +161,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         promotion: fixedSteps ? [] : keep(pro, by.promotion),
         level: Number(level), money_destination: money.trim() || null,
         lane_item_key: request.laneItemKey ?? null, channel_method_id: request.channelMethodId ?? null,
+        niche_ids: nicheIds.filter((id) => nicheOpts.some((o) => o.id === id)),
       });
       if (request.targetType === 'content_items' && request.targetId) {
         const { error } = await T('content_items').update({ recipe_version: recipeVersionString(recipe) }).eq('id', request.targetId);
@@ -159,7 +184,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         <DialogHeader>
           <DialogTitle>Create pipeline</DialogTitle>
           <DialogDescription>
-            {fixedSteps ? 'This kind of job uses a fixed five-step plan.' : 'Pick the methods. Steps are built from them in order.'}
+            {fixedSteps ? 'This kind of job uses a fixed five-step plan.' : 'Pick the playbooks. Steps are built from them in order.'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -167,6 +192,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
             <Label htmlFor="pl-title">Title</Label>
             <Input id="pl-title" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
+          <MultiPick label="Niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
           {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /> : !fixedSteps && (
             <>
               <div className="space-y-1.5">
