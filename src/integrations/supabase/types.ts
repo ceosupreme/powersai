@@ -212,6 +212,20 @@ export type Database = {
             foreignKeyName: "action_items_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "action_items_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "action_items_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -408,6 +422,20 @@ export type Database = {
             foreignKeyName: "ai_search_queries_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "ai_search_queries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "ai_search_queries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -504,6 +532,20 @@ export type Database = {
             foreignKeyName: "ai_search_snapshots_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "ai_search_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "ai_search_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -526,6 +568,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_search_trigger_log_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "ai_search_trigger_log_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "ai_search_trigger_log_venue_id_fkey"
             columns: ["venue_id"]
@@ -618,6 +674,20 @@ export type Database = {
             foreignKeyName: "asana_gm_tasks_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "asana_gm_tasks_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "asana_gm_tasks_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -656,10 +726,75 @@ export type Database = {
             foreignKeyName: "asana_sync_cursor_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "asana_sync_cursor_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "asana_sync_cursor_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
+      }
+      asset_types: {
+        Row: {
+          grp: string
+          key: string
+          label: string
+          lane_keys: string[]
+          niche_groups: string[]
+          niche_keys: string[]
+          notes: string | null
+          platforms: string[]
+          playbook_key: string | null
+          priority: number
+          profiles: string[]
+          setup_minutes: number | null
+          unlocks: string
+          updated_at: string
+        }
+        Insert: {
+          grp: string
+          key: string
+          label: string
+          lane_keys?: string[]
+          niche_groups?: string[]
+          niche_keys?: string[]
+          notes?: string | null
+          platforms?: string[]
+          playbook_key?: string | null
+          priority?: number
+          profiles?: string[]
+          setup_minutes?: number | null
+          unlocks: string
+          updated_at?: string
+        }
+        Update: {
+          grp?: string
+          key?: string
+          label?: string
+          lane_keys?: string[]
+          niche_groups?: string[]
+          niche_keys?: string[]
+          notes?: string | null
+          platforms?: string[]
+          playbook_key?: string | null
+          priority?: number
+          profiles?: string[]
+          setup_minutes?: number | null
+          unlocks?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       audience_pains: {
         Row: {
@@ -726,6 +861,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "audience_pains_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "audience_pains_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "audience_pains_project_id_fkey"
             columns: ["project_id"]
@@ -959,6 +1108,20 @@ export type Database = {
             foreignKeyName: "automation_message_queue_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "automation_message_queue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "automation_message_queue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -1017,6 +1180,20 @@ export type Database = {
           to_address?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "automation_send_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "automation_send_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "automation_send_log_project_id_fkey"
             columns: ["project_id"]
@@ -1129,6 +1306,66 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_asset_decisions: {
+        Row: {
+          asset_key: string
+          decided_at: string
+          decision: string
+          reason: string | null
+          venue_id: string
+        }
+        Insert: {
+          asset_key: string
+          decided_at?: string
+          decision: string
+          reason?: string | null
+          venue_id: string
+        }
+        Update: {
+          asset_key?: string
+          decided_at?: string
+          decision?: string
+          reason?: string | null
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_asset_decisions_asset_key_fkey"
+            columns: ["asset_key"]
+            isOneToOne: false
+            referencedRelation: "asset_types"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "brand_asset_decisions_asset_key_fkey"
+            columns: ["asset_key"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["asset_key"]
+          },
+          {
+            foreignKeyName: "brand_asset_decisions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_asset_decisions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_asset_decisions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_channels: {
         Row: {
           account_label: string | null
@@ -1194,6 +1431,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "knowledge_base"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "brand_channels_project_id_fkey"
@@ -1536,6 +1787,63 @@ export type Database = {
             foreignKeyName: "brand_kits_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_kits_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_kits_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_profiles: {
+        Row: {
+          notes: string | null
+          profiles: string[]
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          notes?: string | null
+          profiles?: string[]
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          notes?: string | null
+          profiles?: string[]
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -1602,8 +1910,36 @@ export type Database = {
             foreignKeyName: "capture_items_routed_project_id_fkey"
             columns: ["routed_project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "capture_items_routed_project_id_fkey"
+            columns: ["routed_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "capture_items_routed_project_id_fkey"
+            columns: ["routed_project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capture_items_suggested_project_id_fkey"
+            columns: ["suggested_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "capture_items_suggested_project_id_fkey"
+            columns: ["suggested_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "capture_items_suggested_project_id_fkey"
@@ -1637,6 +1973,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "channel_products"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_product_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "channel_product_channels_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "channel_product_channels_project_id_fkey"
@@ -1741,8 +2091,85 @@ export type Database = {
             foreignKeyName: "channel_revenue_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "channel_revenue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "channel_revenue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_stats: {
+        Row: {
+          captured_on: string
+          channel_id: string
+          created_at: string
+          followers: number | null
+          following: number | null
+          id: string
+          likes: number | null
+          notes: string | null
+          posts: number | null
+          source: string
+          source_ref: string | null
+          videos: number | null
+          views: number | null
+        }
+        Insert: {
+          captured_on?: string
+          channel_id: string
+          created_at?: string
+          followers?: number | null
+          following?: number | null
+          id?: string
+          likes?: number | null
+          notes?: string | null
+          posts?: number | null
+          source?: string
+          source_ref?: string | null
+          videos?: number | null
+          views?: number | null
+        }
+        Update: {
+          captured_on?: string
+          channel_id?: string
+          created_at?: string
+          followers?: number | null
+          following?: number | null
+          id?: string
+          likes?: number | null
+          notes?: string | null
+          posts?: number | null
+          source?: string
+          source_ref?: string | null
+          videos?: number | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_stats_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "brand_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_stats_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["channel_id"]
           },
         ]
       }
@@ -1992,6 +2419,20 @@ export type Database = {
             foreignKeyName: "content_automation_runs_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_automation_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_automation_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -2029,6 +2470,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "content_families_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_families_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "content_families_project_id_fkey"
             columns: ["project_id"]
@@ -2173,6 +2628,20 @@ export type Database = {
             foreignKeyName: "content_items_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -2242,6 +2711,20 @@ export type Database = {
             foreignKeyName: "content_placements_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_placements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_placements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -2294,6 +2777,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "content_sources"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_sources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_sources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "content_sources_project_id_fkey"
@@ -2355,6 +2852,20 @@ export type Database = {
             foreignKeyName: "context_calendar_entries_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "context_calendar_entries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "context_calendar_entries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -2405,6 +2916,20 @@ export type Database = {
             foreignKeyName: "context_items_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "context_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "context_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -2442,6 +2967,20 @@ export type Database = {
           venue_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "context_source_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "context_source_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "context_source_runs_venue_id_fkey"
             columns: ["venue_id"]
@@ -2498,6 +3037,20 @@ export type Database = {
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_companies_linked_project_id_fkey"
+            columns: ["linked_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "crm_companies_linked_project_id_fkey"
+            columns: ["linked_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "crm_companies_linked_project_id_fkey"
             columns: ["linked_project_id"]
@@ -3090,6 +3643,20 @@ export type Database = {
             foreignKeyName: "days_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "days_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "days_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -3271,6 +3838,20 @@ export type Database = {
             foreignKeyName: "drink_mix_items_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "drink_mix_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "drink_mix_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -3302,6 +3883,20 @@ export type Database = {
           reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "email_suppressions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "email_suppressions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "email_suppressions_project_id_fkey"
             columns: ["project_id"]
@@ -3475,6 +4070,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "employee_incidents"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_incidents_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_incidents_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "employee_incidents_venue_id_fkey"
@@ -3692,6 +4301,20 @@ export type Database = {
             foreignKeyName: "employee_profiles_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -3812,6 +4435,20 @@ export type Database = {
             foreignKeyName: "employee_reviews_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_reviews_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_reviews_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -3923,6 +4560,20 @@ export type Database = {
             foreignKeyName: "employee_weekly_metrics_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_weekly_metrics_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "employee_weekly_metrics_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -3997,6 +4648,20 @@ export type Database = {
             foreignKeyName: "finding_campaign_links_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "finding_campaign_links_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "finding_campaign_links_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -4052,6 +4717,20 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "inbound_leads"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_sequence_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "followup_sequence_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "followup_sequence_runs_project_id_fkey"
@@ -4278,6 +4957,20 @@ export type Database = {
             foreignKeyName: "gbp_place_mappings_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "gbp_place_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "gbp_place_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -4396,6 +5089,20 @@ export type Database = {
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "gbp_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "gbp_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "gbp_snapshots_venue_id_fkey"
             columns: ["venue_id"]
@@ -4637,6 +5344,20 @@ export type Database = {
             foreignKeyName: "gm_logs_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "gm_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "gm_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -4684,6 +5405,20 @@ export type Database = {
           snapshot_date?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "google_reviews_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "google_reviews_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "google_reviews_bar_id_fkey"
             columns: ["bar_id"]
@@ -4881,6 +5616,20 @@ export type Database = {
             foreignKeyName: "growth_action_packs_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_action_packs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_action_packs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -4921,6 +5670,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "growth_audit_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_audit_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "growth_audit_runs_venue_id_fkey"
             columns: ["venue_id"]
@@ -5118,6 +5881,20 @@ export type Database = {
             foreignKeyName: "growth_findings_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_findings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_findings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -5179,6 +5956,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "growth_audit_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "growth_score_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "growth_score_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "growth_score_snapshots_venue_id_fkey"
@@ -5266,6 +6057,20 @@ export type Database = {
           window_basis?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "hq_external_metric_mappings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "hq_external_metric_mappings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "hq_external_metric_mappings_project_id_fkey"
             columns: ["project_id"]
@@ -5384,6 +6189,20 @@ export type Database = {
           value_week_start?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "hq_number_collector_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "hq_number_collector_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "hq_number_collector_checks_project_id_fkey"
             columns: ["project_id"]
@@ -5672,6 +6491,20 @@ export type Database = {
             foreignKeyName: "inbound_leads_captured_for_project_id_fkey"
             columns: ["captured_for_project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inbound_leads_captured_for_project_id_fkey"
+            columns: ["captured_for_project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inbound_leads_captured_for_project_id_fkey"
+            columns: ["captured_for_project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -5681,6 +6514,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "crm_companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbound_leads_promoted_venue_id_fkey"
+            columns: ["promoted_venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inbound_leads_promoted_venue_id_fkey"
+            columns: ["promoted_venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "inbound_leads_promoted_venue_id_fkey"
@@ -5994,6 +6841,20 @@ export type Database = {
             foreignKeyName: "insights_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "insights_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "insights_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -6263,6 +7124,20 @@ export type Database = {
             foreignKeyName: "inventory_items_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inventory_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inventory_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -6309,6 +7184,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_reports_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "inventory_reports_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "inventory_reports_venue_id_fkey"
             columns: ["venue_id"]
@@ -6556,6 +7445,20 @@ export type Database = {
             foreignKeyName: "knowledge_base_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -6676,6 +7579,20 @@ export type Database = {
             foreignKeyName: "lead_logs_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "lead_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "lead_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -6729,6 +7646,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "leak_stack_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "leak_stack_runs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "leak_stack_runs_venue_id_fkey"
             columns: ["venue_id"]
@@ -6947,6 +7878,20 @@ export type Database = {
             foreignKeyName: "manual_upload_history_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "manual_upload_history_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "manual_upload_history_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -6990,6 +7935,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "map_pack_keywords_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "map_pack_keywords_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "map_pack_keywords_venue_id_fkey"
             columns: ["venue_id"]
@@ -7087,6 +8046,20 @@ export type Database = {
             foreignKeyName: "map_pack_snapshots_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "map_pack_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "map_pack_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -7109,6 +8082,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "map_pack_trigger_log_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "map_pack_trigger_log_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "map_pack_trigger_log_venue_id_fkey"
             columns: ["venue_id"]
@@ -7319,6 +8306,20 @@ export type Database = {
             foreignKeyName: "marketing_events_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "marketing_events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "marketing_events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -7429,6 +8430,20 @@ export type Database = {
           week_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "online_reviews_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "online_reviews_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "online_reviews_venue_id_fkey"
             columns: ["venue_id"]
@@ -7625,6 +8640,20 @@ export type Database = {
           weight_revenue?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "period_config_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "period_config_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "period_config_bar_id_fkey"
             columns: ["bar_id"]
@@ -7923,6 +8952,20 @@ export type Database = {
             foreignKeyName: "production_jobs_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "production_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "production_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8015,6 +9058,20 @@ export type Database = {
             foreignKeyName: "project_automation_enrollments_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_automation_enrollments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_automation_enrollments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8075,6 +9132,20 @@ export type Database = {
             foreignKeyName: "project_customer_list_members_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_customer_list_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_customer_list_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8112,6 +9183,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_customer_lists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_customer_lists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "project_customer_lists_project_id_fkey"
             columns: ["project_id"]
@@ -8306,6 +9391,20 @@ export type Database = {
             foreignKeyName: "project_kpi_values_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_kpi_values_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_kpi_values_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8365,6 +9464,20 @@ export type Database = {
             foreignKeyName: "project_kpis_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_kpis_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_kpis_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8418,6 +9531,20 @@ export type Database = {
             foreignKeyName: "project_leak_vector_overrides_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_leak_vector_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_leak_vector_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8458,6 +9585,20 @@ export type Database = {
           weight?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "project_pillar_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_pillar_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "project_pillar_overrides_project_id_fkey"
             columns: ["project_id"]
@@ -8506,6 +9647,20 @@ export type Database = {
             foreignKeyName: "project_pillar_scores_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_pillar_scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_pillar_scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8549,6 +9704,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_qualifier_field_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "project_qualifier_field_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "project_qualifier_field_overrides_project_id_fkey"
             columns: ["project_id"]
@@ -8781,6 +9950,20 @@ export type Database = {
             foreignKeyName: "promo_redemptions_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "promo_redemptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "promo_redemptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -8835,6 +10018,20 @@ export type Database = {
           week_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "promotions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "promotions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "promotions_venue_id_fkey"
             columns: ["venue_id"]
@@ -8909,6 +10106,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leak_stack_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "proposals_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "proposals_venue_id_fkey"
@@ -9082,6 +10293,20 @@ export type Database = {
             foreignKeyName: "public_audit_requests_shell_venue_id_fkey"
             columns: ["shell_venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "public_audit_requests_shell_venue_id_fkey"
+            columns: ["shell_venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "public_audit_requests_shell_venue_id_fkey"
+            columns: ["shell_venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -9134,6 +10359,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reactivation_campaign_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "reactivation_campaign_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "reactivation_campaign_runs_project_id_fkey"
             columns: ["project_id"]
@@ -9205,6 +10444,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "recovery_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "recovery_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "recovery_reports_project_id_fkey"
             columns: ["project_id"]
@@ -9291,6 +10544,20 @@ export type Database = {
             foreignKeyName: "review_request_runs_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "review_request_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "review_request_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -9331,6 +10598,20 @@ export type Database = {
           yelp_review_count?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "review_snapshots_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "review_snapshots_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "review_snapshots_bar_id_fkey"
             columns: ["bar_id"]
@@ -9441,6 +10722,20 @@ export type Database = {
             foreignKeyName: "sculpture_site_mappings_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "sculpture_site_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "sculpture_site_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -9535,6 +10830,20 @@ export type Database = {
           week_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "secret_shop_audits_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "secret_shop_audits_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "secret_shop_audits_venue_id_fkey"
             columns: ["venue_id"]
@@ -9832,6 +11141,20 @@ export type Database = {
             foreignKeyName: "shift_feedback_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "shift_feedback_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "shift_feedback_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -10040,6 +11363,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "venue_asana_log_sources"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shift_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "shift_logs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "shift_logs_bar_id_fkey"
@@ -10265,6 +11602,20 @@ export type Database = {
           week_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "social_media_posts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "social_media_posts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "social_media_posts_venue_id_fkey"
             columns: ["venue_id"]
@@ -10536,6 +11887,20 @@ export type Database = {
           week_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sync_runs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "sync_runs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "sync_runs_bar_id_fkey"
             columns: ["bar_id"]
@@ -10853,6 +12218,20 @@ export type Database = {
             foreignKeyName: "time_entries_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "time_entries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "time_entries_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -10992,6 +12371,20 @@ export type Database = {
             foreignKeyName: "toast_benchmarks_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "toast_benchmarks_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "toast_benchmarks_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -11041,6 +12434,20 @@ export type Database = {
             foreignKeyName: "toast_sync_cursors_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "toast_sync_cursors_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "toast_sync_cursors_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -11081,6 +12488,20 @@ export type Database = {
           week_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "top_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "top_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "top_items_venue_id_fkey"
             columns: ["venue_id"]
@@ -11322,6 +12743,20 @@ export type Database = {
             foreignKeyName: "user_venue_roles_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "user_venue_roles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "user_venue_roles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -11365,6 +12800,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "venue_asana_log_sources_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_asana_log_sources_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "venue_asana_log_sources_venue_id_fkey"
             columns: ["venue_id"]
@@ -11434,6 +12883,20 @@ export type Database = {
             foreignKeyName: "venue_assignments_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_assignments_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_assignments_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -11474,6 +12937,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "venue_contacts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_contacts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "venue_contacts_venue_id_fkey"
             columns: ["venue_id"]
@@ -11608,6 +13085,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_leadership_contacts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_leadership_contacts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "venue_leadership_contacts_venue_id_fkey"
@@ -11849,6 +13340,20 @@ export type Database = {
             foreignKeyName: "venue_profiles_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -11898,6 +13403,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "venue_programming_context_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_programming_context_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "venue_programming_context_venue_id_fkey"
             columns: ["venue_id"]
@@ -11965,6 +13484,20 @@ export type Database = {
             foreignKeyName: "venue_service_subscriptions_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_service_subscriptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_service_subscriptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -12002,6 +13535,20 @@ export type Database = {
           venue_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "venue_weather_grid_cache_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "venue_weather_grid_cache_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "venue_weather_grid_cache_venue_id_fkey"
             columns: ["venue_id"]
@@ -12497,6 +14044,20 @@ export type Database = {
             foreignKeyName: "website_mappings_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "website_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "website_mappings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -12573,6 +14134,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "website_snapshots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "website_pages_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "website_pages_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
           },
           {
             foreignKeyName: "website_pages_venue_id_fkey"
@@ -12733,6 +14308,20 @@ export type Database = {
             foreignKeyName: "website_snapshots_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "website_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "website_snapshots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -12839,6 +14428,20 @@ export type Database = {
           week_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "weekly_briefings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_briefings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "weekly_briefings_venue_id_fkey"
             columns: ["venue_id"]
@@ -13081,6 +14684,20 @@ export type Database = {
             foreignKeyName: "weekly_core_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_core_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_core_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -13162,6 +14779,20 @@ export type Database = {
           wine_sales?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "weekly_sales_mix_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_sales_mix_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "weekly_sales_mix_venue_id_fkey"
             columns: ["venue_id"]
@@ -13422,6 +15053,20 @@ export type Database = {
             foreignKeyName: "weekly_scorecard_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_scorecard_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_scorecard_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -13510,6 +15155,20 @@ export type Database = {
             foreignKeyName: "weekly_social_metrics_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_social_metrics_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weekly_social_metrics_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -13571,6 +15230,20 @@ export type Database = {
             foreignKeyName: "weeks_bar_id_fkey"
             columns: ["bar_id"]
             isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weeks_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weeks_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -13618,6 +15291,52 @@ export type Database = {
         }
         Relationships: []
       }
+      v_brand_asset_map: {
+        Row: {
+          asset_key: string | null
+          brand: string | null
+          by_lanes: string[] | null
+          by_niches: string[] | null
+          by_profile: boolean | null
+          channel_id: string | null
+          channel_platform: string | null
+          channel_status: string | null
+          decision: string | null
+          decision_reason: string | null
+          follower_date: string | null
+          followers: number | null
+          grp: string | null
+          handle: string | null
+          label: string | null
+          lane_labels: string[] | null
+          needed: boolean | null
+          platforms: string[] | null
+          playbook_key: string | null
+          priority: number | null
+          setup_minutes: number | null
+          state: string | null
+          unlocks: string | null
+          url: string | null
+          venue_id: string | null
+        }
+        Relationships: []
+      }
+      v_brand_setup_summary: {
+        Row: {
+          brand: string | null
+          extra_on_file: number | null
+          gaps: number | null
+          in_place: number | null
+          later: number | null
+          missing: number | null
+          needed_count: number | null
+          needs_access: number | null
+          planned: number | null
+          skipped: number | null
+          venue_id: string | null
+        }
+        Relationships: []
+      }
       venue_sync_status: {
         Row: {
           bar_id: string | null
@@ -13631,6 +15350,20 @@ export type Database = {
           sync_type: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sync_runs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "sync_runs_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "sync_runs_bar_id_fkey"
             columns: ["bar_id"]
@@ -13669,6 +15402,20 @@ export type Database = {
           weekly_guests: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "weeks_bar_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "weeks_bar_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
           {
             foreignKeyName: "weeks_bar_id_fkey"
             columns: ["venue_id"]
