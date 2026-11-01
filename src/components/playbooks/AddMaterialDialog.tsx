@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { SOURCE_KINDS, SHELVES, isHiddenPlaybook } from '@/lib/playbookStatus';
 import { keyOf, useAddPlaybookSource, type PlaybookRow } from '@/hooks/usePlaybooks';
 
-export const SAVED_LINE = 'Saved. Claude merges it on the next run (Mondays and Thursdays).';
+export const SAVED_LINE = 'Saved. Claude merges it on the next production run.';
 export const INBOX_URL = 'https://drive.google.com/drive/folders/1boqsx8ccAQdjBtF_x0EhBqWPjbRkqw2O';
 
 const shelfOf = (sub: string | null) => SHELVES.find((s) => (s.subs as readonly string[]).includes(sub ?? ''))?.label ?? '';
