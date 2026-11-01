@@ -168,7 +168,7 @@ export function useUpdateBrandChannel() {
   });
 }
 
-// ---------- Methods library ----------
+// ---------- Playbook library ----------
 export interface KnowledgeRow {
   id: string; venue_id: string | null; subcategory: string | null; title: string; version: string | null;
   summary: string | null; key_points: string | null; expiry_date: string | null; external_url: string | null;
@@ -219,7 +219,7 @@ export function useProjectJobs(projectId: string | null | undefined) {
     queryKey: ['brand-workspace', 'jobs', projectId],
     enabled: !!projectId,
     queryFn: async (): Promise<ProductionJob[]> => {
-      const { data, error } = await T('production_jobs').select('*').eq('project_id', projectId).order('created_at', { ascending: false });
+      const { data, error } = await T('production_jobs').select('*').eq('project_id', projectId).neq('kind', 'playbook').order('created_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -296,7 +296,7 @@ export function useBrandActivity(projectId: string | null | undefined) {
           ? T('product_listings').select('id,outlet,listed_at,product_id').in('product_id', productIds).eq('status', 'listed').not('listed_at', 'is', null).order('listed_at', { ascending: false }).limit(10)
           : Promise.resolve({ data: [], error: null }),
         supabase.from('action_items').select('id,title,completed_at').or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`).eq('status', 'Done').not('completed_at', 'is', null).order('completed_at', { ascending: false }).limit(10),
-        T('production_jobs').select('id,title,created_at').eq('project_id', projectId).order('created_at', { ascending: false }).limit(10),
+        T('production_jobs').select('id,title,created_at').eq('project_id', projectId).neq('kind', 'playbook').order('created_at', { ascending: false }).limit(10),
       ]);
       for (const r of [runs, placements, listings, actions, jobs] as any[]) if (r.error) throw r.error;
       const ev: ActivityEvent[] = [

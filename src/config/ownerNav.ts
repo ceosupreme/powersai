@@ -82,7 +82,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/radar', label: 'Radar', icon: Radar, pageKey: 'content_pipeline' },
-      { path: '/methods', label: 'Methods', icon: BookOpen, pageKey: 'content_pipeline' },
+      { path: '/playbooks', label: 'Playbooks', icon: BookOpen, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/production-board', label: 'Production Board', icon: Film, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/answer-bank', label: 'Answer Bank', icon: HelpCircle, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },

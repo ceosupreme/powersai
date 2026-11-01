@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import type { NonClientCardData } from '@/hooks/usePortfolioData';
 import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
 import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
+import type { ChannelStat } from '@/lib/portfolioSort';
+import { compactNumber } from '@/lib/playbookStatus';
 
 /**
  * Overview card for a non-client project (own brand / prospect):
@@ -15,11 +17,14 @@ import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
 export function BrandProjectCard({
   data,
   work,
+  channels,
   onClick,
 }: {
   data: NonClientCardData;
   /** Workload numbers; undefined while loading. */
   work?: BrandWorkCard | null;
+  /** Live channels and followers from brand_channels; undefined while loading or not shown. */
+  channels?: ChannelStat;
   onClick: () => void;
 }) {
   const grade = data.overall != null ? getGradeFromScore(data.overall) : null;
@@ -69,6 +74,13 @@ export function BrandProjectCard({
       </div>
 
       <ScoreDataStatus coverage={data.coverage} className="mb-3" />
+
+      {channels && (
+        <p className="mb-3 text-sm text-foreground">
+          {channels.total === 0 ? <span className="text-muted-foreground">No channels on file</span>
+            : <>{channels.live} live channel{channels.live === 1 ? '' : 's'} · {compactNumber(channels.followers)} followers</>}
+        </p>
+      )}
 
       <div className="mb-3 text-sm">
         <span className="text-foreground">
