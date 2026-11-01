@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Radar
-- [ ] Add read-only research page and shared owner navigation entry using existing tables
-- [ ] Verify data rules, signed-in desktop/phone views, and preview
+- [x] Add read-only research page and shared owner navigation entry using existing tables
+- [x] Verify data rules, signed-in desktop/phone views, and preview
 
 ## Public studio website (STM build pack)
 
