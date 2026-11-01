@@ -172,9 +172,9 @@ export function useUpdateBrandChannel() {
 export interface KnowledgeRow {
   id: string; venue_id: string | null; subcategory: string | null; title: string; version: string | null;
   summary: string | null; key_points: string | null; expiry_date: string | null; external_url: string | null;
-  attachment_url: string | null; status: string | null; description: string | null;
+  attachment_url: string | null; status: string | null; description: string | null; tags?: string[] | null;
 }
-const KB_COLS = 'id,venue_id,subcategory,title,version,summary,key_points,expiry_date,external_url,attachment_url,status,description';
+const KB_COLS = 'id,venue_id,subcategory,title,version,summary,key_points,expiry_date,external_url,attachment_url,status,description,tags';
 
 export function useKnowledgeRows(ids: (string | null | undefined)[]) {
   const list = [...new Set(ids.filter((i): i is string => !!i))].sort();

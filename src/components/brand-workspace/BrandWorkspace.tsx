@@ -29,6 +29,8 @@ import { PRIORITY_CHIP } from '@/components/portfolio/AllBrandsWaitingStrip';
 import {
   dimensionShelf, isChannelStale, pipelineHref, platformLabel, relativeTime,
 } from '@/lib/ownerWork';
+import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
+import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
   { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
@@ -263,6 +265,7 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
   const methods = useKnowledgeRows(data.map((c) => c.destination_method_id));
   const [open, setOpen] = useState<BrandChannel | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  const [req, setReq] = useState<PipelineRequest | null>(null);
 
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
@@ -316,7 +319,9 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
           );
         })}
       </ul>
-      <ChannelDrawer channel={open} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)} />
+      <ChannelDrawer channel={open} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)}
+        onSetUp={(c) => { setOpen(null); setReq({ projectId, kind: 'channel_setup', title: `Set up ${platformLabel(c.platform)}`, targetKey: c.id, channelMethodId: c.destination_method_id }); }} />
+      <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
     </>
   );
 }
@@ -384,7 +389,7 @@ function ChannelEditor({ channel, onDone }: { channel: BrandChannel; onDone: () 
   );
 }
 
-function ChannelDrawer({ channel, method, onClose }: { channel: BrandChannel | null; method: KnowledgeRow | null; onClose: () => void }) {
+function ChannelDrawer({ channel, method, onClose, onSetUp }: { channel: BrandChannel | null; method: KnowledgeRow | null; onClose: () => void; onSetUp: (c: BrandChannel) => void }) {
   const placements = useQuery({
     queryKey: ['brand-workspace', 'channel-placements', channel?.id],
     enabled: !!channel,
@@ -459,6 +464,7 @@ function ChannelDrawer({ channel, method, onClose }: { channel: BrandChannel | n
                 <a href={channel.url} target="_blank" rel="noreferrer">Open <ExternalLink className="h-4 w-4 ml-1" /></a>
               </Button>
             )}
+            <Button variant="outline" className="mt-3 w-full" onClick={() => onSetUp(channel)}>Set up</Button>
           </>
         )}
       </SheetContent>
@@ -509,6 +515,7 @@ function AvenuesTab({ projectId, canEdit }: { projectId: string; canEdit: boolea
 function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; canEdit: boolean }) {
   const upsert = useUpsertFoundationItemStatus();
   const [marking, setMarking] = useState(false);
+  const [req, setReq] = useState<PipelineRequest | null>(null);
   const [evidence, setEvidence] = useState('');
   const score = laneScore(item);
   return (
@@ -538,6 +545,12 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
           <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Mark on</Button>
         )
       )}
+      {item.status !== 'satisfied' && (
+        <Button size="sm" className="h-8 ml-2" onClick={() => setReq({
+          projectId, kind: 'lane', title: `Turn on: ${item.label}`, targetKey: item.item_key, laneItemKey: item.item_key,
+        })}>Turn this on</Button>
+      )}
+      <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
     </div>
   );
 }
@@ -547,10 +560,12 @@ function ProductsTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProjectProducts(projectId);
   const jobs = useProjectJobs(projectId);
   const byProduct = jobByTarget(jobs.data ?? [], 'channel_products');
+  const [req, setReq] = useState<PipelineRequest | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No products linked to this brand.</p>;
   return (
+    <>
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {data.map((p: any) => (
         <div key={p.id} className="rounded-lg border-t-4 border-orange border-x border-b border-border bg-card p-4 space-y-2">
@@ -568,14 +583,22 @@ function ProductsTab({ projectId }: { projectId: string }) {
                 <Badge key={l.id} variant="outline" className="text-[10px]">{l.outlet}: {l.status}</Badge>
               ))}
           </div>
-          {byProduct.get(p.id) && (
+          {byProduct.get(p.id) ? (
             <Button size="sm" variant="outline" asChild>
               <Link to={pipelineHref(projectId, byProduct.get(p.id)!)}>Pipeline</Link>
             </Button>
+          ) : (
+            <Button size="sm" onClick={() => setReq({
+              projectId, kind: 'product', title: p.name, targetType: 'channel_products', targetId: p.id,
+              productType: productTypeForName(p.name ?? ''),
+              destinations: [...new Set(p.listings.map((l: any) => outletToDestination(l.outlet)).filter(Boolean))] as string[],
+            })}>Start production</Button>
           )}
         </div>
       ))}
     </div>
+    <CreatePipelineDialog request={req} onClose={() => setReq(null)} onCreated={() => jobs.refetch()} />
+    </>
   );
 }
 
@@ -584,9 +607,21 @@ function ContentTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProductionBoardItems([projectId]);
   const approve = useApproveItem();
   const advance = useAdvanceStage();
+  const [batching, setBatching] = useState(false);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
+  const ready = data.filter((it) => !it.approved_at && (it.quality_score ?? 0) >= 80 && !(it.quality_fails ?? []).length);
+  const approveBatch = async () => {
+    setBatching(true);
+    let ok = 0, refused = 0;
+    for (const it of ready) {
+      try { await approve.mutateAsync(it.id); ok++; } catch { refused++; }
+    }
+    setBatching(false);
+    toast.success(`Approved ${ok}. Refused by the database: ${refused}.`);
+    refetch();
+  };
   const onApprove = async (it: BoardItem) => {
     if (!canApprove(it)) return;
     try { await approve.mutateAsync(it.id); toast.success('Approved'); } catch (e: any) { toast.error(e?.message ?? 'Could not approve it'); }
@@ -598,6 +633,13 @@ function ContentTab({ projectId }: { projectId: string }) {
     catch (e: any) { toast.error(e?.message ?? 'Could not move it'); }
   };
   return (
+    <div className="space-y-3">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="text-sm text-muted-foreground">{ready.length} ready to approve</p>
+      <Button size="sm" disabled={batching || ready.length === 0} onClick={approveBatch}>
+        {batching && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Approve batch
+      </Button>
+    </div>
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
       {data.map((it) => (
         <div key={it.id} className="space-y-1">
@@ -605,6 +647,7 @@ function ContentTab({ projectId }: { projectId: string }) {
           <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} />
         </div>
       ))}
+    </div>
     </div>
   );
 }
@@ -615,6 +658,7 @@ function IntelTab({ projectId }: { projectId: string }) {
   const jobs = useProjectJobs(projectId);
   const byContent = jobByTarget(jobs.data ?? [], 'content_items');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [req, setReq] = useState<PipelineRequest | null>(null);
   if (isLoading) return <Loading />;
   if (isError || !data) return <LoadError onRetry={() => refetch()} />;
   return (
@@ -643,15 +687,19 @@ function IntelTab({ projectId }: { projectId: string }) {
         {data.pains.length === 0 ? <p className="text-sm text-muted-foreground">No pains recorded yet.</p> : (
           <ol className="space-y-2">
             {data.pains.map((p, i) => (
-              <li key={p.id} className="flex gap-3 rounded-md border border-dashed border-border p-3">
+              <li key={p.id} className="flex flex-wrap items-start gap-3 rounded-md border border-dashed border-border p-3">
                 <span className="text-2xl font-bold text-muted-foreground w-6 shrink-0">{i + 1}</span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-foreground">{p.pain_text}</p>
                   <p className="text-xs text-muted-foreground">
                     Score {dash(p.pain_score)} · {dash(p.source_count)} sources{p.product_flag ? ' · ' : ''}
                     {p.product_flag && <span className="font-semibold text-foreground">Product</span>}
                   </p>
                 </div>
+                <Button size="sm" variant="outline" onClick={async () => {
+                  try { setReq(await contentItemFromPain(projectId, p.pain_text)); }
+                  catch (e: any) { toast.error(e?.message ?? 'Could not create the item'); }
+                }}>Make this</Button>
               </li>
             ))}
           </ol>
@@ -662,20 +710,26 @@ function IntelTab({ projectId }: { projectId: string }) {
         {data.briefs.length === 0 ? <p className="text-sm text-muted-foreground">No scored ideas yet.</p> : (
           <ul className="space-y-2">
             {data.briefs.map((b) => (
-              <li key={b.id} className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+              <li key={b.id} className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-card p-3">
                 <span className="text-3xl font-bold tabular-nums w-12 shrink-0">{b.idea_score}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-foreground">{b.title}</p>
                   <p className="text-xs text-muted-foreground capitalize">{dash(b.format)} · {dash(b.purpose_type)}</p>
                 </div>
-                {byContent.get(b.id) && (
+                {byContent.get(b.id) ? (
                   <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, byContent.get(b.id)!)}>Pipeline</Link></Button>
+                ) : (
+                  <Button size="sm" onClick={() => setReq({
+                    projectId, kind: 'content', title: b.title, targetType: 'content_items', targetId: b.id,
+                    productType: productTypeForFormat(b.format),
+                  })}>Make this</Button>
                 )}
               </li>
             ))}
           </ul>
         )}
       </section>
+      <CreatePipelineDialog request={req} onClose={() => setReq(null)} onCreated={() => jobs.refetch()} />
       <section>
         <h3 className="text-lg font-semibold mb-2">Dimension library</h3>
         {data.dims.length === 0 ? <p className="text-sm text-muted-foreground">No dimensions filed yet.</p> : (

@@ -52,6 +52,7 @@ const Workspace = lazy(() => import("./pages/Workspace"));
 const BrandKit = lazy(() => import("./pages/BrandKit"));
 const ContentPipeline = lazy(() => import("./pages/ContentPipeline"));
 const Radar = lazy(() => import("./pages/Radar"));
+const Methods = lazy(() => import("./pages/Methods"));
 const ProductionBoard = lazy(() => import("./pages/ProductionBoard"));
 const AnswerBank = lazy(() => import("./pages/AnswerBank"));
 const ChannelRevenue = lazy(() => import("./pages/ChannelRevenue"));
@@ -304,6 +305,11 @@ const App = () => {
                 <Route path="/production-board" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ProductionBoard /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/methods" element={
+                  <ProtectedRoute allowedRoles={['owner']}>
+                    <AppLayout><Methods /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/radar" element={

@@ -5,6 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { CreatePipelineDialog, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
+import { productTypeForFormat } from '@/lib/pipelineComposer';
 import { fetchRadarSources, fetchRadarBriefs, fetchRadarRuns, groupRadarBriefs, radarEvidence, radarShelf, researchUrl } from '@/lib/radarData';
 
 function dateLabel(value: string | null, time = false) {
@@ -47,6 +49,7 @@ export default function Radar() {
   const briefs = useQuery({ queryKey: ['radar', user?.id, 'briefs'], queryFn: fetchRadarBriefs, enabled: !!user });
   const runs = useQuery({ queryKey: ['radar', user?.id, 'runs'], queryFn: fetchRadarRuns, enabled: !!user });
   const groups = groupRadarBriefs(briefs.data ?? []);
+  const [pipeReq, setPipeReq] = useState<PipelineRequest | null>(null);
 
   return <div className="mx-auto max-w-7xl space-y-10 p-4 pb-24 md:p-6 md:pb-24">
     <header className="flex items-center gap-3">
@@ -86,12 +89,13 @@ export default function Radar() {
         <div className="grid gap-4 lg:grid-cols-2">{group.items.map(brief => <Card key={brief.id} className="min-w-0"><CardContent className="space-y-4 p-5">
           <div className="flex items-start gap-4">
             <div className="w-16 shrink-0 text-center"><div className="text-4xl font-semibold tabular-nums text-primary md:text-5xl">{brief.idea_score ?? '—'}</div><div className="mt-1 text-xs text-muted-foreground">Idea score</div></div>
-            <div className="min-w-0 space-y-2"><h4 className="break-words text-xl font-semibold">{brief.title}</h4><Badge variant="secondary">{brief.stage || '—'}</Badge></div>
+            <div className="min-w-0 space-y-2"><h4 className="break-words text-xl font-semibold">{brief.title}</h4><div className="flex flex-wrap gap-2"><Badge variant="secondary">{brief.stage || '—'}</Badge>{(brief as any).recipe_version && <Badge variant="outline">Pipeline</Badge>}</div>{!(brief as any).recipe_version && brief.project_id && <Button size="sm" onClick={() => setPipeReq({ projectId: brief.project_id, kind: 'content', title: brief.title, targetType: 'content_items', targetId: brief.id, productType: productTypeForFormat((brief as any).format) })}>Make this</Button>}</div>
           </div>
           <dl className="space-y-3 text-sm"><div><dt className="font-medium">Hook</dt><dd className="mt-1 whitespace-pre-wrap break-words text-muted-foreground">{brief.hook || '—'}</dd></div><div><dt className="font-medium">Primary keyword</dt><dd className="mt-1 break-words text-muted-foreground">{brief.primary_keyword || '—'}</dd></div></dl>
           <div className="border-t border-border pt-3"><p className="mb-2 text-sm font-medium">Evidence</p><ul className="space-y-2 text-sm leading-5 text-muted-foreground">{radarEvidence(brief.idea_evidence).map((entry, i) => <li key={i} className="break-words">{entry.url ? <a href={entry.url} target="_blank" rel="noopener noreferrer" className="underline decoration-border underline-offset-4 hover:text-primary">{entry.note}</a> : entry.note}</li>)}</ul>{!radarEvidence(brief.idea_evidence).length && <p className="text-sm text-muted-foreground">—</p>}</div>
         </CardContent></Card>)}</div>
       </div>)}
+      <CreatePipelineDialog request={pipeReq} onClose={() => setPipeReq(null)} />
     </section>
 
     <section aria-labelledby="radar-runs" className="space-y-5 border-t border-border pt-8">

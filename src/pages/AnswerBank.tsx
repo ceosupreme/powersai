@@ -18,6 +18,7 @@ import {
 import { ChevronDown, ChevronRight, HelpCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useBrandProjects } from "@/hooks/useContentProduction";
+import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from "@/components/pipeline/CreatePipelineDialog";
 
 const T = (n: string) => supabase.from(n as any) as any;
 const STATUSES = ["unanswered", "answered", "refresh_due"] as const;
@@ -53,6 +54,7 @@ export default function AnswerBank() {
   const [editing, setEditing] = useState<Pain | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(empty);
+  const [pipeReq, setPipeReq] = useState<PipelineRequest | null>(null);
 
   useEffect(() => { if (!brand && projects.length) setBrand(projects[0].id); }, [projects, brand]);
 
@@ -214,6 +216,10 @@ export default function AnswerBank() {
                     <span className="text-xs text-muted-foreground self-center">
                       {p.source_count} sources
                     </span>
+                    <Button size="sm" variant="outline" className="ml-auto h-8" onClick={async () => {
+                      try { setPipeReq(await contentItemFromPain(p.project_id, p.pain_text)); }
+                      catch (e: any) { toast.error(e?.message ?? "Could not create the item"); }
+                    }}>Make this</Button>
                   </div>
                   {isOpen && (
                     <div className="pl-6 space-y-3 text-sm">
@@ -314,6 +320,7 @@ export default function AnswerBank() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    <CreatePipelineDialog request={pipeReq} onClose={() => setPipeReq(null)} />
     </div>
   );
 }
