@@ -4,6 +4,7 @@ import { fetchEffectiveFoundationItems, laneScore } from '@/lib/effectiveFoundat
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
 import { foundationStatusKey } from '@/components/foundation-audit/useFoundationScores';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
+import { isOwnerVisible, missingDependencyIds } from '@/lib/ownerWork';
 
 export type NextTenSource = 'Action' | 'Lane' | 'Product' | 'KPI';
 
@@ -15,6 +16,8 @@ export interface NextTenRow {
   projectName: string;
   /** Underlying record id (action item, product) or item/kpi key. */
   refId: string;
+  /** Action rows that belong to a production job link to its pipeline page. */
+  jobId?: string | null;
   /** Extra context needed to apply the check. */
   pillarKey?: string;
   kpiKey?: string;
@@ -201,6 +204,23 @@ const withRank = (row: Omit<NextTenRow, 'rank'>, now: number): NextTenRow => ({
   rank: rankScore(row, now),
 });
 
+/**
+ * Status of every loaded action item plus any depends_on target outside the
+ * loaded set, so "waits on a step that is not Done" can be checked.
+ */
+export async function fetchActionStatusMap(
+  rows: { id: string; status?: string | null; depends_on?: string | null }[],
+): Promise<Map<string, string | null>> {
+  const map = new Map<string, string | null>(rows.map((r) => [r.id, r.status ?? null]));
+  const missing = missingDependencyIds(rows);
+  if (missing.length) {
+    const { data, error } = await supabase.from('action_items').select('id,status').in('id', missing);
+    if (error) throw error;
+    for (const r of (data ?? []) as any[]) map.set(r.id, r.status ?? null);
+  }
+  return map;
+}
+
 export async function fetchNextTenForProject(
   projectId: string,
   projectName: string,
@@ -216,15 +236,18 @@ export async function fetchNextTenForProject(
   try {
     const actionsRes = await supabase
       .from('action_items')
-      .select('id,title,due_date,approval_status,status,created_at,priority,snoozed_until')
+      .select('id,title,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
+    const actionRows = (actionsRes.data ?? []) as any[];
+    const statusById = await fetchActionStatusMap(actionRows);
     const seen = new Set<string>();
-    for (const a of (actionsRes.data ?? []) as any[]) {
+    for (const a of actionRows) {
       if (a.status === 'Done' || a.approval_status === 'Rejected') continue;
       if (seen.has(a.id)) continue;
       seen.add(a.id);
       if (isSnoozed(a.snoozed_until, now)) continue;
+      if (!isOwnerVisible(a, statusById)) continue;
       const approvalRank = a.approval_status === 'Approved' ? 0 : 1;
       const pr = priorityRank(a.priority);
       const bits = [priorityLabel(pr) !== '—' ? priorityLabel(pr) : null, fmtDue(a.due_date, now)].filter(Boolean);
@@ -237,6 +260,7 @@ export async function fetchNextTenForProject(
             projectId,
             projectName,
             refId: a.id,
+            jobId: a.job_id ?? null,
             approvalRank,
             priorityRank: pr,
             dueDate: a.due_date ?? null,
