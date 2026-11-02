@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { RotateCcw, HelpCircle, Rocket, Sparkles } from "lucide-react";
+import { RotateCcw, HelpCircle, Rocket, Sparkles, BookOpen } from "lucide-react";
 import { useHelpState } from "@/hooks/useHelpState";
 
 export function SettingsHelpTab() {
@@ -82,6 +82,12 @@ export function SettingsHelpTab() {
           <CardTitle className="text-base">Go to</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/guide">
+              <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+              Guide
+            </Link>
+          </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/help">
               <HelpCircle className="h-3.5 w-3.5 mr-1.5" />

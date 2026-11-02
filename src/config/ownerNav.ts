@@ -109,7 +109,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
   {
     label: 'System',
     items: [
-      { path: '/help', label: 'Help', icon: HelpCircle, pageKey: 'dashboard' },
+      { path: '/guide', label: 'Guide', icon: HelpCircle, pageKey: 'dashboard' },
       { path: '/launch', label: 'Launch Checklist', icon: Rocket, pageKey: 'dashboard' },
       { path: '/admin', label: 'Admin Panel', icon: Settings, pageKey: 'dashboard', adminOnly: true },
     ],

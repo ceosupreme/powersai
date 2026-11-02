@@ -113,6 +113,7 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/workspace': 'dashboard',
   '/portfolio': 'dashboard',
   '/help': 'dashboard',
+  '/guide': 'dashboard',
   '/launch': 'project_home',
   '/weekly-review': 'weekly_review',
   '/insights': 'insights',

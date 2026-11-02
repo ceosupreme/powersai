@@ -67,7 +67,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:review-automation-inbox",
     title: "Review the Automation Inbox (the approval gate)",
     description: "Every AI-drafted customer message waits in the Automation Inbox until you approve, edit, or reject it. Nothing sends until you say so.",
-    link: { to: "/automation-inbox", label: "Open Automation Inbox" },
+    link: { to: "/automations/inbox", label: "Open Automation Inbox" },
   },
   {
     key: "setup:brand-vault",
@@ -85,7 +85,7 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:channel-revenue",
     title: "Log one Channel Revenue entry",
     description: "Channel Revenue tracks income by source/month and feeds the Monetization pillar. Add one row so the data starts populating.",
-    link: { to: "/channel-revenue", label: "Open Channel Revenue" },
+    link: { to: "/revenue", label: "Open Channel Revenue" },
   },
   {
     key: "setup:content-pipeline",
@@ -97,13 +97,13 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
     key: "setup:reactivation",
     title: "Try a Reactivation campaign (optional)",
     description: "Upload an old customer list, pick an offer, and let AI draft a win-back. Drafts land in the Automation Inbox for your approval.",
-    link: { to: "/reactivation", label: "Open Reactivation" },
+    link: { to: "/automations/reactivation", label: "Open Reactivation" },
   },
   {
     key: "setup:recovery-reports",
     title: "Review your first Recovery Report",
     description: "The weekly Recovery Report shows what your automations recovered (leads captured, follow-ups re-engaged, reviews landed). Internal-first — you review and choose when to share with the client.",
-    link: { to: "/recovery-reports", label: "Open Recovery Reports" },
+    link: { to: "/automations/recovery-reports", label: "Open Recovery Reports" },
   },
   {
     key: "launch:domain-dns",
@@ -148,8 +148,8 @@ export const LAUNCH_CHECKLIST: LaunchChecklistItem[] = [
   },
   {
     key: "launch:help-content-recheck",
-    title: "Spot-check Help Center articles after any new build",
-    description: "Open /help and skim each article. If you added or removed a feature, update src/config/helpArticles.ts so the content still matches reality.",
-    link: { to: "/help", label: "Open Help Center" },
+    title: "Spot-check the Guide after any new build",
+    description: "Open the Guide and skim the articles for any screen that changed. If you added or removed a feature, update the matching file in src/content/guide so the Guide and its PDF still match reality.",
+    link: { to: "/guide", label: "Open the Guide" },
   },
 ];

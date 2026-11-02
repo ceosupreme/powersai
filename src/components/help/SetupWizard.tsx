@@ -146,13 +146,13 @@ const STEPS: Step[] = [
     title: "When you're stuck",
     body: (
       <>
-        The <strong>Help Center</strong> has a short article per feature, and the{" "}
+        The <strong>Guide</strong> explains every screen step by step, and the{" "}
         <strong>Launch Checklist</strong> tracks setup tasks. Both live in the sidebar; re-launch this
         wizard any time from Settings → Help.
       </>
     ),
-    actionHref: "/help",
-    actionLabel: "Open Help Center",
+    actionHref: "/guide",
+    actionLabel: "Open the Guide",
   },
 ];
 

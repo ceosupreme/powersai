@@ -5,7 +5,8 @@ import { MEDIA_KIT_STEPS, type AssetMapRow, type TrafficAsset } from '@/lib/bran
 
 const T = (t: string) => (supabase as any).from(t);
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-const CLOSED_JOB = ['done', 'complete', 'completed', 'cancelled', 'canceled', 'archived'];
+// The database marks a completed job 'finished' (advance_production_job); the rest are older spellings.
+const CLOSED_JOB = ['finished', 'done', 'complete', 'completed', 'cancelled', 'canceled', 'archived'];
 
 export interface SetupSummary { needed_count: number; in_place: number; gaps: number; missing: number; planned: number; needs_access: number; later: number; skipped: number; extra_on_file: number; setup_score: number | null; setup_gate: string | null }
 export interface ChannelStatRow { id: string; channel_id: string; captured_on: string; followers: number | null; following: number | null; posts: number | null; videos: number | null; views: number | null; likes: number | null; source: string; source_ref: string | null }

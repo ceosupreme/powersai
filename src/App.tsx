@@ -72,6 +72,7 @@ import BrandServices from "./pages/BrandServices";
 import MarketingServices from "./pages/MarketingServices";
 import SystemsServices from "./pages/SystemsServices";
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const HqGuide = lazy(() => import("./pages/HqGuide"));
 const LaunchChecklist = lazy(() => import("./pages/LaunchChecklist"));
 const QualifyLanding = lazy(() => import("./pages/QualifyLanding"));
 const QualifyForVenue = lazy(() => import("./pages/QualifyForVenue"));
@@ -372,6 +373,11 @@ const App = () => {
                 <Route path="/automations/recovery-reports" element={
                   <ProtectedRoute>
                     <AppLayout><RecoveryReports /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/guide" element={
+                  <ProtectedRoute>
+                    <AppLayout><HqGuide /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/help" element={
