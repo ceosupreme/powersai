@@ -1862,6 +1862,8 @@ export type Database = {
           raw_text: string
           routed_at: string | null
           routed_project_id: string | null
+          routed_record_id: string | null
+          routed_table: string | null
           routed_type: Database["public"]["Enums"]["capture_routed_type"] | null
           status: Database["public"]["Enums"]["capture_item_status"]
           suggested_project_id: string | null
@@ -1879,6 +1881,8 @@ export type Database = {
           raw_text: string
           routed_at?: string | null
           routed_project_id?: string | null
+          routed_record_id?: string | null
+          routed_table?: string | null
           routed_type?:
             | Database["public"]["Enums"]["capture_routed_type"]
             | null
@@ -1898,6 +1902,8 @@ export type Database = {
           raw_text?: string
           routed_at?: string | null
           routed_project_id?: string | null
+          routed_record_id?: string | null
+          routed_table?: string | null
           routed_type?:
             | Database["public"]["Enums"]["capture_routed_type"]
             | null
@@ -3210,6 +3216,7 @@ export type Database = {
           created_at: string
           created_by: string
           deal_id: string | null
+          follow_up_completed_at: string | null
           follow_up_date: string | null
           id: string
           occurred_at: string
@@ -3223,6 +3230,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           deal_id?: string | null
+          follow_up_completed_at?: string | null
           follow_up_date?: string | null
           id?: string
           occurred_at?: string
@@ -3236,6 +3244,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           deal_id?: string | null
+          follow_up_completed_at?: string | null
           follow_up_date?: string | null
           id?: string
           occurred_at?: string
@@ -7678,6 +7687,7 @@ export type Database = {
           created_at: string
           created_by: string
           id: string
+          intent: string | null
           log_type: Database["public"]["Enums"]["log_type"]
           status: Database["public"]["Enums"]["log_status"]
           submitted_at: string | null
@@ -7689,6 +7699,7 @@ export type Database = {
           created_at?: string
           created_by: string
           id?: string
+          intent?: string | null
           log_type: Database["public"]["Enums"]["log_type"]
           status?: Database["public"]["Enums"]["log_status"]
           submitted_at?: string | null
@@ -7700,6 +7711,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           id?: string
+          intent?: string | null
           log_type?: Database["public"]["Enums"]["log_type"]
           status?: Database["public"]["Enums"]["log_status"]
           submitted_at?: string | null
@@ -10881,6 +10893,7 @@ export type Database = {
           name: string
           premium_price: number | null
           problem_solved: string | null
+          project_id: string | null
           starter_price: number | null
           status: string
           timeline: string | null
@@ -10897,6 +10910,7 @@ export type Database = {
           name: string
           premium_price?: number | null
           problem_solved?: string | null
+          project_id?: string | null
           starter_price?: number | null
           status?: string
           timeline?: string | null
@@ -10913,13 +10927,36 @@ export type Database = {
           name?: string
           premium_price?: number | null
           problem_solved?: string | null
+          project_id?: string | null
           starter_price?: number | null
           status?: string
           timeline?: string | null
           updated_at?: string
           who_its_for?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "service_offers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "service_offers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "service_offers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_package_items: {
         Row: {
@@ -13574,8 +13611,10 @@ export type Database = {
           asana_score_section_gid: string | null
           asana_write_project_gid: string | null
           asana_write_section_gid: string | null
+          avg_ticket: number | null
           bar_code: string | null
           city: string | null
+          close_rate: number | null
           content_status: string | null
           created_at: string
           current_secret_shop_cleanliness_pct: number | null
@@ -13625,8 +13664,10 @@ export type Database = {
           asana_score_section_gid?: string | null
           asana_write_project_gid?: string | null
           asana_write_section_gid?: string | null
+          avg_ticket?: number | null
           bar_code?: string | null
           city?: string | null
+          close_rate?: number | null
           content_status?: string | null
           created_at?: string
           current_secret_shop_cleanliness_pct?: number | null
@@ -13676,8 +13717,10 @@ export type Database = {
           asana_score_section_gid?: string | null
           asana_write_project_gid?: string | null
           asana_write_section_gid?: string | null
+          avg_ticket?: number | null
           bar_code?: string | null
           city?: string | null
+          close_rate?: number | null
           content_status?: string | null
           created_at?: string
           current_secret_shop_cleanliness_pct?: number | null
@@ -15486,6 +15529,10 @@ export type Database = {
         Args: { p_key: string; p_lease_seconds?: number }
         Returns: Json
       }
+      hq_create_pipeline: {
+        Args: { p_job: Json; p_new_content?: Json; p_steps: Json }
+        Returns: string
+      }
       hq_finish_automation_send: {
         Args: {
           p_attempted_at: string
@@ -15513,6 +15560,11 @@ export type Database = {
           window_start: string
         }[]
       }
+      hq_pause_pipeline: {
+        Args: { p_job_id: string; p_paused: boolean }
+        Returns: undefined
+      }
+      hq_promote_inbound_lead: { Args: { p_lead_id: string }; Returns: string }
       hq_record_delivery_event: {
         Args: {
           p_event_id: string
@@ -15522,6 +15574,10 @@ export type Database = {
           p_type: string
         }
         Returns: undefined
+      }
+      hq_route_capture: {
+        Args: { p_capture_id: string; p_project_id: string; p_type: string }
+        Returns: Json
       }
       hq_save_recovery_draft: {
         Args: {
