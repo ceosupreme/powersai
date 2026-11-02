@@ -15,7 +15,7 @@ HQ keeps its records in the app, its files in Google Drive, and its reports in y
 - Money: "Channel Revenue", "Products", "Offers" and "Affiliate Programs".
 - Colors, fonts, logos and voice: "Brand Kit".
 - Clients and leads: "CRM", "Capture Inbox" and "Automation Inbox".
-- Your to-do list across everything: "Today".
+- Your to-do list across everything: "Dashboard".
 
 ## In Google Drive
 

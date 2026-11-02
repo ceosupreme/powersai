@@ -1,3 +1,9 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { WebsiteMappingPanel } from '@/components/admin/WebsiteMappingPanel';
+import { MapPackKeywordsPanel } from '@/components/admin/MapPackKeywordsPanel';
+import { AISearchQueriesPanel } from '@/components/admin/AISearchQueriesPanel';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -61,6 +67,11 @@ const manualVerdict = (r: ConnectorRecency, emptyNote: string): Verdict => {
 
 export const DataSourcesView = () => {
   const { selectedBar } = useApp();
+  const { isAdmin } = useAuth();
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [hash, isAdmin, selectedBar?.id]);
   const venueId = selectedBar?.id ?? null;
   const venueName = selectedBar?.bar_name ?? '';
   const { data: gbp } = useGbpStatus(venueId);
@@ -150,6 +161,12 @@ export const DataSourcesView = () => {
             </Tooltip>
           </div>
         </Card>
+
+        {venueId && isAdmin && <section className="space-y-4" aria-label="Project data setup">
+          <div id="setup-website"><WebsiteMappingPanel venueId={venueId} /></div>
+          <div id="setup-map-pack"><MapPackKeywordsPanel venueId={venueId} /></div>
+          <div id="setup-ai-search"><AISearchQueriesPanel venueId={venueId} /></div>
+        </section>}
 
         {/* GBP live panel — only when a venue is selected */}
         {venueId && (

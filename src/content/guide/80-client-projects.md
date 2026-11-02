@@ -7,7 +7,7 @@ Every client you sign becomes a project in HQ. The project page is that client's
 
 - Open "Portfolio" (in the phone's bottom bar, or under "Workspace" in the side menu), switch the toggle to "Clients", and tap the client's card. The page lives at /project/ followed by a long internal reference for that client.
 - A promoted lead in the CRM that became a project opens this page when tapped. A CRM company's "View Project" button opens the Dashboard instead.
-- The Dashboard opens from search (the magnifier icon, then "Dashboard") or from "Operational scorecard" on the "Today" screen. "Weekly Review" is in the "Workspace" menu group.
+- The Dashboard opens from search (the magnifier icon, then "Dashboard") or from "Operational scorecard" on the "Dashboard" screen. "Weekly Review" is in the "Workspace" menu group.
 - Opening a project page also makes that client the selected project in the header everywhere else.
 
 ## What you see
@@ -15,7 +15,7 @@ Every client you sign becomes a project in HQ. The project page is that client's
 - The header: the client's name, a project type badge, the live badge ("LIVE — capturing leads", or "Go-live" with the number of required steps done) with a "% fully configured" bar, and a "Setup wizard" button.
 - A "Continue setup" card with "Resume setup" until the client is live.
 - A "Capture link" card with the "Project capture link" (marked "Primary", with "Copy" and "Open") and a "Vertical / cold link".
-- An "Email delivery" card ("Log only (safe mode)" or "Live via Resend") once the client has automations.
+- An "Email delivery" card once the client has automations. Log-only mode is prominently marked OFF: no customer email is sent. Live mode requires a configured provider.
 - A "Proposals" card, then shortcut cards: "Weekly Review", "Growth Audit", "Automation Inbox", "Recovery Reports" and "Brand Vault".
 - The setup wizard, "Set up" plus the client's name, has three tabs: "Identity & type" (required), "Go-live essentials" (capture leads) and "Full configuration" (tracked, not required). Each step opens to show "Mark complete", "Skip for now" (optional steps), "Reset" and sometimes "Open settings", which opens a new tab. Some steps tick themselves when HQ detects the setting.
 - The Dashboard: "Overall Score" with a letter grade, "4-Week Trend", "Confidence" and the week; "This Week's Briefing" with "Wins"; four pillar cards ("Revenue", "Labor", "Operations", "Guest Experience"); alerts; a Toast sales panel; competitors; and charts. Tapping a pillar card opens its page, titled "Revenue", "Labor", "Delivery" or "Client Experience", with "Key Metrics" and suggested actions to approve.
@@ -58,5 +58,5 @@ Every client you sign becomes a project in HQ. The project page is that client's
 - The four-pillar scorecard was built for bars and restaurants that use Toast and 7shifts. For other businesses most metrics stay empty, and the Weekly Review shows "Limited Data".
 - If you change a client's pillars in the setup wizard, the Dashboard switches to simple tiles, one per pillar, scored from that pillar's measures where they exist or typed in by hand each week.
 - A project made with "Create Project from this Company" has no capture link until its settings are saved once ("Admin Panel", "Settings", "Projects").
-- Leads from a client's capture link do not email you. Check the CRM, or rely on the client's follow-up drafts in the Automation Inbox.
+- Client capture leads trigger an owner notification, using the project’s primary leadership contact when available and the operator fallback otherwise. Confirm successful delivery in the notification records.
 - A new project may not appear in the header picker until you reload the page.

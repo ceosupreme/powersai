@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Upload, Download, Trash2, FileIcon, ImageIcon } from 'lucide-react';
@@ -15,18 +18,18 @@ function AssetThumb({ asset }: { asset: BrandAsset }) {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let mounted = true;
-    if (asset.asset_type === 'image') {
+    if (asset.mime_type?.startsWith('image/')) {
       getSignedUrl(asset.storage_path).then((u) => mounted && setUrl(u));
     }
     return () => { mounted = false; };
   }, [asset.id, asset.storage_path, asset.asset_type]);
 
-  if (asset.asset_type === 'image' && url) {
+  if (asset.mime_type?.startsWith('image/') && url) {
     return <img src={url} alt={asset.file_name} className="w-full h-32 object-cover rounded-md bg-muted" />;
   }
   return (
     <div className="w-full h-32 rounded-md bg-muted flex items-center justify-center">
-      {asset.asset_type === 'image' ? <ImageIcon className="h-8 w-8 text-muted-foreground" /> : <FileIcon className="h-8 w-8 text-muted-foreground" />}
+      {asset.mime_type?.startsWith('image/') ? <ImageIcon className="h-8 w-8 text-muted-foreground" /> : <FileIcon className="h-8 w-8 text-muted-foreground" />}
     </div>
   );
 }
@@ -36,10 +39,12 @@ export function AssetUploader({
 }: { projectId: string; kitId: string; assets: BrandAsset[] }) {
   const upload = useUploadAsset(projectId, kitId);
   const del = useDeleteAsset(kitId);
+  const qc = useQueryClient();
+  const [assetType, setAssetType] = useState('image');
 
   const onPick = (files: FileList | null) => {
     if (!files) return;
-    Array.from(files).forEach((f) => upload.mutate(f));
+    Array.from(files).forEach((f) => upload.mutate({ file: f, assetType: assetType === "logo" ? "logo" : f.type.startsWith("image/") ? "image" : "file" }));
   };
 
   const handleDownload = async (asset: BrandAsset) => {
@@ -52,6 +57,9 @@ export function AssetUploader({
 
   return (
     <div className="space-y-4">
+      <label className="block text-sm">Asset purpose
+        <select className="ml-2 rounded border bg-background p-2" value={assetType} onChange={(e) => setAssetType(e.target.value)}><option value="image">Photo or file</option><option value="logo">Brand logo</option></select>
+      </label>
       <label className="block">
         <input
           type="file"
@@ -77,6 +85,12 @@ export function AssetUploader({
                 <span className="uppercase">{a.mime_type?.split('/')[1] ?? a.asset_type}</span>
                 <span>{fmtBytes(a.file_size)}</span>
               </div>
+              <Button variant="ghost" size="sm" disabled={a.asset_type === 'logo'} onClick={async () => {
+                const { error } = await supabase.from('brand_kit_assets').update({ asset_type: 'logo' }).eq('id', a.id);
+                if (error) return toast.error(error.message);
+                await qc.invalidateQueries({ queryKey: ['brand-assets', kitId] });
+                toast.success('Marked as logo. Refresh the foundation audit to update its check.');
+              }}>{a.asset_type === 'logo' ? 'Brand logo' : 'Use as logo'}</Button>
               <div className="flex gap-1">
                 <Button variant="outline" size="sm" className="flex-1 h-7" onClick={() => handleDownload(a)}>
                   <Download className="h-3 w-3" />

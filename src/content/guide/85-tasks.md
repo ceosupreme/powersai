@@ -1,7 +1,7 @@
 # Tasks
 <!-- part: Tools and system | order: 85 | slug: tasks | route: /tasks | tags: tasks, to-do, todo, in progress, done, priority, assignee, due date, overdue, badge, batch, comments, next 10, action items, snooze, from insight -->
 
-The Tasks screen is a shared to-do list for every project you can see. Use it to create tasks, assign them, set priorities and due dates, and tick them off. It is a separate list from the action items that feed "Next 10" and "Waiting on me" on Today, and this article explains how the two fit together.
+The Tasks screen is a shared to-do list for every project you can see. Use it to create tasks, assign them, set priorities and due dates, and tick them off. It is a separate list from the action items that feed "Next 10" and "Waiting on me" on Dashboard, and this article explains how the two fit together.
 
 ## Where to find it
 
@@ -54,8 +54,8 @@ The Tasks screen is a shared to-do list for every project you can see. Use it to
 2. Tap "Delete" to confirm. There is no undo and no archive for tasks.
 
 ### Snooze something for later
-Tasks cannot be snoozed. Snoozing belongs to action items on Today.
-1. Open "Today" and find the item under "Waiting on me".
+Tasks cannot be snoozed. Snoozing belongs to action items on Dashboard.
+1. Open "Dashboard" and find the item under "Waiting on me".
 2. Tap "Snooze". It leaves "Waiting on me" and "Next 10" for seven days, and you see "Snoozed for a week".
 3. To bring it back early, tap "Snoozed" at the bottom of "Waiting on me", then "Un-snooze".
 
@@ -63,7 +63,7 @@ Tasks cannot be snoozed. Snoozing belongs to action items on Today.
 
 - Task: an item on this list. It belongs to one project and has a status and a priority.
 - Action item: a separate kind of to-do that feeds "Next 10" and "Waiting on me". HQ's crews, insights and the "New Task" button in the header create them.
-- Next 10: the ranked list of next steps on Today and on each project's home page. It is built from action items, money lanes, products and weekly numbers, never from this list.
+- Next 10: the ranked list of next steps on Dashboard and on each project's home page. It is built from action items, money lanes, products and weekly numbers, never from this list.
 - From Insight: a task made when you approved an insight's suggested action.
 - Priority: "Critical", "High", "Medium" or "Low". Action items use P1 to P4 instead.
 - Status: "Todo", "In Progress" or "Done".
@@ -82,3 +82,5 @@ Tasks cannot be snoozed. Snoozing belongs to action items on Today.
 - Batch "Delete" removes tasks at once, with no confirmation.
 - Filters reset when you leave the screen.
 - The owner's phone menu shows no Tasks badge. Managers and staff see it on their bottom bar.
+
+The header task dialog labels its destination "Project". Its Asana assignee choices come from HQ profiles with a linked Asana identity, rather than a fixed list of names. Manage those links in Admin Panel’s user editor.

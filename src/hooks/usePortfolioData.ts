@@ -387,21 +387,21 @@ function monthStartISO(d = new Date()) {
  * project_pillar_scores over the project's effective pillars, week-over-week
  * change, this month's channel_revenue, and the Money Lanes Potential percent.
  */
-export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
-  const currentWeek = currentWeekRange().week_start;
+export function useNonClientPortfolio(projects: ProjectDirectoryRow[], requestedWeek?: string) {
+  const currentWeek = requestedWeek ?? currentWeekRange().week_start;
   const qc = useQueryClient();
-  const monthStart = monthStartISO();
+  const monthStart = requestedWeek ? `${requestedWeek.slice(0, 7)}-01` : monthStartISO();
   const ids = projects.map((p) => p.id).join(',');
 
   return useQuery({
-    queryKey: ['non-client-portfolio', ids, currentWeek, monthStart],
+    queryKey: ['non-client-portfolio', ids, currentWeek, monthStart, requestedWeek ? 'exact' : 'latest'],
     enabled: projects.length > 0,
     staleTime: 60_000,
     queryFn: async (): Promise<NonClientCardData[]> =>
       Promise.all(
         projects.map(async (p) => {
           const type = p.project_type ?? 'client';
-          const weekStart = await qc.fetchQuery({
+          const weekStart = requestedWeek ?? await qc.fetchQuery({
             queryKey: scoreReportingWeekKey(p.id, currentWeek),
             queryFn: () => fetchScoreReportingWeek(p.id, currentWeek),
             staleTime: 60_000,
@@ -438,6 +438,7 @@ export function useNonClientPortfolio(projects: ProjectDirectoryRow[]) {
                 .eq('week_start', weekStart),
             ]);
 
+          for (const result of [revenueRes, statusesRes]) if (result.error) throw result.error;
           const rows = (scoresRes.data ?? []) as any[];
           const scoreFor = (pillarKey: string, ws: string) => {
             const row = rows.find((r) => r.pillar_key === pillarKey && r.week_start === ws);

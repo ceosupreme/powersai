@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 export interface ServiceOffer {
   id: string;
   name: string;
+  project_id: string | null;
   description: string | null;
   who_its_for: string | null;
   problem_solved: string | null;
@@ -21,14 +22,14 @@ export interface ServiceOffer {
 
 const KEY = ["service-offers"];
 
-export function useServiceOffers() {
+export function useServiceOffers(projectId?: string | null) {
   return useQuery({
-    queryKey: KEY,
+    queryKey: [...KEY, projectId ?? "all"],
     queryFn: async (): Promise<ServiceOffer[]> => {
-      const { data, error } = await supabase
-        .from("service_offers" as any)
-        .select("*")
-        .order("created_at", { ascending: true });
+      let query = supabase.from("service_offers" as any).select("*").order("created_at", { ascending: true });
+      if (projectId === "shared") query = query.is("project_id", null);
+      else if (projectId) query = query.eq("project_id", projectId);
+      const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as unknown as ServiceOffer[];
     },

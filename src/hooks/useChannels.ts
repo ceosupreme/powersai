@@ -10,7 +10,7 @@ export const useChannels = () => {
   const queryClient = useQueryClient();
 
   const channelsQuery = useQuery({
-    queryKey: ['chat-channels', selectedBar?.id],
+    queryKey: ['chat-channels', user?.id, selectedBar?.id],
     queryFn: async (): Promise<ChatChannelWithMembers[]> => {
       if (!user) return [];
 

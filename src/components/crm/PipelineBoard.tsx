@@ -12,6 +12,8 @@ import {
   STAGES, useDeals, useCompanies, useCrmMutations, type CrmDeal, type CrmDealStage,
 } from "@/hooks/useCrm";
 import { ArchiveOrDeleteDialog } from "@/components/shared/ArchiveOrDeleteDialog";
+import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
+import { sortCollection } from "@/lib/collectionSort";
 
 const STAGE_LABEL: Record<CrmDealStage, string> = {
   lead: "Lead", pitch: "Pitch", proposal: "Proposal", won: "Won", lost: "Lost",
@@ -22,6 +24,8 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
   const companies = useCompanies();
   const { moveDealStage, archiveDeal, deleteDeal } = useCrmMutations();
   const [target, setTarget] = useState<CrmDeal | null>(null);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('newest');
 
   const companyById = useMemo(
     () => Object.fromEntries((companies.data ?? []).map((c) => [c.id, c])),
@@ -32,37 +36,42 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
     const map: Record<CrmDealStage, typeof deals.data> = {
       lead: [], pitch: [], proposal: [], won: [], lost: [],
     } as any;
-    (deals.data ?? []).forEach((d) => { (map[d.stage] ||= []).push(d); });
+    sortCollection((deals.data ?? []).filter(d => `${d.title} ${companyById[d.company_id]?.name ?? ''}`.toLowerCase().includes(query.trim().toLowerCase())), sort)
+      .forEach((d) => { (map[d.stage] ||= []).push(d); });
     return map;
-  }, [deals.data]);
+  }, [deals.data, companyById, query, sort]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+    <div className="space-y-4">
+      <CollectionToolbar query={query} onQuery={setQuery} placeholder="Find a deal or company…" sort={sort} onSort={setSort}
+        count={Object.values(grouped).reduce((n, rows) => n + (rows?.length ?? 0), 0)} total={deals.data?.length ?? 0}
+        options={[{value:'newest',label:'Newest first'},{value:'oldest',label:'Oldest first'},{value:'value',label:'Deal value · highest first'},{value:'name',label:'Title · A to Z'}]} />
+      {(deals.isLoading || companies.isLoading) && <p role="status">Loading pipeline…</p>}
+      {(deals.isError || companies.isError) && <p role="alert">The pipeline could not be fully loaded. <Button variant="link" onClick={() => { deals.refetch(); companies.refetch(); }}>Try again</Button></p>}
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(5,minmax(13rem,1fr))] gap-3 overflow-x-auto pb-3" aria-label="Deals by stage">
       {STAGES.map((stage) => (
-        <div key={stage} className="bg-muted/30 rounded-lg p-2 min-h-[300px]">
-          <div className="flex items-center justify-between px-1 pb-2">
-            <span className="text-sm font-semibold">{STAGE_LABEL[stage]}</span>
+        <section key={stage} data-stage={stage} className="hq-stage md:min-h-[280px]">
+          <div className="hq-stage-heading flex items-center justify-between gap-2">
+            <h2 className="text-base font-bold">{STAGE_LABEL[stage]}</h2>
             <Badge variant="outline">{grouped[stage]?.length ?? 0}</Badge>
           </div>
           <div className="space-y-2">
+            {!deals.isLoading && !deals.isError && (grouped[stage]?.length ?? 0) === 0 && <p className="py-4 text-sm text-muted-foreground">{query ? 'No matching deals.' : `No ${STAGE_LABEL[stage].toLowerCase()} deals yet.`}</p>}
             {(grouped[stage] ?? []).map((d) => {
               const c = companyById[d.company_id];
               const stageIdx = STAGES.indexOf(stage);
               const nextStage = STAGES[Math.min(stageIdx + 1, STAGES.length - 1)];
               return (
-                <Card key={d.id} className="cursor-pointer relative" onClick={() => c && onSelectCompany(c.id)}>
+                <Card key={d.id} className="relative">
                   <CardContent className="p-3 space-y-2">
-                    <div className="text-xs text-muted-foreground truncate">{c?.name ?? "—"}</div>
-                    <div className="text-sm font-medium truncate">{d.title}</div>
+                    <div className="text-xs text-muted-foreground pr-10 break-words">{c?.name ?? "—"}</div>
+                    <button type="button" className="text-left text-base font-semibold leading-snug hover:underline break-words" onClick={() => c && onSelectCompany(c.id)}>{d.title}</button>
                     {d.value != null && (
                       <div className="text-xs">${Number(d.value).toLocaleString()} {d.currency}</div>
                     )}
-                    {stage !== "lost" && nextStage !== stage && (
-                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs"
-                        onClick={(e) => { e.stopPropagation(); moveDealStage.mutate({ id: d.id, stage: nextStage }); }}>
-                        → {STAGE_LABEL[nextStage]} <ArrowRight className="ml-1 h-3 w-3" />
-                      </Button>
-                    )}
+                    <select aria-label={`Stage for ${d.title}`} className="w-full rounded border bg-background p-1 text-xs" value={stage} disabled={moveDealStage.isPending} onClick={e => e.stopPropagation()} onChange={e => {
+                      moveDealStage.mutate({id:d.id, stage:e.target.value as CrmDealStage}, {onError:error => toast.error(error.message)});
+                    }}>{STAGES.map(value => <option key={value} value={value}>{STAGE_LABEL[value]}</option>)}</select>
                     <div className="absolute top-1 right-1" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -80,8 +89,9 @@ export function PipelineBoard({ onSelectCompany }: { onSelectCompany: (id: strin
               );
             })}
           </div>
-        </div>
+        </section>
       ))}
+      </div>
 
       {target && (
         <ArchiveOrDeleteDialog

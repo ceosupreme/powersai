@@ -55,7 +55,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
   {
     label: 'Workspace',
     items: [
-      { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
+      { path: '/workspace', label: 'Dashboard', icon: Sunrise, pageKey: 'dashboard' },
       { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
       { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
       { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
@@ -80,12 +80,16 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
       { path: '/prospects', label: 'Prospect Dock', icon: Target, pageKey: 'prospect_dock' },
       { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
+    ],
+  },
+  {
+    label: 'Content & Production',
+    items: [
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/radar', label: 'Radar', icon: Radar, pageKey: 'content_pipeline' },
       { path: '/playbooks', label: 'Playbooks', icon: BookOpen, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/production-board', label: 'Production Board', icon: Film, pageKey: 'content_pipeline', adminOnly: true },
       { path: '/answer-bank', label: 'Answer Bank', icon: HelpCircle, pageKey: 'content_pipeline', adminOnly: true },
-      { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
     ],
   },
   {
@@ -95,6 +99,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
       { path: '/offers', label: 'Offers', icon: Tag, pageKey: 'offers' },
       { path: '/products', label: 'Products', icon: Package, pageKey: 'products' },
       { path: '/affiliate-programs', label: 'Affiliate Programs', icon: Link2, pageKey: 'affiliate_programs' },
+      { path: '/revenue', label: 'Channel Revenue', icon: DollarSign, pageKey: 'revenue' },
     ],
   },
   {
@@ -118,7 +123,12 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
 
 /** The three screens pinned to the phone bottom bar (the rest live in More). */
 export const PHONE_PRIMARY: OwnerNavItem[] = [
-  { path: '/workspace', label: 'Today', icon: Sunrise, pageKey: 'dashboard' },
+  { path: '/workspace', label: 'Dashboard', icon: Sunrise, pageKey: 'dashboard' },
   { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
   { path: '/inbox', label: 'Inbox', icon: InboxIcon, pageKey: 'capture_inbox' },
 ];
+
+export function hqSection(path: string) {
+  const group = OWNER_NAV_GROUPS.find(g => g.items.some(i => i.path.split('?')[0] === path));
+  return ({'Workspace':'workspace','Clients & Leads':'clients','Growth & Marketing':'growth','Content & Production':'content','Brand & Assets':'brand','Tools':'tools','System':'system'} as Record<string,string>)[group?.label ?? ''] ?? 'workspace';
+}

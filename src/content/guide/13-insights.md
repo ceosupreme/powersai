@@ -1,7 +1,14 @@
 # Insights
 <!-- part: Workspace | order: 13 | slug: insights | route: /insights | tags: insights, ai, observations, proposed, approve, reject, dismiss, assign, due date, batch, select all, filters, priority, pillar, search, restore, approved tasks, rejected tasks, audit log, insights audit, asana -->
 
-Insights is the review queue for AI-written observations about your projects. Each card says what happened and usually proposes an action; you approve it (which turns it into a task), reject it, or leave it for later. The "Audit log" page records who approved or rejected each one, when, and what happened to the resulting task.
+Insights has a brand view and a client view. Brand Insights turns existing saved measurements and work into next steps; client Insights keeps the queue of AI-written observations and proposed actions.
+
+## Brand insights
+Choose a brand in the main selector, or All brands & clients for the brand overview. Colored headers and initials identify each brand. Search by brand or sort by waiting work.
+
+Each card shows its latest recorded score with its measurement period, revenue recorded this month, data coverage, waiting work, and channels behind their publishing cadence. Missing measurements and revenue are clearly labeled. Next steps link directly to the brand workspace, channels, measurements, or revenue entry. These signals use saved records and do not require an AI generation run.
+
+Client-report buttons below the all-brand list switch the main selection to that client. The following instructions describe the client view.
 
 ## Where to find it
 
@@ -74,12 +81,10 @@ On the audit page ("Insights Audit"): the tabs "Approved", "Rejected" and "All",
 
 ## Good to know
 
-- Insights follows the project picked in the header. Choosing one project in the Insights filter also changes the header; choosing "All Projects" in the filter does not.
-- "Last 7 Days", the default, is a rolling seven days, even though its chip reads "Week of" a Monday. "Reset" sets the time filter to "All Time", not back to "Last 7 Days".
+- Insights follows the project picked in the header. Choosing one project in the Insights filter also changes the header; choosing All Projects clears the main selection as well.
+- All Time is the default, so older saved insights are visible. Severity groups start expanded. Reset restores All Time; choose Last 7 Days when you want only recent items.
 - The batch "Approve" only marks items approved: no assignee, no due date, no task and no Asana task are created.
 - The batch "Approve" and "Dismiss" only change insights that have an action attached. An insight shown without an action stays as it was, even though the message counts it.
 - The "Revoke" confirmation says the task "will be removed from Asana", but HQ only moves the item back to Proposed; any Asana task stays where it is.
 - The pillar filter and the "Pillar" sort know only the four client pillars, so insights about other pillars appear only under "Priority" or "Date".
-- The "Team" part of the "Assign to..." list includes a fixed set of names tagged "Asana", carried over from the earlier bar client.
 - "All Time" loads the newest 5,000 insights. The audit page loads the newest 500 of each kind, covers every project whatever the header shows, and its "Spawned from:" link opens Insights without jumping to that insight.
-- Not confirmed: whether your own brands produce insights automatically; most insight types come from the client data feeds.

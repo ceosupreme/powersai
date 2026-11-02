@@ -1,3 +1,4 @@
+import { useApp } from "@/context/AppContext";
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +22,9 @@ import {
 } from '@/hooks/usePlaybooks';
 import { PlaybookWordBadge } from '@/components/playbooks/PlaybookWordBadge';
 import { AddMaterialDialog, INBOX_URL } from '@/components/playbooks/AddMaterialDialog';
+import { CollectionToolbar } from '@/components/shared/CollectionToolbar';
+import { compareName, compareOptional, dateValue } from '@/lib/collectionSort';
+import { Label } from '@/components/ui/label';
 
 const STATUSES = ['draft', 'active', 'under_review', 'superseded', 'archived'];
 const STATUS_OPTION_WORD: Record<string, string> = { draft: 'Planned', active: 'Active', under_review: 'Under review', superseded: 'Superseded', archived: 'Archived' };
@@ -36,31 +40,34 @@ export default function Playbooks() {
   const [params, setParams] = useSearchParams();
   const [shelf, setShelf] = useState<string>(params.get('shelf') ?? 'formats');
   const [q, setQ] = useState('');
-  const [brand, setBrand] = useState('all');
+  const { selectedBar, accessibleBars, setSelectedBar, clearSelectedBar } = useApp();
+  const brand = selectedBar?.id ?? 'all';
+  const setBrand = (id: string) => { if(id === 'all') clearSelectedBar(); else { const b = accessibleBars.find(b=>b.id===id); if(b) setSelectedBar(b); } };
   const [group, setGroup] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
+  const [sort, setSort] = useState('name');
+  const [readiness, setReadiness] = useState('all');
   const today = todayPT();
   const openId = params.get('open');
 
   const visible = useMemo(() => (lib.data ?? []).filter((r) => !isHiddenPlaybook(r)), [lib.data]);
-  const brandIds = useMemo(() => [...new Set(visible.flatMap((r) => [...venueTags(r.tags), ...(r.venue_id ? [r.venue_id] : [])]))].sort(), [visible]);
-  const brands = useQuery({
-    queryKey: ['playbooks', 'brands', brandIds.join(',')],
-    enabled: brandIds.length > 0,
-    queryFn: async () => {
-      const { data, error } = await (supabase as any).from('venues').select('id,name').in('id', brandIds).order('name');
-      if (error) throw error;
-      return (data ?? []) as { id: string; name: string }[];
-    },
-  });
 
   const shelfDef = SHELVES.find((s) => s.key === shelf) ?? SHELVES[0];
   const inShelf = (r: PlaybookRow, s = shelfDef) => (s.subs as readonly string[]).includes(r.subcategory ?? '');
   const list = useMemo(() => visible.filter((r) => inShelf(r)
     && r.title.toLowerCase().includes(q.trim().toLowerCase())
     && (brand === 'all' || appliesToBrand(r, brand))
-    && (shelf !== 'niches' || group === 'all' || nicheGroupLabel(parseNiche(r.key_points).group) === group)), // eslint-disable-line react-hooks/exhaustive-deps
-  [visible, shelf, q, brand, group]);
+    && (readiness === 'all' || playbookStatus(r, today).toLowerCase() === readiness)
+    && (shelf !== 'niches' || group === 'all' || nicheGroupLabel(parseNiche(r.key_points).group) === group))
+    .sort((a, b) => {
+      if (sort === 'review') return compareOptional(dateValue(a.expiry_date), dateValue(b.expiry_date)) || compareName(a.title, b.title);
+      if (sort === 'readiness') {
+        const rank: Record<string, number> = { Written: 0, Thin: 1, Planned: 2 };
+        return (rank[playbookStatus(a, today)] ?? 3) - (rank[playbookStatus(b, today)] ?? 3) || compareName(a.title, b.title);
+      }
+      return compareName(a.title, b.title);
+    }), // eslint-disable-line react-hooks/exhaustive-deps
+  [visible, shelf, q, brand, group, readiness, sort, today]);
 
   const sections = useMemo(() => {
     if (shelf !== 'niches') return [{ title: null as string | null, rows: list }];
@@ -85,7 +92,7 @@ export default function Playbooks() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><BookOpen className="h-6 w-6" /></div>
-          <h1 className="text-3xl font-semibold md:text-4xl">Playbooks</h1>
+          <div><h1 className="text-3xl font-semibold">Playbooks</h1><p className="text-sm text-muted-foreground">All brands · find a method, check its readiness, and start with clear steps.</p></div>
         </div>
         <div className="flex flex-col items-start gap-1 sm:items-end">
           <Button onClick={() => setAddOpen(true)}><Plus className="mr-1 h-4 w-4" />Add your material</Button>
@@ -93,31 +100,40 @@ export default function Playbooks() {
         </div>
       </header>
 
-      <div role="tablist" aria-label="Shelves" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div role="group" aria-label="Playbook categories" className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2">
         {SHELVES.map((s) => {
           const c = countWords(visible.filter((r) => inShelf(r, s)), today);
           const active = s.key === shelf;
           return (
-            <button key={s.key} role="tab" aria-selected={active} type="button"
+            <button key={s.key} aria-pressed={active} type="button"
               onClick={() => { setShelf(s.key); setGroup('all'); }}
-              className={cn('shrink-0 rounded-lg border px-3 py-2 text-left min-h-11',
-                active ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-card text-muted-foreground hover:text-foreground')}>
+              className={cn('min-w-0 rounded-lg border px-3 py-3 text-left min-h-11',
+                active ? 'border-primary bg-primary text-primary-foreground ring-2 ring-primary/20' : 'border-border bg-card text-foreground hover:bg-accent')}>
               <span className="block text-sm font-semibold">{s.label}</span>
-              <span className="block text-[11px]">{countsLine(c)}</span>
+              <span className="block text-xs mt-1">{countsLine(c)}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Input placeholder="Search by title" value={q} onChange={(e) => setQ(e.target.value)} className="sm:max-w-xs" aria-label="Search playbooks" />
+      <CollectionToolbar query={q} onQuery={setQ} placeholder="Find a playbook…" sort={sort} onSort={setSort} count={list.length}
+        options={[{value:'name',label:'Title · A to Z'},{value:'readiness',label:'Written first'},{value:'review',label:'Review date · earliest first'}]} />
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <div className="space-y-1.5"><Label htmlFor="playbook-brand">Brand</Label>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="sm:w-56" aria-label="Filter by brand"><SelectValue /></SelectTrigger>
+          <SelectTrigger id="playbook-brand" className="sm:w-56"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All brands</SelectItem>
-            {(brands.data ?? []).map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+            {[...accessibleBars].sort((a,b)=>a.bar_name.localeCompare(b.bar_name)).map((b) => <SelectItem key={b.id} value={b.id}>{b.bar_name}</SelectItem>)}
           </SelectContent>
         </Select>
+        </div>
+        <div className="space-y-1.5"><Label htmlFor="playbook-readiness">Readiness</Label>
+          <Select value={readiness} onValueChange={setReadiness}>
+            <SelectTrigger id="playbook-readiness" className="sm:w-52"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="all">Any readiness</SelectItem><SelectItem value="written">Written</SelectItem><SelectItem value="thin">Thin</SelectItem><SelectItem value="planned">Planned</SelectItem></SelectContent>
+          </Select>
+        </div>
         {shelf === 'niches' && (
           <Select value={group} onValueChange={setGroup}>
             <SelectTrigger className="sm:w-56" aria-label="Filter by group"><SelectValue /></SelectTrigger>
@@ -127,6 +143,7 @@ export default function Playbooks() {
             </SelectContent>
           </Select>
         )}
+        {(q || brand !== 'all' || readiness !== 'all' || group !== 'all') && <Button variant="ghost" className="self-end" onClick={() => { setQ(''); setBrand('all'); setReadiness('all'); setGroup('all'); }}>Clear filters</Button>}
       </div>
 
       {lib.isLoading ? <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /> :

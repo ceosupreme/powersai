@@ -1,3 +1,5 @@
+import { useApp } from '@/context/AppContext';
+import { useEffect, useRef } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
@@ -17,15 +19,21 @@ const SUBVIEWS = [
 
 const MarketingHub = () => {
   const { isAdmin, isLoading } = useAuth();
+  const { selectedBar } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
-  const subTab = searchParams.get('subtab') || 'overview';
+  const subTab = ['overview','campaigns'].includes(searchParams.get('subtab') ?? '') ? searchParams.get('subtab')! : 'overview';
   const setSubTab = (v: string) => {
     const next = new URLSearchParams(searchParams);
     next.set('subtab', v);
     setSearchParams(next);
   };
 
-  const [openCampaignId, setOpenCampaignId] = useState<string | null>(null);
+  const [openCampaignId, setOpenCampaignId] = useState<string | null>(() => searchParams.get('open'));
+  const previousProject = useRef(selectedBar?.id);
+  useEffect(() => {
+    if (previousProject.current !== selectedBar?.id) setOpenCampaignId(null);
+    previousProject.current = selectedBar?.id;
+  }, [selectedBar?.id]);
   const openCampaign = (id: string) => setOpenCampaignId(id);
 
   if (isLoading) {
@@ -47,7 +55,7 @@ const MarketingHub = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">Marketing Hub</h1>
           <p className="text-muted-foreground text-sm">
-            Plan, schedule, and measure every campaign — no matter where it originated.
+            {selectedBar?.bar_name ?? 'All brands & client projects'} · plan, schedule, and measure campaigns.
           </p>
         </div>
       </div>
@@ -60,7 +68,7 @@ const MarketingHub = () => {
               className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
               <Icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{label}</span>
+              <span>{label}</span>
             </TabsTrigger>
           ))}
         </TabsList>

@@ -4,8 +4,8 @@
 The Content screen, headed "Content Pipeline", is the running list of content pieces for one project, from first idea to published. Use it to add pieces, move them through their stages, and attach the follow-up tasks that go with each one.
 
 ## Where to find it
-- On a computer, tap "Content" under "Growth & Marketing" in the left menu.
-- On a phone, tap "More" in the bottom bar, then "Content" under "Growth & Marketing".
+- On a computer, tap "Content" under "Content & Production" in the left menu.
+- On a phone, tap "More" in the bottom bar, then "Content" under "Content & Production".
 - On a brand's page, "View all" on the "Content pipeline" section opens this screen for that brand.
 - The screen shows the project chosen in the project picker at the top of the screen. With "All projects" chosen, it says "Select a channel to view its content pipeline."
 

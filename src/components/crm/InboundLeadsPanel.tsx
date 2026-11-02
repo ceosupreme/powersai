@@ -213,6 +213,21 @@ export function InboundLeadsPanel() {
                   <Badge variant="outline">{lead.status}</Badge>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{lead.message}</p>
+                <div className="flex flex-wrap gap-3 text-sm" onClick={(e) => e.stopPropagation()}>
+                  {lead.phone && <a className="text-primary underline" href={`tel:${lead.phone}`}>{lead.phone}</a>}
+                  {lead.email && <a className="text-primary underline" href={`mailto:${lead.email}`}>Email lead</a>}
+                  <span className="text-muted-foreground">{lead.conversation_channel || 'Form'} · {lead.source || 'Source not recorded'}</span>
+                </div>
+                {lead.not_ready_reason && <p className="text-sm">Not ready: {lead.not_ready_reason}</p>}
+                {lead.qualifier_data && Object.keys(lead.qualifier_data).length > 0 && <details onClick={(e) => e.stopPropagation()}>
+                  <summary className="cursor-pointer text-sm font-medium">Qualifier answers</summary>
+                  <dl className="mt-2 space-y-2 text-sm">{Object.entries(lead.qualifier_data).map(([key, value]) => <div key={key}><dt className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</dt><dd className="whitespace-pre-wrap break-words">{typeof value === 'string' ? value : JSON.stringify(value)}</dd></div>)}</dl>
+                </details>}
+                {Array.isArray(lead.transcript) && lead.transcript.length > 0 && <details onClick={(e) => e.stopPropagation()}>
+                  <summary className="cursor-pointer text-sm font-medium">Conversation transcript</summary>
+                  <div className="mt-2 space-y-2 text-sm">{lead.transcript.map((entry, index) => <p key={index} className="whitespace-pre-wrap"><strong>{entry.role || 'Speaker'}: </strong>{entry.content || entry.text || ''}</p>)}</div>
+                </details>}
+                {lead.owner_notify_error && <p role="status" className="text-sm text-destructive">Owner notification failed. Follow up from this record.</p>}
 
                 {canTriage && (
                   <div
@@ -267,10 +282,11 @@ export function InboundLeadsPanel() {
                         : <Building2 className="h-4 w-4 mr-1" />}
                       Create project from lead
                     </Button>
-                    {lead.status === "new" && <>
+                    <>
                     <Button
                       size="sm"
                       variant="outline"
+                      disabled={m.promote.isPending}
                       onClick={async () => {
                         try {
                           await m.promote.mutateAsync(lead);
@@ -288,7 +304,7 @@ export function InboundLeadsPanel() {
                     <Button size="sm" variant="ghost" onClick={() => m.archive.mutate(lead.id)}>
                       <Archive className="h-4 w-4 mr-1" /> Archive
                     </Button>
-                    </>}
+                    </>
                   </div>
                 )}
               </CardContent>

@@ -6,12 +6,12 @@ A short, steady routine keeps every brand moving while the crews do the heavy wo
 ## Every morning, about 15 minutes
 
 1. Read the email "Production run: what got made", if one came in. It lists what Claude finished overnight and which steps are now yours. No email means the crew had nothing to do.
-2. Open "Today" and choose "All projects" in the project picker at the top.
+2. Open "Dashboard" and choose "All projects" in the project picker at the top.
 3. Clear "Waiting on me" first. Tap "Approve", "Reject" or "Snooze" on each item. These are suggested steps waiting for your yes or no. Approved ones move into "Next 10"; until then they sit on hold.
 4. Work down "Next 10 across all projects". This is where your pipeline steps show up. Tick each step as you finish it. A row marked "KPI" asks for a number. A row that ends with "· Pipeline" opens the pipeline page, where your step and its files are waiting.
 5. Any idea that comes up, tap the inbox icon in the header and capture it, so it does not get lost.
 
-Why mornings: the production crew runs at 2:13 AM. Steps you finish during the day let the next Claude step happen that same night.
+Why mornings: the production crew is documented to run at 2:13 AM Pacific. Steps you finish during the day make the next Claude step eligible for pickup. Check the last successful run; the schedule alone does not confirm that work happened.
 
 ## Every week, about 30 minutes (Monday is best)
 
@@ -35,11 +35,11 @@ Why mornings: the production crew runs at 2:13 AM. Steps you finish during the d
 
 - Work through one brand's "Setup" tab gaps, or tap "Copy setup brief" and hand the brief to an assistant.
 - Empty the "Capture Inbox" by turning captured ideas into tasks or dropping them.
-- Clear snoozed items on "Today" with the "Snoozed" link before they pile up.
+- Clear snoozed items on "Dashboard" with the "Snoozed" link before they pile up.
 
 ## Good to know
 
-- The routine works on a phone. "Today", "Portfolio" and "Inbox" are on the bottom bar, and everything else is under "More".
+- The routine works on a phone. "Dashboard", "Portfolio" and "Inbox" are on the bottom bar, and everything else is under "More".
 - If "Next 10" shows a yellow note, one source could not be checked. Tap "Try again".
 - Approving an item in "Waiting on me" keeps it in "Next 10" with a small boost, so approved work rises to the top.
 - Skipping a day is fine. Nothing is lost; steps simply wait for you.

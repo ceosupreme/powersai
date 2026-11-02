@@ -47,7 +47,7 @@ export const OverviewView = () => {
         <Card className="p-5 bg-card/30 border-dashed">
           <div className="text-sm font-semibold text-foreground">No audit data yet for this project</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Click <span className="font-medium">Refresh Now</span> to run the analyzers. Tiles will populate from real findings; numbers shown below are honest zeros until then.
+            Click <span className="font-medium">Refresh Now</span> to run the analyzers. Tiles will populate from real findings; unmeasured values stay blank until then.
           </p>
         </Card>
       )}
@@ -85,7 +85,7 @@ export const OverviewView = () => {
 
       <QuickStatsStrip stats={quickStats} />
 
-      {!isLoading && priorities.length === 0 && (
+      {!isLoading && primary.growthScore !== null && priorities.length === 0 && (
         <Badge variant="outline" className="text-[10px]">No active findings — clean slate</Badge>
       )}
     </div>

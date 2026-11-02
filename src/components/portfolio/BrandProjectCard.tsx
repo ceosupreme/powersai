@@ -1,3 +1,4 @@
+import { BrandIdentity } from '@/components/shared/BrandIdentity';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { getGradeFromScore, getGradeColor } from '@/utils/scoring';
@@ -40,11 +41,11 @@ export function BrandProjectCard({
       onClick={onClick}
       className={cn(
         'text-left bg-card border border-border rounded-lg p-4 transition-colors hover:border-primary w-full',
-        parked && 'opacity-75',
+        parked && 'border-dashed',
       )}
     >
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <h3 className="font-semibold text-foreground truncate">{data.name}</h3>
+      <div className="mb-4 space-y-2">
+        <BrandIdentity id={data.id} name={data.name} />
         {parked && (
           <Badge variant="outline" className="text-[10px] shrink-0">Parked</Badge>
         )}

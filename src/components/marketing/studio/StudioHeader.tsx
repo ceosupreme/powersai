@@ -176,6 +176,7 @@ export function StudioHeader({ language = "en" }: { language?: "en" | "es" }) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link to="/auth" className="inline-flex min-h-11 items-center px-2 font-semibold">{language === "es" ? "Ingresar" : "Log in"}</Link>
           <Link to={attributedContact} onClick={() => trackSiteEvent({ event_type: "cta_click", label: "start_project" })} className="home-btn-amber studio-header-cta">
             {labels.start}
           </Link>

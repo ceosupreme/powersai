@@ -27,7 +27,7 @@ export const roleToLayout: Record<UserRole, LayoutType> = {
 };
 
 export const roleToHomeRoute: Record<UserRole, string> = {
-  owner: '/portfolio',
+  owner: '/workspace',
   gm: '/weekly-review',
   lead: '/staff/shift',
   foh: '/staff/my-shift',

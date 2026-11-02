@@ -8,7 +8,12 @@ export type InboundLead = {
   id: string;
   name: string;
   business_name: string | null;
-  email: string;
+  email: string | null;
+  qualifier_data: Record<string, unknown> | null;
+  transcript: { role?: string; content?: string; text?: string }[] | null;
+  not_ready_reason: string | null;
+  owner_notified_at: string | null;
+  owner_notify_error: string | null;
   message: string;
   status: InboundLeadStatus;
   promoted_company_id: string | null;
@@ -163,38 +168,9 @@ export function useInboundLeadMutations() {
     promote: useMutation({
       mutationFn: async (lead: InboundLead) => {
         if (!userId) throw new Error("Sign in required");
-        // NOTE: when project-type awareness lands, default project_type='client' here.
-        const { data: company, error: cErr } = await supabase
-          .from("crm_companies")
-          .insert({
-            name: (lead.business_name && lead.business_name.trim()) || lead.name,
-            status: "prospect",
-            created_by: userId,
-          })
-          .select("id")
-          .single();
-        if (cErr) throw cErr;
-
-        const { first, last } = splitName(lead.name);
-        const { error: ctErr } = await supabase.from("crm_contacts").insert({
-          company_id: company.id,
-          first_name: first,
-          last_name: last,
-          email: lead.email,
-          is_primary: true,
-          created_by: userId,
-        });
-        if (ctErr) throw ctErr;
-
-        // The original full name remains intact on the inbound_leads row —
-        // we only update status + the FK, never the raw `name` column.
-        const { error: uErr } = await supabase
-          .from("inbound_leads")
-          .update({ status: "promoted", promoted_company_id: company.id })
-          .eq("id", lead.id);
-        if (uErr) throw uErr;
-
-        return company.id;
+        const { data, error } = await (supabase as any).rpc('hq_promote_inbound_lead', { p_lead_id: lead.id });
+        if (error) throw error;
+        return data as string;
       },
       onSuccess: inv,
     }),

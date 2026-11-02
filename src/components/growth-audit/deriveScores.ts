@@ -435,10 +435,10 @@ export function derivePrimaryMetrics(
   lastRunIso: string | null | undefined,
   sourcePresence?: {
     gbp?: unknown | null;
-    reputation?: unknown | null;
-    website?: unknown | null;
-    mapPack?: unknown | null;
-    aiSearch?: unknown | null;
+    reputation?: ReputationStatus | null;
+    website?: WebsiteStatus | null;
+    mapPack?: MapPackSummary | null;
+    aiSearch?: AiSearchSummary | null;
   },
 ): PrimaryMetrics {
   // Ops Readiness Gate is currently neutralized — empty reason is the inert
@@ -463,17 +463,17 @@ export function derivePrimaryMetrics(
   if (sourcePresence) {
     const sigs = [
       sourcePresence.gbp,
-      sourcePresence.reputation,
-      sourcePresence.website,
-      sourcePresence.mapPack,
-      sourcePresence.aiSearch,
+      sourcePresence.reputation?.hasReviews,
+      sourcePresence.website?.weekly ?? sourcePresence.website?.pagespeed,
+      sourcePresence.mapPack?.lastCheckedAt,
+      sourcePresence.aiSearch?.lastCheckedAt,
     ];
     connected = sigs.reduce<number>((s, v) => s + (v ? 1 : 0), 0);
     confidence =
       connected === 0 ? 'Unavailable' :
       connected <= 2 ? 'Limited' :
       connected <= 4 ? 'Partial' : 'Complete';
-    confidenceNote = `${connected} of 5 data sources connected`;
+    confidenceNote = `${connected} of 5 data sources have observations`;
   }
 
   return {

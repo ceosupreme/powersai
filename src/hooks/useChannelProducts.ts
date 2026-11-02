@@ -123,6 +123,8 @@ export function useChannelProductMutations() {
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: channelsKey(vars.productId) });
+      qc.invalidateQueries({ queryKey: ["channel-products"] });
+      qc.invalidateQueries({ queryKey: ["brand-workspace"] });
     },
   });
 
@@ -149,11 +151,10 @@ export function useContentChannels() {
     queryFn: async (): Promise<{ id: string; bar_name: string }[]> => {
       const { data, error } = await (supabase as any)
         .from("venues")
-        .select("id, bar_name")
-        .eq("project_type", "content_channel")
-        .order("bar_name");
+        .select("id, name")
+        .order("name");
       if (error) throw error;
-      return (data ?? []) as any;
+      return (data ?? []).map((project: { id: string; name: string }) => ({ id: project.id, bar_name: project.name }));
     },
   });
 }

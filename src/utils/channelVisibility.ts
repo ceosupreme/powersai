@@ -30,14 +30,7 @@ export function filterChannelsByRole(
   role: string | null,
   context?: string
 ): ChatChannelWithMembers[] {
-  const allowedNames = getVisibleChannelNames(role, context);
-
-  return channels.filter((channel) => {
-    // DMs are always visible
-    if (channel.type === 'dm') return true;
-
-    // Team channels: match name against allowed patterns
-    const name = channel.name.toLowerCase();
-    return allowedNames.some((allowed) => name.includes(allowed));
-  });
+  // Membership and RLS in useChannels are authoritative. A channel's name
+  // is display text, not an access rule.
+  return channels;
 }

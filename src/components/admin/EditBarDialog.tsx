@@ -46,6 +46,8 @@ interface Bar {
 }
 
 interface FormData {
+  avg_ticket: string;
+  close_rate: string;
   name: string;
   bar_code: string;
   address: string;
@@ -150,6 +152,7 @@ async function pickUniqueSlug(base: string, ignoreId?: string): Promise<string |
 }
 
 const defaultForm: FormData = {
+  avg_ticket: '', close_rate: '',
   name: '',
   bar_code: '',
   address: '',
@@ -206,6 +209,8 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
     setActiveTab('basic');
     if (editingBar) {
       setFormData({
+      avg_ticket: String((editingBar as any).avg_ticket ?? ''),
+      close_rate: (editingBar as any).close_rate == null ? '' : String(Number((editingBar as any).close_rate)*100),
       name: editingBar.name,
       bar_code: editingBar.bar_code || '',
       address: editingBar.address || '',
@@ -362,6 +367,8 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
     setIsSaving(true);
     try {
       const payload: Record<string, any> = {
+        avg_ticket: formData.avg_ticket === '' ? null : Number(formData.avg_ticket),
+        close_rate: formData.close_rate === '' ? null : Number(formData.close_rate)/100,
         name: formData.name.trim(),
         bar_code: formData.bar_code.trim(),
         address: formData.address.trim() || null,
@@ -387,7 +394,7 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
           const unique = await pickUniqueSlug(base, editingBar.id);
           if (unique) payload.slug = unique;
         }
-        const { error } = await supabase.from('venues').update(payload).eq('id', editingBar.id);
+        const { error } = await supabase.from('venues').update(payload as any).eq('id', editingBar.id);
         if (error) throw error;
         await supabase.from('profiles').update({ assigned_bar_name: payload.name }).eq('assigned_bar_id', editingBar.id);
         toast.success('Project updated');
@@ -586,6 +593,11 @@ export const EditBarDialog = ({ open, onOpenChange, editingBar, onSaved, onDelet
                       </Select>
                     </div>
                     <div className="space-y-1.5">
+                      <Label htmlFor="avg-ticket">Average sale ($)</Label>
+                      <Input id="avg-ticket" type="number" min="0" step="0.01" value={formData.avg_ticket} onChange={e => set('avg_ticket', e.target.value)} />
+                      <Label htmlFor="close-rate">Lead close rate (%)</Label>
+                      <Input id="close-rate" type="number" min="0" max="100" step="0.1" value={formData.close_rate} onChange={e => set('close_rate',e.target.value)} />
+                      <p className="text-xs text-muted-foreground">Used by Recovery Reports and Leak Stack estimates. Leave blank when unknown.</p>
                       <Label>Project Type</Label>
                       <Select
                         value={formData.project_type}

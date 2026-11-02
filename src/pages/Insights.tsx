@@ -30,16 +30,16 @@ import { useInsightSearch } from '@/hooks/useInsightSearch';
 
 
 const PRIORITY_SECTIONS = [
-  { key: 'Critical', title: 'Critical', icon: '🔴', colorClass: 'text-destructive', borderColorClass: 'border-destructive/30', defaultExpanded: false },
-  { key: 'High', title: 'High', icon: '🟠', colorClass: 'text-orange', borderColorClass: 'border-orange/30', defaultExpanded: false },
-  { key: 'Medium', title: 'Medium', icon: '🟡', colorClass: 'text-gold', borderColorClass: 'border-gold/30', defaultExpanded: false },
-  { key: 'Low', title: 'Low', icon: '🟢', colorClass: 'text-signal-green', borderColorClass: 'border-signal-green/30', defaultExpanded: false },
+  { key: 'Critical', title: 'Critical', icon: '🔴', colorClass: 'text-destructive', borderColorClass: 'border-destructive/30', defaultExpanded: true },
+  { key: 'High', title: 'High', icon: '🟠', colorClass: 'text-orange', borderColorClass: 'border-orange/30', defaultExpanded: true },
+  { key: 'Medium', title: 'Medium', icon: '🟡', colorClass: 'text-gold', borderColorClass: 'border-gold/30', defaultExpanded: true },
+  { key: 'Low', title: 'Low', icon: '🟢', colorClass: 'text-signal-green', borderColorClass: 'border-signal-green/30', defaultExpanded: true },
 ] as const;
 
 const ITEMS_PER_PAGE = 10;
 
 const Insights = () => {
-  const { selectedBar, setSelectedBar, isLoading: appLoading, accessibleBars } = useApp();
+  const { selectedBar, setSelectedBar, clearSelectedBar, isLoading: appLoading, accessibleBars } = useApp();
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const showVenueFilter = isAdmin || accessibleBars.length > 1;
@@ -49,7 +49,7 @@ const Insights = () => {
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<string[]>(['Critical', 'High', 'Medium', 'Low']);
   const [pillarFilter, setPillarFilter] = useState<PillarFilter>('all');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('thisWeek');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [sortBy, setSortBy] = useState<SortBy>('priority');
   
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -57,16 +57,18 @@ const Insights = () => {
   // "All Venues" mode for owners/admins. When false, the filter is synced to the
   // global header's selectedBar so the two selectors never disagree.
   const [allVenuesMode, setAllVenuesMode] = useState<boolean>(false);
+  useEffect(() => { setAllVenuesMode(false); setSelectedIds(new Set()); }, [selectedBar?.id]);
   const venueFilter: string = allVenuesMode ? 'all' : (selectedBar?.id ?? 'all');
   const setVenueFilter = useCallback((value: string) => {
     if (value === 'all') {
+      clearSelectedBar();
       setAllVenuesMode(true);
       return;
     }
     const bar = accessibleBars.find(b => b.id === value);
     if (bar) setSelectedBar(bar);
     setAllVenuesMode(false);
-  }, [accessibleBars, setSelectedBar]);
+  }, [accessibleBars, setSelectedBar, clearSelectedBar]);
 
   // Map UI TimeFilter to service's InsightTimeFilter. 'thisWeek' now means
   // rolling 7-day window (label: "Last 7 Days"); the state key stays
@@ -77,7 +79,7 @@ const Insights = () => {
     timeFilter === 'last4' ? 'last4' :
     timeFilter === 'last8' ? 'last8' :
     'all';
-  const { data: allCards = [], isLoading: cardsLoading } = useActionItems(
+  const { data: allCards = [], isLoading: cardsLoading, isError: cardsError, refetch: refetchCards } = useActionItems(
     venueFilter !== 'all' ? venueFilter : (showVenueFilter ? undefined : selectedBar?.id),
     serviceTimeFilter,
   );
@@ -358,6 +360,8 @@ const Insights = () => {
           </p>
         </div>
 
+        {cardsError && <div role="alert" className="hq-section mb-4"><p>Insights could not be loaded.</p><button className="text-primary underline" onClick={() => refetchCards()}>Try again</button></div>}
+        {!cardsLoading && !cardsError && allCards.length === 0 && <div className="hq-section mb-4 space-y-2"><h2 className="text-lg font-bold">No saved insights for this selection</h2><p>Use Growth Audit to check the selected business and create findings. The time filter can also reveal older recommendations.</p><a className="text-primary underline" href="/growth-audit">Open Growth Audit →</a></div>}
         {/* Search */}
         <div className="mb-4 animate-fade-in-up stagger-1 relative">
           <div className="relative">

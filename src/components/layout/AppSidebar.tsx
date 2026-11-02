@@ -54,11 +54,13 @@ import {
   Zap,
   MessageSquare,
   Target,
+  Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { OWNER_NAV_GROUPS, type OwnerNavGroup, type OwnerNavItem } from '@/config/ownerNav';
+import { OWNER_NAV_GROUPS, hqSection, type OwnerNavGroup, type OwnerNavItem } from '@/config/ownerNav';
 import { useFoundationLabel } from '@/hooks/useFoundationLabel';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -105,7 +107,9 @@ export const AppSidebar = () => {
   const { canAccessPage, profile, role, isAdmin } = useAuth();
   const { isPreview, previewRole, setPreviewRole } = usePreview();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState('');
   const foundationLabel = useFoundationLabel();
+  useEffect(() => { setNavSearch(''); }, [location.pathname]);
 
   // Filter groups + items based on page permissions; drop empty groups.
   const filteredGroups = useMemo(
@@ -115,10 +119,11 @@ export const AppSidebar = () => {
           ...g,
           items: g.items.filter(
             (i) => (!i.adminOnly || isAdmin) && canAccessPage(i.pageKey)
+              && (isCollapsed || `${g.label} ${i.path.startsWith('/foundation-audit') ? foundationLabel : i.label}`.toLowerCase().includes(navSearch.trim().toLowerCase()))
           ),
         }))
         .filter((g) => g.items.length > 0),
-    [canAccessPage, isAdmin]
+    [canAccessPage, isAdmin, navSearch, isCollapsed, foundationLabel]
   );
 
   const getInitials = (name: string | null) => {
@@ -173,12 +178,20 @@ export const AppSidebar = () => {
             </div>
           )}
         </Link>
+        {!isCollapsed && <div className="relative mt-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input aria-label="Find a page in HQ" placeholder="Find a page…" value={navSearch}
+            onChange={e => setNavSearch(e.target.value)} className="pl-9 pr-10" />
+          {navSearch && <button type="button" className="absolute right-1 top-1/2 -translate-y-1/2 p-2" aria-label="Clear navigation search" onClick={() => setNavSearch('')}><X className="h-4 w-4" /></button>}
+        </div>}
       </SidebarHeader>
 
       <SidebarContent>
+        {filteredGroups.length === 0 && <p className="px-5 py-4 text-sm text-muted-foreground">No pages match. Try a different name.</p>}
         {filteredGroups.map((group, idx) => (
           <SidebarGroup
             key={group.label}
+            data-hq-section={hqSection(group.items[0].path)}
             className={cn(
               'p-2',
               idx > 0 && 'pt-0 border-t border-sidebar-border/50 mt-2'

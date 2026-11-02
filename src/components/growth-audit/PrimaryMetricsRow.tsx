@@ -69,16 +69,16 @@ export const PrimaryMetricsRow = ({ data, onViewDataSources }: Props) => {
             <Sparkles className="w-3.5 h-3.5" /> Revenue Opportunity
           </div>
           <Badge variant="outline" className="text-[10px] bg-emerald-500/15 text-emerald-600 border-emerald-500/40">
-            {data.opportunityLevel}
+            {isGrowthScored ? data.opportunityLevel : 'Not measured'}
           </Badge>
         </div>
-        <div className="mt-2 text-2xl font-bold text-foreground">{data.opportunityDollars}</div>
-        <div className="text-[11px] text-muted-foreground">surfaced this audit</div>
+        <div className="mt-2 text-2xl font-bold text-foreground">{isGrowthScored ? data.opportunityDollars : '—'}</div>
+        <div className="text-[11px] text-muted-foreground">{isGrowthScored ? 'surfaced this audit' : 'Run an audit after adding data sources'}</div>
         <div className="mt-3 flex gap-1">
           {[1, 2, 3, 4].map(i => (
             <div
               key={i}
-              className={`h-1.5 flex-1 rounded-full ${i <= oppIdx ? 'bg-emerald-500' : 'bg-muted'}`}
+              className={`h-1.5 flex-1 rounded-full ${isGrowthScored && i <= oppIdx ? 'bg-emerald-500' : 'bg-muted'}`}
             />
           ))}
         </div>

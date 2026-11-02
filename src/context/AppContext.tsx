@@ -164,9 +164,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           }
         }
       } catch {}
-      setSelectedBar(accessibleBars[0]);
+      if (accessibleBars.length === 1) setSelectedBar(accessibleBars[0]);
+      else clearSelectedBar();
     } else if (!accessibleBars.find(b => b.id === selectedBar.id)) {
-      setSelectedBar(accessibleBars[0]);
+      if (accessibleBars.length === 1) setSelectedBar(accessibleBars[0]);
+      else clearSelectedBar();
     }
   }, [accessibleBars, selectedBar]);
 

@@ -26,7 +26,7 @@ How the steps are built:
 ### To follow a job from start to finish
 1. Start the job. It begins on step 1, with the status "Ready" when step 1 is yours or "Running" when step 1 is Claude's.
 2. When the current step is yours, it appears in the brand's "Waiting on you" list and is ranked into "Next 10" with everything else. Do the work, then tap "Done".
-3. When the current step is Claude's, it stays out of your lists. Claude's scheduled run each night at 2:13 AM Pacific does it and marks it done.
+3. When the current step is Claude's, it stays out of your lists. An external worker must pick it up, do the work and save the output. The documented schedule is 2:13 AM Pacific, but HQ does not confirm that the worker is running. Check the last actual run and the saved output.
 4. Each time a step is marked done, HQ moves the job to the next step by itself. You never move a job by hand.
 5. Later steps show "Blocked" until the step before them is done. Carry on until the last step is done.
 
@@ -37,23 +37,23 @@ How the steps are built:
 
 ### To give one of your steps to Claude
 1. Open the job's pipeline page and find your step.
-2. Tap "Hand to Claude". The step leaves your lists and joins the nightly run.
+2. Tap "Hand to Claude". The step leaves your lists and becomes eligible for the external worker. This does not start a run or confirm pickup.
 
 ## Words on this screen
 
 - Playbook: a written method in HQ's library. Pipelines build their steps from playbooks.
-- "Claude": a step Claude does in the nightly run.
+- "Claude": a step assigned to Claude, for an external worker or a prompted chat to complete.
 - "You": a step you do and mark done.
 - "Agent" and "Tool": steps owned by an automation other than Claude. The pipelines HQ builds only use "Claude" and "You". Not confirmed: where agent and tool steps come from.
 - "Done": finished.
 - "Blocked": waiting on an earlier step that is not done.
 - "Ready": your step, free to do now.
 - "Awaiting your decision": your step whose title starts with "Decision". You decide, then mark it done.
-- "Queued": a Claude step waiting for the nightly run.
+- "Queued": a Claude step awaiting worker pickup, not confirmation that a run has started.
 - "Open": a step owned by an agent or tool that is not done or blocked.
 - Level: the production level for the job, 1 to 3.
 - Money destination: where the money from this job is meant to land. It is free text.
-- Nightly run: Claude's scheduled run at 2:13 AM Pacific that works through Claude steps.
+- Nightly run: the external production worker, documented to run at 2:13 AM Pacific. Its current schedule and health must be checked in the service that runs it.
 
 ## Good to know
 
@@ -66,5 +66,5 @@ How the steps are built:
 - If the product type's playbook already has a publish or listing step, the destination's matching publish step is left out, so you never publish twice.
 - The level is saved on the job and shown on its page, but it does not change which steps are created. Not confirmed: how Claude uses it.
 - Nothing in HQ publishes or posts to any platform by itself. Publishing and listing steps are yours.
-- There is no button to cancel or delete a job.
+- "Cancel pipeline" pauses the job and preserves its history and outputs. "Resume pipeline" continues at the first unfinished step. There is no delete button.
 - Steps for parked brands do not show on the Today page.

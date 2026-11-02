@@ -7,7 +7,7 @@ Products, headed "Products & Courses", is one shared catalog of everything you s
 - On a computer, tap "Products" under "Brand & Assets" in the left menu.
 - On a phone, tap "More" in the bottom bar, then "Products" under "Brand & Assets".
 - On a brand's page, "View all" on the "Products by stage" section opens this list already filtered to that brand.
-- It is one list for your whole account. The project picker at the top of the screen does not change it.
+- The main brand selector filters the list by saved brand links. All brands shows the whole accessible catalog.
 
 ## What you see
 - The heading "Products & Courses", the line "Shared library; tag channels that promote each product", and a "New Product" button.
@@ -33,11 +33,17 @@ Products, headed "Products & Courses", is one shared catalog of everything you s
 
 ### Filter the list
 1. Use "All brands", "All statuses" and "All outlets" to narrow the table.
-2. The brand you pick is kept in the page address, so you can bookmark a brand's product list.
+2. The page's Brand filter and the main selector stay in sync. Existing links containing a project selection still open that brand.
 
 ### Delete a product
 1. Tap the trash button on the product's row.
 2. Confirm. Linked content items and revenue entries keep their data but lose the link to the product.
+
+
+### Search and sort products
+1. Search by product name or notes.
+2. Narrow the results with the labeled Brand, Status and Outlet filters.
+3. Choose "Sort by" for name, newest, oldest or highest price. Products without a price sort last.
 
 ## Words on this screen
 - Product: anything you sell, such as a book, course, printable or template.
@@ -50,8 +56,11 @@ Products, headed "Products & Courses", is one shared catalog of everything you s
 - Sales Page: the web page where people buy the product.
 
 ## Good to know
-- The "Channels promoting this product" list only shows projects of the Channels type, the ones Portfolio shows under its "Channels" chip. Brands, Apps and Services projects are not listed. If a product is already linked to one of those, the link shows under "Brands", but saving the product from this form removes it.
+- The project-link picker includes every accessible project type. Existing links are loaded before Save becomes available, so editing a product preserves its brand and project links.
 - Each product can have one listing per outlet. Adding the same outlet again replaces that listing's details.
 - Outlet listings save on their own as you edit them; tapping "Cancel" on the form does not undo them.
 - HQ's weekly numbers run counts only listings marked listed, on products linked to a brand, for that brand's products live, listings live and KDP titles numbers. It does not check the marketplace itself.
 - Content items and revenue entries can point at a product through their "Linked Product" field, and a product's pipeline page lists the revenue entries linked to it.
+
+## Main brand selection
+Products follows the main brand or client selector using its saved brand links. Choose All brands to see the entire accessible catalog, including products with no links. One product can belong to more than one brand. Changing the view does not change its links.

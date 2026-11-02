@@ -14,9 +14,9 @@ export type OnboardingItem = {
 
 const ITEMS: OnboardingItem[] = [
   { key: 'gbp', label: 'Add Google Place ID', hash: 'source-gbp' },
-  { key: 'website', label: 'Add website URL', hash: 'source-website_crawler' },
-  { key: 'map_pack', label: 'Add Map Pack keywords', hash: 'source-map_pack' },
-  { key: 'ai_search', label: 'Add AI search queries', hash: 'source-ai_search' },
+  { key: 'website', label: 'Add website URL', hash: 'setup-website' },
+  { key: 'map_pack', label: 'Add Map Pack keywords', hash: 'setup-map-pack' },
+  { key: 'ai_search', label: 'Add AI search queries', hash: 'setup-ai-search' },
 ];
 
 export type OnboardingState = {

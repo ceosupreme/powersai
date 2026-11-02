@@ -4,8 +4,8 @@
 Channel Revenue is where you log the money a project earned, one entry per kind of income per month. Add an entry whenever a payout lands, so the month's totals stay right here, on the brand's page and on Portfolio.
 
 ## Where to find it
-- On a computer, tap "Channel Revenue" under "Growth & Marketing" in the left menu.
-- On a phone, tap "More" in the bottom bar, then "Channel Revenue" under "Growth & Marketing".
+- On a computer, tap "Channel Revenue" under "Brand & Assets" in the left menu.
+- On a phone, tap "More" in the bottom bar, then "Channel Revenue" under "Brand & Assets".
 - On a brand's page, "View all" on the "Revenue this month" section opens this screen for that brand.
 - The screen shows the project chosen in the project picker at the top of the screen. If the picker is on "All projects", it says "Select a channel to view its revenue."
 

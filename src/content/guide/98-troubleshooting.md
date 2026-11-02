@@ -48,7 +48,7 @@ When something in HQ looks wrong, it is usually one of a handful of known causes
 
 - A Quick Generate message that ends in "MOCK" instead of "AI": the AI call failed and HQ showed sample text. Those drafts are not saved. Try again later.
 - "Generate Content" can quietly fall back to template text when the AI call fails, even though its message says the assets were generated. Read what it made before using it.
-- Numbers from "Generate Analysis" under "Post-Event Analysis" are sample numbers in this build. Do not use them for decisions.
+- "Generate Analysis" now requests live results and reports failures. Previously stored sample results require review before being treated as measurements.
 
 ## Signing in
 

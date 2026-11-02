@@ -74,3 +74,5 @@ The person's page has four tabs:
 - Without a hire date, tenure counts only from the first shift in the last 90 days, so it can read lower than it really is.
 - If "All-stars" finds nobody, a note explains how many days of tenure are needed and the longest tenure on record.
 - The tab you open is kept in the page address, so a shared link opens on the same tab.
+
+When a brand is selected, HQ routes legacy venue reports to the brand workspace. The Team entry directs brand work to Tasks and Chat; venue staffing reports remain available for client locations.

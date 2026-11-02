@@ -66,7 +66,9 @@ The Growth Audit studies one project's Google listing, reviews, website, search 
 ## Good to know
 
 - Many checks (shifts, menu, events) were built for bars and restaurants and need point-of-sale data. For most service businesses only the Google listing, reviews, website, rankings and AI search apply.
-- There is no screen for adding a website address, Map Pack keywords or AI search queries, although the setup wizard and the "Finish project setup" box point here. The hint "Growth Audit → Launch → Map Pack Keywords" names a tab that does not exist.
-- A pack made in "Mock" mode, or after the AI fails, shows "Source: MOCK" and is not saved; it disappears after a reload.
+- Admins can edit website mappings, Map Pack keywords and AI search queries in Data Sources for the selected project. The setup checklist opens the matching editor.
+- A pack made in explicit Mock mode is labeled as sample content. A failure in Live mode is shown as an error instead of silently falling back to a mock pack.
 - "Refresh sources" on "Context Calendar" needs the local context integration, which the older help describes as off.
 - "History" tells you to press "Run Full Audit"; the button is called "Refresh Now".
+
+A project without an audit score shows revenue opportunity as "Not measured", not a low dollar range. The source summary counts sources with observations rather than treating empty source objects as connected data.

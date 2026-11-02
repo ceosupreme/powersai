@@ -11,7 +11,7 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Prospect: a business you might pitch. Prospects live on the Prospect Dock, not in the project picker.
 - Project type: the kind of project. It decides which pillars the project is scored on.
 - "All projects": no single project is chosen, so Today shows the lists across every active brand.
-- Active and Parked: a parked brand stays on Portfolio but drops out of Today's lists, and the crews skip it.
+- Active and Parked: a parked brand stays on Portfolio but drops out of Dashboard's lists, and the crews skip it.
 - Brand type: the kinds of brand a brand is, such as "Creator (personal brand)", "Content brand" or "Local news". It decides which setup items are standard for that brand.
 
 ## Today and your to-dos
@@ -68,7 +68,7 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Pipeline, or production job: the step-by-step plan for making one thing for one brand.
 - Recipe: the playbooks a job was built from, with their versions.
 - Step owners: "You" for your steps and "Claude" for Claude's. "Agent" and "Tool" mark steps owned by other automations.
-- Step words: "Done" is finished; "Ready" is your step, free to do now; "Blocked" waits on an earlier step; "Awaiting your decision" is your step that starts with "Decision"; "Queued" is a Claude step waiting for the nightly run; "Open" is an agent or tool step that is not done.
+- Step words: "Done" is finished; "Ready" is your step, free to do now; "Blocked" waits on an earlier step; "Awaiting your decision" is your step that starts with "Decision"; "Queued" is a Claude step awaiting worker pickup, not a confirmed run; "Open" is an agent or tool step that is not done.
 - Job words: "Ready", "Running", "Blocked", "Waiting on a decision", "In review", "Finished" and "Parked". The database sets them as the job moves.
 - "Current step": the step the job is on now.
 - "Hand to Claude": give one of your steps to Claude.
@@ -77,7 +77,7 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Money destination: where the money from a job is meant to land.
 - "Method not written yet": the step's playbook is still planned. The nightly crew writes it first.
 - "Make this": the button that turns a brief, a pain or a product idea into a pipeline.
-- Nightly run: the production crew that runs at 2:13 AM Pacific.
+- Nightly run: the external production crew, documented to run at 2:13 AM Pacific. Verify its current schedule and last successful run in the service that runs it.
 
 ## Content
 

@@ -1,7 +1,16 @@
 # Weekly Review
 <!-- part: Workspace | order: 12 | slug: weekly-review | route: /weekly-review | tags: weekly review, scorecard, client, score, grade, pillars, net sales, labor, splh, tips, turn time, guests, task performance, team performance, wins, warnings, action plan, approve and push, asana, share, copy for meeting, print, email -->
 
-Weekly Review is the one-week scorecard for a client project that sends point-of-sale data: the overall score and grade, four pillar scores, headline numbers, task and team performance, wins, warnings and a short action plan you can approve. Use it to prepare for a weekly client meeting. Your own brands do not have this scorecard, so for them it shows "No weekly data available".
+Weekly Review supports both brands and client projects. Choose a brand to see its saved scores, reporting coverage, revenue for the selected month's period, and current work needing attention. Choose a client to see its operating scorecard.
+
+## Reviewing your brands
+With All brands & clients selected, brand reports appear together, with buttons for opening client reports below. Each brand has a colored header and initials. Search by name or sort by the amount of work waiting on you.
+
+Choose Reporting week on the page to review one of the last twelve weeks. The current week is labeled in progress. Scores and their prior-week change use exactly the selected week; no other week is silently substituted. Revenue covers the calendar month in which the week starts. Waiting items and channel cadence describe current work.
+
+Missing scores say Not measured; missing revenue says Not entered. Next steps link to the workspace, measurements, channels, or revenue entry. A failed read has a retry message. Missing information does not become an invented score.
+
+The remainder of this article describes client operating scorecards.
 
 ## Where to find it
 
@@ -23,7 +32,7 @@ When the selected project has a scorecard for the week:
 - "Performance by Pillar": four cards you can open for the metrics behind each pillar, and a "Show all pillar insights" switch.
 - "12-Week Trends" (closed until tapped) and "Daily Sales & Labor %" for the week.
 
-When there is no scorecard, you see only "No weekly data available" with "Select a bar and week to view your weekly review scorecard."
+When there is no client scorecard for the selected week, the page explains what is missing and offers Check data sources, Open Dashboard, and Refresh records.
 
 ## How to use it
 
@@ -64,10 +73,6 @@ When there is no scorecard, you see only "No weekly data available" with "Select
 
 ## Good to know
 
-- This screen reads only the client weekly scorecard, which is built each week from point-of-sale, scheduling (7shifts) and Asana data and needs nearly a full week of daily sales. Your brands' scores live on Portfolio and in each brand workspace, and their weekly numbers are entered from Next 10's KPI rows or the brand's own page.
-- The "Suggested next steps" panel can say a brand has "no Weekly Review this week" and link here, but this screen has no way to grade a brand.
 - The Action Plan lists only proposed actions dated in the chosen week; "View all on Insights page →" appears when there are more than five.
-- The "Assignee" menu in the Asana preview lists a fixed set of names carried over from the earlier bar client, and the name you pick is not passed on: the task is created without an assignee.
 - The written briefs under "Task Performance" and "Team Performance" are written by AI once per week and then reused.
 - The "Daily Sales & Labor %" chart never shows its "Labor exceeded target" line, because no labor target is passed to it.
-- The empty message still says "Select a bar", wording left from the earlier bar version.

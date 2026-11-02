@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { PenSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { hqSection } from '@/config/ownerNav';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { GlobalHeader } from './GlobalHeader';
@@ -17,6 +18,7 @@ interface VenueLeadershipLayoutProps {
 export const VenueLeadershipLayout = ({ children }: VenueLeadershipLayoutProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const mode = useOwnerMode();
 
   return (
@@ -25,7 +27,7 @@ export const VenueLeadershipLayout = ({ children }: VenueLeadershipLayoutProps) 
         {!isMobile && <AppSidebar />}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <GlobalHeader showVenueSelector showDateSelector />
-          <div className="flex-1 overflow-auto px-3 md:px-8 py-4 md:py-8 pb-24 md:pb-8 max-w-7xl mx-auto w-full">
+          <div data-hq-section={hqSection(pathname)} className="hq-page-content flex-1 overflow-auto px-3 md:px-6 py-4 md:py-6 pb-24 md:pb-8 mx-auto w-full">
             {children}
           </div>
         </main>

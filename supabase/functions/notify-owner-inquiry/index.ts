@@ -1,8 +1,7 @@
 import { guardEdgeRequest } from '../_shared/auth-guard.ts';
-// Owner-only notification for general website inquiries (including hiring).
-// - Server-to-server only; invoked fire-and-forget by submit-inbound-lead.
-// - Skips client-captured leads (captured_for_project_id set) and anything not
-//   routed to the operator (route_to !== 'self').
+// Owner notification for general inquiries and client capture leads.
+// - Server-to-server only; dispatch is awaited by submit-inbound-lead.
+// - Client-captured leads notify their designated project contact; missing contact falls back to the operator.
 // - Idempotent via a conditional claim on inbound_leads.owner_notified_at.
 // - Never sends anything to the visitor. No enrollment, no automations.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -13,7 +12,7 @@ import { resendEmailAdapter } from "../_shared/send-adapters.ts";
 const Body = z.object({ lead_id: z.string().uuid() });
 
 const OWNER_EMAIL = "ceosupreme@gmail.com";
-const INBOX_URL = "https://supremeteammedia.com/crm";
+const INBOX_URL = "https://supremeteammedia.com/crm?tab=inbound";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -73,17 +72,28 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (leadErr || !lead) return json({ error: "Lead not found" }, 404);
 
-  if ((lead as any).captured_for_project_id) return json({ skipped: "client_captured" });
-  if (((lead as any).route_to ?? "self") !== "self") return json({ skipped: "not_owner_routed" });
+  const projectId = (lead as any).captured_for_project_id;
+  if (!projectId && ((lead as any).route_to ?? "self") !== "self") return json({ skipped: "not_owner_routed" });
+  let recipientEmail = OWNER_EMAIL;
+  if (projectId) {
+    const {data: contacts, error} = await sb.from('venue_leadership_contacts')
+      .select('is_primary,role_type,profile:profiles(email)').eq('venue_id',projectId).eq('is_active',true)
+      .order('is_primary',{ascending:false});
+    if (error) return json({error:'recipient_lookup_failed'},500);
+    const contact = (contacts ?? []).find((c: any) => c.profile?.email && (c.is_primary || ['owner','gm','manager'].includes(c.role_type)));
+    recipientEmail = (contact as any)?.profile?.email ?? OWNER_EMAIL;
+  }
   if ((lead as any).owner_notified_at) return json({ skipped: "already_sent" });
 
   // Atomic claim — a concurrent invocation for the same lead gets zero rows.
+  const attemptedAt = new Date().toISOString();
+  const staleBefore = new Date(Date.now() - 10 * 60 * 1000).toISOString();
   const { data: claimed, error: claimErr } = await sb
     .from("inbound_leads")
-    .update({ owner_notify_attempted_at: new Date().toISOString(), owner_notify_error: null })
+    .update({ owner_notify_attempted_at: attemptedAt, owner_notify_error: null })
     .eq("id", lead_id)
     .is("owner_notified_at", null)
-    .is("owner_notify_attempted_at", null)
+    .or(`owner_notify_attempted_at.is.null,owner_notify_attempted_at.lt.${staleBefore}`)
     .select("id");
   if (claimErr) {
     console.error("[notify-owner-inquiry] claim failed", claimErr);
@@ -106,6 +116,7 @@ Deno.serve(async (req) => {
     ["Source", safeText((lead as any).source, 120)],
     ["Submitted", safeText((lead as any).created_at, 60)],
     ["Record ID", lead_id],
+    ["Client project", safeText(projectId,80)],
   ].filter(([, v]) => v.length > 0) as Array<[string, string]>;
 
   const note = safeText((lead as any).message, 4000) || "(no note provided)";
@@ -118,7 +129,7 @@ Deno.serve(async (req) => {
 
   const result = await resendEmailAdapter.send({
     channel: "email",
-    to: OWNER_EMAIL,
+    to: recipientEmail,
     subject,
     body,
     project_id: "owner_notification",
@@ -135,8 +146,8 @@ Deno.serve(async (req) => {
   }
 
   await sb.from("inbound_leads")
-    .update({ owner_notified_at: null, owner_notify_error: String(result.error ?? "unknown").slice(0, 500) })
-    .eq("id", lead_id);
+    .update({ owner_notified_at: null, owner_notify_attempted_at: null, owner_notify_error: String(result.error ?? "unknown").slice(0, 500) })
+    .eq("id", lead_id).eq("owner_notify_attempted_at", attemptedAt);
   console.error("[notify-owner-inquiry] send failed", { lead_id, error: result.error });
   return json({ ok: false, error: String(result.error ?? "unknown") }, 200);
 });

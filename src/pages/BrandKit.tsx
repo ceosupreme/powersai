@@ -1,3 +1,4 @@
+import { ContentStrategyEditor } from '@/components/brand-kit/ContentStrategyEditor';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,30 +147,7 @@ export default function BrandKit() {
             Growth gets full weekly production. Baseline runs evergreen work on the clock. Parked
             gets none.
           </p>
-          <div className="pt-2 space-y-1">
-            <div className="text-sm font-medium">Content pillars</div>
-            {((kitQuery.data as any)?.content_pillars ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">None set yet.</p>
-            ) : (
-              <ul className="text-sm list-disc pl-5">
-                {((kitQuery.data as any).content_pillars as string[]).map((p) => <li key={p}>{p}</li>)}
-              </ul>
-            )}
-          </div>
-          <div className="pt-2 space-y-1">
-            <div className="text-sm font-medium">Mix targets</div>
-            {!(kitQuery.data as any)?.mix_targets || Object.keys((kitQuery.data as any).mix_targets).length === 0 ? (
-              <p className="text-sm text-muted-foreground">None set yet.</p>
-            ) : (
-              <ul className="text-sm space-y-0.5">
-                {Object.entries((kitQuery.data as any).mix_targets as Record<string, number>).map(([k, v]) => (
-                  <li key={k} className="flex justify-between max-w-xs">
-                    <span className="capitalize">{k}</span><span className="text-muted-foreground">{v}%</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {!kitQuery.isLoading && !kitQuery.isError && <ContentStrategyEditor key={`${projectId}:${k?.id ?? 'new'}`} projectId={projectId} kit={k ?? null} />}
         </CardContent>
       </Card>
 

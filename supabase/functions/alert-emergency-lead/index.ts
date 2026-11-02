@@ -1,7 +1,6 @@
 import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 // Operator alert path for emergency-classified inbound leads.
-// - Dispatches through the shared send-adapter interface (manual_log today,
-//   Twilio SMS drops in later without changes here).
+// - Uses a live SMS adapter when available, otherwise internal email.
 // - BYPASSES the client approval / QA queue (automation_message_queue) —
 //   this is an operator notification, not a customer message.
 // - Logs to automation_send_log with metadata.kind='emergency_lead_alert'
@@ -10,7 +9,7 @@ import { guardEdgeRequest } from '../_shared/auth-guard.ts';
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
-import { resolveAdapter, manualLogAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
+import { resolveAdapter, manualLogAdapter, resendEmailAdapter, type AutomationChannel } from "../_shared/send-adapters.ts";
 
 const Body = z.object({ lead_id: z.string().uuid() });
 
@@ -51,19 +50,21 @@ Deno.serve(async (req) => {
 
   // Idempotency: bail if we've already logged an alert for this lead.
   // Kind + lead_id are stashed in the `raw` jsonb column.
-  const { data: existing } = await sb
+  const { data: existing, error: existingError } = await sb
     .from("automation_send_log")
     .select("id")
+    .eq("ok", true).neq("adapter", "manual_log").not("provider_message_id", "is", null)
     .filter("raw->>kind", "eq", "emergency_lead_alert")
     .filter("raw->>lead_id", "eq", lead_id)
     .limit(1);
+  if (existingError) return json({ error: 'Alert history could not be checked' }, 503);
   if (existing && existing.length > 0) return json({ skipped: "already_sent" });
 
   // Recipient resolution: primary/GM leadership contact for the linked
   // project. No project link → recipient=null; we still log so the
   // operator sees the intent in the send log.
   let recipient: { name: string | null; email: string | null; phone: string | null } | null = null;
-  let recipientSource: "venue_leadership_contacts" | "none" = "none";
+  let recipientSource: "venue_leadership_contacts" | "operator_fallback" | "none" = "none";
   const projectId = (lead as any).captured_for_project_id ?? null;
   let projectConfig: Record<string, unknown> = {};
   if (projectId) {
@@ -104,14 +105,23 @@ Deno.serve(async (req) => {
       .from("project_automation_enrollments")
       .select("config")
       .eq("project_id", projectId)
-      .eq("automation_key", "follow_up_sequence")
+      .eq("automation_key", "followup_sequence")
       .maybeSingle();
     if (enr?.config && typeof enr.config === "object") {
       projectConfig = enr.config as Record<string, unknown>;
     }
   }
 
-  const preferredChannel: AutomationChannel = recipient?.phone ? "sms" : "email";
+  if (!recipient?.email && !recipient?.phone) {
+    recipient = {name:'Operator', email:'ceosupreme@gmail.com',phone:null};
+    recipientSource = 'operator_fallback';
+  }
+  const smsReady = resolveAdapter('sms',projectConfig) !== manualLogAdapter;
+  const preferredChannel: AutomationChannel = recipient?.phone && smsReady ? 'sms' : 'email';
+  if (preferredChannel === 'email' && !recipient?.email) {
+    recipient = {...recipient!,email:'ceosupreme@gmail.com'};
+    recipientSource = 'operator_fallback';
+  }
   const to = preferredChannel === "sms" ? recipient?.phone ?? null : recipient?.email ?? null;
 
   const business = lead.business_name || lead.name || "a prospect";
@@ -127,7 +137,7 @@ Deno.serve(async (req) => {
 
   // Fall back to manual_log if we have no recipient contact — real providers
   // would just fail invalid_recipient; the log is still useful to the operator.
-  const adapter = to ? resolveAdapter(preferredChannel, projectConfig) : manualLogAdapter;
+  const adapter = to ? (preferredChannel === 'email' ? resendEmailAdapter : resolveAdapter(preferredChannel, projectConfig)) : manualLogAdapter;
   const result = await adapter.send({
     channel: preferredChannel,
     to,
@@ -151,7 +161,7 @@ Deno.serve(async (req) => {
       to_address: to,
       subject,
       body,
-      ok: result.ok,
+      ok: result.ok && result.provider !== "manual_log" && !!result.provider_message_id,
       provider_message_id: result.provider_message_id ?? null,
       error: result.error ?? null,
       raw: {
@@ -163,9 +173,12 @@ Deno.serve(async (req) => {
     if (logErr) console.error("[alert-emergency-lead] log insert failed:", logErr);
   } else {
     console.log("[alert-emergency-lead] no project link — send log skipped", {
-      lead_id, adapter: result.provider, ok: result.ok,
+      lead_id, adapter: result.provider, ok: result.ok && result.provider !== "manual_log" && !!result.provider_message_id,
     });
   }
 
-  return json({ ok: true, recipient_source: recipientSource, dispatched: result.ok });
+  const dispatched = result.ok && result.provider !== 'manual_log' && !!result.provider_message_id;
+  return json({ ok: dispatched, recipient_source: recipientSource, dispatched,
+    channel: preferredChannel, sms_available: smsReady, delivery_status: result.delivery_status,
+    error: dispatched ? null : result.error ?? 'Alert logged only; delivery is not configured' });
 });

@@ -12,7 +12,7 @@ The Brand Kit keeps one brand's identity in one place: how it sounds, its bios, 
 ## What you see
 - The heading "Brand Kit" with the project's name, and "Archive…" on the right ("Restore" when the kit is archived, "Show archived" when there is no active kit).
 - A tip box titled "One kit per project", which you can close with its X.
-- "Content mode", with the read-only lists "Content pillars" and "Mix targets" ("None set yet." when empty).
+- "Content mode", followed by editable content pillars and mix percentages, with "Save content strategy".
 - "Voice & Bios", then "Colors", "Taglines", "Hashtags" and "Links", each with a row at the bottom for adding more.
 - "Assets": an upload box that says "Click to upload logos, icons, or photos", then a card per file with a preview for images, its type and size, and download and trash buttons.
 
@@ -38,7 +38,7 @@ The Brand Kit keeps one brand's identity in one place: how it sounds, its bios, 
 
 ### Upload, download or remove files
 1. If "Assets" says "Save the brand voice above first to enable uploads.", tap "Save" under "Voice & Bios" first; the kit does not exist yet.
-2. Tap the upload box and choose one or more files. An "Uploaded" message appears for each.
+2. Choose "Brand logo" or "Photo or file", then tap the upload box and choose one or more files. An "Uploaded" message appears for each.
 3. Use a file's download button to save a copy, or its trash button to remove it.
 
 ### Archive, restore or delete the whole kit
@@ -56,10 +56,10 @@ The Brand Kit keeps one brand's identity in one place: how it sounds, its bios, 
 - Archive: hide the kit without losing anything, so it can be restored later. Each project can have only one kit.
 
 ## Good to know
-- "Content pillars" and "Mix targets" can't be changed here or on any other HQ screen in this build; they can only be changed directly in HQ's database.
+- Enter one content pillar per line. Mix targets must total 100%, or all remain zero when unset. Tap "Save content strategy".
 - The X buttons on colors, taglines, hashtags and links delete at once, with no confirmation and no undo.
 - A file's trash button deletes the stored file too, even though the tip box says files are kept. Only deleting the whole kit leaves stored files behind.
 - Restore an archived kit before editing it. While it is archived and hidden, the add buttons do nothing.
-- Where a project's Foundation Audit checks brand items, it reads them from this kit: two or more colors count as colors defined, any tagline counts, and a link that mentions Instagram or Facebook counts as that account being linked. Its "Logo in brand kit" item looks for a file marked as a logo, which this screen never sets, so uploading a logo here does not tick that item.
+- Foundation checks read the kit’s colors, tagline, social links and logo. Choose "Brand logo" before uploading a logo, or use "Use as logo" on an existing image so the logo check recognizes it.
 - The page of each pipeline (a production job in HQ) shows the brand's Short Bio in its "Inputs" card, or its Brand Voice when there is no short bio. The brand's "Assets" tab shows this kit's files and links.
 - Some older parts of HQ call this screen the Brand Vault.

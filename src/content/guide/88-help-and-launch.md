@@ -1,7 +1,7 @@
 # Help Center and Launch Checklist
 <!-- part: Tools and system | order: 88 | slug: help-and-launch | route: /launch | tags: help, help center, articles, launch, launch checklist, checklist, setup, go live, progress, automation bundle, tips, setup wizard, help and guidance -->
 
-The Help Center is HQ's older set of short help articles, and the Launch Checklist is a list of 24 setup and go-live steps that you tick off as you finish them. Use the Help Center for quick background on a feature (this Guide is newer and more complete), and the Launch Checklist when setting HQ up or before giving anyone else a login. The help settings that control tips and the setup wizard are covered here too.
+Guide is the single help destination. Old /help links redirect to /guide. The Launch Checklist contains 24 setup and go-live steps that you tick off as you finish them; use it when setting HQ up or before giving anyone else a login. The help settings that control tips and the setup wizard are covered here too.
 
 ## Where to find it
 
@@ -12,11 +12,8 @@ The Help Center is HQ's older set of short help articles, and the Launch Checkli
 
 ## What you see
 
-### Help Center
-- The heading "Help Center" and "Step-by-step guides for the features in this app."
-- A search box ("Search: crm, brand, export, archive, capture, pillar, lead…").
-- A list of 33 articles, each with a title and a one-line summary. The open article shows its title, summary, tag chips and sections. "How this OS fits together" is open when the screen loads.
-- On a phone the list comes first and the open article sits below it.
+### Guide
+Open Guide to search the current articles and download the guide PDF. Old Help Center links open this same destination.
 
 ### Launch Checklist
 - The heading "Launch Checklist" and "Your real remaining steps before going live."
@@ -31,10 +28,8 @@ The Help Center is HQ's older set of short help articles, and the Launch Checkli
 
 ## How to use it
 
-### Look something up in the Help Center
-1. Type a word in the search box. It matches titles, summaries, tags and article text, and shows "No articles match." when nothing fits.
-2. Tap an article in the list.
-3. On a phone, scroll down past the list to read it.
+### Look something up
+Open Guide and search for the feature or workflow you need.
 
 ### Work through the Launch Checklist
 1. Read a card and tap its link to go to the right screen.
@@ -72,5 +67,4 @@ The Help Center is HQ's older set of short help articles, and the Launch Checkli
 - "Open Qualifier Fields" opens the "Pillars" tab, where "Qualifier Fields" is one of the inner tabs.
 - "Open public site" sends anyone signed in to Portfolio. Check the public pages in a private or signed-out browser window.
 - The security card points to Sync Health, but Sync Health does not show security rules.
-- Much of the Help Center text is older than the screens. For example, it still says Help sits in the side menu and that inbound leads can be deleted from a dialog, which the screen does not offer. When they disagree, trust the screen and this Guide.
 - For other roles, the Launch Checklist page follows the "Project Home" switch in Permissions, while its menu link follows "Dashboard".

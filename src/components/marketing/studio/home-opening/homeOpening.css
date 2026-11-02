@@ -496,3 +496,6 @@
 .stm-studio .stm-svc-head:not([data-armed]) .stm-svc-sub,.stm-studio .stm-svc-card:not([data-armed]):not(.on),.stm-studio .stm-svc-card:not([data-armed]) .stm-svc-clist > span,.stm-studio .stm-svc-trust:not([data-armed]),.stm-studio .stm-svc-foot:not([data-armed]){opacity:1;transform:none}
 .stm-studio .stm-svc-head:not([data-armed]) .stm-svc-rise > span{transform:none}
 .stm-studio .stm-svc-card:not([data-armed]).on{animation:none}
+
+.stm-studio .stm-opening-login { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 12px; border:1px solid currentColor; border-radius:999px; color:hsl(var(--opening-ivory)); font-weight:700; white-space:nowrap; }
+@media(max-width:600px) { .stm-studio .stm-opening-header-inner { flex-wrap:wrap; padding-block:12px; } .stm-studio .stm-opening-header-actions { margin-left:auto; } }

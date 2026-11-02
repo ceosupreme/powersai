@@ -12,10 +12,11 @@ import { z } from 'zod';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Enter your password'),
 });
 
 const signupSchema = loginSchema.extend({
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {

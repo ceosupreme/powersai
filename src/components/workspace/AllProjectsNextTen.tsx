@@ -84,7 +84,7 @@ export const AllProjectsNextTen = ({
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">
-          Next 10 across all projects
+          Next 10 · {projects.length === 1 ? projects[0].name : `${projects.length} selected brands`}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-1">

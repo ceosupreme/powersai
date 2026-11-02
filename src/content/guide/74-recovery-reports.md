@@ -56,3 +56,5 @@ A Recovery Report is a weekly one-page summary for a client: leads captured, fol
 - With "All projects" selected the list mixes clients without showing their names, and the branded view says "your business". Pick a client first.
 - "Copy for client" includes formatting symbols such as # and asterisks, which show as plain characters in some apps.
 - The public report page needs no login, is hidden from search engines and shows only the client-facing report.
+
+Set Average sale and Close rate in the project’s Edit form to use project-specific economics. Recovery calculations prefer these values, then existing period values and defaults when unset. Estimates remain estimates, not confirmed revenue.

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { ASANA_TEAM } from '@/services/asana';
 
 export interface TeamMember {
   id: string;
@@ -12,12 +11,12 @@ export interface TeamMember {
   asanaGid?: string;
 }
 
-// Fetch all team members (profiles + Asana team) for assignment dropdown
+// Fetch all team members (current authenticated profiles) for assignment dropdown
 export const useTeamMembers = () => {
   const { session } = useAuth();
 
   return useQuery({
-    queryKey: ['team-members'],
+    queryKey: ['team-members', session?.user.id],
     queryFn: async (): Promise<TeamMember[]> => {
       // Fetch profiles and venue leadership contacts in parallel
       const [profilesRes, leadershipRes] = await Promise.all([
@@ -32,6 +31,7 @@ export const useTeamMembers = () => {
       ]);
 
       if (profilesRes.error) throw profilesRes.error;
+      if (leadershipRes.error) throw leadershipRes.error;
 
       const leadershipContacts = leadershipRes.data || [];
 
@@ -44,25 +44,12 @@ export const useTeamMembers = () => {
       }
 
       // Resolve Asana GIDs for profile members
-      const resolvedGids = new Set<string>();
       const profileMembers: TeamMember[] = (profilesRes.data || []).map(p => {
         // 1. Use profile.asana_gid (admin-set) first
         let asanaGid = (p as any).asana_gid as string | undefined;
 
         // 2. Then venue leadership contacts
         if (!asanaGid) asanaGid = profileToAsanaGid.get(p.id);
-
-        // 3. Then fuzzy match ASANA_TEAM
-        if (!asanaGid && p.full_name) {
-          const nameLC = p.full_name.toLowerCase();
-          const asanaMatch = ASANA_TEAM.find(a => {
-            const aLC = a.name.toLowerCase();
-            return aLC === nameLC || aLC.includes(nameLC) || nameLC.includes(aLC);
-          });
-          if (asanaMatch) asanaGid = asanaMatch.gid;
-        }
-
-        if (asanaGid) resolvedGids.add(asanaGid);
 
         return {
           ...p,
@@ -71,19 +58,7 @@ export const useTeamMembers = () => {
         };
       });
 
-      // Add Asana team members whose GID wasn't already resolved to a profile
-      const asanaOnlyMembers: TeamMember[] = ASANA_TEAM
-        .filter(asana => !resolvedGids.has(asana.gid))
-        .map(asana => ({
-          id: `asana-${asana.gid}`,
-          full_name: asana.name,
-          email: null,
-          avatar_url: null,
-          isAsanaOnly: true,
-          asanaGid: asana.gid,
-        }));
-
-      return [...profileMembers, ...asanaOnlyMembers];
+      return profileMembers;
     },
     enabled: !!session,
     staleTime: 5 * 60 * 1000,

@@ -6,20 +6,20 @@ HQ can download your records as one backup file or as spreadsheets, one table at
 ## Where to find it
 
 - Backup & Export: Admin Panel, "Settings", "Backup & Export" (a download-arrow icon on a phone, tenth in the row). Only the admin can open it.
-- A reminder card, "No backup on record" or "Last backup was" a number of "days ago", appears on Today when you have not exported anything for 30 days. Its "Export backup" button opens the same screen.
+- A reminder card, "No backup on record" or "Last backup was" a number of "days ago", appears on Dashboard when you have not exported anything for 30 days. Its "Export backup" button opens the same screen.
 - Archive buttons live on CRM, Brand Kit, Capture Inbox and CRM's "Inbound Leads", described below.
 
 ## What you see
 
 - A tip, "Back up before big changes".
 - The "Backup & Export" card with "Download Full JSON Backup".
-- Eight groups of tables: "CRM", "Brand Vault", "Capture", "Inbound Leads", "Projects", "Tasks", "Authored Content" and "Marketing", 25 tables in all. Each row shows the table's name, its internal name, a row count ("counting…", a number of rows, or "no access") and a "CSV" button.
+- Eight groups of tables: CRM, Brand Vault, Capture, Inbound Leads, Projects, Tasks, Authored Content and Marketing. Each row shows its name, row count or access error, and a CSV button.
 
 ## How to use it
 
 ### Download a full backup
 1. Open "Backup & Export" and tap "Download Full JSON Backup".
-2. Wait for "Full backup ready", which shows how many tables and rows it saved.
+2. Wait for "Backup ready", which shows how many tables and rows it saved. A partial backup shows a warning and records the failed tables in the file.
 3. A file named "supreme-team-backup-" plus today's date downloads. Save it outside HQ, for example in Google Drive.
 
 ### Export one table as a spreadsheet
@@ -50,11 +50,13 @@ HQ can download your records as one backup file or as spreadsheets, one table at
 
 ## Good to know
 
-- The backup covers only the 25 tables listed. Action items, logs, chat, content items, playbooks, production jobs, channel revenue, products and offers are not in it.
+- The export includes the tables listed on this screen, now including production jobs, action items, content, research, playbooks, brand channels, products, offers and channel revenue. It is not a complete database snapshot; logs, chat, authentication records and unlisted tables are outside its scope.
 - Uploaded files such as images and PDFs are not in the backup, only their details.
-- Each table is downloaded in a single request. Not confirmed: Supabase normally stops a single request at 1,000 rows, so a bigger table may come out short. Compare the rows in the file with the count on screen.
+- Tables are downloaded in ordered pages of 500 rows. The manifest lists each table’s exported count and failures. A partial export is labeled partial and does not update the last-successful-backup date.
 - Exports include only rows your login can read. As the admin, that is everything.
 - Projects have no archive button. Instead, set "Status" to "Inactive" in the project's "Edit" form. "Delete Project" under "Advanced" is permanent.
 - Deleting a brand kit removes its color, tagline, hashtag, link and asset records. The uploaded files stay in storage.
 - These can only be deleted, never archived: tasks, chat messages, draft logs, users, work items, landers, bundles, packages, templates and project types. Most ask you to confirm first, but deleting a chat message or a batch of tasks does not. Submitted logs cannot be deleted at all.
 - Some screens use "Archived" as a status instead of the archive box, such as Growth Audit's Action Center, Playbooks and Marketing Hub campaigns.
+
+Rows can change during export, so the download is not a transactionally consistent snapshot. Store uploaded files separately; only their metadata is exported.

@@ -1,3 +1,4 @@
+import { BrandReportRoute } from '@/components/shared/BrandReportRoute';
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +16,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/queryClient";
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'));
+const ProjectReportRoute = lazy(() => import('./components/shared/ProjectReportRoute'));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const WeeklyReview = lazy(() => import("./pages/WeeklyReview"));
 const Sales = lazy(() => import("./pages/Sales"));
@@ -209,17 +212,17 @@ const App = () => {
                 } />
                 <Route path="/dashboard" element={
                   <ProtectedRoute allowedRoles={['owner', 'gm', 'lead', 'foh', 'boh']}>
-                    <AppLayout><Dashboard /></AppLayout>
+                    <AppLayout><BrandReportRoute><Dashboard /></BrandReportRoute></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/workspace" element={
                   <ProtectedRoute>
-                    <AppLayout><Workspace /></AppLayout>
+                    <AppLayout><OwnerDashboard /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/weekly-review" element={
                   <ProtectedRoute>
-                    <AppLayout><WeeklyReview /></AppLayout>
+                    <AppLayout><ProjectReportRoute mode="weekly"><WeeklyReview /></ProjectReportRoute></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/sales" element={
@@ -244,7 +247,7 @@ const App = () => {
                 } />
                 <Route path="/insights" element={
                   <ProtectedRoute>
-                    <AppLayout><Insights /></AppLayout>
+                    <AppLayout><ProjectReportRoute mode="insights"><Insights /></ProjectReportRoute></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/insights/audit" element={
@@ -392,7 +395,7 @@ const App = () => {
                 } />
                 <Route path="/employees" element={
                   <ProtectedRoute>
-                    <AppLayout><Employees /></AppLayout>
+                    <AppLayout><BrandReportRoute team><Employees /></BrandReportRoute></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/employees/:id" element={

@@ -12,6 +12,8 @@ export type BrandKit = {
   secondary_font: string | null;
   do_notes: string | null;
   dont_notes: string | null;
+  content_pillars?: string[];
+  mix_targets?: Record<string, number>;
   archived?: boolean;
   archived_at?: string | null;
   archive_reason?: string | null;
@@ -216,7 +218,8 @@ export function buildAssetPath(projectId: string, kitId: string, fileName: strin
 export function useUploadAsset(projectId: string | null | undefined, kitId: string | null) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async (input: File | { file: File; assetType: string }) => {
+      const file = input instanceof File ? input : input.file;
       if (!projectId || !kitId) throw new Error('Kit not ready');
       // Hard-enforce uuid format on both segments before touching storage.
       const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -230,7 +233,7 @@ export function useUploadAsset(projectId: string | null | undefined, kitId: stri
       if (upErr) throw upErr;
       const { data: userRes } = await supabase.auth.getUser();
       const uid = userRes.user?.id;
-      const assetType = file.type.startsWith('image/') ? 'image' : 'file';
+      const assetType = input instanceof File ? (file.type.startsWith('image/') ? 'image' : 'file') : input.assetType;
       const { data, error } = await supabase.from('brand_kit_assets').insert({
         kit_id: kitId, storage_path: path, file_name: file.name,
         asset_type: assetType, mime_type: file.type || null, file_size: file.size,

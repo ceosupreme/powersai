@@ -44,9 +44,7 @@ export async function generateActionPack(
     if (!data || !Array.isArray(data.assets)) throw new Error('Malformed AI response');
     return { ...data, source: 'ai' } as ActionPack;
   } catch (e) {
-    console.warn('[GROWTH-AUDIT] AI generation failed, falling back to mock:', e);
-    const pack = await mockGenerateActionPack(context, venue);
-    return { ...pack, source: 'mock' };
+    throw new Error(e instanceof Error ? e.message : 'Content generation failed. Please retry.');
   }
 }
 
@@ -73,7 +71,6 @@ export async function regenerateAsset(
       editedAt: new Date().toISOString(),
     };
   } catch (e) {
-    console.warn('[GROWTH-AUDIT] AI regenerate failed, falling back to mock:', e);
-    return mockRegenerateAsset(asset, context, venue, refinement);
+    throw new Error(e instanceof Error ? e.message : 'Regeneration failed. Your existing content is unchanged.');
   }
 }

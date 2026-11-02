@@ -93,10 +93,10 @@ const toRow = (c: Campaign): Row => ({
   updated_at: new Date().toISOString(),
 });
 
-export const useCampaignStore = () => {
+export const useCampaignStore = (projectId?: string | null) => {
   const qc = useQueryClient();
 
-  const { data = [], isLoading, refetch } = useQuery({
+  const { data = [], isLoading, error, refetch } = useQuery({
     queryKey: QK,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -141,7 +141,8 @@ export const useCampaignStore = () => {
   });
 
   return {
-    campaigns: data,
+    campaigns: projectId ? data.filter(c => c.venueId === projectId) : data,
+    error,
     loading: isLoading,
     refresh: () => refetch(),
     get: (id: string) => data.find(c => c.id === id) ?? null,

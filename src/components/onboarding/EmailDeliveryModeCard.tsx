@@ -98,7 +98,7 @@ export function EmailDeliveryModeCard({ projectId }: { projectId: string }) {
   if (isLoading) return null;
   if (enrollments.length === 0) return null;
 
-  const liveDisabled = resendAvailable === false;
+  const liveDisabled = resendAvailable !== true;
   const liveDisabledReason = liveDisabled
     ? 'RESEND_API_KEY is not configured on the server. Add the key in project secrets to enable live delivery.'
     : null;
@@ -118,6 +118,7 @@ export function EmailDeliveryModeCard({ projectId }: { projectId: string }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
+        {mode === 'log_only' && <p role="status" className="rounded-md border border-amber-500 bg-amber-500/10 p-3 text-sm font-medium">Email delivery is OFF. Approving a draft only records it; the recipient receives nothing. Enable live delivery when this project is ready.</p>}
         <p className="text-sm text-muted-foreground">
           Controls whether approved emails for this project actually send.
           SMS remains log-only regardless (Twilio is not live yet).

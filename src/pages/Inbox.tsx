@@ -15,8 +15,12 @@ import { useIntegrationDisabled } from "@/hooks/useIntegrationDisabled";
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
 import { InboundEmailList } from "@/components/inbox/InboundEmailList";
+import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
+import { sortCollection } from "@/lib/collectionSort";
+import { Label } from "@/components/ui/label";
 
 const TYPES: CaptureType[] = ["task","idea","note","brand_asset","crm_lead","content_idea"];
+const TYPE_LABELS: Record<CaptureType, string> = { task: 'Task', idea: 'Idea', note: 'Note', brand_asset: 'Brand asset', crm_lead: 'CRM lead', content_idea: 'Content idea' };
 
 function ItemRow({ item }: { item: CaptureItem }) {
   const { accessibleBars } = useApp();
@@ -59,21 +63,21 @@ function ItemRow({ item }: { item: CaptureItem }) {
 
   return (
     <Card>
-      <CardContent className="p-3 space-y-2">
-        <div className="text-sm whitespace-pre-wrap">{item.raw_text}</div>
+      <CardContent className="p-5 space-y-4">
+        <div className="text-base leading-relaxed whitespace-pre-wrap break-words">{item.raw_text}</div>
         <div className="text-xs text-muted-foreground">
           {new Date(item.created_at).toLocaleString()}
           {item.status === "routed" && item.routed_type && (
-            <Badge variant="outline" className="ml-2">{item.routed_type}</Badge>
+            <Badge variant="outline" className="ml-2">{TYPE_LABELS[item.routed_type] ?? item.routed_type}</Badge>
           )}
         </div>
 
         {item.status === "inbox" && (
           <>
             {!aiDisabled && item.ai_suggestion_status === "suggested" && (
-              <div className="flex items-center gap-2 p-2 rounded bg-primary/5 text-xs">
+              <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-primary/30 bg-primary/5 text-sm">
                 <Sparkles className="h-3 w-3 text-primary" />
-                <span>Suggest: <b>{item.suggested_type ?? "—"}</b>
+                <span>Suggested: <b>{item.suggested_type ? TYPE_LABELS[item.suggested_type] : "—"}</b>
                   {item.suggested_project_id ? ` · ${accessibleBars.find(b => b.id === item.suggested_project_id)?.bar_name ?? "project"}` : ""}
                 </span>
                 <Button size="sm" className="ml-auto h-7" onClick={acceptSuggestion}>
@@ -88,24 +92,28 @@ function ItemRow({ item }: { item: CaptureItem }) {
               </Button>
             )}
 
-            <div className="flex gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3">
+              <div className="space-y-1.5"><Label htmlFor={`capture-project-${item.id}`}>Project</Label>
               <Select value={project} onValueChange={setProject}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Project" /></SelectTrigger>
+                <SelectTrigger id={`capture-project-${item.id}`}><SelectValue placeholder="Choose a project" /></SelectTrigger>
                 <SelectContent>
-                  {accessibleBars.map((b) => (
+                  {[...accessibleBars].sort((a, b) => a.bar_name.localeCompare(b.bar_name)).map((b) => (
                     <SelectItem key={b.id} value={b.id}>{b.bar_name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              </div><div className="space-y-1.5"><Label htmlFor={`capture-type-${item.id}`}>Save as</Label>
               <Select value={type} onValueChange={(v) => setType(v as CaptureType)}>
-                <SelectTrigger className="h-8 text-xs w-36"><SelectValue placeholder="Type" /></SelectTrigger>
+                <SelectTrigger id={`capture-type-${item.id}`}><SelectValue placeholder="Choose a type" /></SelectTrigger>
                 <SelectContent>
-                  {TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {TYPES.map((t) => <SelectItem key={t} value={t}>{TYPE_LABELS[t]}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Button size="sm" className="h-8" onClick={() => route()}>Route</Button>
-              <Button size="sm" variant="ghost" className="h-8"
-                onClick={() => m.archive.mutate(item.id)}><Archive className="h-3 w-3" /></Button>
+              </div><div className="flex gap-2">
+              <Button size="sm" disabled={!type || (type !== 'crm_lead' && !project) || m.routeItem.isPending} onClick={() => route()}>Route item</Button>
+              <Button size="icon" variant="outline" aria-label="Archive this capture"
+                onClick={() => m.archive.mutate(item.id)}><Archive className="h-4 w-4" /></Button>
+              </div>
             </div>
           </>
         )}
@@ -115,18 +123,23 @@ function ItemRow({ item }: { item: CaptureItem }) {
 }
 
 export default function Inbox() {
+  const aiDisabled = useIntegrationDisabled("capture_ai_routing");
   const [status, setStatus] = useState<CaptureStatus | "email">("inbox");
   const items = useCaptureItems(status === "email" ? "inbox" : status);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('oldest');
+  const visible = sortCollection((items.data ?? []).filter(it => it.raw_text.toLowerCase().includes(query.trim().toLowerCase()))
+    .map(it => ({...it, title: it.raw_text})), sort);
 
   return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto pb-24 space-y-4">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto pb-24 space-y-4">
       <header className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <InboxIcon className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Inbox</h1>
-          <p className="text-sm text-muted-foreground">Capture first, route later</p>
+          <h1 className="text-2xl font-bold">Capture Inbox</h1>
+          <p className="text-sm text-muted-foreground">All projects · capture first, route later</p>
         </div>
       </header>
 
@@ -141,14 +154,18 @@ export default function Inbox() {
           <TabsContent value="email" className="mt-3"><InboundEmailList /></TabsContent>
         ) : (
           <>
+            <div className="mt-4"><CollectionToolbar query={query} onQuery={setQuery} placeholder="Find a captured idea, task, or note…"
+              sort={sort} onSort={setSort} count={visible.length} total={items.data?.length ?? 0}
+              options={[{value:'oldest',label:'Oldest first'},{value:'newest',label:'Newest first'},{value:'name',label:'Text · A to Z'}]} /></div>
+            {aiDisabled && <p role="status" className="rounded border p-3 text-sm">AI routing suggestions are currently disabled. Choose a project and type to route manually.</p>}
             <HelpTip helpKey={HELP_KEYS.captureSuggest} title="AI suggests, you accept" className="mt-3">
               When an item lands here, the AI proposes a type and project — exactly once per item. Nothing files automatically. Click Accept to take the suggestion, or pick your own type + project and click Route.
             </HelpTip>
             <TabsContent value={status} className="mt-3 space-y-2">
-              {(items.data ?? []).length === 0 && (
-                <div className="text-sm text-muted-foreground">Nothing here.</div>
+              {items.isLoading ? <p role="status">Loading captures…</p> : items.isError ? <p role="alert">Captures could not be loaded. <Button variant="link" onClick={() => items.refetch()}>Try again</Button></p> : visible.length === 0 && (
+                <div className="rounded-lg border border-dashed bg-card p-6 text-muted-foreground">{query ? 'No captures match your search.' : 'Nothing here. Use Capture in the header to save a new idea, task, or note.'}</div>
               )}
-              {(items.data ?? []).map((it) => <ItemRow key={it.id} item={it} />)}
+              {visible.map((it) => <ItemRow key={it.id} item={it} />)}
             </TabsContent>
           </>
         )}

@@ -38,7 +38,7 @@ export interface TokenMeta {
 
 export const TOKEN_META: Record<string, TokenMeta> = {
   first: { label: "Their first name", placeholder: "Mike", hint: "From the lead card" },
-  biz: { label: "Business name", placeholder: "Harbor Town Pub" },
+  biz: { label: "Business name", placeholder: "Business name" },
   vertical: { label: "Vertical (slug)", placeholder: "plumber", hint: "e.g. plumber, bar, mover" },
   vertical_noun: { label: "Vertical (spoken)", placeholder: "plumbing shop", hint: "How you'd say it out loud" },
   leak_$: { label: "Monthly leak amount ($)", placeholder: "4,800", hint: "From their checkup or leak stack run" },

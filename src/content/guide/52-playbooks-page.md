@@ -4,8 +4,8 @@
 Playbooks is HQ's how-to library: the written instructions HQ and Claude follow whenever they make something, publish it, earn from it or promote it. Use this screen to see which playbooks are written, thin or still planned, to read one in full, and to hand Claude your own material so it is merged into the next version.
 
 ## Where to find it
-- On a computer, tap "Playbooks" under "Growth & Marketing" in the left menu.
-- On a phone, tap "More" in the bottom bar, then "Playbooks" under "Growth & Marketing".
+- On a computer, tap "Playbooks" under "Content & Production" in the left menu.
+- On a phone, tap "More" in the bottom bar, then "Playbooks" under "Content & Production".
 - Playbook names on a brand's "Playbooks" and "Setup" tabs, and the playbook name on the page of a job that is writing a playbook, open this screen with that playbook already open.
 - The menu shows it to admin accounts only. The old /methods address also opens it.
 
@@ -13,7 +13,7 @@ Playbooks is HQ's how-to library: the written instructions HQ and Claude follow 
 - The heading "Playbooks", the "Add your material" button, and the link "Or drop files in the Playbook Inbox folder".
 - A row of seven shelves that you can swipe sideways. Under each shelf name is a count such as "9 written, 2 thin, 4 planned". The screen opens on "Formats".
 - "Formats" holds what you make, such as a long-form video, a printable or a book. "Platforms" holds where it goes live, such as YouTube, Etsy or KDP (Amazon's self-publishing service). "Money paths" holds how it earns, such as a lead magnet (a free item that collects contacts), affiliate links or a direct sale. "Niches" holds audience playbooks. "Promotion" holds ways to drive traffic. "Rules" holds platform requirements and each brand's rules. "Plays" holds proven combinations; it stays empty until a pipeline's 30-day check shows something worked, and it says so.
-- A "Search by title" box and a brand filter that starts on "All brands". On "Niches" there is also a group filter that starts on "All groups".
+- A "Search by title" box and a brand filter synchronized with the main selector. On "Niches" there is also a group filter that starts on "All groups".
 - The list for the chosen shelf. Each row shows the title, a status word, the version (such as v1.2), "Review by" with a date, and the Claude skill or pack that goes with it, or "No skill or pack".
 - On "Niches", rows are grouped under Pets, Health and wellness, Safety and self-reliance, Money and business, Local and city, Music and nightlife, Faith and spirit, Lifestyle and hobbies, Cross-brand buyers, and Other. Each row lists the brands it serves, with "(core)" after its core brands.
 - Tapping a row opens the playbook in a side panel. From the top: the status word, "Version" and "Review by"; the description and summary; an "Open readable copy" button when a readable copy exists; the numbered "Steps", "Setup" and "Adds to a pipeline" lists, where each step says "Who:" and, when there is one, "Check:"; for niches, "Brand angles", "Money map" and "Content map"; the "Full playbook" text in a scrolling box; "Being written or updated"; "Version history"; "Sources"; and, for admins, "Edit (admin)".
@@ -48,6 +48,13 @@ Playbooks is HQ's how-to library: the written instructions HQ and Claude follow 
 2. Change "Version", "Review by", "Last reviewed" or "Status". The status choices are "Planned", "Active", "Under review", "Superseded" and "Archived".
 3. Tap "Save".
 
+
+### Find a playbook quickly
+1. Choose a category. Category buttons wrap so every category stays reachable.
+2. Search by title, then narrow by brand or readiness: Written, Thin or Planned.
+3. Choose "Sort by" to order by title, put Written playbooks first, or show the earliest review date first. Missing review dates go last.
+4. Use "Clear filters" to reset the search and filters.
+
 ## Words on this screen
 - Playbook: written instructions for one way of making, publishing, earning or promoting.
 - Shelf: one group of playbooks, such as "Formats" or "Rules".
@@ -77,3 +84,6 @@ Playbooks is HQ's how-to library: the written instructions HQ and Claude follow 
 - When you create a pipeline, playbook choices that are not written yet end in "(planned)", and each one becomes a step that reads "Method not written yet". Niche playbooks add background to a pipeline but never add steps. Playbooks used to be called Methods, which is why that step still says Method.
 - Jobs that write playbooks appear only here, under "Being written or updated", and not in a brand's job lists.
 - If the library can't load, the screen says "Playbooks could not be loaded." with a "Try again" link.
+
+## Main brand selection
+The Brand filter stays in sync with the main header selector. Choose All brands to return to the full accessible list.
