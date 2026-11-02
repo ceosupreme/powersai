@@ -55,7 +55,7 @@ Only unfinished drafts you created yourself can be deleted. Logs filed on this s
 
 ## Good to know
 
-- The card you tap is not saved with the log. An incident, a shoutout and shift notes are all stored as a "Staff Quick Log", so the list cannot tell them apart. Put the kind of report in the first answer.
+- The chosen card is saved as the log’s intent. Older logs may have no intent recorded.
 - There is no edit screen. The edit address sends you back to Logs, so check your answers before you submit.
 - Saved voice notes do not appear in "Previous Logs" or anywhere else in HQ. The only way to see them is the "Voice Notes" export in Admin Panel, "Settings", "Backup & Export".
 - The questions on each form come from HQ's form setup. There is no screen in HQ for changing them.

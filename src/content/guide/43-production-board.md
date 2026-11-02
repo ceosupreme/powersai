@@ -5,14 +5,14 @@ The Production Board shows the content pieces of all your brands in one place, s
 
 ## Where to find it
 
-- On a phone, tap "More" in the bottom bar, then "Production Board". On a computer, choose "Production Board" in the side menu under "Growth & Marketing".
+- On a phone, tap "More" in the bottom bar, then "Production Board". On a computer, choose "Production Board" in the side menu under "Content & Production".
 - The address is /production-board.
 - It is for admins only. Anyone else sees "The Production Board is available to admins only."
 
 ## What you see
 
-- The title "Production Board", the line "Every internal brand in one place, by production step." and an "Import package" button.
-- Three filters:
+- The title "Production Board", the line "All brands · find the next piece to finish, review, or schedule." and an "Import package" button.
+- Four filters, plus search and sorting:
   - Brand: "All brands" or one brand.
   - Content mode: "Any content mode", "Growth", "Baseline" or "Parked".
   - Channel: "Any channel", or one of instagram, facebook, pinterest, tiktok, youtube, blog, email, x, linkedin or other.
@@ -37,7 +37,7 @@ The Production Board shows the content pieces of all your brands in one place, s
 ### To approve a piece
 1. Find its card and check "Quality" and any hard fails.
 2. Tap "Approve". HQ shows "Approved".
-3. If "Approve" is grey, the piece is not ready. On a computer, point at the button to see why: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+3. If "Approve" is grey, the piece is not ready. Read the reason below it: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
 
 ### To approve several pieces at once
 1. The board has no batch button. Open the brand from "Portfolio" under "My brands".
@@ -57,6 +57,14 @@ The Production Board shows the content pieces of all your brands in one place, s
 2. Choose the brand under "Brand".
 3. Choose the package's asset-manifest.json file.
 4. Read the "Created" and "Skipped" lists, then tap "Done".
+
+
+### Find the next piece
+1. Search by title or brand. The count shows how many items match.
+2. Choose "Sort by": earliest due date, oldest, newest, highest quality or title. Missing dates and scores sort last.
+3. Use "Focus" to show all work, pieces ready for approval, or pieces with quality failures.
+4. Use "Clear filters" to restore all brands, modes, channels and work.
+5. Read the reason printed below an unavailable "Approve" button. A due date appears on cards that have one.
 
 ## Words on this screen
 
@@ -81,8 +89,11 @@ The Production Board shows the content pieces of all your brands in one place, s
 - Published pieces leave the tabs and are only counted in "Done:".
 - Moving a piece to "Published" only changes its record. Nothing in HQ posts to any platform by itself.
 - There is no box on this page for typing a score. Claude fills them in: the monthly Radar run sets idea scores on the briefs it files, and Claude sets the quality score when it checks a finished piece against the content standard.
-- The four-week mix counts every piece created for that brand in the last 28 days, whatever the other two filters say.
-- The mix targets come from the brand kit. The Brand Kit page lists them under "Mix targets" but has no box to change them. Not confirmed: where they are set.
+- The four-week mix counts every piece created for that brand in the last 28 days, whatever the other filters say.
+- The mix targets come from the brand kit. Edit them in the Brand Kit content strategy section.
 - The board includes every brand that is switched on, parked ones too. If it says "No internal brand projects are switched on yet.", note that the on and off switch is the "Status" switch ("Active" or "Inactive") in the project's edit window in the Admin Panel, not the "Active" and "Parked" buttons on the brand page.
 - A repeat import of the same package adds nothing twice. New pieces start at the stage named in the file, or Idea, and each gets a draft placement.
 - The import reads only the manifest file. It records the files the manifest lists but does not upload them. Not confirmed: where those files must already be stored.
+
+## Main brand selection
+The Brand filter stays in sync with the main header selector. Choose All brands to return to the full accessible list.

@@ -12,11 +12,12 @@ export function useProjectType(projectId: string | null | undefined) {
     queryKey: ['project-type', projectId],
     enabled: !!projectId,
     queryFn: async (): Promise<ProjectType> => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('venues')
         .select('project_type')
         .eq('id', projectId!)
         .maybeSingle();
+      if(error) throw error;
       return ((data as any)?.project_type ?? 'client') as ProjectType;
     },
     staleTime: 60_000,

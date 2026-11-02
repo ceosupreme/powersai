@@ -50,8 +50,10 @@ The "Avenues" tab shows the brand's money avenues: the ways this brand can earn,
 
 - The first step of a "Turn this on" job lists, in its instructions, the brand's setup items that are not on yet, so you can see what has to be fixed first.
 - HQ matches the job to a platform playbook by the avenue's name (Etsy, KDP, YouTube, Pinterest, Payhip, Gumroad, Shopify, TikTok, Instagram, Facebook, blog or email), when that playbook exists.
-- "Turn this on" does not check whether a job for that avenue already exists, so tapping it twice creates two jobs.
+- Repeating "Turn this on" for the same avenue opens its existing active pipeline. Finished and canceled jobs remain in history.
 - Not confirmed: whether finishing the job marks the avenue on by itself. If an avenue is live and still shows under "Not on yet", use "Mark on".
 - Avenues that are not on and rated critical or high also show in "Next 10", with their value per hour, for example "about $40/hr".
 - The "Playbooks" tab calls a partly-on avenue "Partly on", while this tab files it under "Unknown".
 - There is no way to change the estimates on this tab. Not confirmed: where they are set; no screen covered in this guide edits them.
+
+Admins can use "Estimates" on an avenue to edit estimated 90-day revenue, confidence (0 to 1), leverage and hours. These are planning estimates, not recorded earnings.

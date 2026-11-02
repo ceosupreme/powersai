@@ -83,3 +83,5 @@ Every project in HQ has a type, and the type supplies the project's pillars, lea
 - The qualifier editor has no "required" switch and no place to edit answer choices, although the older Help Center says otherwise.
 - Many integration fields come from the restaurant product, such as Toast POS and 7shifts.
 - Deleting, adding and resetting here use your browser's own pop-up boxes.
+
+The project Edit form includes Average sale and Close rate (%). These supply project-specific values for leak and recovery estimates. Leave them blank only when you intend to use the existing fallback values.

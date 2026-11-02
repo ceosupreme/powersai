@@ -44,14 +44,40 @@ export const BACKUP_TABLES: BackupTable[] = [
   { name: "marketing_campaigns",      label: "Marketing Campaigns",      group: "Marketing" },
   { name: "marketing_events",         label: "Marketing Events",         group: "Marketing" },
   { name: "promotions",               label: "Promotions",               group: "Marketing" },
+  { name: "production_jobs", label: "Production Jobs", group: "Authored Content" },
+  { name: "action_items", label: "Action Items", group: "Authored Content" },
+  { name: "content_items", label: "Content Items", group: "Authored Content" },
+  { name: "content_families", label: "Content Families", group: "Authored Content" },
+  { name: "content_placements", label: "Content Placements", group: "Authored Content" },
+  { name: "content_sources", label: "Content Sources", group: "Authored Content" },
+  { name: "audience_pains", label: "Audience Pains", group: "Authored Content" },
+  { name: "playbook_sources", label: "Playbook Sources", group: "Authored Content" },
+  { name: "brand_channels", label: "Brand Channels", group: "Authored Content" },
+  { name: "channel_products", label: "Channel Products", group: "Authored Content" },
+  { name: "channel_product_channels", label: "Channel Product Channels", group: "Authored Content" },
+  { name: "product_listings", label: "Product Listings", group: "Authored Content" },
+  { name: "channel_revenue", label: "Channel Revenue", group: "Authored Content" },
+  { name: "service_offers", label: "Service Offers", group: "Authored Content" },
+  { name: "service_packages", label: "Service Packages", group: "Authored Content" },
+  { name: "service_package_items", label: "Service Package Items", group: "Authored Content" },
+  { name: "affiliate_programs", label: "Affiliate Programs", group: "Authored Content" },
+  { name: "project_kpis", label: "Project Kpis", group: "Authored Content" },
+  { name: "project_kpi_values", label: "Project Kpi Values", group: "Authored Content" },
 ];
 
 export async function fetchTable(name: string): Promise<Record<string, unknown>[]> {
-  // Cast: BACKUP_TABLES is a static superset; supabase types are strict
-  // per-table. RLS still applies at the DB layer regardless of TS typing.
-  const { data, error } = await (supabase as any).from(name).select("*");
-  if (error) throw new Error(`${name}: ${error.message}`);
-  return (data ?? []) as Record<string, unknown>[];
+  if (!BACKUP_TABLES.some(table => table.name === name)) throw new Error('Unknown backup table');
+  const rows: Record<string, unknown>[] = [];
+  const pageSize = 500;
+  const keys = name === 'channel_product_channels' ? ['product_id', 'project_id'] : ['id'];
+  for (let offset = 0; ; offset += pageSize) {
+    let query = (supabase as any).from(name).select('*');
+    for (const key of keys) query = query.order(key, { ascending: true });
+    const { data, error } = await query.range(offset, offset + pageSize - 1);
+    if (error) throw new Error(`${name}: ${error.message}`);
+    rows.push(...(data ?? []));
+    if ((data ?? []).length < pageSize) return rows;
+  }
 }
 
 export async function countTable(name: string): Promise<number> {

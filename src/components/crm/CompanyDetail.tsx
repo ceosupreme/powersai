@@ -1,3 +1,4 @@
+import { EditCrmRecord, COMPANY_FIELDS, CONTACT_FIELDS, DEAL_FIELDS } from './EditCrmRecord';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -159,12 +160,15 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                 </CardContent>
               </Card>
 
+              <EditCrmRecord title="Company" record={company} fields={COMPANY_FIELDS} onSave={patch => m.updateCompany.mutateAsync({id:company.id,patch})} />
               {/* Contacts */}
               <section className="space-y-2">
                 <h3 className="text-sm font-semibold">Contacts</h3>
                 {(contactsQ.data ?? []).map((c) => (
                   <div key={c.id} className="text-sm border rounded p-2">
                     {c.first_name} {c.last_name} {c.email && <span className="text-muted-foreground">· {c.email}</span>}
+                    {c.phone && <p>{c.phone}</p>}
+                    <EditCrmRecord title="Contact" record={c} fields={CONTACT_FIELDS} onSave={patch => m.updateContact.mutateAsync({id:c.id,patch})} />
                   </div>
                 ))}
                 <div className="flex gap-2">
@@ -195,6 +199,7 @@ export function CompanyDetail({ companyId, onOpenChange }: {
                       )}
                     </span>
                     <Badge variant="outline">{d.stage}</Badge>
+                    <EditCrmRecord title="Deal" record={d} fields={DEAL_FIELDS} onSave={patch => m.updateDeal.mutateAsync({id:d.id,patch})} />
                   </div>
                 ))}
                 <div className="space-y-2">

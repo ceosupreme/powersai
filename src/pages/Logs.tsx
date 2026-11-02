@@ -149,6 +149,7 @@ export default function Logs() {
               Back
             </Button>
             <LogForm
+              intent={selectedIntent}
               barId={effectiveBarId!}
               availablePositions={getPositions()}
               onCancel={handleReset}

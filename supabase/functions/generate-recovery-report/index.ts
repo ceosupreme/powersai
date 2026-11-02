@@ -194,8 +194,10 @@ async function aggregateProject(
     .select("*")
     .eq("bar_id", projectId)
     .maybeSingle();
-  let avgTicket = (period as any)?.avg_ticket ?? (period as any)?.average_ticket ?? null;
-  let closeRate = (period as any)?.close_rate ?? (period as any)?.lead_close_rate ?? null;
+  const { data: projectEconomics, error: economicsError } = await supabase.from('venues').select('avg_ticket,close_rate').eq('id',projectId).single();
+  if (economicsError) throw economicsError;
+  let avgTicket = projectEconomics?.avg_ticket ?? (period as any)?.avg_ticket ?? (period as any)?.average_ticket ?? null;
+  let closeRate = projectEconomics?.close_rate ?? (period as any)?.close_rate ?? (period as any)?.lead_close_rate ?? null;
   let source: EstimateBasis["source"] = "project";
   if (avgTicket == null) {
     avgTicket = DEFAULT_AVG_TICKET;

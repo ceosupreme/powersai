@@ -128,10 +128,10 @@ export const CreateTaskDialog = ({ open, onOpenChange, defaultBarId }: CreateTas
           {/* Bar selector (if multiple bars) */}
           {accessibleBars && accessibleBars.length > 1 && (
             <div className="space-y-2">
-              <Label>Bar *</Label>
+              <Label>Project *</Label>
               <Select value={barId} onValueChange={setBarId}>
                 <SelectTrigger className="bg-card border-border">
-                  <SelectValue placeholder="Select a bar" />
+                  <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
                   {accessibleBars.map((bar) => (

@@ -19,7 +19,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useVenues } from '@/hooks/useVenueData';
+import { useApp } from '@/context/AppContext';
 import { useCampaignStore, newCampaignId } from './useCampaignStore';
 import { getAdapter } from './adapters/registry';
 import {
@@ -47,11 +47,12 @@ export const NewCampaignDialog = ({
 }) => {
   const { toast } = useToast();
   const { add, update } = useCampaignStore();
-  const { data: venues = [] } = useVenues();
+  const { accessibleBars, selectedBar } = useApp();
+  const venues = useMemo(() => accessibleBars.map(b => ({id:b.id,name:b.bar_name})).sort((a,b) => a.name.localeCompare(b.name)), [accessibleBars]);
 
   const blank = (): Partial<Campaign> => ({
     title: '',
-    type: 'Daily Special',
+    type: 'Content Push',
     status: 'Draft',
     startDate: new Date().toISOString().slice(0, 10),
     endDate: new Date(Date.now() + 7 * 86400_000).toISOString().slice(0, 10),
@@ -63,8 +64,8 @@ export const NewCampaignDialog = ({
     linkedMenuItems: [],
     successMetric: '',
     attachments: [],
-    venueId: venues[0]?.id ?? '',
-    venueName: venues[0]?.name ?? '',
+    venueId: selectedBar?.id ?? '',
+    venueName: selectedBar?.bar_name ?? '',
   });
 
   const [form, setForm] = useState<Partial<Campaign>>(blank());
@@ -101,7 +102,7 @@ export const NewCampaignDialog = ({
     }
     if (!form.description?.trim()) e.description = 'Description is required';
     if (!form.objective?.trim()) e.objective = 'Objective is required';
-    if (!form.venueId) e.venueId = 'Venue is required';
+    if (!form.venueId) e.venueId = 'Choose a brand or client project';
     return e;
   }, [form]);
 
@@ -214,7 +215,7 @@ export const NewCampaignDialog = ({
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Venue" error={errors.venueId} required>
+            <Field label="Brand or client project" error={errors.venueId} required>
               <select
                 value={form.venueId ?? ''}
                 onChange={e => {

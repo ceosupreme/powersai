@@ -1,6 +1,8 @@
+import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
+import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -541,6 +543,7 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
   const [marking, setMarking] = useState(false);
   const [req, setReq] = useState<PipelineRequest | null>(null);
   const [evidence, setEvidence] = useState('');
+  const laneQc = useQueryClient();
   const score = laneScore(item);
   return (
     <div className="rounded-2xl border-2 border-gold/40 bg-card p-4 space-y-2">
@@ -552,6 +555,22 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
         <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">per hour</p></div>
         <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">est. 90 days</p></div>
       </div>
+      {canEdit && <EditCrmRecord title="Estimates" record={item} fields={[
+        {key:'est_dollars_90d',label:'Estimated revenue over 90 days ($)',type:'number'},
+        {key:'confidence',label:'Confidence (0 to 1)',type:'number'},
+        {key:'leverage',label:'Leverage multiplier',type:'number'},
+        {key:'est_hours',label:'Estimated hours',type:'number'},
+      ]} onSave={async patch => {
+        if (patch.confidence != null && patch.confidence > 1) throw new Error('Confidence must be between 0 and 1.');
+        if (patch.est_hours != null && patch.est_hours <= 0) throw new Error('Hours must be greater than zero.');
+        const {error} = await (supabase as any).from('project_foundation_item_overrides').upsert({
+          project_id:projectId,item_key:item.item_key,category_key:item.category_key,label:item.label,
+          detection_signal:item.detection_signal,is_manual_only:item.is_manual_only,severity:item.severity,
+          ...patch,
+        },{onConflict:'project_id,item_key'});
+        if(error) throw error;
+        await laneQc.invalidateQueries();
+      }} />}
       {item.recommended_fix && <p className="text-xs text-muted-foreground">{item.recommended_fix}</p>}
       <p className="text-xs">Status: <span className="capitalize">{String(item.status).replace(/_/g, ' ')}</span></p>
       {canEdit && item.status !== 'satisfied' && (
@@ -721,9 +740,9 @@ function IntelTab({ projectId }: { projectId: string }) {
                   </p>
                 </div>
                 <Button size="sm" variant="outline" onClick={async () => {
-                  try { setReq(await contentItemFromPain(projectId, p.pain_text)); }
+                  try { setReq(await contentItemFromPain(projectId, p.pain_text, p.id)); }
                   catch (e: any) { toast.error(e?.message ?? 'Could not create the item'); }
-                }}>Make this</Button>
+                }}>Make this</Button><PainUsageBadge projectId={projectId} painId={p.id} />
               </li>
             ))}
           </ol>

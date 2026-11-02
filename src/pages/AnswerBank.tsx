@@ -1,3 +1,4 @@
+import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -217,9 +218,9 @@ export default function AnswerBank() {
                       {p.source_count} sources
                     </span>
                     <Button size="sm" variant="outline" className="ml-auto h-8" onClick={async () => {
-                      try { setPipeReq(await contentItemFromPain(p.project_id, p.pain_text)); }
+                      try { setPipeReq(await contentItemFromPain(p.project_id, p.pain_text, p.id)); }
                       catch (e: any) { toast.error(e?.message ?? "Could not create the item"); }
-                    }}>Make this</Button>
+                    }}>Make this</Button><PainUsageBadge projectId={p.project_id} painId={p.id} />
                   </div>
                   {isOpen && (
                     <div className="pl-6 space-y-3 text-sm">

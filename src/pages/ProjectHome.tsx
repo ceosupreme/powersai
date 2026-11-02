@@ -156,7 +156,7 @@ export default function ProjectHome() {
   const live = useVenueLiveStatus(progress.statusFor);
 
   // Non-client projects get the one-glance view; client projects are untouched.
-  const isNonClient = !!meta && (meta.project_type ?? CLIENT_PROJECT_TYPE) !== CLIENT_PROJECT_TYPE;
+  const isNonClient = !!meta && projectGroup({ project_type: meta.project_type, is_prospect_shell: false }) === 'brands';
   const { data: pillars = [], isError: pillarsError } = useEffectivePillars(
     isNonClient ? venueId : null,
     meta?.project_type ?? undefined,

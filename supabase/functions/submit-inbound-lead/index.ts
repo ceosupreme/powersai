@@ -141,62 +141,22 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Emergency alert — fire-and-forget, never blocks the response.
-  if (urgency_class === "emergency" && inserted?.id) {
+  // Await downstream acceptance so the edge runtime cannot drop these calls after response.
+  // A notification failure never rolls back a saved inquiry.
+  const dispatch = async (name: string) => {
     try {
-      fetch(`${supabaseUrl}/functions/v1/alert-emergency-lead`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${serviceRoleKey}`,
-        },
-        body: JSON.stringify({ lead_id: inserted.id }),
-      }).catch((e) => console.error("[submit-inbound-lead] alert-emergency error", e));
-    } catch (e) {
-      console.error("[submit-inbound-lead] alert-emergency dispatch failed", e);
-    }
-  }
-
-  // Owner-only notification for general website inquiries (no client project).
-  // Fire-and-forget: a notification failure must never fail the save.
-  if (inserted?.id && !captured_for_project_id && (route_to ?? "self") === "self") {
-    try {
-      fetch(`${supabaseUrl}/functions/v1/notify-owner-inquiry`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${serviceRoleKey}`,
-        },
-        body: JSON.stringify({ lead_id: inserted.id }),
-      }).catch((e) => console.error("[submit-inbound-lead] owner notify error", e));
-      fetch(`${supabaseUrl}/functions/v1/send-prospect-acknowledgment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
-        body: JSON.stringify({ lead_id: inserted.id }),
-      }).catch((e) => console.error("[submit-inbound-lead] acknowledgment error", e));
-    } catch (e) {
-      console.error("[submit-inbound-lead] owner notify dispatch failed", e);
-    }
-  }
-
-  // Fire-and-forget Build C follow-up sequence enrollment. If the project for
-  // this lead is enrolled in follow_up_sequence automation, enqueue drafts.
-  // Errors here do NOT block the lead submission response.
-  try {
-    if (inserted?.id) {
-      const url = `${supabaseUrl}/functions/v1/enqueue-followup-sequence`;
-      // Don't await — best-effort.
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${serviceRoleKey}`,
-        },
-        body: JSON.stringify({ lead_id: inserted.id }),
-      }).catch((e) => console.error("[submit-inbound-lead] enqueue-followup error", e));
-    }
-  } catch (e) {
-    console.error("[submit-inbound-lead] enqueue dispatch failed", e);
+      const response = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceRoleKey}` },
+        body: JSON.stringify({ lead_id: inserted!.id }), signal: AbortSignal.timeout(15000),
+      });
+      if (!response.ok) console.error(`[submit-inbound-lead] ${name} failed`, response.status);
+    } catch (error) { console.error(`[submit-inbound-lead] ${name} failed`, error); }
+  };
+  if (inserted?.id) {
+    const calls = [dispatch('notify-owner-inquiry'), dispatch('enqueue-followup-sequence')];
+    if (urgency_class === 'emergency') calls.push(dispatch('alert-emergency-lead'));
+    if (!captured_for_project_id && (route_to ?? 'self') === 'self') calls.push(dispatch('send-prospect-acknowledgment'));
+    await Promise.allSettled(calls);
   }
 
   return new Response(JSON.stringify({ ok: true, id: inserted?.id }), {

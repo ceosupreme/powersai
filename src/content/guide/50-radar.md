@@ -4,8 +4,8 @@
 Radar is where you read the research HQ has collected: niche profiles, a library of findings marked proven or emerging, scored content ideas for each brand, and a log of research runs. Use it to choose what to make next, and tap "Make this" on a brief to turn it straight into a pipeline, HQ's step-by-step production job.
 
 ## Where to find it
-- On a computer, tap "Radar" under "Growth & Marketing" in the left menu.
-- On a phone, tap "More" in the bottom bar, then "Radar" under "Growth & Marketing".
+- On a computer, tap "Radar" under "Content & Production" in the left menu.
+- On a phone, tap "More" in the bottom bar, then "Radar" under "Content & Production".
 - Radar shows every brand at once. The project picker at the top of the screen does not filter it.
 
 ## What you see

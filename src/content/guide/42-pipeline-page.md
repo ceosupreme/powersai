@@ -34,7 +34,7 @@ At the top:
 - An owner badge: "Claude", "You", "Agent", "Tool" or "Unassigned".
 - The name of the playbook the step came from.
 - "Current step" on the step the job is on now. That card has a highlighted border, and the page scrolls to it when it opens. Finished steps look slightly faded.
-- Buttons, depending on the step: "View instructions", "Open", "Done", "Hand to Claude", "Queue" (or the words "Queued for the next run"), and "Copy prompt".
+- Buttons, depending on the step: "View instructions", "Open", "Done", "Hand to Claude", "Queue" (or "Queued · awaiting worker"), and "Copy prompt".
 - On a content job, a step whose title starts with "Gate" or "Quality gate" also shows a gate strip: "Quality score", "Fails:" (or "none"), and an "Approve" button, or the word "Approved" once it is.
 
 "Outputs": links to what the job has produced, or "No outputs recorded yet."
@@ -56,11 +56,11 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 
 ### To hand your step to Claude
 1. Tap "Hand to Claude" on your step. HQ shows "Handed to Claude".
-2. The step's owner becomes "Claude". It leaves your lists, and the nightly run at 2:13 AM Pacific picks it up.
+2. The step's owner becomes "Claude". It leaves your lists and becomes eligible for the external worker. This does not start a run or confirm pickup.
 
 ### To queue a Claude step for the next run
-1. Tap "Queue" on a Claude step that is not done. HQ shows "Queued for the next run".
-2. The button is replaced by the words "Queued for the next run".
+1. Tap "Queue" on a Claude step that is not done. HQ confirms the queue marker was saved and explains that this does not start a run.
+2. The button is replaced by the words "Queued · awaiting worker".
 
 ### To copy a prompt for a Claude step
 1. Tap "Copy prompt" on a Claude step. HQ shows "Prompt copied".
@@ -70,7 +70,7 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 ### To approve a piece at a quality gate
 1. Find the gate strip on the gate step.
 2. Read the "Quality score" and the "Fails:" list.
-3. Tap "Approve". HQ shows "Approved", and the strip then reads "Approved".
+3. When the score is at least 80 and there are no hard failures, tap "Approve". HQ shows "Approved", and the strip then reads "Approved".
 
 ### To look at a playbook in the recipe
 1. Tap its chip under "Recipe".
@@ -87,10 +87,10 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 - "Blocked": the step waits on an earlier step that is not done.
 - "Ready": your step, free to do now.
 - "Awaiting your decision": your step whose title starts with "Decision".
-- "Queued": a Claude step waiting for the nightly run.
+- "Queued": a Claude step awaiting worker pickup, not confirmation that a run has started.
 - "Open": a step owned by an agent or tool that is not done or blocked.
 - "Hand to Claude": give your step to Claude.
-- "Queue": flag a Claude step for the next nightly run.
+- "Queue": save a request for the external worker to pick up a Claude step.
 - "Copy prompt": copy a ready-made prompt so Claude can do the step in a chat now.
 - Quality gate: the step where a content piece's quality is checked and the piece is approved.
 - "Your time": the minutes the job is expected to take you, and the minutes it actually took.
@@ -99,13 +99,13 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 ## Good to know
 
 - "Done" and "Hand to Claude" only appear on your steps that are not blocked and not done. Steps owned by an agent or tool have no "Done" button on this page.
-- There is no button to take a step back from Claude once it has been handed over.
+- "Take this step" returns an unblocked Claude step to you and clears its queue flag.
 - "Copy prompt" stays on Claude steps even after they are done, so you can have Claude redo one.
-- In this build, "Queue" only marks the step. The nightly run already picks up every ready Claude step in priority order, so a queued step does not jump the line. To get a step done right away, use "Copy prompt" and paste it into a Claude chat.
+- In this build, "Queue" only marks the step. The external worker's schedule and selection rules must be verified separately; this button does not guarantee a run or move the step ahead of other work. To work on a step now, use "Copy prompt" and paste it into a Claude chat, or use "Take this step" when available.
 - "Open" only appears once a step has a link or an output saved on it.
-- The gate's "Approve" button is not greyed out when the score is low, unlike the Production Board. The database can refuse the approval, and HQ then shows its reason or "The database refused the approval".
+- Approve is available only with a quality score of at least 80 and no hard failures. The database enforces the same rule for direct writes.
 - Not confirmed: what fills in "Your time"; nothing on this page sets it.
 - This page shows every step of the job, including snoozed ones that are hidden from your lists.
-- There is no button to cancel or delete a job.
+- "Cancel pipeline" pauses the job without deleting history or outputs. Its steps cannot be updated while paused. "Resume pipeline" resumes at the first unfinished step.
 - Approving a piece or finishing a job never publishes or posts anything. Publishing and listing steps are yours.
 - If the job cannot be found, the page says "Job not found" with a "Back to the brand" button. If it fails to load, it says "This job could not be loaded." with "Try again".

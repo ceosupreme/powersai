@@ -264,11 +264,14 @@ const empty = {
 export function ProductDialog({ open, onOpenChange, product }: Props) {
   const { create, update, setChannels } = useChannelProductMutations();
   const { data: channels = [] } = useContentChannels();
-  const { data: existingChannels = [] } = useProductChannels(product?.id);
+  const linksQuery = useProductChannels(product?.id);
+  const existingChannels = linksQuery.data;
+  const [linksDirty, setLinksDirty] = useState(false);
   const [form, setForm] = useState<any>(empty);
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
   useEffect(() => {
+    setLinksDirty(false);
     if (product) {
       setForm({
         name: product.name ?? "",
@@ -287,15 +290,18 @@ export function ProductDialog({ open, onOpenChange, product }: Props) {
   }, [product, open]);
 
   useEffect(() => {
-    if (product) setSelectedChannels(existingChannels);
-  }, [existingChannels, product]);
+    if (product && existingChannels && !linksDirty) setSelectedChannels(existingChannels);
+  }, [existingChannels, product, linksDirty]);
 
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
-  const toggleChannel = (id: string) =>
+  const toggleChannel = (id: string) => {
+    setLinksDirty(true);
     setSelectedChannels((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
 
   const onSubmit = async () => {
+    if (product && !linksQuery.isSuccess) return toast.error("Project links have not loaded. Try again before saving.");
     if (!form.name.trim()) return toast.error("Name is required");
     const priceNum = form.price ? parseFloat(form.price) : null;
     const monthlyNum = form.monthly_sales ? parseFloat(form.monthly_sales) : null;
@@ -395,7 +401,8 @@ export function ProductDialog({ open, onOpenChange, product }: Props) {
             </div>
           )}
           <div>
-            <Label>Channels promoting this product</Label>
+            <Label>Projects promoting this product</Label>
+            {linksQuery.isError && <p role="alert" className="text-sm text-destructive">Could not load project links. Close and reopen before saving.</p>}
             <div className="mt-2 rounded-md border p-3 max-h-48 overflow-y-auto space-y-2">
               {channels.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No content channels yet.</p>
@@ -415,7 +422,7 @@ export function ProductDialog({ open, onOpenChange, product }: Props) {
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onSubmit} disabled={create.isPending || update.isPending || setChannels.isPending}>
+          <Button onClick={onSubmit} disabled={create.isPending || update.isPending || setChannels.isPending || (!!product && !linksQuery.isSuccess)}>
             {product ? "Save" : "Add"}
           </Button>
         </DialogFooter>

@@ -555,7 +555,8 @@ export default function PortfolioOverview() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-3">
           <BarChart3 className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Portfolio Overview</h1>
+          <div><h1 className="text-2xl font-bold text-foreground">Portfolio</h1>
+          <p className="text-muted-foreground mt-2 max-w-3xl">Your directory of brands and clients. Each brand has a project workspace for its content, channels, tasks, products, and results. Client businesses have their own projects too.</p></div>
         </div>
         {selectedWeekLabel && (
           <span className="text-muted-foreground text-sm">Week of {selectedWeekLabel}</span>

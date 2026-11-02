@@ -1,3 +1,5 @@
+import { useProjectType } from '@/hooks/useEffectivePillars';
+import { projectGroup } from '@/hooks/usePortfolioData';
 import { useState, useEffect, useMemo } from 'react';
 import { useApp, ALL_PROJECTS } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
@@ -38,7 +40,6 @@ const WEEK_SCOPED_EXACT = new Set<string>([
   '/guest-experience',
   '/social',
   '/marketing',
-  '/workspace',
   '/portfolio',
 ]);
 const WEEK_SCOPED_PREFIX = ['/pillar/'];
@@ -78,7 +79,9 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
       WEEK_SCOPED_PREFIX.some((p) => pathname.startsWith(p)),
     [pathname],
   );
-  const shouldShowDateSelector = showDateSelector && routeConsumesWeek;
+  const projectType = useProjectType(selectedBar?.id);
+  const brandReport = pathname === '/weekly-review' && (!selectedBar || projectGroup({project_type:projectType.data ?? null,is_prospect_shell:false}) !== 'clients');
+  const shouldShowDateSelector = showDateSelector && routeConsumesWeek && !brandReport;
 
   // Cmd+K / Ctrl+K shortcut
   useEffect(() => {
@@ -99,7 +102,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 md:h-16 flex items-center justify-between gap-2 px-3 md:px-8 border-b border-border/50 bg-background/80 backdrop-blur-md shadow-sm">
+      <header className="hq-global-header sticky top-0 z-50 min-h-16 flex items-center justify-between gap-2 px-3 md:px-6 py-2 border-b border-border bg-card shadow-sm">
         <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
           {/* Back to Portfolio for owners drilling into a venue */}
           {currentRole === 'owner' && currentVenue && (
@@ -127,7 +130,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
                 if (bar) setSelectedBar(bar);
               }}
             >
-              <SelectTrigger className="w-[130px] md:w-[180px] h-10 md:h-11 bg-card/50 border-border/50 text-foreground hover:bg-card hover:border-primary/30 transition-all duration-200 rounded-xl">
+              <SelectTrigger aria-label="Current brand or client project" className="w-[160px] md:w-[240px] h-10 md:h-11 bg-card text-foreground rounded-lg">
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-primary hidden sm:block" />
                   <SelectValue placeholder="Select Project" />
@@ -135,9 +138,9 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
               </SelectTrigger>
               <SelectContent className="bg-card/95 backdrop-blur-md border-border/50 rounded-xl shadow-xl">
                 <SelectItem value={ALL_PROJECTS} className="cursor-pointer hover:bg-primary/10 rounded-lg my-0.5">
-                  All projects
+                  All brands & clients
                 </SelectItem>
-                {accessibleBars.map((bar) => (
+                {[...accessibleBars].sort((a, b) => a.bar_name.localeCompare(b.bar_name)).map((bar) => (
                   <SelectItem key={bar.id} value={bar.id} className="cursor-pointer hover:bg-primary/10 rounded-lg my-0.5">
                     {bar.bar_name}
                   </SelectItem>
@@ -163,7 +166,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
           )}
         </div>
 
-        <div className="flex items-center gap-1 md:gap-3 shrink-0">
+        <div className="hq-header-actions flex items-center gap-1 md:gap-2 shrink-0">
           {shouldShowDateSelector && (
             <Select
               value={selectedWeek?.id || ''}
@@ -172,7 +175,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
                 if (week) setSelectedWeek(week);
               }}
             >
-              <SelectTrigger className="w-[120px] md:w-[160px] h-10 md:h-11 bg-card/50 border-border/50 text-foreground hover:bg-card hover:border-primary/30 transition-all duration-200 rounded-xl">
+              <SelectTrigger aria-label="Reporting week" className="w-[140px] md:w-[180px] h-10 md:h-11 bg-card text-foreground rounded-lg">
                 <div className="flex items-center gap-2">
                   <CalendarDays className="w-4 h-4 text-primary hidden sm:block" />
                   <SelectValue placeholder="Select Week" />

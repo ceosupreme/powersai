@@ -4,8 +4,8 @@
 The Answer Bank keeps your audience's pains and questions in their own words, one list per brand, ranked by how much they hurt. Use it to decide what to answer next, and tap "Make this" to turn a pain straight into a piece of content.
 
 ## Where to find it
-- On a computer, tap "Answer Bank" under "Growth & Marketing" in the left menu.
-- On a phone, tap "More" in the bottom bar, then "Answer Bank" under "Growth & Marketing".
+- On a computer, tap "Answer Bank" under "Content & Production" in the left menu.
+- On a phone, tap "More" in the bottom bar, then "Answer Bank" under "Content & Production".
 - It is for admin accounts only. Anyone else sees "The Answer Bank is available to admins only."
 - You pick the brand on this screen; the project picker at the top does not change it.
 - A brand's "Intel" tab also lists its eight highest-scoring pains under "Top pains".
@@ -37,7 +37,7 @@ The Answer Bank keeps your audience's pains and questions in their own words, on
 
 ### Turn a pain into content
 1. Tap "Make this" on the entry.
-2. HQ adds an idea to the brand's Content list, titled "Answer:" followed by the first 80 characters of the pain.
+2. HQ prepares an idea titled "Answer:" followed by the first 80 characters of the pain. Nothing is saved yet.
 3. The "Create pipeline" form, which starts a production job, opens with the product type set to a social piece. Check the niches, playbooks, level and money destination; the "Starting a pipeline" article explains each field.
 4. Tap "Create pipeline". HQ opens the new pipeline's page.
 
@@ -54,8 +54,10 @@ The Answer Bank keeps your audience's pains and questions in their own words, on
 - Product idea: the entry is flagged as something that could become a product.
 
 ## Good to know
-- "Make this" creates the Content idea before the form opens. If you cancel the form, the idea stays in the brand's Content list; delete it there if you don't want it.
+- "Make this" prepares the form; the content item is saved only when pipeline creation succeeds.
 - "Make this" does not mark the pain as answered and does not add the new piece to "Answered by". Change the status with "Edit" once the answer is out.
 - This screen has no control for filling in "Answered by". Not confirmed: what fills it.
 - There is no delete button for entries on this screen.
 - If none of your brands are switched on, the screen says "No internal brand projects are switched on yet."
+
+After successful creation, a "Used in pipeline" link identifies the related job. This usage comes from production jobs; it does not change the original research or mark an answer published. Canceling "Make this" creates no content item.

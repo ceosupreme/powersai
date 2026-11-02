@@ -1,3 +1,4 @@
+import { useApp } from '@/context/AppContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
@@ -31,7 +32,8 @@ const dateRange = (a: string, b: string) =>
   `${new Date(a + 'T12:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${new Date(b + 'T12:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 
 export const OverviewView = ({ onOpen }: { onOpen: (id: string) => void }) => {
-  const { campaigns, refresh } = useCampaignStore();
+  const { selectedBar } = useApp();
+  const { campaigns, refresh, loading, error } = useCampaignStore(selectedBar?.id);
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -41,8 +43,8 @@ export const OverviewView = ({ onOpen }: { onOpen: (id: string) => void }) => {
 
   const live = useMemo(() => campaigns.filter(c => c.status === 'Live'), [campaigns]);
   const upcoming = useMemo(
-    () => campaigns.filter(c => c.status === 'Scheduled' && c.startDate <= in7),
-    [campaigns, in7],
+    () => campaigns.filter(c => c.status === 'Scheduled' && c.startDate >= today && c.startDate <= in7),
+    [campaigns, today, in7],
   );
   const recent = useMemo(
     () => campaigns.filter(c => c.status === 'Ended').sort((a, b) => b.endDate.localeCompare(a.endDate)).slice(0, 5),
@@ -86,9 +88,11 @@ export const OverviewView = ({ onOpen }: { onOpen: (id: string) => void }) => {
     } finally { setSyncing(false); }
   };
 
+  if (loading) return <p role="status">Loading campaigns…</p>;
+  if (error) return <Card className="p-5"><p role="alert">Campaigns could not be loaded.</p><Button onClick={refresh}>Try again</Button></Card>;
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <Button size="sm" variant="outline" onClick={syncFromAsana} disabled={syncing} className="gap-1.5">
           <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
           {syncing ? 'Syncing…' : 'Sync from Asana'}
@@ -98,6 +102,7 @@ export const OverviewView = ({ onOpen }: { onOpen: (id: string) => void }) => {
         </Button>
       </div>
 
+      {campaigns.length === 0 && <Card className="hq-section space-y-3"><h2 className="text-xl font-bold">Plan your first campaign{selectedBar ? ` for ${selectedBar.bar_name}` : ''}</h2><p>Create a draft with an objective, dates, and channels. Open it to approve, schedule, record progress, and review results. No campaign is published automatically.</p><div className="flex flex-wrap gap-3"><Button onClick={() => setDialogOpen(true)}>Create a campaign</Button><Button variant="outline" onClick={syncFromAsana} disabled={syncing}>Import from Asana</Button></div><p className="text-sm text-muted-foreground">Asana imports require a configured connection. Drafts and unfinished campaigns appear under Needs attention.</p></Card>}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiTile icon={Activity} label="Live now" value={String(live.length)} accent="text-emerald-600" />
         <KpiTile icon={CalendarClock} label="Upcoming (7d)" value={String(upcoming.length)} accent="text-indigo-600" />

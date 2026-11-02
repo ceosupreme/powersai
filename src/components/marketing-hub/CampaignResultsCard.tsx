@@ -212,9 +212,10 @@ export const CampaignResultsCard = ({
     setRunning(true);
     try {
       const { data, error } = await supabase.functions.invoke('marketing-campaign-analyze', {
-        body: { campaign_id: campaign.id, mode: 'mock', generated_by: 'manual' },
+        body: { campaign_id: campaign.id, mode: 'live', generated_by: 'manual' },
       });
       if (error) throw error;
+      if (data?.error || !data?.results) throw new Error(data?.error || 'No analysis returned');
       const next = { ...campaign, results: data.results };
       onCampaignChange?.(next);
       await update(campaign.id, { results: data.results });

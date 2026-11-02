@@ -400,16 +400,16 @@ const VenuePanel = ({ venueId, venueName }: { venueId: string; venueName: string
   );
 };
 
-export const MapPackKeywordsPanel = () => {
+export const MapPackKeywordsPanel = ({ venueId }: { venueId?: string } = {}) => {
   const { bars } = useApp();
   const [filter, setFilter] = useState('');
 
   const rows = useMemo(() => {
     const f = filter.trim().toLowerCase();
     return (bars ?? [])
-      .filter((b) => !f || b.bar_name.toLowerCase().includes(f))
+      .filter((b) => (!venueId || b.id === venueId) && (!f || b.bar_name.toLowerCase().includes(f)))
       .sort((a, b) => a.bar_name.localeCompare(b.bar_name));
-  }, [bars, filter]);
+  }, [bars, filter, venueId]);
 
   return (
     <Card className="p-5">

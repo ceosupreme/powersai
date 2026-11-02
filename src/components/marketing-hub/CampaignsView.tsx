@@ -1,8 +1,10 @@
+import { compareName, compareOptional, dateValue } from '@/lib/collectionSort';
+import { useApp } from '@/context/AppContext';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, X, Plus, ExternalLink, AlertCircle } from 'lucide-react';
 import { useCampaignStore } from './useCampaignStore';
 import {
@@ -34,8 +36,10 @@ const Pill = <T extends string>({ value, active, onClick, children }: {
 );
 
 export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
-  const { campaigns } = useCampaignStore();
+  const { selectedBar } = useApp();
+  const { campaigns, refresh, loading, error } = useCampaignStore(selectedBar?.id);
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('updated');
   const [statuses, setStatuses] = useState<CampaignStatus[]>([]);
   const [types, setTypes] = useState<CampaignType[]>([]);
   const [origins, setOrigins] = useState<CampaignOrigin[]>([]);
@@ -49,6 +53,7 @@ export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
     [campaigns],
   );
   const [venue, setVenue] = useState<string>('');
+  useEffect(() => setVenue(''), [selectedBar?.id]);
 
   const filtered = useMemo(() => campaigns.filter(c => {
     if (statuses.length && !statuses.includes(c.status)) return false;
@@ -62,10 +67,12 @@ export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
           !c.venueName.toLowerCase().includes(q)) return false;
     }
     return true;
-  }).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [campaigns, statuses, types, origins, venue, search]);
+  }).sort((a, b) => (sort === 'name' ? compareName(a.title,b.title) : sort === 'start' ? compareOptional(dateValue(a.startDate),dateValue(b.startDate)) : compareOptional(dateValue(a.updatedAt),dateValue(b.updatedAt),-1)) || compareName(a.title,b.title)), [campaigns, statuses, types, origins, venue, search, sort]);
 
   const anyFilter = statuses.length || types.length || origins.length || venue || search;
 
+  if (loading) return <p role="status">Loading campaigns…</p>;
+  if (error) return <Card className="p-5"><p role="alert">Campaigns could not be loaded.</p><Button onClick={refresh}>Try again</Button></Card>;
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-end">
@@ -75,24 +82,25 @@ export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
       </div>
 
       <Card className="p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[12rem]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search campaigns…"
+              aria-label="Search campaigns" placeholder="Search campaigns…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 h-9"
             />
           </div>
           <select
-            value={venue}
+            aria-label="Filter campaigns by brand or client" value={venue}
             onChange={e => setVenue(e.target.value)}
             className="h-9 px-3 text-sm rounded-md border border-border bg-background text-foreground"
           >
-            <option value="">All venues</option>
+            <option value="">All in this selection</option>
             {venues.map(v => <option key={v} value={v}>{v}</option>)}
           </select>
+          <select aria-label="Sort campaigns" value={sort} onChange={e=>setSort(e.target.value)} className="h-9 px-3 rounded-md border border-border bg-background"><option value="updated">Recently updated</option><option value="start">Start date · earliest first</option><option value="name">Title · A to Z</option></select>
           {anyFilter ? (
             <Button variant="ghost" size="sm" onClick={() => {
               setSearch(''); setStatuses([]); setTypes([]); setOrigins([]); setVenue('');
@@ -138,7 +146,7 @@ export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
             className="p-4 cursor-pointer hover:border-indigo-500/40 hover:bg-muted/20 transition-colors"
             onClick={() => onOpen(c.id)}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex flex-wrap items-start gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className="font-semibold text-foreground">{c.title}</span>
@@ -208,7 +216,7 @@ export const CampaignsView = ({ onOpen }: { onOpen: (id: string) => void }) => {
 };
 
 const FilterRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="flex items-start gap-3">
+  <div className="flex flex-wrap items-start gap-3">
     <div className="text-xs text-muted-foreground w-14 pt-1.5 flex-shrink-0">{label}</div>
     <div className="flex flex-wrap gap-1.5 flex-1">{children}</div>
   </div>

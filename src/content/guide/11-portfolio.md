@@ -1,7 +1,7 @@
 # Portfolio
 <!-- part: Workspace | order: 11 | slug: portfolio | route: /portfolio | tags: portfolio, overview, home, my brands, clients, prospects, brand card, score, grade, pillars, potential, revenue, waiting on you, channels, followers, setup, setup gaps, parked, sort, type chips, cards, table, gm performance -->
 
-Portfolio is your home screen and the one place to see every brand and client side by side. Use it to spot which brand needs you, which is earning and which still has setup gaps, then tap a card to open that brand. The "Clients" tab keeps the older client scorecards.
+Portfolio is your directory and the place to see every brand and client side by side. Use it to spot which brand needs you, which is earning and which still has setup gaps, then tap a card to open that brand. The "Clients" tab keeps the older client scorecards.
 
 ## Where to find it
 
@@ -18,7 +18,7 @@ From the top:
 - A summary strip: "Revenue", "Needs Attention" and "Lowest Project", plus "Data Confidence" on the Clients tab.
 - A closed "Portfolio Snapshot" panel with weekly sales, ticket, tip, order, guest, turn time, void and labor totals.
 
-On "My brands" you then see type chips ("All", "Brands", "Channels", "Apps", "Services", each with a count), "Sort" with a menu, the "All brands: waiting on you" box (up to eight open steps across your active brands, most urgent first, each with its brand name and a tag "P1" to "P4" or "No priority"), one card per active brand, a "Parked" section (open by default) with parked brands dimmed and tagged "Parked", and "Revenue this month by project", listing each brand with revenue recorded this month, highest first.
+On "My brands" you then see type chips ("All", "Brands", "Channels", "Apps", "Services", each with a count), "Sort" with a menu, the "All brands: waiting on you" box (up to eight open steps across your active brands, most urgent first, each with its brand name and a tag "P1" to "P4" or "No priority"), one card per active brand, a "Parked" section (open by default) with parked brands outlined and tagged "Parked", and "Revenue this month by project", listing each brand with revenue recorded this month, highest first.
 
 Each brand card shows, top to bottom:
 
@@ -95,7 +95,7 @@ For every order except "Waiting on you", brands with no value go last and ties a
 - "Products listed": linked products that are listed somewhere, out of all products linked to this brand.
 - "Published this month": posts confirmed as published this calendar month.
 - "Next move": the top step in this brand's Next 10.
-- Parked: a brand you have set aside. It stays on Portfolio but drops out of the waiting box and Today's lists.
+- Parked: a brand you have set aside. It stays on Portfolio but drops out of the waiting box and Dashboard's lists.
 - Status dot (client card): red and pulsing for a critical insight this week, orange for high, gold for medium, green for none.
 - "No POS": a client whose data confidence is under 40 percent, so its score is hidden.
 - R, L, O, G: the four areas of the client weekly scorecard, Revenue, Labor, Operations and Guest. The Insights filter calls the last two "Delivery" and "Client Experience".
@@ -104,7 +104,7 @@ For every order except "Waiting on you", brands with no value go last and ties a
 
 - Brand cards use each brand's last completed week that has data, not the week in the header. The data lines show the real week; the week in the section heading comes from the header.
 - The Setup line ends with one of three words: "Ready to grow" for a setup score of 70 or more, "Caution" for 50 to 69, and "Set up first" for under 50. See "How scores work".
-- The card's "Waiting on you" count, the "All brands: waiting on you" box (steps only, no content) and Today's "Waiting on me" (decisions only) count slightly different things, so their numbers can differ.
+- The card's "Waiting on you" count, the "All brands: waiting on you" box (steps only, no content) and Dashboard's "Waiting on me" (decisions only) count slightly different things, so their numbers can differ.
 - The type chips also filter the waiting box, but not "Revenue this month by project". Chip counts include parked brands.
 - The money "this month" near the top of a card and "Revenue this month" in its footer are the same figure.
 - On a phone, pillar boxes show only initials; on a computer, hover a box to see the pillar's full name.
@@ -116,3 +116,6 @@ For every order except "Waiting on you", brands with no value go last and ties a
 - The "Prospects" tab always shows a note with an "Open Prospect Dock" link, because prospect projects are not loaded on this screen.
 - If you open a client and come back through the menu instead of "← Portfolio", Portfolio shows that client's detail page ("Weekly Scorecard", "Signal Breakdown", "Recent Insights", "Pending Actions"). Tap the back arrow beside the client's name to see the full Portfolio.
 - The tab, the type chip and the cards or table choice reset each visit; only the sort is remembered.
+
+## Distinguishing brands
+Brand cards have consistent colored headers with large initials and their full names. Color stays with the brand when its name changes. Portfolio is the directory; each brand already has its own project workspace. Client businesses also have projects.

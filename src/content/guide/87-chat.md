@@ -13,7 +13,7 @@ Chat is HQ's built-in team messenger, with team channels and one-to-one direct m
 ## What you see
 
 - A list headed "Messages" with a "Search conversations..." box, a "Channels" section and a "Direct Messages" section. Each section has a "+" button. Conversations with unread messages show in bold with a count.
-- The open conversation. Its header shows the channel name, its topic and the number of members, or, for a direct message, the other person's name and email address. Messages are grouped under "Today", "Yesterday" or a full date, each with the sender's name and the time. Tagged names are highlighted, and changed messages say "(edited)".
+- The open conversation. Its header shows the channel name, its topic and the number of members, or, for a direct message, the other person's name and email address. Messages are grouped under "Dashboard", "Yesterday" or a full date, each with the sender's name and the time. Tagged names are highlighted, and changed messages say "(edited)".
 - A message box that says "Type a message... (⌘+Enter to send)" and a send button.
 - On a phone you see the list first. Tap a conversation to open it, and tap the back arrow to return to the list.
 - The Chat badge counts unread messages from other people in every conversation you belong to. It refreshes every 30 seconds, and opening a conversation marks it as read.
@@ -51,9 +51,8 @@ Chat is HQ's built-in team messenger, with team channels and one-to-one direct m
 
 ## Good to know
 
-- A team channel only shows in your list when its name contains certain words. For the owner they are general, all, all-staff, gm-only, leads, foh and boh. A channel with any other name, such as the example "announcements", is created but never appears in your list. Managers see the same words except gm-only, leads see general and leads, and staff see general plus foh or boh.
-- The Chat badge also counts messages in channels hidden by that rule, so it can show a number you cannot find.
-- A conversation loads only its first 100 messages, oldest first. In a long conversation, newer messages can be missing after you reload, although they still arrive live while the screen is open.
+- Channels are shown according to membership and database access rules; their names do not control visibility.
+- A conversation loads its latest 100 messages, displayed oldest to newest within that recent window. Older history is outside this initial window.
 - New messages appear live in the open conversation. The lists refresh every 30 seconds.
 - "Start a Conversation" also lists a few names from an older Asana team who have no HQ login. Picking one shows "Failed to start conversation".
 - The green dot on a direct-message picture is decoration, not a real online status.

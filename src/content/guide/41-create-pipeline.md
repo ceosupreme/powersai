@@ -93,7 +93,9 @@ Playbooks that are planned but not written yet show "(planned)" after their name
 - The steps come out in this order: "Brand rules check" (Claude), the product type's steps, each destination's steps, then the steps added by monetization and by promotion.
 - The traffic check only warns; it never stops you. An account marked "Exists, needs access" does not count as set up for the check.
 - "Make this" on a pain creates the idea the moment you tap it. If you cancel the form, the idea stays on the brand's list.
-- "Turn this on" and "Set up" do not check for a job already running, so tapping them twice creates two jobs.
+- Repeating "Turn this on" or "Set up" reuses the active pipeline for that target. New jobs, their steps and any new Answer Bank content item are saved together.
 - Jobs started from the "Setup" tab are created at Level 1, with no niches, because they skip the form.
-- When the job is for a content piece, HQ also saves the recipe's playbook versions on the piece. If that part fails, HQ says "Pipeline created, but the recipe could not be saved on the item."
+- The job retains the recipe and playbook versions. Creation fails clearly if a required playbook is missing or a Written method has no usable steps.
 - Creating a pipeline never publishes or posts anything.
+
+Opening "Make this" only prepares the form. Canceling it creates no content item. A new item is created only when the pipeline is successfully saved. Planned methods are clearly labeled and retain their explicit writing prerequisite.

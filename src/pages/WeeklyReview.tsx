@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 
@@ -37,14 +38,13 @@ const WeeklyReview = () => {
   const currentTargets = undefined;
 
   // Supabase scorecard
-  const { data: supabaseWeeks = [], isLoading: supabaseLoading } = useSupabaseWeeks(supabaseBarId || undefined);
+  const { data: supabaseWeeks = [], isLoading: supabaseLoading, isError: weeksError, refetch: retryWeeks } = useSupabaseWeeks(supabaseBarId || undefined);
   const currentSupabaseWeek = useMemo(() => {
     if (!supabaseWeeks.length) return null;
     const today = new Date().toISOString().split('T')[0];
     const completeWeeks = supabaseWeeks.filter(sw => sw.week_end < today);
     if (selectedWeek) {
-      const match = completeWeeks.find(sw => sw.week_start === selectedWeek.week_start);
-      if (match) return match;
+      return supabaseWeeks.find(sw => sw.week_start === selectedWeek.week_start) ?? null;
     }
     return completeWeeks[0] || supabaseWeeks[0];
   }, [selectedWeek, supabaseWeeks]);
@@ -232,9 +232,8 @@ const WeeklyReview = () => {
     return <LoadingState message="Loading weekly review..." />;
   }
 
-  if (!selectedWeek || !scorecard) {
-    return <EmptyState message="No weekly data available" title="No weekly data available" description="Select a bar and week to view your weekly review scorecard." />;
-  }
+  if (weeksError) return <section className="hq-section"><h1 className="text-2xl font-bold">Weekly Review</h1><p role="alert">Weekly records could not be loaded.</p><Button onClick={() => retryWeeks()}>Try again</Button></section>;
+  if ((!selectedWeek && !currentSupabaseWeek) || !scorecard) return <section className="hq-section space-y-4"><h1 className="text-2xl font-bold">Weekly Review</h1><h2 className="text-xl font-semibold">No scorecard for {selectedBar?.bar_name ?? 'this selection'}</h2><p>A client review needs a completed reporting week and saved operating data. Choose a week in the header, add the missing source data, or open the workspace to review current work.</p><div className="flex flex-wrap gap-3"><Button asChild><Link to="/growth-audit?subtab=data-sources">Check data sources</Link></Button><Button asChild variant="outline"><Link to="/workspace">Open Dashboard</Link></Button><Button variant="outline" onClick={() => retryWeeks()}>Refresh records</Button></div></section>;
 
   const weekRange = formatDateRange(
     currentSupabaseWeek?.week_start || selectedWeek.week_start,

@@ -36,6 +36,9 @@ export function useCaptureMutations() {
   const userId = useAuth().user?.id ?? null;
   const inv = () => {
     qc.invalidateQueries({ queryKey: ["capture","items"] });
+    qc.invalidateQueries({ queryKey: ["crm"] });
+    qc.invalidateQueries({ queryKey: ["production-board-items"] });
+    qc.invalidateQueries({ queryKey: ["brand-workspace"] });
   };
 
   return {
@@ -54,33 +57,12 @@ export function useCaptureMutations() {
     }),
     routeItem: useMutation({
       mutationFn: async (input: { id: string; project_id: string | null; type: CaptureType; raw_text: string }) => {
-        const { id, project_id, type, raw_text } = input;
-        // Side-effects per type
-        if (type === "task" && project_id) {
-          const title = (raw_text.split("\n")[0] || "Untitled").slice(0, 200);
-          const { error: tErr } = await supabase.from("tasks").insert({
-            title, description: raw_text,
-            bar_id: project_id,
-            venue_id: project_id,
-            created_by: userId!,
-            status: "Todo",
-          } as any);
-          if (tErr) throw tErr;
-        } else if (type === "crm_lead") {
-          const name = (raw_text.split("\n")[0] || "Untitled lead").slice(0, 200);
-          const { error: cErr } = await supabase.from("crm_companies").insert({
-            name, status: "prospect", created_by: userId!,
-          });
-          if (cErr) throw cErr;
-        }
-        const { error } = await supabase.from("capture_items").update({
-          status: "routed",
-          routed_project_id: project_id,
-          routed_type: type,
-          routed_at: new Date().toISOString(),
-          ai_suggestion_status: "accepted",
-        }).eq("id", id);
+        const { data, error } = await (supabase as any).rpc('hq_route_capture', {
+          p_capture_id: input.id, p_project_id: input.project_id, p_type: input.type,
+        });
         if (error) throw error;
+        return data;
+
       },
       onSuccess: () => inv(),
     }),

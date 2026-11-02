@@ -19,6 +19,7 @@ import { TrafficNotice } from './TrafficNotice';
 const T = (t: string) => (supabase as any).from(t);
 
 export interface PipelineRequest {
+  newContent?: { title: string; summary: string };
   projectId: string;
   kind: JobKind;
   title: string;
@@ -149,12 +150,15 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
 
   const fixedSteps = request?.kind === 'lane' || request?.kind === 'channel_setup';
 
+  const validProduct = by.product_type.some(m => m.key === productType);
   const submit = async () => {
     if (!request) return;
+    if (!fixedSteps && !validProduct) return toast.error('Choose an available product playbook.');
     setBusy(true);
     try {
       const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
       const { jobId, recipe } = await composePipeline({
+        new_content: request.newContent,
         project_id: request.projectId, kind: request.kind, title: title.trim() || request.title,
         target_type: request.targetType ?? null, target_id: request.targetId ?? null, target_key: request.targetKey ?? null,
         product_type: fixedSteps ? null : productType || null,
@@ -171,7 +175,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
       }
       qc.invalidateQueries({ queryKey: ['brand-workspace'] });
       qc.invalidateQueries({ queryKey: ['radar'] });
-      toast.success('Pipeline created');
+      qc.invalidateQueries({ queryKey: ['pain-pipelines'] });
+      toast.success('Pipeline ready');
       onCreated?.(jobId);
       onClose();
       navigate(`/project/${request.projectId}/jobs/${jobId}`);
@@ -199,6 +204,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
             <>
               <div className="space-y-1.5">
                 <Label>Product type</Label>
+                {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">The suggested product type has no matching playbook. Choose one below.</p>}
                 <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger><SelectValue placeholder="Choose a product type" /></SelectTrigger>
                   <SelectContent>
@@ -231,7 +237,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         </div>
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
-          <Button onClick={submit} disabled={busy || (!fixedSteps && !productType)}>
+          <Button onClick={submit} disabled={busy || methods.isLoading || methods.isError || (!fixedSteps && !validProduct)}>
             {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create pipeline
           </Button>
         </DialogFooter>
@@ -240,13 +246,10 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   );
 }
 
-/** Answer Bank → content item, then a content pipeline request. */
-export async function contentItemFromPain(projectId: string, painText: string): Promise<PipelineRequest> {
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+/** Prepare a request only. The content item is created with the job after confirmation. */
+export async function contentItemFromPain(projectId: string, painText: string, painId?: string): Promise<PipelineRequest> {
   const title = `Answer: ${painText.slice(0, 80)}`;
-  const { data, error } = await T('content_items').insert({
-    project_id: projectId, title, stage: 'idea', purpose_type: 'teach', purpose: `From Answer Bank ${today}`,
-  }).select('id').single();
-  if (error) throw error;
-  return { projectId, kind: 'content', title, targetType: 'content_items', targetId: data.id, productType: 'social_piece' };
+  return { projectId, kind: 'content', title, targetType: 'content_items',
+    targetKey: painId ? `pain:${painId}` : `pain:${painText}`, productType: 'social_piece',
+    newContent: { title, summary: painText } };
 }

@@ -1,3 +1,4 @@
+import { CAMPAIGN_STATUSES, type CampaignStatus } from './types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,7 +54,7 @@ export const CampaignDetail = ({
   onOpenChange: (v: boolean) => void;
 }) => {
   const navigate = useNavigate();
-  const { get, update } = useCampaignStore();
+  const { get, update, isMutating } = useCampaignStore();
   const base = campaignId ? get(campaignId) : null;
   const [c, setC] = useState<Campaign | null>(base ?? null);
   const [editOpen, setEditOpen] = useState(false);
@@ -120,6 +121,10 @@ export const CampaignDetail = ({
             <SheetHeader className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={c.status} />
+                <label className="text-xs">Status <select aria-label="Campaign status" className="border rounded bg-background p-1" value={c.status} disabled={isMutating} onChange={async e => {
+                  try { const saved = await update(c.id,{status:e.target.value as CampaignStatus}); setC(saved); toast.success('Status updated'); }
+                  catch(error:any) { toast.error(error.message ?? 'Could not update status'); }
+                }}>{CAMPAIGN_STATUSES.map(status => <option key={status}>{status}</option>)}</select></label>
                 <OriginBadge origin={c.origin} subsource={c.externalSubsource} />
                 <TypeBadge type={c.type} />
                 {c.needsDetails && (

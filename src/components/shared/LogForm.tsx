@@ -19,6 +19,7 @@ import { POSITION_INFO } from '@/types/logs';
 import { FEATURES } from '@/lib/utils';
 
 interface LogFormProps {
+  intent?: string | null;
   barId: string;
   availablePositions: LogPosition[];
   onCancel?: () => void;
@@ -65,7 +66,7 @@ function evaluateCondition(
   return true;
 }
 
-export function LogForm({ barId, availablePositions, onCancel, onSubmitSuccess }: LogFormProps) {
+export function LogForm({ intent, barId, availablePositions, onCancel, onSubmitSuccess }: LogFormProps) {
   const navigate = useNavigate();
   
   // Auto-select position if only one available
@@ -135,12 +136,13 @@ export function LogForm({ barId, availablePositions, onCancel, onSubmitSuccess }
       const { data: logEntry, error: createError } = await supabase
         .from('log_entries')
         .insert({
+          intent: intent ?? 'daily_log',
           log_type: lt,
           bar_id: barId,
           created_by: user.id,
           status: 'submitted',
           submitted_at: new Date().toISOString(),
-        })
+        } as any)
         .select()
         .single();
 

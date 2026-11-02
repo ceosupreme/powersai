@@ -73,3 +73,5 @@ Each person has an account role and a workspace role, and saving them in "Edit" 
 - The quick log buttons on "My Shift", and "Daily Lead Log" and "Voice Note" on the shift dashboard, open the Logs card picker instead of the chosen log.
 - A signed-in login without a role sees "No role assigned to this account", and one whose page access fails to load sees "Access could not be verified" with "Try again" and "Sign out".
 - The staff screens show the signed-in person's own tasks, so when you open them yourself you see yours.
+
+Editing an account with no role row now creates its role assignment. Related save errors are surfaced instead of reporting success. Reopen the account after any error to verify its role and project assignments.

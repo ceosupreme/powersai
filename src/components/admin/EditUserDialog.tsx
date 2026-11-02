@@ -123,17 +123,19 @@ export const EditUserDialog = ({
   const handleSave = async () => {
     if (!user) return;
 
+    const checked = async (request: PromiseLike<{error: any}>) => { const {error} = await request; if(error) throw error; };
     setIsSaving(true);
     try {
-      // 1. Update role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .update({ role: editedRole })
-        .eq('user_id', user.id);
+      // An existing user can legitimately have no role row yet.
+      const { data: roles, error: roleReadError } = await supabase.from('user_roles').select('id').eq('user_id', user.id);
+      if (roleReadError) throw roleReadError;
+      const { error: roleError } = roles?.length
+        ? await supabase.from('user_roles').update({ role: editedRole }).eq('user_id', user.id)
+        : await supabase.from('user_roles').insert({ user_id: user.id, role: editedRole });
       if (roleError) throw roleError;
 
       // 2. Delete old venue_assignments
-      await supabase.from('venue_assignments').delete().eq('user_id', user.id);
+      await checked(supabase.from('venue_assignments').delete().eq('user_id', user.id));
 
       // 3. Insert new venue_assignments
       if (selectedBarIds.length > 0) {
@@ -152,45 +154,45 @@ export const EditUserDialog = ({
 
       // 4. Update profile backward compat + asana_gid
         const primaryBar = bars.find(b => b.id === effectivePrimary);
-        await supabase.from('profiles').update({
+        await checked(supabase.from('profiles').update({
           assigned_bar_id: effectivePrimary,
           assigned_bar_name: primaryBar?.name || null,
           asana_gid: asanaGid.trim() || null,
-        } as any).eq('id', user.id);
+        } as any).eq('id', user.id));
 
         // 5. Sync user_bar_assignments for RLS
-        await supabase.from('user_bar_assignments').delete().eq('user_id', user.id);
+        await checked(supabase.from('user_bar_assignments').delete().eq('user_id', user.id));
         const barAssignRows = selectedBarIds.map(barId => ({
           user_id: user.id,
           bar_id: barId,
         }));
-        await supabase.from('user_bar_assignments').insert(barAssignRows);
+        await checked(supabase.from('user_bar_assignments').insert(barAssignRows));
       } else {
         // No bars selected
-        await supabase.from('profiles').update({
+        await checked(supabase.from('profiles').update({
           assigned_bar_id: null,
           assigned_bar_name: null,
           asana_gid: asanaGid.trim() || null,
-        } as any).eq('id', user.id);
-        await supabase.from('user_bar_assignments').delete().eq('user_id', user.id);
+        } as any).eq('id', user.id));
+        await checked(supabase.from('user_bar_assignments').delete().eq('user_id', user.id));
       }
 
       // 6. Sync user_venue_roles so RoleContext stays consistent
-      await supabase.from('user_venue_roles' as any).delete().eq('user_id', user.id);
+      await checked(supabase.from('user_venue_roles' as any).delete().eq('user_id', user.id));
       const venueRoleMap: Record<string, string> = {
         admin: 'owner', owner: 'owner', gm: 'gm', shift_lead: 'lead', staff: 'foh',
       };
       const mappedRole = venueRoleMap[editedRole] || 'foh';
       if (editedRole === 'admin' || editedRole === 'owner') {
         // Portfolio-level owner role (venue_id = null)
-        await supabase.from('user_venue_roles' as any).insert({
+        await checked(supabase.from('user_venue_roles' as any).insert({
           user_id: user.id, venue_id: null, role: mappedRole,
-        });
+        }));
       } else if (selectedBarIds.length > 0) {
         const venueRoleRows = selectedBarIds.map(vid => ({
           user_id: user.id, venue_id: vid, role: mappedRole,
         }));
-        await supabase.from('user_venue_roles' as any).insert(venueRoleRows);
+        await checked(supabase.from('user_venue_roles' as any).insert(venueRoleRows));
       }
 
       toast.success('User updated successfully');

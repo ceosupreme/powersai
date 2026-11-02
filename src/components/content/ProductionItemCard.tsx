@@ -19,7 +19,7 @@ export function ProductionItemCard({
   const next = nextStageForFormat(it.stage, it.format);
   return (
     <Card className="bg-card text-card-foreground border-border">
-      <CardContent className="p-4 space-y-2">
+      <CardContent className="p-5 space-y-3">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="outline" className="text-xs">
             {brandName}
@@ -36,7 +36,8 @@ export function ProductionItemCard({
             </Badge>
           )}
         </div>
-        <div className="font-medium leading-snug">{it.title}</div>
+        <h2 className="text-lg font-semibold leading-snug">{it.title}</h2>
+        {it.due_date && <p className="text-sm font-medium">Due {it.due_date.slice(0, 10)}</p>}
         <div className="text-xs text-muted-foreground">
           {it.family?.title ?? "No family yet"}
         </div>
@@ -71,12 +72,15 @@ export function ProductionItemCard({
               onClick={() => onApprove(it)}>Approve</Button>
           );
           return ok ? btn : (
+            <div className="space-y-1.5">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild><span tabIndex={0} className="block">{btn}</span></TooltipTrigger>
                 <TooltipContent>{why}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <p className="text-xs text-muted-foreground">{why}</p>
+            </div>
           );
         })()}
         {next !== it.stage && (() => {
@@ -86,7 +90,7 @@ export function ProductionItemCard({
             <Button
               size="sm"
               variant="outline"
-              className="w-full justify-between"
+              className="w-full justify-between h-auto whitespace-normal text-left py-2"
               disabled={locked}
               onClick={() => onMove(it)}
             >

@@ -6,10 +6,10 @@ The Marketing Hub tracks marketing campaigns for every project in one place: wha
 ## Where to find it
 - On a computer, tap "Marketing Hub" under "Growth & Marketing" in the left menu.
 - On a phone, tap "More" in the bottom bar, then "Marketing Hub" under "Growth & Marketing".
-- On Today, the "Campaigns needing attention" list and the "Marketing Hub" link lead here.
+- On Dashboard, the Marketing Hub shortcut opens this screen.
 - The old /marketing and /social-media addresses open this screen too.
 - It is for admin accounts only; anyone else is sent to the home page.
-- It shows campaigns for all projects. The project picker at the top of the screen does not filter it.
+- It follows the brand or client in the main selector. All brands & clients shows the full accessible list.
 
 ## What you see
 - The heading "Marketing Hub" and the line "Plan, schedule, and measure every campaign — no matter where it originated."
@@ -55,11 +55,18 @@ The Marketing Hub tracks marketing campaigns for every project in one place: wha
 - Toast promo code: a discount code from Toast, a restaurant point-of-sale system.
 
 ## Good to know
-- The numbers from "Generate Analysis" under "Post-Event Analysis" are sample numbers in this build. It runs in demo mode and invents revenue, guests, labor and item sales from your expected figures, or from stock figures when those are blank. Don't use them for decisions. Once generated they also feed the "Spend vs. attributed" and "Best performer" tiles.
-- HQ has no control for changing a campaign's status. New campaigns start as "Draft" and only change when Asana's status field changes and you sync, so until then they stay in "Needs attention".
+- "Generate Analysis" requests live results. A failed or unavailable analysis shows an error; expected figures are not substituted as measured results. Older stored demo results need a separate review before being used.
+- The campaign detail panel has a Status selector, so you can move a campaign from Draft through its lifecycle without Asana.
 - There is no delete button for campaigns.
-- "Generate Content" uses AI, but if the AI call fails HQ quietly uses template text instead, and the message still says the assets were generated.
+- "Generate Content" uses AI in Live mode. An AI failure is shown as an error instead of silently returning sample assets. Explicit Mock mode still produces labeled sample content.
 - The "Mock" or "Live" switch applies to every campaign and is remembered on this device only.
 - On-screen hints say to turn on live writes in Admin → Marketing Hub. Not confirmed: where that setting is; the Admin Panel has no Marketing Hub section in this build.
-- Links on Today and in the Growth Audit that point at one campaign open the Marketing Hub but not that campaign; find it in "Campaigns" and tap it.
+- Links on Dashboard and in the Growth Audit that point at one campaign open the Marketing Hub but not that campaign; find it in "Campaigns" and tap it.
 - The form is built for bars and restaurants, with fields such as menu items, guests, happy hour and in-venue signage.
+
+## Brand selection and empty campaigns
+Marketing Hub follows the brand or client in the main selector. All brands & clients shows the accessible campaign library. New Campaign starts assigned to the selected workspace; if nothing is selected, choose the workspace in the form.
+
+When no campaigns exist, Plan your first campaign explains the flow and offers Create a campaign or Import from Asana. Drafts remain visible under Needs attention and Campaigns. Campaigns has search, status/type/origin filters, a brand filter within the selection, and sorting by recently updated, start date, or title. Upcoming means scheduled between today and the next seven days.
+
+A failed campaign read shows Try again. An unsupported old tab link opens Overview. Asana import needs an existing configured connection; creating a campaign alone does not publish it to social channels. Campaign results require real recorded data.

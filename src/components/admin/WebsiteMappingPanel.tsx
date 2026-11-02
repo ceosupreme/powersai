@@ -220,7 +220,7 @@ const VenueRow = ({
   );
 };
 
-export const WebsiteMappingPanel = () => {
+export const WebsiteMappingPanel = ({ venueId }: { venueId?: string } = {}) => {
   const { bars } = useApp();
   const { data, isLoading } = useMappings();
   const [filter, setFilter] = useState('');
@@ -234,9 +234,9 @@ export const WebsiteMappingPanel = () => {
   const rows = useMemo(() => {
     const f = filter.trim().toLowerCase();
     return (bars ?? [])
-      .filter((b) => !f || b.bar_name.toLowerCase().includes(f))
+      .filter((b) => (!venueId || b.id === venueId) && (!f || b.bar_name.toLowerCase().includes(f)))
       .sort((a, b) => a.bar_name.localeCompare(b.bar_name));
-  }, [bars, filter]);
+  }, [bars, filter, venueId]);
 
   return (
     <Card className="p-5">

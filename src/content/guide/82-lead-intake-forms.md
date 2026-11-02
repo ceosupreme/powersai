@@ -44,11 +44,11 @@ Several public pages collect leads: the contact form on the main site pages, the
 
 ## Good to know
 
-- You get an owner alert for every lead that is not tied to a client: the main site, packages, industry pages, the qualifier, free checkup unlocks and proposal requests.
+- Owner notifications include general website leads and client capture leads. Project leadership contacts are used when available, with the operator as fallback.
 - Leads from a client's capture link send you no alert. If the client's "Follow-up sequences" automation is on, follow-up drafts are queued in the Automation Inbox instead.
 - The visitor gets a thank-you email when they gave an email address and the lead is not tied to a client, except free checkup unlocks and proposal requests. It goes out in Spanish when the visitor used a Spanish page, and sending it marks the lead as responded.
-- An emergency lead on a client's capture link sends an alert to that client's main contact. Without a client, the alert is only logged, and text alerts are only logged for now too, so do not count on them.
+- Emergency alerts use SMS only when a live SMS adapter is available. This build has no live SMS adapter, so it falls back to email. A manual log entry is not reported as a sent message; verify the actual provider result.
 - Replies to the hello mailbox appear in the Capture Inbox's "Email" tab, are forwarded to you and stop that lead's waiting follow-ups.
 - Every form needs an email or a phone number. Spam bots that fill a hidden field are dropped quietly, and repeated sends from the same visitor are slowed down.
-- Inbound cards do not show the phone number, the conversation transcript or the qualifier answers, so keep the alert email.
+- Inbound cards show the phone number, available conversation transcript and qualifier answers.
 - The alert's link opens the CRM on the "Pipeline" tab. Switch to "Inbound".

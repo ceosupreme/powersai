@@ -85,12 +85,13 @@ export const useMessages = (channelId: string | null) => {
           profile:profiles!chat_messages_user_id_fkey(id, full_name, email, avatar_url)
         `)
         .eq('channel_id', channelId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
         .limit(100)
         .abortSignal(signal);
 
       if (error) throw error;
-      return (data || []) as ChatMessageWithProfile[];
+      return [...(data || [])].reverse() as ChatMessageWithProfile[];
     },
     enabled: !!channelId && !!user,
   });

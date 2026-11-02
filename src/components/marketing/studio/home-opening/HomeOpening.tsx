@@ -110,6 +110,7 @@ function OpeningHeader({ onContact }: { onContact: () => void }) {
           </div>
         </nav>
         <div className="stm-opening-header-actions">
+          <Link to="/auth" className="stm-opening-login">Log in</Link>
           <Button type="button" onClick={onContact} className="stm-opening-contact">Contact Us <ArrowRight aria-hidden /></Button>
           <Button ref={toggleRef} type="button" variant="outline" size="icon" className="stm-opening-menu-toggle" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => { setOpen((value) => !value); setMenu(null); }}>{open ? <X /> : <Menu />}</Button>
         </div>

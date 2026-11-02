@@ -5,6 +5,7 @@ const T = (t: string) => (supabase as any).from(t);
 export type JobKind = 'content' | 'product' | 'lane' | 'channel_setup';
 
 export interface ComposeInput {
+  new_content?: { title: string; summary: string };
   project_id: string;
   kind: JobKind;
   title: string;
@@ -231,37 +232,29 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     const by = await methodsByKeys(keys);
     const pick = (ks: string[] = []) => ks.map((k) => by.get(k)).filter(Boolean) as MethodRow[];
     const pt = input.product_type ? by.get(input.product_type) ?? null : null;
+    if (!pt) throw new Error('Choose a product type with an available playbook.');
+    if (!isPlannedMethod(pt) && !(parseKeyPoints(pt.key_points).steps ?? []).length) {
+      throw new Error('This product playbook has no production steps. Complete it in Playbooks before creating a pipeline.');
+    }
+    const missing = keys.filter(k => k && !by.has(k));
+    if (missing.length) throw new Error(`Missing playbooks: ${missing.join(', ')}. Update your selections.`);
     const dest = pick(input.destinations), mon = pick(input.monetization), pro = pick(input.promotion);
     recipeRows = orderRecipe(brandRules, niches, [pt, ...dest, ...mon, ...pro]);
     steps = buildRecipeSteps(brandRules, pt, dest, mon, pro);
   }
 
   const recipe = recipeRows.map(recipeEntry);
-  const jobRes = await T('production_jobs').insert({
-    project_id: input.project_id,
-    kind: input.kind,
-    title: input.title,
-    target_type: input.target_type ?? null,
-    target_id: input.target_id ?? null,
-    target_key: input.target_key ?? null,
-    recipe,
-    level: input.level,
-    money_destination: input.money_destination || null,
-    status: steps[0]?.owner_kind === 'owner' ? 'ready' : 'running',
-    current_step: 1,
-    created_by: 'owner',
-    result_links: [],
-  }).select('id').single();
-  if (jobRes.error) throw jobRes.error;
-  const jobId = jobRes.data.id as string;
-
-  let prev: string | null = null;
-  for (let i = 0; i < steps.length; i++) {
-    const row = { ...stepRow(steps[i], i, { project_id: input.project_id, job_id: jobId, user_id: user?.id ?? null }), depends_on: prev };
-    const ins = await supabase.from('action_items').insert(row as any).select('id').single();
-    if (ins.error) throw ins.error;
-    prev = ins.data.id;
-  }
+  const job = {
+    project_id: input.project_id, kind: input.kind, title: input.title,
+    target_type: input.target_type ?? null, target_id: input.target_id ?? null,
+    target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
+    recipe, level: input.level, money_destination: input.money_destination || null,
+  };
+  const rows = steps.map((step, i) => stepRow(step, i, { project_id: input.project_id, job_id: '', user_id: user?.id ?? null }));
+  const { data: jobId, error } = await (supabase as any).rpc('hq_create_pipeline', {
+    p_job: job, p_steps: rows, p_new_content: input.new_content ?? null,
+  });
+  if (error) throw error;
   return { jobId, recipe };
 }
 

@@ -25,7 +25,7 @@ HQ calls each of these a project. Most screens have a project picker at the top,
 2. Playbooks hold the method for every format, platform, money path and niche. Your own material goes into them first.
 3. Radar finds what to make next. Each month it researches every channel brand and files ready-to-make briefs.
 4. When you tap to make a brief, HQ creates a production job, also called a pipeline. Each step belongs to Claude or to you.
-5. Claude does its steps overnight, saves the files to the brand's Drive folder and links them on the step. Your steps show up on Today in "Next 10 across all projects", and in the brand's "Waiting on you" count on its Overview tab.
+5. Claude does its steps overnight, saves the files to the brand's Drive folder and links them on the step. Your steps show up on Dashboard in "Next 10 across all projects", and in the brand's "Waiting on you" count on its Overview tab.
 6. Numbers come in from screenshots, Metricool, and what you enter by hand. They feed each brand's pillar scores.
 7. Portfolio rolls everything up: one card per brand with its overall score, setup progress and money.
 
@@ -38,7 +38,7 @@ HQ calls each of these a project. Most screens have a project picker at the top,
 
 ## The three questions HQ answers
 
-- What needs me today? Open "Today".
+- What needs me today? Open "Dashboard".
 - How is each brand doing? Open "Portfolio".
 - What is still missing? Open a brand and look at its "Setup" tab.
 

@@ -18,6 +18,7 @@ export type CrmContact = {
 export type CrmDealStage = "lead"|"pitch"|"proposal"|"won"|"lost";
 export type CrmDeal = {
   id: string; company_id: string; title: string; stage: CrmDealStage;
+  created_at: string;
   value: number | null; currency: string; expected_close: string | null;
   won_at: string | null; lost_at: string | null; notes: string | null;
   sort_order: number; created_by: string;
@@ -28,7 +29,7 @@ export type CrmInteractionType = "call"|"email"|"meeting"|"note";
 export type CrmInteraction = {
   id: string; company_id: string; contact_id: string | null; deal_id: string | null;
   type: CrmInteractionType; occurred_at: string; summary: string | null;
-  follow_up_date: string | null; created_by: string;
+  follow_up_date: string | null; follow_up_completed_at?: string | null; created_by: string;
 };
 
 export const STAGES: CrmDealStage[] = ["lead","pitch","proposal","won","lost"];
@@ -114,6 +115,7 @@ export function useFollowUpsDue() {
         .from("crm_interactions")
         .select("*")
         .not("follow_up_date", "is", null)
+        .is("follow_up_completed_at" as any, null)
         .lte("follow_up_date", today)
         .order("follow_up_date", { ascending: true });
       if (error) throw error;
@@ -184,7 +186,7 @@ export function useCrmMutations() {
     }),
     updateCompany: useMutation({
       mutationFn: async ({ id, patch }: { id: string; patch: Partial<CrmCompany> }) => {
-        const { error } = await supabase.from("crm_companies").update(patch).eq("id", id);
+        const { error } = await supabase.from("crm_companies").update(patch).eq("id", id).select("id").single();
         if (error) throw error;
       },
       onSuccess: () => inv([["crm","companies"]]),
@@ -216,10 +218,28 @@ export function useCrmMutations() {
     createContact: useMutation({
       mutationFn: async (input: Partial<CrmContact>) => {
         const { error } = await supabase.from("crm_contacts")
-          .insert({ ...input, created_by: userId! });
+          .insert({ ...input, created_by: userId! } as any);
         if (error) throw error;
       },
       onSuccess: () => inv([["crm","contacts"]]),
+    }),
+    updateContact: useMutation({
+      mutationFn: async ({id, patch}: {id: string; patch: Partial<CrmContact>}) => {
+        const {error} = await supabase.from('crm_contacts').update(patch).eq('id',id).select('id').single();
+        if (error) throw error;
+      }, onSuccess: invAllCrm,
+    }),
+    updateDeal: useMutation({
+      mutationFn: async ({id, patch}: {id: string; patch: Partial<CrmDeal>}) => {
+        const {error} = await supabase.from('crm_deals').update(patch).eq('id',id).select('id').single();
+        if (error) throw error;
+      }, onSuccess: invAllCrm,
+    }),
+    completeFollowUp: useMutation({
+      mutationFn: async (id: string) => {
+        const {error} = await supabase.from('crm_interactions').update({follow_up_completed_at: new Date().toISOString()} as any).eq('id',id).select('id').single();
+        if (error) throw error;
+      }, onSuccess: invAllCrm,
     }),
     archiveContact: useMutation({
       mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
@@ -248,7 +268,7 @@ export function useCrmMutations() {
     createDeal: useMutation({
       mutationFn: async (input: Partial<CrmDeal> & { company_id: string; title: string }) => {
         const { error } = await supabase.from("crm_deals")
-          .insert({ ...input, created_by: userId! });
+          .insert({ ...input, created_by: userId! } as any);
         if (error) throw error;
       },
       onSuccess: () => inv([["crm","deals"]]),
@@ -279,10 +299,10 @@ export function useCrmMutations() {
     }),
     moveDealStage: useMutation({
       mutationFn: async ({ id, stage }: { id: string; stage: CrmDealStage }) => {
-        const patch: Partial<CrmDeal> = { stage };
+        const patch: Partial<CrmDeal> = { stage, won_at: null, lost_at: null };
         if (stage === "won") patch.won_at = new Date().toISOString();
         if (stage === "lost") patch.lost_at = new Date().toISOString();
-        const { error } = await supabase.from("crm_deals").update(patch).eq("id", id);
+        const { error } = await supabase.from("crm_deals").update(patch).eq("id", id).select("id").single();
         if (error) throw error;
       },
       onSuccess: () => inv([["crm","deals"]]),
@@ -290,7 +310,7 @@ export function useCrmMutations() {
     logInteraction: useMutation({
       mutationFn: async (input: Partial<CrmInteraction> & { company_id: string; type: CrmInteractionType }) => {
         const { error } = await supabase.from("crm_interactions")
-          .insert({ ...input, created_by: userId! });
+          .insert({ ...input, created_by: userId! } as any);
         if (error) throw error;
       },
       onSuccess: () => inv([["crm","interactions"], ["crm","followups-due"]]),

@@ -1,3 +1,4 @@
+import { useApp } from "@/context/AppContext";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,9 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ImportPackageDialog } from "@/components/content/ImportPackageDialog";
 import { ProductionItemCard } from "@/components/content/ProductionItemCard";
+import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
+import { sortCollection } from "@/lib/collectionSort";
+import { Label } from "@/components/ui/label";
 
 const TABS: { key: string; label: string; stages: ContentStage[] }[] = [
   { key: "research", label: "Research", stages: ["idea"] },
@@ -37,10 +41,15 @@ export default function ProductionBoard() {
   const advance = useAdvanceStage();
   const approve = useApproveItem();
 
-  const [brand, setBrand] = useState("all");
+  const { selectedBar, accessibleBars, setSelectedBar, clearSelectedBar } = useApp();
+  const brand = selectedBar?.id ?? 'all';
+  const setBrand = (id: string) => { if(id === 'all') clearSelectedBar(); else { const b = accessibleBars.find(b=>b.id===id); if(b) setSelectedBar(b); } };
   const [mode, setMode] = useState("all");
   const [channel, setChannel] = useState("all");
   const [importOpen, setImportOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('due');
+  const [attention, setAttention] = useState('all');
 
   const nameById = useMemo(
     () => new Map(projects.map((p) => [p.id, p.name])), [projects],
@@ -61,13 +70,16 @@ export default function ProductionBoard() {
     );
   }
 
-  const filtered = items.filter((it) => {
+  const filtered = sortCollection(items.filter((it) => {
     if (!projectIds.includes(it.project_id)) return false;
     if (brand !== "all" && it.project_id !== brand) return false;
     if (mode !== "all" && modeById.get(it.project_id) !== mode) return false;
     if (channel !== "all" && !it.placements.some((p) => p.channel === channel)) return false;
+    if (query && !`${it.title} ${nameById.get(it.project_id) ?? ''}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
+    if (attention === 'approval' && (it.approved_at || !canApprove(it))) return false;
+    if (attention === 'quality' && !(it.quality_fails?.length)) return false;
     return true;
-  });
+  }), sort);
 
   const selectedProject = brand !== "all" ? projects.find((p) => p.id === brand) : undefined;
   const cutoff = Date.now() - 28 * 86400000;
@@ -112,7 +124,7 @@ export default function ProductionBoard() {
         <div className="flex-1 min-w-[12rem]">
           <h1 className="text-2xl font-bold">Production Board</h1>
           <p className="text-sm text-muted-foreground">
-            Every internal brand in one place, by production step.
+            {selectedBar?.bar_name ?? 'All brands'} · find the next piece to finish, review, or schedule.
           </p>
         </div>
         <Button variant="outline" onClick={() => setImportOpen(true)}>
@@ -120,18 +132,25 @@ export default function ProductionBoard() {
         </Button>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <CollectionToolbar query={query} onQuery={setQuery} placeholder="Find a title or brand…" sort={sort} onSort={setSort}
+        count={filtered.length} total={items.length} options={[
+          {value:'due',label:'Due date · earliest first'}, {value:'oldest',label:'Oldest first'},
+          {value:'newest',label:'Newest first'}, {value:'quality',label:'Quality · highest first'}, {value:'name',label:'Title · A to Z'},
+        ]} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="space-y-1.5"><Label htmlFor="production-brand">Brand</Label>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger><SelectValue placeholder="Brand" /></SelectTrigger>
+          <SelectTrigger id="production-brand"><SelectValue placeholder="Brand" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All brands</SelectItem>
-            {projects.map((p) => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+            {accessibleBars.map((p) => (
+              <SelectItem key={p.id} value={p.id}>{p.bar_name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
+        </div><div className="space-y-1.5"><Label htmlFor="production-mode">Content mode</Label>
         <Select value={mode} onValueChange={setMode}>
-          <SelectTrigger><SelectValue placeholder="Content mode" /></SelectTrigger>
+          <SelectTrigger id="production-mode"><SelectValue placeholder="Content mode" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Any content mode</SelectItem>
             {Object.entries(CONTENT_MODE_LABELS).map(([k, v]) => (
@@ -139,8 +158,9 @@ export default function ProductionBoard() {
             ))}
           </SelectContent>
         </Select>
+        </div><div className="space-y-1.5"><Label htmlFor="production-channel">Channel</Label>
         <Select value={channel} onValueChange={setChannel}>
-          <SelectTrigger><SelectValue placeholder="Channel" /></SelectTrigger>
+          <SelectTrigger id="production-channel"><SelectValue placeholder="Channel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Any channel</SelectItem>
             {PLACEMENT_CHANNELS.map((c) => (
@@ -148,7 +168,19 @@ export default function ProductionBoard() {
             ))}
           </SelectContent>
         </Select>
+        </div><div className="space-y-1.5"><Label htmlFor="production-attention">Focus</Label>
+          <Select value={attention} onValueChange={setAttention}>
+            <SelectTrigger id="production-attention"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All work</SelectItem>
+              <SelectItem value="approval">Ready for approval</SelectItem>
+              <SelectItem value="quality">Needs quality fixes</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+      {(query || brand !== 'all' || mode !== 'all' || channel !== 'all' || attention !== 'all') &&
+        <Button variant="ghost" size="sm" onClick={() => { setQuery(''); setBrand('all'); setMode('all'); setChannel('all'); setAttention('all'); }}>Clear filters</Button>}
 
       {selectedProject && (
         <Card className="bg-card text-card-foreground border-border">
@@ -233,7 +265,7 @@ export default function ProductionBoard() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
                     {rows.map((it) => (
                       <ProductionItemCard
                         key={it.id}

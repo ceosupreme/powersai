@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TrafficNotice } from '@/components/pipeline/TrafficNotice';
-import { useApproveItem } from '@/hooks/useContentProduction';
+import { useApproveItem, canApprove } from '@/hooks/useContentProduction';
 import { buildStarterPrompt } from '@/lib/pipelineComposer';
 import { playbookStatus } from '@/lib/playbookStatus';
 import { jobStatusWord } from '@/hooks/usePlaybooks';
@@ -99,6 +99,8 @@ function briefText(brief: unknown): string | null {
 }
 
 export default function PipelineJob() {
+  const qc = useQueryClient();
+  const [jobBusy,setJobBusy] = useState(false);
   const { venueId, jobId } = useParams<{ venueId: string; jobId: string }>();
   const { data, isLoading, isError, refetch } = usePipelineJob(jobId);
   const recipeIds = useMemo(() => (data?.job.recipe ?? []).map((r) => r.id), [data]);
@@ -156,8 +158,9 @@ export default function PipelineJob() {
   const queueStep = (s: Step) => {
     const { facts } = parseFacts(s.facts);
     const merged = { ...(facts ?? (s.facts ? { note: s.facts } : {})), queued: true, queued_at: new Date().toISOString() };
-    return updateStep(s, { facts: JSON.stringify(merged) }, 'Queued for the next run');
+    return updateStep(s, { facts: JSON.stringify(merged) }, 'Saved for worker pickup. This does not start a run.');
   };
+  const reclaim = (s: Step) => updateStep(s, { owner_kind: 'owner', assignee: 'Allmighty', approval_status: 'Approved', facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }) }, 'Assigned to you');
   const handToClaude = (s: Step) => updateStep(s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' }, 'Handed to Claude');
   const copyPrompt = async (s: Step) => {
     const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
@@ -169,6 +172,7 @@ export default function PipelineJob() {
     catch { toast.error('Could not copy. Your browser blocked the clipboard.'); }
   };
   const approveTarget = async () => {
+    if (!canApprove(target)) return toast.error('Approval needs a quality score of at least 80 and no hard failures.');
     try { await approve.mutateAsync(target.id); toast.success('Approved'); refetch(); }
     catch (e: any) { toast.error(e?.message ?? 'The database refused the approval'); }
   };
@@ -205,6 +209,15 @@ export default function PipelineJob() {
             {job.money_destination && <p>{/^feeds:/i.test(job.money_destination) ? job.money_destination : `Feeds: ${job.money_destination}`}</p>}
           </div>
         )}
+        {job.status !== 'finished' && <Button variant="outline" disabled={jobBusy} onClick={async () => {
+          setJobBusy(true);
+          try {
+            const {error} = await (supabase as any).rpc('hq_pause_pipeline',{p_job_id:job.id,p_paused:job.status !== 'parked'});
+            if(error) throw error;
+            await qc.invalidateQueries();
+            toast.success(job.status === 'parked' ? 'Pipeline resumed' : 'Pipeline canceled; history retained');
+          } catch(error:any) { toast.error(error.message); } finally { setJobBusy(false); }
+        }}>{job.status === 'parked' ? 'Resume pipeline' : 'Cancel pipeline'}</Button>}
       </header>
 
       <section>
@@ -265,7 +278,7 @@ export default function PipelineJob() {
             const link = firstStepLink(facts, s.output_url);
             const method = s.method_id ? kb.data?.get(s.method_id) : null;
             const current = s.step_order != null && s.step_order === job.current_step;
-            const canDone = s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
+            const canDone = job.status !== 'parked' && s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
             const queued = !!(facts as any)?.queued;
             const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
@@ -288,9 +301,10 @@ export default function PipelineJob() {
                       {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Hand to Claude</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
                         queued
-                          ? <span className="self-center text-xs text-muted-foreground">Queued for the next run</span>
-                          : <Button size="sm" variant="outline" disabled={busyStep === s.id} onClick={() => queueStep(s)}>Queue</Button>
+                          ? <span className="self-center text-xs text-muted-foreground">Queued · awaiting worker</span>
+                          : <Button size="sm" variant="outline" disabled={busyStep === s.id || st === 'blocked' || job.status === 'parked'} onClick={() => queueStep(s)}>Queue</Button>
                       )}
+                      {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
                       {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy prompt</Button>}
                     </div>
                     {isGate && target && (
@@ -298,7 +312,7 @@ export default function PipelineJob() {
                         <span>Quality score <span className="font-semibold">{target.quality_score ?? '—'}</span></span>
                         <span>Fails: {(target.quality_fails ?? []).length ? target.quality_fails.join(', ') : 'none'}</span>
                         {target.approved_at ? <span className="font-semibold">Approved</span> : (
-                          <Button size="sm" className="h-7" disabled={approve.isPending} onClick={approveTarget}>Approve</Button>
+                          <Button size="sm" className="h-7" disabled={approve.isPending || !canApprove(target)} onClick={approveTarget}>Approve</Button>
                         )}
                       </div>
                     )}

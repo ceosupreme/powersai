@@ -1,7 +1,7 @@
 # The crews that run while you sleep
 <!-- part: Making things | order: 44 | slug: nightly-crews | route: none | tags: production run, scheduled tasks, automation, overnight, email report, radar, life pulse, blog autopilot, crews -->
 
-Several scheduled crews work on HQ without you: a nightly production run, a nightly setup score update, a monthly research run, a twice-weekly blog crew, and a few small background jobs inside HQ. This article lists every one, what it does, when it runs, what it will never do, and how you hear about the results.
+HQ's documented automation plan includes a nightly production run, a nightly setup score update, a monthly research run, a twice-weekly blog crew, and small background jobs inside HQ. This article describes those schedules and intended behavior. External crew schedules and successful execution were not verified in this review. Check the service that runs each crew and its last successful output before relying on it.
 
 ## At a glance
 
@@ -49,7 +49,7 @@ When anything happened, you get one email with the subject "Production run: what
 4. Per brand: the steps finished with their Drive links, the steps now waiting on you with what to do, the minutes it should take and the pipeline link, and any blocked steps.
 5. Any new Play: a combination that clearly won, with the proof.
 
-It closes with how many Claude steps and playbook jobs are still queued. No email means nothing happened that night.
+It closes with how many Claude steps and playbook jobs are still queued. No email alone does not establish what happened: the run or its email delivery may have failed. Check the run history and saved outputs.
 
 ### What the production run will never do
 
@@ -93,9 +93,9 @@ Life Pulse is your private dashboard. It is a separate app, not part of HQ. HQ's
 
 ### Check what the crew did last night
 
-1. Open the report email "Production run: what got made". If there is no email, nothing happened.
+1. Open the report email "Production run: what got made". If there is no email, check the external worker's run history and delivery status.
 2. Tap a pipeline link in the email to open the job. Finished steps show their file link.
-3. Open "Today" to see the steps that are now waiting on you.
+3. Open "Dashboard" to see the steps that are now waiting on you.
 
 ### Get a step done sooner
 
@@ -114,3 +114,7 @@ The crews are scheduled tasks in your Claude account, not settings in HQ. Ask Cl
 - If a step stays Open for several nights, read its note on the pipeline page. It almost always names what is missing, such as an input, a login, or your decision.
 - A step titled "Method not written yet" means the playbook for that method is still planned. The crew writes that playbook first and then rewrites the step.
 - The crews never ask for passwords. Logins always happen directly on the platform, by you.
+
+## Queue and worker connection
+
+The Queue button saves a request for the external production worker. It does not start that worker or confirm a scheduled run. The worker's schedule and selection rules live outside this repository. To prioritize queued work, its configuration must select eligible queued steps before ordinary steps, still respecting dependencies, paused jobs and active brands. Until that configuration is verified, treat the order described above as the documented plan and check the last actual run instead of assuming pickup.

@@ -1,4 +1,6 @@
 import { ReactNode, useEffect } from 'react';
+import { useHqAppearanceScope } from '@/hooks/useHqAppearance';
+import '@/styles/hq-appearance.css';
 import { ensureExtraFonts } from '@/lib/extraFonts';
 import { Link } from 'react-router-dom';
 import { useRole } from '@/context/RoleContext';
@@ -18,6 +20,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
+  useHqAppearanceScope();
   useEffect(() => { ensureExtraFonts(); }, []);
   const { layout, isLoading: roleLoading } = useRole();
   const { role: legacyRole } = useAuth();
