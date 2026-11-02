@@ -22,7 +22,7 @@ HQ keeps its records in the app, its files in Google Drive, and its reports in y
 - "Supreme Team HQ - Brands": one folder for each brand, holding every file the production crew makes for it. Files are named with the job, the step and the date, so the newest version is easy to spot.
 - "Supreme Team HQ - Playbooks": a readable Google Doc for every written playbook, named with the shelf, the title and the version.
 - "Supreme Team HQ - Playbook Inbox": drop your own material here for the playbooks. The "Merged" folder inside it holds everything that has already been used.
-- "Supreme Team HQ - Plans and Specs": build plans, specs, and the PDF copy of this guide.
+- "Supreme Team HQ - Plans and Specs": build plans and specs. It is also the place to keep the PDF copy of this guide.
 
 Every file the crew makes is also linked on the pipeline step that made it, so you rarely need to dig through Drive.
 
@@ -51,7 +51,7 @@ The crews that run on a schedule live in your Claude account, not in HQ. The art
 ## This guide
 
 - In HQ: "Guide" in the menu under "System".
-- As a PDF: in "Supreme Team HQ - Plans and Specs".
+- As a PDF: Claude sends a fresh copy in the chat whenever the guide is rebuilt. Keep it in "Supreme Team HQ - Plans and Specs".
 - The older, shorter help articles are still available from the link at the bottom of every Guide article, in the "Help Center".
 
 ## Good to know
