@@ -49,8 +49,8 @@ BEGIN
         VALUES(heading,item.raw_text,p_project_id,p_project_id,auth.uid(),'Todo') RETURNING id INTO record_id;
     WHEN 'idea','content_idea' THEN
       target := 'content_items';
-      INSERT INTO public.content_items(project_id,title,stage,purpose_type,purpose,brief)
-        VALUES(p_project_id,heading,'idea','teach','From Capture Inbox',jsonb_build_object('summary',item.raw_text)) RETURNING id INTO record_id;
+      INSERT INTO public.content_items(project_id,title,stage,purpose_type,purpose,brief,created_by)
+        VALUES(p_project_id,heading,'idea','teach','From Capture Inbox',jsonb_build_object('summary',item.raw_text),auth.uid()) RETURNING id INTO record_id;
     WHEN 'note' THEN
       target := 'knowledge_base';
       INSERT INTO public.knowledge_base(venue_id,scope,category,subcategory,title,full_text,status,owner_id)
@@ -95,8 +95,8 @@ BEGIN
     ORDER BY created_at LIMIT 1;
   IF existing_id IS NOT NULL THEN RETURN existing_id; END IF;
   IF p_new_content IS NOT NULL AND v_target_id IS NULL THEN
-    INSERT INTO public.content_items(project_id,title,stage,purpose_type,purpose,brief)
-      VALUES(project,p_new_content->>'title','idea','teach','From Answer Bank',jsonb_build_object('summary',p_new_content->>'summary')) RETURNING id INTO v_target_id;
+    INSERT INTO public.content_items(project_id,title,stage,purpose_type,purpose,brief,created_by)
+      VALUES(project,p_new_content->>'title','idea','teach','From Answer Bank',jsonb_build_object('summary',p_new_content->>'summary'),auth.uid()) RETURNING id INTO v_target_id;
   END IF;
   INSERT INTO public.production_jobs(project_id,kind,title,target_type,target_id,target_key,recipe,level,money_destination,status,current_step,created_by,result_links)
     VALUES(project,p_job->>'kind',p_job->>'title',p_job->>'target_type',v_target_id,p_job->>'target_key',p_job->'recipe',

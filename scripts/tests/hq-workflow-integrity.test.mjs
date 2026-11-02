@@ -13,10 +13,10 @@ CREATE TABLE crm_contacts(id uuid DEFAULT gen_random_uuid(),company_id uuid REFE
 CREATE TABLE crm_deals(id uuid DEFAULT gen_random_uuid(),company_id uuid REFERENCES crm_companies(id),title text,stage text,notes text,created_by uuid);
 CREATE TABLE crm_interactions(id uuid DEFAULT gen_random_uuid());
 CREATE TABLE inbound_leads(id uuid PRIMARY KEY,name text,business_name text,email text,phone text,message text,status text,promoted_company_id uuid);
-CREATE TABLE capture_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),raw_text text,status text DEFAULT 'inbox',routed_project_id uuid,routed_type capture_routed_type,routed_at timestamptz,ai_suggestion_status text);
+CREATE TABLE capture_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),raw_text text,status text DEFAULT 'inbox',routed_project_id uuid,routed_type capture_routed_type,routed_at timestamptz,ai_suggestion_status text,created_by uuid DEFAULT auth.uid());
 CREATE TABLE log_entries(id uuid);
 CREATE TABLE tasks(id uuid DEFAULT gen_random_uuid(),title text,description text,bar_id uuid,venue_id uuid,created_by uuid,status text);
-CREATE TABLE content_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),project_id uuid,title text,stage text,purpose_type text,purpose text,brief jsonb,quality_score int,quality_fails text[] DEFAULT ARRAY[]::text[],approved_at timestamptz);
+CREATE TABLE content_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),project_id uuid,title text,stage text,purpose_type text,purpose text,brief jsonb,quality_score int,quality_fails text[] DEFAULT ARRAY[]::text[],approved_at timestamptz,created_by uuid);
 CREATE TABLE knowledge_base(id uuid DEFAULT gen_random_uuid(),venue_id uuid,scope text,category text,subcategory text,title text,full_text text,status text,owner_id uuid);
 CREATE TABLE brand_kits(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),project_id uuid UNIQUE,created_by uuid);
 CREATE TABLE brand_kit_links(id uuid DEFAULT gen_random_uuid(),kit_id uuid,label text,url text,category text);
@@ -96,4 +96,21 @@ test('approval rejects missing scores, low scores and hard failures at the datab
  }
  await db.query('UPDATE content_items SET quality_score=80,quality_fails=ARRAY[]::text[],approved_at=now() WHERE id=$1',[id]);
  assert.ok(await scalar('SELECT approved_at v FROM content_items WHERE id=$1',[id]));
+});
+
+test('capture and pipeline content creation satisfy the live creator access policy',async()=>{
+ await db.exec(`ALTER TABLE content_items ENABLE ROW LEVEL SECURITY;
+ CREATE POLICY content_read ON content_items FOR SELECT TO authenticated USING (true);
+ CREATE POLICY content_insert ON content_items FOR INSERT TO authenticated WITH CHECK (created_by=auth.uid());
+ CREATE POLICY capture_own ON capture_items FOR ALL TO authenticated USING (created_by=auth.uid()) WITH CHECK (created_by=auth.uid());
+ SET ROLE authenticated;`);
+ try {
+  for (const type of ['idea','content_idea']) {
+   const {id}=await one("INSERT INTO capture_items(raw_text) VALUES('Creator access test') RETURNING id");
+   const routed=await scalar('SELECT hq_route_capture($1,$2,$3) v',[id,project,type]);
+   assert.equal(await scalar('SELECT created_by v FROM content_items WHERE id=$1',[routed.id]),user);
+  }
+  const id=await scalar('SELECT hq_create_pipeline($1,$2,$3) v',[JSON.stringify({...job,target_key:'creator-access-test'}),JSON.stringify(steps),JSON.stringify({title:'Creator access test',summary:'Test'})]);
+  assert.equal(await scalar('SELECT c.created_by v FROM content_items c JOIN production_jobs j ON j.target_id=c.id WHERE j.id=$1',[id]),user);
+ } finally {await db.exec('RESET ROLE');}
 });

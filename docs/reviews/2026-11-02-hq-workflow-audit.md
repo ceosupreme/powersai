@@ -67,7 +67,7 @@ The local review includes the requested backend usability changes. The public si
 
 - Clean dependency install succeeds after repairing the stale package lock. The existing locked Supabase SDK version, 2.89.0, is retained.
 - TypeScript app check passes.
-- 172 frontend, security and database tests pass. Coverage includes promotion, routing, rollback, denied access, pause/resume, quality approval, brand filtering, login routing, brand-color contrast, and offer assignment under row access rules.
+- 173 frontend, security and database tests pass. Coverage includes promotion, routing, rollback, denied access, pause/resume, quality approval, brand filtering, login routing, brand-color contrast, and offer assignment under row access rules.
 - Guide structure, routes and plain-language formatting checks pass.
 - Vite production compilation and metadata generation complete. Optional full public-page prerendering falls back to route-specific SPA metadata because Python Playwright is unavailable in this environment.
 - An isolated browser preview of the actual editor components verifies the visible empty-audit state, disabled Save for an invalid 90% content mix, and the company-edit save/close interaction. It uses synthetic data and a mocked save hook, not production persistence. The actual-component readability preview also verifies Dashboard, brand reports, scoped Offers, and Marketing empty states at desktop and phone widths. Extra-large text and dark mode are checked in the isolated preview. A full authenticated staging smoke test remains required.
@@ -84,3 +84,7 @@ The local review includes the requested backend usability changes. The public si
 7. Confirm a full authenticated desktop/mobile smoke pass before merge and release. If a frontend rollback is needed, the migration is additive and can remain while the old frontend is restored.
 
 The branch is suitable for review and staging validation. It is not a certification of live delivery, complete database recoverability or background-worker execution.
+
+## Release preflight, 2 November 2026
+
+The production schema check found that content creation must set created_by explicitly to satisfy the existing insert policy. Capture routing and pipeline content creation now set the authenticated creator, with a regression test using that policy. Both migrations and owner-role checks for promotion, all six capture types, pipeline retry/advance/pause/resume, content approval, and offer assignment succeeded in one rolled-back transaction against the current live schema. No test records or schema changes from that preflight were retained. This check does not replace a signed-in browser check or external delivery verification.
