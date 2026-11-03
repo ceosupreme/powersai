@@ -1,3 +1,6 @@
+# Proposal pages stay out of search: Google and Bing are blocked below, and each
+# proposal page carries a noindex tag. Link-preview bots may read them so a
+# shared proposal link shows the client's own preview image.
 User-agent: Googlebot
 Allow: /
 Disallow: /proposal/
@@ -10,17 +13,14 @@ Disallow: /proposal-media/
 
 User-agent: Twitterbot
 Allow: /
-Disallow: /proposal/
 Disallow: /proposal-media/
 
 User-agent: facebookexternalhit
 Allow: /
-Disallow: /proposal/
 Disallow: /proposal-media/
 
 User-agent: *
 Allow: /
-Disallow: /proposal/
 Disallow: /proposal-media/
 
 Sitemap: https://supremeteammedia.com/sitemap.xml
