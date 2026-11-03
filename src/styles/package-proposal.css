@@ -1,0 +1,187 @@
+/* Package proposal pages (/proposal/:slug for records in src/content/packageProposals.ts).
+   Builds on proposal.css: same tokens, top bar, form, footer and mobile actions. */
+
+.pp-page .pp-hero { padding-block: clamp(44px, 7vw, 92px) clamp(36px, 5vw, 64px); }
+.pp-page .pp-program { margin-top: 26px; font-size: .95rem; font-weight: 700; letter-spacing: .04em; color: hsl(var(--ink-muted)); }
+.pp-page .pp-intro { max-width: 760px; margin-top: 14px; font-size: 1.12rem; line-height: 1.55; color: hsl(var(--ink-muted)); }
+.pp-page details > summary { list-style: none; }
+.pp-page details > summary::-webkit-details-marker { display: none; }
+.pp-page details > summary:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; border-radius: 10px; }
+
+/* Packages: three cards */
+.pp-page .pp-packages { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
+.pp-page .pp-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 40px; align-items: stretch; }
+.pp-page .pp-card { position: relative; display: flex; flex-direction: column; padding: 30px 26px 26px; background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 22px; }
+.pp-page .pp-card.is-recommended { border: 2px solid hsl(var(--gold)); box-shadow: 0 30px 60px -34px rgba(11, 18, 40, .45); }
+.pp-page .pp-badge { position: absolute; top: -14px; left: 24px; padding: 6px 12px; border-radius: 999px; background: hsl(var(--gold)); color: #fff; font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.pp-page .pp-card-num { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold)); }
+.pp-page .pp-card h3 { margin-top: 6px; font-family: "Inter Tight", sans-serif; font-size: 1.5rem; font-weight: 800; line-height: 1.12; }
+.pp-page .pp-tagline { margin-top: 8px; min-height: 4.4em; color: hsl(var(--ink-muted)); line-height: 1.45; }
+.pp-page .pp-target { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; padding: 18px 18px 16px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 16px; }
+.pp-page .pp-target-label { font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--navy-text) / .7); }
+.pp-page .pp-target-range { font-family: "Inter Tight", sans-serif; font-size: clamp(3rem, 5vw, 4rem); font-weight: 800; line-height: 1; letter-spacing: -.02em; color: hsl(var(--gold-bright)); }
+.pp-page .pp-target-text { font-size: 1.02rem; font-weight: 600; line-height: 1.35; }
+.pp-page .pp-lift { align-self: flex-start; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: hsl(var(--gold-bright) / .18); color: hsl(var(--gold-bright)); font-size: .88rem; font-weight: 800; }
+.pp-page .pp-target-note { margin-top: 4px; font-size: .9rem; color: hsl(var(--navy-text) / .8); }
+.pp-page .pp-signed { margin-top: 10px; padding-top: 10px; border-top: 1px solid hsl(var(--navy-text) / .16); font-size: 1.02rem; font-weight: 700; }
+.pp-page .pp-price { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; }
+.pp-page .pp-price strong { font-family: "Inter Tight", sans-serif; font-size: 2.1rem; font-weight: 800; line-height: 1.05; letter-spacing: -.01em; }
+.pp-page .pp-price strong span { font-size: 1rem; font-weight: 700; color: hsl(var(--ink-muted)); }
+.pp-page .pp-price > span { font-size: .93rem; color: hsl(var(--ink-muted)); }
+.pp-page .pp-highlights { display: grid; gap: 9px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-highlights li { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 9px; align-items: start; font-size: .99rem; line-height: 1.42; }
+.pp-page .pp-highlights svg { margin-top: 3px; color: hsl(var(--gold)); }
+.pp-page .pp-card .pp-included { margin-bottom: 22px; }
+.pp-page .pp-card .pp-choose { width: 100%; margin-top: auto; }
+.pp-page .proposal-btn.is-quiet { background: hsl(var(--paper)); color: hsl(var(--ink)); border: 2px solid hsl(var(--ink)); box-shadow: none; }
+.pp-page .pp-cards-note { max-width: 860px; margin-top: 20px; font-size: .96rem; color: hsl(var(--ink-muted)); }
+.pp-page .pp-cards-note a { font-weight: 700; color: hsl(var(--gold)); white-space: nowrap; }
+
+/* Small drop-downs inside cards and steps */
+.pp-page .pp-mini { margin-top: 12px; }
+.pp-page .pp-mini summary { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; cursor: pointer; font-weight: 700; color: hsl(var(--gold)); }
+.pp-page .pp-mini summary svg { transition: transform .2s ease; }
+.pp-page .pp-mini[open] summary svg { transform: rotate(180deg); }
+.pp-page .pp-mini p { margin-top: 4px; font-size: .95rem; line-height: 1.5; color: hsl(var(--ink-muted)); }
+.pp-page .pp-included ul { display: grid; gap: 7px; margin: 6px 0 0; padding-left: 18px; font-size: .95rem; color: hsl(var(--ink-muted)); }
+
+/* How it works */
+.pp-page .pp-journey { padding-block: clamp(44px, 6vw, 80px); }
+.pp-page .pp-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 30px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-steps li { padding: 20px 18px 14px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.pp-page .pp-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--navy)); color: hsl(var(--gold-bright)); font-weight: 800; }
+.pp-page .pp-steps h3 { margin-top: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.2rem; font-weight: 800; line-height: 1.15; }
+.pp-page .pp-steps > li > p { margin-top: 6px; font-size: .97rem; line-height: 1.45; color: hsl(var(--ink-muted)); }
+
+/* Compare table with the package filter */
+.pp-page .pp-compare-section { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
+.pp-page .pp-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.pp-page .pp-filter button { min-height: 44px; padding: 0 16px; border: 1px solid hsl(var(--rule)); border-radius: 999px; background: hsl(var(--paper)); font: inherit; font-weight: 700; color: hsl(var(--ink)); cursor: pointer; }
+.pp-page .pp-filter button[aria-pressed="true"] { background: hsl(var(--navy)); border-color: hsl(var(--navy)); color: hsl(var(--navy-text)); }
+.pp-page .pp-table-scroll { margin-top: 18px; overflow-x: auto; border: 1px solid hsl(var(--rule)); border-radius: 18px; background: hsl(var(--paper)); }
+.pp-page .pp-compare { width: 100%; border-collapse: collapse; font-size: .98rem; }
+.pp-page .pp-table-scroll.is-all .pp-compare { min-width: 780px; }
+.pp-page .pp-compare th, .pp-page .pp-compare td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid hsl(var(--rule)); line-height: 1.4; }
+.pp-page .pp-compare thead th { background: hsl(var(--navy)); color: hsl(var(--navy-text)); font-family: "Inter Tight", sans-serif; font-size: 1.05rem; font-weight: 800; }
+.pp-page .pp-compare thead th span { display: block; margin-top: 2px; font-family: "Instrument Sans", sans-serif; font-size: .86rem; font-weight: 600; color: hsl(var(--gold-bright)); }
+.pp-page .pp-compare thead th.is-recommended { box-shadow: inset 0 -4px 0 hsl(var(--gold-bright)); }
+.pp-page .pp-compare tbody th[scope="row"] { width: 36%; font-weight: 600; }
+.pp-page .pp-compare td.is-recommended { background: hsl(var(--cobalt-pale) / .5); }
+.pp-page .pp-compare-group th { background: hsl(var(--surface)); font-size: .8rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold)); }
+.pp-page .pp-yes svg { color: hsl(var(--gold)); }
+.pp-page .pp-no svg { color: hsl(var(--ink-muted) / .55); }
+.pp-page .pp-footnote { margin-top: 14px; font-size: .94rem; color: hsl(var(--ink-muted)); }
+/* Keep the row labels in view when all three packages scroll sideways on a phone. */
+.pp-page .pp-table-scroll.is-all .pp-compare th[scope="row"],
+.pp-page .pp-table-scroll.is-all .pp-compare thead th:first-child { position: sticky; left: 0; z-index: 1; }
+.pp-page .pp-table-scroll.is-all .pp-compare th[scope="row"] { background: hsl(var(--paper)); box-shadow: 1px 0 0 hsl(var(--rule)); }
+
+/* Drop-downs: explanations, the math, the fine print and the questions */
+.pp-page .pp-explain, .pp-page .pp-faq { padding-block: clamp(44px, 6vw, 88px); }
+.pp-page .pp-accordion { display: grid; gap: 10px; margin-top: 26px; }
+.pp-page .pp-drop { background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.pp-page .pp-drop[open] { border-color: hsl(var(--gold) / .45); }
+.pp-page .pp-drop summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 16px 22px; cursor: pointer; font-family: "Inter Tight", sans-serif; font-size: 1.18rem; font-weight: 800; line-height: 1.25; }
+.pp-page .pp-drop summary svg { flex: none; color: hsl(var(--gold)); transition: transform .2s ease; }
+.pp-page .pp-drop[open] summary svg { transform: rotate(180deg); }
+.pp-page .pp-drop-body { padding: 0 22px 22px; }
+.pp-page .pp-drop-body > p { max-width: 840px; margin-top: 12px; line-height: 1.6; color: hsl(var(--ink)); }
+.pp-page .pp-drop-body > p:first-child { margin-top: 0; }
+.pp-page .pp-loop { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-loop li { padding: 16px; background: hsl(var(--paper)); border-radius: 12px; }
+.pp-page .pp-loop span { font-size: .85rem; font-weight: 800; color: hsl(var(--gold)); }
+.pp-page .pp-loop strong { display: block; margin-top: 6px; font-size: 1.05rem; }
+.pp-page .pp-loop p { margin-top: 6px; font-size: .95rem; color: hsl(var(--ink-muted)); }
+.pp-page .pp-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+.pp-page .pp-columns > div { padding: 18px 20px; background: hsl(var(--paper)); border-radius: 12px; }
+.pp-page .pp-columns > div:last-child { background: hsl(var(--cobalt-pale)); }
+.pp-page .pp-columns h4 { font-family: "Inter Tight", sans-serif; font-size: 1.1rem; font-weight: 800; }
+.pp-page .pp-columns ul { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-columns li { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 9px; line-height: 1.45; }
+.pp-page .pp-columns svg { margin-top: 3px; color: hsl(var(--gold)); }
+.pp-page .pp-calendar { margin-top: 18px; }
+
+/* The math */
+.pp-page .pp-math { padding-block: clamp(40px, 5vw, 72px); background: hsl(var(--surface)); }
+.pp-page .pp-math .pp-drop, .pp-page .pp-terms .pp-drop { background: hsl(var(--paper)); }
+.pp-page .pp-drop-body > p.pp-callout { padding: 14px 18px; background: hsl(var(--cobalt-pale)); border-radius: 12px; font-weight: 700; }
+.pp-page .pp-math-table { width: 100%; border-collapse: collapse; }
+.pp-page .pp-math-table th, .pp-page .pp-math-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid hsl(var(--rule)); line-height: 1.35; }
+.pp-page .pp-math-table thead th { background: hsl(var(--navy)); color: hsl(var(--navy-text)); font-weight: 800; }
+.pp-page .pp-math-table tbody th { font-weight: 600; }
+.pp-page .pp-math-table td { font-weight: 700; white-space: nowrap; }
+.pp-page .pp-math-table tr.is-total th, .pp-page .pp-math-table tr.is-total td { background: hsl(var(--cobalt-pale)); font-weight: 800; }
+.pp-page .pp-drop-body > p.pp-example { display: grid; gap: 6px; padding: 18px 20px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 14px; font-size: 1.15rem; font-weight: 800; line-height: 1.4; }
+.pp-page .pp-example span { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold-bright)); }
+
+/* Timeline */
+.pp-page .pp-timeline { padding-block: clamp(44px, 6vw, 80px); }
+.pp-page .pp-time { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 36px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-time li { position: relative; padding: 22px 18px 20px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 16px; }
+.pp-page .pp-time-dot { position: absolute; top: -14px; left: 18px; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: hsl(var(--gold)); color: #fff; font-size: .85rem; font-weight: 800; }
+.pp-page .pp-time-when { display: block; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: hsl(var(--ink-muted)); }
+.pp-page .pp-time h3 { margin-top: 6px; font-family: "Inter Tight", sans-serif; font-size: 1.25rem; font-weight: 800; }
+.pp-page .pp-time p { margin-top: 6px; font-size: .96rem; line-height: 1.45; color: hsl(var(--ink-muted)); }
+
+/* Terms for every package */
+.pp-page .pp-terms { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
+.pp-page .pp-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 30px; margin: 26px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-points li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 1.04rem; line-height: 1.45; }
+.pp-page .pp-points svg { margin-top: 4px; color: hsl(var(--gold)); }
+.pp-page .pp-fine { display: grid; gap: 16px; margin: 0; }
+.pp-page .pp-fine dt { font-weight: 800; }
+.pp-page .pp-fine dd { margin: 4px 0 0; line-height: 1.55; color: hsl(var(--ink-muted)); }
+
+/* National rollout band */
+.pp-page .pp-national { padding-block: clamp(44px, 6vw, 80px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-top: 0 !important; }
+.pp-page .pp-national .proposal-eyebrow { color: hsl(var(--gold-bright)); }
+.pp-page .pp-national-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: end; }
+.pp-page .pp-national p { font-size: 1.12rem; line-height: 1.6; }
+.pp-page .pp-national p.pp-national-note { margin-top: 14px; font-size: .95rem; color: hsl(var(--navy-text) / .7); }
+
+/* Package picker in the agreement form */
+.pp-page .pp-pick { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+.pp-page .pp-pick legend { margin-bottom: 8px; font-size: .92rem; font-weight: 600; }
+.pp-page .proposal-form .pp-pick-option { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; border: 1px solid hsl(var(--rule)); border-radius: 12px; background: hsl(var(--paper)); cursor: pointer; }
+.pp-page .proposal-form .pp-pick-option.is-selected { border: 2px solid hsl(var(--gold)); background: hsl(var(--cobalt-pale)); }
+.pp-page .proposal-form .pp-pick-option input[type="radio"] { width: 20px; height: 20px; margin-top: 2px; padding: 0; accent-color: hsl(var(--gold)); }
+.pp-page .pp-pick-text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 1.02rem; }
+.pp-page .pp-pick-text em { padding: 2px 8px; border-radius: 999px; background: hsl(var(--gold)); color: #fff; font-style: normal; font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.pp-page .pp-pick-text > span { display: block; margin-top: 3px; font-size: .9rem; font-weight: 500; color: hsl(var(--ink-muted)); }
+
+/* Narrower screens */
+@media (max-width: 1060px) {
+  .pp-page .pp-steps, .pp-page .pp-time { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pp-page .pp-time { row-gap: 26px; }
+}
+@media (max-width: 900px) {
+  .pp-page .pp-cards { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .pp-page .pp-tagline { min-height: 0; }
+  .pp-page .pp-national-in { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .pp-page .pp-loop { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .pp-page .pp-steps, .pp-page .pp-time, .pp-page .pp-points, .pp-page .pp-columns { grid-template-columns: minmax(0, 1fr); }
+  .pp-page .pp-card { padding: 28px 20px 22px; }
+  .pp-page .pp-drop summary { padding: 14px 16px; font-size: 1.06rem; }
+  .pp-page .pp-drop-body { padding: 0 16px 18px; }
+  .pp-page .pp-compare th, .pp-page .pp-compare td { padding: 12px; }
+}
+
+/* Print or save as PDF: every drop-down opens (see the page script), controls hide. */
+@media print {
+  .pp-page .pp-filter, .pp-page .pp-choose, .pp-page .proposal-jump, .pp-page .pp-cards-note a, .pp-page details > summary svg { display: none !important; }
+  .pp-page .pp-target, .pp-page .pp-national, .pp-page .pp-example, .pp-page .pp-compare thead th, .pp-page .pp-math-table thead th, .pp-page .pp-badge, .pp-page .pp-step-num, .pp-page .pp-time-dot { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pp-page .pp-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pp-page .pp-table-scroll { overflow: visible; }
+  .pp-page .pp-table-scroll.is-all .pp-compare { min-width: 0; }
+}
+
+/* Shorter hero than the single-program page, so the package cards come up sooner. */
+.pp-page .pp-hero { padding-block: clamp(32px, 5vw, 72px) clamp(28px, 4vw, 52px); }
+.pp-page .pp-hero .proposal-title { font-size: clamp(2.25rem, 5.2vw, 4.3rem); }
+.pp-page .pp-program { margin-top: 18px; }
+@media (max-width: 640px) {
+  .pp-page .pp-hero .proposal-jump { display: none; }
+  .pp-page .pp-hero .proposal-subtitle { font-size: 1.1rem; }
+}

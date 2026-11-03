@@ -6,7 +6,9 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { getProposal, isVideoFile, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
+import { getPackageProposal } from "@/content/packageProposals";
 import NotFound from "./NotFound";
+import PackageProposalView from "./PackageProposal";
 import "@/styles/proposal.css";
 
 /**
@@ -23,6 +25,9 @@ import "@/styles/proposal.css";
  */
 export default function Proposal() {
   const { slug } = useParams<{ slug: string }>();
+  // Package proposals (a choice of packages) render their own layout.
+  const packageProposal = getPackageProposal(slug);
+  if (packageProposal) return <PackageProposalView proposal={packageProposal} />;
   const proposal = getProposal(slug);
   if (!proposal) return <NotFound />;
   return <ProposalView proposal={proposal} />;
