@@ -72,6 +72,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
   const embed = toEmbedUrl(p.videoUrl);
   const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
+  const samples = p.samples.items.filter((it) => isVideoFile(it.src));
 
   const choose = (id: PlanId) => {
     setSelected(id);
@@ -140,6 +141,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             <nav className="proposal-jump" aria-label="Jump to a section">
               <a href="#packages">Packages</a>
               <a href="#how-it-works">How it works</a>
+              {samples.length > 0 && <a href="#samples">Sample ads</a>}
               <a href="#compare">Compare</a>
               <a href="#how-we-do-it">How we do it</a>
               <a href="#the-math">The math</a>
@@ -186,6 +188,37 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             </ol>
           </div>
         </section>
+
+        {/* 3b. Sample campaign creative in phone frames; hidden until a sample file exists. */}
+        {samples.length > 0 && (
+          <section className="pp-samples" id="samples">
+            <div className="proposal-wrap">
+              <span className="proposal-eyebrow">{p.samples.eyebrow}</span>
+              <h2 className="proposal-h2">{p.samples.title}</h2>
+              <p className="pp-intro">{p.samples.body}</p>
+              <div className="pp-sample-grid">
+                {samples.map((it) => (
+                  <figure className="pp-sample" key={it.src}>
+                    <div className="pp-phone">
+                      <video
+                        controls
+                        playsInline
+                        preload="metadata"
+                        poster={it.src.replace(/\.mp4$/i, "-poster.jpg")}
+                        aria-label={`Sample ad: ${it.title}`}
+                        onPlay={() => track(`proposal_sample_${it.title.toLowerCase().replace(/[^a-z]+/g, "_")}`)}
+                      >
+                        {hlsFor(it.src) && <source src={hlsFor(it.src) ?? undefined} type="application/vnd.apple.mpegurl" />}
+                        <source src={it.src} type="video/mp4" />
+                      </video>
+                    </div>
+                    <figcaption><strong>{it.title}</strong><span>{it.job}</span></figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* 4. Compare everything, filterable by package. */}
         <section className="pp-compare-section" id="compare">

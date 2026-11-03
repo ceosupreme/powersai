@@ -73,6 +73,11 @@ export type PackageProposalRecord = {
   packagesIntro: { eyebrow: string; title: string; body: string; footnote: string };
   plans: [PackagePlan, PackagePlan, PackagePlan];
   journey: { title: string; body: string; steps: { title: string; body: string; detail: string }[] };
+  /**
+   * Sample campaign creative shown in phone frames. A sample with an empty src is skipped, and the
+   * section hides until at least one has a file (a direct .mp4; a -poster.jpg and the HLS copy sit beside it).
+   */
+  samples: { eyebrow: string; title: string; body: string; items: { title: string; job: string; src: string }[] };
   compare: { title: string; body: string; groups: CompareGroup[]; footnote: string };
   explain: { title: string; body: string; items: ExplainItem[] };
   math: {
@@ -255,6 +260,16 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         detailsNote: "Includes the whole-team CRM setup and migration of the lead sources you choose.",
       },
     ],
+    samples: {
+      eyebrow: "Sample campaign creative",
+      title: "What your owners would see.",
+      body: "Three styles aimed at the same people: timeshare owners near your presentations. These are samples for your review. Nothing runs until you approve the message.",
+      items: [
+        { title: "Whiteboard explainer", job: "For owners who are still researching", src: "" },
+        { title: "Cinematic", job: "The direct invitation to a presentation", src: "" },
+        { title: "Animated", job: "Stops the scroll on social", src: "" },
+      ],
+    },
     journey: {
       title: "How we get more owners into your room.",
       body: "Your team presents and closes. We handle the work that gets owners there: finding them, answering them, booking them and getting them to show up.",

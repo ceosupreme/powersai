@@ -63,6 +63,19 @@
 .pp-page .pp-steps h3 { margin-top: 12px; font-family: "Inter Tight", sans-serif; font-size: 1.2rem; font-weight: 800; line-height: 1.15; }
 .pp-page .pp-steps > li > p { margin-top: 6px; font-size: .97rem; line-height: 1.45; color: hsl(var(--ink-muted)); }
 
+/* Sample campaign creative: vertical ads in phone frames */
+.pp-page .pp-samples { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); }
+.pp-page .pp-samples .proposal-eyebrow { color: hsl(var(--gold-bright)); }
+.pp-page .pp-samples .proposal-h2 { color: hsl(var(--navy-text)); }
+.pp-page .pp-samples .pp-intro { color: hsl(var(--navy-text) / .78); }
+.pp-page .pp-sample-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 34px; margin-top: 40px; }
+.pp-page .pp-sample { margin: 0; width: 280px; display: flex; flex-direction: column; gap: 14px; }
+.pp-page .pp-phone { position: relative; aspect-ratio: 9 / 16; border-radius: 38px; padding: 10px; background: #05080f; box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .12); }
+.pp-page .pp-phone video { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; background: #000; display: block; }
+.pp-page .pp-sample figcaption strong { display: block; font-family: "Inter Tight", sans-serif; font-size: 1.2rem; font-weight: 800; }
+.pp-page .pp-sample figcaption span { display: block; margin-top: 2px; font-size: .95rem; color: hsl(var(--navy-text) / .75); }
+@media print { .pp-page .pp-samples { display: none !important; } }
+
 /* Compare table with the package filter */
 .pp-page .pp-compare-section { padding-block: clamp(44px, 6vw, 88px); background: hsl(var(--surface)); }
 .pp-page .pp-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
