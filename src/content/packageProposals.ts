@@ -65,6 +65,8 @@ export type PackageProposalRecord = {
   subtitle: string;
   /** One-line promise under the subtitle. */
   promise: string;
+  /** A direct .mp4 file (with a matching -poster.jpg beside it) or a YouTube, Loom or Vimeo link. Empty string hides the video. */
+  videoUrl: string;
   client: { company: string; contacts: string };
   preparedOn: string;
   preparedBy: { name: string; company: string; email: string; site: string };
@@ -107,6 +109,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     subtitle:
       "We bring in new timeshare owners, answer around the clock, qualify and book the right households, and count everyone who walks in, so your team can focus on presentations and sales.",
     promise: "More sales opportunities. Less routine chasing. One clear view of the results.",
+    videoUrl: "/proposal-media/cpn-growth.mp4",
     client: { company: "Consumer Protection Networks", contacts: "Erik Green and Michael Wixsom" },
     preparedOn: "November 4, 2026",
     preparedBy: {

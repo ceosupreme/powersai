@@ -202,6 +202,7 @@
 .pp-page .pp-hero { padding-block: clamp(32px, 5vw, 72px) clamp(28px, 4vw, 52px); }
 .pp-page .pp-hero .proposal-title { font-size: clamp(2.25rem, 5.2vw, 4.3rem); }
 .pp-page .pp-program { margin-top: 18px; }
+.pp-page .pp-video { max-width: 900px; margin-top: 26px; }
 .pp-page .pp-promise { max-width: 760px; margin-top: 16px; font-family: "Inter Tight", sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.3rem); font-weight: 800; line-height: 1.35; color: hsl(var(--ink)); }
 @media (max-width: 640px) {
   .pp-page .pp-hero .proposal-jump { display: none; }

@@ -6,6 +6,7 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import type { CompareCell, PackagePlan, PackageProposalRecord, PlanId } from "@/content/packageProposals";
+import { isVideoFile, toEmbedUrl } from "@/content/proposals";
 import "@/styles/proposal.css";
 import "@/styles/package-proposal.css";
 
@@ -69,6 +70,8 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
 
   const mark = getStudioMedia("home-opening-mark");
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
+  const embed = toEmbedUrl(p.videoUrl);
+  const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
 
   const choose = (id: PlanId) => {
     setSelected(id);
@@ -108,6 +111,31 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             </h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
             <p className="pp-promise">{p.promise}</p>
+            {(embed || videoFile) && (
+              <div className="proposal-video pp-video">
+                {videoFile ? (
+                  <video
+                    controls
+                    playsInline
+                    preload="metadata"
+                    poster={videoFile.replace(/\.mp4$/, "-poster.jpg")}
+                    aria-label={`${p.programName}: the packages in two and a half minutes`}
+                    onPlay={() => track("proposal_video_play")}
+                    onEnded={() => track("proposal_video_complete")}
+                  >
+                    <source src={videoFile} type="video/mp4" />
+                    <a href={videoFile}>Open the video</a>
+                  </video>
+                ) : (
+                  <iframe
+                    src={embed ?? undefined}
+                    title={`${p.programName}: the packages explained`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                )}
+              </div>
+            )}
             <nav className="proposal-jump" aria-label="Jump to a section">
               <a href="#packages">Packages</a>
               <a href="#how-it-works">How it works</a>
