@@ -26,12 +26,16 @@ export type PackagePlan = {
     note?: string;
   };
   signedClients: string;
+  /** The time side of the result: inquiries we answer and screen so the team doesn't. */
+  handled: string;
   monthly: string;
   foundation: string;
   /** Foundation balance due when the launch deliverables are ready. */
   balance: string;
   highlights: string[];
-  included: string[];
+  /** What the package does for the buyer, shown in the card's drop-down. The itemized list lives in the compare table. */
+  details: { lead: string; text: string }[];
+  detailsNote?: string;
 };
 
 /** A compare-table cell: "yes", "no", or a short text value. */
@@ -59,12 +63,14 @@ export type PackageProposalRecord = {
   programName: string;
   headline: string[];
   subtitle: string;
+  /** One-line promise under the subtitle. */
+  promise: string;
   client: { company: string; contacts: string };
   preparedOn: string;
   preparedBy: { name: string; company: string; email: string; site: string };
   packagesIntro: { eyebrow: string; title: string; body: string; footnote: string };
   plans: [PackagePlan, PackagePlan, PackagePlan];
-  journey: { title: string; steps: { title: string; body: string; detail: string }[] };
+  journey: { title: string; body: string; steps: { title: string; body: string; detail: string }[] };
   compare: { title: string; body: string; groups: CompareGroup[]; footnote: string };
   explain: { title: string; body: string; items: ExplainItem[] };
   math: {
@@ -76,6 +82,7 @@ export type PackageProposalRecord = {
     definition: string;
     sales: string;
     example: string;
+    exampleNote: string;
   };
   timeline: { title: string; steps: { when: string; title: string; body: string }[] };
   terms: { title: string; points: string[]; fineprint: { title: string; body: string }[] };
@@ -99,6 +106,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     headline: ["More owners in your room every week.", "We handle the calls and booking."],
     subtitle:
       "We bring in new timeshare owners, answer around the clock, qualify and book the right households, and count everyone who walks in, so your team can focus on presentations and sales.",
+    promise: "More sales opportunities. Less routine chasing. One clear view of the results.",
     client: { company: "Consumer Protection Networks", contacts: "Erik Green and Michael Wixsom" },
     preparedOn: "November 4, 2026",
     preparedBy: {
@@ -124,8 +132,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           range: "10–15",
           label: "more qualified households in your room every week",
           lift: "About 50% more than today",
+          note: "All new owners we bring in",
         },
         signedClients: "10–20 more signed clients a month",
+        handled: "165–245 new inquiries a month answered and screened for you",
         monthly: "$3,000",
         foundation: "$3,000",
         balance: "$1,500",
@@ -135,16 +145,25 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           "Screened and booked into your sessions, with reminders that get them there",
           "A Command Center that counts every new owner at your door",
         ],
-        included: [
-          "A campaign page, qualifier and booking for each market",
-          "Facebook and Instagram campaigns, with Google added once eligible",
-          "1 flagship video, 6–8 short videos and 2–3 new ad versions every month",
-          "A free owner's guide and a 60-second ownership cost check",
-          "QR codes on your existing mailers that lead to the guide and booking",
-          "Weekly social posting",
-          "Confirmations, reminders, no-show rebooking and follow-up for the undecided",
-          "The CPN Command Center with door check-in, and a report every Monday",
+        details: [
+          {
+            lead: "We bring new owners into the business.",
+            text: "Campaigns combine original video and ads, free owner resources, social posting and paid advertising, run around Boston and your upcoming presentation markets instead of relying on one channel.",
+          },
+          {
+            lead: "We answer and book them.",
+            text: "An assistant answers the campaign numbers around the clock, and forms and texts get an immediate response. Suitable owners are screened and offered your available sessions. Personal questions go to your designated team with the household's details attached.",
+          },
+          {
+            lead: "More of them make it to your presentation.",
+            text: "Confirmations, directions, reminders and easy rescheduling keep the next step clear. No-shows are offered the next session, undecided attendees get follow-up while their rep gets a next-step task, and owners who aren't ready yet are invited back when your team returns to their area.",
+          },
+          {
+            lead: "You see all of it.",
+            text: "Your CPN Command Center shows campaign households, presenter prep, upcoming sessions, arrivals at the door and what each source produced. Every Monday you see what happened and what we're improving.",
+          },
         ],
+        detailsNote: "Covers Boston plus up to three travel markets at a time.",
       },
       {
         id: "expanded",
@@ -156,8 +175,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           range: "20–25",
           label: "more qualified households in your room every week",
           lift: "About double today",
+          note: "All new owners we bring in",
         },
         signedClients: "20–33 more signed clients a month",
+        handled: "330–410 new inquiries a month answered and screened for you",
         monthly: "$5,000",
         foundation: "$3,000",
         balance: "$1,500",
@@ -167,16 +188,26 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           "Your own owner audience that keeps sending people between mail drops",
           "New campaigns tested every week, with spend moved to what produces tours",
         ],
-        included: [
-          "Up to five active markets, including Boston",
-          "YouTube and wider search, video and social campaigns alongside Facebook and Instagram",
-          "2 flagship videos, 12–16 short videos and 4–6 new ad versions every month",
-          "Branded owner channels with 3–5 posts a week",
-          "A new free owner's guide every month, plus a five-video owner course",
-          "A monthly newsletter to your whole owner list",
-          "Retargeting, so owners who looked but didn't book see your next session",
-          "Weekly testing and a source scoreboard showing the cost per tour of every campaign",
+        details: [
+          {
+            lead: "More ways for owners to respond.",
+            text: "Several campaign approaches run at once: direct presentation invitations, free owner guides, the ownership cost check and ongoing owner education. Owners ready to book and owners still researching each get a useful next step.",
+          },
+          {
+            lead: "A bigger effort to bring them in.",
+            text: "More campaigns running at once, more message testing and wider distribution, including YouTube and broader search, video and social. We review results every week, research what owners are asking every month, and keep refining around attended tours.",
+          },
+          {
+            lead: "Owners keep coming between events.",
+            text: "Your branded owner channels, guide library, five-video owner course and monthly newsletter build interest between mail drops and presentation dates.",
+          },
+          {
+            lead: "More markets at once.",
+            text: "Campaign windows, booking and follow-up across up to five active markets, including Boston, focused wherever your next sessions are.",
+          },
         ],
+        detailsNote:
+          "The step up buys more work bringing owners in, more markets and more active management, not just more content. Everything in Appointment Growth stays included.",
       },
       {
         id: "complete",
@@ -190,6 +221,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           note: "Including 5–8 a week from leads you already have",
         },
         signedClients: "25–44 more signed clients a month",
+        handled: "330–410 new inquiries a month answered and screened for you",
         monthly: "$7,500",
         foundation: "$5,000",
         balance: "$3,500",
@@ -199,20 +231,30 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           "Mail, phone rooms, vendors and campaigns followed up in one place",
           "Reps get prep sheets and follow-up lists on their phones",
         ],
-        included: [
-          "CRM setup, plus migration of the lead sources you choose",
-          "Vendor and phone-room leads brought into one workflow",
-          "Missed calls on your mailer lines answered with a text in seconds",
-          "Follow-up for past responders who never booked",
-          "Reminders on every booking source you choose, not just ours",
-          "Follow-up for owners who attended but didn't sign",
-          "A rep phone app with presenter prep sheets and follow-up lists",
-          "A whole-team report with the cost per tour of every source and vendor",
+        details: [
+          {
+            lead: "Every lead source in one operation.",
+            text: "Mail responders, vendor leads, outside bookings and our campaign inquiries land in one household record with source history, assignments and clear next steps. It can replace your current CRM or run alongside it.",
+          },
+          {
+            lead: "More follow-up off your team.",
+            text: "Missed calls on your mailer lines get a text back in seconds. Reminders cover bookings from every source you choose. Unbooked owners, no-shows and undecided attendees get coordinated follow-up instead of sitting on separate lists.",
+          },
+          {
+            lead: "Reps ready before and after the presentation.",
+            text: "Prep sheets on their phones show who is coming and why. Assigned follow-up lists and recorded outcomes keep the next step visible.",
+          },
+          {
+            lead: "The whole picture for leadership.",
+            text: "Attendance and sales by source, market and session, with your source costs and vendor tour records next to door check-ins, so you can see what every source really costs per tour.",
+          },
         ],
+        detailsNote: "Includes the whole-team CRM setup and migration of the lead sources you choose.",
       },
     ],
     journey: {
-      title: "One owner's path from first look to your front door.",
+      title: "How we get more owners into your room.",
+      body: "Your team presents and closes. We handle the work that gets owners there: finding them, answering them, booking them and getting them to show up.",
       steps: [
         {
           title: "They find you",
@@ -279,7 +321,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
             { label: "CPN Command Center with door check-in", values: ["yes", "yes", "yes"] },
             { label: "Monday report", values: ["Campaign results", "Results across every campaign", "Whole team, plus vendor review"] },
             { label: "Cost per tour by source", values: ["Our campaigns", "Our campaigns", "Every source and vendor"] },
-            { label: "CRM built around how you sell", values: ["no", "no", "yes"] },
+            { label: "CRM for your leads", values: ["Our campaign leads", "Our campaign leads", "Your whole team, with migration"] },
             { label: "Vendor and phone-room leads in one place", values: ["no", "no", "yes"] },
             { label: "Rep phone app with prep sheets and follow-up lists", values: ["no", "no", "yes"] },
           ],
@@ -306,7 +348,8 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           title: "How we bring in new owners",
           paragraphs: [
             "Campaign strategy, messaging and paid advertising built around your offer and your presentation calendar. Facebook and Instagram lead, aimed at timeshare owners where your team will be, with Google added once eligibility is confirmed. Growth + Expanded Marketing adds YouTube and wider search, video and social campaigns, and up to five markets at once.",
-            "Not every owner is ready to call. A free owner's guide, a 60-second ownership cost check and a QR code on your mailers give those owners a way to raise their hand, and they stay in follow-up until the next session near them.",
+            "Not every owner is ready to call. A free owner's guide and a 60-second ownership cost check give those owners a way to raise their hand, and they stay in follow-up until the next session near them.",
+            "Your mailers ask owners to pick up the phone. A QR code on the same mailer adds a second way to respond: scan, check what the timeshare is costing them, read the free guide and choose a session. Owners who aren't ready to call still have a route into your room.",
             "Expanded Marketing also builds an owner audience you keep: branded channels, a growing library of guides, a five-video owner course and a monthly newsletter that keep sending people between mail drops.",
           ],
         },
@@ -393,17 +436,19 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     },
     math: {
       title: "See the math behind each target",
-      summary: "Each target comes from one funnel: new inquiries × the share who qualify × the share who book × the share who attend.",
+      summary:
+        "Each target comes from one funnel: new inquiries × the share who qualify × the share who book × the share who attend. The table shows four weeks at the month-three pace, and counts each household once even when it comes through more than one source.",
       funnel: "65% qualify × 50% of those book × 75% of those attend = about 1 in 4 new inquiries in your room.",
       table: {
         columns: ["Appointment Growth", "Expanded Marketing and Complete System"],
         rows: [
           { label: "Ad budget, paid directly to the platforms", values: ["$5,000", "$8,000"] },
           { label: "Cost per inquiry from ads", values: ["$30–$40", "$30–$35"] },
-          { label: "New inquiries from ads", values: ["125–167", "229–267"] },
-          { label: "Of those, in your room", values: ["30–41", "56–65"] },
+          { label: "New inquiries from ads", values: ["125–166", "228–266"] },
           { label: "New inquiries from guides, mailer QR codes, channels and referrals", values: ["40–80", "100–145"] },
-          { label: "Of those, in your room", values: ["10–20", "24–35"] },
+          { label: "All new inquiries, answered and screened for you", values: ["165–246", "328–411"], total: true },
+          { label: "In your room, from ads", values: ["30–40", "56–65"] },
+          { label: "In your room, from everything else", values: ["10–20", "24–35"] },
           { label: "New owners in your room, every four weeks", values: ["40–60", "80–100"], total: true },
           { label: "Per week", values: ["10–15", "20–25"], total: true },
         ],
@@ -412,7 +457,8 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         "The Complete System adds 20–32 more over four weeks from leads you already have: 8–18 past mail responders followed up into a tour, and 12–14 more arrivals from better attendance on bookings from your other sources. That's 100–132 in four weeks, or 25–33 a week.",
       definition: "One tour is one qualified household. A couple attending together counts once.",
       sales: "At your closing range of one in four to one in three, that's about 10–20, 20–33 and 25–44 more signed clients every four weeks.",
-      example: "50 more tours × 30% closing × $20,000 average fee = $300,000 in signed fees over four weeks.",
+      example: "50 more tours × 30% closing × $20,000 average fee = $300,000 in gross signed fees over four weeks.",
+      exampleNote: "That's 15 more clients from 50 more sales conversations.",
     },
     timeline: {
       title: "Build, launch, improve.",
@@ -430,11 +476,11 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         "$1,500 starts any package. The rest of the foundation is due when the launch deliverables are ready.",
         "A 60-day pilot with a real decision at day 30, before the second monthly fee. Then month to month with 30 days' notice.",
         "First-month assurance: if no qualified household attends in the first 30 live days, we refund that month's fee.",
-        "Texting, calling and AI usage are included.",
-        "Your ad spend goes straight to the platforms. We never mark it up or take a percentage.",
+        "No percentage of your sales and no per-lead fees.",
+        "You control your ad budget and pay the platforms directly. We never mark it up or take a percentage.",
+        "Texting, calling, email and AI usage are included.",
         "Your leads, accounts, pages and finished creative stay yours.",
-        "Move up anytime. Setup you've already paid counts toward the next package.",
-        "A pay-per-tour option once real numbers are in.",
+        "Move up anytime, with setup you've already paid credited to the next package. A pay-per-tour option opens once real numbers are in.",
       ],
       fineprint: [
         {
@@ -447,7 +493,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         {
           title: "Usage",
-          body: "Standard texting, calling and AI usage for your team's agreed operation is included. Any unusually high-volume campaign is agreed with you before it runs.",
+          body: "Standard texting, calling, email and AI usage for your team's agreed operation is included. Any unusually high-volume campaign is agreed with you before it runs.",
         },
         {
           title: "Ownership",
@@ -465,7 +511,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     },
     national: {
       title: "Built to extend across CPN.",
-      body: "Any CPN team can start with any package. Once three teams are live, a national dashboard and a shared content library are included: one view of every team, source, market and session, with every video and guide localized for each team's markets.",
+      body: "Any CPN team can start with any package at the same team pricing. Once three teams are live, a national dashboard and a shared content library are included: one view of every team, source, market and session, with every video and guide localized for each team's markets.",
       note: "Corporate case management, customer portals and document handling can be scoped separately later.",
     },
     faq: {

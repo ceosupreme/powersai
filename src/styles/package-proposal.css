@@ -23,12 +23,15 @@
 .pp-page .pp-target-text { font-size: 1.02rem; font-weight: 600; line-height: 1.35; }
 .pp-page .pp-lift { align-self: flex-start; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: hsl(var(--gold-bright) / .18); color: hsl(var(--gold-bright)); font-size: .88rem; font-weight: 800; }
 .pp-page .pp-target-note { margin-top: 4px; font-size: .9rem; color: hsl(var(--navy-text) / .8); }
-.pp-page .pp-signed { margin-top: 10px; padding-top: 10px; border-top: 1px solid hsl(var(--navy-text) / .16); font-size: 1.02rem; font-weight: 700; }
+/* The two result lines (money, then time) sit at the bottom of the box, so they line up across cards. */
+.pp-page .pp-results { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+.pp-page .pp-signed { margin-top: 10px; padding-top: 10px; border-top: 1px solid hsl(var(--navy-text) / .16); font-size: 1.02rem; font-weight: 700; text-wrap: balance; }
+.pp-page .pp-handled { font-size: .95rem; font-weight: 600; line-height: 1.4; color: hsl(var(--navy-text) / .85); text-wrap: balance; }
 .pp-page .pp-price { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; }
 .pp-page .pp-price strong { font-family: "Inter Tight", sans-serif; font-size: 2.1rem; font-weight: 800; line-height: 1.05; letter-spacing: -.01em; }
 .pp-page .pp-price strong span { font-size: 1rem; font-weight: 700; color: hsl(var(--ink-muted)); }
 .pp-page .pp-price > span { font-size: .93rem; color: hsl(var(--ink-muted)); }
-.pp-page .pp-highlights { display: grid; gap: 9px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-highlights { display: grid; align-content: start; gap: 9px; margin: 18px 0 0; padding: 0; list-style: none; }
 .pp-page .pp-highlights li { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 9px; align-items: start; font-size: .99rem; line-height: 1.42; }
 .pp-page .pp-highlights svg { margin-top: 3px; color: hsl(var(--gold)); }
 .pp-page .pp-card .pp-included { margin-bottom: 22px; }
@@ -43,7 +46,14 @@
 .pp-page .pp-mini summary svg { transition: transform .2s ease; }
 .pp-page .pp-mini[open] summary svg { transform: rotate(180deg); }
 .pp-page .pp-mini p { margin-top: 4px; font-size: .95rem; line-height: 1.5; color: hsl(var(--ink-muted)); }
-.pp-page .pp-included ul { display: grid; gap: 7px; margin: 6px 0 0; padding-left: 18px; font-size: .95rem; color: hsl(var(--ink-muted)); }
+/* The card drop-down: what the package does, then a link to its column in the compare table. */
+.pp-page .pp-details { display: grid; gap: 10px; margin-top: 6px; }
+.pp-page .pp-mini .pp-details p { margin-top: 0; }
+.pp-page .pp-details strong { font-weight: 800; color: hsl(var(--ink)); }
+.pp-page .pp-mini .pp-details p.pp-details-note { padding-top: 10px; border-top: 1px solid hsl(var(--rule)); font-size: .92rem; font-weight: 600; }
+.pp-page .pp-see-all { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 40px; padding: 0; border: 0; background: none; font: inherit; font-size: .95rem; font-weight: 700; color: hsl(var(--gold)); cursor: pointer; }
+.pp-page .pp-see-all:hover { text-decoration: underline; }
+.pp-page .pp-see-all:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 2px; border-radius: 8px; }
 
 /* How it works */
 .pp-page .pp-journey { padding-block: clamp(44px, 6vw, 80px); }
@@ -113,6 +123,7 @@
 .pp-page .pp-math-table tr.is-total th, .pp-page .pp-math-table tr.is-total td { background: hsl(var(--cobalt-pale)); font-weight: 800; }
 .pp-page .pp-drop-body > p.pp-example { display: grid; gap: 6px; padding: 18px 20px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 14px; font-size: 1.15rem; font-weight: 800; line-height: 1.4; }
 .pp-page .pp-example span { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold-bright)); }
+.pp-page .pp-example small { font-size: 1rem; font-weight: 600; color: hsl(var(--navy-text) / .85); }
 
 /* Timeline */
 .pp-page .pp-timeline { padding-block: clamp(44px, 6vw, 80px); }
@@ -148,6 +159,16 @@
 .pp-page .pp-pick-text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 1.02rem; }
 .pp-page .pp-pick-text em { padding: 2px 8px; border-radius: 999px; background: hsl(var(--gold)); color: #fff; font-style: normal; font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .pp-page .pp-pick-text > span { display: block; margin-top: 3px; font-size: .9rem; font-weight: 500; color: hsl(var(--ink-muted)); }
+.pp-page .pp-pick-text > span.pp-pick-target { font-weight: 700; color: hsl(var(--ink)); }
+
+/* Side by side, the cards share rows, so the target boxes, prices and buttons line up across all three. */
+@media (min-width: 901px) {
+  @supports (grid-template-rows: subgrid) {
+    .pp-page .pp-cards { row-gap: 0; }
+    .pp-page .pp-card { display: grid; grid-row: span 8; grid-template-rows: subgrid; row-gap: 0; }
+    .pp-page .pp-tagline { min-height: 0; }
+  }
+}
 
 /* Narrower screens */
 @media (max-width: 1060px) {
@@ -170,7 +191,7 @@
 
 /* Print or save as PDF: every drop-down opens (see the page script), controls hide. */
 @media print {
-  .pp-page .pp-filter, .pp-page .pp-choose, .pp-page .proposal-jump, .pp-page .pp-cards-note a, .pp-page details > summary svg { display: none !important; }
+  .pp-page .pp-filter, .pp-page .pp-choose, .pp-page .pp-see-all, .pp-page .proposal-jump, .pp-page .pp-cards-note a, .pp-page details > summary svg { display: none !important; }
   .pp-page .pp-target, .pp-page .pp-national, .pp-page .pp-example, .pp-page .pp-compare thead th, .pp-page .pp-math-table thead th, .pp-page .pp-badge, .pp-page .pp-step-num, .pp-page .pp-time-dot { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pp-page .pp-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .pp-page .pp-table-scroll { overflow: visible; }
@@ -181,6 +202,7 @@
 .pp-page .pp-hero { padding-block: clamp(32px, 5vw, 72px) clamp(28px, 4vw, 52px); }
 .pp-page .pp-hero .proposal-title { font-size: clamp(2.25rem, 5.2vw, 4.3rem); }
 .pp-page .pp-program { margin-top: 18px; }
+.pp-page .pp-promise { max-width: 760px; margin-top: 16px; font-family: "Inter Tight", sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.3rem); font-weight: 800; line-height: 1.35; color: hsl(var(--ink)); }
 @media (max-width: 640px) {
   .pp-page .pp-hero .proposal-jump { display: none; }
   .pp-page .pp-hero .proposal-subtitle { font-size: 1.1rem; }

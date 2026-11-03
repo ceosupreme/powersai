@@ -76,6 +76,13 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
     document.getElementById("get-started")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // From a card's drop-down: show that package alone in the compare table.
+  const compareOne = (id: PlanId) => {
+    setView(id);
+    track(`proposal_card_compare_${id}`);
+    document.getElementById("compare")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="stm-studio proposal-page pp-page min-h-screen">
       <header className="proposal-topbar">
@@ -100,6 +107,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
               ))}
             </h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
+            <p className="pp-promise">{p.promise}</p>
             <nav className="proposal-jump" aria-label="Jump to a section">
               <a href="#packages">Packages</a>
               <a href="#how-it-works">How it works</a>
@@ -119,7 +127,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             <p className="pp-intro">{p.packagesIntro.body}</p>
             <div className="pp-cards">
               {p.plans.map((plan, i) => (
-                <PlanCard key={plan.id} plan={plan} index={i} onChoose={choose} />
+                <PlanCard key={plan.id} plan={plan} index={i} onChoose={choose} onCompare={compareOne} />
               ))}
             </div>
             <p className="pp-cards-note">
@@ -133,6 +141,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">How it works</span>
             <h2 className="proposal-h2">{p.journey.title}</h2>
+            <p className="pp-intro">{p.journey.body}</p>
             <ol className="pp-steps">
               {p.journey.steps.map((st, i) => (
                 <li key={st.title}>
@@ -233,7 +242,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 <p>{p.math.complete}</p>
                 <p>{p.math.definition}</p>
                 <p>{p.math.sales}</p>
-                <p className="pp-example"><span>One example</span>{p.math.example}</p>
+                <p className="pp-example"><span>One example</span>{p.math.example}<small>{p.math.exampleNote}</small></p>
               </Drop>
             </div>
           </div>
@@ -363,7 +372,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   );
 }
 
-function PlanCard({ plan, index, onChoose }: { plan: PackagePlan; index: number; onChoose: (id: PlanId) => void }) {
+function PlanCard({ plan, index, onChoose, onCompare }: { plan: PackagePlan; index: number; onChoose: (id: PlanId) => void; onCompare: (id: PlanId) => void }) {
   return (
     <article className={`pp-card${plan.recommended ? " is-recommended" : ""}`} aria-labelledby={`plan-${plan.id}`}>
       {plan.recommended && <span className="pp-badge">Recommended</span>}
@@ -377,7 +386,10 @@ function PlanCard({ plan, index, onChoose }: { plan: PackagePlan; index: number;
         <span className="pp-target-text">{plan.target.label}</span>
         <span className="pp-lift">{plan.target.lift}</span>
         {plan.target.note && <span className="pp-target-note">{plan.target.note}</span>}
-        <span className="pp-signed">{plan.signedClients}</span>
+        <div className="pp-results">
+          <span className="pp-signed">{plan.signedClients}</span>
+          <span className="pp-handled">{plan.handled}</span>
+        </div>
       </div>
 
       <div className="pp-price">
@@ -390,8 +402,16 @@ function PlanCard({ plan, index, onChoose }: { plan: PackagePlan; index: number;
       </ul>
 
       <details className="pp-mini pp-included">
-        <summary>What's included <ChevronDown aria-hidden size={16} /></summary>
-        <ul>{plan.included.map((it) => <li key={it}>{it}</li>)}</ul>
+        <summary>What this package does for you <ChevronDown aria-hidden size={16} /></summary>
+        <div className="pp-details">
+          {plan.details.map((d) => (
+            <p key={d.lead}><strong>{d.lead}</strong> {d.text}</p>
+          ))}
+          {plan.detailsNote && <p className="pp-details-note">{plan.detailsNote}</p>}
+          <button type="button" className="pp-see-all" onClick={() => onCompare(plan.id)}>
+            See every item in this package <ArrowRight aria-hidden size={16} />
+          </button>
+        </div>
       </details>
 
       <button type="button" className={`proposal-btn pp-choose${plan.recommended ? "" : " is-quiet"}`} onClick={() => onChoose(plan.id)}>
@@ -570,7 +590,7 @@ function AgreementForm({ proposal: p, selected, onSelect }: { proposal: PackageP
   }
 
   return (
-    <form className="proposal-form" id="agreement-form" onSubmit={onSubmit} noValidate>
+    <form className="proposal-form" id="agreement-form" onSubmit={onSubmit} onInput={() => { if (error) setError(null); }} noValidate>
       <div aria-hidden className="proposal-honeypot">
         <label>Company website<input type="text" name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>
@@ -582,6 +602,7 @@ function AgreementForm({ proposal: p, selected, onSelect }: { proposal: PackageP
             <input type="radio" name="package" value={pl.id} checked={selected === pl.id} onChange={() => onSelect(pl.id)} />
             <span className="pp-pick-text">
               <strong>{pl.name}{pl.recommended ? <em>Recommended</em> : null}</strong>
+              <span className="pp-pick-target">{pl.target.range} more qualified households a week by month 3</span>
               <span>{pl.monthly} a month · {pl.foundation} foundation · start with $1,500</span>
             </span>
           </label>
