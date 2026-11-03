@@ -6,7 +6,7 @@ import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import type { CompareCell, PackagePlan, PackageProposalRecord, PlanId } from "@/content/packageProposals";
-import { isVideoFile, toEmbedUrl } from "@/content/proposals";
+import { hlsFor, isVideoFile, toEmbedUrl } from "@/content/proposals";
 import "@/styles/proposal.css";
 import "@/styles/package-proposal.css";
 
@@ -123,7 +123,8 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                     onPlay={() => track("proposal_video_play")}
                     onEnded={() => track("proposal_video_complete")}
                   >
-                    <source src={videoFile} type="video/mp4" />
+                    {hlsFor(videoFile) && <source src={hlsFor(videoFile) ?? undefined} type="application/vnd.apple.mpegurl" />}
+                    <source src={videoFile} type={/\.mp4$/i.test(videoFile) ? "video/mp4" : undefined} />
                     <a href={videoFile}>Open the video</a>
                   </video>
                 ) : (

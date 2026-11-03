@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
-import { getProposal, isVideoFile, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
+import { getProposal, hlsFor, isVideoFile, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
 import { getPackageProposal } from "@/content/packageProposals";
 import NotFound from "./NotFound";
 import PackageProposalView from "./PackageProposal";
@@ -84,7 +84,8 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
               <div className="proposal-video">
                 {videoFile ? (
                   <video controls playsInline preload="metadata" poster={videoFile.replace(/\.mp4$/, "-poster.jpg")} aria-label={`${p.preparedBy.name} walks through the ${p.title}`}>
-                    <source src={videoFile} />
+                    {hlsFor(videoFile) && <source src={hlsFor(videoFile) ?? undefined} type="application/vnd.apple.mpegurl" />}
+                    <source src={videoFile} type={/\.mp4$/i.test(videoFile) ? "video/mp4" : undefined} />
                     <a href={videoFile}>Open the walkthrough video</a>
                   </video>
                 ) : (

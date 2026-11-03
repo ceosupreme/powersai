@@ -300,6 +300,16 @@ export function isVideoFile(url: string): boolean {
   return /\.(mp4|webm|mov)(\?|#|$)/i.test(url);
 }
 
+/**
+ * The HLS copy of a direct .mp4 (made with scripts/proposal-video-hls.sh), offered first so the
+ * video plays in Safari and on iPhones: the site host answers byte-range requests with the whole
+ * file, which Safari refuses for .mp4. Browsers without HLS skip it and play the .mp4; if the
+ * playlist is missing, Safari falls through to the .mp4 as well.
+ */
+export function hlsFor(videoFile: string): string | null {
+  return /\.mp4$/i.test(videoFile) ? videoFile.replace(/\.mp4$/i, "/index.m3u8") : null;
+}
+
 /** Turns a share link into an embeddable player URL. Returns null for anything unrecognized. */
 export function toEmbedUrl(url: string): string | null {
   if (!url || isVideoFile(url)) return null;
