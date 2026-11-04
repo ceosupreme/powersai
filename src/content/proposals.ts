@@ -105,6 +105,14 @@ export type ProposalRecord = {
   internalLabel: string;
 };
 
+/**
+ * Retired proposal links that forward to the proposal that replaced them, so a
+ * prospect who opens an older link always lands on the current proposal.
+ */
+export const PROPOSAL_REDIRECTS: Record<string, string> = {
+  "cpn-boston": "cpn-growth",
+};
+
 export const PROPOSALS: Record<string, ProposalRecord> = {
   "cpn-boston": {
     slug: "cpn-boston",

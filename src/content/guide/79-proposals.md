@@ -8,6 +8,7 @@ A proposal page is a private web page made for one prospect, with your walkthrou
 - Each proposal lives at its own path, /proposal/ followed by a short name for that proposal.
 - There is no menu item and no screen in HQ for making these pages. Each proposal is written into the website itself as its own page and then published, so ask Claude when you need a new one.
 - A wrong or removed link shows the site's "page not found" screen.
+- An older proposal link that has been replaced forwards straight to the new proposal, so a prospect who opens the old link still lands on the current one. The Consumer Protection Networks link ending in cpn-boston now forwards to the one ending in cpn-growth.
 - Separate from these pages, the "Proposals" cards in a CRM company's panel, on a client's project page and on the Leak Stack make a printable proposal document inside HQ (see the last task below).
 
 ## What you see

@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowRight, Check, FileDown, Mail, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
-import { getProposal, hlsFor, isVideoFile, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
+import { getProposal, hlsFor, isVideoFile, PROPOSAL_REDIRECTS, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
 import { getPackageProposal } from "@/content/packageProposals";
 import NotFound from "./NotFound";
 import PackageProposalView from "./PackageProposal";
@@ -25,6 +25,9 @@ import "@/styles/proposal.css";
  */
 export default function Proposal() {
   const { slug } = useParams<{ slug: string }>();
+  // A retired proposal link forwards to the proposal that replaced it.
+  const redirectTo = slug ? PROPOSAL_REDIRECTS[slug] : undefined;
+  if (redirectTo) return <Navigate to={`/proposal/${redirectTo}`} replace />;
   // Package proposals (a choice of packages) render their own layout.
   const packageProposal = getPackageProposal(slug);
   if (packageProposal) return <PackageProposalView proposal={packageProposal} />;
