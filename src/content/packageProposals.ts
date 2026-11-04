@@ -3,9 +3,9 @@
  * packages instead of one program. Same privacy rules as src/content/proposals.ts
  * (never prerendered, noindex, robots.txt disallows /proposal/).
  *
- * The page runs like a pitch deck: the promise and video, the opportunity, the
- * plan, the results, then the investment, the risk terms and the next step. Each
- * section is one slide with one job, and the deeper detail stays one tap away in
+ * The page runs as a sales presentation: the promise and video, the opportunity,
+ * the plan, the results, then the investment, the risk terms and the next step.
+ * Each section has one job, and the deeper detail stays one tap away in
  * drop-downs. All copy lives here; the page only renders it.
  */
 
@@ -73,11 +73,11 @@ export type PackageProposalRecord = {
   preparedBy: { name: string; company: string; email: string; site: string };
   packagesIntro: { eyebrow: string; title: string; body: string; footnote: string };
   /**
-   * Copy for the deck slides that frame the offer before the prices. The calendar, team and
-   * monthly-improvement slides also show the matching explain items ("markets", "who-does-what",
+   * Copy for the sections that frame the offer before the prices. The calendar, team and
+   * monthly-improvement sections also show the matching explain items ("markets", "who-does-what",
    * "improve"), so their detail copy lives in one place.
    */
-  deck: {
+  story: {
     opportunity: { title: string; body: string; keep: { title: string; items: string[] }; add: { title: string; items: string[] } };
     calendar: { title: string };
     team: { title: string };
@@ -144,7 +144,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       footnote:
         "Every package starts with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
     },
-    deck: {
+    story: {
       opportunity: {
         title: "Your team already sells. We bring more owners to the room.",
         body: "Your mail, phone rooms and vendors keep doing what they do. We add a new-owner engine built around your presentation calendar, and we take the answering, booking and follow-up off your team.",

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Mail, Minus, Plus, Presentation, Printer, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Mail, Minus, Plus, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
@@ -14,11 +14,11 @@ import "@/styles/package-proposal.css";
  * Unlisted package proposal page: /proposal/:slug for records in
  * src/content/packageProposals.ts.
  *
- * The page runs like a pitch deck: each section is one numbered slide with one
- * job (promise, opportunity, plan, calendar, team, results, investment, risk,
- * first 90 days, growth, questions, next step). Deeper detail sits in drop-downs.
- * A Present button turns the sections into full-screen slides for screen-sharing.
- * Printing opens every drop-down so the saved PDF is complete.
+ * The page runs as a sales presentation: the promise and video, the opportunity,
+ * the plan, the calendar, who does what, the results, then the investment, the
+ * risk terms, the first 90 days, room to grow, questions and the next step.
+ * Deeper detail sits in drop-downs. Printing opens every drop-down so the saved
+ * PDF is complete.
  *
  * The agreement request goes through the live submit-inbound-lead intake, like
  * the single-program proposal page. The lead's email column stays empty on
@@ -76,7 +76,6 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   const embed = toEmbedUrl(p.videoUrl);
   const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
   const samples = p.samples.items.filter((it) => isVideoFile(it.src));
-  const present = usePresentMode(() => track("proposal_present"));
 
   // Three explain items get slides of their own; the rest stay in the detail drop-downs.
   const explainItem = (id: string) => p.explain.items.find((it) => it.id === id);
@@ -84,10 +83,6 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   const team = explainItem("who-does-what");
   const improve = explainItem("improve");
   const detailItems = p.explain.items.filter((it) => !["markets", "who-does-what", "improve"].includes(it.id));
-
-  // Slide numbers follow the slides that actually render (the sample ads stay hidden until files exist).
-  let slideNo = 1;
-  const nextNo = () => String(++slideNo).padStart(2, "0");
 
   const choose = (id: PlanId) => {
     setSelected(id);
@@ -104,19 +99,14 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   };
 
   return (
-    <div className={`stm-studio proposal-page pp-page min-h-screen${present.on ? " is-presenting" : ""}`}>
+    <div className="stm-studio proposal-page pp-page min-h-screen">
       <header className="proposal-topbar">
         <div className="proposal-wrap proposal-topbar-in">
           <Link to="/" className="proposal-brand" aria-label={`${p.preparedBy.company} home`} onClick={() => track("proposal_brand")}>
             {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} />}
             <span>{p.preparedBy.company}</span>
           </Link>
-          <div className="pp-topbar-right">
-            <span className="proposal-topbar-for">Proposal for {p.client.company}</span>
-            <button type="button" className="pp-present-btn" onClick={present.start} title="Show this page as full-screen slides">
-              <Presentation aria-hidden size={17} /> Present
-            </button>
-          </div>
+          <span className="proposal-topbar-for">Proposal for {p.client.company}</span>
         </div>
       </header>
 
@@ -159,7 +149,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 )}
               </div>
             )}
-            <nav className="proposal-jump" aria-label="Jump to a slide">
+            <nav className="proposal-jump" aria-label="Jump to a section">
               <a href="#opportunity">The opportunity</a>
               <a href="#how-it-works">The plan</a>
               {samples.length > 0 && <a href="#samples">Sample ads</a>}
@@ -174,18 +164,18 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 02 The opportunity: keep what works, add what's missing. */}
         <section className="pp-opportunity" id="opportunity">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="The opportunity" />
-            <h2 className="proposal-h2 pp-slide-title">{p.deck.opportunity.title}</h2>
-            <p className="pp-intro">{p.deck.opportunity.body}</p>
+            <span className="proposal-eyebrow">The opportunity</span>
+            <h2 className="proposal-h2 pp-slide-title">{p.story.opportunity.title}</h2>
+            <p className="pp-intro">{p.story.opportunity.body}</p>
             <div className="pp-keep-add">
               <div className="pp-keep">
-                <h3>{p.deck.opportunity.keep.title}</h3>
-                <ul>{p.deck.opportunity.keep.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
+                <h3>{p.story.opportunity.keep.title}</h3>
+                <ul>{p.story.opportunity.keep.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
               </div>
               <span className="pp-plus" aria-hidden><Plus size={26} /></span>
               <div className="pp-add">
-                <h3>{p.deck.opportunity.add.title}</h3>
-                <ul>{p.deck.opportunity.add.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
+                <h3>{p.story.opportunity.add.title}</h3>
+                <ul>{p.story.opportunity.add.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
               </div>
             </div>
           </div>
@@ -194,7 +184,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 03 The plan: five steps from first look to a counted arrival, each with a "how we do it" drop-down. */}
         <section className="pp-journey" id="how-it-works">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="The plan" />
+            <span className="proposal-eyebrow">The plan</span>
             <h2 className="proposal-h2 pp-slide-title">{p.journey.title}</h2>
             <p className="pp-intro">{p.journey.body}</p>
             <ol className="pp-steps">
@@ -218,8 +208,8 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           <section className="pp-cal-slide" id="calendar">
             <div className="proposal-wrap pp-cal-grid">
               <div>
-                <SlideEyebrow no={nextNo()} label="Your calendar" />
-                <h2 className="proposal-h2 pp-slide-title">{p.deck.calendar.title}</h2>
+                <span className="proposal-eyebrow">Your calendar</span>
+                <h2 className="proposal-h2 pp-slide-title">{p.story.calendar.title}</h2>
                 {markets.paragraphs.map((para, i) => (
                   <p key={i} className={i === markets.paragraphs.length - 1 ? "pp-cal-note" : "pp-cal-text"}>{para}</p>
                 ))}
@@ -233,8 +223,8 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {team && (
           <section className="pp-team" id="who-does-what">
             <div className="proposal-wrap">
-              <SlideEyebrow no={nextNo()} label="Who does what" />
-              <h2 className="proposal-h2 pp-slide-title">{p.deck.team.title}</h2>
+              <span className="proposal-eyebrow">Who does what</span>
+              <h2 className="proposal-h2 pp-slide-title">{p.story.team.title}</h2>
               {team.paragraphs.map((para, i) => <p key={i} className="pp-intro">{para}</p>)}
               {team.columns && (
                 <div className="pp-team-cols">
@@ -254,7 +244,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {samples.length > 0 && (
           <section className="pp-samples" id="samples">
             <div className="proposal-wrap">
-              <SlideEyebrow no={nextNo()} label={p.samples.eyebrow} />
+              <span className="proposal-eyebrow">{p.samples.eyebrow}</span>
               <h2 className="proposal-h2 pp-slide-title">{p.samples.title}</h2>
               <p className="pp-intro">{p.samples.body}</p>
               <div className="pp-sample-grid">
@@ -284,9 +274,9 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 07 The results: the targets, the funnel behind them, one example, and the full math in a drop-down. */}
         <section className="pp-results-slide" id="results">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="The results" />
-            <h2 className="proposal-h2 pp-slide-title">{p.deck.results.title}</h2>
-            <p className="pp-intro">{p.deck.results.body}</p>
+            <span className="proposal-eyebrow">The results</span>
+            <h2 className="proposal-h2 pp-slide-title">{p.story.results.title}</h2>
+            <p className="pp-intro">{p.story.results.body}</p>
             <div className="pp-kpis">
               {p.plans.map((plan) => (
                 <div key={plan.id} className={`pp-kpi${plan.recommended ? " is-recommended" : ""}`}>
@@ -298,9 +288,9 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
               ))}
             </div>
             <div className="pp-funnel">
-              <span className="pp-funnel-title">{p.deck.results.funnelTitle}</span>
+              <span className="pp-funnel-title">{p.story.results.funnelTitle}</span>
               <ol>
-                {p.deck.results.funnel.map((f) => <li key={f.label}><strong>{f.value}</strong><span>{f.label}</span></li>)}
+                {p.story.results.funnel.map((f) => <li key={f.label}><strong>{f.value}</strong><span>{f.label}</span></li>)}
               </ol>
             </div>
             <p className="pp-example-slide"><span>One example</span>{p.math.example}<small>{p.math.exampleNote}</small></p>
@@ -338,7 +328,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 08 Your investment: three packages, with the full comparison folded underneath. */}
         <section className="pp-packages" id="packages">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="Your investment" />
+            <span className="proposal-eyebrow">Your investment</span>
             <h2 className="proposal-h2 pp-slide-title">{p.packagesIntro.title}</h2>
             <p className="pp-intro">{p.packagesIntro.body}</p>
             <div className="pp-cards">
@@ -380,11 +370,11 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 09 The risk is on us: the terms as big tiles, everything else in the fine print. */}
         <section className="pp-risk" id="terms">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="The risk is on us" />
-            <h2 className="proposal-h2 pp-slide-title">{p.deck.risk.title}</h2>
-            <p className="pp-intro">{p.deck.risk.body}</p>
+            <span className="proposal-eyebrow">The risk is on us</span>
+            <h2 className="proposal-h2 pp-slide-title">{p.story.risk.title}</h2>
+            <p className="pp-intro">{p.story.risk.body}</p>
             <ul className="pp-risk-tiles">
-              {p.deck.risk.tiles.map((t) => <li key={t.big}><strong>{t.big}</strong><span>{t.label}</span></li>)}
+              {p.story.risk.tiles.map((t) => <li key={t.big}><strong>{t.big}</strong><span>{t.label}</span></li>)}
             </ul>
             <div className="pp-accordion">
               <Drop title="Read the full terms and fine print" onOpen={() => track("proposal_fineprint")}>
@@ -407,7 +397,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 10 The first 90 days, then how it improves every month. */}
         <section className="pp-timeline" id="timeline">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="The first 90 days" />
+            <span className="proposal-eyebrow">The first 90 days</span>
             <h2 className="proposal-h2 pp-slide-title">{p.timeline.title}</h2>
             <ol className="pp-time">
               {p.timeline.steps.map((st, i) => (
@@ -421,7 +411,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             </ol>
             {improve && (
               <div className="pp-improve">
-                <h3>{p.deck.improve.title}</h3>
+                <h3>{p.story.improve.title}</h3>
                 {improve.paragraphs.map((para, i) => <p key={i}>{para}</p>)}
                 {improve.steps && (
                   <ol className="pp-loop">
@@ -439,7 +429,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         <section className="pp-national" id="national">
           <div className="proposal-wrap pp-national-in">
             <div>
-              <SlideEyebrow no={nextNo()} label="Room to grow" />
+              <span className="proposal-eyebrow">Room to grow</span>
               <h2 className="proposal-h2">{p.national.title}</h2>
             </div>
             <div>
@@ -452,7 +442,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         {/* 12 Questions, then every detail for anyone who wants it. */}
         <section className="pp-faq" id="faq">
           <div className="proposal-wrap">
-            <SlideEyebrow no={nextNo()} label="Questions" />
+            <span className="proposal-eyebrow">Questions</span>
             <h2 className="proposal-h2 pp-slide-title">{p.faq.title}</h2>
             <div className="pp-accordion">
               {p.faq.items.map((item, i) => (
@@ -495,7 +485,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         <section className="proposal-accept pp-start" id="get-started">
           <div className="proposal-wrap proposal-accept-grid">
             <div className="proposal-accept-intro">
-              <SlideEyebrow no={nextNo()} label="Next step" />
+              <span className="proposal-eyebrow">Next step</span>
               <h2 className="proposal-h2">{p.start.title}</h2>
               <p>{p.start.intro}</p>
               <ol className="proposal-after-list">
@@ -524,15 +514,6 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         </section>
       </main>
 
-      {present.on && (
-        <div className="pp-present-bar" role="toolbar" aria-label="Slide controls">
-          <button type="button" onClick={present.prev} aria-label="Previous slide"><ChevronLeft aria-hidden size={20} /></button>
-          <span aria-live="polite">{present.index + 1} / {present.count}</span>
-          <button type="button" onClick={present.next} aria-label="Next slide"><ChevronRight aria-hidden size={20} /></button>
-          <button type="button" className="pp-present-exit" onClick={present.stop}><X aria-hidden size={18} /> Exit</button>
-        </div>
-      )}
-
       <nav className="proposal-mobile-actions" aria-label="Proposal actions">
         <a href="#packages" onClick={() => track("proposal_mobile_packages")}>Packages</a>
         <a href="#get-started" onClick={() => track("proposal_mobile_start")}>Get started <ArrowRight aria-hidden size={16} /></a>
@@ -552,84 +533,6 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
       </footer>
     </div>
   );
-}
-
-/** The numbered label above each slide's headline, like a pitch deck: "02 The opportunity". */
-function SlideEyebrow({ no, label }: { no: string; label: string }) {
-  return <span className="proposal-eyebrow pp-slide-eyebrow"><b>{no}</b>{label}</span>;
-}
-
-const slideSections = () => Array.from(document.querySelectorAll<HTMLElement>(".pp-page main > section"));
-
-/** The slide whose top has passed the upper third of the screen. */
-function currentSlide() {
-  const line = window.scrollY + window.innerHeight * 0.3;
-  let at = 0;
-  slideSections().forEach((s, i) => { if (s.offsetTop <= line) at = i; });
-  return at;
-}
-
-function goToSlide(i: number) {
-  const list = slideSections();
-  list[Math.max(0, Math.min(list.length - 1, i))]?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-/**
- * Present mode for screen-sharing on a call: every section becomes a full-screen slide.
- * Right arrow, Page Down or the space bar goes forward; left arrow or Page Up goes back; Escape exits.
- * Up and down arrows still scroll inside a tall slide.
- */
-function usePresentMode(onStart: () => void) {
-  const [on, setOn] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!on) return;
-    const root = document.documentElement;
-    root.classList.add("pp-presenting");
-    const update = () => { setIndex(currentSlide()); setCount(slideSections().length); };
-    update();
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t?.closest("input, textarea, select, video, [contenteditable='true']")) return;
-      const forward = e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && (t === document.body || t === root));
-      const back = e.key === "ArrowLeft" || e.key === "PageUp";
-      if (forward) { e.preventDefault(); goToSlide(currentSlide() + 1); }
-      else if (back) { e.preventDefault(); goToSlide(currentSlide() - 1); }
-      else if (e.key === "Escape") setOn(false);
-    };
-    const onFullscreen = () => { if (!document.fullscreenElement) setOn(false); };
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    window.addEventListener("keydown", onKey);
-    document.addEventListener("fullscreenchange", onFullscreen);
-    return () => {
-      root.classList.remove("pp-presenting");
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      window.removeEventListener("keydown", onKey);
-      document.removeEventListener("fullscreenchange", onFullscreen);
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
-    };
-  }, [on]);
-
-  const start = () => {
-    onStart();
-    setOn(true);
-    document.documentElement.requestFullscreen?.().catch(() => undefined);
-    window.setTimeout(() => goToSlide(0), 80);
-  };
-
-  return {
-    on,
-    index,
-    count,
-    start,
-    stop: () => setOn(false),
-    next: () => goToSlide(currentSlide() + 1),
-    prev: () => goToSlide(currentSlide() - 1),
-  };
 }
 
 function PlanCard({ plan, index, onChoose, onCompare }: { plan: PackagePlan; index: number; onChoose: (id: PlanId) => void; onCompare: (id: PlanId) => void }) {
