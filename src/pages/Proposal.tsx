@@ -74,7 +74,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-hero">
           <div className="proposal-wrap">
             <p className="proposal-eyebrow">
-              Prepared for {p.client.contact}, {p.client.company} · {p.preparedOn}
+              Prepared for {p.client.contact}{p.client.company !== p.client.contact ? `, ${p.client.company}` : ""} · {p.preparedOn}
             </p>
             <p className="proposal-program-name">{p.title}</p>
             <h1 className="proposal-title">{p.headline.map((line, i) => <span key={i} className={i === p.headline.length - 1 ? "proposal-title-accent" : undefined}>{line}</span>)}</h1>
@@ -197,7 +197,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-who" id="who-does-what">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.whoDoesWhat.title}</span>
-            <h2 className="proposal-h2">We run the marketing. You run the presentations.</h2>
+            <h2 className="proposal-h2">{p.whoDoesWhat.headline ?? "We run the marketing. You run the presentations."}</h2>
             <div className="proposal-who-grid">
               <div className="proposal-who-col">
                 <h3>{p.preparedBy.company}</h3>
@@ -220,6 +220,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
               <p><strong>{p.markets.home}</strong> {p.markets.travelNote}</p>
               <p className="proposal-scope">{p.markets.scopeNote}</p>
             </div>
+            {p.markets.showCalendar && (
             <figure className="proposal-calendar" aria-label="Example of eight live weeks: the home market runs the whole time and each travel market gets its own window">
               <figcaption>Example: eight live weeks</figcaption>
               <div className="proposal-cal-weeks" aria-hidden>
@@ -247,6 +248,18 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 <span><b className="proposal-cal-dot" /> Presentation days</span>
               </p>
             </figure>
+            )}
+            {!p.markets.showCalendar && p.markets.textPreview && (
+            <figure className="proposal-calendar proposal-textpreview" aria-label={p.markets.textPreview.caption}>
+              <figcaption>{p.markets.textPreview.caption}</figcaption>
+              <div className="proposal-text-thread">
+                {p.markets.textPreview.messages.map((m, i) => (
+                  <p key={i} className={m.from === "agent" ? "proposal-text-bubble is-agent" : "proposal-text-bubble is-lead"}>{m.text}</p>
+                ))}
+              </div>
+              <p className="proposal-cal-key"><span>{p.markets.textPreview.note}</span></p>
+            </figure>
+            )}
           </div>
         </section>
 

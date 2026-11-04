@@ -13,4 +13,9 @@ export const PROPOSAL_SHARE = {
     description: "More owners in your room every week. We handle the calls and booking. Watch the video and compare the three packages.",
     image: "/og/proposal-cpn-growth.jpg",
   },
+  keegan: {
+    title: "Keegan's Exclusive Lead Engine | Supreme Team Media",
+    description: "Your own exclusive leads, from people who expect your call, delivered straight into Cassi. See the plan and the pilot.",
+    image: "/og/proposal-keegan.jpg",
+  },
 };
