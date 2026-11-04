@@ -141,7 +141,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                     playsInline
                     preload="metadata"
                     poster={videoFile.replace(/\.mp4$/, "-poster.jpg")}
-                    aria-label={`${p.programName}: the packages in two and a half minutes`}
+                    aria-label={`${p.programName}: the proposal video`}
                     onPlay={() => track("proposal_video_play")}
                     onEnded={() => track("proposal_video_complete")}
                   >
