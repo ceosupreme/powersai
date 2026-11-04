@@ -332,7 +332,7 @@ html.pp-presenting .pp-page .proposal-topbar,
 html.pp-presenting .pp-page .proposal-mobile-actions,
 html.pp-presenting .pp-page .proposal-footer,
 html.pp-presenting .pp-page .proposal-jump { display: none !important; }
-html.pp-presenting .pp-page main > section { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; scroll-snap-align: start; padding-block: 56px 80px; }
+html.pp-presenting .pp-page main > section { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; scroll-snap-align: start; scroll-margin-top: 0; padding-block: 56px 80px; }
 .pp-page .pp-present-bar { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 6px; background: hsl(var(--navy) / .94); color: hsl(var(--navy-text)); border: 1px solid hsl(var(--navy-text) / .14); border-radius: 999px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .6); }
 .pp-page .pp-present-bar button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 40px; height: 40px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
 .pp-page .pp-present-bar button:hover { background: hsl(var(--navy-text) / .12); }
