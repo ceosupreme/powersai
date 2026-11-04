@@ -143,7 +143,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     packagesIntro: {
       eyebrow: "Choose your package",
       title: "Pick how much growth we take on.",
-      body: "Both packages include everything in the proposal you already have. The Complete System adds your phones, one CRM for every lead source, more campaigns and markets, and follow-up that turns more owners into clients.",
+      body: "Both packages include everything in the proposal you already have. The Partnership adds answering on the mailer lines you connect, one CRM for the lead sources you choose, more campaigns and markets, and follow-up that turns more owners into clients.",
       footnote:
         "Both packages start with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
     },
@@ -155,7 +155,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           title: "What stays the same",
           items: [
             "Your mail drops and phone rooms",
-            "Your current lead vendors",
+            "Your current lead vendors, including your Facebook provider. We coordinate so we don't compete for the same owners.",
             "Your presentations and your sales process",
             "Your CRM, unless you choose to replace it",
           ],
@@ -248,9 +248,9 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       },
       {
         id: "complete",
-        name: "Complete Growth & Lead System",
-        shortName: "Complete System",
-        tagline: "Your phones answered, every lead in one CRM, more campaigns, and follow-up that closes more.",
+        name: "Growth & Conversion Partnership",
+        shortName: "Partnership",
+        tagline: "Your mailer lines answered, the lead sources you choose in one CRM, more campaigns, and follow-up that closes more.",
         recommended: true,
         target: {
           range: "25–33",
@@ -266,7 +266,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         highlights: [
           "Everything in Appointment Growth",
           "Your mailer and campaign lines answered around the clock",
-          "Every lead source in one CRM built around how you sell",
+          "The lead sources you choose in one CRM, built around how you sell",
           "Up to five markets at once, with new campaigns tested every week",
           "Follow-up that turns more no-shows and undecided owners into signed clients",
         ],
@@ -276,7 +276,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
             text: "Calls to your mailer lines and our campaign numbers are answered around the clock by an assistant that handles routine questions, screens the owner and books the right session. Missed calls get a text back in seconds, and anything that needs a person goes to your team with the household's details attached.",
           },
           {
-            lead: "Every lead source in one operation.",
+            lead: "Your lead sources in one operation.",
             text: "Mail responders, vendor leads, outside bookings and our campaign inquiries land in one household record with source history, assignments and clear next steps. It can replace your current CRM or run alongside it.",
           },
           {
@@ -327,7 +327,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           title: "More of them show up",
           body: "Confirmations, directions and reminders get them in the door.",
           detail:
-            "Owners get a confirmation, directions, reminders before the session and an easy confirm or reschedule link. No-shows are offered the next session, and owners who attend but don't sign get follow-up based on the next step they gave your team.",
+            "Owners get a confirmation, directions, a short guide to what they'll learn, reminders before the session and an easy confirm or reschedule link. No-shows are offered the next session, and owners who attend but don't sign get follow-up based on the next step they gave your team.",
         },
         {
           title: "You see every one",
@@ -396,10 +396,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           id: "new-owners",
           title: "How we bring in new owners",
           paragraphs: [
-            "Campaign strategy, messaging and paid advertising built around your offer and your presentation calendar. Facebook and Instagram lead, aimed at timeshare owners where your team will be, with Google added once eligibility is confirmed. The Complete System adds YouTube and wider search, video and social campaigns, and up to five markets at once.",
+            "Campaign strategy, messaging and paid advertising built around your offer and your presentation calendar. Facebook and Instagram lead, aimed at timeshare owners where your team will be, with Google added once eligibility is confirmed. The Partnership adds YouTube and wider search, video and social campaigns, and up to five markets at once.",
             "Not every owner is ready to call. A free owner's guide and a 60-second ownership cost check give those owners a way to raise their hand, and they stay in follow-up until the next session near them.",
             "Your mailers ask owners to pick up the phone. A QR code on the same mailer adds a second way to respond: scan, check what the timeshare is costing them, read the free guide and choose a session. Owners who aren't ready to call still have a route into your room.",
-            "The Complete System also builds an owner audience you keep: branded channels, a growing library of guides, a five-video owner course and a monthly newsletter that keep sending people between mail drops.",
+            "The Partnership also builds an owner audience you keep: branded channels, a growing library of guides, a five-video owner course and a monthly newsletter that keep sending people between mail drops.",
           ],
         },
         {
@@ -415,7 +415,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           id: "show-up",
           title: "How more of them show up",
           paragraphs: [
-            "Every booking gets a confirmation, directions and reminders before the session, with an easy confirm or reschedule link and a courtesy call with a human option.",
+            "Every booking gets a confirmation, directions, a short guide to what they'll learn and reminders before the session, with an easy confirm or reschedule link and a courtesy call with a human option.",
             "No-shows are offered the next session in their area. Owners who attend but don't sign get follow-up based on the next step they gave your team, so interest isn't lost between meetings.",
           ],
         },
@@ -433,7 +433,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           paragraphs: [
             "The program follows your presentation calendar, not a radius. A mail drop for an event in another city has to be printed and mailed weeks ahead. A campaign for that same event is a change of location and a venue line on the calendar, running from the same videos and pages.",
             "Boston runs continuously as the home market. Each travel market gets its own campaign window that opens two to three weeks before your presentations there and closes the day after, aimed at owners who live where the team will be.",
-            "Appointment Growth covers the home market plus up to three travel markets at once. The Complete System covers up to five markets at once, including Boston.",
+            "Appointment Growth covers the home market plus up to three travel markets at once. The Partnership covers up to five markets at once, including Boston.",
           ],
           calendar: true,
         },
@@ -451,7 +451,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         {
           id: "complete-system",
-          title: "How the Complete System handles your phones and the leads you already have",
+          title: "How the Partnership handles your phones and the leads you already have",
           paragraphs: [
             "Mail responders, phone-room bookings, vendor leads and our campaigns all land in one CRM built around how your team sells, so every owner gets the same organized follow-up instead of sitting on separate lists.",
             "Calls to your mailer lines are answered around the clock, the same way as the campaign numbers, and missed calls get a text back in seconds. Past responders who never booked are invited to the next session near them. Reminders cover every booking source you choose, and owners who attended but didn't sign get follow-up.",
@@ -489,7 +489,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         "Each target comes from one funnel: new inquiries × the share who qualify × the share who book × the share who attend. The table shows four weeks at the month-three pace, and counts each household once even when it comes through more than one source.",
       funnel: "65% qualify × 50% of those book × 75% of those attend = about 1 in 4 new inquiries in your room.",
       table: {
-        columns: ["Appointment Growth", "Complete System, new owners"],
+        columns: ["Appointment Growth", "Partnership, new owners"],
         rows: [
           { label: "Ad budget, paid directly to the platforms", values: ["$5,000", "$8,000"] },
           { label: "Cost per inquiry from ads", values: ["$30–$40", "$30–$35"] },
@@ -503,9 +503,9 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         ],
       },
       complete:
-        "The Complete System adds 20–32 more over four weeks from leads you already have: 8–18 past mail responders followed up into a tour, and 12–14 more arrivals from better attendance on bookings from your other sources. That's 100–132 in four weeks, or 25–33 a week.",
+        "The Partnership adds 20–32 more over four weeks from leads you already have: 8–18 past mail responders followed up into a tour, and 12–14 more arrivals from better attendance on bookings from your other sources. That's 100–132 in four weeks, or 25–33 a week.",
       definition: "One tour is one qualified household. A couple attending together counts once.",
-      sales: "At your closing range of one in four to one in three, that's about 10–20 more signed clients every four weeks with Appointment Growth, and 25–44 with the Complete System.",
+      sales: "At your closing range of one in four to one in three, that's about 10–20 more signed clients every four weeks with Appointment Growth, and 25–44 with the Partnership.",
     },
     timeline: {
       title: "Build, launch, improve.",
@@ -566,11 +566,11 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       items: [
         {
           q: "Will you answer our phones?",
-          a: "Yes. Calls to the campaign numbers are answered around the clock by an assistant that handles routine questions and books the right session. Texts and forms get a response within a minute. Anything that needs a person goes to your designated team with the details attached. In the Complete System, the same handling extends to your mailer lines and the other sources you choose.",
+          a: "Yes. Calls to the campaign numbers are answered around the clock by an assistant that handles routine questions and books the right session. Texts and forms get a response within a minute. Anything that needs a person goes to your designated team with the details attached. In the Partnership, the same handling extends to your mailer lines and the other sources you choose.",
         },
         {
           q: "Do we have to replace our CRM?",
-          a: "No. Appointment Growth gives your team a simple CRM for the households we bring in and runs alongside whatever you use now. The Complete System can replace your CRM or connect alongside it, whichever corporate approves.",
+          a: "No. Appointment Growth gives your team a simple CRM for the households we bring in and runs alongside whatever you use now. The Partnership can replace your CRM or connect alongside it, whichever corporate approves.",
         },
         {
           q: "Does our team have to be on camera?",
