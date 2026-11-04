@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, ChevronDown, Mail, Minus, Printer } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Mail, Minus, Plus, Presentation, Printer, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
@@ -14,9 +14,11 @@ import "@/styles/package-proposal.css";
  * Unlisted package proposal page: /proposal/:slug for records in
  * src/content/packageProposals.ts.
  *
- * The short version (headline, three package cards, prices, a choose button)
- * shows first; every explanation sits in a drop-down so the buyer opens only
- * what they want. Printing opens every drop-down so the saved PDF is complete.
+ * The page runs like a pitch deck: each section is one numbered slide with one
+ * job (promise, opportunity, plan, calendar, team, results, investment, risk,
+ * first 90 days, growth, questions, next step). Deeper detail sits in drop-downs.
+ * A Present button turns the sections into full-screen slides for screen-sharing.
+ * Printing opens every drop-down so the saved PDF is complete.
  *
  * The agreement request goes through the live submit-inbound-lead intake, like
  * the single-program proposal page. The lead's email column stays empty on
@@ -62,6 +64,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   const recommended = p.plans.find((pl) => pl.recommended)?.id ?? p.plans[0].id;
   const [selected, setSelected] = useState<PlanId>(recommended);
   const [view, setView] = useState<"all" | PlanId>("all");
+  const [compareOpen, setCompareOpen] = useState(false);
 
   // On a phone, open the compare table on one package so it fits; "All three" is one tap away.
   useEffect(() => {
@@ -73,6 +76,18 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   const embed = toEmbedUrl(p.videoUrl);
   const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
   const samples = p.samples.items.filter((it) => isVideoFile(it.src));
+  const present = usePresentMode(() => track("proposal_present"));
+
+  // Three explain items get slides of their own; the rest stay in the detail drop-downs.
+  const explainItem = (id: string) => p.explain.items.find((it) => it.id === id);
+  const markets = explainItem("markets");
+  const team = explainItem("who-does-what");
+  const improve = explainItem("improve");
+  const detailItems = p.explain.items.filter((it) => !["markets", "who-does-what", "improve"].includes(it.id));
+
+  // Slide numbers follow the slides that actually render (the sample ads stay hidden until files exist).
+  let slideNo = 1;
+  const nextNo = () => String(++slideNo).padStart(2, "0");
 
   const choose = (id: PlanId) => {
     setSelected(id);
@@ -80,28 +95,34 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
     document.getElementById("get-started")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // From a card's drop-down: show that package alone in the compare table.
+  // From a card's drop-down: open the comparison under the cards on that package alone.
   const compareOne = (id: PlanId) => {
     setView(id);
+    setCompareOpen(true);
     track(`proposal_card_compare_${id}`);
-    document.getElementById("compare")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => document.getElementById("compare")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   };
 
   return (
-    <div className="stm-studio proposal-page pp-page min-h-screen">
+    <div className={`stm-studio proposal-page pp-page min-h-screen${present.on ? " is-presenting" : ""}`}>
       <header className="proposal-topbar">
         <div className="proposal-wrap proposal-topbar-in">
           <Link to="/" className="proposal-brand" aria-label={`${p.preparedBy.company} home`} onClick={() => track("proposal_brand")}>
             {mark?.src && <img src={mark.src} alt="" width={mark.width} height={mark.height} />}
             <span>{p.preparedBy.company}</span>
           </Link>
-          <span className="proposal-topbar-for">Proposal for {p.client.company}</span>
+          <div className="pp-topbar-right">
+            <span className="proposal-topbar-for">Proposal for {p.client.company}</span>
+            <button type="button" className="pp-present-btn" onClick={present.start} title="Show this page as full-screen slides">
+              <Presentation aria-hidden size={17} /> Present
+            </button>
+          </div>
         </div>
       </header>
 
       <main>
-        {/* 1. The short version: headline, then straight to the packages. */}
-        <section className="pp-hero">
+        {/* 01 Title: the promise and the video. */}
+        <section className="pp-hero" id="top">
           <div className="proposal-wrap">
             <p className="proposal-eyebrow">Prepared for {p.client.contacts}, {p.client.company} · {p.preparedOn}</p>
             <p className="pp-program">{p.programName}</p>
@@ -138,40 +159,43 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 )}
               </div>
             )}
-            <nav className="proposal-jump" aria-label="Jump to a section">
-              <a href="#packages">Packages</a>
-              <a href="#how-it-works">How it works</a>
+            <nav className="proposal-jump" aria-label="Jump to a slide">
+              <a href="#opportunity">The opportunity</a>
+              <a href="#how-it-works">The plan</a>
               {samples.length > 0 && <a href="#samples">Sample ads</a>}
-              <a href="#compare">Compare</a>
-              <a href="#how-we-do-it">How we do it</a>
-              <a href="#the-math">The math</a>
+              <a href="#results">The results</a>
+              <a href="#packages">Packages</a>
+              <a href="#terms">The terms</a>
               <a href="#get-started">Get started</a>
             </nav>
           </div>
         </section>
 
-        {/* 2. Three package cards. */}
-        <section className="pp-packages" id="packages">
+        {/* 02 The opportunity: keep what works, add what's missing. */}
+        <section className="pp-opportunity" id="opportunity">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">{p.packagesIntro.eyebrow}</span>
-            <h2 className="proposal-h2">{p.packagesIntro.title}</h2>
-            <p className="pp-intro">{p.packagesIntro.body}</p>
-            <div className="pp-cards">
-              {p.plans.map((plan, i) => (
-                <PlanCard key={plan.id} plan={plan} index={i} onChoose={choose} onCompare={compareOne} />
-              ))}
+            <SlideEyebrow no={nextNo()} label="The opportunity" />
+            <h2 className="proposal-h2 pp-slide-title">{p.deck.opportunity.title}</h2>
+            <p className="pp-intro">{p.deck.opportunity.body}</p>
+            <div className="pp-keep-add">
+              <div className="pp-keep">
+                <h3>{p.deck.opportunity.keep.title}</h3>
+                <ul>{p.deck.opportunity.keep.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
+              </div>
+              <span className="pp-plus" aria-hidden><Plus size={26} /></span>
+              <div className="pp-add">
+                <h3>{p.deck.opportunity.add.title}</h3>
+                <ul>{p.deck.opportunity.add.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
+              </div>
             </div>
-            <p className="pp-cards-note">
-              {p.packagesIntro.footnote} <a href="#terms">What's included with every package</a>
-            </p>
           </div>
         </section>
 
-        {/* 3. How it works: five steps, each with a "how we do it" drop-down. */}
+        {/* 03 The plan: five steps from first look to a counted arrival, each with a "how we do it" drop-down. */}
         <section className="pp-journey" id="how-it-works">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">How it works</span>
-            <h2 className="proposal-h2">{p.journey.title}</h2>
+            <SlideEyebrow no={nextNo()} label="The plan" />
+            <h2 className="proposal-h2 pp-slide-title">{p.journey.title}</h2>
             <p className="pp-intro">{p.journey.body}</p>
             <ol className="pp-steps">
               {p.journey.steps.map((st, i) => (
@@ -189,12 +213,49 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           </div>
         </section>
 
-        {/* 3b. Sample campaign creative in phone frames; hidden until a sample file exists. */}
+        {/* 04 Built around the presentation calendar. */}
+        {markets && (
+          <section className="pp-cal-slide" id="calendar">
+            <div className="proposal-wrap pp-cal-grid">
+              <div>
+                <SlideEyebrow no={nextNo()} label="Your calendar" />
+                <h2 className="proposal-h2 pp-slide-title">{p.deck.calendar.title}</h2>
+                {markets.paragraphs.map((para, i) => (
+                  <p key={i} className={i === markets.paragraphs.length - 1 ? "pp-cal-note" : "pp-cal-text"}>{para}</p>
+                ))}
+              </div>
+              <MarketCalendar />
+            </div>
+          </section>
+        )}
+
+        {/* 05 Who does what. */}
+        {team && (
+          <section className="pp-team" id="who-does-what">
+            <div className="proposal-wrap">
+              <SlideEyebrow no={nextNo()} label="Who does what" />
+              <h2 className="proposal-h2 pp-slide-title">{p.deck.team.title}</h2>
+              {team.paragraphs.map((para, i) => <p key={i} className="pp-intro">{para}</p>)}
+              {team.columns && (
+                <div className="pp-team-cols">
+                  {team.columns.map((col, i) => (
+                    <div key={col.heading} className={i === 0 ? "is-us" : "is-you"}>
+                      <h3>{col.heading}</h3>
+                      <ul>{col.items.map((it) => <li key={it}><Check aria-hidden size={18} /> <span>{it}</span></li>)}</ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 06 Sample campaign creative in phone frames; hidden until a sample file exists. */}
         {samples.length > 0 && (
           <section className="pp-samples" id="samples">
             <div className="proposal-wrap">
-              <span className="proposal-eyebrow">{p.samples.eyebrow}</span>
-              <h2 className="proposal-h2">{p.samples.title}</h2>
+              <SlideEyebrow no={nextNo()} label={p.samples.eyebrow} />
+              <h2 className="proposal-h2 pp-slide-title">{p.samples.title}</h2>
               <p className="pp-intro">{p.samples.body}</p>
               <div className="pp-sample-grid">
                 {samples.map((it) => (
@@ -220,64 +281,29 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           </section>
         )}
 
-        {/* 4. Compare everything, filterable by package. */}
-        <section className="pp-compare-section" id="compare">
+        {/* 07 The results: the targets, the funnel behind them, one example, and the full math in a drop-down. */}
+        <section className="pp-results-slide" id="results">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">Compare</span>
-            <h2 className="proposal-h2">{p.compare.title}</h2>
-            <p className="pp-intro">{p.compare.body}</p>
-            <div className="pp-filter" role="group" aria-label="Show packages">
-              <button type="button" aria-pressed={view === "all"} onClick={() => { setView("all"); track("proposal_compare_all"); }}>All three</button>
+            <SlideEyebrow no={nextNo()} label="The results" />
+            <h2 className="proposal-h2 pp-slide-title">{p.deck.results.title}</h2>
+            <p className="pp-intro">{p.deck.results.body}</p>
+            <div className="pp-kpis">
               {p.plans.map((plan) => (
-                <button key={plan.id} type="button" aria-pressed={view === plan.id} onClick={() => { setView(plan.id); track(`proposal_compare_${plan.id}`); }}>
-                  {plan.shortName}
-                </button>
+                <div key={plan.id} className={`pp-kpi${plan.recommended ? " is-recommended" : ""}`}>
+                  <span className="pp-kpi-name">{plan.shortName}{plan.recommended && <em>Recommended</em>}</span>
+                  <strong>{plan.target.range}</strong>
+                  <span className="pp-kpi-label">more qualified households a week</span>
+                  <span className="pp-lift">{plan.target.lift}</span>
+                </div>
               ))}
             </div>
-            <CompareTable proposal={p} view={view} />
-            <p className="pp-footnote">{p.compare.footnote}</p>
-          </div>
-        </section>
-
-        {/* 5. How we do it: the full explanations, one drop-down each. */}
-        <section className="pp-explain" id="how-we-do-it">
-          <div className="proposal-wrap">
-            <span className="proposal-eyebrow">The detail</span>
-            <h2 className="proposal-h2">{p.explain.title}</h2>
-            <p className="pp-intro">{p.explain.body}</p>
-            <div className="pp-accordion">
-              {p.explain.items.map((item) => (
-                <Drop key={item.id} title={item.title} onOpen={() => track(`proposal_explain_${item.id}`)}>
-                  {item.paragraphs.map((para, i) => <p key={i}>{para}</p>)}
-                  {item.steps && (
-                    <ol className="pp-loop">
-                      {item.steps.map((st, i) => (
-                        <li key={st.title}><span>0{i + 1}</span><strong>{st.title}</strong><p>{st.body}</p></li>
-                      ))}
-                    </ol>
-                  )}
-                  {item.columns && (
-                    <div className="pp-columns">
-                      {item.columns.map((col) => (
-                        <div key={col.heading}>
-                          <h4>{col.heading}</h4>
-                          <ul>{col.items.map((it) => <li key={it}><Check aria-hidden size={17} /> {it}</li>)}</ul>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {item.calendar && <MarketCalendar />}
-                </Drop>
-              ))}
+            <div className="pp-funnel">
+              <span className="pp-funnel-title">{p.deck.results.funnelTitle}</span>
+              <ol>
+                {p.deck.results.funnel.map((f) => <li key={f.label}><strong>{f.value}</strong><span>{f.label}</span></li>)}
+              </ol>
             </div>
-          </div>
-        </section>
-
-        {/* 6. The math, closed by default. */}
-        <section className="pp-math" id="the-math">
-          <div className="proposal-wrap">
-            <span className="proposal-eyebrow">The numbers</span>
-            <h2 className="proposal-h2">Where the targets come from.</h2>
+            <p className="pp-example-slide"><span>One example</span>{p.math.example}<small>{p.math.exampleNote}</small></p>
             <div className="pp-accordion">
               <Drop title={p.math.title} onOpen={() => track("proposal_math")}>
                 <p>{p.math.summary}</p>
@@ -304,40 +330,67 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 <p>{p.math.complete}</p>
                 <p>{p.math.definition}</p>
                 <p>{p.math.sales}</p>
-                <p className="pp-example"><span>One example</span>{p.math.example}<small>{p.math.exampleNote}</small></p>
               </Drop>
             </div>
           </div>
         </section>
 
-        {/* 7. Timeline. */}
-        <section className="pp-timeline" id="timeline">
+        {/* 08 Your investment: three packages, with the full comparison folded underneath. */}
+        <section className="pp-packages" id="packages">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">The first 90 days</span>
-            <h2 className="proposal-h2">{p.timeline.title}</h2>
-            <ol className="pp-time">
-              {p.timeline.steps.map((st, i) => (
-                <li key={st.when}>
-                  <span className="pp-time-dot">{i + 1}</span>
-                  <span className="pp-time-when">{st.when}</span>
-                  <h3>{st.title}</h3>
-                  <p>{st.body}</p>
-                </li>
+            <SlideEyebrow no={nextNo()} label="Your investment" />
+            <h2 className="proposal-h2 pp-slide-title">{p.packagesIntro.title}</h2>
+            <p className="pp-intro">{p.packagesIntro.body}</p>
+            <div className="pp-cards">
+              {p.plans.map((plan, i) => (
+                <PlanCard key={plan.id} plan={plan} index={i} onChoose={choose} onCompare={compareOne} />
               ))}
-            </ol>
+            </div>
+            <p className="pp-cards-note">
+              {p.packagesIntro.footnote} <a href="#terms">What's included with every package</a>
+            </p>
+            <details
+              className="pp-compare-drop"
+              id="compare"
+              open={compareOpen}
+              onToggle={(e) => {
+                const isOpen = (e.currentTarget as HTMLDetailsElement).open;
+                setCompareOpen(isOpen);
+                if (isOpen) track("proposal_compare_open");
+              }}
+            >
+              <summary><span>{p.compare.title}</span><ChevronDown aria-hidden size={20} /></summary>
+              <div className="pp-compare-body">
+                <p className="pp-intro">{p.compare.body}</p>
+                <div className="pp-filter" role="group" aria-label="Show packages">
+                  <button type="button" aria-pressed={view === "all"} onClick={() => { setView("all"); track("proposal_compare_all"); }}>All three</button>
+                  {p.plans.map((plan) => (
+                    <button key={plan.id} type="button" aria-pressed={view === plan.id} onClick={() => { setView(plan.id); track(`proposal_compare_${plan.id}`); }}>
+                      {plan.shortName}
+                    </button>
+                  ))}
+                </div>
+                <CompareTable proposal={p} view={view} />
+                <p className="pp-footnote">{p.compare.footnote}</p>
+              </div>
+            </details>
           </div>
         </section>
 
-        {/* 8. Terms for every package, fine print in a drop-down. */}
-        <section className="pp-terms" id="terms">
+        {/* 09 The risk is on us: the terms as big tiles, everything else in the fine print. */}
+        <section className="pp-risk" id="terms">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">Every package</span>
-            <h2 className="proposal-h2">{p.terms.title}</h2>
-            <ul className="pp-points">
-              {p.terms.points.map((pt) => <li key={pt}><Check aria-hidden size={18} /> <span>{pt}</span></li>)}
+            <SlideEyebrow no={nextNo()} label="The risk is on us" />
+            <h2 className="proposal-h2 pp-slide-title">{p.deck.risk.title}</h2>
+            <p className="pp-intro">{p.deck.risk.body}</p>
+            <ul className="pp-risk-tiles">
+              {p.deck.risk.tiles.map((t) => <li key={t.big}><strong>{t.big}</strong><span>{t.label}</span></li>)}
             </ul>
             <div className="pp-accordion">
-              <Drop title="Read the fine print" onOpen={() => track("proposal_fineprint")}>
+              <Drop title="Read the full terms and fine print" onOpen={() => track("proposal_fineprint")}>
+                <ul className="pp-points">
+                  {p.terms.points.map((pt) => <li key={pt}><Check aria-hidden size={18} /> <span>{pt}</span></li>)}
+                </ul>
                 <dl className="pp-fine">
                   {p.terms.fineprint.map((f) => (
                     <div key={f.title}>
@@ -351,11 +404,42 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           </div>
         </section>
 
-        {/* 9. National rollout. */}
+        {/* 10 The first 90 days, then how it improves every month. */}
+        <section className="pp-timeline" id="timeline">
+          <div className="proposal-wrap">
+            <SlideEyebrow no={nextNo()} label="The first 90 days" />
+            <h2 className="proposal-h2 pp-slide-title">{p.timeline.title}</h2>
+            <ol className="pp-time">
+              {p.timeline.steps.map((st, i) => (
+                <li key={st.when}>
+                  <span className="pp-time-dot">{i + 1}</span>
+                  <span className="pp-time-when">{st.when}</span>
+                  <h3>{st.title}</h3>
+                  <p>{st.body}</p>
+                </li>
+              ))}
+            </ol>
+            {improve && (
+              <div className="pp-improve">
+                <h3>{p.deck.improve.title}</h3>
+                {improve.paragraphs.map((para, i) => <p key={i}>{para}</p>)}
+                {improve.steps && (
+                  <ol className="pp-loop">
+                    {improve.steps.map((st, i) => (
+                      <li key={st.title}><span>0{i + 1}</span><strong>{st.title}</strong><p>{st.body}</p></li>
+                    ))}
+                  </ol>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 11 Room to grow across CPN. */}
         <section className="pp-national" id="national">
           <div className="proposal-wrap pp-national-in">
             <div>
-              <span className="proposal-eyebrow">For every CPN team</span>
+              <SlideEyebrow no={nextNo()} label="Room to grow" />
               <h2 className="proposal-h2">{p.national.title}</h2>
             </div>
             <div>
@@ -365,11 +449,11 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           </div>
         </section>
 
-        {/* 10. FAQ. */}
+        {/* 12 Questions, then every detail for anyone who wants it. */}
         <section className="pp-faq" id="faq">
           <div className="proposal-wrap">
-            <span className="proposal-eyebrow">Questions</span>
-            <h2 className="proposal-h2">{p.faq.title}</h2>
+            <SlideEyebrow no={nextNo()} label="Questions" />
+            <h2 className="proposal-h2 pp-slide-title">{p.faq.title}</h2>
             <div className="pp-accordion">
               {p.faq.items.map((item, i) => (
                 <Drop key={item.q} title={item.q} onOpen={() => track(`proposal_faq_${i + 1}`)}>
@@ -377,14 +461,41 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 </Drop>
               ))}
             </div>
+            <h3 className="pp-sub-h" id="how-we-do-it">{p.explain.title}</h3>
+            <p className="pp-intro">{p.explain.body}</p>
+            <div className="pp-accordion">
+              {detailItems.map((item) => (
+                <Drop key={item.id} title={item.title} onOpen={() => track(`proposal_explain_${item.id}`)}>
+                  {item.paragraphs.map((para, i) => <p key={i}>{para}</p>)}
+                  {item.steps && (
+                    <ol className="pp-loop">
+                      {item.steps.map((st, i) => (
+                        <li key={st.title}><span>0{i + 1}</span><strong>{st.title}</strong><p>{st.body}</p></li>
+                      ))}
+                    </ol>
+                  )}
+                  {item.columns && (
+                    <div className="pp-columns">
+                      {item.columns.map((col) => (
+                        <div key={col.heading}>
+                          <h4>{col.heading}</h4>
+                          <ul>{col.items.map((it) => <li key={it}><Check aria-hidden size={17} /> {it}</li>)}</ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {item.calendar && <MarketCalendar />}
+                </Drop>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* 11. Get started: package picker and agreement request. */}
+        {/* 13 Next step: package picker and agreement request. */}
         <section className="proposal-accept pp-start" id="get-started">
           <div className="proposal-wrap proposal-accept-grid">
             <div className="proposal-accept-intro">
-              <span className="proposal-eyebrow">Get started</span>
+              <SlideEyebrow no={nextNo()} label="Next step" />
               <h2 className="proposal-h2">{p.start.title}</h2>
               <p>{p.start.intro}</p>
               <ol className="proposal-after-list">
@@ -413,6 +524,15 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
         </section>
       </main>
 
+      {present.on && (
+        <div className="pp-present-bar" role="toolbar" aria-label="Slide controls">
+          <button type="button" onClick={present.prev} aria-label="Previous slide"><ChevronLeft aria-hidden size={20} /></button>
+          <span aria-live="polite">{present.index + 1} / {present.count}</span>
+          <button type="button" onClick={present.next} aria-label="Next slide"><ChevronRight aria-hidden size={20} /></button>
+          <button type="button" className="pp-present-exit" onClick={present.stop}><X aria-hidden size={18} /> Exit</button>
+        </div>
+      )}
+
       <nav className="proposal-mobile-actions" aria-label="Proposal actions">
         <a href="#packages" onClick={() => track("proposal_mobile_packages")}>Packages</a>
         <a href="#get-started" onClick={() => track("proposal_mobile_start")}>Get started <ArrowRight aria-hidden size={16} /></a>
@@ -432,6 +552,84 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
       </footer>
     </div>
   );
+}
+
+/** The numbered label above each slide's headline, like a pitch deck: "02 The opportunity". */
+function SlideEyebrow({ no, label }: { no: string; label: string }) {
+  return <span className="proposal-eyebrow pp-slide-eyebrow"><b>{no}</b>{label}</span>;
+}
+
+const slideSections = () => Array.from(document.querySelectorAll<HTMLElement>(".pp-page main > section"));
+
+/** The slide whose top has passed the upper third of the screen. */
+function currentSlide() {
+  const line = window.scrollY + window.innerHeight * 0.3;
+  let at = 0;
+  slideSections().forEach((s, i) => { if (s.offsetTop <= line) at = i; });
+  return at;
+}
+
+function goToSlide(i: number) {
+  const list = slideSections();
+  list[Math.max(0, Math.min(list.length - 1, i))]?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/**
+ * Present mode for screen-sharing on a call: every section becomes a full-screen slide.
+ * Right arrow, Page Down or the space bar goes forward; left arrow or Page Up goes back; Escape exits.
+ * Up and down arrows still scroll inside a tall slide.
+ */
+function usePresentMode(onStart: () => void) {
+  const [on, setOn] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!on) return;
+    const root = document.documentElement;
+    root.classList.add("pp-presenting");
+    const update = () => { setIndex(currentSlide()); setCount(slideSections().length); };
+    update();
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t?.closest("input, textarea, select, video, [contenteditable='true']")) return;
+      const forward = e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && (t === document.body || t === root));
+      const back = e.key === "ArrowLeft" || e.key === "PageUp";
+      if (forward) { e.preventDefault(); goToSlide(currentSlide() + 1); }
+      else if (back) { e.preventDefault(); goToSlide(currentSlide() - 1); }
+      else if (e.key === "Escape") setOn(false);
+    };
+    const onFullscreen = () => { if (!document.fullscreenElement) setOn(false); };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    window.addEventListener("keydown", onKey);
+    document.addEventListener("fullscreenchange", onFullscreen);
+    return () => {
+      root.classList.remove("pp-presenting");
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("fullscreenchange", onFullscreen);
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
+    };
+  }, [on]);
+
+  const start = () => {
+    onStart();
+    setOn(true);
+    document.documentElement.requestFullscreen?.().catch(() => undefined);
+    window.setTimeout(() => goToSlide(0), 80);
+  };
+
+  return {
+    on,
+    index,
+    count,
+    start,
+    stop: () => setOn(false),
+    next: () => goToSlide(currentSlide() + 1),
+    prev: () => goToSlide(currentSlide() - 1),
+  };
 }
 
 function PlanCard({ plan, index, onChoose, onCompare }: { plan: PackagePlan; index: number; onChoose: (id: PlanId) => void; onCompare: (id: PlanId) => void }) {

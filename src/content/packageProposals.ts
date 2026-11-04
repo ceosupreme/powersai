@@ -3,9 +3,10 @@
  * packages instead of one program. Same privacy rules as src/content/proposals.ts
  * (never prerendered, noindex, robots.txt disallows /proposal/).
  *
- * The page shows the short version first (headline, package cards, prices) and
- * keeps every explanation one tap away in drop-downs, so a buyer can decide fast
- * or read everything. All copy lives here; the page only renders it.
+ * The page runs like a pitch deck: the promise and video, the opportunity, the
+ * plan, the results, then the investment, the risk terms and the next step. Each
+ * section is one slide with one job, and the deeper detail stays one tap away in
+ * drop-downs. All copy lives here; the page only renders it.
  */
 
 export type PlanId = "growth" | "expanded" | "complete";
@@ -71,6 +72,19 @@ export type PackageProposalRecord = {
   preparedOn: string;
   preparedBy: { name: string; company: string; email: string; site: string };
   packagesIntro: { eyebrow: string; title: string; body: string; footnote: string };
+  /**
+   * Copy for the deck slides that frame the offer before the prices. The calendar, team and
+   * monthly-improvement slides also show the matching explain items ("markets", "who-does-what",
+   * "improve"), so their detail copy lives in one place.
+   */
+  deck: {
+    opportunity: { title: string; body: string; keep: { title: string; items: string[] }; add: { title: string; items: string[] } };
+    calendar: { title: string };
+    team: { title: string };
+    results: { title: string; body: string; funnelTitle: string; funnel: { value: string; label: string }[] };
+    risk: { title: string; body: string; tiles: { big: string; label: string }[] };
+    improve: { title: string };
+  };
   plans: [PackagePlan, PackagePlan, PackagePlan];
   journey: { title: string; body: string; steps: { title: string; body: string; detail: string }[] };
   /**
@@ -129,6 +143,57 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       body: "Every package includes everything in the proposal you already have. Each step up adds more work that brings in owners, or takes more of the lead operation off your team.",
       footnote:
         "Every package starts with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
+    },
+    deck: {
+      opportunity: {
+        title: "Your team already sells. We bring more owners to the room.",
+        body: "Your mail, phone rooms and vendors keep doing what they do. We add a new-owner engine built around your presentation calendar, and we take the answering, booking and follow-up off your team.",
+        keep: {
+          title: "What stays the same",
+          items: [
+            "Your mail drops and phone rooms",
+            "Your current lead vendors",
+            "Your presentations and your sales process",
+            "Your CRM, unless you choose to replace it",
+          ],
+        },
+        add: {
+          title: "What we add",
+          items: [
+            "New owners from campaigns in every market you visit",
+            "Every inquiry we generate answered within a minute, day or night",
+            "Owners screened and booked into your real sessions",
+            "Reminders and rebooking that get more of them in the door",
+            "A Command Center that counts every arrival by source",
+          ],
+        },
+      },
+      calendar: { title: "Campaigns that follow your calendar." },
+      team: { title: "You present and close. We handle everything that gets owners there." },
+      results: {
+        title: "What this can mean for your room.",
+        body: "Targets for the third live month, in more qualified households in your room every week.",
+        funnelTitle: "Every 100 new inquiries, at the rates in our model",
+        funnel: [
+          { value: "100", label: "new inquiries" },
+          { value: "65", label: "qualify" },
+          { value: "33", label: "book a session" },
+          { value: "24", label: "are in your room" },
+        ],
+      },
+      risk: {
+        title: "Start with $1,500. Decide at day 30.",
+        body: "You see real results before the second monthly fee, and you see every dollar of ad spend.",
+        tiles: [
+          { big: "$1,500", label: "starts any package. The rest of the foundation is due when launch is ready." },
+          { big: "Day 30", label: "Continue, adjust or stop, before the second monthly fee." },
+          { big: "Month 1", label: "That month's fee refunded if no qualified household attends in the first 30 live days." },
+          { big: "0%", label: "of your sales, and no per-lead fees." },
+          { big: "$0", label: "markup on your ad budget. You pay the platforms directly." },
+          { big: "Yours", label: "Your leads, accounts, pages and finished creative stay with CPN." },
+        ],
+      },
+      improve: { title: "Every month, we make it better." },
     },
     plans: [
       {

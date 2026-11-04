@@ -221,3 +221,156 @@
   .pp-page .pp-hero .proposal-jump { display: none; }
   .pp-page .pp-hero .proposal-subtitle { font-size: 1.1rem; }
 }
+
+/* ===== Pitch-deck layout: one numbered slide per section ===== */
+.pp-page .pp-slide-eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+.pp-page .pp-slide-eyebrow b { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 24px; padding: 0 7px; border-radius: 7px; background: hsl(var(--gold)); color: #fff; font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
+.pp-page .pp-team .pp-slide-eyebrow b, .pp-page .pp-risk .pp-slide-eyebrow b, .pp-page .pp-national .pp-slide-eyebrow b, .pp-page .pp-samples .pp-slide-eyebrow b { background: hsl(var(--gold-bright)); color: #101412; }
+.pp-page .pp-slide-title { max-width: 920px; text-wrap: balance; }
+
+/* 02 The opportunity: what stays, plus what we add */
+.pp-page .pp-opportunity { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--surface)); }
+.pp-page .pp-keep-add { display: grid; grid-template-columns: minmax(0, .9fr) auto minmax(0, 1.1fr); gap: 20px; align-items: stretch; margin-top: 40px; }
+.pp-page .pp-keep, .pp-page .pp-add { padding: 28px 28px 30px; border-radius: 22px; }
+.pp-page .pp-keep { background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); }
+.pp-page .pp-add { background: hsl(var(--navy)); color: hsl(var(--navy-text)); box-shadow: 0 30px 60px -34px rgba(11, 18, 40, .55); }
+.pp-page .pp-keep h3, .pp-page .pp-add h3 { font-family: "Inter Tight", sans-serif; font-size: 1.35rem; font-weight: 800; line-height: 1.15; }
+.pp-page .pp-add h3 { color: hsl(var(--gold-bright)); }
+.pp-page .pp-keep ul, .pp-page .pp-add ul { display: grid; gap: 14px; margin: 20px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-keep li, .pp-page .pp-add li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; font-size: 1.08rem; line-height: 1.42; }
+.pp-page .pp-keep svg { margin-top: 3px; color: hsl(var(--ink-muted)); }
+.pp-page .pp-add svg { margin-top: 3px; color: hsl(var(--gold-bright)); }
+.pp-page .pp-plus { align-self: center; display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: hsl(var(--gold)); color: #fff; box-shadow: 0 14px 30px -14px hsl(var(--gold)); }
+
+/* 04 Your calendar */
+.pp-page .pp-cal-slide { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--surface)); }
+.pp-page .pp-cal-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; align-items: center; }
+.pp-page .pp-cal-text { margin-top: 16px; max-width: 560px; font-size: 1.1rem; line-height: 1.6; color: hsl(var(--ink-muted)); }
+.pp-page .pp-cal-note { margin-top: 18px; padding: 14px 18px; max-width: 560px; background: hsl(var(--cobalt-pale)); border-radius: 12px; font-weight: 700; line-height: 1.5; }
+.pp-page .pp-cal-slide .pp-calendar { margin-top: 0; }
+
+/* 05 Who does what */
+.pp-page .pp-team { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-top: 0 !important; }
+.pp-page .pp-team .proposal-eyebrow { color: hsl(var(--gold-bright)); }
+.pp-page .pp-team .proposal-h2 { color: hsl(var(--navy-text)); }
+.pp-page .pp-team .pp-intro { color: hsl(var(--navy-text) / .78); }
+.pp-page .pp-team-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 36px; }
+.pp-page .pp-team-cols > div { padding: 28px 28px 30px; border-radius: 20px; background: hsl(var(--navy-text) / .06); border: 1px solid hsl(var(--navy-text) / .14); }
+.pp-page .pp-team-cols > div.is-us { border: 2px solid hsl(var(--gold-bright) / .8); }
+.pp-page .pp-team-cols h3 { font-family: "Inter Tight", sans-serif; font-size: 1.35rem; font-weight: 800; }
+.pp-page .pp-team-cols .is-us h3 { color: hsl(var(--gold-bright)); }
+.pp-page .pp-team-cols ul { display: grid; gap: 14px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-team-cols li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; font-size: 1.08rem; line-height: 1.45; }
+.pp-page .pp-team-cols svg { margin-top: 3px; color: hsl(var(--gold-bright)); }
+.pp-page .pp-samples { border-top: 0 !important; }
+
+/* 07 The results */
+.pp-page .pp-results-slide { padding-block: clamp(48px, 7vw, 96px); }
+.pp-page .pp-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 36px; }
+.pp-page .pp-kpi { display: flex; flex-direction: column; gap: 6px; padding: 24px 24px 22px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-radius: 20px; }
+.pp-page .pp-kpi.is-recommended { box-shadow: inset 0 0 0 2px hsl(var(--gold-bright)), 0 30px 60px -34px rgba(11, 18, 40, .55); }
+.pp-page .pp-kpi-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: hsl(var(--navy-text) / .75); }
+.pp-page .pp-kpi-name em { padding: 2px 8px; border-radius: 999px; background: hsl(var(--gold-bright)); color: #101412; font-style: normal; font-size: .7rem; letter-spacing: .04em; }
+.pp-page .pp-kpi strong { margin-top: 4px; font-family: "Inter Tight", sans-serif; font-size: clamp(3.2rem, 5.6vw, 4.8rem); font-weight: 800; line-height: 1; letter-spacing: -.02em; color: hsl(var(--gold-bright)); }
+.pp-page .pp-kpi-label { font-size: 1.05rem; font-weight: 700; }
+.pp-page .pp-kpi .pp-lift { margin-top: 6px; }
+.pp-page .pp-funnel { margin-top: 22px; padding: 22px 24px 24px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 20px; }
+.pp-page .pp-funnel-title { font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: hsl(var(--gold)); }
+.pp-page .pp-funnel ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 14px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-funnel li { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 14px; }
+.pp-page .pp-funnel li + li::before { content: ""; position: absolute; left: -18px; top: 50%; width: 18px; height: 2px; background: hsl(var(--gold)); }
+.pp-page .pp-funnel li strong { font-family: "Inter Tight", sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1; color: hsl(var(--ink)); }
+.pp-page .pp-funnel li span { font-size: .98rem; font-weight: 600; color: hsl(var(--ink-muted)); }
+.pp-page .pp-funnel li:last-child { background: hsl(var(--navy)); border-color: hsl(var(--navy)); }
+.pp-page .pp-funnel li:last-child strong { color: hsl(var(--gold-bright)); }
+.pp-page .pp-funnel li:last-child span { color: hsl(var(--navy-text) / .85); }
+.pp-page p.pp-example-slide { display: grid; gap: 6px; margin-top: 16px; padding: 20px 24px; background: hsl(var(--cobalt-pale)); border-left: 5px solid hsl(var(--gold)); border-radius: 0 16px 16px 0; font-size: clamp(1.1rem, 1.6vw, 1.3rem); font-weight: 800; line-height: 1.4; }
+.pp-page .pp-example-slide span { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--gold)); }
+.pp-page .pp-example-slide small { font-size: 1rem; font-weight: 600; color: hsl(var(--ink-muted)); }
+
+/* 08 Your investment: the full comparison folds under the cards */
+.pp-page .pp-compare-drop { margin-top: 26px; border: 1px solid hsl(var(--rule)); border-radius: 18px; background: hsl(var(--paper)); }
+.pp-page .pp-compare-drop[open] { border-color: hsl(var(--gold) / .45); }
+.pp-page .pp-compare-drop > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 16px 22px; cursor: pointer; font-family: "Inter Tight", sans-serif; font-size: 1.18rem; font-weight: 800; line-height: 1.25; }
+.pp-page .pp-compare-drop > summary svg { flex: none; color: hsl(var(--gold)); transition: transform .2s ease; }
+.pp-page .pp-compare-drop[open] > summary svg { transform: rotate(180deg); }
+.pp-page .pp-compare-body { padding: 0 22px 22px; }
+.pp-page .pp-compare-body > .pp-intro { margin-top: 0; font-size: 1rem; }
+
+/* 09 The risk is on us */
+.pp-page .pp-risk { padding-block: clamp(48px, 7vw, 96px); background: hsl(var(--navy)); color: hsl(var(--navy-text)); border-top: 0 !important; }
+.pp-page .pp-risk .proposal-eyebrow { color: hsl(var(--gold-bright)); }
+.pp-page .pp-risk .proposal-h2 { color: hsl(var(--navy-text)); }
+.pp-page .pp-risk .pp-intro { color: hsl(var(--navy-text) / .78); }
+.pp-page .pp-risk-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 36px 0 0; padding: 0; list-style: none; }
+.pp-page .pp-risk-tiles li { display: flex; flex-direction: column; gap: 10px; padding: 24px 24px 26px; background: hsl(var(--navy-text) / .06); border: 1px solid hsl(var(--navy-text) / .14); border-radius: 20px; }
+.pp-page .pp-risk-tiles strong { font-family: "Inter Tight", sans-serif; font-size: clamp(2.2rem, 3.6vw, 3rem); font-weight: 800; line-height: 1; color: hsl(var(--gold-bright)); }
+.pp-page .pp-risk-tiles span { font-size: 1.05rem; line-height: 1.45; color: hsl(var(--navy-text) / .9); }
+.pp-page .pp-risk .pp-drop { background: hsl(var(--paper)); color: hsl(var(--ink)); }
+.pp-page .pp-risk .pp-drop .pp-points { margin-top: 0; }
+.pp-page .pp-risk .pp-drop .pp-fine { margin-top: 22px; padding-top: 18px; border-top: 1px solid hsl(var(--rule)); }
+
+/* 10 The first 90 days, then monthly improvement */
+.pp-page .pp-improve { margin-top: 44px; padding: 28px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 22px; }
+.pp-page .pp-improve h3 { font-family: "Inter Tight", sans-serif; font-size: 1.5rem; font-weight: 800; }
+.pp-page .pp-improve > p { margin-top: 10px; max-width: 820px; font-size: 1.05rem; line-height: 1.55; color: hsl(var(--ink-muted)); }
+
+/* 12 Questions and every detail */
+.pp-page .pp-faq { background: hsl(var(--surface)); }
+.pp-page .pp-faq .pp-drop { background: hsl(var(--paper)); }
+.pp-page .pp-sub-h { margin-top: 52px; font-family: "Inter Tight", sans-serif; font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 800; line-height: 1.15; scroll-margin-top: 24px; }
+.pp-page .pp-sub-h + .pp-intro { margin-top: 8px; }
+
+/* Present button and present mode (full-screen slides for screen-sharing) */
+.pp-page .pp-topbar-right { display: flex; align-items: center; gap: 14px; }
+.pp-page .pp-present-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: hsl(var(--navy)); color: hsl(var(--navy-text)); font: inherit; font-size: .92rem; font-weight: 700; cursor: pointer; }
+.pp-page .pp-present-btn svg { color: hsl(var(--gold-bright)); }
+.pp-page .pp-present-btn:hover { background: hsl(var(--gold)); }
+.pp-page .pp-present-btn:focus-visible, .pp-page .pp-present-bar button:focus-visible { outline: 2px solid hsl(var(--gold-bright)); outline-offset: 2px; }
+html.pp-presenting { scroll-snap-type: y proximity; }
+html.pp-presenting .pp-page .proposal-topbar,
+html.pp-presenting .pp-page .proposal-mobile-actions,
+html.pp-presenting .pp-page .proposal-footer,
+html.pp-presenting .pp-page .proposal-jump { display: none !important; }
+html.pp-presenting .pp-page main > section { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; scroll-snap-align: start; padding-block: 56px 80px; }
+.pp-page .pp-present-bar { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 6px; background: hsl(var(--navy) / .94); color: hsl(var(--navy-text)); border: 1px solid hsl(var(--navy-text) / .14); border-radius: 999px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .6); }
+.pp-page .pp-present-bar button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 40px; height: 40px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.pp-page .pp-present-bar button:hover { background: hsl(var(--navy-text) / .12); }
+.pp-page .pp-present-bar span { min-width: 58px; text-align: center; font-variant-numeric: tabular-nums; font-size: .92rem; font-weight: 700; }
+.pp-page .pp-present-bar .pp-present-exit { margin-left: 4px; padding-inline: 14px; }
+
+@media (max-width: 1060px) {
+  .pp-page .pp-risk-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .pp-page .pp-present-btn { display: none; }
+  .pp-page .pp-keep-add { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .pp-page .pp-plus { justify-self: center; width: 46px; height: 46px; }
+  .pp-page .pp-cal-grid, .pp-page .pp-team-cols { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .pp-page .pp-team-cols { gap: 16px; }
+  .pp-page .pp-kpis { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .pp-page .pp-funnel ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .pp-page .pp-funnel li + li::before { display: none; }
+}
+@media (max-width: 640px) {
+  .pp-page .pp-risk-tiles { grid-template-columns: minmax(0, 1fr); }
+  .pp-page .pp-keep, .pp-page .pp-add, .pp-page .pp-team-cols > div { padding: 22px 20px 24px; }
+  .pp-page .pp-improve { padding: 22px 18px; }
+  .pp-page .pp-compare-body { padding: 0 14px 16px; }
+  .pp-page .pp-compare-drop > summary { padding: 14px 16px; font-size: 1.06rem; }
+}
+@media print {
+  .pp-page .pp-present-btn, .pp-page .pp-present-bar { display: none !important; }
+  .pp-page .pp-team, .pp-page .pp-risk, .pp-page .pp-kpi, .pp-page .pp-add, .pp-page .pp-plus, .pp-page .pp-slide-eyebrow b, .pp-page .pp-funnel li:last-child, .pp-page .pp-kpi-name em { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pp-page .pp-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* In present mode the title slide sits side by side, so the headline and the video fit on one screen. */
+@media (min-width: 901px) {
+  html.pp-presenting .pp-page .pp-hero .proposal-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); grid-template-areas: "eyebrow video" "program video" "title video" "subtitle video" "promise video"; column-gap: 52px; align-content: center; }
+  html.pp-presenting .pp-page .pp-hero .proposal-eyebrow { grid-area: eyebrow; }
+  html.pp-presenting .pp-page .pp-hero .pp-program { grid-area: program; }
+  html.pp-presenting .pp-page .pp-hero .proposal-title { grid-area: title; font-size: clamp(2.3rem, 3.6vw, 3.7rem); }
+  html.pp-presenting .pp-page .pp-hero .proposal-subtitle { grid-area: subtitle; font-size: clamp(1.05rem, 1.5vw, 1.3rem); }
+  html.pp-presenting .pp-page .pp-hero .pp-promise { grid-area: promise; }
+  html.pp-presenting .pp-page .pp-hero .pp-video { grid-area: video; align-self: center; max-width: none; margin-top: 0; }
+}
