@@ -44,7 +44,8 @@ export type CompareCell = "yes" | "no" | string;
 
 export type CompareGroup = {
   title: string;
-  rows: { label: string; values: [CompareCell, CompareCell, CompareCell] }[];
+  /** One value per package, in the same order as plans. */
+  rows: { label: string; values: CompareCell[] }[];
 };
 
 export type ExplainItem = {
@@ -85,7 +86,8 @@ export type PackageProposalRecord = {
     risk: { title: string; body: string; tiles: { big: string; label: string }[] };
     improve: { title: string };
   };
-  plans: [PackagePlan, PackagePlan, PackagePlan];
+  /** Two or three packages; the cards, targets and compare table size themselves to the count. */
+  plans: PackagePlan[];
   journey: { title: string; body: string; steps: { title: string; body: string; detail: string }[] };
   /**
    * Sample campaign creative shown in phone frames. A sample with an empty src is skipped, and the
@@ -98,12 +100,13 @@ export type PackageProposalRecord = {
     title: string;
     summary: string;
     funnel: string;
-    table: { columns: [string, string]; rows: { label: string; values: [string, string]; total?: boolean }[] };
+    table: { columns: string[]; rows: { label: string; values: string[]; total?: boolean }[] };
     complete: string;
     definition: string;
     sales: string;
-    example: string;
-    exampleNote: string;
+    /** Optional worked example under the funnel; omit to leave it out. */
+    example?: string;
+    exampleNote?: string;
   };
   timeline: { title: string; steps: { when: string; title: string; body: string }[] };
   terms: { title: string; points: string[]; fineprint: { title: string; body: string }[] };
@@ -140,9 +143,9 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     packagesIntro: {
       eyebrow: "Choose your package",
       title: "Pick how much growth we take on.",
-      body: "Every package includes everything in the proposal you already have. Each step up adds more work that brings in owners, or takes more of the lead operation off your team.",
+      body: "Both packages include everything in the proposal you already have. The Complete System adds your phones, one CRM for every lead source, more campaigns and markets, and follow-up that turns more owners into clients.",
       footnote:
-        "Every package starts with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
+        "Both packages start with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
     },
     story: {
       opportunity: {
@@ -200,7 +203,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         id: "growth",
         name: "Appointment Growth Program",
         shortName: "Appointment Growth",
-        tagline: "New owners in your room, with every inquiry answered and booked.",
+        tagline: "New owners in your room, with every inquiry answered, booked and tracked.",
         target: {
           range: "10–15",
           label: "more qualified households in your room every week",
@@ -216,6 +219,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           "Campaigns for Boston plus up to three travel markets at a time",
           "Every call, text and form we generate answered within a minute, day or night",
           "Screened and booked into your sessions, with reminders that get them there",
+          "A simple CRM for every household we bring in, shared with your team",
           "A Command Center that counts every new owner at your door",
         ],
         details: [
@@ -232,6 +236,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
             text: "Confirmations, directions, reminders and easy rescheduling keep the next step clear. No-shows are offered the next session, undecided attendees get follow-up while their rep gets a next-step task, and owners who aren't ready yet are invited back when your team returns to their area.",
           },
           {
+            lead: "A simple CRM for your team.",
+            text: "Every household we bring in has a record your team can open, with its source, screening answers, booking, attendance and next step. It runs alongside whatever you use now.",
+          },
+          {
             lead: "You see all of it.",
             text: "Your CPN Command Center shows campaign households, presenter prep, upcoming sessions, arrivals at the door and what each source produced. Every Monday you see what happened and what we're improving.",
           },
@@ -239,54 +247,11 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         detailsNote: "Covers Boston plus up to three travel markets at a time.",
       },
       {
-        id: "expanded",
-        name: "Growth + Expanded Marketing",
-        shortName: "Expanded Marketing",
-        tagline: "A bigger machine that brings in more owners every month, and costs less per tour as it grows.",
-        recommended: true,
-        target: {
-          range: "20–25",
-          label: "more qualified households in your room every week",
-          lift: "About double today",
-          note: "All new owners we bring in",
-        },
-        signedClients: "20–33 more signed clients a month",
-        handled: "330–410 new inquiries a month answered and screened for you",
-        monthly: "$5,000",
-        foundation: "$3,000",
-        balance: "$1,500",
-        highlights: [
-          "Everything in Appointment Growth",
-          "Up to five markets running at once, on more platforms",
-          "Your own owner audience that keeps sending people between mail drops",
-          "New campaigns tested every week, with spend moved to what produces tours",
-        ],
-        details: [
-          {
-            lead: "More ways for owners to respond.",
-            text: "Several campaign approaches run at once: direct presentation invitations, free owner guides, the ownership cost check and ongoing owner education. Owners ready to book and owners still researching each get a useful next step.",
-          },
-          {
-            lead: "A bigger effort to bring them in.",
-            text: "More campaigns running at once, more message testing and wider distribution, including YouTube and broader search, video and social. We review results every week, research what owners are asking every month, and keep refining around attended tours.",
-          },
-          {
-            lead: "Owners keep coming between events.",
-            text: "Your branded owner channels, guide library, five-video owner course and monthly newsletter build interest between mail drops and presentation dates.",
-          },
-          {
-            lead: "More markets at once.",
-            text: "Campaign windows, booking and follow-up across up to five active markets, including Boston, focused wherever your next sessions are.",
-          },
-        ],
-        detailsNote:
-          "The step up buys more work bringing owners in, more markets and more active management, not just more content. Everything in Appointment Growth stays included.",
-      },
-      {
         id: "complete",
         name: "Complete Growth & Lead System",
         shortName: "Complete System",
-        tagline: "Every lead, every vendor and every rep in one system that follows up for you.",
+        tagline: "Your phones answered, every lead in one CRM, more campaigns, and follow-up that closes more.",
+        recommended: true,
         target: {
           range: "25–33",
           label: "more qualified households in your room every week",
@@ -295,34 +260,35 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         signedClients: "25–44 more signed clients a month",
         handled: "330–410 new inquiries a month answered and screened for you",
-        monthly: "$7,500",
-        foundation: "$5,000",
-        balance: "$3,500",
+        monthly: "$5,000",
+        foundation: "$3,000",
+        balance: "$1,500",
         highlights: [
-          "Everything in Growth + Expanded Marketing",
-          "A CRM built around how you sell, replacing yours or running alongside it",
-          "Mail, phone rooms, vendors and campaigns followed up in one place",
-          "Reps get prep sheets and follow-up lists on their phones",
+          "Everything in Appointment Growth",
+          "Your mailer and campaign lines answered around the clock",
+          "Every lead source in one CRM built around how you sell",
+          "Up to five markets at once, with new campaigns tested every week",
+          "Follow-up that turns more no-shows and undecided owners into signed clients",
         ],
         details: [
+          {
+            lead: "Your phones, answered.",
+            text: "Calls to your mailer lines and our campaign numbers are answered around the clock by an assistant that handles routine questions, screens the owner and books the right session. Missed calls get a text back in seconds, and anything that needs a person goes to your team with the household's details attached.",
+          },
           {
             lead: "Every lead source in one operation.",
             text: "Mail responders, vendor leads, outside bookings and our campaign inquiries land in one household record with source history, assignments and clear next steps. It can replace your current CRM or run alongside it.",
           },
           {
-            lead: "More follow-up off your team.",
-            text: "Missed calls on your mailer lines get a text back in seconds. Reminders cover bookings from every source you choose. Unbooked owners, no-shows and undecided attendees get coordinated follow-up instead of sitting on separate lists.",
+            lead: "More owners coming in.",
+            text: "Several campaign approaches run at once across up to five markets, including Boston: direct invitations, free owner guides, the ownership cost check and ongoing owner education. New campaigns are tested every week, spend moves to what produces tours, and your owner channels, guide library and monthly newsletter keep interest building between mail drops.",
           },
           {
-            lead: "Reps ready before and after the presentation.",
-            text: "Prep sheets on their phones show who is coming and why. Assigned follow-up lists and recorded outcomes keep the next step visible.",
-          },
-          {
-            lead: "The whole picture for leadership.",
-            text: "Attendance and sales by source, market and session, with your source costs and vendor tour records next to door check-ins, so you can see what every source really costs per tour.",
+            lead: "Follow-up that closes more.",
+            text: "Unbooked owners, no-shows and undecided attendees get coordinated follow-up instead of sitting on separate lists. Reps get prep sheets on their phones before the presentation and a follow-up list after, and leadership sees attendance and sales by source, market and session.",
           },
         ],
-        detailsNote: "Includes the whole-team CRM setup and migration of the lead sources you choose.",
+        detailsNote: "Includes the whole-team CRM setup and migration of the lead sources you choose. Everything in Appointment Growth stays included.",
       },
     ],
     samples: {
@@ -373,50 +339,50 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     },
     compare: {
       title: "Compare everything, side by side.",
-      body: "Tap a package to see only what it includes, or compare all three.",
+      body: "Tap a package to see only what it includes, or compare both.",
       groups: [
         {
           title: "Bringing in new owners",
           rows: [
-            { label: "Markets running at once", values: ["Boston + 3 travel markets", "Up to 5, including Boston", "Up to 5, including Boston"] },
-            { label: "Campaign page, qualifier and booking for each market", values: ["yes", "yes", "yes"] },
-            { label: "Ad platforms", values: ["Facebook and Instagram, Google once eligible", "Adds YouTube and wider search, video and social", "Same as Expanded Marketing"] },
-            { label: "Campaign testing", values: ["Monthly improvement", "Every week, spend moved to what works", "Every week, spend moved to what works"] },
-            { label: "Free owner's guide and 60-second cost check", values: ["Launch guide and cost check", "Plus a new guide every month", "Plus a new guide every month"] },
-            { label: "QR codes on your existing mailers", values: ["yes", "yes", "yes"] },
-            { label: "Owner channels, newsletter and five-video course", values: ["no", "yes", "yes"] },
-            { label: "Retargeting owners who looked but didn't book", values: ["no", "yes", "yes"] },
+            { label: "Markets running at once", values: ["Boston + 3 travel markets", "Up to 5, including Boston"] },
+            { label: "Campaign page, qualifier and booking for each market", values: ["yes", "yes"] },
+            { label: "Ad platforms", values: ["Facebook and Instagram, Google once eligible", "Adds YouTube and wider search, video and social"] },
+            { label: "Campaign testing", values: ["Monthly improvement", "Every week, spend moved to what works"] },
+            { label: "Free owner's guide and 60-second cost check", values: ["Launch guide and cost check", "Plus a new guide every month"] },
+            { label: "QR codes on your existing mailers", values: ["yes", "yes"] },
+            { label: "Owner channels, newsletter and five-video course", values: ["no", "yes"] },
+            { label: "Retargeting owners who looked but didn't book", values: ["no", "yes"] },
           ],
         },
         {
           title: "Answering, booking and show-up",
           rows: [
-            { label: "Calls, texts and forms answered within a minute, day or night", values: ["Every campaign lead", "Every campaign lead", "Every source you choose"] },
-            { label: "Confirmations, directions and reminders", values: ["Campaign bookings", "Campaign bookings", "Every booking source you choose"] },
-            { label: "No-show rebooking and follow-up for the undecided", values: ["Campaign leads", "Campaign leads", "Every source you choose"] },
-            { label: "Missed-call text-back on your mailer lines", values: ["no", "no", "yes"] },
-            { label: "Follow-up for past responders who never booked", values: ["no", "no", "yes"] },
+            { label: "Calls, texts and forms answered within a minute, day or night", values: ["Every campaign lead", "Your mailer lines and every source you choose"] },
+            { label: "Confirmations, directions and reminders", values: ["Campaign bookings", "Every booking source you choose"] },
+            { label: "No-show rebooking and follow-up for the undecided", values: ["Campaign leads", "Every source you choose"] },
+            { label: "Missed-call text-back on your mailer lines", values: ["no", "yes"] },
+            { label: "Follow-up for past responders who never booked", values: ["no", "yes"] },
           ],
         },
         {
           title: "Your team and your numbers",
           rows: [
-            { label: "CPN Command Center with door check-in", values: ["yes", "yes", "yes"] },
-            { label: "Monday report", values: ["Campaign results", "Results across every campaign", "Whole team, plus vendor review"] },
-            { label: "Cost per tour by source", values: ["Our campaigns", "Our campaigns", "Every source and vendor"] },
-            { label: "CRM for your leads", values: ["Our campaign leads", "Our campaign leads", "Your whole team, with migration"] },
-            { label: "Vendor and phone-room leads in one place", values: ["no", "no", "yes"] },
-            { label: "Rep phone app with prep sheets and follow-up lists", values: ["no", "no", "yes"] },
+            { label: "CPN Command Center with door check-in", values: ["yes", "yes"] },
+            { label: "Monday report", values: ["Campaign results", "Whole team, plus vendor review"] },
+            { label: "Cost per tour by source", values: ["Our campaigns", "Every source and vendor"] },
+            { label: "CRM for your leads", values: ["Simple CRM for the households we bring in", "Your whole team, with migration"] },
+            { label: "Vendor and phone-room leads in one place", values: ["no", "yes"] },
+            { label: "Rep phone app with prep sheets and follow-up lists", values: ["no", "yes"] },
           ],
         },
         {
           title: "Creative we produce every month",
           rows: [
-            { label: "Flagship videos", values: ["1", "2", "2"] },
-            { label: "Short videos", values: ["6–8", "12–16", "12–16"] },
-            { label: "New ad versions", values: ["2–3", "4–6", "4–6"] },
-            { label: "Social publishing", values: ["Weekly", "3–5 posts a week", "3–5 posts a week"] },
-            { label: "Email", values: ["Guide delivery and follow-up", "Plus a monthly newsletter", "Plus follow-up across every source"] },
+            { label: "Flagship videos", values: ["1", "2"] },
+            { label: "Short videos", values: ["6–8", "12–16"] },
+            { label: "New ad versions", values: ["2–3", "4–6"] },
+            { label: "Social publishing", values: ["Weekly", "3–5 posts a week"] },
+            { label: "Email", values: ["Guide delivery and follow-up", "Plus a monthly newsletter and follow-up across every source"] },
           ],
         },
       ],
@@ -430,10 +396,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           id: "new-owners",
           title: "How we bring in new owners",
           paragraphs: [
-            "Campaign strategy, messaging and paid advertising built around your offer and your presentation calendar. Facebook and Instagram lead, aimed at timeshare owners where your team will be, with Google added once eligibility is confirmed. Growth + Expanded Marketing adds YouTube and wider search, video and social campaigns, and up to five markets at once.",
+            "Campaign strategy, messaging and paid advertising built around your offer and your presentation calendar. Facebook and Instagram lead, aimed at timeshare owners where your team will be, with Google added once eligibility is confirmed. The Complete System adds YouTube and wider search, video and social campaigns, and up to five markets at once.",
             "Not every owner is ready to call. A free owner's guide and a 60-second ownership cost check give those owners a way to raise their hand, and they stay in follow-up until the next session near them.",
             "Your mailers ask owners to pick up the phone. A QR code on the same mailer adds a second way to respond: scan, check what the timeshare is costing them, read the free guide and choose a session. Owners who aren't ready to call still have a route into your room.",
-            "Expanded Marketing also builds an owner audience you keep: branded channels, a growing library of guides, a five-video owner course and a monthly newsletter that keep sending people between mail drops.",
+            "The Complete System also builds an owner audience you keep: branded channels, a growing library of guides, a five-video owner course and a monthly newsletter that keep sending people between mail drops.",
           ],
         },
         {
@@ -467,7 +433,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
           paragraphs: [
             "The program follows your presentation calendar, not a radius. A mail drop for an event in another city has to be printed and mailed weeks ahead. A campaign for that same event is a change of location and a venue line on the calendar, running from the same videos and pages.",
             "Boston runs continuously as the home market. Each travel market gets its own campaign window that opens two to three weeks before your presentations there and closes the day after, aimed at owners who live where the team will be.",
-            "Appointment Growth covers the home market plus up to three travel markets at once. Expanded Marketing and the Complete System cover up to five markets at once, including Boston.",
+            "Appointment Growth covers the home market plus up to three travel markets at once. The Complete System covers up to five markets at once, including Boston.",
           ],
           calendar: true,
         },
@@ -485,10 +451,10 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         {
           id: "complete-system",
-          title: "How the Complete System handles the leads you already have",
+          title: "How the Complete System handles your phones and the leads you already have",
           paragraphs: [
             "Mail responders, phone-room bookings, vendor leads and our campaigns all land in one CRM built around how your team sells, so every owner gets the same organized follow-up instead of sitting on separate lists.",
-            "Missed calls on your mailer lines get a text back in seconds. Past responders who never booked are invited to the next session near them. Reminders cover every booking source you choose, and owners who attended but didn't sign get follow-up.",
+            "Calls to your mailer lines are answered around the clock, the same way as the campaign numbers, and missed calls get a text back in seconds. Past responders who never booked are invited to the next session near them. Reminders cover every booking source you choose, and owners who attended but didn't sign get follow-up.",
             "Reps see a prep sheet for every household before the presentation and their follow-up list on their phones. You see what every source and vendor really costs per tour. It can replace your current CRM or run alongside it, whichever corporate approves.",
           ],
         },
@@ -523,7 +489,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         "Each target comes from one funnel: new inquiries × the share who qualify × the share who book × the share who attend. The table shows four weeks at the month-three pace, and counts each household once even when it comes through more than one source.",
       funnel: "65% qualify × 50% of those book × 75% of those attend = about 1 in 4 new inquiries in your room.",
       table: {
-        columns: ["Appointment Growth", "Expanded Marketing and Complete System"],
+        columns: ["Appointment Growth", "Complete System, new owners"],
         rows: [
           { label: "Ad budget, paid directly to the platforms", values: ["$5,000", "$8,000"] },
           { label: "Cost per inquiry from ads", values: ["$30–$40", "$30–$35"] },
@@ -539,9 +505,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       complete:
         "The Complete System adds 20–32 more over four weeks from leads you already have: 8–18 past mail responders followed up into a tour, and 12–14 more arrivals from better attendance on bookings from your other sources. That's 100–132 in four weeks, or 25–33 a week.",
       definition: "One tour is one qualified household. A couple attending together counts once.",
-      sales: "At your closing range of one in four to one in three, that's about 10–20, 20–33 and 25–44 more signed clients every four weeks.",
-      example: "50 more tours × 30% closing × $20,000 average fee = $300,000 in gross signed fees over four weeks.",
-      exampleNote: "That's 15 more clients from 50 more sales conversations.",
+      sales: "At your closing range of one in four to one in three, that's about 10–20 more signed clients every four weeks with Appointment Growth, and 25–44 with the Complete System.",
     },
     timeline: {
       title: "Build, launch, improve.",
@@ -606,7 +570,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         {
           q: "Do we have to replace our CRM?",
-          a: "No. Appointment Growth and Expanded Marketing run alongside whatever you use now. The Complete System can replace your CRM or connect alongside it, whichever corporate approves.",
+          a: "No. Appointment Growth gives your team a simple CRM for the households we bring in and runs alongside whatever you use now. The Complete System can replace your CRM or connect alongside it, whichever corporate approves.",
         },
         {
           q: "Does our team have to be on camera?",
@@ -637,7 +601,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     start: {
       title: "Choose your starting package.",
       intro:
-        "Every package starts with $1,500. Pick one and request the agreement. Sean sends the one-page agreement and the $1,500 starting invoice the same business day, and build starts the day it clears. To start, he'll ask for:",
+        "Both packages start with $1,500. Pick one and request the agreement. Sean sends the one-page agreement and the $1,500 starting invoice the same business day, and build starts the day it clears. To start, he'll ask for:",
       items: [
         "Your presentation calendar and venues for the next eight weeks, in Boston and in every market the team is traveling to.",
         "Logo and brand files, plus anything you already use: mailers, photos, and the questions your agents hear most.",
@@ -651,7 +615,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       confirmationBody:
         "Sean will send the one-page agreement for the {package} and the $1,500 starting invoice to the email you entered the same business day, and will call the number you gave to set the kickoff and collect the calendar.",
     },
-    internalLabel: "CPN Appointment Growth System (three packages), CPN Boston",
+    internalLabel: "CPN Appointment Growth System (two packages), CPN Boston",
   },
 };
 

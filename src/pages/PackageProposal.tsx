@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, ChevronDown, Mail, Minus, Plus, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,11 +62,13 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
   }, []);
 
   const recommended = p.plans.find((pl) => pl.recommended)?.id ?? p.plans[0].id;
+  // The card and target grids size themselves to the number of packages (two or three).
+  const cols = { "--pp-cols": String(p.plans.length) } as CSSProperties;
   const [selected, setSelected] = useState<PlanId>(recommended);
   const [view, setView] = useState<"all" | PlanId>("all");
   const [compareOpen, setCompareOpen] = useState(false);
 
-  // On a phone, open the compare table on one package so it fits; "All three" is one tap away.
+  // On a phone, open the compare table on one package so it fits; the full comparison is one tap away.
   useEffect(() => {
     if (window.matchMedia("(max-width: 640px)").matches) setView(recommended);
   }, [recommended]);
@@ -277,7 +279,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             <span className="proposal-eyebrow">The results</span>
             <h2 className="proposal-h2 pp-slide-title">{p.story.results.title}</h2>
             <p className="pp-intro">{p.story.results.body}</p>
-            <div className="pp-kpis">
+            <div className="pp-kpis" style={cols}>
               {p.plans.map((plan) => (
                 <div key={plan.id} className={`pp-kpi${plan.recommended ? " is-recommended" : ""}`}>
                   <span className="pp-kpi-name">{plan.shortName}{plan.recommended && <em>Recommended</em>}</span>
@@ -293,7 +295,9 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 {p.story.results.funnel.map((f) => <li key={f.label}><strong>{f.value}</strong><span>{f.label}</span></li>)}
               </ol>
             </div>
-            <p className="pp-example-slide"><span>One example</span>{p.math.example}<small>{p.math.exampleNote}</small></p>
+            {p.math.example && (
+              <p className="pp-example-slide"><span>One example</span>{p.math.example}{p.math.exampleNote && <small>{p.math.exampleNote}</small>}</p>
+            )}
             <div className="pp-accordion">
               <Drop title={p.math.title} onOpen={() => track("proposal_math")}>
                 <p>{p.math.summary}</p>
@@ -325,13 +329,13 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
           </div>
         </section>
 
-        {/* 08 Your investment: three packages, with the full comparison folded underneath. */}
+        {/* 08 Your investment: the packages, with the full comparison folded underneath. */}
         <section className="pp-packages" id="packages">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">Your investment</span>
             <h2 className="proposal-h2 pp-slide-title">{p.packagesIntro.title}</h2>
             <p className="pp-intro">{p.packagesIntro.body}</p>
-            <div className="pp-cards">
+            <div className="pp-cards" style={cols}>
               {p.plans.map((plan, i) => (
                 <PlanCard key={plan.id} plan={plan} index={i} onChoose={choose} onCompare={compareOne} />
               ))}
@@ -353,7 +357,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
               <div className="pp-compare-body">
                 <p className="pp-intro">{p.compare.body}</p>
                 <div className="pp-filter" role="group" aria-label="Show packages">
-                  <button type="button" aria-pressed={view === "all"} onClick={() => { setView("all"); track("proposal_compare_all"); }}>All three</button>
+                  <button type="button" aria-pressed={view === "all"} onClick={() => { setView("all"); track("proposal_compare_all"); }}>{p.plans.length === 2 ? "Both" : "All three"}</button>
                   {p.plans.map((plan) => (
                     <button key={plan.id} type="button" aria-pressed={view === plan.id} onClick={() => { setView(plan.id); track(`proposal_compare_${plan.id}`); }}>
                       {plan.shortName}
@@ -585,7 +589,7 @@ function PlanCard({ plan, index, onChoose, onCompare }: { plan: PackagePlan; ind
 }
 
 function CompareTable({ proposal: p, view }: { proposal: PackageProposalRecord; view: "all" | PlanId }) {
-  const cols = view === "all" ? [0, 1, 2] : [p.plans.findIndex((pl) => pl.id === view)];
+  const cols = view === "all" ? p.plans.map((_, i) => i) : [p.plans.findIndex((pl) => pl.id === view)];
   return (
     <div className={`pp-table-scroll${view === "all" ? " is-all" : ""}`}>
       <table className="pp-compare">
