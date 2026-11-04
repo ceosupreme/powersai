@@ -561,7 +561,7 @@ function PlanCard({ plan, index, onChoose, onCompare }: { plan: PackagePlan; ind
 
       <div className="pp-price">
         <strong>{plan.monthly}<span> a month</span></strong>
-        <span>{plan.foundation} foundation · start with $1,500</span>
+        <span>{plan.foundation} setup · start with $1,500</span>
       </div>
 
       <ul className="pp-highlights">
@@ -693,7 +693,7 @@ function AgreementForm({ proposal: p, selected, onSelect }: { proposal: PackageP
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter the email the agreement and invoice should go to.");
 
     const requestedAt = new Date();
-    const terms = `${plan.foundation} foundation ($1,500 to begin, ${plan.balance} when the launch deliverables are ready), then ${plan.monthly} a month from go-live`;
+    const terms = `${plan.foundation} setup ($1,500 to begin, ${plan.balance} when the launch deliverables are ready), then ${plan.monthly} a month from go-live`;
     const note = [
       `PACKAGE CHOSEN, AGREEMENT REQUESTED: ${plan.name}`,
       `Proposal: ${p.internalLabel}`,
@@ -770,7 +770,7 @@ function AgreementForm({ proposal: p, selected, onSelect }: { proposal: PackageP
             <span className="pp-pick-text">
               <strong>{pl.name}{pl.recommended ? <em>Recommended</em> : null}</strong>
               <span className="pp-pick-target">{pl.target.range} more qualified households a week by month 3</span>
-              <span>{pl.monthly} a month · {pl.foundation} foundation · start with $1,500</span>
+              <span>{pl.monthly} a month · {pl.foundation} setup · start with $1,500</span>
             </span>
           </label>
         ))}

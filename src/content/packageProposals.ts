@@ -126,7 +126,7 @@ export type PackageProposalRecord = {
 export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
   "cpn-growth": {
     slug: "cpn-growth",
-    programName: "CPN Appointment Growth System",
+    programName: "CPN Growth Proposal",
     headline: ["More owners in your room every week.", "We handle the calls and booking."],
     subtitle:
       "We bring in new timeshare owners, answer around the clock, qualify and book the right households, and count everyone who walks in, so your team can focus on presentations and sales.",
@@ -145,7 +145,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
       title: "Pick how much growth we take on.",
       body: "Both packages include everything in the proposal you already have. The Partnership adds answering on the mailer lines you connect, one CRM for the lead sources you choose, more campaigns and markets, and follow-up that turns more owners into clients.",
       footnote:
-        "Both packages start with $1,500. The rest of the foundation is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
+        "Both packages start with $1,500. The rest of the setup is due when the launch deliverables are ready, and the monthly fee starts the day your campaigns go live.",
     },
     story: {
       opportunity: {
@@ -188,7 +188,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         title: "Start with $1,500. Decide at day 30.",
         body: "You see real results before the second monthly fee, and you see every dollar of ad spend.",
         tiles: [
-          { big: "$1,500", label: "starts any package. The rest of the foundation is due when launch is ready." },
+          { big: "$1,500", label: "starts any package. The rest of the setup is due when launch is ready." },
           { big: "Day 30", label: "Continue, adjust or stop, before the second monthly fee." },
           { big: "Month 1", label: "That month's fee refunded if no qualified household attends in the first 30 live days." },
           { big: "0%", label: "of your sales, and no per-lead fees." },
@@ -520,7 +520,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
     terms: {
       title: "Included with every package.",
       points: [
-        "$1,500 starts any package. The rest of the foundation is due when the launch deliverables are ready.",
+        "$1,500 starts any package. The rest of the setup is due when the launch deliverables are ready.",
         "A 60-day pilot with a real decision at day 30, before the second monthly fee. Then month to month with 30 days' notice.",
         "First-month assurance: if no qualified household attends in the first 30 live days, we refund that month's fee.",
         "No percentage of your sales and no per-lead fees.",
@@ -548,7 +548,7 @@ export const PACKAGE_PROPOSALS: Record<string, PackageProposalRecord> = {
         },
         {
           title: "Upgrades",
-          body: "Move up a package anytime. Setup you've already paid is credited toward the next package's foundation for the same team.",
+          body: "Move up a package anytime. Setup you've already paid is credited toward the next package's setup for the same team.",
         },
         {
           title: "After the pilot",
