@@ -393,7 +393,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     included: {
       title: "What's included",
       headline: "Every piece of the operation, handled by us.",
-      intro: "These are the services you'd normally buy from four or five different vendors. Here they're one program, one team and one number.",
+      intro: "These are the services you'd normally buy from four or five different vendors. Here they're one program and one team, with the advertising included.",
       items: [
         { title: "Social media setup and management", body: "Your profiles set up for business on the platforms your buyers use, and kept active with new content every day." },
         { title: "Content production", body: "Posts, short explainers and guides on protection, coverage and the questions your prospects ask, all written to the insurance advertising rules." },
@@ -404,14 +404,14 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         { title: "Sales support", body: "Pre-call explainers, objection answers and application follow-up, so every conversation starts further along and fewer deals stall." },
         { title: "Brand and creative", body: "Your name, look and message done right once, then carried through every ad, page, post and video." },
         { title: "Compliance coordination", body: "Everything educational, with no projections, no illustrations and no income claims. We prepare each submission and coordinate approvals through your agency." },
-        { title: "Monthly reporting and review", body: "One scoreboard from lead to paid policy, by source, including the leads you still buy, reviewed together every month." },
+        { title: "Monthly reporting and review", body: "One dashboard that follows every lead from the ad to the paid policy, by source, including the leads you still buy, reviewed together every month." },
       ],
     },
     monthly: [
       { value: "Daily", label: "new content published on your platforms" },
       { value: "2", label: "new guides every month" },
       { value: "1", label: "new free lead tool every month" },
-      { value: "Monthly", label: "scoreboard review, the first at day 30" },
+      { value: "Monthly", label: "dashboard review, the first at day 30" },
     ],
     growthLoop: {
       title: "Produce, publish, run the ads, and tune it. Every month.",
@@ -419,11 +419,11 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       steps: [
         { title: "Produce and publish", body: "New content goes out every day across your platforms, plus two new guides and a new free tool each month, so your audience and your lead sources keep growing." },
         { title: "Run the ads", body: "Fresh ad creative every month, campaigns managed weekly, and creative on request when you need something for a group, an event or a referral partner." },
-        { title: "Review the scoreboard", body: "Leads, pickups, appointments, applications and paid policies by source. We look at it together every month and decide what to push next." },
+        { title: "Review the dashboard", body: "Leads, pickups, appointments, applications and paid policies by source. We look at it together every month and decide what to push next." },
       ],
     },
     scoreboard: {
-      title: "What we measure",
+      title: "What your dashboard shows",
       stages: ["Leads", "Pickups", "Appointments", "Applications", "Paid policies"],
       note: "Tracked by source, including the leads you still buy, so you can see what each source actually produces.",
     },
@@ -433,7 +433,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       us: [
         "Strategy, advertising, content, video and creative, with no filming or writing required from you",
         "Your website, lead tools, guides, profiles and every follow-up sequence",
-        "Compliance submissions, the scoreboard and the monthly review",
+        "Compliance submissions, your dashboard and the monthly review",
       ],
       them: [
         "Tell us your licensed states, your niches and who approves ads at your agency",
@@ -446,7 +446,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       body: "You sell by phone, so the campaigns follow your licenses, not a radius around San Diego. We open with truckers because you know that market and they're the leads that cost the most to buy. Contractors and other 1099 earners come next, on the same system.",
       home: "Ads run only where you can write business.",
       travelNote: "Each new state or niche is a settings change, running from the same website, tools and content.",
-      scopeNote: "Included scope: one niche campaign at a time, with a second niche added when the first one's numbers say so. Vendor leads you keep buying are tracked on your scoreboard, but managing those orders and their replacement claims stays with you.",
+      scopeNote: "Included scope: one niche campaign at a time, with a second niche added when the first one's numbers say so. Vendor leads you keep buying are tracked on your dashboard, but managing those orders and their replacement claims stays with you.",
       textPreview: {
         caption: "What a lead gets seconds after asking",
         messages: [
@@ -459,12 +459,12 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     pricing: {
       title: "Your investment",
-      headline: "One program. One number. Advertising included.",
+      headline: "One monthly fee. Advertising included.",
       lines: [
         {
           label: "The program",
           amount: "$5,000 a month",
-          body: "Everything on this page: the build, the daily content, the ads and the ad spend, the tools, the follow-up and the monthly review. One number, no separate ad bill.",
+          body: "Everything on this page: the build, the daily content, the ads and the ad spend, the tools, the follow-up and the monthly review. No separate ad bill.",
         },
         {
           label: "Your first month",
@@ -483,7 +483,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         "Hosting and the software behind your website and tools are included.",
         "Your website, content, tools, ad accounts and lead data are yours to keep.",
       ],
-      summary: "Month one is $5,000 in two payments. Every month after is $5,000, advertising included, for as long as the scoreboard earns it.",
+      summary: "Month one is $5,000 in two payments. Every month after is $5,000, advertising included, for as long as the results earn it.",
     },
     pilot: {
       title: "The first 30 days",
@@ -507,7 +507,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         },
         {
           when: "Day 30",
-          title: "Scoreboard review",
+          title: "Dashboard review",
           body: "Leads, pickups, appointments, applications and paid policies, by source, including the leads you still buy. Then we continue month to month.",
         },
       ],
@@ -551,9 +551,9 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         { q: "Do I have to be on camera?", a: "No. We produce everything. One short intro video with you in it helps leads recognize you before you call, and we make that easy: one recorded call with us, and we handle the rest. If you'd rather stay off camera, we build around your name and voice." },
         { q: "How much of my time does this take?", a: "About an hour at kickoff, a few approvals by text or email as the creative comes through, and a 30-minute review each month. One recorded call for your intro video if you want to be in it; if not, we build around your name and voice. Everything else is on us." },
         { q: "What about compliance?", a: "Everything we publish is educational: no illustrations, no projections, no income claims. We write to the insurance advertising rules, prepare each submission and coordinate the approvals through your agency. Final say stays with your agency and the carriers, which is how it should be." },
-        { q: "Do I keep buying leads?", a: "Your call. Most agents keep buying while their own sources come up, then cut back as the scoreboard tells them to. Vendor leads go on the same scoreboard so you can compare source by source. Managing those vendor orders stays with you." },
-        { q: "When do leads start?", a: "The first campaign goes live in weeks two to three, the day your agency approves it. Your website, tools and content are live by the end of month one, and the sources keep building from there. At day 30 we review the scoreboard together." },
-        { q: "What if it doesn't work?", a: "You'll see it on the scoreboard before anyone has to guess. The program is month to month with 30 days' notice, and the website, content, tools, ad accounts and lead data are yours either way. Nothing we build leaves with us." },
+        { q: "Do I keep buying leads?", a: "Your call. Most agents keep buying while their own sources come up, then cut back as the dashboard tells them to. Vendor leads go on the same dashboard so you can compare source by source. Managing those vendor orders stays with you." },
+        { q: "When do leads start?", a: "The first campaign goes live in weeks two to three, the day your agency approves it. Your website, tools and content are live by the end of month one, and the sources keep building from there. At day 30 we review the dashboard together." },
+        { q: "What if it doesn't work?", a: "You'll see it on the dashboard before anyone has to guess. The program is month to month with 30 days' notice, and the website, content, tools, ad accounts and lead data are yours either way. Nothing we build leaves with us." },
         { q: "What happens when I add agents?", a: "The same system can feed each agent you bring on: their own page, their own leads landing in their Cassi account, and the same content and campaigns pointed at their territory. That gets scoped as an upgrade when you're ready, on the foundation you already own." },
       ],
     },

@@ -292,3 +292,11 @@
 @media (max-width: 760px) { .proposal-page .proposal-faq-grid { grid-template-columns: minmax(0, 1fr); } }
 @media print { .proposal-page .proposal-proof li, .proposal-page .proposal-scoreboard, .proposal-page .proposal-build { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 @media (max-width: 900px) { .proposal-page .proposal-assurance-grid.has-build { grid-template-columns: minmax(0, 1fr); } }
+
+/* Actions directly under the proposal video */
+.proposal-page .proposal-video-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.proposal-page .proposal-video-actions .proposal-btn { text-decoration: none; }
+.proposal-page .proposal-btn-quiet { color: hsl(var(--ink)); background: hsl(var(--surface)); box-shadow: none; border: 1px solid hsl(var(--rule)); }
+.proposal-page .proposal-btn-quiet:hover { background: hsl(var(--ink) / .06); }
+@media (max-width: 640px) { .proposal-page .proposal-video-actions .proposal-btn { flex: 1 1 100%; } }
+@media print { .proposal-page .proposal-video-actions { display: none !important; } }

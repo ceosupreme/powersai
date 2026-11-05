@@ -147,6 +147,12 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 )}
               </div>
             )}
+            {(embed || videoFile) && (
+              <div className="proposal-video-actions">
+                <a href="#what-it-costs" className="proposal-btn proposal-btn-quiet" onClick={() => track("proposal_video_pricing")}>See the investment</a>
+                <a href="#accept" className="proposal-btn" onClick={() => track("proposal_video_accept")}>{p.accept.mobileLabel ?? "Approve the plan"} <ArrowRight aria-hidden size={18} /></a>
+              </div>
+            )}
 
             <ul className="proposal-facts" aria-label="What the program does">
               {p.headlineFacts.map((f) => (
