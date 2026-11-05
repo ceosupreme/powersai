@@ -451,7 +451,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         caption: "What a lead gets seconds after asking",
         messages: [
           { from: "agent", text: "Hi Mike, this is Keegan Sundberg, the licensed agent behind the Driver Protection Checkup you just finished." },
-          { from: "agent", text: "Your results are in the link below. I'll call you from this number in the next few minutes, or grab a time that works for you: [booking link]" },
+          { from: "agent", text: "Your results are in the link below. I'll call you from this number in the next few minutes, or tap the link to grab a time that works for you." },
           { from: "lead", text: "Sounds good, I'm on a break now." },
         ],
         note: "Example only. Final wording is approved by you and your agency before launch.",
