@@ -343,7 +343,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       email: "supremeteammedia@gmail.com",
       site: "supremeteammedia.com",
     },
-    videoUrl: "",
+    videoUrl: "/proposal-media/keegan.mp4",
     pdfUrl: "",
     headlineFacts: [
       { label: "More leads", value: "Lead sources you own: ads, a website and free tools under your name" },

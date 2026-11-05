@@ -15,7 +15,7 @@ export const PROPOSAL_SHARE = {
   },
   keegan: {
     title: "Keegan's Growth Program | Supreme Team Media",
-    description: "More leads, warmer leads, more closed business. One program, advertising included. See the plan, the first 30 days and the price.",
+    description: "More leads, warmer leads, more closed business. Watch the five-minute plan, then approve it on the page.",
     image: "/og/proposal-keegan.jpg",
   },
 };
