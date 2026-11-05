@@ -14,8 +14,8 @@ export const PROPOSAL_SHARE = {
     image: "/og/proposal-cpn-growth.jpg",
   },
   keegan: {
-    title: "Keegan's Exclusive Lead Engine | Supreme Team Media",
-    description: "Your own exclusive leads, from people who expect your call, delivered straight into Cassi. See the plan and the pilot.",
+    title: "Keegan's Growth Program | Supreme Team Media",
+    description: "More leads, warmer leads, more closed business. One program, advertising included. See the plan, the first 30 days and the price.",
     image: "/og/proposal-keegan.jpg",
   },
 };

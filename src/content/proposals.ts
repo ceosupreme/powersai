@@ -30,6 +30,10 @@ export type ProposalRecord = {
   slug: string;
   /** Program or service name. Shown small above the headline. */
   title: string;
+  /** Browser tab title. Defaults to "<title> for <client>". */
+  pageTitle?: string;
+  /** Jump links under the hero facts. Defaults to the CPN set. */
+  nav?: { href: string; label: string }[];
   /** The benefit headline, one line per entry. The H1. */
   headline: string[];
   /** One or two short lines under the title. */
@@ -59,11 +63,16 @@ export type ProposalRecord = {
   /** The opening note to the client, in the sender's words. */
   opening: string[];
   outcomes: { label: string; title: string; body: string }[];
+  /** Numbered program blocks. Leave empty to skip the section. */
   blocks: ProposalBlock[];
+  /** What's included, as the service categories the client already prices in their head. Optional section after "How it works". */
+  included?: { title: string; headline: string; intro: string; items: { title: string; body: string }[] };
   /** What the program produces each month, shown as four big figures. */
   monthly: { value: string; label: string }[];
   /** What the monthly fee pays for: the improvement loop. */
   growthLoop: { title: string; intro: string; steps: { title: string; body: string }[] };
+  /** The stages the monthly scoreboard follows, shown as a strip inside the growth-loop section. Optional. */
+  scoreboard?: { title: string; stages: string[]; note: string };
   /** The division of work, two columns. */
   whoDoesWhat: { title: string; /** Section headline. Defaults to the CPN wording when omitted. */ headline?: string; us: string[]; them: string[] };
   markets: {
@@ -79,6 +88,8 @@ export type ProposalRecord = {
   };
   pricing: {
     title: string;
+    /** Section headline. Defaults to the CPN wording when omitted. */
+    headline?: string;
     lines: { label: string; amount: string; body: string }[];
     plainRules: string[];
     /** One line that adds the pieces up for the pilot. */
@@ -86,11 +97,22 @@ export type ProposalRecord = {
   };
   pilot: {
     title: string;
+    /** Section headline. Defaults to the CPN sixty-day wording when omitted. */
+    headline?: string;
+    /** Shows this section above the investment band instead of below it. */
+    beforePricing?: boolean;
     phases: ProposalPhase[];
-    assurance: { title: string; body: string };
+    /** A refund or similar promise. Omit when the offer makes none. */
+    assurance?: { title: string; body: string };
+    /** A checklist of what the first month builds, shown where the assurance box would be. */
+    build?: { title: string; items: string[] };
     definition: { title: string; body: string };
     after: string;
   };
+  /** Why the company, kept short: a headline, a paragraph or two, three proof tiles and a link. Optional section before the questions. */
+  why?: { title: string; headline: string; body: string[]; proof: { value: string; label: string }[]; link?: { label: string; to: string } };
+  /** The buying questions, answered in full on the page. Optional section before the close. */
+  faq?: { title: string; headline: string; items: { q: string; a: string }[] };
   afterAccept: {
     title: string;
     intro: string;
@@ -100,6 +122,8 @@ export type ProposalRecord = {
     buttonLabel: string;
     confirmationTitle: string;
     confirmationBody: string;
+    /** Label on the phone sticky bar. Defaults to "Request the agreement". */
+    mobileLabel?: string;
   };
   /** Appears in the agreement-request record so the owner alert reads clearly. */
   internalLabel: string;
@@ -303,15 +327,16 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
   },
   keegan: {
     slug: "keegan",
-    title: "Exclusive Lead Engine",
-    headline: ["Your own exclusive leads.", "People who expect your call.", "Delivered into Cassi."],
-    subtitle: "A managed lead system for Keegan: ads and an active social presence bring in drivers who want coverage, a page with your name on it qualifies and books them, and every lead lands in Cassi the moment it comes in. We run the marketing. You keep doing the part you're good at.",
+    title: "Growth Program for Life Insurance Agents",
+    pageTitle: "Keegan's Growth Program | Supreme Team Media",
+    headline: ["More leads.", "Warmer leads.", "More closed business."],
+    subtitle: "A done-for-you marketing operation that builds you lead sources you own and makes every lead easier to close. Built around you, the niches you already sell to, and the Cassi account you already run on.",
     client: {
       company: "Keegan Sundberg",
       contact: "Keegan Sundberg",
       location: "San Diego, selling in the states you're licensed in",
     },
-    preparedOn: "November 4, 2026",
+    preparedOn: "November 5, 2026",
     preparedBy: {
       name: "Sean Mayo",
       company: "Supreme Team Media",
@@ -321,182 +346,234 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     videoUrl: "",
     pdfUrl: "",
     headlineFacts: [
-      { label: "Exclusive", value: "Every lead is yours alone, never shared or resold" },
-      { label: "Expected", value: "They know who's calling and why before you dial" },
-      { label: "Owned", value: "Your pages, ad account, profiles and audience stay yours" },
+      { label: "More leads", value: "Lead sources you own: ads, a website and free tools under your name" },
+      { label: "Warmer leads", value: "People who asked for you by name and expect your call" },
+      { label: "More closed business", value: "Follow-up, booking and retention running inside Cassi" },
     ],
-    factsNote: "Built, run and improved for you by Supreme Team Media for flat fees, with no per-lead charges and no cut of your commissions.",
+    factsNote: "Built, run and improved for you by Supreme Team Media for one flat monthly fee, advertising included. No per-lead charges and no cut of your commissions.",
+    nav: [
+      { href: "#how-it-works", label: "How it works" },
+      { href: "#whats-included", label: "What's included" },
+      { href: "#the-pilot", label: "The first 30 days" },
+      { href: "#what-it-costs", label: "Your investment" },
+      { href: "#questions", label: "Questions" },
+      { href: "#accept", label: "Approve the plan" },
+    ],
     journey: {
-      title: "One connected path from a scroll to a booked call.",
+      title: "Four jobs, one system, inside the CRM you already use.",
       steps: [
-        { label: "Attract", body: "Ads and weekly social content reach truckers and 1099 workers in the states you're licensed in." },
-        { label: "Build trust", body: "They see a real, licensed agent with a name, a face and helpful content, not a faceless quote form." },
-        { label: "Qualify and book", body: "A short page with your name on it asks the right questions, verifies the phone number and offers your calendar." },
-        { label: "Deliver", body: "The lead lands in Cassi within seconds, and a text confirms your name, your photo and the number you'll call from." },
-        { label: "Improve", body: "Each week's conversations and policies decide the next ads, the next posts and the next round of questions." },
+        { label: "Attract", body: "Ads and daily content under your name, where your buyers already spend their time. The campaigns say plainly what this is. One example: life insurance for people who work for themselves, from a licensed agent named Keegan." },
+        { label: "Capture", body: "Your own website, with a Driver Protection Checkup and a 1099 Benefits Gap Checker, plus guides worth downloading. People trade their contact info for something useful, and they know it's you they're hearing from." },
+        { label: "Warm up", body: "A text and an email from you go out right away, with your intro video, your photo and your booking link. By the time you call, they've seen your face and can pick a time." },
+        { label: "Close and keep", body: "Appointment reminders, no-show rebooking, application follow-up, policy delivery and client check-ins run automatically in Cassi, so your phone time goes to people who are ready." },
       ],
     },
     opening: [
-      "Keegan, thanks for walking me through how you work. Cassi works, you like it, and it stays. What you need is a better source of the people who land in it, and a reason for them to pick up when you call.",
-      "Most vendor leads come from ads selling a money idea, so the person who fills out the form isn't expecting an insurance agent to call. This program flips that. The ads say plainly what this is, the page has your name on it, and the person knows you're calling before the phone rings. We build it, run it and improve it every week, and every lead belongs to you.",
+      "Keegan, thanks for Tuesday. You said the problem in one sentence: the leads don't pick up, or they don't remember asking. That isn't a dialing problem. A stranger's quiz ad brought them in, and nobody told them an agent named Keegan would call. This program fixes the source.",
+      "Everything here runs under your name, on your own website and your own ad accounts, and lands in Cassi, which stays exactly as it is. Keep buying whatever vendor leads you want while your own sources come up. Nothing on this page needs your time beyond a few approvals. The whole program, the first 30 days and the price are below. Approve it at the bottom and we get started.",
     ],
     outcomes: [
       {
-        label: "The immediate goal",
-        title: "More real conversations from every dollar",
-        body: "Fewer people who don't answer or don't remember asking, and more who pick up because they asked for you by name. Measured in conversations and issued policies, not in rows on a spreadsheet.",
+        label: "Result one",
+        title: "More leads, from sources you own",
+        body: "Advertising under your name, a website on your own domain, free tools and guides people actually want, and new content published every day. Each one is a lead source that belongs to you and keeps working month after month, reaching working adults 30 to 70 with the income to fund a policy. For you that starts with truckers, then contractors and other 1099 earners.",
       },
       {
-        label: "The lasting advantage",
-        title: "Your own lead source and your own audience",
-        body: "Your ad account, your page, your social profiles and the audience they build stay yours. The same system can be pointed at a second niche, and later at the agents you bring onto your team.",
+        label: "Result two",
+        title: "Warmer leads, who know who's calling",
+        body: "A vendor lead filled out somebody else's quiz. Your lead saw your name on the ad, used your tool on your site, got a text from you before your call, and expects to hear from you. That's the difference between “I never filled anything out” and “yeah, I was waiting for you.”",
+      },
+      {
+        label: "Result three",
+        title: "More closed business, from the leads you already have",
+        body: "Booking, reminders and no-show recovery before the appointment. Short explainers that answer the common questions before you get on the phone, so the conversation starts further along. Application follow-up, policy delivery and check-in sequences after the sale, so clients stay on the books and send referrals. Plus a reactivation sequence for the leads already sitting in Cassi, so the money you already spent gets another shot.",
       },
     ],
-    blocks: [
-      {
-        number: "01",
-        title: "Ads that say what this is",
-        body: "Facebook and Instagram campaigns aimed at truckers, owner-operators and company drivers who don't have coverage or a retirement plan through work. The ads are honest about the offer: life insurance and protection for drivers and their families, and a licensed agent named Keegan will call. Fewer curious clicks, more people who are ready for the conversation. We start with one niche, test several angles, and manage the budget you approve.",
-        note: "Ads run only in the states where you're licensed, under the financial products category Meta requires for insurance, and use only language you and your carriers approve before anything goes live. No tax-free or be-your-own-bank hype, and no income claims.",
-      },
-      {
-        number: "02",
-        title: "A page with your name on it",
-        body: "A short page built around you: your photo, your license, what the call covers and what happens next. It asks a few qualifying questions, verifies the phone number, records consent naming you, and offers your calendar. The thank-you screen and a confirmation text show the exact number you'll call from, with a save-my-contact button so your call doesn't get screened out. Every lead is exclusive to you and is sent into your Cassi account in real time, so your existing follow-up fires automatically.",
-      },
-      {
-        number: "03",
-        title: "A social presence that makes you real",
-        body: "We set up your business profiles on Facebook, Instagram, TikTok and YouTube and run an active content campaign for drivers and 1099 workers: short, useful videos and posts about protecting their families and planning for the years after driving. When someone looks you up before answering, they find a real agent with real content. The people who watch your videos become a warm audience for the ads, your best posts become ad creative, and over time the profiles bring in inquiries of their own.",
-        note: "We produce all of the content. You can appear when you want to, but nothing depends on you filming. Every post follows Family First Life's content guidance: education and serving families, never income talk.",
-      },
-      {
-        number: "04",
-        title: "Measured on conversations, not lead counts",
-        body: "A weekly scoreboard follows each lead from inquiry to issued policy: leads, people reached, people who remembered asking, appointments, applications, issued policies, and cost per issued policy. You keep marking outcomes in Cassi the way you do now. We read them and use them to decide what runs next.",
-      },
-    ],
+    blocks: [],
+    included: {
+      title: "What's included",
+      headline: "Every piece of the operation, handled by us.",
+      intro: "These are the services you'd normally buy from four or five different vendors. Here they're one program, one team and one number.",
+      items: [
+        { title: "Social media setup and management", body: "Your profiles set up for business on the platforms your buyers use, and kept active with new content every day." },
+        { title: "Content production", body: "Posts, short explainers and guides on protection, coverage and the questions your prospects ask, all written to the insurance advertising rules." },
+        { title: "Video production", body: "Your intro video, educational clips and ad spots, produced by us. You appear when you want to; nothing waits on you filming." },
+        { title: "Paid advertising", body: "Campaigns under your name aimed at your niches, written for approval, managed and tuned every week, with the ad spend included in your fee." },
+        { title: "Website and lead tools", body: "Your own site on your own domain, with free tools like the Driver Protection Checkup and the 1099 Benefits Gap Checker, plus a new tool every month." },
+        { title: "CRM automation and follow-up", body: "Leads land in Cassi the moment they come in, and the warm-up, booking, reminder, reactivation and retention sequences run from there." },
+        { title: "Sales support", body: "Pre-call explainers, objection answers and application follow-up, so every conversation starts further along and fewer deals stall." },
+        { title: "Brand and creative", body: "Your name, look and message done right once, then carried through every ad, page, post and video." },
+        { title: "Compliance coordination", body: "Everything educational, with no projections, no illustrations and no income claims. We prepare each submission and coordinate approvals through your agency." },
+        { title: "Monthly reporting and review", body: "One scoreboard from lead to paid policy, by source, including the leads you still buy, reviewed together every month." },
+      ],
+    },
     monthly: [
-      { value: "12+", label: "short videos and posts produced by STM each month" },
-      { value: "4", label: "platforms where your profiles stay active" },
-      { value: "3 to 4", label: "new ad variations tested each month" },
-      { value: "Weekly", label: "scoreboard from first inquiry to issued policy" },
+      { value: "Daily", label: "new content published on your platforms" },
+      { value: "2", label: "new guides every month" },
+      { value: "1", label: "new free lead tool every month" },
+      { value: "Monthly", label: "scoreboard review, the first at day 30" },
     ],
     growthLoop: {
-      title: "The system does the routine work. We keep improving the results.",
-      intro: "Your monthly fee pays for active marketing and content, not software access and a report. Every change is judged by conversations and issued policies, not clicks.",
+      title: "After the build: produce, publish, run the ads, and tune it every month.",
+      intro: "The first month builds your system. Every month after, we operate it. You're not paying for a folder of files; you're paying for a team running your marketing while you sell.",
       steps: [
-        { title: "Test the message", body: "Compare ad angles and content to learn what brings in drivers who answer and qualify." },
-        { title: "Follow the outcome", body: "Track each lead through reached, appointment, application and issued policy." },
-        { title: "Refine the next cycle", body: "Use those results to improve the ads, the page questions and the content before spend goes up." },
+        { title: "Produce and publish", body: "New content goes out every day across your platforms, plus two new guides and a new free tool each month, so your audience and your lead sources keep growing." },
+        { title: "Run the ads", body: "Fresh ad creative every month, campaigns managed weekly, and creative on request when you need something for a group, an event or a referral partner." },
+        { title: "Review the scoreboard", body: "Leads, pickups, appointments, applications and paid policies by source. We look at it together every month and decide what to push next." },
       ],
+    },
+    scoreboard: {
+      title: "What we measure",
+      stages: ["Leads", "Pickups", "Appointments", "Applications", "Paid policies"],
+      note: "Tracked by source, including the leads you still buy, so you can see what each source actually produces.",
     },
     whoDoesWhat: {
       title: "Who does what",
       headline: "We run the marketing. You run the calls.",
       us: [
-        "Ad strategy, campaign management and all creative production, with no filming required from you",
-        "Your lead page, phone verification, consent records, booking and the connection into Cassi",
-        "Your social profiles, the weekly content campaign and the weekly scoreboard",
+        "Strategy, advertising, content, video and creative, with no filming or writing required from you",
+        "Your website, lead tools, guides, profiles and the follow-up sequences inside Cassi",
+        "Compliance submissions, the scoreboard and the monthly review",
       ],
       them: [
-        "Share your licensed states and send the ads through any approval your carriers or agency require",
-        "Approve the advertising budget, paid directly to Meta",
-        "Call, close, and mark outcomes in Cassi the way you already do",
+        "Tell us your licensed states, your niches and who approves ads at your agency",
+        "Approve the creative and the campaigns before they run",
+        "Call, close and mark outcomes in Cassi the way you already do",
       ],
     },
     markets: {
-      title: "Your licensed states, starting with truckers",
-      body: "You sell by phone, so the campaign follows your licenses, not a radius around San Diego. We open with truckers because they need coverage, they usually don't get it through work, and they're the leads that cost the most to buy from a vendor.",
+      title: "Your licensed states, starting with truckers.",
+      body: "You sell by phone, so the campaigns follow your licenses, not a radius around San Diego. We open with truckers because you know that market and they're the leads that cost the most to buy. Contractors and other 1099 earners come next, on the same system.",
       home: "Ads run only where you can write business.",
-      travelNote: "Each state you add is a setting change, running from the same ads, page and content.",
-      scopeNote: "Included scope: one niche campaign at a time. A second niche, such as contractors and tradesmen or the self-employed, is added once the first one's numbers are proven and we agree on it.",
+      travelNote: "Each new state or niche is a settings change, running from the same website, tools and content.",
+      scopeNote: "Included scope: one niche campaign at a time, with a second niche added when the first one's numbers say so. Vendor leads you keep buying are tracked on your scoreboard, but managing those orders and their replacement claims stays with you.",
       textPreview: {
-        caption: "What a driver gets seconds after asking",
+        caption: "What a lead gets seconds after asking",
         messages: [
-          { from: "agent", text: "Hi Mike, this is Keegan Sundberg, the licensed agent you asked to hear from about coverage for you and your family." },
-          { from: "agent", text: "I'll call you from this number in the next few minutes. Tap the card below to save it so my call comes through." },
+          { from: "agent", text: "Hi Mike, this is Keegan Sundberg, the licensed agent behind the Driver Protection Checkup you just finished." },
+          { from: "agent", text: "Your results are in the link below. I'll call you from this number in the next few minutes, or grab a time that works for you: [booking link]" },
           { from: "lead", text: "Sounds good, I'm on a break now." },
         ],
-        note: "Example only. The final wording is approved by you before launch.",
+        note: "Example only. Final wording is approved by you and your agency before launch.",
       },
     },
     pricing: {
       title: "Your investment",
+      headline: "One program. One number. Advertising included.",
       lines: [
         {
-          label: "One-time foundation",
-          amount: "$750",
-          body: "Due to begin. Your lead page, phone verification and booking, the connection into Cassi, your business profiles on four platforms, and the launch ads and videos.",
+          label: "The program",
+          amount: "$5,000 a month",
+          body: "Everything on this page: the build, the daily content, the ads and the ad spend, the tools, the follow-up and the monthly review. One number, no separate ad bill.",
         },
         {
-          label: "Monthly management",
-          amount: "$1,500 a month",
-          body: "Begins the day the ads go live, not the day we sign. Ad management, weekly content on four platforms, new ad creative, upkeep of the page and the Cassi connection, and the weekly scoreboard.",
+          label: "Your first month",
+          amount: "$2,500 + $2,500",
+          body: "$2,500 at kickoff starts the build. $2,500 when your system is live: your landing page and first tool on your domain, leads reaching you in Cassi, tracking working.",
         },
         {
-          label: "Advertising budget",
-          amount: "$2,000 to $2,500 a month",
-          body: "Suggested starting range, separate from our fees. You pay Meta directly, so every dollar is visible to you. Projected: about 45 to 80 exclusive leads a month at this range, based on 2026 Meta cost-per-lead data for IUL campaigns. Projected, not promised.",
+          label: "Every month after",
+          amount: "Month to month",
+          body: "After the day-30 review, the program continues month to month with 30 days' notice. No contract term and no setup fee hiding anywhere.",
         },
       ],
       plainRules: [
-        "No per-lead charges.",
-        "No cut of your commissions or overrides.",
-        "Your ad account, page, profiles and lead records stay yours.",
+        "No per-lead charges and no cut of your commissions.",
+        "No separate advertising bill.",
+        "Hosting and the software behind your website and tools are included.",
+        "Your website, content, tools, ad accounts and lead data are yours to keep.",
       ],
-      summary: "Completing both live pilot months comes to $7,750 to $8,750 in total, including the foundation and the suggested ad budget. You can stop at the day-30 review before a second management fee.",
+      summary: "Month one is $5,000 in two payments. Every month after is $5,000, advertising included, for as long as the scoreboard earns it.",
     },
     pilot: {
-      title: "How the pilot works",
+      title: "The first 30 days",
+      headline: "Built in month one. Running from month two.",
+      beforePricing: true,
       phases: [
         {
-          when: "Before launch",
-          title: "Build your foundation",
-          body: "Confirm your licensed states and approved language. We build the page, booking, Cassi connection and social profiles, and produce the launch ads and first content for your approval. Target launch: within two weeks of receiving the inputs and approvals.",
+          when: "Week one",
+          title: "Kickoff",
+          body: "We collect your states, niches, photo and brand pieces, get into Cassi, and write the first campaign for your agency's approval.",
         },
         {
-          when: "Live days 1 to 30",
-          title: "Launch and learn",
-          body: "The ads go live and the monthly fee starts. Leads arrive in Cassi in real time, the content campaign runs every week, and you see the scoreboard every Monday.",
+          when: "Weeks two to three",
+          title: "First campaign live",
+          body: "Your landing page and first free tool go live on your domain, your profiles go live for business, and the first campaign starts the day your agency approves it.",
+        },
+        {
+          when: "By day 30",
+          title: "Your system is live",
+          body: "Website, both tools, both guides, your intro video and the starter creative kit are live, and new content is publishing every day.",
         },
         {
           when: "Day 30",
-          title: "Continue, adjust or stop",
-          body: "We review the first month's numbers together and you decide whether to continue before the second monthly management fee is charged.",
-        },
-        {
-          when: "Live days 31 to 60",
-          title: "Build on what works",
-          body: "Keep the winning ads, cut the rest, and raise the budget or add a second niche only when the numbers support it and we agree on it.",
+          title: "Scoreboard review",
+          body: "Leads, pickups, appointments, applications and paid policies, by source, including the leads you still buy. Then we continue month to month.",
         },
       ],
-      assurance: {
-        title: "First-month assurance",
-        body: "Fewer than 15 qualified leads delivered to Cassi in the first 30 live days? We refund that month's $1,500 management fee, provided at least $2,000 in ad budget was funded and the ads were approved to run.",
+      build: {
+        title: "Built in month one",
+        items: [
+          "Your brand: name, look and message, done right once",
+          "Your website, on your own domain",
+          "Two free lead tools: the Driver Protection Checkup and the 1099 Benefits Gap Checker",
+          "Two guides worth downloading",
+          "Your intro video",
+          "A starter creative kit for ads, posts and profiles",
+          "Your social profiles, set up for business",
+          "Your first ad campaign, written to the insurance advertising rules and submitted through your agency for approval",
+        ],
       },
       definition: {
-        title: "What counts",
-        body: "A qualified lead lives in a state where you're licensed, falls within the age range you write, asked to be contacted about coverage, passed phone verification, and gave consent naming you. Each person counts once. The qualifying questions are agreed with you before launch, so results are measured against a shared definition.",
+        title: "What “live” means",
+        body: "Your system is live when your landing page and first free tool are on your domain, leads are reaching you in Cassi, and tracking is working. That's when the second $2,500 is due. The first ad campaign launches as soon as your agency approves it, and that approval doesn't hold up the milestone.",
       },
-      after: "After the 60 days the program continues month to month with 30 days' notice. When you start bringing agents onto your team, the same system can send leads into each agent's Cassi account, quoted when you're ready.",
+      after: "From day 30 on, the program runs month to month with 30 days' notice, and everything we build stays yours.",
+    },
+    why: {
+      title: "Why Supreme Team Media",
+      headline: "Thirty years of marketing and lead systems, now pointed at your business.",
+      body: [
+        "We've spent 30 years building marketing and lead systems, and the systems we run today sit inside multi-million-dollar businesses, working every day without the owner touching them. That's the standard this program is built to: your marketing runs whether or not you're thinking about it.",
+      ],
+      proof: [
+        { value: "30 years", label: "building marketing and lead systems" },
+        { value: "Multi-million-dollar", label: "businesses running on our systems today" },
+        { value: "One team", label: "for strategy, creative, ads, web, automation and reporting" },
+      ],
+      link: { label: "See the work", to: "/work" },
+    },
+    faq: {
+      title: "Questions agents ask",
+      headline: "Straight answers.",
+      items: [
+        { q: "Does this work with Cassi?", a: "Yes. Cassi stays your CRM, in your name and on your plan, exactly as it is. Leads from your ads, site and tools land in Cassi the moment they come in, the follow-up runs there, and your pipeline stays where you already work. If your account needs a setting opened up, your upline can grant it." },
+        { q: "Do I have to be on camera?", a: "No. We produce everything. One short intro video with you in it helps leads recognize you before you call, and we make that easy: one recorded call with us, and we handle the rest. If you'd rather stay off camera, we build around your name and voice." },
+        { q: "How much of my time does this take?", a: "About an hour at kickoff, one recorded call for your intro video, and a few approvals by text or email as the creative comes through. The monthly review is 30 minutes. Everything else is on us." },
+        { q: "What about compliance?", a: "Everything we publish is educational: no illustrations, no projections, no income claims. We write to the insurance advertising rules, prepare each submission and coordinate the approvals through your agency. Final say stays with your agency and the carriers, which is how it should be." },
+        { q: "Do I keep buying leads?", a: "Your call. Most agents keep buying while their own sources come up, then cut back as the scoreboard tells them to. Vendor leads go on the same scoreboard so you can compare source by source. Managing those vendor orders stays with you." },
+        { q: "When do leads start?", a: "The first campaign goes live in weeks two to three, the day your agency approves it. Your website, tools and content are live by the end of month one, and the sources keep building from there. At day 30 we review the scoreboard together." },
+        { q: "What if it doesn't work?", a: "You'll see it on the scoreboard before anyone has to guess. The program is month to month with 30 days' notice, and the website, content, tools, ad accounts and lead data are yours either way. Nothing we build leaves with us." },
+        { q: "What happens when I add agents?", a: "The same system can feed each agent you bring on: their own page, their own leads landing in their Cassi account, and the same content and campaigns pointed at their territory. That gets scoped as an upgrade when you're ready, on the foundation you already own." },
+      ],
     },
     afterAccept: {
-      title: "Your own lead source starts here.",
-      intro: "Approve the plan and request the agreement with the form. Sean sends the one-page agreement and the $750 starting invoice the same business day, and the build starts the day it clears. To start, he will ask you for:",
+      title: "Your own lead sources start here.",
+      intro: "Approve the plan and request the agreement with the form. Sean sends the one-page agreement and the $2,500 kickoff invoice the same business day, and the build starts the day it clears. To start, he'll ask you for:",
       items: [
-        "The states you're licensed in and the carriers you write with, plus any ad approval process your agency or carriers require.",
-        "A professional photo of you, and any short clips you'd like to use (optional).",
-        "Time for a short call to set up your Facebook business page and ad account in your name and connect the page to your Cassi account.",
+        "The states you're licensed in, and who approves advertising at your agency.",
+        "Access to your Cassi account, so leads and follow-up run there (your upline can open it up if your account is restricted).",
+        "A professional photo, and a short recorded call with us for your intro video.",
         "Your name and address for the agreement, and the email for the invoice.",
       ],
     },
     accept: {
       buttonLabel: "Approve the plan and request the agreement",
       confirmationTitle: "Thank you, Keegan. The agreement is on its way.",
-      confirmationBody: "Sean will send the one-page agreement and the $750 starting invoice to the email you entered the same business day, and will call the number you gave to set up the kickoff.",
+      confirmationBody: "Sean will send the one-page agreement and the $2,500 kickoff invoice to the email you entered the same business day, and will call the number you gave to set the kickoff.",
+      mobileLabel: "Approve the plan",
     },
-    internalLabel: "Exclusive Lead Engine, Keegan Sundberg",
+    internalLabel: "Growth Program for Life Insurance Agents, Keegan Sundberg",
   },
 };
 

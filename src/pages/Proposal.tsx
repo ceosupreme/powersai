@@ -38,7 +38,7 @@ export default function Proposal() {
 
 function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
   useStudioHead({
-    title: `${p.title} for ${p.client.company} | ${p.preparedBy.company}`,
+    title: p.pageTitle ?? `${p.title} for ${p.client.company} | ${p.preparedBy.company}`,
     description: p.subtitle,
     path: `/proposal/${p.slug}`,
   });
@@ -60,6 +60,52 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
   const embed = toEmbedUrl(p.videoUrl);
   const videoFile = isVideoFile(p.videoUrl) ? p.videoUrl : null;
   const track = (label: string) => trackSiteEvent({ event_type: "cta_click", label });
+  const nav = p.nav ?? [
+    { href: "#how-it-works", label: "How it works" },
+    { href: "#who-does-what", label: "Who does what" },
+    { href: "#what-it-costs", label: "Your investment" },
+    { href: "#the-pilot", label: p.pilot.title },
+    { href: "#accept", label: "Get started" },
+  ];
+
+  // The rollout section renders above or below the investment band, depending on the record.
+  const pilotSection = (
+    <section className="proposal-pilot" id="the-pilot">
+      <div className="proposal-wrap">
+        <span className="proposal-eyebrow">{p.pilot.title}</span>
+        <h2 className="proposal-h2">{p.pilot.headline ?? "Sixty live days. A real decision at day thirty."}</h2>
+        <ol className="proposal-phases">
+          {p.pilot.phases.map((ph, i) => (
+            <li key={ph.when}>
+              <span className="proposal-phase-step">{i + 1}</span>
+              <span className="proposal-phase-when">{ph.when}</span>
+              <h3>{ph.title}</h3>
+              <p>{ph.body}</p>
+            </li>
+          ))}
+        </ol>
+        <div className={`proposal-assurance-grid${p.pilot.build ? " has-build" : ""}`}>
+          {p.pilot.build && (
+            <article className="proposal-build">
+              <h3>{p.pilot.build.title}</h3>
+              <ul>{p.pilot.build.items.map((item) => <li key={item}><Check aria-hidden size={18} /> {item}</li>)}</ul>
+            </article>
+          )}
+          {!p.pilot.build && p.pilot.assurance && (
+            <article className="proposal-assurance">
+              <h3>{p.pilot.assurance.title}</h3>
+              <p>{p.pilot.assurance.body}</p>
+            </article>
+          )}
+          <article className="proposal-definition">
+            <h3>{p.pilot.definition.title}</h3>
+            <p>{p.pilot.definition.body}</p>
+            <p>{p.pilot.after}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
 
   return (
     <div className="stm-studio proposal-page min-h-screen">
@@ -112,22 +158,18 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             </ul>
             <p className="proposal-facts-note">{p.factsNote}</p>
             <nav className="proposal-jump" aria-label="Jump to a section">
-              <a href="#how-it-works">How it works</a>
-              <a href="#who-does-what">Who does what</a>
-              <a href="#what-it-costs">Your investment</a>
-              <a href="#the-pilot">The pilot</a>
-              <a href="#accept">Get started</a>
+              {nav.map((n) => <a key={n.href} href={n.href}>{n.label}</a>)}
             </nav>
           </div>
         </section>
 
         <section className="proposal-opening">
-          <div className="proposal-wrap proposal-opening-grid">
+          <div className={`proposal-wrap proposal-opening-grid${p.outcomes.length > 2 ? " has-row" : ""}`}>
             <div className="proposal-opening-note">
               {p.opening.map((line, i) => <p key={i}>{line}</p>)}
               <p className="proposal-sign">{p.preparedBy.name}, {p.preparedBy.company}</p>
             </div>
-            <div className="proposal-outcomes">
+            <div className={`proposal-outcomes${p.outcomes.length > 2 ? " is-row" : ""}`}>
               {p.outcomes.map((o) => (
                 <article key={o.label} className="proposal-outcome">
                   <span className="proposal-eyebrow">{o.label}</span>
@@ -143,7 +185,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">How it works</span>
             <h2 className="proposal-h2">{p.journey.title}</h2>
-            <ol className="proposal-journey-steps">
+            <ol className={`proposal-journey-steps cols-${p.journey.steps.length}`}>
               {p.journey.steps.map((st, i) => (
                 <li key={st.label}>
                   <span className="proposal-journey-num">{i + 1}</span>
@@ -155,22 +197,47 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-blocks">
-          <div className="proposal-wrap">
-            <span className="proposal-eyebrow">Your managed program</span>
-            <h2 className="proposal-h2">Marketing, automation and follow-up, working together.</h2>
-            <div className="proposal-block-grid">
-              {p.blocks.map((b) => (
-                <article key={b.number} className="proposal-block">
-                  <span className="proposal-block-num">{b.number}</span>
-                  <h3>{b.title}</h3>
-                  <p>{b.body}</p>
-                  {b.note && <p className="proposal-block-note">{b.note}</p>}
-                </article>
-              ))}
+        {p.included && (
+          <section className="proposal-included" id="whats-included">
+            <div className="proposal-wrap">
+              <span className="proposal-eyebrow">{p.included.title}</span>
+              <h2 className="proposal-h2">{p.included.headline}</h2>
+              <p className="proposal-section-intro">{p.included.intro}</p>
+              <ul className="proposal-included-grid">
+                {p.included.items.map((item) => (
+                  <li key={item.title}>
+                    <Check aria-hidden size={20} />
+                    <div>
+                      <h3>{item.title}</h3>
+                      <p>{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {p.blocks.length > 0 && (
+          <section className="proposal-blocks">
+            <div className="proposal-wrap">
+              <span className="proposal-eyebrow">Your managed program</span>
+              <h2 className="proposal-h2">Marketing, automation and follow-up, working together.</h2>
+              <div className="proposal-block-grid">
+                {p.blocks.map((b) => (
+                  <article key={b.number} className="proposal-block">
+                    <span className="proposal-block-num">{b.number}</span>
+                    <h3>{b.title}</h3>
+                    <p>{b.body}</p>
+                    {b.note && <p className="proposal-block-note">{b.note}</p>}
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {p.pilot.beforePricing && pilotSection}
 
         <section className="proposal-growth-loop" id="ongoing-management">
           <div className="proposal-wrap">
@@ -186,6 +253,20 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 </article>
               ))}
             </div>
+            {p.scoreboard && (
+              <figure className="proposal-scoreboard" aria-label={p.scoreboard.title}>
+                <figcaption>{p.scoreboard.title}</figcaption>
+                <ol className="proposal-scoreboard-stages">
+                  {p.scoreboard.stages.map((stage, i) => (
+                    <li key={stage}>
+                      {i > 0 && <ArrowRight aria-hidden size={16} className="proposal-scoreboard-arrow" />}
+                      <span>{stage}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p>{p.scoreboard.note}</p>
+              </figure>
+            )}
             <ul className="proposal-monthly" aria-label="Included monthly production and reporting">
               {p.monthly.map((m) => (
                 <li key={m.label}>
@@ -269,7 +350,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
         <section className="proposal-pricing" id="what-it-costs">
           <div className="proposal-wrap">
             <span className="proposal-eyebrow">{p.pricing.title}</span>
-            <h2 className="proposal-h2">Build the foundation. Then put it to work.</h2>
+            <h2 className="proposal-h2">{p.pricing.headline ?? "Build the foundation. Then put it to work."}</h2>
             <div className="proposal-price-grid">
               {p.pricing.lines.map((l) => (
                 <article key={l.label} className="proposal-price">
@@ -289,33 +370,51 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
           </div>
         </section>
 
-        <section className="proposal-pilot" id="the-pilot">
-          <div className="proposal-wrap">
-            <span className="proposal-eyebrow">{p.pilot.title}</span>
-            <h2 className="proposal-h2">Sixty live days. A real decision at day thirty.</h2>
-            <ol className="proposal-phases">
-              {p.pilot.phases.map((ph, i) => (
-                <li key={ph.when}>
-                  <span className="proposal-phase-step">{i + 1}</span>
-                  <span className="proposal-phase-when">{ph.when}</span>
-                  <h3>{ph.title}</h3>
-                  <p>{ph.body}</p>
-                </li>
-              ))}
-            </ol>
-            <div className="proposal-assurance-grid">
-              <article className="proposal-assurance">
-                <h3>{p.pilot.assurance.title}</h3>
-                <p>{p.pilot.assurance.body}</p>
-              </article>
-              <article className="proposal-definition">
-                <h3>{p.pilot.definition.title}</h3>
-                <p>{p.pilot.definition.body}</p>
-                <p>{p.pilot.after}</p>
-              </article>
+        {!p.pilot.beforePricing && pilotSection}
+
+        {p.why && (
+          <section className="proposal-why" id="why-us">
+            <div className="proposal-wrap">
+              <span className="proposal-eyebrow">{p.why.title}</span>
+              <h2 className="proposal-h2">{p.why.headline}</h2>
+              <div className="proposal-why-grid">
+                <div className="proposal-why-text">
+                  {p.why.body.map((line, i) => <p key={i}>{line}</p>)}
+                  {p.why.link && (
+                    <Link to={p.why.link.to} className="proposal-btn proposal-why-link" onClick={() => track("proposal_why_link")}>
+                      {p.why.link.label} <ArrowRight aria-hidden size={18} />
+                    </Link>
+                  )}
+                </div>
+                <ul className="proposal-proof" aria-label="Proof points">
+                  {p.why.proof.map((pr) => (
+                    <li key={pr.value}>
+                      <strong>{pr.value}</strong>
+                      <span>{pr.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {p.faq && (
+          <section className="proposal-faq" id="questions">
+            <div className="proposal-wrap">
+              <span className="proposal-eyebrow">{p.faq.title}</span>
+              <h2 className="proposal-h2">{p.faq.headline}</h2>
+              <dl className="proposal-faq-grid">
+                {p.faq.items.map((item) => (
+                  <div key={item.q} className="proposal-faq-item">
+                    <dt>{item.q}</dt>
+                    <dd>{item.a}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
+        )}
 
         <section className="proposal-accept" id="accept">
           <div className="proposal-wrap proposal-accept-grid">
@@ -358,7 +457,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
 
       <nav className="proposal-mobile-actions" aria-label="Proposal actions">
         <a href="#what-it-costs" onClick={() => track("proposal_mobile_investment")}>Your investment</a>
-        <a href="#agreement-form" onClick={() => track("proposal_mobile_accept")}>Request the agreement <ArrowRight aria-hidden size={16} /></a>
+        <a href="#agreement-form" onClick={() => track("proposal_mobile_accept")}>{p.accept.mobileLabel ?? "Request the agreement"} <ArrowRight aria-hidden size={16} /></a>
       </nav>
 
       <footer className="proposal-footer">
