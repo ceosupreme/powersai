@@ -376,7 +376,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       {
         label: "Result one",
         title: "More leads, from sources you own",
-        body: "Advertising under your name, a website on your own domain, free tools and guides people actually want, and new content published every day. Each one is a lead source that belongs to you and keeps working month after month, reaching working adults 30 to 70 with the income to fund a policy. For you that starts with truckers, then contractors and other 1099 earners.",
+        body: "Advertising under your name, a website on your own domain, free tools and guides people actually want, and new content published every day. Each one is a lead source that belongs to you and keeps working month after month, reaching working adults 30 to 70 with the income to fund a policy. Every lead your campaigns produce comes straight to you and is never sold to another agent. For you that starts with truckers, then contractors and other 1099 earners.",
       },
       {
         label: "Result two",
