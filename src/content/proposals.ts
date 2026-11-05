@@ -348,7 +348,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     headlineFacts: [
       { label: "More leads", value: "Lead sources you own: ads, a website and free tools under your name" },
       { label: "Warmer leads", value: "People who asked for you by name and expect your call" },
-      { label: "More closed business", value: "Follow-up, booking and retention running inside Cassi" },
+      { label: "More closed business", value: "Follow-up, booking and retention that run automatically" },
     ],
     factsNote: "Built, run and improved for you by Supreme Team Media for one flat monthly fee, advertising included. No per-lead charges and no cut of your commissions.",
     nav: [
@@ -360,7 +360,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       { href: "#accept", label: "Approve the plan" },
     ],
     journey: {
-      title: "Four jobs, one system, inside the CRM you already use.",
+      title: "Four jobs, one system, from first impression to paid policy.",
       steps: [
         { label: "Attract", body: "Ads and daily content under your name, where your buyers already spend their time. The campaigns say plainly what this is. One example: life insurance for people who work for themselves, from a licensed agent named Keegan." },
         { label: "Capture", body: "Your own website, with a Driver Protection Checkup and a 1099 Benefits Gap Checker, plus guides worth downloading. People trade their contact info for something useful, and they know it's you they're hearing from." },
@@ -414,8 +414,8 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       { value: "Monthly", label: "scoreboard review, the first at day 30" },
     ],
     growthLoop: {
-      title: "After the build: produce, publish, run the ads, and tune it every month.",
-      intro: "The first month builds your system. Every month after, we operate it. You're not paying for a folder of files; you're paying for a team running your marketing while you sell.",
+      title: "Produce, publish, run the ads, and tune it. Every month.",
+      intro: "Month one builds your system and gets the first campaign live. From there, we operate it. You're not paying for a folder of files; you're paying for a team running your marketing while you sell.",
       steps: [
         { title: "Produce and publish", body: "New content goes out every day across your platforms, plus two new guides and a new free tool each month, so your audience and your lead sources keep growing." },
         { title: "Run the ads", body: "Fresh ad creative every month, campaigns managed weekly, and creative on request when you need something for a group, an event or a referral partner." },
@@ -432,7 +432,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       headline: "We run the marketing. You run the calls.",
       us: [
         "Strategy, advertising, content, video and creative, with no filming or writing required from you",
-        "Your website, lead tools, guides, profiles and the follow-up sequences inside Cassi",
+        "Your website, lead tools, guides, profiles and every follow-up sequence",
         "Compliance submissions, the scoreboard and the monthly review",
       ],
       them: [
@@ -487,7 +487,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     pilot: {
       title: "The first 30 days",
-      headline: "Built in month one. Running from month two.",
+      headline: "Build and launch in month one. Improve every month after.",
       beforePricing: true,
       phases: [
         {
@@ -549,7 +549,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       items: [
         { q: "Does this work with Cassi?", a: "Yes. Cassi stays your CRM, in your name and on your plan, exactly as it is. Leads from your ads, site and tools land in Cassi the moment they come in, the follow-up runs there, and your pipeline stays where you already work. If your account needs a setting opened up, your upline can grant it." },
         { q: "Do I have to be on camera?", a: "No. We produce everything. One short intro video with you in it helps leads recognize you before you call, and we make that easy: one recorded call with us, and we handle the rest. If you'd rather stay off camera, we build around your name and voice." },
-        { q: "How much of my time does this take?", a: "About an hour at kickoff, one recorded call for your intro video, and a few approvals by text or email as the creative comes through. The monthly review is 30 minutes. Everything else is on us." },
+        { q: "How much of my time does this take?", a: "About an hour at kickoff, a few approvals by text or email as the creative comes through, and a 30-minute review each month. One recorded call for your intro video if you want to be in it; if not, we build around your name and voice. Everything else is on us." },
         { q: "What about compliance?", a: "Everything we publish is educational: no illustrations, no projections, no income claims. We write to the insurance advertising rules, prepare each submission and coordinate the approvals through your agency. Final say stays with your agency and the carriers, which is how it should be." },
         { q: "Do I keep buying leads?", a: "Your call. Most agents keep buying while their own sources come up, then cut back as the scoreboard tells them to. Vendor leads go on the same scoreboard so you can compare source by source. Managing those vendor orders stays with you." },
         { q: "When do leads start?", a: "The first campaign goes live in weeks two to three, the day your agency approves it. Your website, tools and content are live by the end of month one, and the sources keep building from there. At day 30 we review the scoreboard together." },
@@ -563,7 +563,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       items: [
         "The states you're licensed in, and who approves advertising at your agency.",
         "Access to your Cassi account, so leads and follow-up run there (your upline can open it up if your account is restricted).",
-        "A professional photo, and a short recorded call with us for your intro video.",
+        "A professional photo and any brand pieces you already have. A short recorded call for your intro video is optional.",
         "Your name and address for the agreement, and the email for the invoice.",
       ],
     },
