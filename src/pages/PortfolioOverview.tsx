@@ -407,7 +407,8 @@ export default function PortfolioOverview() {
     enabled: cardIds.length > 0 && group === 'brands',
     staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from('v_brand_setup_summary').select('venue_id,in_place,needed_count,gaps,setup_gate').in('venue_id', cardIds);
+      // One call for every card; reading the view directly ran past the 8-second limit for signed-in reads.
+      const { data, error } = await (supabase as any).rpc('brand_setup_summaries', { p_venue_ids: cardIds });
       if (error) throw error;
       const m = new Map<string, SetupStat>();
       for (const r of (data ?? []) as any[]) m.set(r.venue_id, { inPlace: Number(r.in_place ?? 0), needed: Number(r.needed_count ?? 0), gaps: Number(r.gaps ?? 0), gate: r.setup_gate ?? null });
