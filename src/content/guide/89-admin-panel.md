@@ -1,7 +1,7 @@
 # Admin Panel: users and permissions
-<!-- part: Tools and system | order: 89 | slug: admin-panel | route: /admin | tags: admin, admin panel, settings, users, create user, invite, import, roles, permissions, page access, role page access, delete user, assigned projects -->
+<!-- part: Tools and system | order: 89 | slug: admin-panel | route: /admin | tags: admin, admin panel, settings, crews, users, create user, invite, import, roles, permissions, page access, role page access, delete user, assigned projects -->
 
-The Admin Panel is where you control who can sign in to HQ, what each person can open and how HQ is set up. This article explains how to get there, what its six tabs are, and how to use the first two, "Users" and "Permissions". The other tabs have their own articles, listed below.
+The Admin Panel is where you control who can sign in to HQ, what each person can open and how HQ is set up. This article explains how to get there, what its seven tabs are, and how to use the first two, "Users" and "Permissions". The other tabs have their own articles, listed below.
 
 ## Where to find it
 
@@ -12,10 +12,10 @@ The Admin Panel is where you control who can sign in to HQ, what each person can
 ## What you see
 
 - The heading "Admin Panel" and "Manage users, roles, and project access."
-- Six tabs. On a phone they show icons only, in this order: "Users" (two people), "Permissions" (padlock), "Settings" (gear), "Pillars" (stacked layers), "Work / Portfolio" (briefcase) and "Vertical Landers" (globe).
+- Seven tabs. On a phone they show icons only, in this order: "Users" (two people), "Permissions" (padlock), "Settings" (gear), "Crews" (pulse line), "Pillars" (stacked layers), "Work / Portfolio" (briefcase) and "Vertical Landers" (globe). A red number on "Crews" counts the crews that failed or missed their run.
 - The "Users" tab: a "Users" card with "Create User", "Import Users" and "Search users...", and a table with "Name", "Email", "Role", "Project", "Joined" (computer only) and "Actions". The table scrolls sideways on a phone. "Project" shows each person's projects, with the main one highlighted.
 - The "Permissions" tab: "Role Page Access", a table of 32 pages with an on/off switch for "Owner", "GM", "Shift Lead" and "Staff", and a "Save" button.
-- The other tabs: "Settings" is covered in "Admin: projects, project types and pillars", "Admin: targets, monitoring and Sync Health", "Admin: offers, templates and website content", "Backup, export, archive and delete" and "Help Center and Launch Checklist". "Pillars" is in "Admin: projects, project types and pillars". "Work / Portfolio" and "Vertical Landers" are in "Admin: offers, templates and website content".
+- The other tabs: "Settings" is covered in "Admin: projects, project types and pillars", "Admin: targets, monitoring and Sync Health", "Admin: offers, templates and website content", "Backup, export, archive and delete" and "Help Center and Launch Checklist". "Crews" is in "The crews that run while you sleep". "Pillars" is in "Admin: projects, project types and pillars". "Work / Portfolio" and "Vertical Landers" are in "Admin: offers, templates and website content".
 
 ## How to use it
 

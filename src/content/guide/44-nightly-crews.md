@@ -1,120 +1,130 @@
 # The crews that run while you sleep
-<!-- part: Making things | order: 44 | slug: nightly-crews | route: none | tags: production run, scheduled tasks, automation, overnight, email report, radar, life pulse, blog autopilot, crews -->
+<!-- part: Making things | order: 44 | slug: nightly-crews | route: /admin?tab=crews | tags: crews, crew activity, scheduled tasks, automation, overnight, email report, weekly hq run, backlog builder, muse, morning brief, life pulse, blog autopilot, city fill, background jobs, missed run -->
 
-HQ's documented automation plan includes a nightly production run, a nightly setup score update, a monthly research run, a twice-weekly blog crew, and small background jobs inside HQ. This article describes those schedules and intended behavior. External crew schedules and successful execution were not verified in this review. Check the service that runs each crew and its last successful output before relying on it.
+Crews are scheduled tasks in your Claude account that work for HQ and your brands on a fixed schedule. HQ also runs its own background jobs inside its database. Every crew writes one line to HQ when it finishes: what it tried, what it got done and what it flagged. The Admin Panel's "Crews" tab shows each one's last run, and your morning brief tells you only about the ones that failed or missed their run. This article lists the crews as of November 9, 2026 and explains how to check on them.
 
 ## At a glance
 
-- Every night at 2:13 AM Pacific: the production run does Claude's pipeline steps and writes playbooks.
-- Every night at about 2 AM Pacific: HQ updates every brand's Setup score.
-- The 1st of every month at 4:38 AM Pacific: the monthly Radar run researches the channel brands and files new briefs.
-- Mondays and Thursdays early in the morning: the Coastal Beauties blog crew publishes one article.
-- All day, inside HQ: approved automation messages go out on schedule, follow-ups stop for leads who replied, online checkouts are double-checked, and recovery reports are drafted every Monday.
+Claude crews, in Pacific time:
+- Every day at 5:56 AM: the morning brief (the Life Pulse collector).
+- Tuesdays at 3:41 AM: the weekly backlog builder.
+- Fridays at 2:17 AM: the weekly HQ run.
+- Saturdays at 1:35 PM: the weekly social posts for Muse.
+- Mondays and Thursdays at 5 AM (6 AM in summer): the Coastal Beauties blog crew.
+- Mondays at 6:33 AM: Coastal Beauties City Fill.
+- Every day at 10 PM: the Life Pulse check-in reminder.
 
-## The production run (every night at 2:13 AM Pacific)
+HQ background jobs: the automation sender every 5 minutes, the checkout double-check every hour, and once a day the follow-up stopper, the setup scores, the trend feeds and the job history cleanup. Recovery report drafts run every Monday.
 
-This is the main crew. It works in four parts, in this order.
+## Check that your crews ran
 
-### 1. Your material first
+1. Open "Admin Panel" and tap "Crews". On a phone the tab shows a pulse line. A red number on the tab counts the crews that need a look.
+2. Read the box at the top. It says "Nothing failed or missed its schedule", or it names each crew that needs a look.
+3. Each crew has a row: what it does, when it runs, when it last ran, what it got done, what it flagged, and how it reports to you. A red dot and red text mean it failed or missed its run, with the reason.
+4. Tap "Refresh" to check again. The tab also refreshes itself every few minutes.
 
-- It checks the Drive folder "Supreme Team HQ - Playbook Inbox" and anything you saved with "Add your material" on the Playbooks page.
-- It reads up to four new items a night, oldest first, and decides which playbooks each one informs.
-- For a playbook that is already written, it merges your material in right away as a new version. For a playbook that is still planned, it moves that playbook to the front of the writing line.
-- Your material wins over outside opinions and over Claude's earlier text. When your material conflicts with an official platform rule or a legal or safety requirement, the official rule stays in the steps, your point is kept as a "Your note" line, and the conflict is sent to you to decide.
-- Files that were merged move to the "Merged" folder inside the inbox. Nothing you add is ever deleted. Material it cannot use is marked rejected with the reason.
+The morning brief reads the same list every morning. When a crew failed or missed its run, the push has a line such as "Crews: Weekly HQ run failed; Muse posts missed its run". When everything ran, the brief says nothing about crews.
 
-### 2. Playbook writing
+## The Claude crews
 
-- It writes or updates up to two playbooks a night, and a third when the first two go quickly.
-- Playbooks that your material is waiting on go first, then playbooks that a pipeline is stuck on.
-- Each one gets researched, written to the shelf's template, saved as a readable Google Doc in the Drive folder "Supreme Team HQ - Playbooks", and wired in: platforms get linked to their channels, niches suggest money lanes, and any pipeline step that said "Method not written yet" is rewritten to follow the new playbook.
-- A written playbook is never overwritten. Every change becomes a new version and the old one is kept as superseded.
+### Morning brief (every day at 5:56 AM Pacific)
 
-### 3. Production steps
+- It pulls your job-search mail and agent reports into Life Pulse, and finds new jobs on Indeed, in job-alert emails and in a few public feeds.
+- It reads HQ and picks the day's three business moves, plus anyone waiting on you: website inquiries, orders, emails to hello@ and free checkups that left an email.
+- It checks that supremeteammedia.com and the free checkup page load.
+- It files the prospect lists your Muse agent emails onto HQ's Prospects page.
+- It sends one push, "Morning brief" with the date, which also names any crew that failed or missed its run. Nothing is emailed.
 
-- It picks up Claude's pipeline steps that are ready: the step before them is Done, the job is not parked or finished, and the brand is active.
-- It does at most six steps a night, and no more than three from one job, most urgent first.
-- It follows the playbooks on the job's recipe and the brand's kit, niche profile and Answer Bank.
-- Every file goes into the brand's folder inside the Drive folder "Supreme Team HQ - Brands", named with the job, the step and the date. The link is saved on the step and on the job, and the step is marked Done.
-- When the next step is yours, it adds one card to Life Pulse with an "Open pipeline" button, so it is waiting for you in the morning.
-- When a step cannot be done honestly, for example an input is missing or the only route costs money, it leaves the step Open and writes one sentence saying what is blocking it.
+### Weekly HQ run (Fridays at 2:17 AM Pacific)
 
-### 4. The report email
+- Agent Desk first: it checks the work orders in your Airtable base, verifies or sends back the finished ones, and writes up to three new ones.
+- It files the playbooks you finish. Drop a finished playbook in the Drive folder "Supreme Team HQ - Playbook Inbox", named for the playbook (for example "Pinterest - playbook"), and it becomes that playbook's next version, word for word. The run does not write playbooks or do niche research: you do that in your own AI threads (your call, November 1, 2026). Other material stays in the inbox, marked new, for you.
+- It does up to six of Claude's ready pipeline steps, no more than three from one job, most urgent first. Each file goes into the brand's folder inside "Supreme Team HQ - Brands", is linked on the step, and the step is marked Done. When the next step is yours, it adds a Life Pulse card with an "Open pipeline" button.
+- It files channel numbers: Metricool followers and posts once a week, your Muse complaint reports into each brand's Answer Bank, and your Muse Facebook stats reports. It also matches placeholder brand colors to your real page images.
+- It emails "Weekly HQ run: what got done" when anything happened.
 
-When anything happened, you get one email with the subject "Production run: what got made". It is plain text, written for your phone, in this order:
+### Weekly backlog builder (Tuesdays at 3:41 AM Pacific)
 
-1. Playbooks written or updated, with their version and a link to the readable copy.
-2. Your material: what was merged where, what was rejected and why, and how many items still wait in the inbox.
-3. Decisions for you, such as a conflict between your material and a platform rule.
-4. Per brand: the steps finished with their Drive links, the steps now waiting on you with what to do, the minutes it should take and the pipeline link, and any blocked steps.
-5. Any new Play: a combination that clearly won, with the proof.
+- It keeps a backlog of researched, ready-to-make ideas for every brand. A brand is full at 10 vetted ideas; a brand that sells products also needs at least 3 product ideas.
+- Each week it picks three brands that are not full, researches them with free sources, and files up to six briefs per brand that score 60 or more with at least two separate signals. It uses vidIQ only for YouTube-led brands, at most 10 credits a run.
+- Briefs show up on "Radar" and on each brand's "Intel" tab. It never starts a pipeline: you do that with "Make this".
+- It emails "Backlog builder" with the number of new ideas and how many brands are full. When every backlog is full, it stops and sends nothing.
 
-It closes with how many Claude steps and playbook jobs are still queued. No email alone does not establish what happened: the run or its email delivery may have failed. Check the run history and saved outputs.
+### Weekly social posts for Muse (Saturdays at 1:35 PM Pacific)
 
-### What the production run will never do
+- It records what Muse posted from last week's batch and marks those posts approved and published in HQ. Your approval in Muse counts as your HQ approval (your call, November 1, 2026).
+- It decides which Facebook Pages are active next week, makes next week's posts with their images and videos, saves them in HQ as drafts, and writes the message for Muse in Drive.
+- It emails "Muse posts ready" with the week and the message to paste into Muse. It never posts anything itself.
 
-- Spend Lovable credits or money. It does not use paid tools, and it only uses vidIQ when a step carries its own budget.
-- Publish, schedule or list anything anywhere, or approve a piece of content.
-- Mark one of your steps Done. A step is Done only when its file exists and is linked.
-- Delete your material or overwrite a written playbook.
-- Contact anyone but you.
-
-## Setup scores (every night at about 2 AM Pacific)
-
-HQ recomputes every brand's Setup score from its setup map and saves it as this week's "Setup" pillar score. The job runs on a fixed world clock, so it runs at 2:05 AM Pacific in winter and 3:05 AM Pacific in summer. See "How scores work" for what the number means.
-
-## The monthly Radar run (the 1st of every month at 4:38 AM Pacific)
-
-- It researches the channel brands on its list: Supreme Wellness, Supreme Survival, Coastal Beauties, Big Paws Club, San Diego Remix, and Temecula & Murrieta News. Supreme Team Media and Allmighty Supreme are not on the list.
-- For each brand it builds or refreshes the niche profile, mines complaints from product reviews and online forums for free, and files them in the Answer Bank.
-- It uses vidIQ research within a hard cap of 90 vidIQ credits for the whole run, and never uses vidIQ's generation tools. Coverage rotates, so about four brands get a full vidIQ harvest each month. A brand that already has fresh briefs waiting is skipped, and the email says so.
-- It files three to five briefs per brand. Each brief is a video, a printable or a book. Product and book briefs must name the winning item they improve on and quote the complaint they fix.
-- The briefs show up on the "Radar" page and on each brand's "Intel" tab. It never starts a pipeline on its own. You start one by tapping "Make this" on a brief.
-- You get one Life Pulse card and one email with the subject "Monthly Radar: this month's picks across your brands", with the top two briefs per brand, the evidence, and the credits used.
-
-## The Coastal Beauties blog crew (Mondays and Thursdays)
+### Coastal Beauties blog crew (Mondays and Thursdays)
 
 - It publishes one new article, or one real update to an existing article, on the Coastal Beauties website, at 5 AM Pacific in winter and 6 AM Pacific in summer.
 - It costs no Lovable credits, uses only images that are already on the site, checks the article against the content standard, and checks the live page after publishing.
-- It only notifies you when something needs you: a draft that scored just under the bar and is waiting for your look, a run that could not publish, or a broken page. A clean publish sends nothing.
+- It only notifies you when something needs you: a draft that scored just under the bar and is waiting for your look, a run that could not publish, or a broken page.
 
-## Background jobs inside HQ
+### Coastal Beauties City Fill (Mondays at 6:33 AM Pacific)
 
-- Every five minutes, approved automation messages whose send time has come are sent. Only messages you approved go out.
-- Once a day, pending follow-up messages are cancelled for any lead who replied, booked, opted out, or whose sequence was halted.
-- Once an hour, HQ checks Stripe for completed online checkouts and records any that were missed.
-- Every Monday morning, HQ drafts a recovery report for each active project. Drafts are never sent on their own.
+- It adds up to 15 new local businesses a week to the Coastal Beauties directory: photographers, model and talent agencies, studios and video crews, and hair, makeup and styling pros. Each one is checked on its own website first.
+- It never adds models or influencers. You hand-pick those.
+- It emails "Coastal Beauties directory: weekly fill", including what is waiting for your review.
 
-## Life Pulse
+### Life Pulse check-in reminder (every day at 10 PM Pacific)
 
-Life Pulse is your private dashboard. It is a separate app, not part of HQ. HQ's crews only add cards to it when something needs you. Two more scheduled tasks belong to Life Pulse itself, a morning collector and a 10 PM check-in reminder. They are listed here only so you know every scheduled task you have.
+- One push, "Tonight's check-in", unless you already did it.
+
+## HQ background jobs
+
+These run inside HQ's database on a fixed world clock, so their Pacific times move by an hour when daylight saving time starts or ends.
+
+- Automation sender, every 5 minutes: sends approved automation messages when their time comes. Only messages you approved go out.
+- Checkout double-check, every hour: checks Stripe for completed online checkouts and records any that were missed.
+- Follow-up stopper, every day at 5 AM Pacific: cancels pending follow-ups for leads who replied, booked, opted out or were halted.
+- Setup scores, every day at 2:05 AM Pacific: recomputes every brand's Setup score. See "How scores work".
+- Trend feeds, every day at 5:07 and 5:22 AM Pacific: fetch and file Google's Trending Now feeds, and on Mondays the autocomplete for every brief keyword.
+- Recovery reports, Mondays at 8 AM Pacific: drafts a recovery report for each active project. Drafts are never sent on their own.
+- Job history cleanup, every day at 1:17 AM Pacific: deletes background-job history older than 7 days.
+
+Four of these jobs hand their work to a backend function: the automation sender, the checkout double-check, the follow-up stopper and the recovery reports. The job history only shows that the hand-off happened, so the "Crews" tab shows these four as "Result not tracked" until HQ records what the function answered.
+
+## What the crews never do
+
+- Spend Lovable credits or money. Paid research tools are used only inside the caps you set.
+- Publish, schedule or post anything, except the blog crew, which publishes one article per run on the Coastal Beauties site.
+- Approve content for you. The Muse crew only records the approvals you gave in Muse.
+- Delete your material or overwrite a written playbook.
+- Contact anyone but you, or ask for a password.
 
 ## How to use it
 
-### Check what the crew did last night
-
-1. Open the report email "Production run: what got made". If there is no email, check the external worker's run history and delivery status.
-2. Tap a pipeline link in the email to open the job. Finished steps show their file link.
-3. Open "Dashboard" to see the steps that are now waiting on you.
+### Find out what a crew did
+1. Open "Admin Panel", "Crews" and read the crew's row: "Got done" and "Flagged" come from its last run.
+2. For the full detail, open the report it names under "Reports to you by", such as the "Weekly HQ run: what got done" email.
+3. Tap a pipeline link in that email to open the job. Finished steps show their file link.
 
 ### Get a step done sooner
-
-1. Make sure the step before it is Done. The crew only picks up steps that are ready.
-2. Make sure the brand is active. Parked jobs and inactive brands are skipped.
-3. The crew takes the most urgent steps first, then the oldest jobs, up to six steps a night.
-4. When one step cannot wait for the night, open the pipeline, tap "Copy prompt" on the Claude step, and paste it into a Claude chat. Claude does the step there and marks it done with the output link.
+1. Make sure the step before it is Done and the brand is active. The weekly HQ run only picks up steps that are ready, skips parked jobs, and takes the most urgent steps first, then the oldest jobs.
+2. When a step cannot wait for Friday, open the pipeline, tap "Copy prompt" on the Claude step, and paste it into a Claude chat. Claude does the step there and marks it done with the output link.
 
 ### Pause or change a crew
+The crews are scheduled tasks in your Claude account, not settings in HQ. Ask Claude in any chat to pause, resume or change one, for example "pause the weekly HQ run for a week". Claude confirms before it changes anything. A crew that is new or renamed shows up on the "Crews" tab the first time it logs a run.
 
-The crews are scheduled tasks in your Claude account, not settings in HQ. Ask Claude in any chat to pause, resume, or change one, for example "pause the production run for a week". Claude will confirm before it changes anything.
+## Words on this screen
+
+- Crew: a scheduled Claude task that works for HQ on its own.
+- Background job: a job that runs inside HQ's database on a fixed clock.
+- "Ran fine": its last run did its job, or found nothing to do.
+- "Partly done": it ran but part of the job was blocked or skipped. "Flagged" says what.
+- "Failed": its last run did not get its main job done, or could not send its report.
+- "Missed its run": no run came in within its window.
+- "No run logged yet": it is new on the list and its first run is still ahead.
+- "Paused": the job is switched off.
+- "Result not tracked": the job starts on time, but HQ does not record yet whether the work behind it succeeded.
 
 ## Good to know
 
-- The production run and the monthly Radar run follow Pacific time all year. The setup score job, the blog crew and HQ's background jobs run on a fixed world clock, so their Pacific times move by an hour when daylight saving time starts or ends.
-- If a step stays Open for several nights, read its note on the pipeline page. It almost always names what is missing, such as an input, a login, or your decision.
-- A step titled "Method not written yet" means the playbook for that method is still planned. The crew writes that playbook first and then rewrites the step.
-- The crews never ask for passwords. Logins always happen directly on the platform, by you.
-
-## Queue and worker connection
-
-The Queue button saves a request for the external production worker. It does not start that worker or confirm a scheduled run. The worker's schedule and selection rules live outside this repository. To prioritize queued work, its configuration must select eligible queued steps before ordinary steps, still respecting dependencies, paused jobs and active brands. Until that configuration is verified, treat the order described above as the documented plan and check the last actual run instead of assuming pickup.
+- A crew's window is its schedule plus some slack: a day and 2 hours for daily crews, a week and 3 hours for weekly crews, and 4 days and 3 hours for the blog crew. The automation sender's window is 20 minutes.
+- A crew logs its own run as its last step, even when it had nothing to do or hit an error. A crew that stops partway may not log at all; it then shows as "Missed its run" once its window passes.
+- The Claude crews follow Pacific time all year. Times can slip by a few minutes when many scheduled tasks start at once.
+- The "Queue" button on a Claude step saves a request but does not start a run, and the weekly HQ run does not read it yet.
+- If a step stays Open for several weeks, read its note on the pipeline page. It almost always names what is missing, such as an input, a login, a playbook you need to write, or your decision.
+- Life Pulse is your private dashboard, a separate app. The morning brief and the check-in reminder belong to it; they are listed here so you can see every scheduled task in one place.

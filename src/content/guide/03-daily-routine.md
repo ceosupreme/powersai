@@ -5,13 +5,13 @@ A short, steady routine keeps every brand moving while the crews do the heavy wo
 
 ## Every morning, about 15 minutes
 
-1. Read the email "Production run: what got made", if one came in. It lists what Claude finished overnight and which steps are now yours. No email means the crew had nothing to do.
+1. Read the morning brief push. It gives the day's three business moves, anyone waiting on you, and any crew that failed or missed its run. On Fridays, also read "Weekly HQ run: what got done" for the steps Claude finished and the ones that are now yours.
 2. Open "Dashboard" and choose "All projects" in the project picker at the top.
 3. Clear "Waiting on me" first. Tap "Approve", "Reject" or "Snooze" on each item. These are suggested steps waiting for your yes or no. Approved ones move into "Next 10"; until then they sit on hold.
 4. Work down "Next 10 across all projects". This is where your pipeline steps show up. Tick each step as you finish it. A row marked "KPI" asks for a number. A row that ends with "· Pipeline" opens the pipeline page, where your step and its files are waiting.
 5. Any idea that comes up, tap the inbox icon in the header and capture it, so it does not get lost.
 
-Why mornings: the production crew is documented to run at 2:13 AM Pacific. Steps you finish during the day make the next Claude step eligible for pickup. Check the last successful run; the schedule alone does not confirm that work happened.
+Why mornings: the brief lands at about 6 AM Pacific, and the weekly HQ run does Claude's ready steps early on Friday. Steps you finish during the week make the next Claude step ready for that run. "Admin Panel", "Crews" shows whether each crew actually ran.
 
 ## Every week, about 30 minutes (Monday is best)
 
@@ -19,17 +19,16 @@ Why mornings: the production crew is documented to run at 2:13 AM Pacific. Steps
 2. Sort the cards by "Setup gaps" to see which brands are furthest from set up. Each card shows a line such as "Setup: 7 of 10 in place, Ready to grow".
 3. Enter last week's numbers. KPI rows show up in "Next 10", and every brand's pillar cards are on its "Overview" tab.
 4. Refresh follower numbers for channels Metricool does not cover. On a brand's "Channels" tab, tap "Update from screenshots", add screenshots of the profiles, and save what HQ reads.
-5. Pick one brand marked "Set up first" and open its "Setup" tab. Tap "Set up the top 3" to start its three most important setup items. The crew does the Claude parts overnight.
+5. Pick one brand marked "Set up first" and open its "Setup" tab. Tap "Set up the top 3" to start its three most important setup items. The weekly HQ run does the Claude parts on Friday.
 6. Open "Weekly Review" for the full weekly picture.
-7. Add any new research, course notes or videos with "Add your material" on "Playbooks". The crew merges them that night.
+7. Drop any playbook you finish into the Drive folder "Supreme Team HQ - Playbook Inbox". The weekly HQ run files it on Friday. It does not write playbooks from your notes; you do that in your own AI threads.
 
 ## Every month, in the first few days
 
-1. Read the email "Monthly Radar: this month's picks across your brands".
-2. Open "Radar" and tap "Make this" on each brief you want made. Each one becomes a pipeline, and the crew starts its first steps that night.
-3. Check "Channel Revenue" for last month's money per brand.
-4. Open "Playbooks" and look for anything marked "Thin" or past its review date. Adding your own notes to those is the fastest way to improve them.
-5. Look at the "Answer Bank" for buyer complaints flagged as product ideas, and tap "Make this" on any worth making.
+1. Open "Radar" and tap "Make this" on each brief you want made. The weekly backlog builder adds new briefs every Tuesday until each brand's backlog is full. Each brief you pick becomes a pipeline, and the weekly HQ run starts its Claude steps on Friday.
+2. Check "Channel Revenue" for last month's money per brand.
+3. Open "Playbooks" and look for anything marked "Thin" or past its review date. Adding your own notes to those is the fastest way to improve them.
+4. Look at the "Answer Bank" for buyer complaints flagged as product ideas, and tap "Make this" on any worth making.
 
 ## When you have extra time
 

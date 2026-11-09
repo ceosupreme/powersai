@@ -75,9 +75,9 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - "Copy prompt": copy a ready-made prompt so Claude can do a step in a chat right away.
 - Quality gate: the step where a content piece's quality is checked and the piece is approved.
 - Money destination: where the money from a job is meant to land.
-- "Method not written yet": the step's playbook is still planned. The nightly crew writes it first.
+- "Method not written yet": the step's playbook is still planned. Write it and drop it in the Playbook Inbox; the weekly HQ run files it and rewrites the step.
 - "Make this": the button that turns a brief, a pain or a product idea into a pipeline.
-- Nightly run: the external production crew, documented to run at 2:13 AM Pacific. Verify its current schedule and last successful run in the service that runs it.
+- Weekly HQ run: the crew that does Claude's ready pipeline steps, early every Friday. Its last run is on "Admin Panel", "Crews".
 
 ## Content
 
@@ -141,4 +141,5 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Roles: "Owner", "General Manager", "Lead", "Producer" and "Contributor". A role decides which screens a staff account sees.
 - "Preview Role": see HQ the way another role sees it. "Exit Preview" brings you back.
 - Archive: hide a record but keep it and everything tied to it. Delete removes it for good.
-- Crew: a scheduled Claude run, such as the nightly production run or the monthly Radar run.
+- Crew: a scheduled Claude task that works for HQ on its own, such as the weekly HQ run or the morning brief.
+- Crew activity: the "Crews" tab on the Admin Panel, with every crew's and background job's last run. Red means it failed or missed its run.

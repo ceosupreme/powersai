@@ -57,8 +57,8 @@ When something in HQ looks wrong, it is usually one of a handful of known causes
 
 ## Email and reports
 
-- No "Production run: what got made" email: the crew had nothing to do that night, or everything it touched was already done. Check spam once, then check a pipeline you expected to move.
-- No monthly Radar email: it arrives on the 1st of the month in the morning, Pacific time.
+- Not sure a crew ran: open "Admin Panel", "Crews". Every crew logs a line when it finishes. A red dot means it failed or missed its run, and the row says why.
+- No report email from a crew: some crews only write when there is something to say. The backlog builder stays quiet once every backlog is full, and the blog crew only notifies you when something needs you. Check the crew's row on "Crews" before assuming it did not run, then check spam once.
 
 ## When the guide and a screen disagree
 

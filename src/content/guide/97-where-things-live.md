@@ -28,18 +28,21 @@ Every file the crew makes is also linked on the pipeline step that made it, so y
 
 ## In your email
 
-- "Production run: what got made": after a night when the production crew did anything. No email means nothing happened.
-- "Monthly Radar: this month's picks across your brands": on the 1st of each month, with the top briefs for each researched brand.
+- "Weekly HQ run: what got done": Fridays, when the weekly HQ run did anything.
+- "Backlog builder": Tuesdays, while any brand's backlog of ideas is not full.
+- "Muse posts ready": Saturdays, with the message to paste into Muse.
+- "Coastal Beauties directory: weekly fill": Mondays.
+- Not every crew emails. "Admin Panel", "Crews" shows every crew's last run, including the ones that report by push or only when something needs you.
 
 ## In Life Pulse
 
-Life Pulse is your private dashboard, separate from HQ. HQ's crews add a card there when something needs you, with a button that opens the right place: "Open pipeline" for a step that is now yours, "Open playbook" for a decision about a playbook, and "Open HQ" for the monthly Radar picks.
+Life Pulse is your private dashboard, separate from HQ. HQ's crews add a card there when something needs you, with a button that opens the right place: "Open pipeline" for a step that is now yours, and "Open HQ" for a person waiting on you. The morning brief also arrives there as a push.
 
 ## Outside services connected to HQ
 
 - Metricool: pulls follower and post numbers for the accounts connected to it. Not every account can be connected on the current plan, so the rest get their numbers from screenshots on the "Channels" tab or by hand.
 - Stripe: online checkouts and payments. HQ double-checks completed checkouts every hour.
-- vidIQ: YouTube research for the monthly Radar run, inside a fixed credit cap.
+- vidIQ: YouTube research for the weekly backlog builder, only for YouTube-led brands and at most 10 credits a run.
 - Google Drive and Gmail: where the crews save files and send reports.
 - Lovable: the builder and database behind HQ. Bigger screen changes are built there, which costs credits, so Claude always asks you first.
 - GitHub: a copy of HQ's code. Small fixes are made there directly at no cost and go live after a publish.

@@ -4,12 +4,13 @@ import { useAuth } from '@/context/AuthContext';
 
 import { UsersTab } from '@/components/admin/UsersTab';
 import { SettingsTab } from '@/components/admin/SettingsTab';
-import { Users, ShieldCheck, Settings, Lock, Layers, Briefcase, Globe } from 'lucide-react';
+import { Users, ShieldCheck, Settings, Lock, Layers, Briefcase, Globe, Activity } from 'lucide-react';
 import { RolePageDefaults } from '@/components/admin/RolePageDefaults';
 import { SettingsPillarsTab } from '@/components/admin/SettingsPillarsTab';
 import { PortfolioItemsTab } from '@/components/admin/PortfolioItemsTab';
 import { VerticalLandersTab } from '@/components/admin/VerticalLandersTab';
 import { VerticalLanderFamiliesCard } from '@/components/admin/VerticalLanderFamiliesCard';
+import { CrewActivityCard, needsALook, useCrewStatus } from '@/components/admin/CrewActivityCard';
 
 
 const Admin = () => {
@@ -17,6 +18,8 @@ const Admin = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'users';
   const setActiveTab = (value: string) => setSearchParams({ tab: value });
+  const { data: crews } = useCrewStatus(!isLoading && isAdmin);
+  const crewsNeedingALook = (crews ?? []).filter((c) => needsALook(c.state)).length;
 
   if (isLoading) {
     return (
@@ -74,6 +77,21 @@ const Admin = () => {
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
             <TabsTrigger
+              value="crews"
+              className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
+            >
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Crews</span>
+              {crewsNeedingALook > 0 && (
+                <span
+                  className="rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-4 text-destructive-foreground"
+                  aria-label={`${crewsNeedingALook} need a look`}
+                >
+                  {crewsNeedingALook}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
               value="pillars"
               className="gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
@@ -106,6 +124,10 @@ const Admin = () => {
 
           <TabsContent value="settings" className="space-y-4 animate-fade-in-up">
             <SettingsTab />
+          </TabsContent>
+
+          <TabsContent value="crews" className="space-y-4 animate-fade-in-up">
+            <CrewActivityCard />
           </TabsContent>
 
           <TabsContent value="pillars" className="space-y-4 animate-fade-in-up">
