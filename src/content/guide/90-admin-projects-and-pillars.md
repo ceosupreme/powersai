@@ -6,7 +6,7 @@ Every project in HQ has a type, and the type supplies the project's pillars, lea
 ## Where to find it
 
 - Projects: Admin Panel, "Settings", then the first sub-tab, "Projects" (a building icon on a phone).
-- Project types and templates: Admin Panel, "Pillars" (the stacked-layers icon on a phone).
+- Project types and templates: Admin Panel, "Pillars" (the stacked-layers icon on a phone). Adding ?subtab=leak_vectors or ?subtab=qualifier_fields and ?type=hvac to the address opens that inner tab and type directly.
 - One project's own pillars: the project's "Edit" form, "Pillars" tab. The same panels appear in the project's "Set up" wizard.
 
 ## What you see
@@ -22,8 +22,12 @@ Every project in HQ has a type, and the type supplies the project's pillars, lea
 - "Advanced": "Diagnostics", "Legacy Asana Fields" (read only) and "Danger Zone" with "Delete Project".
 
 ### Pillars tab
+- A help tip, "What this screen is for", explaining that this screen holds the starting settings a new project of each type begins with, and that your own brands already carry their own scorecards, so nothing here changes them.
 - "Project Types": every type with its name, a "vertical" tag where it applies, "system default" on the Client type, how many projects use it, "Duplicate" and a trash button.
-- "Project-Type Config": a "Project type" picker and three inner tabs. "Pillars" has one row per pillar (name, a locked key, weight, order number, data source and a trash button) and a "Weight sum" that turns green at 100. "Leak Vectors" has a name, how the leak is detected, its dollar formula, a benchmark and "headline" or "supporting". "Qualifier Fields" has "Ready definition (per type)", "Primary channel" and one row per question (label, locked key, answer type, channel and a "shared" switch).
+- "Starting settings by project type": a "Project type" picker that shows how many projects use each type, a sentence under it such as "12 active projects use the Internal Brand type. 12 of them have their own scorecard and ignore the pillars below.", and three inner tabs. The screen opens on the type most of your active projects use.
+- "Pillars" has a short explanation, column headings ("Pillar name", "ID (set once)", "Weight %", "Order", "Fills itself from"), one row per pillar and a line reading "Weights add up to: 100" that turns green at 100 and says "(should be 100)" otherwise. A blank "Fills itself from" means the pillar is scored by hand.
+- "Leak checks" has a short explanation and column headings ("Leak name", "How it is detected", "Dollar formula", "Benchmark", "Weight"), with "headline" or "supporting" as the weight.
+- "Lead quiz questions" has "Ready definition: what counts as a lead worth calling", "Main channel the quiz runs on", column headings ("Question", "ID (set once)", "Answer", "Channel", "Shared") and one row per question. For a type that is not a vertical, a note says the type has no public lead quiz, so the questions are not asked anywhere.
 
 ## How to use it
 
@@ -47,10 +51,10 @@ Every project in HQ has a type, and the type supplies the project's pillars, lea
 3. Turn on "Vertical" if the type should have its own public qualifier page.
 4. Tap "Duplicate". A message says how many pillars, leak vectors and qualifier fields were copied.
 
-### Edit a type's pillars, leak vectors or questions
-1. Under "Project-Type Config", pick the "Project type".
-2. Open "Pillars", "Leak Vectors" or "Qualifier Fields" and edit the rows.
-3. Add a row with "Add pillar", "Add leak vector" or "Add field".
+### Edit a type's pillars, leak checks or questions
+1. Under "Starting settings by project type", pick the "Project type".
+2. Open "Pillars", "Leak checks" or "Lead quiz questions" and edit the rows.
+3. Add a row with "Add pillar", "Add leak check" or "Add question". A new pillar needs a name and an ID.
 4. Tap "Save changes". The trash button removes a row after a pop-up confirmation.
 
 ### Give one project its own pillars
@@ -79,7 +83,8 @@ Every project in HQ has a type, and the type supplies the project's pillars, lea
 - A type can be deleted only when no project uses it, and the Client type never.
 - There is no button to create a type from scratch or rename one. Duplicate a type and edit the copy instead.
 - To change a key, delete the row and add it again.
-- Pillar weights should add up to 100. The total turns green at 100, but saving is allowed at any total.
+- Pillar weights should add up to 100. The total turns green at 100 and says "(should be 100)" otherwise, but saving is allowed at any total.
+- Changing a type's starting settings only reaches projects that still follow them. As of November 2026 every one of your brands has its own scorecard, so the brand types' pillars here are only used by projects created later.
 - The qualifier editor has no "required" switch and no place to edit answer choices, although the older Help Center says otherwise.
 - Many integration fields come from the restaurant product, such as Toast POS and 7shifts.
 - Deleting, adding and resetting here use your browser's own pop-up boxes.

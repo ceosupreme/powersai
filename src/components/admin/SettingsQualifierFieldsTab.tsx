@@ -123,7 +123,7 @@ export const SettingsQualifierFieldsTab = ({ projectType }: Props) => {
     <div className="space-y-4">
       <div className="bg-muted/30 rounded-md p-3 space-y-3">
         <div className="space-y-1.5">
-          <Label className="text-xs">Ready definition (per type)</Label>
+          <Label className="text-xs">Ready definition: what counts as a lead worth calling</Label>
           <Textarea
             rows={2}
             value={readyDef}
@@ -132,7 +132,7 @@ export const SettingsQualifierFieldsTab = ({ projectType }: Props) => {
           />
         </div>
         <div className="flex items-center gap-3">
-          <Label className="text-xs">Primary channel</Label>
+          <Label className="text-xs">Main channel the quiz runs on</Label>
           <Select value={primaryChannel || ''} onValueChange={(v) => setPrimaryChannel(v as any)}>
             <SelectTrigger className="w-[200px] h-9"><SelectValue placeholder="—" /></SelectTrigger>
             <SelectContent>
@@ -143,9 +143,20 @@ export const SettingsQualifierFieldsTab = ({ projectType }: Props) => {
       </div>
 
       <div className="space-y-2">
+        <div className="grid grid-cols-12 gap-2 px-2 text-xs font-medium text-muted-foreground">
+          <span className="col-span-3">Question</span>
+          <span className="col-span-3">ID (set once)</span>
+          <span className="col-span-1">Answer</span>
+          <span className="col-span-2">Channel</span>
+          <span className="col-span-2">Shared</span>
+          <span className="col-span-1" />
+        </div>
+        {rows.length === 0 && (
+          <p className="px-2 py-4 text-sm text-muted-foreground">No questions yet for this type. Add the first one below.</p>
+        )}
         {rows.map((r) => (
           <div key={r.id} className="grid grid-cols-12 gap-2 items-center bg-muted/30 rounded-md p-2">
-            <Input className="col-span-3 h-9" value={r.field_label}
+            <Input className="col-span-3 h-9" aria-label="Question" value={r.field_label}
               onChange={(e) => update(r.id, { field_label: e.target.value })} />
             <Input className="col-span-3 h-9 font-mono text-xs" value={r.field_key} disabled />
             <Select value={r.field_type} onValueChange={(v) => update(r.id, { field_type: v as any })}>
@@ -172,12 +183,12 @@ export const SettingsQualifierFieldsTab = ({ projectType }: Props) => {
       </div>
 
       <div className="grid grid-cols-12 gap-2 items-center border-t pt-3">
-        <Input className="col-span-3 h-9" placeholder="Label" value={newLabel}
+        <Input className="col-span-3 h-9" placeholder="New question" value={newLabel}
           onChange={(e) => setNewLabel(e.target.value)} />
-        <Input className="col-span-3 h-9 font-mono text-xs" placeholder="field_key (snake_case)"
+        <Input className="col-span-3 h-9 font-mono text-xs" placeholder="new_question_id"
           value={newKey} onChange={(e) => setNewKey(e.target.value)} />
         <Button size="sm" onClick={addRow} className="col-span-2 gap-1">
-          <Plus className="h-4 w-4" /> Add field
+          <Plus className="h-4 w-4" /> Add question
         </Button>
         <div className="col-span-4 flex justify-end">
           <Button size="sm" onClick={saveAll} disabled={saving} className="gap-1">

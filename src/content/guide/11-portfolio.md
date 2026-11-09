@@ -12,7 +12,7 @@ Portfolio is your directory and the place to see every brand and client side by 
 
 From the top:
 
-- A "Welcome — let's get your first project live" card with "Set up first project", "Take the tour" and "Launch checklist". It goes away once you dismiss it with the X, a project is fully live, or you have finished the tour and started the launch checklist.
+- A "Welcome to HQ" card with "Take the tour", "What needs me today" (opens Dashboard) and "Launch checklist", plus a line such as "26 projects in HQ · Tour not started · Checklist 0 items done". It goes away once you dismiss it with the X, or once you have finished the tour and ticked at least one checklist item.
 - The heading "Portfolio Overview" with "Week of" and the week chosen in the header.
 - Three tabs: "My brands" (open by default), "Clients" and "Prospects".
 - A summary strip: "Revenue", "Needs Attention" and "Lowest Project", plus "Data Confidence" on the Clients tab.

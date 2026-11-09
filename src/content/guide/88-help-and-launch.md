@@ -1,7 +1,7 @@
 # Help Center and Launch Checklist
 <!-- part: Tools and system | order: 88 | slug: help-and-launch | route: /launch | tags: help, help center, articles, launch, launch checklist, checklist, setup, go live, progress, automation bundle, tips, setup wizard, help and guidance -->
 
-Guide is the single help destination. Old /help links redirect to /guide. The Launch Checklist contains 24 setup and go-live steps that you tick off as you finish them; use it when setting HQ up or before giving anyone else a login. The help settings that control tips and the setup wizard are covered here too.
+Guide is the single help destination. Old /help links redirect to /guide. The Launch Checklist contains 23 setup and go-live steps that you tick off as you finish them; use it when setting HQ up or before giving anyone else a login. The help settings that control tips and the setup wizard are covered here too.
 
 ## Where to find it
 
@@ -17,8 +17,8 @@ Open Guide to search the current articles and download the guide PDF. Old Help C
 
 ### Launch Checklist
 - The heading "Launch Checklist" and "Your real remaining steps before going live."
-- A progress card such as "5 of 24 complete" with a percentage bar.
-- 24 cards, each with a checkbox, a title, a short description and usually a link such as "Open Portfolio". The first 16 are setup steps (projects, types, pillars, the lead qualifier, Weekly Review, CRM, automations, Brand Kit, Growth Audit, revenue, content and reports). The last 8 are go-live checks (the domain, a Capture Inbox test, a security check, a full backup, the public pages, AI routing, archive protection and a Guide spot-check). Ticked cards fade and are crossed out.
+- A progress card such as "5 of 23 complete" with a percentage bar.
+- 23 cards, each with a checkbox, a title, a short description and usually a link such as "Open Dashboard". The first 15 are setup steps in the order you use HQ: take the tour, clear "Waiting on me" and finish one Next 10 step, find the brand furthest from set up, check every Brand Kit, confirm channels and followers, start the top three setup items on one brand, add your material to the Playbooks, turn one Radar brief into a pipeline, follow it on the Production Board, enter last week's numbers, log one Channel Revenue entry, and four steps marked "Client businesses only" (a business type's settings, the public lead quiz, an Automation Bundle and the Automation Inbox). The last 8 are go-live checks (the domain, a Capture Inbox test, a security check, a full backup, the public pages, AI routing, archive protection and a Guide spot-check). Ticked cards fade and are crossed out.
 
 ### Help & Guidance
 - "Show help across the app", a switch for the tips and info boxes.
@@ -57,14 +57,13 @@ Open Guide and search for the feature or workflow you need.
 - Suggested: a bundle made for the project's type.
 - Keep existing: leaves automations the project already has as they are.
 - Replace with defaults: overwrites those automations with the bundle's settings.
-- Setup wizard: a short welcome tour of the setup steps. It opens on its own on Portfolio for a login that has not seen it yet.
+- Setup wizard: the nine-step getting-started tour (Dashboard, Portfolio, a brand's workspace, pipelines, playbooks, scores, client settings and the Guide). It opens on its own on Portfolio for a login that has not seen it yet, and each step has a button that opens the screen it describes in a new tab. Finishing it lands you on Dashboard.
 
 ## Good to know
 
 - Checklist ticks are manual. Nothing ticks itself, even when the work is done.
 - Your ticks are saved to your login and follow you to every device. Another person's ticks are separate.
-- "Open Integrations" opens Admin Panel, "Settings", "Projects". There is no Integrations tab; each project's integrations are in its "Edit" form under "Integrations".
-- "Open Qualifier Fields" opens the "Pillars" tab, where "Qualifier Fields" is one of the inner tabs.
+- "Open client settings" opens Admin Panel, "Pillars", on the type most of your projects use. The lead quiz questions are the inner tab "Lead quiz questions"; adding ?subtab=qualifier_fields to the address opens it directly.
 - "Open public site" sends anyone signed in to Portfolio. Check the public pages in a private or signed-out browser window.
 - The security card points to Sync Health, but Sync Health does not show security rules.
 - For other roles, the Launch Checklist page follows the "Project Home" switch in Permissions, while its menu link follows "Dashboard".

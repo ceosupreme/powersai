@@ -93,14 +93,25 @@ export const SettingsLeakVectorsTab = ({ projectType }: Props) => {
   return (
     <div className="space-y-3">
       <div className="space-y-2">
+        <div className="grid grid-cols-12 gap-2 px-2 text-xs font-medium text-muted-foreground">
+          <span className="col-span-2">Leak name</span>
+          <span className="col-span-3">How it is detected</span>
+          <span className="col-span-3">Dollar formula</span>
+          <span className="col-span-2">Benchmark</span>
+          <span className="col-span-1">Weight</span>
+          <span className="col-span-1" />
+        </div>
+        {rows.length === 0 && (
+          <p className="px-2 py-4 text-sm text-muted-foreground">No leak checks yet for this type. Add the first one below.</p>
+        )}
         {rows.map((r) => (
           <div key={r.id} className="grid grid-cols-12 gap-2 items-center bg-muted/30 rounded-md p-2">
-            <Input className="col-span-2 h-9" value={r.name} onChange={(e) => update(r.id, { name: e.target.value })} />
-            <Input className="col-span-3 h-9 text-xs" placeholder="detect_signal"
+            <Input className="col-span-2 h-9" aria-label="Leak name" value={r.name} onChange={(e) => update(r.id, { name: e.target.value })} />
+            <Input className="col-span-3 h-9 text-xs" placeholder="what signals this leak"
               value={r.detect_signal ?? ''} onChange={(e) => update(r.id, { detect_signal: e.target.value || null })} />
-            <Input className="col-span-3 h-9 text-xs" placeholder="dollarize_formula"
+            <Input className="col-span-3 h-9 text-xs" placeholder="how it turns into dollars"
               value={r.dollarize_formula ?? ''} onChange={(e) => update(r.id, { dollarize_formula: e.target.value || null })} />
-            <Input className="col-span-2 h-9 text-xs" placeholder="benchmark"
+            <Input className="col-span-2 h-9 text-xs" placeholder="normal range"
               value={r.benchmark ?? ''} onChange={(e) => update(r.id, { benchmark: e.target.value || null })} />
             <Select value={r.severity} onValueChange={(v) => update(r.id, { severity: v as Row['severity'] })}>
               <SelectTrigger className="col-span-1 h-9 text-xs"><SelectValue /></SelectTrigger>
@@ -117,10 +128,10 @@ export const SettingsLeakVectorsTab = ({ projectType }: Props) => {
       </div>
 
       <div className="grid grid-cols-12 gap-2 items-center border-t pt-3">
-        <Input className="col-span-4 h-9" placeholder="New leak vector name"
+        <Input className="col-span-4 h-9" placeholder="New leak check name"
           value={newName} onChange={(e) => setNewName(e.target.value)} />
         <Button size="sm" onClick={addRow} className="col-span-2 gap-1">
-          <Plus className="h-4 w-4" /> Add leak vector
+          <Plus className="h-4 w-4" /> Add leak check
         </Button>
         <div className="col-span-6 flex justify-end">
           <Button size="sm" onClick={saveAll} disabled={saving} className="gap-1">

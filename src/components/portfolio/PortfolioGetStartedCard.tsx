@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Building2, Compass, ListChecks, X, ArrowRight } from "lucide-react";
+import { Sparkles, LayoutDashboard, Compass, ListChecks, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetStartedState } from "@/hooks/useGetStartedState";
 
@@ -9,7 +9,7 @@ export function PortfolioGetStartedCard() {
 
   if (!state.shouldShow) return null;
 
-  const { venueCount, liveVenueCount, setupDone, checklistCompletedCount } = state;
+  const { venueCount, setupDone, checklistCompletedCount } = state;
 
   return (
     <div className="relative rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card p-6 shadow-sm">
@@ -27,31 +27,29 @@ export function PortfolioGetStartedCard() {
           <Sparkles className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-semibold text-foreground">
-            Welcome — let's get your first project live
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">Welcome to HQ</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your operator OS is ready. Pick a starting point below — you can
-            re-open any of these later from Help.
+            Take the five-minute tour, or go straight to what needs you today. You can re-open
+            both later from Admin Panel, Settings, Help & Guidance.
           </p>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
             <Button
               variant="default"
               className="justify-start"
-              onClick={() => navigate("/admin?tab=settings&subtab=bars")}
+              onClick={() => state.relaunchSetup()}
             >
-              <Building2 className="h-4 w-4" />
-              Set up first project
+              <Compass className="h-4 w-4" />
+              Take the tour
               <ArrowRight className="ml-auto h-3.5 w-3.5" />
             </Button>
             <Button
               variant="secondary"
               className="justify-start"
-              onClick={() => state.relaunchSetup()}
+              onClick={() => navigate("/workspace")}
             >
-              <Compass className="h-4 w-4" />
-              Take the tour
+              <LayoutDashboard className="h-4 w-4" />
+              What needs me today
               <ArrowRight className="ml-auto h-3.5 w-3.5" />
             </Button>
             <Button
@@ -66,7 +64,7 @@ export function PortfolioGetStartedCard() {
           </div>
 
           <p className="mt-3 text-xs text-muted-foreground">
-            {liveVenueCount} of {venueCount || 0} projects live ·{" "}
+            {venueCount || 0} project{venueCount === 1 ? "" : "s"} in HQ ·{" "}
             {setupDone ? "Tour complete" : "Tour not started"} · Checklist{" "}
             {checklistCompletedCount} item{checklistCompletedCount === 1 ? "" : "s"} done
           </p>
