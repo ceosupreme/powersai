@@ -6,7 +6,7 @@
 -- the call was handed off (on Nov 9 2026 three of them had been refused with "Sign in required"
 -- since Nov 5 while the history said "succeeded"), so public.crew_track_request can wrap their
 -- call and keep the function's answer. Wrapping the live jobs is a separate step
--- (20261109211000_crew_track_background_calls.sql); until then they show as "unknown".
+-- (20261109211000_background_jobs_scoped_keys.sql), applied the same day.
 --
 -- The Admin "Crews" tab and the morning brief read public.crew_status(): one row per crew, red
 -- (failed or missed) when the last run failed or no run came in within the crew's window.
