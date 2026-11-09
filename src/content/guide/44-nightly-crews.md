@@ -84,7 +84,7 @@ These run inside HQ's database on a fixed world clock, so their Pacific times mo
 - Recovery reports, Mondays at 8 AM Pacific: drafts a recovery report for each active project. Drafts are never sent on their own.
 - Job history cleanup, every day at 1:17 AM Pacific: deletes background-job history older than 7 days.
 
-Four of these jobs hand their work to a backend function: the automation sender, the checkout double-check, the follow-up stopper and the recovery reports. The job history only shows that the hand-off happened, so the "Crews" tab shows these four as "Result not tracked" until HQ records what the function answered.
+Four of these jobs hand their work to a backend function: the automation sender, the checkout double-check, the follow-up stopper and the recovery reports. The job history only shows that the hand-off happened, so HQ also records what the function answered each time, and the "Crews" tab goes red when the function turns the job away or fails. Since November 9, 2026 each of these jobs signs in with its own key.
 
 ## What the crews never do
 
@@ -117,6 +117,7 @@ The crews are scheduled tasks in your Claude account, not settings in HQ. Ask Cl
 - "Failed": its last run did not get its main job done, or could not send its report.
 - "Missed its run": no run came in within its window.
 - "No run logged yet": it is new on the list and its first run is still ahead.
+- "Waiting for first answer": a background job that already runs on schedule, but HQ only started recording what its function answers. The answer shows after its next run.
 - "Paused": the job is switched off.
 - "Result not tracked": the job starts on time, but HQ does not record yet whether the work behind it succeeded.
 

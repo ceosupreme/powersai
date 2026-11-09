@@ -78,7 +78,9 @@ function whenText(iso: string | null): string | null {
 }
 
 function CrewRow({ crew }: { crew: CrewStatusRow }) {
-  const look = STATE_LOOK[crew.state] ?? STATE_LOOK.unknown;
+  const base = STATE_LOOK[crew.state] ?? STATE_LOOK.unknown;
+  // A background job that already ran but whose function's answer is not recorded yet.
+  const look = crew.state === 'waiting' && crew.last_finished_at ? { ...base, label: 'Waiting for first answer' } : base;
   const red = needsALook(crew.state);
   const lastRun = whenText(crew.last_finished_at);
   const showDone = crew.crew_kind === 'claude_task' && crew.last_finished_at && crew.last_done;
