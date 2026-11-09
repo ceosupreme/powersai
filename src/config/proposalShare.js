@@ -18,4 +18,9 @@ export const PROPOSAL_SHARE = {
     description: "More leads, warmer leads, more closed business. Watch the plan in under five minutes, then approve it on the page.",
     image: "/og/proposal-keegan.jpg",
   },
+  finca: {
+    title: "Finca Growth Program | Supreme Team Media",
+    description: "More people find Finca. More of them come back. More per head. See the plan, the first 30 days and the price.",
+    image: "/og/proposal-finca.jpg",
+  },
 };

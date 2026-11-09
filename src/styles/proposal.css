@@ -143,10 +143,18 @@
 .proposal-page .proposal-form { display: grid; gap: 16px; padding: 28px; background: hsl(var(--surface)); border: 1px solid hsl(var(--rule)); border-radius: 20px; box-shadow: 0 30px 60px -36px rgba(11, 18, 40, .5); }
 .proposal-page .proposal-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .proposal-page .proposal-form label { display: grid; gap: 6px; font-size: .92rem; font-weight: 600; }
-.proposal-page .proposal-form input:not([type="checkbox"]) { width: 100%; height: 50px; padding: 0 14px; font: inherit; font-size: 1rem; color: hsl(var(--ink)); background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 12px; }
+.proposal-page .proposal-form input:not([type="checkbox"]):not([type="radio"]) { width: 100%; height: 50px; padding: 0 14px; font: inherit; font-size: 1rem; color: hsl(var(--ink)); background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 12px; }
 .proposal-page .proposal-form input:focus { outline: 2px solid hsl(var(--gold)); outline-offset: 1px; }
 .proposal-page .proposal-check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: hsl(var(--paper)); border-radius: 12px; font-weight: 500 !important; }
 .proposal-page .proposal-check input { width: 22px; height: 22px; margin-top: 2px; accent-color: hsl(var(--gold)); }
+.proposal-page .proposal-form-options { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.proposal-page .proposal-form-options legend { margin-bottom: 8px; padding: 0; font-size: .92rem; font-weight: 600; }
+.proposal-page .proposal-form .proposal-form-option { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 16px; background: hsl(var(--paper)); border: 1px solid hsl(var(--rule)); border-radius: 12px; font-weight: 500; cursor: pointer; }
+.proposal-page .proposal-form .proposal-form-option:has(input:checked) { border-color: hsl(var(--gold)); box-shadow: 0 0 0 1px hsl(var(--gold)); }
+.proposal-page .proposal-form-option input { width: 20px; height: 20px; margin-top: 2px; accent-color: hsl(var(--gold)); }
+.proposal-page .proposal-form-option > span { display: grid; gap: 2px; }
+.proposal-page .proposal-form-option strong { font-weight: 750; }
+.proposal-page .proposal-form-option > span > span { font-size: .9rem; color: hsl(var(--ink-muted)); }
 .proposal-page .proposal-form-error { padding: 12px 14px; background: hsl(0 84% 95%); color: hsl(0 60% 35%); border-radius: 10px; font-size: .95rem; }
 .proposal-page .proposal-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 26px; font: inherit; font-size: 1.1rem; font-weight: 800; color: #101412; background: linear-gradient(135deg, #F6C65A, #E89A2B); border: 0; border-radius: 14px; box-shadow: 0 12px 26px -10px rgba(232, 154, 43, .6); cursor: pointer; }
 .proposal-page .proposal-btn:disabled { opacity: .7; cursor: default; }

@@ -124,6 +124,14 @@ export type ProposalRecord = {
     confirmationBody: string;
     /** Label on the phone sticky bar. Defaults to "Request the agreement". */
     mobileLabel?: string;
+    /**
+     * Ways to start, such as the full program or a pilot. When set, the request form asks the
+     * prospect to pick one (the first is selected by default) and the choice travels in the
+     * agreement request. Leave it out when there is only one way to start.
+     */
+    options?: { label: string; detail: string }[];
+    /** Question above the start choices. Defaults to "How do you want to start?". */
+    optionsLabel?: string;
   };
   /** Appears in the agreement-request record so the owner alert reads clearly. */
   internalLabel: string;
@@ -343,7 +351,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       email: "supremeteammedia@gmail.com",
       site: "supremeteammedia.com",
     },
-    // videoUrl: "/proposal-media/keegan.mp4", // hidden until the final video is ready
+    videoUrl: "", // hidden until the final video is ready: "/proposal-media/keegan.mp4"
     pdfUrl: "",
     headlineFacts: [
       { label: "More leads", value: "Lead sources you own: ads, a website and free tools under your name" },
@@ -574,6 +582,264 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       mobileLabel: "Approve the plan",
     },
     internalLabel: "Growth Program for Life Insurance Agents, Keegan Sundberg",
+  },
+  finca: {
+    slug: "finca",
+    title: "Finca Growth Program",
+    pageTitle: "Finca Growth Program | Supreme Team Media",
+    headline: ["More people find Finca.", "More of them come back.", "More per head."],
+    subtitle: "A managed system that gets Finca found by the people nearby who still don't know it's there, brings guests back on purpose instead of by luck, and puts a method behind the check. Nothing trendy in it. Run by us, so it never lands on the GM's plate.",
+    client: {
+      company: "Finca",
+      contact: "Keenan, General Manager",
+      location: "North Park, San Diego",
+    },
+    preparedOn: "November 9, 2026",
+    preparedBy: {
+      name: "Sean Mayo",
+      company: "Supreme Team Media",
+      email: "supremeteammedia@gmail.com",
+      site: "supremeteammedia.com",
+    },
+    videoUrl: "", // no video yet; the video block stays hidden until a link goes here
+    pdfUrl: "",
+    headlineFacts: [
+      { label: "Found", value: "Finca shows up wherever people decide where to go tonight: Google, Maps, AI assistants, Yelp, OpenTable, the block itself" },
+      { label: "Back", value: "A guest list Finca owns, with follow-up that runs itself in Finca's voice" },
+      { label: "Per head", value: "A system behind the $55 target: the right sell at the right moment, measured weekly" },
+    ],
+    factsNote: "Built, run and improved for Finca by Supreme Team Media for a flat monthly fee. No percentage of sales, no per-cover charges, and it works alongside what Finca already runs.",
+    nav: [
+      { href: "#how-it-works", label: "How it works" },
+      { href: "#whats-included", label: "What's included" },
+      { href: "#the-pilot", label: "The first 30 days" },
+      { href: "#what-it-costs", label: "Your investment" },
+      { href: "#questions", label: "Questions" },
+      { href: "#accept", label: "Approve the plan" },
+    ],
+    journey: {
+      title: "One system, from the first search to the next visit.",
+      steps: [
+        { label: "Found", body: "Google, Maps, AI assistants, Yelp and OpenTable all show Finca the way it deserves to be seen: the Wine Spectator cover, Spanish wine, a menu search can read, the hours right, the reviews climbing." },
+        { label: "Chosen", body: "Content that looks like the room: the bar, the bottle wall, the plates, the people. Produced by us, published where Finca's guests actually look." },
+        { label: "Captured", body: "Every guest has a chance to join the list: at the reservation, at the bar, in the bottle shop, in the club. Simple, optional, and worth it to them." },
+        { label: "Back", body: "A thank-you, a review request, a nudge when it's been a while, a birthday, Thursday happy hour, Oyster Sunday, a bottle they liked back in the shop. In Finca's voice, a few times a year, never a robot." },
+        { label: "Measured", body: "One weekly scorecard: sales, guests, labor, operations. What's off gets flagged every morning and assigned. Owners see it monthly." },
+      ],
+    },
+    opening: [
+      "Keenan, good meeting you Thursday. This is the plan. It's written so you can forward it as it is.",
+      "Finca has the hard part done. The food, the wine, the room and the service are there, and a Wine Spectator cover says so. What's missing is reach: too many people within a mile of Grim and North Park Way still don't know Finca exists. From the outside, here's what we saw. Finca sits at 176 Google reviews at a 4.3, while The Rose in South Park sits at 537 at a 4.6, and Google weighs exactly that when it decides who to show. The menu on the site is a PDF search can't read, and the wine club and the party booking live on two other web addresses, so searches that should land on Finca don't.",
+      "This program fixes reach without touching the identity. Nothing trendy, no gimmicks, no stunts. It makes Finca easy to find, easy to come back to and easy to spend a little more at, and we run it so it never depends on anyone at Finca having spare hours. The whole plan, the first 30 days and the price are below, plus a $500 pilot if you'd rather see it work first.",
+    ],
+    outcomes: [
+      {
+        label: "Result one",
+        title: "Found, by the people who are already looking",
+        body: "When someone in North Park asks Google, Maps, Yelp or ChatGPT where to get a glass of wine tonight, the answer should be Finca. We rebuild the Google Business Profile, make the menu, the wine list, the club and the party page readable by search, put the Wine Spectator story and Spanish wine where those searches land, and run a review engine that moves the count toward where the reputation already is. This is the part of marketing that is never trendy and never stops working.",
+      },
+      {
+        label: "Result two",
+        title: "Back, on purpose instead of by luck",
+        body: "A Friday shouldn't depend on who happens to walk by. Every guest gets an easy, optional way onto Finca's own list: at the reservation, at the bar, in the shop, in the club. Then the follow-up runs by itself: a thank-you after a visit with a review request, a note when it's been a while, a birthday or anniversary, Thursday all-day happy hour, Oyster Sunday, a bottle they liked back in the shop, the club. Finca's voice, a few times a year, with a real person one reply away. Weeknights fill from a list Finca owns, not from a platform Finca rents.",
+      },
+      {
+        label: "Result three",
+        title: "More per head, with a method behind it",
+        body: "Finca has already moved the check into the fifties. Getting to $55 is a system, not a speech: the two lines that matter on a pre-shift card, the bottle-to-go close at the shelf while the table is still happy, the club offered at the right moment, and the menu engineered from Toast's own numbers so the dishes that should attach to every order do. At the $55 target, a 200-cover night is $1,000 more than a $50 night, and this program costs less than three of those nights a month. Projected, and measured on the scorecard from week one.",
+      },
+    ],
+    blocks: [],
+    included: {
+      title: "What's included",
+      headline: "Every piece, handled by us.",
+      intro: "The parts of marketing that keep working whether or not anyone posted that day, run as one program by one team, alongside what Finca already does.",
+      items: [
+        { title: "Local search and maps", body: "Google Business Profile rebuilt and managed, menu, wine list, club and party pages readable by search, Yelp and OpenTable aligned, and Finca pitched to the best-of lists and set up for the AI answers people now use to pick a spot." },
+        { title: "Review engine", body: "A review request after each captured visit, every review answered in Finca's voice within a day, and the count climbing toward the reputation Finca already has." },
+        { title: "Guest list and follow-up", body: "Capture at the reservation, the bar, the shop and the club. Follow-up, lapsed-guest nudges, birthdays, happy hour, Oyster Sunday, club and retail offers, all automatic, all approved by Finca first." },
+        { title: "Content and video", body: "Weekly photo and short video content that looks like the room, produced by us, fed to the social posting Finca already does and to Google, Yelp and OpenTable. No one on the team has to film anything." },
+        { title: "Private events and holidays", body: "A party page people can find, every inquiry answered within minutes with a human following, and the holiday calendar worked from now through December." },
+        { title: "Per-head program", body: "Pre-shift sell cards, the bottle-to-go close, the club offer, and menu engineering from Toast data. Short, practical, and run with the GM, not around him." },
+        { title: "Bottle shop and wine club", body: "Treated as their own businesses: findable online, offered at the table, and worked through the list." },
+        { title: "Scorecard and morning flags", body: "Sales, guests, labor and operations scored weekly, what's off flagged each morning and assigned, and a monthly owner report. Toast and OpenTable stay as they are; we read from them." },
+        { title: "Monthly review", body: "One 30-minute owner review a month: what moved, what's next." },
+      ],
+    },
+    monthly: [
+      { value: "Daily", label: "what's off, flagged each morning and assigned" },
+      { value: "Weekly", label: "the scorecard across sales, guests, labor and operations" },
+      { value: "Weekly", label: "new photo and video content produced by us" },
+      { value: "Monthly", label: "the 30-minute owner review" },
+    ],
+    growthLoop: {
+      title: "The system does the routine work. We keep improving the results.",
+      intro: "Your monthly fee pays for a team running Finca's reach and its guest list every week, not for software and a report. Every change is judged on covers, the list and the check, not on likes.",
+      steps: [
+        { title: "Measure", body: "The scorecard reads from Toast and OpenTable every week." },
+        { title: "Fix what's off", body: "Every flag becomes a task with a name on it." },
+        { title: "Push what works", body: "The content, the offers and the search placement that moved the numbers get more of the effort." },
+      ],
+    },
+    scoreboard: {
+      title: "What we measure",
+      stages: ["Found", "Visited", "On the list", "Came back", "Per head"],
+      note: "Tracked from Google, OpenTable and Toast, so the owners see one set of numbers.",
+    },
+    whoDoesWhat: {
+      title: "Who does what",
+      headline: "We run the reach. Finca runs the room.",
+      us: [
+        "Strategy, local search, content and video, with no filming or posting required from the team",
+        "The guest list, the follow-up, the review engine and the party inquiries",
+        "The scorecard, the morning flags and the monthly owner review",
+      ],
+      them: [
+        "Approve the message and the creative before anything goes out",
+        "Let the floor use the guest capture and the two sell lines at pre-shift",
+        "Fifteen minutes a week with Keenan. Everything else is on us",
+      ],
+    },
+    markets: {
+      title: "North Park first. Then the rest of San Diego.",
+      body: "Finca's guests live, work and drink within a few miles of Grim and North Park Way, so everything starts there: the people walking University who've never turned the corner, the buildings on the block, the regulars' friends. Once the neighborhood knows, the same system reaches the rest of the city, because the Wine Spectator story, Spanish wine, date night and the bottle shop are things people search for from La Jolla to Chula Vista.",
+      home: "North Park runs continuously.",
+      travelNote: "Citywide reach comes through search, AI answers, press and the guest list, never through stunts.",
+      scopeNote: "Included scope: one venue, built to add a second location if Finca ever opens one.",
+      textPreview: {
+        caption: "What a guest gets the day after a visit",
+        messages: [
+          { from: "agent", text: "Hi Jen, it's Finca. Thanks for coming in last night. If you've got 30 seconds, a Google review helps a small place more than you'd think." },
+          { from: "lead", text: "Done. The lamb was unreal." },
+          { from: "agent", text: "That's Joe's. Thursday is all-day happy hour if you want a lighter night." },
+        ],
+        note: "Example only. Every message is approved by Finca before it goes out, and nothing a guest sees sounds like a robot.",
+      },
+    },
+    pricing: {
+      title: "Your investment",
+      headline: "One program. Flat fees. Nothing trendy in it.",
+      lines: [
+        {
+          label: "One-time foundation",
+          amount: "$1,500",
+          body: "$750 to begin and $750 when the system is live. The Missed Money Checkup, the Google rebuild, the guest capture, the review engine, the first content set and the scorecard setup.",
+        },
+        {
+          label: "Monthly program",
+          amount: "$2,500 a month",
+          body: "Begins the day the system is live, not the day we sign. Search, content, the list and follow-up, the per-head program, the scorecard and the monthly review.",
+        },
+        {
+          label: "Or start with a 30-day pilot",
+          amount: "$500",
+          body: "Guest capture at the host stand, the bar and the shop, a review request after every captured visit, and a day-30 count of guests added and reviews in. Move to the full program and the $500 comes off the foundation.",
+        },
+      ],
+      plainRules: [
+        "No percentage of sales and no per-cover charges.",
+        "No ad spend required. If we ever add ads, Finca pays the platform directly.",
+        "Works alongside the social posting Finca already does.",
+        "Toast and OpenTable stay exactly as they are.",
+        "Finca's guest list, content, profiles and data stay Finca's.",
+      ],
+      summary: "Month one is $1,500 in two payments. Every month after is $2,500 from the day the system is live, month to month with 30 days' notice. Or prove it first with the $500 pilot, credited to the foundation when Finca moves ahead.",
+    },
+    pilot: {
+      title: "The first 30 days",
+      headline: "Build and launch in month one. Improve every month after.",
+      beforePricing: true,
+      phases: [
+        {
+          when: "Week one",
+          title: "Kickoff and checkup",
+          body: "We deliver the Missed Money Checkup on Finca, rebuild the Google Business Profile, turn on guest capture at the host stand, the bar and the shop, and switch on the review engine.",
+        },
+        {
+          when: "Weeks two to three",
+          title: "The list starts working",
+          body: "The first content set goes live. Follow-up, review requests, lapsed-guest nudges and the Thursday and Sunday reminders run from the list. Menu, wine list, club and party pages become readable by search. Pre-shift cards go to the floor.",
+        },
+        {
+          when: "By day 30",
+          title: "The system is live",
+          body: "Scorecard running from Toast and OpenTable, morning flags going to the GM, the party page live, and the first owner report delivered.",
+        },
+        {
+          when: "Day 30",
+          title: "Owner review",
+          body: "Found, visited, on the list, came back, per head. Then month to month.",
+        },
+      ],
+      build: {
+        title: "Built in month one",
+        items: [
+          "The Missed Money Checkup",
+          "Google Business Profile rebuilt, Yelp and OpenTable aligned",
+          "Menu, wine list, club and party pages search can read",
+          "Guest capture at the host stand, the bar, the shop and the club",
+          "The guest journey: thank-you, review request, lapse nudge, birthdays, happy hour, Oyster Sunday, club and retail offers",
+          "The review engine",
+          "The first photo and video content set",
+          "Pre-shift sell cards and the bottle-to-go close",
+          "The weekly scorecard and morning flags",
+        ],
+      },
+      definition: {
+        title: "What “live” means",
+        body: "The system is live when the guest list is capturing, the review engine and the follow-up are running, the Google profile is rebuilt, and the scorecard is reading from Toast and OpenTable. That's when the second $750 is due.",
+      },
+      after: "From day 30 on, the program runs month to month with 30 days' notice. Everything we build stays Finca's.",
+    },
+    why: {
+      title: "Why Supreme Team Media",
+      headline: "We built and ran the operating system behind an eight-venue San Diego group.",
+      body: [
+        "BarPulse, our bar and restaurant operating system, scores every venue every week on revenue, guest experience, labor and operations, flags what's off each morning and turns each flag into a task someone owns. It plugs into Toast and scheduling and was built for and ran inside an eight-venue San Diego hospitality group. The scorecard in this program is the same one. On top of that sits thirty years of marketing and design, which is the part that keeps Finca looking like Finca.",
+      ],
+      proof: [
+        { value: "8 venues", label: "San Diego hospitality group our operating system ran" },
+        { value: "Toast", label: "connected read-only, nothing replaced" },
+        { value: "30 years", label: "marketing and design" },
+      ],
+      link: { label: "See the work", to: "/work" },
+    },
+    faq: {
+      title: "Questions owners ask",
+      headline: "Straight answers.",
+      items: [
+        { q: "We already have someone posting and a company doing marketing. Does this replace them?", a: "No. This runs alongside. The posting keeps going; we feed it better material and coordinate so nothing doubles up. What this adds is the part nobody is doing: being found locally, the guest list, the review engine, the per-head program and the scorecard. If you ever decide to consolidate, the scorecard will tell you what's earning its keep." },
+        { q: "Is this going to make Finca look trendy?", a: "No. Nothing here is a stunt or a promotion built around what's trending. The system works behind the scenes: search, maps, the list, the reviews, the scorecard. The content looks like the room. The only thing guests notice is that Finca is easier to find and remembers them." },
+        { q: "Will guests get spammed by a robot?", a: "No. A guest hears from Finca a few times a year, in Finca's voice, with a real person one reply away, and every message is approved by Finca before it runs." },
+        { q: "What does Keenan have to do?", a: "About fifteen minutes a week, mostly approvals by text, plus the morning flags that make his day shorter, not longer. Everything else is on us." },
+        { q: "What about private parties and holidays?", a: "Part of the program. A party page people can find, every inquiry answered within minutes with a human following, and the holiday calendar worked from now through December." },
+        { q: "Do we have to change Toast or OpenTable?", a: "No. Both stay exactly as they are. We read from them; we don't replace them." },
+        { q: "What if it doesn't work?", a: "You'll see it on the scorecard before anyone has to guess. Month to month with 30 days' notice, and the guest list, content, profiles and data are Finca's either way." },
+        { q: "Can we start smaller?", a: "Yes. The 30-day pilot is $500: guest capture at the host stand, the bar and the shop, a review request after every captured visit, and a day-30 count of guests added and reviews in. If Finca moves to the full program, the $500 comes off the $1,500 foundation." },
+        { q: "Can you prove it?", a: "The scorecard in this program ran across an eight-venue San Diego group, and Finca's own numbers are on it from week one. You'll be judging real covers, a real list and a real check, not a slideshow." },
+      ],
+    },
+    afterAccept: {
+      title: "Finca's reach starts here.",
+      intro: "Pick the full program or the pilot and request the agreement with the form. Sean sends the one-page agreement and the first invoice ($750 for the program, $500 for the pilot) the same business day, and the build starts the day it clears. To start, he'll ask for:",
+      items: [
+        "Logo, brand files, and the current menu and wine list as files.",
+        "Access to the Google Business Profile, and read-only reporting access to Toast and OpenTable.",
+        "Who posts to social today, so we coordinate and nothing doubles up.",
+        "The business name and address for the agreement, and the email for the invoice.",
+      ],
+    },
+    accept: {
+      buttonLabel: "Approve the plan and request the agreement",
+      confirmationTitle: "Thank you. The agreement is on its way.",
+      confirmationBody: "Sean will send the one-page agreement and the first invoice to the email you entered the same business day, and will call the number you gave to set the kickoff.",
+      mobileLabel: "Approve the plan",
+      options: [
+        { label: "The full program", detail: "$1,500 foundation in two payments, then $2,500 a month from the day it's live" },
+        { label: "The 30-day pilot", detail: "$500, credited to the foundation if Finca moves ahead" },
+      ],
+    },
+    internalLabel: "Finca Growth Program, Finca North Park",
   },
 };
 

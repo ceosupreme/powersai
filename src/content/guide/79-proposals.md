@@ -19,12 +19,13 @@ A proposal page is a private web page made for one prospect, with your walkthrou
 - The sections: your opening note and the outcomes, the "How it works" steps, the program blocks, the monthly work and output, "Who does what" in two columns, the markets with an example calendar, the investment with an "Approve the plan" button, the pilot phases, and the "Getting started" list.
 - Side actions: "Arrange a quick proposal review" and "Ask … a question" (both open the prospect's email app addressed to you), "Download the two-page PDF" when a PDF is attached, and "Print or save this page as a PDF".
 - The "Request your agreement" form: "Your full name", "Title" (optional), "Company" (filled in already), "Best phone number" and "Email for the agreement and invoice". The fine print reads "We send the agreement for your review. Nothing is charged on this page."
+- When a proposal offers more than one way to start, such as the full program or a smaller pilot, the form opens with "How do you want to start?" and the choices, with the first one already selected. The Finca proposal offers "The full program" and "The 30-day pilot".
 - On a phone, a bar at the bottom offers "Your investment" and "Request the agreement".
 
 ## How to use it
 
 ### Make a new proposal page
-1. Gather the content: the program name, headline and subtitle; the prospect's company, contact and location; the date; a video link (YouTube, Loom or Vimeo, or a video file); an optional PDF; three headline facts; the journey steps; your opening note; outcomes; program blocks; monthly output; the improvement loop; who does what; markets; pricing lines and plain rules; pilot phases; next steps; the button and confirmation wording; and a short internal label for your alert.
+1. Gather the content: the program name, headline and subtitle; the prospect's company, contact and location; the date; a video link (YouTube, Loom or Vimeo, or a video file); an optional PDF; three headline facts; the journey steps; your opening note; outcomes; program blocks; monthly output; the improvement loop; who does what; markets; pricing lines and plain rules; pilot phases; next steps; the button and confirmation wording; the start choices, if there is more than one way to start; and a short internal label for your alert.
 2. Ask your builder to add it as a new entry in the proposal content file with a short, unique name for the link, then publish the site.
 3. Open the link yourself on a phone and on a computer before you send it.
 
@@ -34,7 +35,7 @@ A proposal page is a private web page made for one prospect, with your walkthrou
 
 ### Handle an agreement request
 1. You receive the usual new-inquiry email alert.
-2. Open "CRM", then "Inbound", then "New". The lead's message starts with "PLAN APPROVED, AGREEMENT REQUESTED" and lists the person, title, company, phone, the email for the agreement and invoice, the time, and the terms shown on the page. Its type badge reads "agreement_request".
+2. Open "CRM", then "Inbound", then "New". The lead's message starts with "PLAN APPROVED, AGREEMENT REQUESTED" and lists the person, title, company, phone, the email for the agreement and invoice, the time, and the terms shown on the page. When the proposal offered a choice, a "Start with:" line right under the first line shows which start they picked. Its type badge reads "agreement_request".
 3. Send the agreement and invoice yourself. The page never charges or sends anything.
 
 ### Make a printable proposal inside HQ

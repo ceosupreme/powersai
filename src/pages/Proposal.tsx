@@ -499,6 +499,8 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     const company = String(form.get("company") ?? "").trim();
     const phone = String(form.get("phone") ?? "").trim();
     const email = String(form.get("email") ?? "").trim();
+    // The start the prospect picked, when the proposal offers more than one (for example a pilot).
+    const startOption = p.accept.options?.length ? String(form.get("start_option") ?? p.accept.options[0].label) : "";
 
     if (name.length < 2) return setError("Please enter your full name.");
     if (company.length < 2) return setError("Please enter the company name.");
@@ -509,6 +511,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
     const terms = p.pricing.lines.map((l) => `${l.label}: ${l.amount}`).join("; ");
     const note = [
       `PLAN APPROVED, AGREEMENT REQUESTED: ${p.internalLabel}`,
+      ...(startOption ? [`Start with: ${startOption}`] : []),
       `Requested by: ${name}${title ? `, ${title}` : ""}`,
       `Company: ${company}`,
       `Phone: ${phone}`,
@@ -534,6 +537,7 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
           intent: `Plan approved, agreement requested: ${p.title}`,
           services: [p.title],
           signer_title: title || null,
+          start_option: startOption || null,
           agreement_email: email,
           agreement_requested: true,
           requested_at: requestedAt.toISOString(),
@@ -570,6 +574,20 @@ function AcceptForm({ proposal: p }: { proposal: ProposalRecord }) {
         <label>Company website<input type="text" name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>
       <h3 className="proposal-form-title">Request your agreement</h3>
+      {p.accept.options && p.accept.options.length > 0 && (
+        <fieldset className="proposal-form-options">
+          <legend>{p.accept.optionsLabel ?? "How do you want to start?"}</legend>
+          {p.accept.options.map((o, i) => (
+            <label key={o.label} className="proposal-form-option">
+              <input type="radio" name="start_option" value={o.label} defaultChecked={i === 0} />
+              <span>
+                <strong>{o.label}</strong>
+                <span>{o.detail}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
       <div className="proposal-form-row">
         <label>
           <span>Your full name</span>
