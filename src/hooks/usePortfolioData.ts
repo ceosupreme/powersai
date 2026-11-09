@@ -3,15 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useApp } from '@/context/AppContext';
 import { getGradeFromScore } from '@/utils/scoring';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEffectivePillars } from '@/lib/effectivePillars';
-import {
-  fetchEffectiveFoundationCategories,
-  fetchEffectiveFoundationItems,
-} from '@/lib/effectiveFoundation';
+import { fetchEffectivePillarsBatch } from '@/lib/effectivePillars';
+import { fetchEffectiveFoundationBatch } from '@/lib/effectiveFoundation';
+import { fetchRowsIn, groupBy, omit } from '@/lib/batchFetch';
 import { deriveFoundationScores } from '@/components/foundation-audit/deriveFoundationScores';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
 import { deriveScoreCoverage, type ScoreCoverage } from '@/lib/scoreCoverage';
-import { fetchScoreReportingWeek, priorScoreWeek, scoreReportingWeekKey } from '@/lib/scoreReportingWeek';
+import { fetchScoreReportingWeeksBatch, priorScoreWeek, scoreReportingWeekKey } from '@/lib/scoreReportingWeek';
 
 export interface PortfolioVenue {
   id: string;
@@ -87,45 +85,49 @@ export function usePortfolioData() {
 
       const result: Record<string, ScorecardRow> = {};
       const weekRowsByBar: Record<string, { id: string; week_start: string; week_end: string } | null> = {};
+      for (const barId of barIds) weekRowsByBar[barId] = null;
 
-      for (const barId of barIds) {
-        let weekRow: { id: string; week_start: string; week_end: string } | null = null;
-
-        if (selectedWeek) {
-          const { data } = await supabase
-            .from('weeks')
-            .select('id, week_start, week_end')
-            .eq('bar_id', barId)
-            .eq('week_start', selectedWeek.week_start)
-            .limit(1)
-            .maybeSingle();
-          weekRow = data;
-        }
-
-        weekRowsByBar[barId] = weekRow;
-
-        if (weekRow?.id) {
-          const [scorecardResult, coreResult] = await Promise.all([
-            supabase
-              .from('weekly_scorecard')
-              .select('overall_score, overall_grade, revenue_score, labor_score, operations_score, guest_score, confidence, trend_4wk')
-              .eq('bar_id', barId)
-              .eq('week_id', weekRow.id)
-              .maybeSingle(),
-            supabase
-              .from('weekly_core')
-              .select('net_sales, yoy_change_pct')
-              .eq('week_id', weekRow.id)
-              .maybeSingle(),
-          ]);
-
-          if (scorecardResult.data) {
-            result[barId] = {
-              ...scorecardResult.data,
-              net_sales: coreResult.data?.net_sales ?? null,
-              yoy_change_pct: coreResult.data?.yoy_change_pct ?? null,
-            };
+      // One request for every project's week row, and one each for their scorecards and sales,
+      // instead of visiting the projects one after another. Read errors leave a project without
+      // a scorecard, exactly as the one-at-a-time version did.
+      if (selectedWeek) {
+        const weekRows = await fetchRowsIn<{ id: string; bar_id: string; week_start: string; week_end: string }>(
+          'weeks', 'id, bar_id, week_start, week_end', 'bar_id', barIds,
+          (q) => q.eq('week_start', selectedWeek.week_start),
+        ).catch(() => []);
+        for (const row of weekRows) {
+          if (row.bar_id in weekRowsByBar && weekRowsByBar[row.bar_id] === null) {
+            weekRowsByBar[row.bar_id] = { id: row.id, week_start: row.week_start, week_end: row.week_end };
           }
+        }
+      }
+
+      const weekIds = Object.values(weekRowsByBar).filter((w): w is { id: string; week_start: string; week_end: string } => !!w?.id).map((w) => w.id);
+      if (weekIds.length > 0) {
+        const [scorecards, cores] = await Promise.all([
+          fetchRowsIn<ScorecardRow & { bar_id: string; week_id: string }>(
+            'weekly_scorecard',
+            'bar_id, week_id, overall_score, overall_grade, revenue_score, labor_score, operations_score, guest_score, confidence, trend_4wk',
+            'week_id', weekIds,
+          ).catch(() => []),
+          fetchRowsIn<{ week_id: string; net_sales: number | null; yoy_change_pct: number | null }>(
+            'weekly_core', 'week_id, net_sales, yoy_change_pct', 'week_id', weekIds,
+          ).catch(() => []),
+        ]);
+        for (const barId of barIds) {
+          const weekRow = weekRowsByBar[barId];
+          if (!weekRow?.id) continue;
+          // A single row only, as .maybeSingle() required: none or several means no scorecard.
+          const mine = scorecards.filter((r) => r.bar_id === barId && r.week_id === weekRow.id);
+          if (mine.length !== 1) continue;
+          const coreRows = cores.filter((r) => r.week_id === weekRow.id);
+          const core = coreRows.length === 1 ? coreRows[0] : null;
+          const { bar_id: _bar, week_id: _week, ...scorecard } = mine[0];
+          result[barId] = {
+            ...scorecard,
+            net_sales: core?.net_sales ?? null,
+            yoy_change_pct: core?.yoy_change_pct ?? null,
+          };
         }
       }
 
@@ -397,99 +399,100 @@ export function useNonClientPortfolio(projects: ProjectDirectoryRow[], requested
     queryKey: ['non-client-portfolio', ids, currentWeek, monthStart, requestedWeek ? 'exact' : 'latest'],
     enabled: projects.length > 0,
     staleTime: 60_000,
-    queryFn: async (): Promise<NonClientCardData[]> =>
-      Promise.all(
-        projects.map(async (p) => {
-          const type = p.project_type ?? 'client';
-          const weekStart = requestedWeek ?? await qc.fetchQuery({
-            queryKey: scoreReportingWeekKey(p.id, currentWeek),
-            queryFn: () => fetchScoreReportingWeek(p.id, currentWeek),
-            staleTime: 60_000,
-          });
-          const priorWeekStart = priorScoreWeek(weekStart);
-          const [pillars, scoresRes, revenueRes, categories, items, statusesRes, definitionsRes, valuesRes] =
-            await Promise.all([
-              fetchEffectivePillars(p.id, type),
-              supabase
-                .from('project_pillar_scores')
-                .select('pillar_key,score,week_start,updated_at')
-                .eq('project_id', p.id)
-                .in('week_start', [weekStart, priorWeekStart]),
-              supabase
-                .from('channel_revenue')
-                .select('amount')
-                .eq('project_id', p.id)
-                .eq('period_month', monthStart),
-              fetchEffectiveFoundationCategories(p.id, type),
-              fetchEffectiveFoundationItems(p.id, type),
-              supabase
-                .from('venue_foundation_item_status')
-                .select('item_key,status,evidence_url,notes,source,detected_at,updated_at')
-                .eq('venue_id', p.id),
-              supabase
-                .from('project_kpis')
-                .select('pillar_key,kpi_key,target')
-                .eq('project_id', p.id)
-                .eq('is_active', true),
-              supabase
-                .from('project_kpi_values')
-                .select('*')
-                .eq('project_id', p.id)
-                .eq('week_start', weekStart),
-            ]);
+    queryFn: async (): Promise<NonClientCardData[]> => {
+      // Each table is read once for every card (a handful of requests), not once per card.
+      const projectIds = projects.map((p) => p.id);
+      const typed = projects.map((p) => ({ id: p.id, project_type: p.project_type ?? 'client' }));
+      let weekOf: Map<string, string>;
+      if (requestedWeek) {
+        weekOf = new Map(projectIds.map((id) => [id, requestedWeek]));
+      } else {
+        weekOf = await fetchScoreReportingWeeksBatch(projectIds, currentWeek);
+        for (const [id, week] of weekOf) qc.setQueryData(scoreReportingWeekKey(id, currentWeek), week);
+      }
+      const weeks = [...new Set(projectIds.flatMap((id) => [weekOf.get(id)!, priorScoreWeek(weekOf.get(id)!)]))];
+      // These three never failed the whole list: a read error marks the score coverage instead.
+      const settle = <T,>(promise: Promise<T[]>) =>
+        promise.then((data) => ({ data, error: null as unknown }), (error) => ({ data: [] as T[], error }));
+      const [pillarsBy, foundationBy, scoresRes, revenueAll, statusAll, definitionsRes, valuesRes] = await Promise.all([
+        fetchEffectivePillarsBatch(typed),
+        fetchEffectiveFoundationBatch(typed),
+        settle(fetchRowsIn('project_pillar_scores', 'project_id,pillar_key,score,week_start,updated_at', 'project_id', projectIds,
+          (q) => q.in('week_start', weeks))),
+        fetchRowsIn('channel_revenue', 'project_id,amount', 'project_id', projectIds, (q) => q.eq('period_month', monthStart)),
+        fetchRowsIn('venue_foundation_item_status', 'venue_id,item_key,status,evidence_url,notes,source,detected_at,updated_at',
+          'venue_id', projectIds),
+        settle(fetchRowsIn('project_kpis', 'project_id,pillar_key,kpi_key,target', 'project_id', projectIds,
+          (q) => q.eq('is_active', true))),
+        settle(fetchRowsIn('project_kpi_values', '*', 'project_id', projectIds, (q) => q.in('week_start', weeks))),
+      ]);
+      const scoresBy = groupBy(scoresRes.data as any[], 'project_id');
+      const revenueBy = groupBy(revenueAll as any[], 'project_id');
+      const statusesBy = groupBy(statusAll as any[], 'venue_id');
+      const definitionsBy = groupBy(definitionsRes.data as any[], 'project_id');
+      const valuesBy = groupBy(valuesRes.data as any[], 'project_id');
+      const sourceError = !!(definitionsRes.error || valuesRes.error || scoresRes.error);
 
-          for (const result of [revenueRes, statusesRes]) if (result.error) throw result.error;
-          const rows = (scoresRes.data ?? []) as any[];
-          const scoreFor = (pillarKey: string, ws: string) => {
-            const row = rows.find((r) => r.pillar_key === pillarKey && r.week_start === ws);
-            return row?.score == null ? null : Number(row.score);
-          };
+      return projects.map((p) => {
+        const weekStart = weekOf.get(p.id)!;
+        const priorWeekStart = priorScoreWeek(weekStart);
+        const pillars = pillarsBy.get(p.id) ?? [];
+        const { categories, items } = foundationBy.get(p.id) ?? { categories: [], items: [] };
+        const rows = (scoresBy.get(p.id) ?? [])
+          .filter((r) => r.week_start === weekStart || r.week_start === priorWeekStart)
+          .map((r) => omit(r, 'project_id'));
+        const scoreFor = (pillarKey: string, ws: string) => {
+          const row = rows.find((r) => r.pillar_key === pillarKey && r.week_start === ws);
+          return row?.score == null ? null : Number(row.score);
+        };
 
-          const bars: NonClientPillarBar[] = pillars.map((pl) => ({
-            key: pl.pillar_key,
-            label: pl.pillar_label,
-            short: pillarInitials(pl.pillar_label),
-            score: scoreFor(pl.pillar_key, weekStart),
-          }));
+        const bars: NonClientPillarBar[] = pillars.map((pl) => ({
+          key: pl.pillar_key,
+          label: pl.pillar_label,
+          short: pillarInitials(pl.pillar_label),
+          score: scoreFor(pl.pillar_key, weekStart),
+        }));
 
-          const overall = weightedPillarOverall(
-            pillars.map((pl) => ({ weight: pl.weight, score: scoreFor(pl.pillar_key, weekStart) })),
-          );
-          const priorOverall = weightedPillarOverall(
-            pillars.map((pl) => ({
-              weight: pl.weight,
-              score: scoreFor(pl.pillar_key, priorWeekStart),
-            })),
-          );
+        const overall = weightedPillarOverall(
+          pillars.map((pl) => ({ weight: pl.weight, score: scoreFor(pl.pillar_key, weekStart) })),
+        );
+        const priorOverall = weightedPillarOverall(
+          pillars.map((pl) => ({
+            weight: pl.weight,
+            score: scoreFor(pl.pillar_key, priorWeekStart),
+          })),
+        );
 
-          const revenueRows = (revenueRes.data ?? []) as any[];
-          const monthRevenue = revenueRows.length
-            ? revenueRows.reduce((s, r) => s + Number(r.amount ?? 0), 0)
-            : null;
+        const revenueRows = (revenueBy.get(p.id) ?? []).map((r) => omit(r, 'project_id'));
+        const monthRevenue = revenueRows.length
+          ? revenueRows.reduce((s, r) => s + Number(r.amount ?? 0), 0)
+          : null;
 
-          const foundation = deriveFoundationScores(
-            categories,
-            items,
-            (statusesRes.data ?? []) as any[],
-          );
+        const foundation = deriveFoundationScores(
+          categories,
+          items,
+          (statusesBy.get(p.id) ?? []).map((r) => omit(r, 'venue_id')) as any[],
+        );
 
-          return {
-            id: p.id,
-            name: p.name,
-            focusStatus: p.focus_status,
-            overall,
-            overallWoW: overall != null && priorOverall != null ? overall - priorOverall : null,
-            pillars: bars,
-            monthRevenue,
-            potential: foundation.overall,
-            coverage: deriveScoreCoverage(
-              definitionsRes.data ?? [], valuesRes.data ?? [], pillars,
-              rows.filter((r) => r.week_start === weekStart),
-              !!(definitionsRes.error || valuesRes.error || scoresRes.error),
-              weekStart,
-            ),
-          };
-        }),
-      ),
+        return {
+          id: p.id,
+          name: p.name,
+          focusStatus: p.focus_status,
+          overall,
+          overallWoW: overall != null && priorOverall != null ? overall - priorOverall : null,
+          pillars: bars,
+          monthRevenue,
+          potential: foundation.overall,
+          coverage: deriveScoreCoverage(
+            (definitionsBy.get(p.id) ?? []).map((r) => omit(r, 'project_id')),
+            (valuesBy.get(p.id) ?? []).filter((v) => v.week_start === weekStart),
+            pillars,
+            rows.filter((r) => r.week_start === weekStart),
+            sourceError,
+            weekStart,
+          ),
+        };
+      });
+    },
   });
 }

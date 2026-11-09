@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
+import { fetchRowsIn, groupBy, omit } from '@/lib/batchFetch';
 
 export type FoundationSeverity = 'low' | 'medium' | 'high' | 'critical';
 
@@ -78,7 +79,15 @@ export async function fetchEffectiveFoundationCategories(
   if (templatesResult.error) throw templatesResult.error;
   const overrideRows = (overridesResult.data ?? []) as any[];
   const templateRows = (templatesResult.data ?? []) as any[];
+  return mergeFoundationCategories(projectType, overrideRows, templateRows);
+}
 
+/** Client types: a project's own list REPLACES the template. Other types: merge by category_key. */
+export function mergeFoundationCategories(
+  projectType: string,
+  overrideRows: any[],
+  templateRows: any[],
+): EffectiveFoundationCategory[] {
   if (projectType === CLIENT_PROJECT_TYPE) {
     if (overrideRows.length > 0) {
       return overrideRows
@@ -145,7 +154,15 @@ export async function fetchEffectiveFoundationItems(
   if (templatesResult.error) throw templatesResult.error;
   const overrideRows = (overridesResult.data ?? []) as any[];
   const templateRows = (templatesResult.data ?? []) as any[];
+  return mergeFoundationItems(projectType, overrideRows, templateRows);
+}
 
+/** Client types: a project's own list REPLACES the template. Other types: merge by item_key. */
+export function mergeFoundationItems(
+  projectType: string,
+  overrideRows: any[],
+  templateRows: any[],
+): EffectiveFoundationItem[] {
   const shape = (row: any, source: 'template' | 'override'): EffectiveFoundationItem => ({
     category_key: row.category_key,
     item_key: row.item_key,
@@ -212,4 +229,43 @@ export async function fetchEffectiveFoundationItems(
   }
 
   return merged.sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/**
+ * fetchEffectiveFoundationCategories and fetchEffectiveFoundationItems for many projects at
+ * once: four requests in total instead of four per project. `project_type` must already be
+ * resolved (the single-project functions take it the same way).
+ */
+export async function fetchEffectiveFoundationBatch(
+  projects: { id: string; project_type: string }[],
+  parts: { categories?: boolean; items?: boolean } = { categories: true, items: true },
+): Promise<Map<string, { categories: EffectiveFoundationCategory[]; items: EffectiveFoundationItem[] }>> {
+  const ids = projects.map((p) => p.id);
+  const types = projects.map((p) => p.project_type);
+  const bySort = (q: any) => q.order('sort_order', { ascending: true });
+  const none = Promise.resolve([] as any[]);
+  const [catOverrides, catTemplates, itemOverrides, itemTemplates] = await Promise.all([
+    parts.categories ? fetchRowsIn('project_foundation_category_overrides', `project_id,${CATEGORY_COLUMNS},is_hidden`, 'project_id', ids, bySort) : none,
+    parts.categories ? fetchRowsIn('foundation_category_templates', `project_type,${CATEGORY_COLUMNS}`, 'project_type', types, bySort) : none,
+    parts.items ? fetchRowsIn('project_foundation_item_overrides', `project_id,${ITEM_COLUMNS},is_hidden`, 'project_id', ids, bySort) : none,
+    parts.items ? fetchRowsIn('foundation_item_templates', `project_type,${ITEM_COLUMNS}`, 'project_type', types, bySort) : none,
+  ]);
+  const catOverridesBy = groupBy(catOverrides, 'project_id');
+  const catTemplatesBy = groupBy(catTemplates, 'project_type');
+  const itemOverridesBy = groupBy(itemOverrides, 'project_id');
+  const itemTemplatesBy = groupBy(itemTemplates, 'project_type');
+  const own = (m: Map<string, any[]>, k: string, col: string) => (m.get(k) ?? []).map((r) => omit(r, col));
+  return new Map(
+    projects.map((p) => [
+      p.id,
+      {
+        categories: parts.categories
+          ? mergeFoundationCategories(p.project_type, own(catOverridesBy, p.id, 'project_id'), own(catTemplatesBy, p.project_type, 'project_type'))
+          : [],
+        items: parts.items
+          ? mergeFoundationItems(p.project_type, own(itemOverridesBy, p.id, 'project_id'), own(itemTemplatesBy, p.project_type, 'project_type'))
+          : [],
+      },
+    ]),
+  );
 }

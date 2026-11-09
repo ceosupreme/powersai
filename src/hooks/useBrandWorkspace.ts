@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
-import { fetchActionStatusMap, fetchNextTenForProject, isSnoozed, priorityRank } from '@/hooks/useNextTen';
+import { actionRowsFor, fetchActionRowsForProjects, fetchActionStatusMap, fetchNextTenBatch, isSnoozed, priorityRank } from '@/hooks/useNextTen';
+import { fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
 import { isApprovalReady, isChannelStale, isOwnerVisible, monthBounds } from '@/lib/ownerWork';
 
@@ -38,6 +39,57 @@ export interface BrandWorkSummary {
   revenueMonth: number | null;
 }
 
+/** What a brand work summary is computed from. Both the single-brand and the many-brand loaders fill this in. */
+interface BrandWorkInputs {
+  actionRows: any[];
+  statusById: Map<string, string | null>;
+  contentRows: any[];
+  channelRows: any[];
+  productIds: string[];
+  listedProductIds: Set<string>;
+  placementCount: number;
+  revenueRows: any[];
+}
+
+function deriveBrandWorkSummary(projectId: string, x: BrandWorkInputs, now: number): BrandWorkSummary {
+  const seen = new Set<string>();
+  const waitingActions: WaitingAction[] = x.actionRows
+    .filter((a) => {
+      if (seen.has(a.id)) return false;
+      seen.add(a.id);
+      return a.status !== 'Done' && a.approval_status !== 'Rejected' && !isSnoozed(a.snoozed_until, now) && isOwnerVisible(a, x.statusById);
+    })
+    .map((a) => ({
+      id: a.id, title: a.title ?? 'Untitled step', priority: a.priority ?? null,
+      priorityRank: priorityRank(a.priority), jobId: a.job_id ?? null, projectId,
+    }))
+    .sort((a, b) => a.priorityRank - b.priorityRank);
+
+  const waitingContent: WaitingContent[] = x.contentRows
+    .filter(isApprovalReady)
+    .map((c) => ({ id: c.id, title: c.title, quality_score: c.quality_score, idea_score: c.idea_score, projectId }));
+
+  const channels = x.channelRows;
+  const followerRows = channels.filter((c) => c.followers != null);
+  const productsListed = x.productIds.filter((id) => x.listedProductIds.has(id)).length;
+  const revRows = x.revenueRows;
+
+  return {
+    projectId,
+    waitingActions,
+    waitingContent,
+    waitingCount: waitingActions.length + waitingContent.length,
+    channelsLive: channels.filter((c) => c.status === 'live').length,
+    channelsTotal: channels.length,
+    channelsStale: channels.filter((c) => isChannelStale(c, now)).length,
+    followers: followerRows.length ? followerRows.reduce((s, c) => s + Number(c.followers), 0) : null,
+    productsListed,
+    productsTotal: x.productIds.length,
+    publishedThisMonth: x.placementCount,
+    revenueMonth: revRows.length ? revRows.reduce((s, r) => s + Number(r.amount ?? 0), 0) : null,
+  };
+}
+
 export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWorkSummary> {
   const now = Date.now();
   const { start, next, monthStart } = monthBounds();
@@ -56,49 +108,71 @@ export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWor
 
   const actionRows = (actionsRes.data ?? []) as any[];
   const statusById = await fetchActionStatusMap(actionRows);
-  const seen = new Set<string>();
-  const waitingActions: WaitingAction[] = actionRows
-    .filter((a) => {
-      if (seen.has(a.id)) return false;
-      seen.add(a.id);
-      return a.status !== 'Done' && a.approval_status !== 'Rejected' && !isSnoozed(a.snoozed_until, now) && isOwnerVisible(a, statusById);
-    })
-    .map((a) => ({
-      id: a.id, title: a.title ?? 'Untitled step', priority: a.priority ?? null,
-      priorityRank: priorityRank(a.priority), jobId: a.job_id ?? null, projectId,
-    }))
-    .sort((a, b) => a.priorityRank - b.priorityRank);
-
-  const waitingContent: WaitingContent[] = ((contentRes.data ?? []) as any[])
-    .filter(isApprovalReady)
-    .map((c) => ({ id: c.id, title: c.title, quality_score: c.quality_score, idea_score: c.idea_score, projectId }));
-
-  const channels = (channelsRes.data ?? []) as any[];
-  const followerRows = channels.filter((c) => c.followers != null);
-
-  const productIds = [...new Set(((linksRes.data ?? []) as any[]).map((l) => l.product_id).filter(Boolean))];
-  let productsListed = 0;
+  const productIds = [...new Set(((linksRes.data ?? []) as any[]).map((l) => l.product_id).filter(Boolean))] as string[];
+  let listedProductIds = new Set<string>();
   if (productIds.length) {
     const lr = await T('product_listings').select('product_id').in('product_id', productIds).eq('status', 'listed');
     if (lr.error) throw lr.error;
-    productsListed = new Set(((lr.data ?? []) as any[]).map((l) => l.product_id)).size;
+    listedProductIds = new Set(((lr.data ?? []) as any[]).map((l) => l.product_id));
   }
-  const revRows = (revenueRes.data ?? []) as any[];
+  return deriveBrandWorkSummary(projectId, {
+    actionRows,
+    statusById,
+    contentRows: (contentRes.data ?? []) as any[],
+    channelRows: (channelsRes.data ?? []) as any[],
+    productIds,
+    listedProductIds,
+    placementCount: (placementsRes.data ?? []).length,
+    revenueRows: (revenueRes.data ?? []) as any[],
+  }, now);
+}
 
-  return {
-    projectId,
-    waitingActions,
-    waitingContent,
-    waitingCount: waitingActions.length + waitingContent.length,
-    channelsLive: channels.filter((c) => c.status === 'live').length,
-    channelsTotal: channels.length,
-    channelsStale: channels.filter((c) => isChannelStale(c, now)).length,
-    followers: followerRows.length ? followerRows.reduce((s, c) => s + Number(c.followers), 0) : null,
-    productsListed,
-    productsTotal: productIds.length,
-    publishedThisMonth: (placementsRes.data ?? []).length,
-    revenueMonth: revRows.length ? revRows.reduce((s, r) => s + Number(r.amount ?? 0), 0) : null,
-  };
+/**
+ * Work summaries plus each brand's top Next 10 step, for many brands at once: each table is
+ * read once for all of them (about a dozen requests) instead of around thirty per brand.
+ */
+async function fetchBrandWorkCards(projects: { id: string; name: string }[], weekStart: string): Promise<Map<string, BrandWorkCard>> {
+  const now = Date.now();
+  const { start, next, monthStart } = monthBounds();
+  const ids = projects.map((p) => p.id);
+  const [actionRows, contentRows, channelRows, linkRows, placementRows, revenueRows] = await Promise.all([
+    fetchActionRowsForProjects(ids),
+    fetchRowsIn('content_items', 'project_id,id,title,quality_score,quality_fails,approved_at,idea_score', 'project_id', ids),
+    fetchRowsIn('brand_channels', 'project_id,status,cadence_target,last_post_at,followers', 'project_id', ids),
+    fetchRowsIn('channel_product_channels', 'project_id,product_id', 'project_id', ids, undefined, ['project_id', 'product_id']),
+    fetchRowsIn('content_placements', 'project_id,id', 'project_id', ids,
+      (q) => q.eq('status', 'published').gte('verified_at', start).lt('verified_at', next)),
+    fetchRowsIn('channel_revenue', 'project_id,amount', 'project_id', ids, (q) => q.eq('period_month', monthStart)),
+  ]);
+  const statusById = await fetchActionStatusMap(actionRows);
+  const allProductIds = [...new Set((linkRows as any[]).map((l) => l.product_id).filter(Boolean))] as string[];
+  const [listedRows, nextTen] = await Promise.all([
+    fetchRowsIn('product_listings', 'product_id', 'product_id', allProductIds, (q) => q.eq('status', 'listed')),
+    fetchNextTenBatch(projects, weekStart, { actionRows, statusById, linkRows }),
+  ]);
+  const listedProductIds = new Set((listedRows as any[]).map((l) => l.product_id));
+  const contentBy = groupBy(contentRows as any[], 'project_id');
+  const channelsBy = groupBy(channelRows as any[], 'project_id');
+  const linksBy = groupBy(linkRows as any[], 'project_id');
+  const placementsBy = groupBy(placementRows as any[], 'project_id');
+  const revenueBy = groupBy(revenueRows as any[], 'project_id');
+
+  return new Map(
+    projects.map((p) => {
+      const productIds = [...new Set((linksBy.get(p.id) ?? []).map((l) => l.product_id).filter(Boolean))] as string[];
+      const summary = deriveBrandWorkSummary(p.id, {
+        actionRows: actionRowsFor(actionRows, p.id),
+        statusById,
+        contentRows: contentBy.get(p.id) ?? [],
+        channelRows: channelsBy.get(p.id) ?? [],
+        productIds,
+        listedProductIds,
+        placementCount: (placementsBy.get(p.id) ?? []).length,
+        revenueRows: revenueBy.get(p.id) ?? [],
+      }, now);
+      return [p.id, { ...summary, nextMove: nextTen.get(p.id)?.rows[0]?.step ?? null }];
+    }),
+  );
 }
 
 export function useBrandWorkSummary(projectId: string | null | undefined) {
@@ -116,18 +190,7 @@ export function useBrandWorkSummaries(projects: { id: string; name: string }[]) 
     queryKey: ['brand-work-summary', 'many', projects.map((p) => p.id).join(','), weekStart],
     enabled: projects.length > 0,
     staleTime: 60_000,
-    queryFn: async () => {
-      const out = await Promise.all(
-        projects.map(async (p) => {
-          const [summary, next] = await Promise.all([
-            fetchBrandWorkSummary(p.id),
-            fetchNextTenForProject(p.id, p.name, weekStart).catch(() => null),
-          ]);
-          return { ...summary, nextMove: next?.rows[0]?.step ?? null };
-        }),
-      );
-      return new Map(out.map((s) => [s.projectId, s]));
-    },
+    queryFn: () => fetchBrandWorkCards(projects, weekStart),
   });
 }
 
