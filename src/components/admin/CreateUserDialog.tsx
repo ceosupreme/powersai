@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -23,6 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
+import { createdUserId, workspaceRoleFor, checkedSetupWrite } from '@/lib/teamAccountSetup';
 
 interface Bar {
   id: string;
@@ -37,6 +38,7 @@ interface CreateUserDialogProps {
 export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const creatingRef = useRef(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -68,16 +70,23 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
   };
 
   const handleCreate = async () => {
-    if (!formData.email || !formData.password || !formData.full_name) {
+    if (creatingRef.current) return;
+    if (!formData.email.trim() || !formData.password || !formData.full_name.trim()) {
       toast.error('Please fill in all required fields');
       return;
     }
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
+    if (formData.role !== 'admin' && selectedBarIds.length === 0) {
+      toast.error('Assign at least one business or brand before creating a team account.');
+      return;
+    }
+    creatingRef.current = true;
     setIsCreating(true);
+    let createdAccountId: string | null = null;
     try {
       const effectivePrimary = primaryBarId && selectedBarIds.includes(primaryBarId)
         ? primaryBarId
@@ -86,9 +95,9 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
 
       const { data, error } = await supabase.functions.invoke('create-user', {
         body: {
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
-          full_name: formData.full_name,
+          full_name: formData.full_name.trim(),
           role: formData.role,
           bar_id: effectivePrimary || undefined,
           bar_name: primaryBar?.name,
@@ -98,13 +107,14 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const newUserId = data?.user_id || data?.id;
+      const newUserId = createdUserId(data);
+      createdAccountId = newUserId;
 
       // Save asana_gid to profile if provided
       if (newUserId && formData.asana_gid.trim()) {
-        await supabase.from('profiles').update({
+        await checkedSetupWrite(supabase.from('profiles').update({
           asana_gid: formData.asana_gid.trim(),
-        } as any).eq('id', newUserId);
+        } as any).eq('id', newUserId).select('id').single(), 'Profile update');
       }
 
       // Insert venue_assignments for all selected bars
@@ -115,31 +125,30 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
           role_at_venue: formData.role,
           is_primary: barId === effectivePrimary,
         }));
-        await supabase.from('venue_assignments').insert(rows);
+        await checkedSetupWrite(supabase.from('venue_assignments').insert(rows), 'Business assignments');
 
         // Sync user_bar_assignments for RLS
         const barAssignRows = selectedBarIds.map(barId => ({
           user_id: newUserId,
           bar_id: barId,
         }));
-        await supabase.from('user_bar_assignments').insert(barAssignRows);
+        // The server already upserts the primary project. Do not re-insert it.
+        await checkedSetupWrite(supabase.from('user_bar_assignments')
+          .upsert(barAssignRows, { onConflict: 'user_id,bar_id' }), 'Project access');
       }
 
       // Sync user_venue_roles so RoleContext stays consistent
       if (newUserId) {
-        const venueRoleMap: Record<string, string> = {
-          admin: 'owner', owner: 'owner', gm: 'gm', shift_lead: 'lead', staff: 'foh',
-        };
-        const mappedRole = venueRoleMap[formData.role] || 'foh';
+        const mappedRole = workspaceRoleFor(formData.role);
         if (formData.role === 'admin' || formData.role === 'owner') {
-          await supabase.from('user_venue_roles' as any).insert({
+          await checkedSetupWrite(supabase.from('user_venue_roles' as any).insert({
             user_id: newUserId, venue_id: null, role: mappedRole,
-          });
+          }), 'Workspace role');
         } else if (selectedBarIds.length > 0) {
           const venueRoleRows = selectedBarIds.map(vid => ({
             user_id: newUserId, venue_id: vid, role: mappedRole,
           }));
-          await supabase.from('user_venue_roles' as any).insert(venueRoleRows);
+          await checkedSetupWrite(supabase.from('user_venue_roles' as any).insert(venueRoleRows), 'Workspace roles');
         }
       }
 
@@ -149,14 +158,22 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       onUserCreated();
     } catch (error: any) {
       console.error('Error creating user:', error);
-      toast.error(error.message || 'Failed to create user');
+      toast.error(createdAccountId
+        ? 'The account exists, but setup is incomplete. Open Users → Edit to repair its role and business assignments before sharing access.'
+        : 'Account setup could not be confirmed. Check Users before trying again; a failed response can still leave an account.');
+      // Account creation and browser-side assignment writes are not atomic.
+      onUserCreated();
+      setOpen(false);
+      resetForm();
     } finally {
+      creatingRef.current = false;
       setIsCreating(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
+      if (creatingRef.current) return;
       setOpen(isOpen);
       if (!isOpen) resetForm();
     }}>
@@ -170,10 +187,10 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
           <DialogDescription>
-            Create a new user account with specified role and bar assignment.
+            Create a separate login and assign the businesses or brands this person works on. System Admin is not a shortcut for team access.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <fieldset disabled={isCreating} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="full_name">Full Name *</Label>
             <Input
@@ -198,7 +215,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             <Input
               id="password"
               type="password"
-              placeholder="Min 6 characters"
+              placeholder="At least 8 characters"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
             />
@@ -206,6 +223,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
           <div className="grid gap-2">
             <Label htmlFor="role">Role</Label>
             <Select
+              disabled={isCreating}
               value={formData.role}
               onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as AppRole }))}
             >
@@ -231,10 +249,10 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             />
           </div>
           <div className="grid gap-2">
-            <Label>Assigned Bars</Label>
+            <Label>Assigned businesses and brands</Label>
             <div className="space-y-2 rounded-md border border-border p-3 max-h-[200px] overflow-y-auto">
               {bars.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No bars available</p>
+                <p className="text-sm text-muted-foreground">No businesses or brands available</p>
               ) : (
                 bars.map(bar => {
                   const isChecked = selectedBarIds.includes(bar.id);
@@ -273,11 +291,11 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             </div>
             {selectedBarIds.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                {selectedBarIds.length} bar{selectedBarIds.length !== 1 ? 's' : ''} selected
+                {selectedBarIds.length} business/brand assignment{selectedBarIds.length !== 1 ? 's' : ''} selected
               </p>
             )}
           </div>
-        </div>
+        </fieldset>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isCreating}>
             Cancel
