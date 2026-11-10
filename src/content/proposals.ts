@@ -629,8 +629,8 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
     },
     opening: [
       "Keenan, good meeting you Thursday. This is the plan. It's written so you can forward it as it is.",
-      "Finca has the hard part done. The food, the wine, the room and the service are there, and a Wine Spectator cover says so. What's missing is reach: too many people within a mile of Grim and North Park Way still don't know Finca exists. From the outside, here's what we saw. Finca sits at 176 Google reviews at a 4.3, while The Rose in South Park sits at 537 at a 4.6, and Google weighs exactly that when it decides who to show. The menu on the site is a PDF search can't read, and the wine club and the party booking live on two other web addresses, so searches that should land on Finca don't.",
-      "This program fixes reach without touching the identity. Nothing trendy, no gimmicks, no stunts. It makes Finca easy to find, easy to come back to and easy to spend a little more at, and we run it so it never depends on anyone at Finca having spare hours. The whole plan, the first 30 days and the price are below, plus a $500 pilot if you'd rather see it work first.",
+      "Finca has the hard part done. The food, the wine, the room and the service are there, and a Wine Spectator cover says so. What's missing is reach: too many people within a mile of Grim and North Park Way still don't know Finca exists. From the outside, here's what we saw. Finca sits at 178 Google reviews at a 4.3, while The Rose in South Park sits at 538 at a 4.6, and Google weighs exactly that when it decides who to show. The menu on the site is a PDF search can't read, and the wine club and the party booking live on two other web addresses, so searches that should land on Finca don't.",
+      "This program fixes reach without touching the identity. Nothing trendy, no gimmicks, no stunts. It makes Finca easy to find, easy to come back to and easy to spend a little more at, and we run it so it never depends on anyone at Finca having spare hours. The whole plan, the first 30 days and the price are below.",
     ],
     outcomes: [
       {
@@ -697,7 +697,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       them: [
         "Approve the message and the creative before anything goes out",
         "Let the floor use the guest capture and the two sell lines at pre-shift",
-        "Fifteen minutes a week with Keenan. Everything else is on us",
+        "Fifteen minutes a week with Keenan",
       ],
     },
     markets: {
@@ -798,7 +798,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         "BarPulse, our bar and restaurant operating system, scores every venue every week on revenue, guest experience, labor and operations, flags what's off each morning and turns each flag into a task someone owns. It plugs into Toast and scheduling and was built for and ran inside an eight-venue San Diego hospitality group. The scorecard in this program is the same one. On top of that sits thirty years of marketing and design, which is the part that keeps Finca looking like Finca.",
       ],
       proof: [
-        { value: "8 venues", label: "San Diego hospitality group our operating system ran" },
+        { value: "8 venues", label: "one San Diego hospitality group, run on our operating system" },
         { value: "Toast", label: "connected read-only, nothing replaced" },
         { value: "30 years", label: "marketing and design" },
       ],
@@ -815,7 +815,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
         { q: "What about private parties and holidays?", a: "Part of the program. A party page people can find, every inquiry answered within minutes with a human following, and the holiday calendar worked from now through December." },
         { q: "Do we have to change Toast or OpenTable?", a: "No. Both stay exactly as they are. We read from them; we don't replace them." },
         { q: "What if it doesn't work?", a: "You'll see it on the scorecard before anyone has to guess. Month to month with 30 days' notice, and the guest list, content, profiles and data are Finca's either way." },
-        { q: "Can we start smaller?", a: "Yes. The 30-day pilot is $500: guest capture at the host stand, the bar and the shop, a review request after every captured visit, and a day-30 count of guests added and reviews in. If Finca moves to the full program, the $500 comes off the $1,500 foundation." },
+        { q: "Can we start smaller?", a: "Yes. The 30-day pilot is $500, credited to the foundation if Finca moves ahead. Details are under Your investment." },
         { q: "Can you prove it?", a: "The scorecard in this program ran across an eight-venue San Diego group, and Finca's own numbers are on it from week one. You'll be judging real covers, a real list and a real check, not a slideshow." },
       ],
     },
