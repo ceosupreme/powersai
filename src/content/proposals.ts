@@ -601,7 +601,7 @@ export const PROPOSALS: Record<string, ProposalRecord> = {
       email: "supremeteammedia@gmail.com",
       site: "supremeteammedia.com",
     },
-    videoUrl: "", // no video yet; the video block stays hidden until a link goes here
+    videoUrl: "/proposal-media/finca.mp4",
     pdfUrl: "",
     headlineFacts: [
       { label: "Found", value: "Finca shows up wherever people decide where to go tonight: Google, Maps, AI assistants, Yelp, OpenTable, the block itself" },
