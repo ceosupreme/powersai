@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { ExternalLink, Loader2, Pencil } from 'lucide-react';
+import { ExternalLink, Loader2, Pencil, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatting';
@@ -627,15 +627,74 @@ function ProductsTab({ projectId }: { projectId: string }) {
 // ---------------- Content ----------------
 function ContentTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProductionBoardItems([projectId]);
+  const qc = useQueryClient();
   const [selectedWork, setSelectedWork] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [draftTitle, setDraftTitle] = useState('');
+  const [draftFormat, setDraftFormat] = useState('short');
+  const [creatingBusy, setCreatingBusy] = useState(false);
+
+  const createPost = async () => {
+    if (!draftTitle.trim() || creatingBusy) return;
+    setCreatingBusy(true);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError ?? new Error('Sign in to create a post.');
+      const { data: post, error } = await (supabase as any).from('content_items')
+        .insert({
+          project_id: projectId, title: draftTitle.trim(), format: draftFormat,
+          stage: 'idea', purpose_type: 'teach', brief: {}, created_by: user.id,
+        })
+        .select('id').maybeSingle();
+      if (error || !post?.id) throw error ?? new Error('The post was not saved.');
+      setCreating(false);
+      setDraftTitle('');
+      await qc.invalidateQueries({ queryKey: ['production-board-items'] });
+      setSelectedWork(post.id);
+      toast.success('Draft created. Open its script, caption and files.');
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Could not create the post.');
+    } finally { setCreatingBusy(false); }
+  };
+
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">
-        Open a post to read or edit its script, attach file links, approve the finished work,
-        and record actual scheduling or publication. Changing a label does not schedule a post.
-      </p>
+      <div className="flex flex-wrap justify-between items-start gap-3">
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Open a post to edit its script, attach production links, approve finished work,
+          and record actual scheduling or publication. Changing a label never sends a post.
+        </p>
+        <Button size="sm" onClick={() => setCreating(value => !value)}>
+          <Plus className="h-4 w-4 mr-1"/>Create a post
+        </Button>
+      </div>
+      {creating && <Card className="p-4 space-y-3">
+        <label className="block space-y-1">
+          <span className="text-sm font-medium">New post title</span>
+          <Input value={draftTitle} onChange={e => setDraftTitle(e.target.value)}
+            placeholder="e.g. Three questions buyers ask before booking"/>
+        </label>
+        <label className="block space-y-1">
+          <span className="text-sm font-medium">Format</span>
+          <select className="w-full rounded-md border bg-background px-3 py-2"
+            value={draftFormat} onChange={e => setDraftFormat(e.target.value)}>
+            <option value="short">Short video or Reel</option>
+            <option value="long_form">Long-form video</option>
+            <option value="post">Social post or graphic</option>
+            <option value="article">Article or blog post</option>
+            <option value="email">Email</option>
+          </select>
+        </label>
+        <p className="text-xs text-muted-foreground">Creates a brand-specific draft; nothing is scheduled or published.</p>
+        <div className="flex flex-wrap gap-2">
+          <Button disabled={creatingBusy || !draftTitle.trim()} onClick={createPost}>
+            {creatingBusy ? 'Creating draft…' : 'Create draft and open editor'}
+          </Button>
+          <Button variant="ghost" disabled={creatingBusy} onClick={() => setCreating(false)}>Cancel</Button>
+        </div>
+      </Card>}
       {data.length === 0 ? <p className="text-sm text-muted-foreground">
         No posts yet. Use Content to create one, or turn an audience question into a production plan.
       </p> : (
@@ -659,7 +718,7 @@ function ContentTab({ projectId }: { projectId: string }) {
 function IntelTab({ projectId }: { projectId: string }) {
   const { data, isLoading, isError, refetch } = useBrandIntel(projectId);
   const jobs = useProjectJobs(projectId);
-  const byContent = jobByTarget(jobs.data ?? [], 'content_items');
+  const byContent = jobByTarget((jobs.data ?? []).filter(job => job.status !== 'parked' && job.status !== 'finished'), 'content_items');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [req, setReq] = useState<PipelineRequest | null>(null);
   const navigate = useNavigate();
