@@ -225,6 +225,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         if (error) toast.error('Pipeline created, but the recipe could not be saved on the item.');
       }
       qc.invalidateQueries({ queryKey: ['brand-workspace'] });
+      qc.invalidateQueries({ queryKey: ['brand-goal-plans', request.projectId] });
       qc.invalidateQueries({ queryKey: ['radar'] });
       qc.invalidateQueries({ queryKey: ['pain-pipelines'] });
       toast.success('Pipeline ready');
