@@ -27,6 +27,7 @@ import { AppRole } from '@/types/auth';
 interface Bar {
   id: string;
   name: string;
+  project_type?: string;
 }
 
 interface UserData {
@@ -59,6 +60,12 @@ export const EditUserDialog = ({
   const [asanaGid, setAsanaGid] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
+  const visibleProjects = bars.filter(p =>
+    editedRole !== 'owner' || p.project_type === 'internal_brand'
+  );
+  const inaccessibleSelection = selectedBarIds.filter(id =>
+    !visibleProjects.some(p => p.id === id)
+  );
 
   useEffect(() => {
     if (user && open) {
@@ -122,6 +129,13 @@ export const EditUserDialog = ({
 
   const handleSave = async () => {
     if (!user) return;
+    if (isLoadingAssignments) return toast.error('Wait for assignments to finish loading.');
+    if (editedRole !== 'admin' && selectedBarIds.length === 0) {
+      return toast.error('Choose at least one accessible brand or project for this account.');
+    }
+    if (inaccessibleSelection.length > 0) {
+      return toast.error('This role cannot use one or more existing assignments. Remove or reclassify those assignments before saving.');
+    }
 
     const checked = async (request: PromiseLike<{error: any}>) => { const {error} = await request; if(error) throw error; };
     setIsSaving(true);
@@ -214,7 +228,7 @@ export const EditUserDialog = ({
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
           <DialogDescription>
-            {user.full_name || user.email}
+            {user.full_name || user.email} — manage this person's role and exactly which projects they can access.
           </DialogDescription>
         </DialogHeader>
 
@@ -231,7 +245,7 @@ export const EditUserDialog = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="owner">Brand manager</SelectItem>
                   <SelectItem value="gm">GM</SelectItem>
                   <SelectItem value="shift_lead">Shift Lead</SelectItem>
                   <SelectItem value="staff">Staff</SelectItem>
@@ -253,7 +267,14 @@ export const EditUserDialog = ({
             </div>
 
             <div className="grid gap-2">
-              <Label>Assigned Bars</Label>
+              <Label>{editedRole === 'owner' ? 'Brands this person can manage' : 'Projects this person can access'}{editedRole !== 'admin' ? ' *' : ''}</Label>
+              <p className="text-xs text-muted-foreground">
+                {editedRole === 'owner'
+                  ? 'Brand managers may be assigned internal brands only; choose at least one.'
+                  : editedRole === 'admin'
+                    ? 'Admins have full access. Project assignments are optional.'
+                    : 'Choose at least one real project. Prospect shells are not assignable.'}
+              </p>
               {isLoadingAssignments ? (
                 <div className="flex items-center gap-2 py-2">
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -261,10 +282,10 @@ export const EditUserDialog = ({
                 </div>
               ) : (
                 <div className="space-y-2 rounded-md border border-border p-3 max-h-[200px] overflow-y-auto">
-                  {bars.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No bars available</p>
+                  {visibleProjects.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No eligible projects are available for this role.</p>
                   ) : (
-                    bars.map(bar => {
+                    visibleProjects.map(bar => {
                       const isChecked = selectedBarIds.includes(bar.id);
                       const isPrimary = primaryBarId === bar.id;
                       return (
@@ -302,13 +323,16 @@ export const EditUserDialog = ({
               )}
               {selectedBarIds.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  {selectedBarIds.length} bar{selectedBarIds.length !== 1 ? 's' : ''} selected
+                  {selectedBarIds.length} project{selectedBarIds.length !== 1 ? 's' : ''} selected
                   {primaryBarId && selectedBarIds.length > 1 && (
                     <> · Primary: {bars.find(b => b.id === primaryBarId)?.name}</>
                   )}
                 </p>
               )}
             </div>
+            {inaccessibleSelection.length > 0 && <p role="alert" className="text-xs text-destructive">
+              {inaccessibleSelection.length} existing assignment(s) are unavailable for this role. Ask an administrator to review them before saving.
+            </p>}
           </div>
 
           <p className="text-xs text-muted-foreground">
@@ -320,7 +344,7 @@ export const EditUserDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isSaving || isLoadingAssignments || inaccessibleSelection.length > 0 || (editedRole !== 'admin' && selectedBarIds.length === 0)}>
             {isSaving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
