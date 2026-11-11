@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ImportPackageDialog } from "@/components/content/ImportPackageDialog";
 import { ProductionItemCard } from "@/components/content/ProductionItemCard";
 import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
+import { ContentDetailsDialog } from '@/components/content/ContentDetailsDialog';
 import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
@@ -49,6 +50,7 @@ export default function ProductionBoard() {
   const [channel, setChannel] = useState("all");
   const [importOpen, setImportOpen] = useState(false);
   const [placement, setPlacement] = useState<{ item: BoardItem; mode: 'schedule' | 'publish' } | null>(null);
+  const [detailsItem, setDetailsItem] = useState<BoardItem | null>(null);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('due');
   const [attention, setAttention] = useState('all');
@@ -280,6 +282,7 @@ export default function ProductionBoard() {
                         approving={approve.isPending}
                         onApprove={doApprove}
                         onMove={move}
+                        onOpen={setDetailsItem}
                       />
                     ))}
                   </div>
@@ -297,6 +300,7 @@ export default function ProductionBoard() {
         onDone={() => refetch()}
       />
       <ManualPlacementDialog item={placement?.item ?? null} mode={placement?.mode ?? 'schedule'} onClose={() => setPlacement(null)} />
+      <ContentDetailsDialog item={detailsItem} onClose={() => setDetailsItem(null)} />
     </div>
   );
 }
