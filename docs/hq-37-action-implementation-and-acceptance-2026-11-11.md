@@ -61,3 +61,9 @@ Source: the agreed `HQ_Brand_Pages_Fix_Plan.pdf` pages 3–4 and `HQ_Combined_Re
 Use the agreed 13 end-to-end journeys, then all 37 actions. For each: role (admin, Jenna brand manager, restricted client/bar staff as appropriate); project ID; route and button; initial state; observed UI; expected database row/table/status (or correctly no write); follow-up route; pass/fail; screenshot or query evidence; rollback or clean test data. **Test cross-brand reads and writes as authenticated, never just by hiding a component.** Verify responsive phone experience and public STM marketing routes after source validation, before merge/publish.
 
 Do not silently reschedule overdue steps or assume a Claude Friday run, external scheduling integration, stored income, or staged disaster-recovery restoration without evidence.
+
+## Read-only publication integrity snapshot — November 11, 2026
+
+After the approved Big Paws Short B correction, live data contained **zero** content items at stage `scheduled` and **zero** content placements with status `scheduled`. Four content items were marked `published`; each had a corresponding published placement with a recorded live URL. **One historical published entry**, `Big dog, small back seat (the guide)`, has no content approval timestamp but does have a September 18, 2026 blog live URL and a saved public-verification run receipt. Preserve that historical record; do not retroactively invent approval or remove a real published link. At release, distinguish legacy publications from future content subject to the new approval gate.
+
+This was a read-only inspection; no additional publication statuses were edited.
