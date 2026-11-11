@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCompleteNextTenRow } from '@/hooks/useNextTen';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { BrandWeeklyNumbers } from '@/components/brand-workspace/BrandWeeklyNumbers';
+import { BrandProductPlans } from '@/components/brand-workspace/BrandProductPlans';
 import type { ManagedBrand } from '@/hooks/useBrandManagerProjects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -430,6 +431,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           </CardContent></Card>;
         })}
       </>}
+      <BrandProductPlans projectId={brand.id} />
     </section>}
 
     {view === 'posts' && <section className="space-y-4">
