@@ -198,7 +198,7 @@ export default function PipelineJob() {
   };
   const handToClaude = (s: Step) => updateStep(s, {
     owner_kind: 'claude', assignee: 'Claude', assignee_id: null, approval_status: 'Auto',
-  }, 'Assigned to Claude for a future scheduled run. No run has started yet.');
+  }, 'Assigned to Claude for later review. This does not start an automated run.');
   const copyPrompt = async (s: Step) => {
     const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
     const text = buildStarterPrompt({
@@ -360,9 +360,9 @@ export default function PipelineJob() {
                       </Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
                       {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done — next step</Button>}
-                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Give to Claude (scheduled run)</Button>}
+                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Assign to Claude for later review</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
-                        <span className="self-center text-xs text-muted-foreground">Assigned to Claude · no run started by this screen</span>
+                        <span className="self-center text-xs text-muted-foreground">Assigned to Claude · processing must be confirmed separately; this screen has not started a run</span>
                       )}
                       {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
                       {isAdmin && s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy Claude prompt</Button>}
