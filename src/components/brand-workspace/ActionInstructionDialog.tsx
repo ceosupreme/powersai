@@ -36,7 +36,7 @@ export function ActionInstructionDialog({ projectId, projectName, actionId, onCl
     queryFn: async (): Promise<Action> => {
       const { data, error } = await supabase.from('action_items')
         .select('id,title,detail,facts,status,approval_status,estimated_minutes,due_date,feedback_note,output_url')
-        .eq('id', actionId!).eq('bar_id', projectId).maybeSingle();
+        .eq('id', actionId!).or('bar_id.eq.' + projectId + ',venue_id.eq.' + projectId).maybeSingle();
       if (error) throw error;
       if (!data) throw new Error('This task cannot be opened for the selected project.');
       return data as Action;
@@ -56,7 +56,7 @@ export function ActionInstructionDialog({ projectId, projectName, actionId, onCl
     try {
       const { error } = await supabase.from('action_items')
         .update({ feedback_note: note.trim() || null, output_url: url.trim() || null })
-        .eq('id', row.data.id).eq('bar_id', projectId);
+        .eq('id', row.data.id).or('bar_id.eq.' + projectId + ',venue_id.eq.' + projectId);
       if (error) throw error;
       await row.refetch();
       toast.success('Progress saved. The task remains open.');
