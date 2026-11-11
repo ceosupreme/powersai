@@ -17,9 +17,10 @@ interface Props {
   items: ContentItem[];
   projectId: string;
   onEdit: (item: ContentItem) => void;
+  onPlacement: (item: ContentItem, mode: 'schedule' | 'publish') => void;
 }
 
-export function ContentKanbanView({ items, projectId, onEdit }: Props) {
+export function ContentKanbanView({ items, projectId, onEdit, onPlacement }: Props) {
   const { update } = useContentItemMutations(projectId);
 
   const grouped = useMemo(() => {
@@ -35,6 +36,10 @@ export function ContentKanbanView({ items, projectId, onEdit }: Props) {
   const advance = async (it: ContentItem) => {
     const ns = nextStage(it.stage as ContentStage);
     if (ns === it.stage) return;
+    if (ns === 'scheduled' || ns === 'published') {
+      onPlacement(it, ns === 'scheduled' ? 'schedule' : 'publish');
+      return;
+    }
     try {
       await update.mutateAsync({ id: it.id, patch: { stage: ns } });
     } catch (e: any) {
