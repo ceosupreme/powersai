@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -300,7 +300,7 @@ function Row({ title, badge, sub, children }: { title: string; badge: string; su
   );
 }
 
-function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (v: { platform: string; handle: string; url: string; followers: number | null; status: 'live' | 'dormant' }) => void }) {
+export function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (v: { platform: string; handle: string; url: string; followers: number | null; status: 'live' | 'dormant' }) => void }) {
   const [v, setV] = useState({ platform: '', handle: '', url: '', followers: '', status: 'live' as 'live' | 'dormant' });
   const platforms = row?.platforms ?? [];
   const open = !!row;
@@ -344,8 +344,9 @@ function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClo
   );
 }
 
-function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (reason: string) => void }) {
+export function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (reason: string) => void }) {
   const [reason, setReason] = useState('');
+  useEffect(() => { if (!row) setReason(''); }, [row?.asset_key]);
   return (
     <Dialog open={!!row} onOpenChange={(o) => { if (!o) { setReason(''); onClose(); } }}>
       <DialogContent>
@@ -354,14 +355,14 @@ function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose
         <Textarea id="skip-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={!reason.trim()} onClick={() => { onSave(reason.trim()); setReason(''); }}>Skip it</Button>
+          <Button disabled={!reason.trim()} onClick={() => onSave(reason.trim())}>Skip it</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-function ProfileDialog({ open, value, onClose, onSave }: { open: boolean; value: string[]; onClose: () => void; onSave: (v: string[]) => void }) {
+export function ProfileDialog({ open, value, onClose, onSave }: { open: boolean; value: string[]; onClose: () => void; onSave: (v: string[]) => void }) {
   const [sel, setSel] = useState<string[]>(value);
   const [was, setWas] = useState(false);
   if (open !== was) { setWas(open); if (open) setSel(value); }
