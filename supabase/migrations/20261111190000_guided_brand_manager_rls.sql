@@ -69,11 +69,9 @@ CREATE POLICY "Brand manager can update exclusive products"
   USING (public.user_can_edit_brand_product(id))
   WITH CHECK (public.user_can_edit_brand_product(id));
 
-DROP POLICY IF EXISTS "Authenticated can read product channel links" ON public.channel_product_channels;
-DROP POLICY IF EXISTS "Read product channel links within assigned projects" ON public.channel_product_channels;
-CREATE POLICY "Read product channel links within assigned projects"
-  ON public.channel_product_channels FOR SELECT TO authenticated
-  USING (public.user_can_access_project(project_id));
+-- Keep the existing link-table SELECT policy for this milestone.
+-- It is broader than desired; change it only after client/staff regression tests
+-- demonstrate no dependent screens rely on its current behavior.
 
 DROP POLICY IF EXISTS "Brand manager can record content placements" ON public.content_placements;
 CREATE POLICY "Brand manager can record content placements"
