@@ -8,7 +8,7 @@ import type { BoardItem } from '@/hooks/useContentProduction';
 const CONTENT_FIELDS: { key: string; label: string }[] = [
   { key: 'script', label: 'Script' }, { key: 'script_text', label: 'Script' },
   { key: 'caption', label: 'Caption' }, { key: 'copy', label: 'Copy' },
-  { key: 'hook', label: 'Hook' }, { key: 'brief', label: 'Creative brief' },
+  { key: 'hook', label: 'Hook' },
   { key: 'cta', label: 'Call to action' }, { key: 'notes', label: 'Notes' },
   { key: 'primary_keyword', label: 'Main keyword' },
 ];
@@ -39,9 +39,15 @@ export function ContentDetailsDialog({ item, onClose }: { item: BoardItem | null
       return data as Record<string, unknown>;
     },
   });
-  const fields = CONTENT_FIELDS.map((field) => ({
-    ...field, value: printable(details.data?.[field.key]),
-  })).filter((field) => field.value.trim());
+  const rawBrief = details.data?.brief;
+  const brief = rawBrief && typeof rawBrief === 'object' && !Array.isArray(rawBrief)
+    ? rawBrief as Record<string, unknown> : {};
+  const fields = [
+    { key: 'brief_summary', label: 'Creative brief', value: printable(brief.summary) },
+    { key: 'brief_script', label: 'Script', value: printable(brief.script) },
+    { key: 'brief_caption', label: 'Caption / post copy', value: printable(brief.caption) },
+    ...CONTENT_FIELDS.map((field) => ({ ...field, value: printable(details.data?.[field.key]) })),
+  ].filter((field) => field.value.trim());
   return <Dialog open={!!item} onOpenChange={(open) => !open && onClose()}>
     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
