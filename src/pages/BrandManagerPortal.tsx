@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Target } from 'lucide-react';
@@ -19,7 +19,7 @@ type Step = {
   status: string; approval_status: string | null; owner_kind: string | null;
   assignee: string | null; assignee_id: string | null; depends_on: string | null;
   job_id: string | null; step_order: number | null; due_date: string | null;
-  estimated_minutes: number | null; priority: string | null; output_url: string | null;
+  estimated_minutes: number | null; priority: string | null; output_url: string | null; feedback_note: string | null;
 };
 type Job = { id: string; title: string; status: string };
 type Post = { id: string; title: string; stage: string; format: string | null; hook: string | null; cta: string | null; brief: unknown; due_date: string | null };
@@ -83,6 +83,9 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const [postDraft, setPostDraft] = useState<PostDraft | null>(null);
   const [postBusy, setPostBusy] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null);
+  const [progressNote, setProgressNote] = useState('');
+  const [resultUrl, setResultUrl] = useState('');
+  const [savingProgress, setSavingProgress] = useState(false);
 
   const go = (nextView: string, extra: Record<string, string> = {}) => {
     const next = new URLSearchParams({ view: nextView, brand: brand.id, ...extra });
@@ -94,7 +97,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     queryKey: ['brand-manager-steps', brand.id],
     queryFn: async (): Promise<Step[]> => {
       const { data, error } = await supabase.from('action_items')
-        .select('id,title,detail,facts,status,approval_status,owner_kind,assignee,assignee_id,depends_on,job_id,step_order,due_date,estimated_minutes,priority,output_url')
+        .select('id,title,detail,facts,status,approval_status,owner_kind,assignee,assignee_id,depends_on,job_id,step_order,due_date,estimated_minutes,priority,output_url,feedback_note')
         .or(`bar_id.eq.${brand.id},venue_id.eq.${brand.id}`)
         .order('due_date', { ascending: true, nullsFirst: false })
         .limit(500);
@@ -165,6 +168,33 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const selectedStep = steps.find(s => s.id === stepId);
   const selectedPost = postsQuery.data?.find(p => p.id === postId);
   const selectedDocument = docsQuery.data?.find(d => d.id === docId);
+  const editableStep = !!selectedStep && !!user && (selectedStep.assignee_id === user.id ||
+    (!!fullName && selectedStep.assignee?.trim().toLowerCase() === fullName));
+
+  useEffect(() => {
+    setProgressNote(selectedStep?.feedback_note ?? '');
+    setResultUrl(selectedStep?.output_url ?? '');
+  }, [selectedStep?.id, selectedStep?.feedback_note, selectedStep?.output_url]);
+
+  const saveProgress = async () => {
+    if (!selectedStep || !editableStep) return toast.error('This task is not assigned to you.');
+    if (resultUrl.trim()) {
+      try {
+        const url = new URL(resultUrl.trim());
+        if (!['https:', 'http:'].includes(url.protocol)) throw new Error();
+      } catch { return toast.error('Use a valid link starting with https:// or leave the result link empty.'); }
+    }
+    setSavingProgress(true);
+    try {
+      const { data, error } = await supabase.from('action_items')
+        .update({ feedback_note: progressNote.trim() || null, output_url: resultUrl.trim() || null })
+        .eq('id', selectedStep.id).eq('bar_id', brand.id).select('id').maybeSingle();
+      if (error || !data) throw error ?? new Error('Could not save progress for this task.');
+      await stepsQuery.refetch();
+      toast.success('Your progress is saved. This step is still open.');
+    } catch (error: any) { toast.error(error?.message ?? 'Could not save your progress.'); }
+    finally { setSavingProgress(false); }
+  };
 
   const done = async (step: Step) => {
     if (!user || step.assignee_id !== user.id && step.assignee?.trim().toLowerCase() !== fullName) return toast.error('This step is not assigned to you.');
@@ -173,9 +203,24 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     }
     try {
       await complete.mutateAsync({ key: `action-${step.id}`, source: 'Action', refId: step.id, step: step.title, projectId: brand.id, projectName: brand.name, rank: 0 });
-      await qc.invalidateQueries({ queryKey: ['brand-manager-steps', brand.id] });
-      toast.success('Step completed. Here is what comes next.');
-      go('today');
+      const refreshed = await stepsQuery.refetch();
+      const current = refreshed.data ?? [];
+      const currentById = new Map(current.map(s => [s.id, s]));
+      const candidates = current.filter(s =>
+        s.status !== 'Done' && s.approval_status !== 'Rejected' &&
+        s.approval_status !== 'Blocked' &&
+        s.owner_kind === 'owner' &&
+        (s.assignee_id === user.id || (!!fullName && s.assignee?.trim().toLowerCase() === fullName)) &&
+        (!s.depends_on || currentById.get(s.depends_on)?.status === 'Done')
+      );
+      const following = chooseFirst(candidates);
+      if (following) {
+        toast.success('Step completed. Opening your next available step.');
+        go('step', { step: following.id });
+      } else {
+        toast.success('Step completed. No other steps are ready right now.');
+        go('today');
+      }
     } catch (error: any) { toast.error(error?.message ?? 'Could not save this step.'); }
   };
 
@@ -296,8 +341,19 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           </ul></div>}
           {selectedStep.output_url && <a className="inline-flex gap-1 items-center text-primary underline text-sm" href={selectedStep.output_url} target="_blank" rel="noreferrer">Open the work or result <ExternalLink className="h-4 w-4"/></a>}
         </CardContent></Card>
+        <Card className="p-4 space-y-3">
+          <div><h3 className="font-semibold">Save your progress</h3>
+            <p className="text-xs text-muted-foreground">Keep notes and a link to your work without finishing the step. Your notes stay with this task.</p></div>
+          <label className="block space-y-1"><span className="text-sm font-medium">Work notes</span>
+            <Textarea rows={3} value={progressNote} onChange={e => setProgressNote(e.target.value)} placeholder="What you've completed, what remains, or what you need…" />
+          </label>
+          <label className="block space-y-1"><span className="text-sm font-medium">Link to your work (optional)</span>
+            <Input type="url" value={resultUrl} onChange={e => setResultUrl(e.target.value)} placeholder="https://…"/>
+          </label>
+          <Button variant="outline" disabled={savingProgress || !editableStep} onClick={saveProgress}>Save progress (keep step open)</Button>
+        </Card>
         <div className="flex flex-wrap gap-2">
-          <Button disabled={complete.isPending || selectedStep.status === 'Done' || selectedStep.approval_status === 'Blocked'}
+          <Button disabled={!editableStep || savingProgress || complete.isPending || selectedStep.status === 'Done' || selectedStep.approval_status === 'Blocked'}
             onClick={() => done(selectedStep)}><CheckCircle2 className="h-4 w-4 mr-2"/>All done — next step</Button>
           <Button variant="outline" onClick={() => setHelpKind('blocked')}>I'm stuck</Button>
           <Button variant="outline" onClick={() => setHelpKind('change')}>Something needs changing</Button>
