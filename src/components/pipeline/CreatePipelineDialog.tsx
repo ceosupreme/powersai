@@ -119,8 +119,9 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   useEffect(() => {
     if (!request) { setSeeded(false); return; }
     setTitle(request.title); setProductType(request.productType ?? ''); setLevel('2'); setMoney('');
-    setMon(request.monetization ?? (request.kind === 'product' ? ['direct_sale'] : request.kind === 'content' ? ['lead_magnet', 'affiliate'] : []));
-    setPro(request.promotion ?? (request.kind === 'product' ? ['video_to_product'] : request.kind === 'content' ? ['post_to_lead_magnet'] : []));
+    // Do not silently add a sales channel or monetization playbook to product plans.
+    setMon(request.monetization ?? (request.kind === 'content' ? ['lead_magnet', 'affiliate'] : []));
+    setPro(request.promotion ?? (request.kind === 'content' ? ['post_to_lead_magnet'] : []));
     setDest(request.destinations ?? []);
   }, [request]);
 
