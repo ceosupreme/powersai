@@ -24,6 +24,8 @@ import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, t
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { RevenueLaneCard } from './RevenueLaneCard';
+import { BrandWeeklyNumbers } from './BrandWeeklyNumbers';
+import { ActionInstructionDialog } from './ActionInstructionDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -158,7 +160,10 @@ function OverviewTab({
   const activity = useBrandActivity(projectId);
   const complete = useCompleteNextTenRow();
   const [reviewPostId, setReviewPostId] = useState<string | null>(null);
+  const [standaloneActionId, setStandaloneActionId] = useState<string | null>(null);
   const s = summary.data;
+  const firstAction = s?.waitingActions[0];
+  const firstContent = s?.waitingContent[0];
 
   const tiles: { label: string; value: string }[] = [
     { label: 'Overall score', value: overallScore == null ? '—' : String(overallScore) },
@@ -181,6 +186,23 @@ function OverviewTab({
   return (
     <div className="space-y-6">
       <SetupLine projectId={projectId} onOpen={onOpenSetup} />
+      <Card className="border-primary/40">
+        <CardHeader className="pb-2"><CardTitle className="text-lg">Your next priority</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
+          firstAction ? <>
+            <p className="font-semibold">{firstAction.title}</p>
+            <p className="text-sm text-muted-foreground">This is the highest-priority actionable step currently recorded for the brand. Open it for the work instructions and expected outcome.</p>
+            {firstAction.jobId ?
+              <Button asChild><Link to={pipelineHref(projectId, firstAction.jobId)}>Start this step</Link></Button> :
+              <Button onClick={() => setStandaloneActionId(firstAction.id)}>Open work instructions</Button>}
+          </> : firstContent ? <>
+            <p className="font-semibold">{firstContent.title}</p>
+            <p className="text-sm text-muted-foreground">The content is ready for review. Check its work and approval requirements first.</p>
+            <Button onClick={() => setReviewPostId(firstContent.id)}>Review this post</Button>
+          </> : <p className="text-sm text-muted-foreground">No owner step is ready right now. Open My Plan or Accounts to set up for other work.</p>}
+        </CardContent>
+      </Card>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {tiles.map((t) => (
           <div key={t.label} className="rounded-xl border border-primary/25 bg-card p-4">
@@ -189,9 +211,10 @@ function OverviewTab({
           </div>
         ))}
       </div>
+      <BrandWeeklyNumbers projectId={projectId} />
 
       <Card className="border-primary/40">
-        <CardHeader className="pb-2"><CardTitle className="text-base">Waiting on you</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-base">Other work needing attention</CardTitle></CardHeader>
         <CardContent>
           {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
             !s || s.waitingCount === 0 ? (
@@ -215,7 +238,7 @@ function OverviewTab({
                           <Link to={pipelineHref(projectId, a.jobId)}>Open step & instructions</Link>
                         </Button>
                       ) : (
-                        <Button size="sm" variant="outline" disabled={complete.isPending} onClick={() => markDone(a.id)}>Mark completed</Button>
+                        <Button size="sm" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>
                       )}
                     </div>
                   </li>
@@ -262,6 +285,7 @@ function OverviewTab({
       </Card>
 
       {setup}
+      <ActionInstructionDialog projectId={projectId} projectName="This brand" actionId={standaloneActionId} onClose={() => setStandaloneActionId(null)} />
       <ContentWorkflowDialog projectId={projectId} itemId={reviewPostId} onClose={() => setReviewPostId(null)} />
     </div>
   );
