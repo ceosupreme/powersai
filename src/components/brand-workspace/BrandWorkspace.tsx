@@ -440,7 +440,7 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose }: { channel: 
         project_id: channel.project_id, kind: 'channel_setup',
         title: 'Set up ' + platformLabel(channel.platform),
         target_key: channel.id, channel_method_id: channel.destination_method_id,
-        level: 1,
+        level: 1, goal_text: 'Set up ' + platformLabel(channel.platform) + ' for this brand',
       });
       toast.success('Setup plan saved. Opening your first step.');
       onClose();
