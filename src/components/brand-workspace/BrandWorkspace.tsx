@@ -581,7 +581,7 @@ function AvenuesTab({ projectId, canEdit }: { projectId: string; canEdit: boolea
 function ProductsTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProjectProducts(projectId);
   const jobs = useProjectJobs(projectId);
-  const byProduct = jobByTarget(jobs.data ?? [], 'channel_products');
+  const byProduct = jobByTarget((jobs.data ?? []).filter(j => j.status !== 'parked' && j.status !== 'finished'), 'channel_products');
   const [req, setReq] = useState<PipelineRequest | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
@@ -597,7 +597,7 @@ function ProductsTab({ projectId }: { projectId: string }) {
           </div>
           <p className="text-xs text-muted-foreground capitalize">
             {p.funnel_stage ? String(p.funnel_stage).replace(/_/g, ' ') : 'No stage'} · {p.price == null ? 'No price' : formatCurrency(Number(p.price))}
-            {' · '}{p.monthly_sales == null ? '— sales/mo' : `${Number(p.monthly_sales)} sales/mo`}
+            {' · '}{p.monthly_sales == null ? 'No monthly sales figure' : `${Number(p.monthly_sales)} sales/month figure (not verified earnings)`}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {p.listings.length === 0 ? <span className="text-xs text-muted-foreground">No listings yet</span> :
@@ -607,14 +607,14 @@ function ProductsTab({ projectId }: { projectId: string }) {
           </div>
           {byProduct.get(p.id) ? (
             <Button size="sm" variant="outline" asChild>
-              <Link to={pipelineHref(projectId, byProduct.get(p.id)!)}>Pipeline</Link>
+              <Link to={pipelineHref(projectId, byProduct.get(p.id)!)}>Open the production plan</Link>
             </Button>
           ) : (
             <Button size="sm" onClick={() => setReq({
               projectId, kind: 'product', title: p.name, targetType: 'channel_products', targetId: p.id,
               productType: productTypeForName(p.name ?? ''),
               destinations: [...new Set(p.listings.map((l: any) => outletToDestination(l.outlet)).filter(Boolean))] as string[],
-            })}>Start production</Button>
+            })}>Make a plan to create this</Button>
           )}
         </div>
       ))}
