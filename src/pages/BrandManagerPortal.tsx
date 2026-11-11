@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Target } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Plus, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -96,6 +96,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const [helpBusy, setHelpBusy] = useState(false);
   const [postDraft, setPostDraft] = useState<PostDraft | null>(null);
   const [postBusy, setPostBusy] = useState(false);
+  const [creatingPost, setCreatingPost] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostFormat, setNewPostFormat] = useState('short');
+  const [newPostBusy, setNewPostBusy] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null);
   const [progressNote, setProgressNote] = useState('');
   const [resultUrl, setResultUrl] = useState('');
@@ -258,6 +262,25 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     finally { setHelpBusy(false); }
   };
 
+  const createPost = async () => {
+    if (!user || !newPostTitle.trim() || newPostBusy) return;
+    setNewPostBusy(true);
+    try {
+      const { data, error } = await (supabase as any).from('content_items')
+        .insert({
+          project_id: brand.id, title: newPostTitle.trim(), format: newPostFormat,
+          stage: 'idea', purpose_type: 'teach', brief: {}, created_by: user.id,
+        }).select('id').maybeSingle();
+      if (error || !data?.id) throw error ?? new Error('The post could not be created.');
+      setCreatingPost(false); setNewPostTitle('');
+      await qc.invalidateQueries({ queryKey: ['brand-manager-posts', brand.id] });
+      go('posts', { post: data.id });
+      setSelectedWorkflow(data.id);
+      toast.success('Post created. Start with the script, caption and files.');
+    } catch (error: any) { toast.error(error?.message ?? 'Could not create a post.'); }
+    finally { setNewPostBusy(false); }
+  };
+
   const editPost = (post: Post) => {
     const b = briefObject(post.brief);
     setPostDraft({ id: post.id, title: post.title, script: plain(b.script), caption: plain(b.caption) });
@@ -410,7 +433,29 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     </section>}
 
     {view === 'posts' && <section className="space-y-4">
-      <div><h2 className="text-xl font-semibold">Posts & videos</h2><p className="text-sm text-muted-foreground">Open a post to see its brief, edit its script or caption, and check its production status.</p></div>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div><h2 className="text-xl font-semibold">Posts & videos</h2><p className="text-sm text-muted-foreground">Create a post or open a draft to work on its script, caption, files and scheduling record.</p></div>
+        <Button onClick={() => setCreatingPost(v => !v)}><Plus className="h-4 w-4 mr-2"/>Create a post</Button>
+      </div>
+      {creatingPost && <Card className="p-4 space-y-3">
+        <label className="block space-y-1"><span className="text-sm font-medium">What is this post about?</span>
+          <Input value={newPostTitle} onChange={e => setNewPostTitle(e.target.value)} placeholder="e.g. Three mistakes when planning a holiday party"/>
+        </label>
+        <label className="block space-y-1"><span className="text-sm font-medium">What are you making?</span>
+          <select className="w-full rounded-md border bg-background px-3 py-2" value={newPostFormat} onChange={e => setNewPostFormat(e.target.value)}>
+            <option value="short">Short video or Reel</option>
+            <option value="long_form">Long video</option>
+            <option value="post">Social post or graphic</option>
+            <option value="article">Article or blog post</option>
+            <option value="email">Email</option>
+          </select>
+        </label>
+        <p className="text-xs text-muted-foreground">This creates a draft in your brand only. It will not be published.</p>
+        <div className="flex flex-wrap gap-2">
+          <Button disabled={newPostBusy || !newPostTitle.trim()} onClick={createPost}>Create draft and open</Button>
+          <Button variant="ghost" onClick={() => setCreatingPost(false)}>Cancel</Button>
+        </div>
+      </Card>}
       {postsQuery.isLoading && <p>Loading posts…</p>}
       {postsQuery.isError && <p role="alert">Posts could not be loaded. <Button onClick={() => postsQuery.refetch()}>Try again</Button></p>}
       {selectedPost ? <div className="space-y-4">
