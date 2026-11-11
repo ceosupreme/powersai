@@ -675,6 +675,7 @@ function IntelTab({ projectId }: { projectId: string }) {
         project_id: projectId, kind: 'content', title: draft.title,
         target_type: 'content_items', target_key: draft.targetKey ?? null,
         product_type: 'social_piece', level: 1,
+        goal_text: 'Answer a real audience question with useful content and measure the response',
         destinations: [], monetization: [], promotion: [],
       });
       await jobs.refetch();
