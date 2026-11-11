@@ -446,6 +446,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           <Button variant="outline" onClick={() => setHelpKind('blocked')}>I'm stuck</Button>
           <Button variant="outline" onClick={() => setHelpKind('change')}>Something needs changing</Button>
         </div>
+        {!archivedStep && selectedStep.status !== 'Done' && <p className="text-sm text-muted-foreground">
+          <strong>What happens next:</strong> When you mark this step done, HQ saves the completion
+          and opens the next available step assigned to you. If nothing is ready, you return to Today.
+        </p>}
         {helpKind && <Card className="p-4 space-y-3">
           <p className="font-medium">{helpKind === 'blocked' ? 'What is stopping you?' : 'What needs to be changed?'}</p>
           <Textarea value={helpNote} onChange={e => setHelpNote(e.target.value)} rows={3} placeholder="Describe what you need…" />
