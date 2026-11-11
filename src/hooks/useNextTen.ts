@@ -624,6 +624,32 @@ export function useCompleteNextTenRow() {
     mutationFn: async (row: NextTenRow) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (row.source === 'Action') {
+        const scoped = `bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`;
+        const { data: current, error: readError } = await supabase
+          .from('action_items')
+          .select('id,status,approval_status,owner_kind,depends_on,job_id')
+          .eq('id', row.refId).or(scoped).maybeSingle();
+        if (readError) throw readError;
+        if (!current) throw new Error('This task could not be found in the selected brand.');
+        if (current.status === 'Done') throw new Error('This step has already been completed.');
+        if (current.approval_status !== 'Approved') throw new Error('This step needs approval before it can be completed.');
+        if (current.owner_kind === 'claude') throw new Error('This step is assigned to Claude. Take it yourself first.');
+        if (current.job_id) {
+          const { data: job, error: jobError } = await (supabase as any).from('production_jobs')
+            .select('status').eq('id', current.job_id).eq('project_id', row.projectId).maybeSingle();
+          if (jobError) throw jobError;
+          if (!job || job.status === 'parked' || job.status === 'finished') {
+            throw new Error('This plan is archived or finished. The step remains in its history.');
+          }
+        }
+        if (current.depends_on) {
+          const { data: prerequisite, error: dependencyError } = await supabase.from('action_items')
+            .select('status').eq('id', current.depends_on).maybeSingle();
+          if (dependencyError) throw dependencyError;
+          if (prerequisite?.status !== 'Done') {
+            throw new Error('Finish the preceding step before completing this one.');
+          }
+        }
         const { data, error } = await supabase
           .from('action_items')
           .update({
@@ -632,11 +658,13 @@ export function useCompleteNextTenRow() {
             completed_by: user?.id ?? null,
           })
           .eq('id', row.refId)
-          .or(`bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`)
+          .or(scoped)
+          .eq('approval_status', 'Approved')
+          .neq('status', 'Done')
           .select('id')
           .maybeSingle();
         if (error) throw error;
-        if (!data) throw new Error('The step was not updated. It may have been reassigned or your access may have changed.');
+        if (!data) throw new Error('The step was not updated. It may have changed or your access may have been revoked.');
         return;
       }
       if (row.source === 'Lane') {
