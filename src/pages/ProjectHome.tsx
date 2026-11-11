@@ -506,9 +506,6 @@ export default function ProjectHome() {
               )}
             </>
           }
-          // Personal-brand setup is handled inside "Accounts to set up".
-          // Client go-live forms, capture links and email switches must never
-          // appear inside an internal brand workspace.
           setup={null}
         />
       ) : isClientProject ? (
