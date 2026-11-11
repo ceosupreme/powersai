@@ -194,7 +194,7 @@ function OverviewTab({
             <p className="font-semibold">{firstAction.title}</p>
             <p className="text-sm text-muted-foreground">This is the highest-priority actionable step currently recorded for the brand. Open it for the work instructions and expected outcome.</p>
             {firstAction.jobId ?
-              <Button asChild><Link to={pipelineHref(projectId, firstAction.jobId)}>Start this step</Link></Button> :
+              <Button asChild><Link to={pipelineHref(projectId, firstAction.jobId, firstAction.id)}>Start this step</Link></Button> :
               <Button onClick={() => setStandaloneActionId(firstAction.id)}>Open work instructions</Button>}
           </> : firstContent ? <>
             <p className="font-semibold">{firstContent.title}</p>
@@ -235,7 +235,7 @@ function OverviewTab({
                     <div className="flex gap-2">
                       {a.jobId ? (
                         <Button size="sm" asChild>
-                          <Link to={pipelineHref(projectId, a.jobId)}>Open step & instructions</Link>
+                          <Link to={pipelineHref(projectId, a.jobId, a.id)}>Open step & instructions</Link>
                         </Button>
                       ) : (
                         <Button size="sm" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>
