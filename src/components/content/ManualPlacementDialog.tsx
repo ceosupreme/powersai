@@ -20,7 +20,7 @@ function httpUrl(raw: string): string | null {
 
 /** This dialog records a user's manual action, never claims an API scheduler sent the post. */
 export function ManualPlacementDialog({ item, mode, onClose }: {
-  item: BoardItem | null;
+  item: (Pick<BoardItem, 'id' | 'project_id' | 'title'> & { placements?: BoardItem['placements'] }) | null;
   mode: Mode;
   onClose: () => void;
 }) {
@@ -51,6 +51,13 @@ export function ManualPlacementDialog({ item, mode, onClose }: {
     setBusy(true);
     try {
       const T = (table: string) => (supabase as any).from(table);
+      const { data: approval, error: approvalError } = await T('content_items')
+        .select('approved_at,stage').eq('id', item.id).eq('project_id', item.project_id).maybeSingle();
+      if (approvalError || !approval) throw approvalError ?? new Error('This post cannot be opened for your brand.');
+      if (!approval.approved_at) throw new Error('Approve the content before scheduling or publishing it.');
+      if (approval.stage === 'published' && mode === 'schedule') {
+        throw new Error('This post is already marked published. Do not move it back into scheduling.');
+      }
       // Re-check the database so retrying a partially saved action cannot create duplicates.
       const { data: existing, error: lookupError } = await T('content_placements')
         .select('id')
