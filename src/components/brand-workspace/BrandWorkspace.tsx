@@ -40,15 +40,15 @@ import { useChannelStats } from '@/hooks/useBrandSetup';
 import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
-  { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
-  { key: 'setup', label: 'Setup', accent: 'border-primary text-primary' },
-  { key: 'channels', label: 'Channels', accent: 'border-signal-green text-signal-green' },
-  { key: 'avenues', label: 'Avenues', accent: 'border-gold text-gold' },
-  { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
-  { key: 'content', label: 'Content', accent: 'border-blue-500 text-blue-600' },
-  { key: 'intel', label: 'Intel', accent: 'border-accent-foreground text-accent-foreground' },
-  { key: 'playbooks', label: 'Playbooks', accent: 'border-foreground text-foreground' },
-  { key: 'assets', label: 'Assets', accent: 'border-muted-foreground text-muted-foreground' },
+  { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
+  { key: 'setup', label: 'Accounts to set up', description: 'Accounts and profiles this brand needs, what is already active, and what to set up next.', accent: 'border-primary text-primary' },
+  { key: 'channels', label: 'Social accounts', description: 'Where this brand shows up, how its audience is growing, and when it last posted.', accent: 'border-signal-green text-signal-green' },
+  { key: 'avenues', label: 'Ways to make money', description: 'Potential revenue opportunities and the ones already running. Estimates are not earned revenue.', accent: 'border-gold text-gold' },
+  { key: 'products', label: 'What you sell', description: 'Offers and products this brand sells or plans to launch, plus their production plans.', accent: 'border-orange text-orange' },
+  { key: 'content', label: 'Posts and videos', description: 'Content from idea to publication, with the next real action on each item.', accent: 'border-blue-500 text-blue-600' },
+  { key: 'intel', label: 'What your audience asks', description: 'Audience questions, problems, and opportunities to answer them through content or offers.', accent: 'border-accent-foreground text-accent-foreground' },
+  { key: 'playbooks', label: 'How-to guides', description: 'Instructions and methods HQ uses to perform work consistently.', accent: 'border-foreground text-foreground' },
+  { key: 'assets', label: 'Files and documents', description: 'Brand resources and working documents. Open the current file before acting on it.', accent: 'border-muted-foreground text-muted-foreground' },
 ] as const;
 type TabKey = (typeof WORKSPACE_TABS)[number]['key'];
 
@@ -102,6 +102,9 @@ export function BrandWorkspace({
           </button>
         ))}
       </nav>
+      <p className="text-sm text-muted-foreground" role="status">
+        {WORKSPACE_TABS.find((t) => t.key === tab)?.description}
+      </p>
 
       {tab === 'overview' && (
         <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
@@ -552,8 +555,8 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
         <Badge variant="outline" className="text-[10px] capitalize shrink-0">{item.severity}</Badge>
       </div>
       <div className="flex gap-4 text-sm">
-        <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">per hour</p></div>
-        <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">est. 90 days</p></div>
+        <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">estimated per hour of work</p></div>
+        <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">estimated 90-day potential</p></div>
       </div>
       {canEdit && <EditCrmRecord title="Estimates" record={item} fields={[
         {key:'est_dollars_90d',label:'Estimated revenue over 90 days ($)',type:'number'},
@@ -576,22 +579,22 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
       {canEdit && item.status !== 'satisfied' && (
         marking ? (
           <div className="flex gap-2 flex-wrap">
-            <Input className="h-8 flex-1 min-w-[10rem]" placeholder="Evidence URL (optional)" value={evidence} onChange={(e) => setEvidence(e.target.value)} />
+            <Input className="h-8 flex-1 min-w-[10rem]" type="url" aria-label="Evidence link for an already-running revenue opportunity" placeholder="Account or evidence link (optional)" value={evidence} onChange={(e) => setEvidence(e.target.value)} />
             <Button size="sm" className="h-8" disabled={upsert.isPending}
               onClick={() => upsert.mutate(
                 { venue_id: projectId, item_key: item.item_key, status: 'satisfied', evidence_url: evidence.trim() || null, notes: item.notes ?? null },
-                { onSuccess: () => { toast.success('Marked on'); setMarking(false); }, onError: (e: any) => toast.error(e?.message ?? 'Could not save') },
+                { onSuccess: () => { toast.success('Recorded as running (manual confirmation)'); setMarking(false); }, onError: (e: any) => toast.error(e?.message ?? 'Could not save') },
               )}>Save</Button>
             <Button size="sm" variant="ghost" className="h-8" onClick={() => setMarking(false)}>Cancel</Button>
           </div>
         ) : (
-          <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Mark on</Button>
+          <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Already running</Button>
         )
       )}
       {item.status !== 'satisfied' && (
         <Button size="sm" className="h-8 ml-2" onClick={() => setReq({
           projectId, kind: 'lane', title: `Turn on: ${item.label}`, targetKey: item.item_key, laneItemKey: item.item_key,
-        })}>Turn this on</Button>
+        })}>Create a setup plan</Button>
       )}
       <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
     </div>
