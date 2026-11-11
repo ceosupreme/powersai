@@ -163,6 +163,7 @@ export async function startSetup(projectId: string, row: AssetMapRow): Promise<s
   const { jobId } = await composePipeline({
     project_id: projectId, kind: 'channel_setup', title: `Set up ${row.label}`,
     target_key: channelId, level: 1,
+    goal_text: 'Set up or verify ' + row.label + ' so the brand can use it',
     channel_method_key: row.playbook_key,
     custom_steps: row.asset_key === 'media_kit' ? MEDIA_KIT_STEPS : null,
   });
