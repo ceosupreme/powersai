@@ -13,9 +13,11 @@ interface ProtectedRouteProps {
   children: ReactNode;
   allowedRoles?: UserRole[];
   pageKey?: PageKey;
+  /** Require the verified global admin role, not merely a portfolio owner role. */
+  adminOnly?: boolean;
 }
 
-export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, allowedRoles, pageKey, adminOnly = false }: ProtectedRouteProps) => {
   const { user, isLoading, permissionsError, isAdmin, canAccessPage, signOut, refreshProfile } = useAuth();
   const { currentRole, isLoading: roleLoading } = useRole();
   const location = useLocation();
@@ -100,6 +102,11 @@ export const ProtectedRoute = ({ children, allowedRoles, pageKey }: ProtectedRou
   // Admin users bypass all role-gating
   if (isAdmin) {
     return <>{children}</>;
+  }
+
+  // Portfolio owners and brand managers are not global administrators.
+  if (adminOnly) {
+    return <Navigate to={getRoleHome(currentRole)} replace />;
   }
 
   const effectiveRoles = allowedRoles || getAllowedRoles(location.pathname);
