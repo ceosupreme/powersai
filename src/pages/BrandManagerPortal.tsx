@@ -25,7 +25,7 @@ type Step = {
   job_id: string | null; step_order: number | null; due_date: string | null;
   estimated_minutes: number | null; priority: string | null; output_url: string | null; feedback_note: string | null;
 };
-type Job = { id: string; title: string; status: string };
+type Job = { id: string; title: string; status: string; goal_text: string | null };
 type Post = { id: string; title: string; stage: string; format: string | null; hook: string | null; cta: string | null; brief: unknown; due_date: string | null };
 type BrandDocument = { id: string; title: string; summary: string | null; full_text: string | null; external_url: string | null; attachment_url: string | null; updated_at: string | null };
 type PostDraft = { id: string; title: string; script: string; caption: string };
@@ -130,11 +130,11 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     queryKey: ['brand-manager-jobs', brand.id],
     queryFn: async (): Promise<Job[]> => {
       const { data, error } = await (supabase as any).from('production_jobs')
-        .select('id,title,status').eq('project_id', brand.id).order('created_at', { ascending: false });
+        .select('id,title,status,goal_text').eq('project_id', brand.id).order('created_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
-    enabled: view === 'plan',
+    enabled: view === 'plan' || view === 'today' || view === 'step',
   });
   const postsQuery = useQuery({
     queryKey: ['brand-manager-posts', brand.id],
@@ -187,6 +187,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const eligible = pending.filter(s => s.approval_status !== 'Blocked' && (!s.depends_on || byId.get(s.depends_on)?.status === 'Done'));
   const nextStep = chooseFirst(eligible);
   const selectedStep = steps.find(s => s.id === stepId);
+  const nextJob = jobsQuery.data?.find(j => j.id === nextStep?.job_id);
+  const activeJob = jobsQuery.data?.find(j => j.id === selectedStep?.job_id);
   const selectedPost = postsQuery.data?.find(p => p.id === postId);
   const selectedDocument = docsQuery.data?.find(d => d.id === docId);
   const editableStep = !!selectedStep && !!user && (selectedStep.assignee_id === user.id ||
@@ -334,6 +336,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
             <div>
               <p className="text-lg font-semibold">{nextStep.title}</p>
               <p className="mt-2 text-sm text-muted-foreground">{nextStep.detail || 'Open this step for its instructions and expected result.'}</p>
+              {nextJob?.goal_text && <p className="mt-2 text-sm"><strong>Business result:</strong> {nextJob.goal_text}</p>}
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
               <span className="inline-flex gap-1 items-center"><Clock3 className="h-4 w-4" />{minutesFor(nextStep) == null ? 'Time not estimated' : `About ${minutesFor(nextStep)} minutes`}</span>
@@ -370,6 +373,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
         <div>
           <p className="text-sm text-muted-foreground">Step {selectedStep.step_order ?? '—'} · {dueText(selectedStep.due_date)}</p>
           <h2 className="text-2xl font-bold mt-1">{selectedStep.title}</h2>
+          {activeJob?.goal_text && <p className="mt-2 text-sm text-muted-foreground"><strong>Why this work matters:</strong> {activeJob.goal_text}</p>}
         </div>
         <Card><CardHeader><CardTitle className="text-base">What to do</CardTitle></CardHeader><CardContent className="space-y-3">
           {selectedStep.detail
@@ -416,7 +420,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           const items = mine.filter(s => (s.job_id ?? 'other') === group).sort((a,b) => (a.step_order ?? 999) - (b.step_order ?? 999));
           const job = jobsQuery.data?.find(j => j.id === group);
           const weeks = [...new Set(items.map(s => weekStart(s.due_date)))].sort((a,b) => a === 'undated' ? 1 : b === 'undated' ? -1 : a.localeCompare(b));
-          return <Card key={group}><CardHeader><CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle></CardHeader><CardContent className="space-y-4">
+          return <Card key={group}><CardHeader>
+            <CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle>
+            {job?.goal_text && <p className="text-sm text-muted-foreground">Business result: {job.goal_text}</p>}
+          </CardHeader><CardContent className="space-y-4">
             {weeks.map(week => {
               const within = items.filter(s => weekStart(s.due_date) === week);
               return <section key={week} className="space-y-1">
