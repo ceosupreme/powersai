@@ -67,6 +67,8 @@ The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pag
 ## Change log
 
 - `src/components/brand-workspace/BrandWorkspace.tsx`: plain-language labels and descriptive text for nine tabs. Existing tab keys preserved; source-only, isolated branch, not deployed. Full runtime smoke test still required.
+- `src/components/brand-workspace/SetupTab.tsx`: created setup plans open directly instead of relying on expiring toast links; source-only, not deployed.
+- `src/components/pipeline/CreatePipelineDialog.tsx`: product plans no longer preselect every brand channel. Explicitly chosen selling outlets determine destination steps; only live channels prefill non-product jobs. Unwritten/draft guides are labeled unavailable instead of generating placeholder plans through this dialog; source-only, not deployed.
 
 ## Blockers / decisions
 
