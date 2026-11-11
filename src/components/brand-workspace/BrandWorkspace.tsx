@@ -876,14 +876,51 @@ function AssetPreview({ path, mime, name }: { path: string; mime: string | null;
 }
 
 function DocRow({ d }: { d: KnowledgeRow }) {
-  const href = d.attachment_url || d.external_url;
+  const [open, setOpen] = useState(false);
+  const current = useQuery({
+    queryKey: ['brand-workspace', 'document-reader', d.id],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from('knowledge_base')
+        .select('id,title,version,summary,full_text,external_url,attachment_url,updated_at')
+        .eq('id', d.id).maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('This document is no longer available to your account.');
+      return data as {
+        id: string; title: string; version: string | null; summary: string | null;
+        full_text: string | null; external_url: string | null;
+        attachment_url: string | null; updated_at: string | null;
+      };
+    },
+  });
+  const src = current.data?.attachment_url || current.data?.external_url;
+  const original = src && /^https?:\/\//i.test(src) ? src : null;
   return (
     <li className="py-2 flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-sm text-foreground">{d.title}{d.version ? ` · v${d.version}` : ''}</p>
+        <p className="text-sm text-foreground">{d.title}{d.version ? ' · v' + d.version : ''}</p>
         <p className="text-xs text-muted-foreground">Review by {dash(d.expiry_date)}{d.status === 'draft' ? ' · planned' : ''}</p>
       </div>
-      {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline shrink-0">Open</a>}
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>Read document</Button>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent className="overflow-y-auto w-full sm:max-w-xl">
+          <SheetHeader>
+            <SheetTitle>{current.data?.title ?? d.title}</SheetTitle>
+            <SheetDescription>Current HQ document text and its original reference, if available.</SheetDescription>
+          </SheetHeader>
+          {current.isLoading ? <div className="pt-5"><Loading /></div> :
+            current.isError ? <div className="pt-5"><LoadError onRetry={() => current.refetch()} /></div> :
+            <div className="pt-5 space-y-3">
+              {current.data?.summary && <p className="text-sm text-muted-foreground">{current.data.summary}</p>}
+              {current.data?.full_text ? (
+                <div className="whitespace-pre-wrap text-sm leading-relaxed rounded-lg border p-4">{current.data.full_text}</div>
+              ) : <p className="text-sm text-muted-foreground">There is no readable text stored for this document yet.</p>}
+              {original && <Button asChild variant="outline" size="sm">
+                <a href={original} target="_blank" rel="noreferrer">Open original source</a>
+              </Button>}
+            </div>}
+        </SheetContent>
+      </Sheet>
     </li>
   );
 }
