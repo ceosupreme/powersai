@@ -1,7 +1,7 @@
 import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
 import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,7 +39,7 @@ import { PlaybooksTab } from './PlaybooksTab';
 import { SetupLine, SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
-import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
+import { composePipeline, outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
   { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
@@ -273,7 +273,6 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
   const methods = useKnowledgeRows(data.map((c) => c.destination_method_id));
   const [open, setOpen] = useState<BrandChannel | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
-  const [req, setReq] = useState<PipelineRequest | null>(null);
   const [shots, setShots] = useState(false);
   const stats = useChannelStats(data.map((c) => c.id));
 
@@ -338,9 +337,7 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
           );
         })}
       </ul>
-      <ChannelDrawer channel={open} stats={open ? stats.data?.get(open.id) ?? [] : []} canEdit={isAdmin} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)}
-        onSetUp={(c) => { setOpen(null); setReq({ projectId, kind: 'channel_setup', title: `Set up ${platformLabel(c.platform)}`, targetKey: c.id, channelMethodId: c.destination_method_id }); }} />
-      <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
+      <ChannelDrawer channel={open} stats={open ? stats.data?.get(open.id) ?? [] : []} canEdit={isAdmin} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)} />
     </>
   );
 }
@@ -408,7 +405,26 @@ function ChannelEditor({ channel, onDone }: { channel: BrandChannel; onDone: () 
   );
 }
 
-function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { channel: BrandChannel | null; stats: import('@/hooks/useBrandSetup').ChannelStatRow[]; canEdit: boolean; method: KnowledgeRow | null; onClose: () => void; onSetUp: (c: BrandChannel) => void }) {
+function ChannelDrawer({ channel, stats, canEdit, method, onClose }: { channel: BrandChannel | null; stats: import('@/hooks/useBrandSetup').ChannelStatRow[]; canEdit: boolean; method: KnowledgeRow | null; onClose: () => void }) {
+  const navigate = useNavigate();
+  const [creatingPlan, setCreatingPlan] = useState(false);
+  const setUp = async () => {
+    if (!channel || !canEdit || creatingPlan) return;
+    setCreatingPlan(true);
+    try {
+      const { jobId } = await composePipeline({
+        project_id: channel.project_id, kind: 'channel_setup',
+        title: 'Set up ' + platformLabel(channel.platform),
+        target_key: channel.id, channel_method_id: channel.destination_method_id,
+        level: 1,
+      });
+      toast.success('Setup plan saved. Opening your first step.');
+      onClose();
+      navigate(pipelineHref(channel.project_id, jobId));
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Could not make the account setup plan.');
+    } finally { setCreatingPlan(false); }
+  };
   const placements = useQuery({
     queryKey: ['brand-workspace', 'channel-placements', channel?.id],
     enabled: !!channel,
@@ -439,12 +455,12 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
             <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
               {([
                 ['Status', channel.status.replace(/_/g, ' ') + (isChannelStale(channel) ? ' · STALE' : '')],
-                ['Level', dash(channel.content_level)],
+                ['Posting level (1 light, 3 full)', dash(channel.content_level)],
                 ['Account', dash(channel.account_label)],
                 ['Followers', channel.followers == null ? '—' : `${channel.followers.toLocaleString()}${channel.follower_date ? ` (${channel.follower_date})` : ''}`],
-                ['Cadence', channel.cadence_target == null ? '—' : `${Number(channel.cadence_target)} per week`],
+                ['Posts per week', channel.cadence_target == null ? '—' : `${Number(channel.cadence_target)} per week`],
                 ['Last post', relativeTime(channel.last_post_at)],
-                ['Scheduler', dash(channel.scheduler)],
+                ['Posting tool', dash(channel.scheduler)],
                 ['URL', dash(channel.url)],
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k} className="min-w-0">
@@ -455,7 +471,7 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
             </dl>
             {channel.notes && <p className="mt-3 text-sm text-muted-foreground whitespace-pre-wrap">{channel.notes}</p>}
             <div className="mt-5">
-              <h4 className="text-sm font-semibold">Method</h4>
+              <h4 className="text-sm font-semibold">How-to guide used</h4>
               {method ? (
                 <div className="mt-1 text-sm">
                   <p className="font-medium">{method.title}{method.version ? ` v${method.version}` : ''}</p>
@@ -486,7 +502,9 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
                 <a href={channel.url} target="_blank" rel="noreferrer">Open <ExternalLink className="h-4 w-4 ml-1" /></a>
               </Button>
             )}
-            <Button variant="outline" className="mt-3 w-full" onClick={() => onSetUp(channel)}>Set up</Button>
+            {canEdit && <Button variant="outline" className="mt-3 w-full" disabled={creatingPlan} onClick={setUp}>
+              {creatingPlan ? 'Creating setup plan…' : 'Make a setup plan and open the first step'}
+            </Button>}
           </>
         )}
       </SheetContent>
