@@ -40,7 +40,11 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
       await save.mutateAsync({
         project_id: projectId, week_start: week, pillar_key: def.pillar_key,
         kpi_key: def.kpi_key, actual,
-        score: def.target == null ? null : scoreKpi(def.direction, actual, def.target),
+        // Checklist inputs are 0 or 1 here, but the shared scoring function
+        // expects a percentage. Prevent "completed" from scoring as only 1%.
+        score: def.target == null ? null : def.direction === 'checklist'
+          ? scoreKpi(def.direction, actual === 1 ? 100 : 0, def.target)
+          : scoreKpi(def.direction, actual, def.target),
         note: note.trim() ? 'Manual weekly entry: ' + note.trim() : 'Manual weekly entry',
       });
       toast.success('Weekly number saved.');
