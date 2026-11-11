@@ -126,7 +126,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
         {canEdit && (
           <div className="flex flex-wrap gap-2">
             <Button size="sm" disabled={!top.length} onClick={() => setTop3Open(true)}>Set up the top 3</Button>
-            <Button size="sm" variant="outline" onClick={copyBrief}>Copy setup brief</Button>
+            <Button size="sm" variant="outline" onClick={copyBrief}>Copy instructions for an assistant</Button>
           </div>
         )}
       </header>
@@ -142,11 +142,11 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 {canEdit && (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {isFoundation(r) ? (
-                      <Button size="sm" onClick={openBrandKit}>Set it up</Button>
+                      <Button size="sm" onClick={openBrandKit}>Open your brand kit</Button>
                     ) : r.channel_id && openJobs.get(r.channel_id) ? (
-                      <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, openJobs.get(r.channel_id)!)}>Open setup job</Link></Button>
+                      <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, openJobs.get(r.channel_id)!)}>Resume setup plan</Link></Button>
                     ) : (
-                      <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>
+                      <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Make setup plan & open first step</Button>
                     )}
                     {!isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                     <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => run(`later-${r.asset_key}`, () => setDecision(projectId, r.asset_key, 'later'), `${r.label} moved to Later`)}>Later</Button>
@@ -167,9 +167,9 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
               {r.handle && <p className="text-xs text-muted-foreground">{r.handle}</p>}
               {canEdit && (
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {isFoundation(r) ? <Button size="sm" onClick={openBrandKit}>Set it up</Button>
-                    : job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Open setup job</Link></Button>
-                    : <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>}
+                  {isFoundation(r) ? <Button size="sm" onClick={openBrandKit}>Open your brand kit</Button>
+                    : job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Resume setup plan</Link></Button>
+                    : <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Make setup plan & open first step</Button>}
                   {r.state === 'planned' && !isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                 </div>
               )}
@@ -247,7 +247,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 toast.success(`${created.length} setup plans created. Opening the first plan.`);
                 navigate(pipelineHref(projectId, created[0]));
               }
-            }).then(() => setTop3Open(false))}>Start all {top.length}</Button>
+            }).then(() => setTop3Open(false))}>Create plans & open first step</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
