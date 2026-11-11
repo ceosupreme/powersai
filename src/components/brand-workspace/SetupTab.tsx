@@ -310,7 +310,14 @@ export function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null
     setV({ platform: row.channel_platform ?? platforms[0] ?? row.asset_key, handle: row.handle ?? '', url: row.url ?? '', followers: '', status: 'live' });
   }
   const followers = v.followers.trim() === '' ? null : Number(v.followers.replace(/,/g, ''));
-  const bad = followers != null && (!Number.isFinite(followers) || followers < 0);
+  const bad = followers != null && (!Number.isSafeInteger(followers) || followers < 0);
+  const link = v.url.trim();
+  const badUrl = !!link && (() => {
+    try {
+      const parsed = new URL(link);
+      return parsed.protocol !== 'https:' && parsed.protocol !== 'http:';
+    } catch { return true; }
+  })();
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
@@ -325,9 +332,11 @@ export function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null
             </div>
           )}
           <div className="space-y-1"><Label htmlFor="hi-handle">Handle</Label><Input id="hi-handle" value={v.handle} onChange={(e) => setV({ ...v, handle: e.target.value })} /></div>
-          <div className="space-y-1"><Label htmlFor="hi-url">Link</Label><Input id="hi-url" type="url" value={v.url} onChange={(e) => setV({ ...v, url: e.target.value })} /></div>
+          <div className="space-y-1"><Label htmlFor="hi-url">Link</Label><Input id="hi-url" type="url" value={v.url} onChange={(e) => setV({ ...v, url: e.target.value })} placeholder="https://example.com/youraccount" />
+            {badUrl && <p className="text-xs text-destructive">Use a full link starting with https:// or http://.</p>}
+          </div>
           <div className="space-y-1"><Label htmlFor="hi-f">Followers (optional)</Label><Input id="hi-f" inputMode="numeric" value={v.followers} onChange={(e) => setV({ ...v, followers: e.target.value })} />
-            {bad && <p className="text-xs text-destructive">Followers must be a whole number.</p>}</div>
+            {bad && <p className="text-xs text-destructive">Followers must be a nonnegative whole number.</p>}</div>
           <div className="space-y-1"><Label>Status</Label>
             <Select value={v.status} onValueChange={(s) => setV({ ...v, status: s as 'live' | 'dormant' })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -337,7 +346,7 @@ export function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={bad || (!v.handle.trim() && !v.url.trim())} onClick={() => onSave({ ...v, handle: v.handle.trim(), url: v.url.trim(), followers })}>Save</Button>
+          <Button disabled={bad || badUrl || (!v.handle.trim() && !link)} onClick={() => onSave({ ...v, handle: v.handle.trim(), url: link, followers })}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
