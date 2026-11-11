@@ -12,6 +12,7 @@ import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialo
 import { BrandWeeklyNumbers } from '@/components/brand-workspace/BrandWeeklyNumbers';
 import { BrandProductPlans } from '@/components/brand-workspace/BrandProductPlans';
 import { BrandAccountSetup } from '@/components/brand-workspace/BrandAccountSetup';
+import { BrandManagerFileUpload } from '@/components/brand-workspace/BrandManagerFileUpload';
 import { BrandRevenueOpportunities } from '@/components/brand-workspace/BrandRevenueOpportunities';
 import type { ManagedBrand } from '@/hooks/useBrandManagerProjects';
 import { Button } from '@/components/ui/button';
@@ -550,7 +551,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     </section>}
 
     {view === 'files' && <section className="space-y-4">
-      <div><h2 className="text-xl font-semibold">Files & documents</h2><p className="text-sm text-muted-foreground">Read this brand's reference documents without opening the full administrative library.</p></div>
+      <div><h2 className="text-xl font-semibold">Files & documents</h2><p className="text-sm text-muted-foreground">Read the current brand documents, use saved links and upload new brand files without accessing administrative settings.</p></div>
+      <BrandManagerFileUpload projectId={brand.id} />
       {brandFiles.isLoading && <p className="text-sm text-muted-foreground">Loading this brand's files and links…</p>}
       {brandFiles.isError && <p role="alert">Brand files could not be loaded. <Button variant="outline" size="sm" onClick={() => brandFiles.refetch()}>Try again</Button></p>}
       {(brandFiles.data?.links ?? []).length > 0 && <Card className="p-4 space-y-3">
