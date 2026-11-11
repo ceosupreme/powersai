@@ -38,7 +38,7 @@ Required BEFORE applying ANY database migration or RLS change:
 
 ## Recovery references
 - Restricted source schema: `hq_recovery_20261111` (public-table metadata and targeted operational rows; excludes secrets and auth passwords).
-- Independent private backup: Google Drive folder `STM HQ - Recovery snapshots` (folder ID `1S8KMrBC9xJGMljmaktmWEmL6x412Sl-k`; owner-only). Manifest includes exact sorted JSONL row counts and MD5 values.
+- Independent private backup: Google Drive folder `STM HQ - Recovery snapshots` (owner-only; access reference retained outside this public repository). Manifest includes exact sorted JSONL row counts and MD5 values.
 - All 16 Google Drive backup files were verified by raw document readback. Do not share backup links publicly or put their data in this public repository.
 - Restore-format check: `role_page_defaults` deserialized as native typed records in read-only SQL and matched its original MD5 for 59 rows.
 
