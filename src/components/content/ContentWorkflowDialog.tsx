@@ -153,7 +153,10 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   };
   const saveWork = async (advance = false) => {
     if (!item) return;
+    // Publishing or scheduling requires a record with the platform and evidence.
+    // Never advance either stage through the generic content-step button.
     if (advance && next === 'scheduled') { setMode('schedule'); return; }
+    if (advance && next === 'published') { setMode('publish'); return; }
     if (advance && item.stage === 'script' && !script.trim()) return toast.error('Write the script before advancing.');
     if (advance && ['record','edit','design','thumbnail'].includes(item.stage) && !assets.length)
       return toast.error('Add the link to the completed production file before advancing.');
@@ -275,7 +278,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
             <div className="flex gap-2 flex-wrap">
               <Button disabled={busy} onClick={() => saveWork()}>{busy && <Loader2 className="h-4 w-4 mr-2 animate-spin"/>}Save work</Button>
               {next && next !== item.stage && <Button disabled={busy} variant="outline" onClick={() => saveWork(true)}>
-                {next === 'scheduled' ? 'Choose where and when to post' : 'Save and continue to ' + STAGE_LABELS[next]}
+                {next === 'scheduled' ? 'Choose where and when to post' :
+                  next === 'published' ? 'Record the live post and its link' :
+                  'Save and continue to ' + STAGE_LABELS[next]}
               </Button>}
               {!item.approved_at && <Button disabled={busy || !canApprove(item)} variant="outline" onClick={approve}>Approve finished content</Button>}
             </div>
