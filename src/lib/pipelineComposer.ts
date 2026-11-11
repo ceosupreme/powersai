@@ -132,7 +132,7 @@ export function channelSetupSteps(br: MethodRow | null, ch: MethodRow | null): P
 }
 
 /** Row fields for one step; depends_on is set by the caller. */
-export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; job_id: string; user_id: string | null }, today = new Date()) {
+export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; job_id: string; user_id: string | null; owner_name?: string }, today = new Date()) {
   const owner = s.owner_kind === 'owner';
   const due = s.due_in_days != null ? new Date(today.getTime() + s.due_in_days * 86400000).toISOString().slice(0, 10) : null;
   return {
@@ -148,7 +148,8 @@ export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; jo
     status: 'Open',
     approval_status: owner ? (i === 0 ? 'Approved' : 'Blocked') : 'Auto',
     priority: owner ? 'P2-High' : 'P3-Medium',
-    assignee: owner ? 'Allmighty' : 'Claude',
+    assignee: owner ? (ctx.owner_name || 'Brand owner') : 'Claude',
+    assignee_id: owner ? ctx.user_id : null,
     source: 'pipeline',
     is_manual: true,
     created_by_id: ctx.user_id,
@@ -250,7 +251,12 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
     recipe, level: input.level, money_destination: input.money_destination || null,
   };
-  const rows = steps.map((step, i) => stepRow(step, i, { project_id: input.project_id, job_id: '', user_id: user?.id ?? null }));
+  const ownerName = typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
+    ? user.user_metadata.full_name.trim()
+    : user?.email ?? 'Brand owner';
+  const rows = steps.map((step, i) => stepRow(step, i, {
+    project_id: input.project_id, job_id: '', user_id: user?.id ?? null, owner_name: ownerName,
+  }));
   const { data: jobId, error } = await (supabase as any).rpc('hq_create_pipeline', {
     p_job: job, p_steps: rows, p_new_content: input.new_content ?? null,
   });
