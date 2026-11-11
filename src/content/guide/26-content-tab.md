@@ -1,11 +1,11 @@
-# Content tab
+# Posts and videos
 <!-- part: Running a brand | order: 26 | slug: content-tab | route: /project/:venueId | tags: content, content pieces, approve, approve batch, batch approve, quality score, idea score, hard fails, stage, move to next step, placements, family, format, purpose -->
 
-The "Content" tab shows every content piece for this brand, such as videos, posts, pins and articles, with its stage, scores and approval. It is also the place to approve a whole batch of ready pieces at once. Use it to review this brand's content and to clear approvals quickly.
+The "Posts and videos" tab shows every content piece for this brand, such as videos, posts, pins and articles, with its stage, scores and approval. It is also the place to approve a whole batch of ready pieces at once. Use it to review this brand's content and to clear approvals quickly.
 
 ## Where to find it
 
-- Open the brand, then tap "Content" in the tab row.
+- Open the brand, then tap "Posts and videos" in the tab row.
 - Or tap "Open" on a "Ready to approve" row in "Waiting on you" on the "Overview" tab.
 - The address ends in ?tab=content.
 
@@ -18,7 +18,7 @@ The "Content" tab shows every content piece for this brand, such as videos, post
   - Its placements: each channel and account it is going to, with a status badge, or "No placements yet."
   - Any hard fails, listed in red.
   - An "Approve" button, until the piece is approved.
-  - A "Move to next step" button naming the next stage, until the piece reaches its last stage.
+  - A next-action button. For scheduling, it asks you to confirm the actual platform and scheduled date; for publication, it asks for the live post URL. HQ does not publish to platforms itself.
 - With no pieces, the tab says "No content items for this brand yet."
 
 ## How to use it
@@ -34,7 +34,7 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 3. A piece still at "Idea" or "Script" with no score shows "Not written yet. Approve appears once it's written and scored." instead of the button.
 
 ### To move a piece to its next stage
-1. Tap "Move to next step" on the card. HQ shows "Moved to" and the new stage.
+1. Tap the next-action button. If it is an ordinary internal production step, HQ advances the stage. To schedule or publish, HQ requires manual confirmation that the action occurred on the external platform, plus date or live URL.
 2. If the button reads "Approve first to schedule", approve the piece first. A piece cannot move into "Scheduled" or "Published" until it is approved.
 
 ## Words on this screen
@@ -54,7 +54,7 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 ## Good to know
 
 - Each format follows its own route. Videos (long-form, short, reel, livestream) go Idea, Script, Record, Edit, Thumbnail, Scheduled, Published. Graphics (carousel, pin, post, story, printable) go Idea, Script, Design, Scheduled, Published. Text (article, email, community post) goes Idea, Script, Scheduled, Published. A piece with no format follows the video route.
-- Approving a piece, or moving it to "Published", only changes its record in HQ. Nothing in HQ posts to any platform by itself.
+- HQ does not post to a platform by itself. Manually record scheduling only after scheduling on the actual platform, and publication only with a live URL.
 - The database can refuse an approval. "Approve batch" counts refusals under "Refused by the database" and carries on with the rest.
 - There is no box in HQ for typing an idea or quality score. Claude fills them in: the monthly Radar run sets the idea score on each brief it files, and Claude sets the quality score when it checks a finished piece against the content standard.
 - The Production Board shows the same cards for all brands at once, sorted into stage tabs, but it has no batch button. Batch approval lives here.
