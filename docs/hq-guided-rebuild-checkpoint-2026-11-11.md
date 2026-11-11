@@ -124,9 +124,16 @@ Milestone 0's code baseline, targeted data backup, independent export, SQL/RLS s
 - Added an explicit What happens next explanation to the brand manager step view. Its completion mechanism still relies on the existing `advance_production_job` database trigger, which was inspected rather than replaced.
 - A new review of the baseline found no post-change workflow run at the latest commit, as expected: `.github/workflows/hq-rebuild-check.yml` runs on `workflow_dispatch` or when the draft PR becomes ready for review. The user requested deferring noncritical testing until the feature work is complete.
 
+### Follow-up content and approval verification
+
+- The Start Here guide is **not stale anymore**: Google Drive document `1D9-HJeVA1k6AEag9xVMrESf3y8USpDsnRWMmFoe32GA` was fetched through the connected Drive source, and the in-HQ `knowledge_base` row `07110e45-6816-5759-918d-d4e0dcc54264` was fetched from live Supabase. After normalizing the document heading, separators and list markers, their content text is identical (4,477 normalized characters), including the wine-course section. The guide's direct external link can be retained.
+- The first onboarding task `443e2140-c242-5159-94b3-d633b3c416d6` already instructs Jenna to open Today, My Plan, Posts & Videos and Files, and to read Start Here **inside HQ**. No task content, date, completion state or document was modified. The retired Start Here navigation and missing wine-section concern is closed for this record.
+- Inspecting 96 live owner-kind tasks showed owner approvals only as Approved (64, including completed) or Blocked (32). The brand manager's next-step selection, completion action, and next-candidate logic now require explicit Approved and dependency completion. Previously proposed/unreviewed steps could appear actionable.
+- No changes to client/bar portal or public marketing pages in this follow-up.
+
 ### Still open before release
 
-1. Reconcile old Jenna Banks work-step instructions referencing retired Start Here navigation and older Google Docs against the current authoritative HQ document and wine section. Do not change dates, task status or completion as part of text cleanup.
+1. Continue targeted review of other legacy Jenna instructions only if a concrete outdated reference is found; the Start Here / wine and four-screen guide itself has now been verified current. Preserve dates and completion.
 2. Complete repair/review of all 37 actions in `HQ_Brand_Pages_Fix_Plan.pdf`, then run the combined plan's 13 acceptance journeys with saved evidence, including an actual brand-manager login, admin, restricted account and bar/client regression.
 3. Confirm publishing/scheduling records and scheduled-run dependencies without treating a draft or a manual confirmation as independently verified publication.
 4. Confirm the exact release/sync method, run production build/typecheck at the appropriate gate, inspect public STM marketing routes, and perform fuller nonproduction database restore verification.
