@@ -18,6 +18,10 @@ export interface ComposeInput {
   promotion?: string[];
   level: number;
   money_destination?: string | null;
+  /** Concrete business result this plan intends to advance, not a guarantee. */
+  goal_text?: string | null;
+  goal_pillar_key?: string | null;
+  goal_kpi_key?: string | null;
   /** Lane jobs: the foundation item key. */
   lane_item_key?: string | null;
   /** Channel setup jobs: the channel's governing method. */
@@ -254,6 +258,9 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     target_type: input.target_type ?? null, target_id: input.target_id ?? null,
     target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
     recipe, level: input.level, money_destination: input.money_destination || null,
+    goal_text: input.goal_text?.trim() || null,
+    goal_pillar_key: input.goal_pillar_key || null,
+    goal_kpi_key: input.goal_kpi_key || null,
   };
   const ownerName = typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
     ? user.user_metadata.full_name.trim()
