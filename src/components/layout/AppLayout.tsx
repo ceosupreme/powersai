@@ -7,6 +7,7 @@ import { useRole } from '@/context/RoleContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePreview } from '@/context/PreviewContext';
 import { PortfolioLayout } from './PortfolioLayout';
+import { BrandManagerLayout } from './BrandManagerLayout';
 import { VenueLeadershipLayout } from './VenueLeadershipLayout';
 import { ShiftExecutionLayout } from './ShiftExecutionLayout';
 import { ClientLayout } from './ClientLayout';
@@ -67,6 +68,12 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       {children}
     </>
   );
+
+  // Keep authenticated brand owners out of administrator navigation. Real
+  // permissions remain enforced by RLS; a preview never grants this role.
+  if (!isPreview && legacyRole === 'owner' && effectiveLayout === 'portfolio') {
+    return <BrandManagerLayout>{wrappedChildren}</BrandManagerLayout>;
+  }
 
   switch (effectiveLayout) {
     case 'portfolio':
