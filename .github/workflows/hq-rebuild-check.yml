@@ -1,0 +1,26 @@
+name: HQ rebuild checks
+
+on:
+  push:
+    branches: [hq-guided-workflows-2026-11-11]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --no-audit --no-fund
+      - name: Type check
+        run: npx tsc --noEmit -p tsconfig.app.json
+      - name: Production build
+        run: npm run build
