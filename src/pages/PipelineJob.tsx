@@ -8,6 +8,7 @@ import { playbookStatus } from '@/lib/playbookStatus';
 import { jobStatusWord } from '@/hooks/usePlaybooks';
 import { PlaybookWordBadge } from '@/components/playbooks/PlaybookWordBadge';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -100,6 +101,7 @@ function briefText(brief: unknown): string | null {
 
 export default function PipelineJob() {
   const qc = useQueryClient();
+  const { user, profile, isAdmin } = useAuth();
   const [jobBusy,setJobBusy] = useState(false);
   const { venueId, jobId } = useParams<{ venueId: string; jobId: string }>();
   const { data, isLoading, isError, refetch } = usePipelineJob(jobId);
@@ -155,13 +157,20 @@ export default function PipelineJob() {
     toast.success(ok);
     refetch();
   };
-  const queueStep = (s: Step) => {
-    const { facts } = parseFacts(s.facts);
-    const merged = { ...(facts ?? (s.facts ? { note: s.facts } : {})), queued: true, queued_at: new Date().toISOString() };
-    return updateStep(s, { facts: JSON.stringify(merged) }, 'Saved for worker pickup. This does not start a run.');
+  // Assign the work to the person who clicked, not to the HQ administrator.
+  const reclaim = (s: Step) => {
+    if (!user) return toast.error('Sign in to take this step.');
+    return updateStep(s, {
+      owner_kind: 'owner',
+      assignee: profile?.full_name?.trim() || user.email || 'Current user',
+      assignee_id: user.id,
+      approval_status: 'Approved',
+      facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }),
+    }, 'This step is assigned to you.');
   };
-  const reclaim = (s: Step) => updateStep(s, { owner_kind: 'owner', assignee: 'Allmighty', approval_status: 'Approved', facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }) }, 'Assigned to you');
-  const handToClaude = (s: Step) => updateStep(s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' }, 'Handed to Claude');
+  const handToClaude = (s: Step) => updateStep(s, {
+    owner_kind: 'claude', assignee: 'Claude', assignee_id: null, approval_status: 'Auto',
+  }, 'Assigned to Claude for a future scheduled run. No run has started yet.');
   const copyPrompt = async (s: Step) => {
     const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
     const text = buildStarterPrompt({
@@ -279,7 +288,6 @@ export default function PipelineJob() {
             const method = s.method_id ? kb.data?.get(s.method_id) : null;
             const current = s.step_order != null && s.step_order === job.current_step;
             const canDone = job.status !== 'parked' && s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
-            const queued = !!(facts as any)?.queued;
             const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
               <li key={s.id} id={s.step_order != null ? `step-${s.step_order}` : undefined}
@@ -298,14 +306,12 @@ export default function PipelineJob() {
                       <Button size="sm" variant="outline" onClick={() => setStepOpen(s)}>View instructions</Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
                       {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done</Button>}
-                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Hand to Claude</Button>}
+                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Give to Claude (scheduled run)</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
-                        queued
-                          ? <span className="self-center text-xs text-muted-foreground">Queued · awaiting worker</span>
-                          : <Button size="sm" variant="outline" disabled={busyStep === s.id || st === 'blocked' || job.status === 'parked'} onClick={() => queueStep(s)}>Queue</Button>
+                        <span className="self-center text-xs text-muted-foreground">Assigned to Claude · no run started by this screen</span>
                       )}
                       {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
-                      {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy prompt</Button>}
+                      {isAdmin && s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy Claude prompt</Button>}
                     </div>
                     {isGate && target && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md bg-muted/40 p-2 text-xs">
