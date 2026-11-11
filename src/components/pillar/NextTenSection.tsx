@@ -201,7 +201,7 @@ export const NextTenSection = ({
                   )}
                   <div className="min-w-0 flex-1">
                     {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
                             {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
                           </Link>
                         ) : (
