@@ -56,11 +56,17 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
   const by = (st: string) => rows.filter((r) => r.state === st).sort(byPriority);
   const top = useMemo(() => topMissing(rows, new Set(openJobs.keys())), [rows, openJobs]);
 
-  const run = async (key: string, fn: () => Promise<unknown>, ok?: string) => {
+  const run = async (key: string, fn: () => Promise<unknown>, ok?: string): Promise<boolean> => {
     setBusy(key);
-    try { await fn(); if (ok) toast.success(ok); await refresh(); }
-    catch (e: any) { toast.error(e?.message ?? 'That did not save'); }
-    finally { setBusy(null); }
+    try {
+      await fn();
+      if (ok) toast.success(ok);
+      await refresh();
+      return true;
+    } catch (e: any) {
+      toast.error(e?.message ?? 'That did not save');
+      return false;
+    } finally { setBusy(null); }
   };
 
   const setUp = (r: AssetMapRow) => run(`setup-${r.asset_key}`, async () => {
@@ -223,11 +229,11 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
       </Folded>
 
       <HaveItDialog row={haveIt} onClose={() => setHaveIt(null)}
-        onSave={(v) => run('have', () => recordExisting(projectId, haveIt!, v), `${haveIt!.label} recorded`).then(() => setHaveIt(null))} />
+        onSave={(v) => run('have', () => recordExisting(projectId, haveIt!, v), `${haveIt!.label} recorded`).then(saved => {if (saved) setHaveIt(null);})} />
       <SkipDialog row={skip} onClose={() => setSkip(null)}
-        onSave={(reason) => run('skip', () => setDecision(projectId, skip!.asset_key, 'skip', reason), `${skip!.label} skipped`).then(() => setSkip(null))} />
+        onSave={(reason) => run('skip', () => setDecision(projectId, skip!.asset_key, 'skip', reason), `${skip!.label} skipped`).then(saved => {if (saved) setSkip(null);})} />
       <ProfileDialog open={editProfile} value={profile.data ?? []} onClose={() => setEditProfile(false)}
-        onSave={(v) => run('profile', () => saveBrandProfile(projectId, v), 'Brand type saved').then(() => setEditProfile(false))} />
+        onSave={(v) => run('profile', () => saveBrandProfile(projectId, v), 'Brand type saved').then(saved => {if (saved) setEditProfile(false);})} />
 
       <Dialog open={top3Open} onOpenChange={(o) => !o && setTop3Open(false)}>
         <DialogContent>
@@ -247,7 +253,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 toast.success(`${created.length} setup plans created. Opening the first plan.`);
                 navigate(pipelineHref(projectId, created[0]));
               }
-            }).then(() => setTop3Open(false))}>Create plans & open first step</Button>
+            }).then(saved => {if (saved) setTop3Open(false);})}>Create plans & open first step</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
