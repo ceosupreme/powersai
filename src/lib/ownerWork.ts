@@ -1,3 +1,4 @@
+import { canApproveFinishedContent } from '@/lib/contentReadiness';
 /**
  * Pure rules shared by Next 10, Waiting on me, the Portfolio cards, the brand
  * workspace and the pipeline page. No data access here so the rules can be tested.
@@ -42,13 +43,18 @@ export function pipelineHref(projectId: string, jobId: string, stepId?: string |
   return stepId ? `${route}?step=${encodeURIComponent(stepId)}` : route;
 }
 
-/** Content waiting for approval: quality 80+, no hard fails, not approved yet. */
+/** Only finished deliverables, not title-only concepts, wait for final approval. */
 export function isApprovalReady(it: {
   quality_score: number | null;
   quality_fails: string[] | null;
   approved_at: string | null;
+  brief?: unknown;
+  format?: string | null;
+  stage?: string | null;
+  cta?: string | null;
+  purpose_type?: string | null;
 }): boolean {
-  return (it.quality_score ?? 0) >= 80 && (it.quality_fails ?? []).length === 0 && !it.approved_at;
+  return !it.approved_at && canApproveFinishedContent(it);
 }
 
 const DAY_MS = 86_400_000;
