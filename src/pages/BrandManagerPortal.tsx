@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useCompleteNextTenRow } from '@/hooks/useNextTen';
+import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import type { ManagedBrand } from '@/hooks/useBrandManagerProjects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -81,6 +82,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const [helpBusy, setHelpBusy] = useState(false);
   const [postDraft, setPostDraft] = useState<PostDraft | null>(null);
   const [postBusy, setPostBusy] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null);
 
   const go = (nextView: string, extra: Record<string, string> = {}) => {
     const next = new URLSearchParams({ view: nextView, brand: brand.id, ...extra });
@@ -339,7 +341,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           {plain(briefObject(selectedPost.brief).summary) && <p className="text-sm whitespace-pre-wrap">{plain(briefObject(selectedPost.brief).summary)}</p>}
           <div><p className="text-sm font-semibold">Script</p><p className="text-sm whitespace-pre-wrap mt-1">{plain(briefObject(selectedPost.brief).script) || 'No script saved yet.'}</p></div>
           <div><p className="text-sm font-semibold">Caption</p><p className="text-sm whitespace-pre-wrap mt-1">{plain(briefObject(selectedPost.brief).caption) || 'No caption saved yet.'}</p></div>
-          <Button onClick={() => editPost(selectedPost)}><Pencil className="h-4 w-4 mr-2"/>Edit post</Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button onClick={() => setSelectedWorkflow(selectedPost.id)}>Open full post workflow</Button>
+            <Button variant="outline" onClick={() => editPost(selectedPost)}><Pencil className="h-4 w-4 mr-2"/>Quick edit</Button>
+          </div>
         </CardContent></Card>
         {postDraft && <Card className="p-4 space-y-3">
           <label className="block space-y-1"><span className="text-sm font-medium">Title</span><Input value={postDraft.title} onChange={e => setPostDraft({...postDraft,title:e.target.value})}/></label>
@@ -372,5 +377,6 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     </section>}
 
     {!['today','step','plan','posts','files'].includes(view) && <Card className="p-5 flex items-center gap-3"><AlertCircle className="h-5 w-5"/><span>This section was not found.</span><Button variant="outline" onClick={() => go('today')}>Go to Today</Button></Card>}
+    <ContentWorkflowDialog projectId={brand.id} itemId={selectedWorkflow} onClose={() => setSelectedWorkflow(null)} />
   </div>;
 }
