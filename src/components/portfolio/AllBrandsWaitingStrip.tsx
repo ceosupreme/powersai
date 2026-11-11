@@ -42,7 +42,7 @@ export function AllBrandsWaitingStrip({
               <button
                 type="button"
                 className="w-full text-left py-2 flex items-start gap-3 hover:bg-primary/5 rounded"
-                onClick={() => (r.jobId ? navigate(pipelineHref(r.projectId, r.jobId)) : onOpenProject(r.projectId))}
+                onClick={() => (r.jobId ? navigate(pipelineHref(r.projectId, r.jobId, r.id)) : onOpenProject(r.projectId))}
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{r.brand}</p>
