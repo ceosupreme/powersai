@@ -42,7 +42,7 @@ export function ProductionItemCard({
           <Button size="sm" variant="outline" className="w-full" onClick={() => onOpen(it)}>
             Open script, caption and files
           </Button>
-        )
+        )}
         {it.due_date && <p className="text-sm font-medium">Due {it.due_date.slice(0, 10)}</p>}
         <div className="text-xs text-muted-foreground">
           {it.family?.title ?? "No family yet"}
