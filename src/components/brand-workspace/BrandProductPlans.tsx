@@ -16,7 +16,11 @@ export function BrandProductPlans({ projectId }: { projectId: string }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [request, setRequest] = useState<PipelineRequest | null>(null);
-  const byProduct = jobByTarget(jobs.data ?? [], 'channel_products');
+  // A parked or finished job must not block a new production plan.
+  const byProduct = jobByTarget(
+    (jobs.data ?? []).filter(job => job.status !== 'parked' && job.status !== 'finished'),
+    'channel_products',
+  );
   const items = products.data ?? [];
   const displayed = expanded ? items : items.slice(0, 6);
 
