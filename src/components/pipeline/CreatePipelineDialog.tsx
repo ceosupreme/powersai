@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
-  composePipeline, methodKey, platformToDestination, recipeVersionString, type JobKind,
+  composePipeline, methodKey, parseKeyPoints, platformToDestination, recipeVersionString, type JobKind,
 } from '@/lib/pipelineComposer';
 
 import { TrafficNotice } from './TrafficNotice';
@@ -34,18 +34,28 @@ export interface PipelineRequest {
   channelMethodId?: string | null;
 }
 
-interface MethodOpt { id: string; title: string; status: string | null; subcategory: string; key: string }
+interface MethodOpt {
+  id: string; title: string; status: string | null; subcategory: string; key: string;
+  /** Incomplete guides must not generate fake production steps. */
+  available?: boolean;
+}
 
 function useMethodOptions(enabled: boolean) {
   return useQuery({
     queryKey: ['pipeline-composer', 'methods'],
     enabled,
     queryFn: async (): Promise<MethodOpt[]> => {
-      const { data, error } = await T('knowledge_base').select('id,title,status,subcategory,tags')
+      const { data, error } = await T('knowledge_base').select('id,title,status,subcategory,tags,key_points')
         .in('subcategory', ['product_type', 'destination', 'monetization', 'promotion'])
         .in('status', ['active', 'draft']).order('title');
       if (error) throw error;
-      return ((data ?? []) as any[]).map((r) => ({ ...r, key: methodKey(r) ?? '' })).filter((r) => r.key);
+      return ((data ?? []) as any[]).map((r) => {
+        const instructions = parseKeyPoints(r.key_points);
+        const hasSteps = ['product_type', 'destination'].includes(r.subcategory)
+          ? (instructions.steps?.length ?? 0) > 0
+          : (instructions.adds?.length ?? 0) > 0;
+        return { ...r, key: methodKey(r) ?? '', available: r.status === 'active' && instructions.planned !== true && hasSteps };
+      }).filter((r) => r.key);
     },
   });
 }
@@ -58,12 +68,15 @@ function MultiPick({ label, options, value, onChange }: { label: string; options
         <div className="flex flex-wrap gap-1.5">
           {options.map((o) => {
             const on = value.includes(o.key);
+            const available = o.available !== false;
             return (
-              <button key={o.id} type="button" aria-pressed={on}
+              <button key={o.id} type="button" aria-pressed={on} disabled={!available}
                 onClick={() => onChange(on ? value.filter((k) => k !== o.key) : [...value, o.key])}
+                title={!available ? 'Guide coming: instructions must be finished before this can be included in a plan.' : undefined}
                 className={cn('rounded-full border px-3 py-1 text-xs min-h-8',
-                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground')}>
-                {on ? '✓ ' : ''}{o.title}{o.status === 'draft' ? ' (planned)' : ''}
+                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground',
+                  !available && 'opacity-50 cursor-not-allowed')}>
+                {on ? '✓ ' : ''}{o.title}{!available ? ' (guide coming)' : ''}
               </button>
             );
           })}
@@ -112,8 +125,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   }, [request]);
 
   useEffect(() => {
-    if (!request || seeded || !channels.data || request.destinations?.length) return;
-    const keys = channels.data.filter((c) => ['live', 'dormant', 'planned'].includes(c.status))
+    if (!request || seeded || !channels.data || request.destinations?.length || request.kind === 'product') return;
+    const keys = channels.data.filter((c) => c.status === 'live')
       .map((c) => platformToDestination(c.platform)).filter(Boolean) as string[];
     setDest([...new Set(keys)]);
     setSeeded(true);
@@ -150,10 +163,17 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
 
   const fixedSteps = request?.kind === 'lane' || request?.kind === 'channel_setup';
 
-  const validProduct = by.product_type.some(m => m.key === productType);
+  const validProduct = by.product_type.some(m => m.key === productType && m.available !== false);
   const submit = async () => {
     if (!request) return;
-    if (!fixedSteps && !validProduct) return toast.error('Choose an available product playbook.');
+    if (!fixedSteps && !validProduct) return toast.error('Choose a product type with a completed how-to guide.');
+    if (!fixedSteps) {
+      const selectedMethods = [...by.destination.filter(m => dest.includes(m.key)),
+        ...by.monetization.filter(m => mon.includes(m.key)),
+        ...by.promotion.filter(m => pro.includes(m.key))];
+      const unavailable = selectedMethods.filter(m => m.available === false);
+      if (unavailable.length) return toast.error(`Complete these guides before building the plan: ${unavailable.map(m => m.title).join(', ')}`);
+    }
     setBusy(true);
     try {
       const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
@@ -204,17 +224,23 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
             <>
               <div className="space-y-1.5">
                 <Label>Product type</Label>
-                {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">The suggested product type has no matching playbook. Choose one below.</p>}
+                {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">This product type needs a finished how-to guide. Choose an available type below.</p>}
                 <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger><SelectValue placeholder="Choose a product type" /></SelectTrigger>
                   <SelectContent>
                     {by.product_type.map((m) => (
-                      <SelectItem key={m.id} value={m.key}>{m.title}{m.status === 'draft' ? ' (planned)' : ''}</SelectItem>
+                      <SelectItem key={m.id} value={m.key} disabled={m.available === false}>{m.title}{m.available === false ? ' (guide coming)' : ''}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <MultiPick label="Destinations" options={by.destination} value={dest} onChange={setDest} />
+              <MultiPick label={request?.kind === 'product' ? 'Where will you sell this?' : 'Where will this go?'} options={by.destination} value={dest} onChange={setDest} />
+              {request?.kind === 'product' && (
+                <p className="text-xs text-muted-foreground">
+                  Choose only the selling outlets you want included. Nothing is selected automatically.
+                  If you choose none, the plan will cover creating the product, without listing it on a sales outlet.
+                </p>
+              )}
               <MultiPick label="Monetization" options={by.monetization} value={mon} onChange={setMon} />
               <MultiPick label="Promotion" options={by.promotion} value={pro} onChange={setPro} />
               {request && <TrafficNotice projectId={request.projectId}
