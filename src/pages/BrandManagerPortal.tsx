@@ -211,7 +211,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     try {
       const { data, error } = await supabase.from('action_items')
         .update({ feedback_note: progressNote.trim() || null, output_url: resultUrl.trim() || null })
-        .eq('id', selectedStep.id).eq('bar_id', brand.id).select('id').maybeSingle();
+        .eq('id', selectedStep.id).or('bar_id.eq.' + brand.id + ',venue_id.eq.' + brand.id).select('id').maybeSingle();
       if (error || !data) throw error ?? new Error('Could not save progress for this task.');
       await stepsQuery.refetch();
       toast.success('Your progress is saved. This step is still open.');
