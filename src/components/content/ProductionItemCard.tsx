@@ -8,13 +8,14 @@ import { FORMAT_LABELS, STAGE_LABELS, nextStageForFormat } from "@/components/co
 
 /** One Production Board card: scores, placements, Approve (existing rules) and next step. */
 export function ProductionItemCard({
-  item: it, brandName, approving, onApprove, onMove,
+  item: it, brandName, approving, onApprove, onMove, onOpen,
 }: {
   item: BoardItem;
   brandName: string;
   approving: boolean;
   onApprove: (it: BoardItem) => void;
   onMove: (it: BoardItem) => void;
+  onOpen?: (it: BoardItem) => void;
 }) {
   const next = nextStageForFormat(it.stage, it.format);
   return (
@@ -37,6 +38,11 @@ export function ProductionItemCard({
           )}
         </div>
         <h2 className="text-lg font-semibold leading-snug">{it.title}</h2>
+        {onOpen && (
+          <Button size="sm" variant="outline" className="w-full" onClick={() => onOpen(it)}>
+            Open script, caption and files
+          </Button>
+        )
         {it.due_date && <p className="text-sm font-medium">Due {it.due_date.slice(0, 10)}</p>}
         <div className="text-xs text-muted-foreground">
           {it.family?.title ?? "No family yet"}
@@ -101,7 +107,9 @@ export function ProductionItemCard({
               <span className="text-xs">
                 {locked
                   ? "Approve first to schedule"
-                  : `Move to next step — ${STAGE_LABELS[next]}`}
+                  : next === 'scheduled' ? 'Record platform and scheduled time'
+                    : next === 'published' ? 'Add live post link'
+                    : `Move to next step — ${STAGE_LABELS[next]}`}
               </span>
               <ArrowRight className="h-3 w-3" />
             </Button>
