@@ -9,6 +9,7 @@ import { useCompleteNextTenRow } from '@/hooks/useNextTen';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { BrandWeeklyNumbers } from '@/components/brand-workspace/BrandWeeklyNumbers';
 import { BrandProductPlans } from '@/components/brand-workspace/BrandProductPlans';
+import { BrandAccountSetup } from '@/components/brand-workspace/BrandAccountSetup';
 import { BrandRevenueOpportunities } from '@/components/brand-workspace/BrandRevenueOpportunities';
 import type { ManagedBrand } from '@/hooks/useBrandManagerProjects';
 import { Button } from '@/components/ui/button';
@@ -432,6 +433,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           </CardContent></Card>;
         })}
       </>}
+      <BrandAccountSetup projectId={brand.id} />
       <BrandProductPlans projectId={brand.id} />
       <BrandRevenueOpportunities projectId={brand.id} />
     </section>}
