@@ -40,15 +40,15 @@ import { useChannelStats } from '@/hooks/useBrandSetup';
 import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
-  { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
-  { key: 'setup', label: 'Setup', accent: 'border-primary text-primary' },
-  { key: 'channels', label: 'Channels', accent: 'border-signal-green text-signal-green' },
-  { key: 'avenues', label: 'Avenues', accent: 'border-gold text-gold' },
-  { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
-  { key: 'content', label: 'Content', accent: 'border-blue-500 text-blue-600' },
-  { key: 'intel', label: 'Intel', accent: 'border-accent-foreground text-accent-foreground' },
-  { key: 'playbooks', label: 'Playbooks', accent: 'border-foreground text-foreground' },
-  { key: 'assets', label: 'Assets', accent: 'border-muted-foreground text-muted-foreground' },
+  { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
+  { key: 'setup', label: 'Accounts to set up', description: 'See which brand accounts and profiles are ready and which need attention.', accent: 'border-primary text-primary' },
+  { key: 'channels', label: 'Social accounts', description: 'Review your pages, followers, posting activity, and account details.', accent: 'border-signal-green text-signal-green' },
+  { key: 'avenues', label: 'Ways to make money', description: 'Explore revenue opportunities and see which ones are already running.', accent: 'border-gold text-gold' },
+  { key: 'products', label: 'What you sell', description: 'See products and services, their status, and the work to launch them.', accent: 'border-orange text-orange' },
+  { key: 'content', label: 'Posts and videos', description: 'Follow each piece of content from its idea to verified publication.', accent: 'border-blue-500 text-blue-600' },
+  { key: 'intel', label: 'What your audience asks', description: 'Discover customer questions and the content or offers that answer them.', accent: 'border-accent-foreground text-accent-foreground' },
+  { key: 'playbooks', label: 'How-to guides', description: 'Find the instructions HQ uses for repeatable, quality work.', accent: 'border-foreground text-foreground' },
+  { key: 'assets', label: 'Files and documents', description: 'Find brand files, useful links, and reference documents.', accent: 'border-muted-foreground text-muted-foreground' },
 ] as const;
 type TabKey = (typeof WORKSPACE_TABS)[number]['key'];
 
@@ -102,6 +102,10 @@ export function BrandWorkspace({
           </button>
         ))}
       </nav>
+
+      <p className="text-sm text-muted-foreground" role="status">
+        {WORKSPACE_TABS.find((t) => t.key === tab)?.description}
+      </p>
 
       {tab === 'overview' && (
         <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
