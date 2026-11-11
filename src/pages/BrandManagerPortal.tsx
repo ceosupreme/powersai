@@ -149,7 +149,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     },
     enabled: view === 'posts',
   });
-  const brandFiles = useBrandKitAssetsView(view === 'files' ? brand.id : null);
+  const brandFiles = useBrandKitAssetsView(view === 'files' || view === 'step' ? brand.id : null);
   const [openingFile, setOpeningFile] = useState<string | null>(null);
   const openBrandFile = async (storagePath: string) => {
     setOpeningFile(storagePath);
@@ -410,6 +410,18 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
             {(factsObject(selectedStep.facts).checks as unknown[]).map((c,i) => <li key={i}>{String(c)}</li>)}
           </ul></div>}
           {selectedStep.output_url && <a className="inline-flex gap-1 items-center text-primary underline text-sm" href={selectedStep.output_url} target="_blank" rel="noreferrer">Open the work or result <ExternalLink className="h-4 w-4"/></a>}
+          {(brandFiles.data?.links ?? []).filter((l: any) =>
+            String(l.category).toLowerCase() === 'workspace' && /^https?:\/\//.test(l.url ?? '')
+          ).length > 0 && <div className="space-y-2">
+            <p className="font-semibold text-sm">Upload or find the files for this step</p>
+            {(brandFiles.data?.links ?? []).filter((l: any) =>
+              String(l.category).toLowerCase() === 'workspace' && /^https?:\/\//.test(l.url ?? '')
+            ).map((l: any) => <a key={l.id} href={l.url} target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-primary underline mr-3">
+              {l.label || 'Open work folder'} <ExternalLink className="h-4 w-4"/>
+            </a>)}
+            <p className="text-xs text-muted-foreground">Upload in the linked workspace, then paste the file's link in Save your progress below.</p>
+          </div>}
         </CardContent></Card>
         <Card className="p-4 space-y-3">
           <div><h3 className="font-semibold">Save your progress</h3>
