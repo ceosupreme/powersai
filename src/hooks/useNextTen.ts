@@ -604,15 +604,19 @@ export function useCompleteNextTenRow() {
     mutationFn: async (row: NextTenRow) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (row.source === 'Action') {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('action_items')
           .update({
             status: 'Done',
             completed_at: new Date().toISOString(),
             completed_by: user?.id ?? null,
           })
-          .eq('id', row.refId);
+          .eq('id', row.refId)
+          .or(`bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`)
+          .select('id')
+          .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error('The step was not updated. It may have been reassigned or your access may have changed.');
         return;
       }
       if (row.source === 'Lane') {
@@ -634,11 +638,14 @@ export function useCompleteNextTenRow() {
       if (row.source === 'Product') {
         const next = nextProductStage(row.productStatus ?? null);
         if (!next) return;
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('channel_products')
           .update({ status: next })
-          .eq('id', row.refId);
+          .eq('id', row.refId)
+          .select('id')
+          .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error('The product was not updated. It may no longer be editable from this brand.');
       }
     },
     onSuccess: (_d, row) => {
@@ -650,6 +657,7 @@ export function useCompleteNextTenRow() {
       qc.invalidateQueries({ queryKey: foundationStatusKey(row.projectId) });
       qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
       qc.invalidateQueries({ queryKey: ['pipeline-job'] });
+      qc.invalidateQueries({ queryKey: ['brand-manager-steps', row.projectId] });
       qc.invalidateQueries({ queryKey: ['brand-workspace'] });
       qc.invalidateQueries({ queryKey: ['brand-work-summary'] });
     },
