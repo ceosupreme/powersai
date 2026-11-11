@@ -96,6 +96,16 @@ The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pag
 - [OPEN] Approve exact overdue-task changes before editing any dates or statuses.
 - [OPEN] Confirm whether GitHub branch changes will be merged/published by the active Lovable sync path.
 
+## Current rebuild reconciliation (2026-11-11)
+
+- Draft branch now includes a four-item brand-manager layout, RLS-backed brand discovery, guided Today / My Plan / Posts & Videos / Files screens and a dedicated step execution view. Its routes are integrated through AppLayout and OwnerDashboard; admin, client and bar-staff route selection remains unchanged.
+- Current live RLS verification: Jenna's owner role can see her brand's 24 product links, none from STM; a restricted client sees none; admin retains the full 159. This change was intentionally applied and matched by `20261111192500_scope_product_link_reads.sql`.
+- Existing live brand-manager functions and policies were reconciled to `20261111190000_guided_brand_manager_rls.sql`. A redundant follow-up migration was removed from the branch.
+- The 28 legacy "Emily" steps within the Jenna Banks brand were linked to Jenna's existing verified user ID, without changing titles, dates, status, or completion history. A new Today screen can now find them by ID.
+- The current Start Here HQ document has readable text including the wine lane. However some old task instructions still reference retired navigation and an older Google Doc; clean up this content before release.
+- Source CI completed TypeScript typecheck and production build successfully on the draft branch. Subsequent commits must be checked again. The app is NOT merged or published.
+- Targeted off-database recovery documents were verified; one typed read-only restore-format check matched 59 rows and the snapshot MD5. A complete staging restore and real browser sign-in test are still outstanding.
+
 ## Milestone gate
 
-Milestone 0's code baseline, targeted data snapshot, external export and schema/RLS capture are **complete and verified**. Automated-run dependency inventory, read/write RLS simulations, and a complete nonproduction restore are still open before any live permission migration, merge or publish. No migration, authorization change, production data cleanup, merge or publish is authorized by this control record.
+Milestone 0's code baseline, targeted data backup, independent export, SQL/RLS snapshot, and basic restore-format check are complete. Milestone 1 has verified read isolation and basic brand-manager policies, but a true interactive logged-in write test, client/staff regression checks, and complete staging restore remain open. Milestone 2's guided interface is implemented in an isolated source branch and passes its initial build checks; real end-to-end tests are not yet complete. No GitHub merge or public-site Publish has occurred. Do not report the rebuild as production-ready until user acceptance and client/staff checks pass.
