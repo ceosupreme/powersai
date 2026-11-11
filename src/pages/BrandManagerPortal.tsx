@@ -207,7 +207,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     .filter(j => j.status === 'parked' || j.status === 'finished').map(j => j.id));
   const pending = mine.filter(s => (!s.job_id || !inactiveJobs.has(s.job_id))
     && s.status !== 'Done' && s.approval_status !== 'Rejected');
-  const eligible = pending.filter(s => s.approval_status !== 'Blocked' && (!s.depends_on || byId.get(s.depends_on)?.status === 'Done'));
+  const eligible = pending.filter(s => s.approval_status === 'Approved' && (!s.depends_on || byId.get(s.depends_on)?.status === 'Done'));
   const nextStep = chooseFirst(eligible);
   const selectedStep = steps.find(s => s.id === stepId);
   const nextJob = jobsQuery.data?.find(j => j.id === nextStep?.job_id);
@@ -246,8 +246,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const done = async (step: Step) => {
     if (step.job_id && inactiveJobs.has(step.job_id)) return toast.error('This plan is archived or finished; its steps are kept as history.');
     if (!user || step.assignee_id !== user.id && step.assignee?.trim().toLowerCase() !== fullName) return toast.error('This step is not assigned to you.');
-    if (step.status === 'Done' || step.approval_status === 'Blocked' || (step.depends_on && byId.get(step.depends_on)?.status !== 'Done')) {
-      return toast.error('Complete the earlier step before finishing this one.');
+    if (step.status === 'Done' || step.approval_status !== 'Approved' || (step.depends_on && byId.get(step.depends_on)?.status !== 'Done')) {
+      return toast.error('This step is waiting for approval or an earlier step to finish.');
     }
     try {
       await complete.mutateAsync({ key: `action-${step.id}`, source: 'Action', refId: step.id, step: step.title, projectId: brand.id, projectName: brand.name, rank: 0 });
@@ -255,8 +255,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
       const current = refreshed.data ?? [];
       const currentById = new Map(current.map(s => [s.id, s]));
       const candidates = current.filter(s =>
-        s.status !== 'Done' && s.approval_status !== 'Rejected' &&
-        s.approval_status !== 'Blocked' &&
+        s.status !== 'Done' && s.approval_status === 'Approved' &&
         s.owner_kind === 'owner' &&
         (s.assignee_id === user.id || (!!fullName && s.assignee?.trim().toLowerCase() === fullName)) &&
         (!s.depends_on || currentById.get(s.depends_on)?.status === 'Done')
@@ -441,7 +440,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           <Button variant="outline" disabled={savingProgress || !editableStep} onClick={saveProgress}>Save progress (keep step open)</Button>
         </Card>
         <div className="flex flex-wrap gap-2">
-          <Button disabled={!editableStep || savingProgress || complete.isPending || selectedStep.status === 'Done' || selectedStep.approval_status === 'Blocked'}
+          <Button disabled={!editableStep || savingProgress || complete.isPending || selectedStep.status === 'Done' || selectedStep.approval_status !== 'Approved' ||
+               (!!selectedStep.depends_on && byId.get(selectedStep.depends_on)?.status !== 'Done')}
             onClick={() => done(selectedStep)}><CheckCircle2 className="h-4 w-4 mr-2"/>All done — next step</Button>
           <Button variant="outline" onClick={() => setHelpKind('blocked')}>I'm stuck</Button>
           <Button variant="outline" onClick={() => setHelpKind('change')}>Something needs changing</Button>
@@ -481,7 +481,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
                 </div>
                 <div className="divide-y">{within.map(s => <button key={s.id} type="button" className="w-full text-left py-3 flex items-center justify-between gap-3 hover:text-primary" onClick={() => go('step',{step:s.id})}>
                   <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
-                  <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-green-600"/> : <Badge variant="outline">{s.approval_status === 'Blocked' ? 'Waiting' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
+                  <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-green-600"/> : <Badge variant="outline">{s.approval_status !== 'Approved' ? 'Waiting for approval' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
                 </button>)}</div>
               </section>;
             })}
