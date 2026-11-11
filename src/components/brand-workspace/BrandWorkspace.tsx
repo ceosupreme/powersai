@@ -25,6 +25,7 @@ import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
 import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
+import { ContentDetailsDialog } from '@/components/content/ContentDetailsDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -658,6 +659,7 @@ function ContentTab({ projectId }: { projectId: string }) {
   const advance = useAdvanceStage();
   const [batching, setBatching] = useState(false);
   const [placement, setPlacement] = useState<{ item: BoardItem; mode: 'schedule' | 'publish' } | null>(null);
+  const [detailsItem, setDetailsItem] = useState<BoardItem | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
@@ -699,12 +701,13 @@ function ContentTab({ projectId }: { projectId: string }) {
       {data.map((it) => (
         <div key={it.id} className="space-y-1">
           <p className="text-[11px] uppercase tracking-wide text-blue-600">{STAGE_LABELS[it.stage as keyof typeof STAGE_LABELS] ?? it.stage}</p>
-          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} />
+          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} onOpen={setDetailsItem} />
         </div>
       ))}
     </div>
     </div>
     <ManualPlacementDialog item={placement?.item ?? null} mode={placement?.mode ?? 'schedule'} onClose={() => setPlacement(null)} />
+    <ContentDetailsDialog item={detailsItem} onClose={() => setDetailsItem(null)} />
     </>
   );
 }
