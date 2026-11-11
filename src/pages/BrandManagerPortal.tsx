@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Plus, Target } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -43,6 +43,20 @@ function dateLabel(value: string | null): string {
   if (!value) return 'No due date';
   const date = new Date(value.slice(0, 10) + 'T12:00:00');
   return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+function pacificToday(): string {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const value = (type: string) => parts.find(p => p.type === type)?.value ?? '';
+  return `${value('year')}-${value('month')}-${value('day')}`;
+}
+function minutesFor(step: Step): number | null {
+  if (step.estimated_minutes != null) return step.estimated_minutes;
+  const match = step.title.match(/(?:about\s+)?(\d+)\s+minutes?\b/i);
+  return match ? Number(match[1]) : null;
+}
+function dueText(value: string | null): string {
+  if (!value) return 'No due date';
+  return value.slice(0, 10) < pacificToday() ? `Overdue · ${dateLabel(value)}` : dateLabel(value);
 }
 function chooseFirst(steps: Step[]): Step | undefined {
   return [...steps].sort((a, b) =>
@@ -127,7 +141,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
       ]);
       if (channels.error) throw channels.error;
       if (revenue.error) throw revenue.error;
-      const month = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit' }).format(new Date());
+      const month = pacificToday().slice(0, 7);
       const entries = (revenue.data ?? []).filter((r: any) => String(r.period_month ?? '').slice(0, 7) === month);
       return {
         followers: (channels.data ?? []).reduce((sum: number, r: any) => sum + (Number(r.followers) || 0), 0),
@@ -235,8 +249,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
               <p className="mt-2 text-sm text-muted-foreground">{nextStep.detail || 'Open this step for its instructions and expected result.'}</p>
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-              <span className="inline-flex gap-1 items-center"><Clock3 className="h-4 w-4" />{nextStep.estimated_minutes == null ? 'Time not estimated' : `About ${nextStep.estimated_minutes} minutes`}</span>
-              <span>Due: {dateLabel(nextStep.due_date)}</span>
+              <span className="inline-flex gap-1 items-center"><Clock3 className="h-4 w-4" />{minutesFor(nextStep) == null ? 'Time not estimated' : `About ${minutesFor(nextStep)} minutes`}</span>
+              <span>Due: {dueText(nextStep.due_date)}</span>
             </div>
             <Button onClick={() => go('step', {step: nextStep.id})}>Start this step <ArrowRight className="h-4 w-4 ml-2"/></Button>
           </> : <div className="space-y-2">
@@ -250,7 +264,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
         <h2 className="text-lg font-semibold">Coming up</h2>
         {eligible.filter(s => s.id !== nextStep?.id).length
           ? eligible.filter(s => s.id !== nextStep?.id).slice(0, 3).map(s => <Card key={s.id} className="p-4 flex items-center justify-between gap-3">
-              <div><p className="font-medium">{s.title}</p><p className="text-xs text-muted-foreground">{dateLabel(s.due_date)}</p></div>
+              <div><p className="font-medium">{s.title}</p><p className="text-xs text-muted-foreground">{dueText(s.due_date)}</p></div>
               <Button size="sm" variant="outline" onClick={() => go('step', {step: s.id})}>Open</Button>
             </Card>)
           : <p className="text-sm text-muted-foreground">No additional ready steps. Your next tasks will appear here.</p>}
@@ -266,13 +280,14 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
       <Button variant="outline" size="sm" onClick={() => go('plan')}><ArrowLeft className="h-4 w-4 mr-2"/>My plan</Button>
       {!selectedStep ? <Card className="p-5"><p role="alert">This step was not found in your brand. It may have been reassigned.</p></Card> : <>
         <div>
-          <p className="text-sm text-muted-foreground">Step {selectedStep.step_order ?? '—'} · {dateLabel(selectedStep.due_date)}</p>
+          <p className="text-sm text-muted-foreground">Step {selectedStep.step_order ?? '—'} · {dueText(selectedStep.due_date)}</p>
           <h2 className="text-2xl font-bold mt-1">{selectedStep.title}</h2>
         </div>
         <Card><CardHeader><CardTitle className="text-base">What to do</CardTitle></CardHeader><CardContent className="space-y-3">
           {selectedStep.detail
             ? <p className="whitespace-pre-wrap leading-relaxed">{selectedStep.detail}</p>
             : <p className="text-sm text-muted-foreground">Detailed instructions have not been added. You can request clarification below.</p>}
+          {selectedStep.due_date && dueText(selectedStep.due_date).startsWith('Overdue') && <p className="text-xs text-amber-700 dark:text-amber-300">This task is overdue. Its instructions may refer to an older plan or menu. Review before completing it, or request an update.</p>}
           {plain(factsObject(selectedStep.facts).expected_output) && <div className="rounded-md bg-muted p-3"><p className="font-medium text-sm">What you should have when finished</p><p className="text-sm mt-1">{plain(factsObject(selectedStep.facts).expected_output)}</p></div>}
           {Array.isArray(factsObject(selectedStep.facts).checks) && <div><p className="font-medium text-sm">Before you finish, check:</p><ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
             {(factsObject(selectedStep.facts).checks as unknown[]).map((c,i) => <li key={i}>{String(c)}</li>)}
@@ -303,7 +318,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           const job = jobsQuery.data?.find(j => j.id === group);
           return <Card key={group}><CardHeader><CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle></CardHeader><CardContent className="divide-y">
             {items.map(s => <button key={s.id} type="button" className="w-full text-left py-3 flex items-center justify-between gap-3 hover:text-primary" onClick={() => go('step',{step:s.id})}>
-              <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dateLabel(s.due_date)}</span></span>
+              <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
               <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-green-600"/> : <Badge variant="outline">{s.approval_status === 'Blocked' ? 'Waiting' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
             </button>)}
           </CardContent></Card>;
