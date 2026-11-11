@@ -59,7 +59,7 @@ function deriveBrandWorkSummary(projectId: string, x: BrandWorkInputs, now: numb
       if (seen.has(a.id)) return false;
       seen.add(a.id);
       return (!a.job_id || !x.inactiveJobIds.has(a.job_id))
-        && a.status !== 'Done' && a.approval_status !== 'Rejected'
+        && a.status !== 'Done' && a.approval_status === 'Approved'
         && !isSnoozed(a.snoozed_until, now) && isOwnerVisible(a, x.statusById);
     })
     .map((a) => ({
