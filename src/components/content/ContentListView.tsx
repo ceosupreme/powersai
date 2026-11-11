@@ -16,12 +16,18 @@ interface Props {
   items: ContentItem[];
   projectId: string;
   onEdit: (item: ContentItem) => void;
+  onPlacement: (item: ContentItem, mode: 'schedule' | 'publish') => void;
 }
 
-export function ContentListView({ items, projectId, onEdit }: Props) {
+export function ContentListView({ items, projectId, onEdit, onPlacement }: Props) {
   const { update, remove } = useContentItemMutations(projectId);
 
   const changeStage = async (id: string, stage: string) => {
+    if (stage === 'scheduled' || stage === 'published') {
+      const item = items.find((candidate) => candidate.id === id);
+      if (item) onPlacement(item, stage === 'scheduled' ? 'schedule' : 'publish');
+      return;
+    }
     try {
       await update.mutateAsync({ id, patch: { stage } });
     } catch (e: any) {
