@@ -65,7 +65,7 @@ export function ContentDetailsDialog({ item, onClose }: { item: BoardItem | null
             </div>)}
           </section> : null}
         </div>}
-      {item && <Button asChild variant="outline"><Link to={`/content?open=${item.id}`} onClick={onClose}>Edit post in the content pipeline</Link></Button>}
+      {item && <Button asChild variant="outline"><Link to={`/content?brand=${item.project_id}&open=${item.id}`} onClick={onClose}>Edit post in the content pipeline</Link></Button>}
     </DialogContent>
   </Dialog>;
 }
