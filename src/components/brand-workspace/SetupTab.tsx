@@ -63,10 +63,20 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
     finally { setBusy(null); }
   };
 
-  const setUp = (r: AssetMapRow) => run(`setup-${r.asset_key}`, async () => {
-    const jobId = await startSetup(projectId, r);
-    toast.success(`Setup started for ${r.label}`, { action: { label: 'Open pipeline', onClick: () => navigate(pipelineHref(projectId, jobId)) } });
-  });
+  // Starting setup must lead into the created work, not a transient toast.
+  const setUp = async (r: AssetMapRow) => {
+    setBusy(`setup-${r.asset_key}`);
+    try {
+      const jobId = await startSetup(projectId, r);
+      await refresh();
+      toast.success(`Setup plan created for ${r.label}`);
+      navigate(pipelineHref(projectId, jobId));
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not create the setup plan');
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const copyBrief = async () => {
     try {
@@ -239,9 +249,22 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
           </ol>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setTop3Open(false)}>Cancel</Button>
-            <Button disabled={!!busy} onClick={() => run('top3', async () => {
-              for (const r of top) await startSetup(projectId, r);
-            }, `${top.length} setup pipelines started`).then(() => setTop3Open(false))}>Start all {top.length}</Button>
+            <Button disabled={!!busy} onClick={async () => {
+              setBusy('top3');
+              const created: string[] = [];
+              try {
+                for (const row of top) created.push(await startSetup(projectId, row));
+                await refresh();
+                setTop3Open(false);
+                toast.success(`${created.length} setup plans created`);
+                if (created[0]) navigate(pipelineHref(projectId, created[0]));
+              } catch (e: any) {
+                toast.error(`Created ${created.length} of ${top.length} plans. ${e?.message ?? 'Please try again.'}`);
+                await refresh();
+              } finally {
+                setBusy(null);
+              }
+            }}>Start all {top.length}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
