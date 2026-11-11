@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useCompleteNextTenRow } from '@/hooks/useNextTen';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
+import { BrandWeeklyNumbers } from '@/components/brand-workspace/BrandWeeklyNumbers';
 import type { ManagedBrand } from '@/hooks/useBrandManagerProjects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -334,6 +335,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
         <Card className="p-3"><p className="text-xl font-semibold">{numbers.isError ? '—' : numbers.data?.revenue == null ? '—' : `$${numbers.data.revenue.toLocaleString()}`}</p><p className="text-xs text-muted-foreground">Revenue recorded this month</p></Card>
         <Card className="p-3"><p className="text-xl font-semibold">{mine.filter(s => s.status === 'Done').length}</p><p className="text-xs text-muted-foreground">Steps completed (all time)</p></Card>
       </section>
+      <BrandWeeklyNumbers projectId={brand.id} />
     </>}
 
     {view === 'step' && <section className="space-y-4">
