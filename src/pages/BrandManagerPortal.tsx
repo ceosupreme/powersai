@@ -203,7 +203,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const mine = steps.filter(s => s.owner_kind === 'owner' && (
     s.assignee_id === user?.id || (!!fullName && s.assignee?.trim().toLowerCase() === fullName)
   ));
-  const pending = mine.filter(s => s.status !== 'Done' && s.approval_status !== 'Rejected');
+  const inactiveJobs = new Set((jobsQuery.data ?? [])
+    .filter(j => j.status === 'parked' || j.status === 'finished').map(j => j.id));
+  const pending = mine.filter(s => (!s.job_id || !inactiveJobs.has(s.job_id))
+    && s.status !== 'Done' && s.approval_status !== 'Rejected');
   const eligible = pending.filter(s => s.approval_status !== 'Blocked' && (!s.depends_on || byId.get(s.depends_on)?.status === 'Done'));
   const nextStep = chooseFirst(eligible);
   const selectedStep = steps.find(s => s.id === stepId);
@@ -211,7 +214,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const activeJob = jobsQuery.data?.find(j => j.id === selectedStep?.job_id);
   const selectedPost = postsQuery.data?.find(p => p.id === postId);
   const selectedDocument = docsQuery.data?.find(d => d.id === docId);
-  const editableStep = !!selectedStep && !!user && (selectedStep.assignee_id === user.id ||
+  const archivedStep = !!selectedStep?.job_id && inactiveJobs.has(selectedStep.job_id);
+  const editableStep = !!selectedStep && !!user && !archivedStep && (selectedStep.assignee_id === user.id ||
     (!!fullName && selectedStep.assignee?.trim().toLowerCase() === fullName));
 
   useEffect(() => {
@@ -240,6 +244,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   };
 
   const done = async (step: Step) => {
+    if (step.job_id && inactiveJobs.has(step.job_id)) return toast.error('This plan is archived or finished; its steps are kept as history.');
     if (!user || step.assignee_id !== user.id && step.assignee?.trim().toLowerCase() !== fullName) return toast.error('This step is not assigned to you.');
     if (step.status === 'Done' || step.approval_status === 'Blocked' || (step.depends_on && byId.get(step.depends_on)?.status !== 'Done')) {
       return toast.error('Complete the earlier step before finishing this one.');
@@ -400,6 +405,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           </p>}
           {activeJob?.goal_text && <p className="mt-2 text-sm text-muted-foreground"><strong>Business goal:</strong> {activeJob.goal_text}</p>}
         </div>
+        {archivedStep && <p role="status" className="rounded-md border p-3 text-sm text-muted-foreground">This plan is archived or finished. Its history is preserved, but you cannot complete new work in this plan.</p>}
         <Card><CardHeader><CardTitle className="text-base">What to do</CardTitle></CardHeader><CardContent className="space-y-3">
           {selectedStep.detail
             ? <p className="whitespace-pre-wrap leading-relaxed">{selectedStep.detail}</p>
@@ -460,6 +466,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           return <Card key={group}><CardHeader>
             <CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle>
             {job?.goal_text && <p className="text-sm text-muted-foreground">Business result: {job.goal_text}</p>}
+            {(job?.status === 'parked' || job?.status === 'finished') && <p className="text-xs text-muted-foreground">This plan is {job.status === 'parked' ? 'archived' : 'finished'}. These steps remain visible as history.</p>}
           </CardHeader><CardContent className="space-y-4">
             {weeks.map(week => {
               const within = items.filter(s => weekStart(s.due_date) === week);
