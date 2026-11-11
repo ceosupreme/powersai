@@ -492,7 +492,7 @@ export function actionRowsFor(rows: any[], projectId: string): any[] {
 export async function fetchNextTenBatch(
   projects: { id: string; name: string }[],
   weekStart: string,
-  shared: { actionRows?: any[]; statusById?: Map<string, string | null>; linkRows?: any[] } = {},
+  shared: { actionRows?: any[]; statusById?: Map<string, string | null>; inactiveJobIds?: Set<string>; linkRows?: any[] } = {},
 ): Promise<Map<string, NextTenResult>> {
   const now = Date.now();
   const ids = projects.map((p) => p.id);
@@ -502,7 +502,7 @@ export async function fetchNextTenBatch(
       const rows = shared.actionRows ?? (await fetchActionRowsForProjects(ids));
       const [statusById, inactiveJobIds] = await Promise.all([
         shared.statusById ? Promise.resolve(shared.statusById) : fetchActionStatusMap(rows),
-        fetchInactiveJobIds(rows),
+        shared.inactiveJobIds ? Promise.resolve(shared.inactiveJobIds) : fetchInactiveJobIds(rows),
       ]);
       return { rows, statusById, inactiveJobIds };
     })(),
