@@ -109,3 +109,31 @@ The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pag
 ## Milestone gate
 
 Milestone 0's code baseline, targeted data backup, independent export, SQL/RLS snapshot, and basic restore-format check are complete. Milestone 1 has verified read isolation and basic brand-manager policies, but a true interactive logged-in write test, client/staff regression checks, and complete staging restore remain open. Milestone 2's guided interface is implemented in an isolated source branch and passes its initial build checks; real end-to-end tests are not yet complete. No GitHub merge or public-site Publish has occurred. Do not report the rebuild as production-ready until user acceptance and client/staff checks pass.
+
+
+## Continued rebuild — 2026-11-11 12:30 PT, after chat handoff
+
+- The existing draft PR is #7 at https://github.com/ceosupreme/powersai/pull/7; continue on `hq-guided-workflows-2026-11-11`. It remains DRAFT and unmerged. Do not publish, merge, or mark ready until the release gates have passed.
+- Lovable project `dc01aa48-8dd7-400a-b397-110a5d357bc1` and its database were reachable during this continuation. Lovable's project commit was still the original main baseline, not the protected GitHub draft branch.
+- Corrected success reporting: task completion and product status mutation now confirm an updated row; Waiting on Me approvals and PipelineJob reassignment also refuse silent zero-row success. The brand manager task query invalidates after a completion.
+- Connected the weekly scorecard to production jobs by the already-existing `goal_pillar_key` and `goal_kpi_key` columns. A person may open linked plans from each manually reported KPI, but the interface does not confuse a targeted metric with actual results. New plans invalidate that read.
+- Exact audited live correction #1: `Big Paws Club` job `42525503-2b20-4d36-b076-699aec198d07`, title `Big Dog Energy: A Guided Journal`, kind product, with exactly 26 steps and zero marked Done, was set from `running` to `parked`; all action rows were preserved. No other job was touched.
+- Exact audited live correction #2: `Big Paws Club` content item `2fe85c98-a043-4a4c-bd25-90e3ab9e24c0` (Short B), which had stage `scheduled` without scheduled_at, publication or external scheduling confirmation, was moved to last pre-scheduling stage `thumbnail`. Its existing approved_at, quality score 82, and draft TikTok placement remain in place. Nothing was posted externally.
+- Both changes have an idempotent, precondition-guarded source-controlled migration: `20261111211000_correct_audited_brand_workflow_state.sql`. A single live SQL operation returned 1 archived job and 1 corrected content item.
+- Closed an important archival-visibility gap in source: open steps belonging to parked or finished jobs are filtered out of Next 10, portfolio work summaries and Waiting on Me. Brand managers retain archived plan history in My Plan but cannot mark its steps done. This will not affect the live frontend until deployment.
+- Added an explicit What happens next explanation to the brand manager step view. Its completion mechanism still relies on the existing `advance_production_job` database trigger, which was inspected rather than replaced.
+- A new review of the baseline found no post-change workflow run at the latest commit, as expected: `.github/workflows/hq-rebuild-check.yml` runs on `workflow_dispatch` or when the draft PR becomes ready for review. The user requested deferring noncritical testing until the feature work is complete.
+
+### Still open before release
+
+1. Reconcile old Jenna Banks work-step instructions referencing retired Start Here navigation and older Google Docs against the current authoritative HQ document and wine section. Do not change dates, task status or completion as part of text cleanup.
+2. Complete repair/review of all 37 actions in `HQ_Brand_Pages_Fix_Plan.pdf`, then run the combined plan's 13 acceptance journeys with saved evidence, including an actual brand-manager login, admin, restricted account and bar/client regression.
+3. Confirm publishing/scheduling records and scheduled-run dependencies without treating a draft or a manual confirmation as independently verified publication.
+4. Confirm the exact release/sync method, run production build/typecheck at the appropriate gate, inspect public STM marketing routes, and perform fuller nonproduction database restore verification.
+5. Do not automatically change the approved-task-date list. Outstanding questions remain on the Big Paws email-list plan, Amazon Associates, paid-call booking/payment and the proposed overdue-task rescheduling. Preserve them until expressly resolved.
+
+### Safe continuation constraints
+
+- Use GitHub source edits and scoped SQL directly; reserve paid Lovable agent messages for work it does materially better.
+- New database changes should be additive or tightly preconditioned, source-controlled, and recoverable. Do not broaden membership or RLS merely to make an interface work.
+- No full acceptance testing or release until implementation is complete; a crucial build/dependency check may be performed earlier if needed. User does not need repeated "continue" prompts while a task is being actively handled.
