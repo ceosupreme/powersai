@@ -65,7 +65,8 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
 
   const setUp = (r: AssetMapRow) => run(`setup-${r.asset_key}`, async () => {
     const jobId = await startSetup(projectId, r);
-    toast.success(`Setup started for ${r.label}`, { action: { label: 'Open pipeline', onClick: () => navigate(pipelineHref(projectId, jobId)) } });
+    toast.success(`Setup plan created for ${r.label}`);
+    navigate(pipelineHref(projectId, jobId));
   });
 
   const copyBrief = async () => {
@@ -240,8 +241,13 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
           <DialogFooter>
             <Button variant="ghost" onClick={() => setTop3Open(false)}>Cancel</Button>
             <Button disabled={!!busy} onClick={() => run('top3', async () => {
-              for (const r of top) await startSetup(projectId, r);
-            }, `${top.length} setup pipelines started`).then(() => setTop3Open(false))}>Start all {top.length}</Button>
+              const created: string[] = [];
+              for (const r of top) created.push(await startSetup(projectId, r));
+              if (created.length > 0) {
+                toast.success(`${created.length} setup plans created. Opening the first plan.`);
+                navigate(pipelineHref(projectId, created[0]));
+              }
+            }).then(() => setTop3Open(false))}>Start all {top.length}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
