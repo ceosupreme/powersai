@@ -70,17 +70,28 @@ Required BEFORE applying ANY database migration or RLS change:
 
 The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pages_Fix_Plan.pdf` (supplied in the planning conversation). Each row needs action -> expected backend effect -> resulting screen -> saved evidence -> pass/fail.
 
+## Milestone 1 authorization execution — live database (2026-11-11)
+
+- Applied the reviewed SQL migration `20261111190000_guided_brand_manager_rls.sql` after a successful transaction that rolled back. Grants scoped owner-role access to production jobs, linked products, content placements and brand channels; restricts owner exposure to global manager-only knowledge docs. Existing client and staff role policies were not changed, nor was the broadly readable product-link policy (deferred pending regressions).
+- Jenna's owner role was pre-existing; added membership to her named internal brand in two assignment tables only. No other brand memberships were granted.
+- Verified under a simulated real PostgreSQL `authenticated` role + Jenna JWT identity: Jenna brand visible (1); STM and Coastal Beauties not visible (0); brand-specific docs (8); global company docs (0); brand-linked product rows and production jobs visible.
+- Full pipeline creation test succeeded under Jenna's authenticated role, with transaction ROLLBACK; same attempted operation for STM was denied. Updating Jenna's brand-channel rows succeeded (6), while STM updates affected zero; all testing writes were rolled back.
+- Frontend access and mobile workflows remain on the draft branch and **are not live**. The admin-route global-role guard is committed but not deployed. Content-placement UPDATE test on Jenna returned zero because none exist; later INSERT/scheduling tests required.
+- This is not a guarantee of full end-to-end production readiness. Client/staff portal regressions and runtime tests remain required.
+
 ## Change log
 
 - `src/components/brand-workspace/BrandWorkspace.tsx`: plain-language labels and descriptive text for nine tabs. Existing tab keys preserved; source-only, isolated branch, not deployed. Full runtime smoke test still required.
 - `src/components/brand-workspace/SetupTab.tsx`: created setup plans open directly instead of relying on expiring toast links; source-only, not deployed.
 - `src/components/pipeline/CreatePipelineDialog.tsx`: product plans no longer preselect every brand channel. Explicitly chosen selling outlets determine destination steps; only live channels prefill non-product jobs. Unwritten/draft guides are labeled unavailable instead of generating placeholder plans through this dialog; source-only, not deployed.
+- `src/App.tsx` and `src/components/auth/ProtectedRoute.tsx`: require verified global administrator role for admin routes; source-only, not deployed.
+- `supabase/migrations/20261111190000_guided_brand_manager_rls.sql`: applied to production after backup and rollback dry run; committed as the auditable migration for code sync.
 
 ## Blockers / decisions
 
 - [RESOLVED] Lovable connector restored. Backed up 33 operational tables (including the discovered `venue_assignments` membership table) and six schema-definition datasets to restricted `hq_recovery_20261111` within Supabase and to a private Google Drive recovery folder.
 - [CHECKED] Independent private Google Drive export: 16 documents (one manifest and 15 data/schema parts), each verified against its source text, with folder confirmed owner-only. Tested typed read-only deserialization of role_page_defaults: 59 rows and MD5 match. This is a targeted rollback archive, NOT a full disaster-recovery backup of auth credentials, storage objects or secrets. Full nonproduction data restoration remains untested.
-- [OPEN] Assign Jenna to approved brands after permissions are verified.
+- [VERIFIED] Jenna assigned to Jenna Banks internal brand only in both venue_assignments and user_bar_assignments, with exact profile/project prechecks. Coastal Beauties and STM remain unassigned.
 - [OPEN] Confirm Big Paws email list setup, Amazon Associates status and paid-call booking/payment decision before data cleanup.
 - [OPEN] Approve exact overdue-task changes before editing any dates or statuses.
 - [OPEN] Confirm whether GitHub branch changes will be merged/published by the active Lovable sync path.
