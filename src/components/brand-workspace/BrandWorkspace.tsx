@@ -1,4 +1,5 @@
 import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
+import { useAuth } from '@/context/AuthContext';
 import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ExternalLink, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -804,22 +806,51 @@ function AssetPreview({ path, mime, name }: { path: string; mime: string | null;
   return url ? <img src={url} alt={name} className="aspect-square w-full rounded object-cover" loading="lazy" /> : <div className="aspect-square rounded bg-muted" />;
 }
 
+/** Reveal the text actually stored for this document. An external source link is optional. */
 function DocRow({ d }: { d: KnowledgeRow }) {
+  const [open, setOpen] = useState(false);
   const href = d.attachment_url || d.external_url;
+  const raw = d.description?.trim() || d.key_points?.trim() || d.summary?.trim() || '';
+  let readableText = raw;
+  if (raw.startsWith('{') || raw.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'string') readableText = parsed;
+      else if (Array.isArray(parsed)) readableText = parsed.map((entry) => typeof entry === 'string' ? entry : JSON.stringify(entry, null, 2)).join('\n\n');
+      else if (parsed && typeof parsed === 'object') {
+        readableText = String(parsed.markdown || parsed.content || parsed.body || parsed.text || JSON.stringify(parsed, null, 2));
+      }
+    } catch { /* Preserve the original source text. */ }
+  }
   return (
-    <li className="py-2 flex items-start justify-between gap-3">
+    <li className="py-3 flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-sm text-foreground">{d.title}{d.version ? ` · v${d.version}` : ''}</p>
         <p className="text-xs text-muted-foreground">Review by {dash(d.expiry_date)}{d.status === 'draft' ? ' · planned' : ''}</p>
+        {!raw && !href && <p className="text-xs text-amber-600">The document has no readable text or source link yet.</p>}
       </div>
-      {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline shrink-0">Open</a>}
+      <div className="flex flex-wrap gap-3 shrink-0 text-sm">
+        {raw && <button type="button" onClick={() => setOpen(true)} className="text-primary underline">Read here</button>}
+        {href && <a href={href} target="_blank" rel="noreferrer" className="text-primary underline">Open source</a>}
+      </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{d.title}</DialogTitle>
+            <DialogDescription>Saved in HQ{d.version ? ` · version ${d.version}` : ''}{d.status === 'draft' ? ' · draft' : ''}</DialogDescription>
+          </DialogHeader>
+          <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">{readableText}</div>
+          {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline">Open original source</a>}
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
 
 function AssetsTab({ projectId }: { projectId: string }) {
   const kit = useBrandKitAssetsView(projectId);
-  const docs = useProjectDocuments(projectId);
+  const { isAdmin } = useAuth();
+  const docs = useProjectDocuments(projectId, isAdmin);
   if (kit.isLoading || docs.isLoading) return <Loading />;
   if (kit.isError || docs.isError) return <LoadError onRetry={() => { kit.refetch(); docs.refetch(); }} />;
   const links = (kit.data?.links ?? []) as any[];
