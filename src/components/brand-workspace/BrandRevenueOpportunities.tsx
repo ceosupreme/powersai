@@ -39,6 +39,8 @@ export function BrandRevenueOpportunities({ projectId }: { projectId: string }) 
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-4 space-y-3">
           {foundation.isLoading ? <p className="text-sm text-muted-foreground">Loading revenue opportunities…</p> :
+          foundation.error ? <p role="alert" className="text-sm text-destructive">Revenue opportunities could not be loaded. Please try opening this section again.</p> :
+          !foundation.result ? <p className="text-sm text-muted-foreground">Revenue opportunity data is not available yet.</p> :
           !lanes.length ? <p className="text-sm text-muted-foreground">No revenue opportunities are defined for this brand yet.</p> : <>
             <p className="text-xs text-muted-foreground">{running} of {lanes.length} opportunities reported running. Forecasts are not earnings.</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
