@@ -8,6 +8,7 @@ import { ContentItem, useContentItems } from "@/hooks/useContentItems";
 import { ContentListView } from "@/components/content/ContentListView";
 import { ContentKanbanView } from "@/components/content/ContentKanbanView";
 import { ContentItemDialog } from "@/components/content/ContentItemDialog";
+import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
 import { HelpTip } from "@/components/help/HelpTip";
 import { HELP_KEYS } from "@/config/helpKeys";
 
@@ -18,6 +19,7 @@ export default function ContentPipeline() {
   const { data: items = [], isLoading } = useContentItems(projectId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ContentItem | null>(null);
+  const [placement, setPlacement] = useState<{ item: ContentItem; mode: 'schedule' | 'publish' } | null>(null);
 
   // Details opened from the production board preserve brand and exact item.
   useEffect(() => {
@@ -78,14 +80,14 @@ export default function ContentPipeline() {
           {isLoading ? (
             <div className="text-sm text-muted-foreground">Loading…</div>
           ) : (
-            <ContentListView items={items} projectId={projectId} onEdit={openEdit} />
+            <ContentListView items={items} projectId={projectId} onEdit={openEdit} onPlacement={(item, mode) => setPlacement({ item, mode })} />
           )}
         </TabsContent>
         <TabsContent value="kanban" className="mt-4">
           {isLoading ? (
             <div className="text-sm text-muted-foreground">Loading…</div>
           ) : (
-            <ContentKanbanView items={items} projectId={projectId} onEdit={openEdit} />
+            <ContentKanbanView items={items} projectId={projectId} onEdit={openEdit} onPlacement={(item, mode) => setPlacement({ item, mode })} />
           )}
         </TabsContent>
       </Tabs>
@@ -95,6 +97,11 @@ export default function ContentPipeline() {
         onOpenChange={setDialogOpen}
         projectId={projectId}
         item={editing}
+      />
+      <ManualPlacementDialog
+        item={placement ? { id: placement.item.id, project_id: placement.item.project_id, title: placement.item.title } : null}
+        mode={placement?.mode ?? 'schedule'}
+        onClose={() => setPlacement(null)}
       />
     </div>
   );
