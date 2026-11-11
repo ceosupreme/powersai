@@ -335,7 +335,9 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           {nextStep ? <>
             <div>
               <p className="text-lg font-semibold">{nextStep.title}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{nextStep.detail || 'Open this step for its instructions and expected result.'}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{plain(factsObject(nextStep.facts).why) ||
+                (nextStep.detail ? nextStep.detail.slice(0, 220) + (nextStep.detail.length > 220 ? '…' : '') :
+                  'Open this step for its instructions and expected result.')}</p>
               {nextJob?.goal_text && <p className="mt-2 text-sm"><strong>Business result:</strong> {nextJob.goal_text}</p>}
             </div>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -373,7 +375,10 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
         <div>
           <p className="text-sm text-muted-foreground">Step {selectedStep.step_order ?? '—'} · {dueText(selectedStep.due_date)}</p>
           <h2 className="text-2xl font-bold mt-1">{selectedStep.title}</h2>
-          {activeJob?.goal_text && <p className="mt-2 text-sm text-muted-foreground"><strong>Why this work matters:</strong> {activeJob.goal_text}</p>}
+          {plain(factsObject(selectedStep.facts).why) && <p className="mt-2 text-sm text-muted-foreground">
+            <strong>Why this matters:</strong> {plain(factsObject(selectedStep.facts).why)}
+          </p>}
+          {activeJob?.goal_text && <p className="mt-2 text-sm text-muted-foreground"><strong>Business goal:</strong> {activeJob.goal_text}</p>}
         </div>
         <Card><CardHeader><CardTitle className="text-base">What to do</CardTitle></CardHeader><CardContent className="space-y-3">
           {selectedStep.detail
@@ -381,7 +386,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
             : <p className="text-sm text-muted-foreground">Detailed instructions have not been added. You can request clarification below.</p>}
           {selectedStep.due_date && dueText(selectedStep.due_date).startsWith('Overdue') && <p className="text-xs text-amber-700 dark:text-amber-300">This task is overdue. Its instructions may refer to an older plan or menu. Review before completing it, or request an update.</p>}
           {plain(factsObject(selectedStep.facts).expected_output) && <div className="rounded-md bg-muted p-3"><p className="font-medium text-sm">What you should have when finished</p><p className="text-sm mt-1">{plain(factsObject(selectedStep.facts).expected_output)}</p></div>}
-          {Array.isArray(factsObject(selectedStep.facts).checks) && <div><p className="font-medium text-sm">Before you finish, check:</p><ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
+          {Array.isArray(factsObject(selectedStep.facts).checks) && (factsObject(selectedStep.facts).checks as unknown[]).length > 0 && <div><p className="font-medium text-sm">Before you finish, check:</p><ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
             {(factsObject(selectedStep.facts).checks as unknown[]).map((c,i) => <li key={i}>{String(c)}</li>)}
           </ul></div>}
           {selectedStep.output_url && <a className="inline-flex gap-1 items-center text-primary underline text-sm" href={selectedStep.output_url} target="_blank" rel="noreferrer">Open the work or result <ExternalLink className="h-4 w-4"/></a>}
