@@ -61,6 +61,7 @@ export function RevenueLaneCard({ item, projectId, canEdit }: { item: any; proje
         project_id: projectId, kind: 'lane',
         title: 'Activate revenue opportunity: ' + item.label,
         target_key: item.item_key, lane_item_key: item.item_key, level: 2,
+        goal_text: 'Activate ' + item.label + ' and begin recording real earnings',
       });
       toast.success('Setup plan ready. Opening its first step.');
       navigate(pipelineHref(projectId, jobId));
