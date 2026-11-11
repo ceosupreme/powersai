@@ -208,6 +208,16 @@ export default function PipelineJob() {
           {isAdmin && !isPlaybookJob && job.money_destination && <Badge variant="secondary" title="Where revenue or conversions from this plan are intended to go">Money to: {job.money_destination}</Badge>}
           {isAdmin && <Badge variant="outline" title="The plan's estimated and recorded operator time">Your time: {job.owner_minutes_est ?? '—'} min est · {job.owner_minutes_actual ?? '—'} min actual</Badge>}
         </div>
+        {job.goal_text && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-1">
+            <p className="font-semibold">The business result this plan supports</p>
+            <p>{job.goal_text}</p>
+            {job.goal_kpi_key && <p className="text-xs text-muted-foreground">
+              Connected scorecard: {job.goal_pillar_key ?? 'Business'} / {job.goal_kpi_key}
+            </p>}
+            <p className="text-xs text-muted-foreground">This is the intended outcome. Actual results must be recorded separately.</p>
+          </div>
+        )}
         {isPlaybookJob && (
           <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm space-y-1">
             <p className="flex flex-wrap items-center gap-2">
