@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { fetchActionStatusMap, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
+import { fetchActionStatusMap, fetchInactiveJobIds, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
 import { isOwnerVisible } from '@/lib/ownerWork';
 
 export interface WaitingRow {
@@ -60,11 +60,15 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
 
       const now = Date.now();
       const seen = new Set<string>();
-      const statusById = await fetchActionStatusMap((data ?? []) as any[]);
+      const [statusById, inactiveJobIds] = await Promise.all([
+        fetchActionStatusMap((data ?? []) as any[]),
+        fetchInactiveJobIds((data ?? []) as any[]),
+      ]);
       const rows = ((data ?? []) as any[])
         .filter((a) => {
           if (seen.has(a.id)) return false;
           seen.add(a.id);
+          if (a.job_id && inactiveJobIds.has(a.job_id)) return false;
           if (a.approval_status === 'Rejected') return false;
           if (!isOwnerVisible(a, statusById)) return false;
           return a.status !== 'Done';
