@@ -155,9 +155,10 @@ export default function PipelineJob() {
 
   const updateStep = async (s: Step, patch: Record<string, unknown>, ok: string) => {
     setBusyStep(s.id);
-    const { error } = await supabase.from('action_items').update(patch as any).eq('id', s.id);
+    const { data: saved, error } = await supabase.from('action_items')
+      .update(patch as any).eq('id', s.id).select('id').maybeSingle();
     setBusyStep(null);
-    if (error) return toast.error(error.message);
+    if (error || !saved) return toast.error(error?.message ?? 'The step was not updated. Check your access and try again.');
     toast.success(ok);
     refetch();
   };
