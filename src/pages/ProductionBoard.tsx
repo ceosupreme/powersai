@@ -32,6 +32,7 @@ const TABS: { key: string; label: string; stages: ContentStage[] }[] = [
   { key: "images", label: "Images", stages: ["design", "thumbnail"] },
   { key: "video", label: "Video", stages: ["record", "edit"] },
   { key: "scheduling", label: "Scheduling", stages: ["scheduled"] },
+  { key: "published", label: "Published", stages: ["published"] },
 ];
 
 export default function ProductionBoard() {
@@ -96,7 +97,9 @@ export default function ProductionBoard() {
   const offers = mixCounts.find((m) => m.pt === "offer")!.n;
   if (recent.length > 0 && offers / recent.length > 0.2) mixFlags.push("Offers are more than one in five pieces.");
 
-  const doneCount = filtered.filter((it) => it.stage === "published").length;
+  const recordedPublishedCount = filtered.filter(it =>
+    it.placements.some(p => p.status === 'published' && !!p.live_url)
+  ).length;
 
   return (
     <div className="p-4 md:p-6 space-y-4 pb-24">
@@ -232,7 +235,7 @@ export default function ProductionBoard() {
               </TabsTrigger>
             ))}
             <span className="ml-2 self-center text-xs text-muted-foreground">
-              Done: {doneCount}
+              Live links recorded: {recordedPublishedCount}
             </span>
           </TabsList>
 
