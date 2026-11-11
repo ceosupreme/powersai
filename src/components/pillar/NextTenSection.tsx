@@ -73,9 +73,6 @@ export const NextTenSection = ({
     if (def?.direction === 'checklist' && num !== 0 && num !== 1) {
       return toast.error('Enter 1 for complete or 0 for not completed.');
     }
-    const def = kpiDefs.find(
-      (d) => d.pillar_key === row.pillarKey && d.kpi_key === row.kpiKey,
-    );
     setBusy(row.key);
     try {
       await upsertKpi.mutateAsync({
