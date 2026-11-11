@@ -53,7 +53,7 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,detail,source,job_id,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
+        .select('id,title,detail,source,job_id,facts,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -82,7 +82,13 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             due_date: (a.due_date as string) ?? null,
             detail: (a.detail as string) ?? null,
             source: (a.source as string) ?? null,
-            jobId: (a.job_id as string) ?? null,
+            jobId: (() => {
+              if (a.source !== 'brand_help') return (a.job_id as string) ?? null;
+              try {
+                const facts = typeof a.facts === 'string' ? JSON.parse(a.facts) : a.facts;
+                return typeof facts?.source_job_id === 'string' ? facts.source_job_id : null;
+              } catch { return null; }
+            })(),
             snoozed_until: (a.snoozed_until as string) ?? null,
             projectId,
             projectName: (projectId && nameById.get(projectId)) || 'Project',
