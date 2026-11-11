@@ -24,6 +24,7 @@ import {
 import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
+import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -656,6 +657,7 @@ function ContentTab({ projectId }: { projectId: string }) {
   const approve = useApproveItem();
   const advance = useAdvanceStage();
   const [batching, setBatching] = useState(false);
+  const [placement, setPlacement] = useState<{ item: BoardItem; mode: 'schedule' | 'publish' } | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
@@ -677,10 +679,15 @@ function ContentTab({ projectId }: { projectId: string }) {
   const onMove = async (it: BoardItem) => {
     const next = nextStageForFormat(it.stage, it.format);
     if (next === it.stage) return toast.info('This one is already at the last step.');
+    if (next === 'scheduled' || next === 'published') {
+      setPlacement({ item: it, mode: next === 'scheduled' ? 'schedule' : 'publish' });
+      return;
+    }
     try { await advance.mutateAsync({ id: it.id, stage: next }); toast.success(`Moved to ${STAGE_LABELS[next]}`); }
     catch (e: any) { toast.error(e?.message ?? 'Could not move it'); }
   };
   return (
+    <>
     <div className="space-y-3">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm text-muted-foreground">{ready.length} ready to approve</p>
@@ -697,6 +704,8 @@ function ContentTab({ projectId }: { projectId: string }) {
       ))}
     </div>
     </div>
+    <ManualPlacementDialog item={placement?.item ?? null} mode={placement?.mode ?? 'schedule'} onClose={() => setPlacement(null)} />
+    </>
   );
 }
 
