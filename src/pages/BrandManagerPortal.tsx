@@ -59,6 +59,19 @@ function dueText(value: string | null): string {
   if (!value) return 'No due date';
   return value.slice(0, 10) < pacificToday() ? `Overdue · ${dateLabel(value)}` : dateLabel(value);
 }
+function weekStart(value: string | null): string {
+  if (!value) return 'undated';
+  const date = new Date(value.slice(0, 10) + 'T12:00:00Z');
+  if (!Number.isFinite(date.valueOf())) return 'undated';
+  const back = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - back);
+  return date.toISOString().slice(0, 10);
+}
+function weekLabel(value: string): string {
+  if (value === 'undated') return 'No due date';
+  const d = new Date(value + 'T12:00:00Z');
+  return 'Week of ' + d.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
+}
 function chooseFirst(steps: Step[]): Step | undefined {
   return [...steps].sort((a, b) =>
     (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') ||
@@ -368,17 +381,27 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     </section>}
 
     {view === 'plan' && <section className="space-y-4">
-      <div><h2 className="text-xl font-semibold">My plan</h2><p className="text-sm text-muted-foreground">Your steps, grouped by plan. Open a step for instructions, links and completion.</p></div>
+      <div><h2 className="text-xl font-semibold">My plan</h2><p className="text-sm text-muted-foreground">Your assigned steps, grouped by work plan and week. Open any step for instructions, saved notes and next actions.</p></div>
       {jobsQuery.isError && <p role="alert">Plans could not be loaded. <Button variant="link" onClick={() => jobsQuery.refetch()}>Try again</Button></p>}
       {mine.length === 0 ? <Card className="p-5"><p>No steps are currently assigned to you.</p></Card> : <>
         {Array.from(new Set(mine.map(s => s.job_id ?? 'other'))).map(group => {
           const items = mine.filter(s => (s.job_id ?? 'other') === group).sort((a,b) => (a.step_order ?? 999) - (b.step_order ?? 999));
           const job = jobsQuery.data?.find(j => j.id === group);
-          return <Card key={group}><CardHeader><CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle></CardHeader><CardContent className="divide-y">
-            {items.map(s => <button key={s.id} type="button" className="w-full text-left py-3 flex items-center justify-between gap-3 hover:text-primary" onClick={() => go('step',{step:s.id})}>
-              <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
-              <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-green-600"/> : <Badge variant="outline">{s.approval_status === 'Blocked' ? 'Waiting' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
-            </button>)}
+          const weeks = [...new Set(items.map(s => weekStart(s.due_date)))].sort((a,b) => a === 'undated' ? 1 : b === 'undated' ? -1 : a.localeCompare(b));
+          return <Card key={group}><CardHeader><CardTitle className="text-base">{job?.title ?? (group === 'other' ? 'Other assigned work' : 'Work plan')}</CardTitle></CardHeader><CardContent className="space-y-4">
+            {weeks.map(week => {
+              const within = items.filter(s => weekStart(s.due_date) === week);
+              return <section key={week} className="space-y-1">
+                <div className="flex items-baseline justify-between gap-2 border-b pb-2">
+                  <h3 className="text-sm font-semibold">{weekLabel(week)}</h3>
+                  <span className="text-xs text-muted-foreground">{within.filter(s => s.status === 'Done').length} of {within.length} done</span>
+                </div>
+                <div className="divide-y">{within.map(s => <button key={s.id} type="button" className="w-full text-left py-3 flex items-center justify-between gap-3 hover:text-primary" onClick={() => go('step',{step:s.id})}>
+                  <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
+                  <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-green-600"/> : <Badge variant="outline">{s.approval_status === 'Blocked' ? 'Waiting' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
+                </button>)}</div>
+              </section>;
+            })}
           </CardContent></Card>;
         })}
       </>}
