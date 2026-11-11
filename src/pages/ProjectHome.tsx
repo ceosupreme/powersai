@@ -164,7 +164,6 @@ export default function ProjectHome() {
   const reportingWeek = useScoreReportingWeek(isNonClient ? venueId : null);
   const weekStart = reportingWeek.weekStart;
   useEnsureCurrentWeek(venueId ?? null, isNonClient);
-  const [setupOpen, setSetupOpen] = useState(false);
 
   // Overall score: the same weighted current-week number the Portfolio card shows.
   const scoreRows = useMemo<ProjectDirectoryRow[]>(
@@ -265,7 +264,7 @@ export default function ProjectHome() {
     ? 100
     : Math.round((live.requiredDone / live.requiredTotal) * 100);
 
-  const setupBlocks = (
+  const setupBlocks = !isNonClient ? (
     <>
       {/* Continue setup (only rendered for roles that can actually run the wizard) */}
       {canRunWizard && setupIncomplete && (
@@ -331,7 +330,7 @@ export default function ProjectHome() {
         })}
       </div>
     </>
-  );
+  ) : null;
 
   return (
 
@@ -434,16 +433,16 @@ export default function ProjectHome() {
               )}
             </div>
           )}
-          <div className="pt-2">
+          {!isNonClient && <div className="pt-2">
             <VenueLiveBadge
               isLive={live.isLive}
               phase3Pct={live.phase3Pct}
               requiredDone={live.requiredDone}
               requiredTotal={live.requiredTotal}
             />
-          </div>
+          </div>}
         </div>
-        {canRunWizard && (
+        {!isNonClient && canRunWizard && (
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
             <Settings className="h-4 w-4 mr-1" /> Setup wizard
           </Button>
@@ -504,23 +503,13 @@ export default function ProjectHome() {
               )}
             </>
           }
-          setup={
-            <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-between">
-                  <span>Setup</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
-            </Collapsible>
-          }
+          setup={null}
         />
       ) : (
         setupBlocks
       )}
 
-      {canRunWizard && wizardOpen && venueId && (
+      {!isNonClient && canRunWizard && wizardOpen && venueId && (
         <VenueOnboardingWizard
           open={wizardOpen}
           onOpenChange={setWizardOpen}
