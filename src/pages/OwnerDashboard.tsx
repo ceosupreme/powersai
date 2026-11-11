@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import BrandManagerHome from '@/pages/BrandManagerHome';
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -14,6 +15,13 @@ import { Button } from '@/components/ui/button';
 import { HelpTip } from '@/components/help/HelpTip';
 
 export default function OwnerDashboard() {
+  const { role, isAdmin } = useAuth();
+  // Preserve the existing admin dashboard, client portal, and staff views.
+  if (!isAdmin && role === 'owner') return <BrandManagerHome />;
+  return <FullOwnerDashboard />;
+}
+
+function FullOwnerDashboard() {
   const {selectedBar} = useApp();
   const {canAccessPage, isAdmin} = useAuth();
   const directory = useProjectDirectory();
