@@ -21,11 +21,12 @@ The Admin Panel is where you control who can sign in to HQ, what each person can
 
 ### Add a person with a password
 1. Open "Users" and tap "Create User".
-2. Fill in "Full Name", "Email" and "Temporary Password" (at least 6 characters).
+2. Fill in "Full Name", "Email" and "Temporary Password" (at least 8 characters, the same minimum as signing up).
 3. Pick a "Role": "Admin", "Owner", "GM", "Shift Lead" or "Staff". It starts at "Staff".
 4. If you use Asana, add their "Asana GID", the number that links them to their Asana account.
 5. Tick their projects under "Assigned Bars" (an older word for projects). With more than one ticked, tap "Set primary" on their main project.
 6. Tap "Create User". Give the person their email and temporary password yourself; HQ does not send them.
+7. If it fails, the message says why, for example that the password is too short or that the email already has an account. An email that already has an account can't be created again; find the person in the table and tap "Edit" instead.
 
 ### Invite several people by email
 1. Tap "Import Users".

@@ -23,6 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
+import { functionErrorMessage } from '@/lib/functionError';
 
 interface Bar {
   id: string;
@@ -68,12 +69,15 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
   };
 
   const handleCreate = async () => {
-    if (!formData.email || !formData.password || !formData.full_name) {
+    const email = formData.email.trim();
+    const fullName = formData.full_name.trim();
+    if (!email || !formData.password || !fullName) {
       toast.error('Please fill in all required fields');
       return;
     }
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    // Same minimum as sign-up and password reset (the sign-in service rejects shorter ones).
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
@@ -86,9 +90,9 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
 
       const { data, error } = await supabase.functions.invoke('create-user', {
         body: {
-          email: formData.email,
+          email,
           password: formData.password,
-          full_name: formData.full_name,
+          full_name: fullName,
           role: formData.role,
           bar_id: effectivePrimary || undefined,
           bar_name: primaryBar?.name,
@@ -143,13 +147,13 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
         }
       }
 
-      toast.success(`User ${formData.email} created successfully`);
+      toast.success(`User ${email} created successfully`);
       setOpen(false);
       resetForm();
       onUserCreated();
     } catch (error: any) {
       console.error('Error creating user:', error);
-      toast.error(error.message || 'Failed to create user');
+      toast.error(`Couldn't create the user: ${await functionErrorMessage(error, 'Failed to create user')}`);
     } finally {
       setIsCreating(false);
     }
@@ -198,7 +202,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             <Input
               id="password"
               type="password"
-              placeholder="Min 6 characters"
+              placeholder="At least 8 characters"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
             />
