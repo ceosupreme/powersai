@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { canApproveFinishedContent, contentDeliveryGaps, type ReadinessContent } from '@/lib/contentReadiness';
 
 export const CONTENT_MODES = ["growth", "baseline", "parked"] as const;
 export type ContentMode = (typeof CONTENT_MODES)[number];
@@ -51,7 +52,8 @@ export interface BrandProject {
 
 export interface BoardItem {
   id: string; project_id: string; title: string; format: string | null;
-  stage: string; family_id: string | null; purpose: string | null;
+  stage: string; brief: unknown; cta: string | null;
+  family_id: string | null; purpose: string | null;
   founder_minutes: number | null; due_date: string | null;
   idea_score: number | null; quality_score: number | null; quality_fails: string[] | null;
   purpose_type: string | null; approved_at: string | null; created_at: string;
@@ -100,7 +102,7 @@ export function useProductionBoardItems(projectIds: string[]) {
     enabled: projectIds.length > 0,
     queryFn: async (): Promise<BoardItem[]> => {
       const { data: items, error } = await T("content_items")
-        .select("id,project_id,title,format,stage,family_id,purpose,founder_minutes,due_date,idea_score,quality_score,quality_fails,purpose_type,approved_at,created_at")
+        .select("id,project_id,title,format,stage,brief,cta,family_id,purpose,founder_minutes,due_date,idea_score,quality_score,quality_fails,purpose_type,approved_at,created_at")
         .in("project_id", projectIds)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -200,8 +202,8 @@ export function useContentSourceTrace(sourceId: string | null) {
 
 export const PURPOSE_TYPES = ["teach", "entertain", "story", "community", "proof", "offer"] as const;
 
-export function canApprove(it: { quality_score: number | null; quality_fails: string[] | null }) {
-  return (it.quality_score ?? 0) >= 80 && (it.quality_fails ?? []).length === 0;
+export function canApprove(it: ReadinessContent) {
+  return canApproveFinishedContent(it);
 }
 
 export function useApproveItem() {
@@ -211,17 +213,22 @@ export function useApproveItem() {
       const { data: u, error: authError } = await supabase.auth.getUser();
       if (authError || !u.user) throw authError ?? new Error('Sign in to approve content.');
       const { data: current, error: readError } = await T("content_items")
-        .select('id,quality_score,quality_fails,approved_at')
+        .select('id,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at')
         .eq('id', id).maybeSingle();
       if (readError) throw readError;
       if (!current) throw new Error('This post is unavailable to your account.');
       if (current.approved_at) throw new Error('This post is already approved.');
       if (!canApprove(current)) {
-        throw new Error('Quality must be 80 or higher with no hard failures before approving.');
+        const gaps = contentDeliveryGaps(current);
+        throw new Error([
+          'Final approval requires quality 80+, no hard failures, and finished production.',
+          ...gaps,
+        ].join(' '));
       }
       const { data: saved, error } = await T("content_items")
         .update({ approved_at: new Date().toISOString(), approved_by: u.user.id })
         .eq("id", id).is('approved_at', null).gte('quality_score', 80)
+        .eq('stage', current.stage)
         .select('id').maybeSingle();
       if (error) throw error;
       if (!saved) throw new Error('Approval was not saved. Content quality, access or approval state may have changed.');
