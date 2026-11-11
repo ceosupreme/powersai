@@ -120,8 +120,10 @@ function useWaitingMutation(ids: string[]) {
       } else if (action === 'unsnooze') {
         patch = { snoozed_until: null };
       }
-      const { error } = await supabase.from('action_items').update(patch).eq('id', id);
+      const { data, error } = await supabase.from('action_items').update(patch)
+        .eq('id', id).select('id').maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error('This decision was not saved. The task may be unavailable or your access may have changed.');
     },
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: waitingOnMeKey(ids) });
