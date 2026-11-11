@@ -34,7 +34,6 @@ import { useBrandKitAssetsView } from '@/hooks/useBrandWorkspace';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
-import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import type { ProjectType } from '@/lib/effectivePillars';
 
 
@@ -42,6 +41,7 @@ interface ProjectMeta {
   id: string;
   name: string;
   project_type: ProjectType | null;
+  is_prospect_shell: boolean | null;
   bar_code: string | null;
   slug: string | null;
   north_star: string | null;
@@ -83,7 +83,9 @@ export default function ProjectHome() {
 
   // The legacy go-live wizard is only for client businesses, not internal
   // brands. Both admin and owner roles still work on actual client projects.
-  const isClientProject = meta?.project_type === CLIENT_PROJECT_TYPE;
+  const isClientProject = !!meta && projectGroup({
+    project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell,
+  }) === 'clients';
   const canRunWizard = isClientProject && (isAdmin || currentRole === 'owner');
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug,north_star,monetization_model,focus_status,ownership')
+      .select('id,name,project_type,is_prospect_shell,bar_code,slug,north_star,monetization_model,focus_status,ownership')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -158,7 +160,7 @@ export default function ProjectHome() {
   const live = useVenueLiveStatus(progress.statusFor);
 
   // Non-client projects get the one-glance view; client projects are untouched.
-  const isNonClient = !!meta && projectGroup({ project_type: meta.project_type, is_prospect_shell: false }) === 'brands';
+  const isNonClient = !!meta && projectGroup({ project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell }) === 'brands';
   const { data: pillars = [], isError: pillarsError } = useEffectivePillars(
     isNonClient ? venueId : null,
     meta?.project_type ?? undefined,
@@ -171,9 +173,9 @@ export default function ProjectHome() {
   // Overall score: the same weighted current-week number the Portfolio card shows.
   const scoreRows = useMemo<ProjectDirectoryRow[]>(
     () => (isNonClient && meta ? [{
-      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: false,
+      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell,
       focus_status: meta.focus_status ?? 'active',
-      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: false }),
+      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell }),
     }] : []),
     [isNonClient, meta],
   );
