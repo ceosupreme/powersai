@@ -143,22 +143,20 @@ export const AllProjectsNextTen = ({
                 {rows.map((row) => (
                   <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                     <div className="flex items-start gap-3">
-                      <Checkbox
-                        className="mt-0.5"
-                        checked={false}
-                        disabled={busy === row.key}
-                        aria-label={
-                          row.source === 'KPI'
+                      {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
+                        <Checkbox
+                          className="mt-0.5"
+                          checked={false}
+                          disabled={busy === row.key}
+                          aria-label={row.source === 'KPI'
                             ? `Enter this week's number for ${row.step}`
-                            : row.source === 'Lane'
-                              ? `Mark on: ${row.step}`
-                              : `Mark done: ${row.step}`
-                        }
-                        onCheckedChange={() => onCheck(row)}
-                      />
+                            : `Mark finished after completing: ${row.step}`}
+                          onCheckedChange={() => onCheck(row)}
+                        />
+                      )}
                       <div className="min-w-0 flex-1">
                         {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
                             {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
                           </Link>
                         ) : (
@@ -168,6 +166,19 @@ export const AllProjectsNextTen = ({
                           {row.projectName}
                           {row.note ? ` · ${row.note}` : ''}
                         </p>
+                        {row.source === 'Action' && row.approvalRank !== 0 && (
+                          <p className="text-[11px] text-amber-700 dark:text-amber-300">Approval required before completion.</p>
+                        )}
+                        {row.source === 'Lane' && (
+                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=avenues`}>
+                            Open earning opportunity and verify setup
+                          </Link>
+                        )}
+                        {row.source === 'Product' && (
+                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=products`}>
+                            Open product and its production plan
+                          </Link>
+                        )}
                         {kpiOpen === row.key && (
                           <div className="flex items-center gap-2 mt-2">
                             <Input
