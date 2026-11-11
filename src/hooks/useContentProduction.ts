@@ -139,8 +139,15 @@ export function useAdvanceStage() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, stage }: { id: string; stage: string }) => {
-      const { error } = await T("content_items").update({ stage }).eq("id", id);
+      if (stage === 'scheduled' || stage === 'published') {
+        throw new Error('Open the post workflow to record an external schedule or actual live link first.');
+      }
+      const { data, error } = await T("content_items")
+        .update({ stage }).eq("id", id)
+        .not('stage', 'in', '(scheduled,published)')
+        .select('id').maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error('Content was not updated. It may already be scheduled, published, or unavailable to you.');
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["production-board-items"] });
@@ -201,12 +208,29 @@ export function useApproveItem() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data: u } = await supabase.auth.getUser();
-      const { error } = await T("content_items")
-        .update({ approved_at: new Date().toISOString(), approved_by: u.user?.id ?? null })
-        .eq("id", id);
+      const { data: u, error: authError } = await supabase.auth.getUser();
+      if (authError || !u.user) throw authError ?? new Error('Sign in to approve content.');
+      const { data: current, error: readError } = await T("content_items")
+        .select('id,quality_score,quality_fails,approved_at')
+        .eq('id', id).maybeSingle();
+      if (readError) throw readError;
+      if (!current) throw new Error('This post is unavailable to your account.');
+      if (current.approved_at) throw new Error('This post is already approved.');
+      if (!canApprove(current)) {
+        throw new Error('Quality must be 80 or higher with no hard failures before approving.');
+      }
+      const { data: saved, error } = await T("content_items")
+        .update({ approved_at: new Date().toISOString(), approved_by: u.user.id })
+        .eq("id", id).is('approved_at', null).gte('quality_score', 80)
+        .select('id').maybeSingle();
       if (error) throw error;
+      if (!saved) throw new Error('Approval was not saved. Content quality, access or approval state may have changed.');
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["production-board-items"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["production-board-items"] });
+      qc.invalidateQueries({ queryKey: ["content-workflow"] });
+      qc.invalidateQueries({ queryKey: ["brand-work-summary"] });
+      qc.invalidateQueries({ queryKey: ["brand-manager-posts"] });
+    },
   });
 }
