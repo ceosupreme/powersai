@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
-import { actionRowsFor, fetchActionRowsForProjects, fetchActionStatusMap, fetchNextTenBatch, isSnoozed, priorityRank } from '@/hooks/useNextTen';
+import { actionRowsFor, fetchActionRowsForProjects, fetchActionStatusMap, fetchInactiveJobIds, fetchNextTenBatch, isSnoozed, priorityRank } from '@/hooks/useNextTen';
 import { fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
 import { isApprovalReady, isChannelStale, isOwnerVisible, monthBounds } from '@/lib/ownerWork';
@@ -43,6 +43,7 @@ export interface BrandWorkSummary {
 interface BrandWorkInputs {
   actionRows: any[];
   statusById: Map<string, string | null>;
+  inactiveJobIds: Set<string>;
   contentRows: any[];
   channelRows: any[];
   productIds: string[];
@@ -57,7 +58,9 @@ function deriveBrandWorkSummary(projectId: string, x: BrandWorkInputs, now: numb
     .filter((a) => {
       if (seen.has(a.id)) return false;
       seen.add(a.id);
-      return a.status !== 'Done' && a.approval_status !== 'Rejected' && !isSnoozed(a.snoozed_until, now) && isOwnerVisible(a, x.statusById);
+      return (!a.job_id || !x.inactiveJobIds.has(a.job_id))
+        && a.status !== 'Done' && a.approval_status === 'Approved'
+        && !isSnoozed(a.snoozed_until, now) && isOwnerVisible(a, x.statusById);
     })
     .map((a) => ({
       id: a.id, title: a.title ?? 'Untitled step', priority: a.priority ?? null,
@@ -107,7 +110,9 @@ export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWor
   for (const r of [actionsRes, contentRes, channelsRes, linksRes, placementsRes, revenueRes]) if (r.error) throw r.error;
 
   const actionRows = (actionsRes.data ?? []) as any[];
-  const statusById = await fetchActionStatusMap(actionRows);
+  const [statusById, inactiveJobIds] = await Promise.all([
+    fetchActionStatusMap(actionRows), fetchInactiveJobIds(actionRows),
+  ]);
   const productIds = [...new Set(((linksRes.data ?? []) as any[]).map((l) => l.product_id).filter(Boolean))] as string[];
   let listedProductIds = new Set<string>();
   if (productIds.length) {
@@ -118,6 +123,7 @@ export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWor
   return deriveBrandWorkSummary(projectId, {
     actionRows,
     statusById,
+    inactiveJobIds,
     contentRows: (contentRes.data ?? []) as any[],
     channelRows: (channelsRes.data ?? []) as any[],
     productIds,
@@ -144,11 +150,13 @@ async function fetchBrandWorkCards(projects: { id: string; name: string }[], wee
       (q) => q.eq('status', 'published').gte('verified_at', start).lt('verified_at', next)),
     fetchRowsIn('channel_revenue', 'project_id,amount', 'project_id', ids, (q) => q.eq('period_month', monthStart)),
   ]);
-  const statusById = await fetchActionStatusMap(actionRows);
+  const [statusById, inactiveJobIds] = await Promise.all([
+    fetchActionStatusMap(actionRows), fetchInactiveJobIds(actionRows),
+  ]);
   const allProductIds = [...new Set((linkRows as any[]).map((l) => l.product_id).filter(Boolean))] as string[];
   const [listedRows, nextTen] = await Promise.all([
     fetchRowsIn('product_listings', 'product_id', 'product_id', allProductIds, (q) => q.eq('status', 'listed')),
-    fetchNextTenBatch(projects, weekStart, { actionRows, statusById, linkRows }),
+    fetchNextTenBatch(projects, weekStart, { actionRows, statusById, inactiveJobIds, linkRows }),
   ]);
   const listedProductIds = new Set((listedRows as any[]).map((l) => l.product_id));
   const contentBy = groupBy(contentRows as any[], 'project_id');
@@ -163,6 +171,7 @@ async function fetchBrandWorkCards(projects: { id: string; name: string }[], wee
       const summary = deriveBrandWorkSummary(p.id, {
         actionRows: actionRowsFor(actionRows, p.id),
         statusById,
+        inactiveJobIds,
         contentRows: contentBy.get(p.id) ?? [],
         channelRows: channelsBy.get(p.id) ?? [],
         productIds,
@@ -272,7 +281,9 @@ export function useProjectDocuments(projectId: string | null | undefined) {
 export interface ProductionJob {
   id: string; project_id: string; kind: string; title: string; target_type: string | null; target_id: string | null;
   recipe: { id: string; key: string; title: string; version: string; status: string }[] | null;
-  level: number | null; status: string; money_destination: string | null; owner_minutes_est: number | null;
+  level: number | null; status: string; money_destination: string | null;
+  goal_text: string | null; goal_pillar_key: string | null; goal_kpi_key: string | null;
+  owner_minutes_est: number | null;
   owner_minutes_actual: number | null; current_step: number | null; result_links: { label: string; url: string }[] | null;
   created_at: string;
 }

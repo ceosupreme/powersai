@@ -46,9 +46,17 @@ export const NextTenSection = ({
       setKpiValue('');
       return;
     }
+    if (row.source === 'Action' && row.approvalRank !== 0) {
+      return toast.error('This step must be approved before it can be completed.');
+    }
+    // Never turn on a money lane or advance a product by ticking a box.
+    // Those require confirmation and a real setup or production workflow.
+    if (row.source !== 'Action') return;
     setBusy(row.key);
     try {
       await complete.mutateAsync(row);
+      await refetch();
+      toast.success('Step completed. Your next priorities are now shown.');
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     } finally {
@@ -58,10 +66,13 @@ export const NextTenSection = ({
 
   const saveKpi = async (row: NextTenRow) => {
     const num = kpiValue.trim() === '' ? null : Number(kpiValue);
-    if (num == null || !Number.isFinite(num)) return toast.error('Enter a finite number');
+    if (num == null || !Number.isFinite(num) || num < 0) return toast.error('Enter a nonnegative number.');
     const def = kpiDefs.find(
       (d) => d.pillar_key === row.pillarKey && d.kpi_key === row.kpiKey,
     );
+    if (def?.direction === 'checklist' && num !== 0 && num !== 1) {
+      return toast.error('Enter 1 for complete or 0 for not completed.');
+    }
     setBusy(row.key);
     try {
       await upsertKpi.mutateAsync({
@@ -70,7 +81,10 @@ export const NextTenSection = ({
         pillar_key: row.pillarKey!,
         kpi_key: row.kpiKey!,
         actual: num,
-        score: def ? scoreKpi(def.direction, num, def.target) : null,
+        score: def
+          ? scoreKpi(def.direction, def.direction === 'checklist' ? (num === 1 ? 100 : 0) : num, def.target)
+          : null,
+        note: 'Manual weekly entry from brand Next 10',
       });
       setKpiOpen(null);
       setKpiValue('');
@@ -182,22 +196,20 @@ export const NextTenSection = ({
             {rows.map((row) => (
               <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                 <div className="flex items-start gap-3">
-                  <Checkbox
-                    className="mt-0.5"
-                    checked={false}
-                    disabled={busy === row.key}
-                    aria-label={
-                      row.source === 'KPI'
+                  {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
+                    <Checkbox
+                      className="mt-0.5"
+                      checked={false}
+                      disabled={busy === row.key}
+                      aria-label={row.source === 'KPI'
                         ? `Enter this week's number for ${row.step}`
-                        : row.source === 'Lane'
-                          ? `Mark on: ${row.step}`
-                          : `Mark done: ${row.step}`
-                    }
-                    onCheckedChange={() => onCheck(row)}
-                  />
+                        : `Mark finished after completing: ${row.step}`}
+                      onCheckedChange={() => onCheck(row)}
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
                             {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
                           </Link>
                         ) : (
@@ -205,6 +217,21 @@ export const NextTenSection = ({
                         )}
                     {row.note && (
                       <p className="text-[11px] text-muted-foreground">{row.note}</p>
+                    )}
+                    {row.source === 'Action' && row.approvalRank !== 0 && (
+                      <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                        Approval required before this step can be completed.
+                      </p>
+                    )}
+                    {row.source === 'Lane' && (
+                      <Link to={`/project/${row.projectId}?tab=avenues`} className="text-sm text-primary underline-offset-2 hover:underline">
+                        See how to start this revenue opportunity →
+                      </Link>
+                    )}
+                    {row.source === 'Product' && (
+                      <Link to={`/project/${row.projectId}?tab=products`} className="text-sm text-primary underline-offset-2 hover:underline">
+                        Open product and production plan →
+                      </Link>
                     )}
                     {kpiOpen === row.key && (
                       <div className="flex items-center gap-2 mt-2">

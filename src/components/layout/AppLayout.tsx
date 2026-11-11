@@ -10,6 +10,8 @@ import { PortfolioLayout } from './PortfolioLayout';
 import { VenueLeadershipLayout } from './VenueLeadershipLayout';
 import { ShiftExecutionLayout } from './ShiftExecutionLayout';
 import { ClientLayout } from './ClientLayout';
+import { BrandManagerLayout } from './BrandManagerLayout';
+import { useBrandManagerProjects } from '@/hooks/useBrandManagerProjects';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +25,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   useHqAppearanceScope();
   useEffect(() => { ensureExtraFonts(); }, []);
   const { layout, isLoading: roleLoading } = useRole();
-  const { role: legacyRole } = useAuth();
+  const { role: legacyRole, isAdmin } = useAuth();
+  const managedBrands = useBrandManagerProjects();
   const { isPreview, previewRole, previewLayout, previewRoleLabel, setPreviewRole } = usePreview();
 
   if (roleLoading) {
@@ -67,6 +70,21 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       {children}
     </>
   );
+
+  // Only verified internal-brand owners enter the guided workspace.
+  // Client and bar staff keep their existing screens. Errors fail closed.
+  if (legacyRole === 'owner' && !isAdmin) {
+    if (managedBrands.isLoading) {
+      return <div className="min-h-screen flex items-center justify-center"><LoadingState message="Checking your brands..." /></div>;
+    }
+    if (managedBrands.isError) {
+      return <div className="min-h-screen flex flex-col items-center justify-center gap-3 p-6">
+        <p role="alert">We could not verify your brand access.</p>
+        <Button onClick={() => void managedBrands.refetch()}>Try again</Button>
+      </div>;
+    }
+    if ((managedBrands.data?.length ?? 0) > 0) return <BrandManagerLayout>{wrappedChildren}</BrandManagerLayout>;
+  }
 
   switch (effectiveLayout) {
     case 'portfolio':

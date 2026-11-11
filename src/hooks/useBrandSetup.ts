@@ -138,8 +138,10 @@ export async function recordExisting(projectId: string, row: AssetMapRow, v: { p
   const patch = { platform: v.platform, handle: v.handle || null, url: v.url || null, status: v.status, account_label: row.label };
   let channelId = row.channel_id;
   if (channelId) {
-    const { error } = await T('brand_channels').update(patch).eq('id', channelId);
+    const { data: saved, error } = await T('brand_channels').update(patch)
+      .eq('id', channelId).eq('project_id', projectId).select('id').maybeSingle();
     if (error) throw error;
+    if (!saved) throw new Error('The account could not be updated inside this assigned brand.');
   } else {
     const { data, error } = await T('brand_channels').insert({ project_id: projectId, ...patch, content_level: 1, notes: 'Added from the setup map' }).select('id').single();
     if (error) throw error;
@@ -163,6 +165,7 @@ export async function startSetup(projectId: string, row: AssetMapRow): Promise<s
   const { jobId } = await composePipeline({
     project_id: projectId, kind: 'channel_setup', title: `Set up ${row.label}`,
     target_key: channelId, level: 1,
+    goal_text: 'Set up or verify ' + row.label + ' so the brand can use it',
     channel_method_key: row.playbook_key,
     custom_steps: row.asset_key === 'media_kit' ? MEDIA_KIT_STEPS : null,
   });

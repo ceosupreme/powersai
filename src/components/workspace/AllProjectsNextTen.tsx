@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { pipelineHref } from '@/lib/ownerWork';
+import { supabase } from '@/integrations/supabase/client';
+import { scoreKpi, type KpiDirection } from '@/lib/kpiScoring';
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,9 +49,14 @@ export const AllProjectsNextTen = ({
       setKpiValue('');
       return;
     }
+    // Lanes and products require real setup/production confirmation.
+    if (row.source !== 'Action') return;
+    if (row.approvalRank !== 0) return toast.error('Approve this step before marking it done.');
     setBusy(row.key);
     try {
       await complete.mutateAsync(row);
+      await refetch();
+      toast.success('Step completed. Your next priorities are now shown.');
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     } finally {
@@ -59,16 +66,31 @@ export const AllProjectsNextTen = ({
 
   const saveKpi = async (row: NextTenRow) => {
     const num = kpiValue.trim() === '' ? null : Number(kpiValue);
-    if (num == null || !Number.isFinite(num)) return toast.error('Enter a finite number');
+    if (num == null || !Number.isFinite(num) || num < 0) return toast.error('Enter a valid nonnegative number.');
     setBusy(row.key);
     try {
+      const { data: definition, error: definitionError } = await supabase
+        .from('project_kpis')
+        .select('direction,target')
+        .eq('project_id', row.projectId)
+        .eq('pillar_key', row.pillarKey!)
+        .eq('kpi_key', row.kpiKey!).maybeSingle();
+      if (definitionError) throw definitionError;
+      if (!definition) throw new Error('The scorecard metric could not be found.');
+      if (definition.direction === 'checklist' && num !== 0 && num !== 1) {
+        throw new Error('Use 1 for complete or 0 for not completed.');
+      }
+      const score = definition.target == null ? null : definition.direction === 'checklist'
+        ? scoreKpi('checklist', num === 1 ? 100 : 0, Number(definition.target))
+        : scoreKpi(definition.direction as KpiDirection, num, Number(definition.target));
       await upsertKpi.mutateAsync({
         project_id: row.projectId,
         week_start: weekStart,
         pillar_key: row.pillarKey!,
         kpi_key: row.kpiKey!,
         actual: num,
-        score: null,
+        score,
+        note: 'Manual weekly entry from Dashboard',
       });
       setKpiOpen(null);
       setKpiValue('');
@@ -121,22 +143,20 @@ export const AllProjectsNextTen = ({
                 {rows.map((row) => (
                   <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                     <div className="flex items-start gap-3">
-                      <Checkbox
-                        className="mt-0.5"
-                        checked={false}
-                        disabled={busy === row.key}
-                        aria-label={
-                          row.source === 'KPI'
+                      {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
+                        <Checkbox
+                          className="mt-0.5"
+                          checked={false}
+                          disabled={busy === row.key}
+                          aria-label={row.source === 'KPI'
                             ? `Enter this week's number for ${row.step}`
-                            : row.source === 'Lane'
-                              ? `Mark on: ${row.step}`
-                              : `Mark done: ${row.step}`
-                        }
-                        onCheckedChange={() => onCheck(row)}
-                      />
+                            : `Mark finished after completing: ${row.step}`}
+                          onCheckedChange={() => onCheck(row)}
+                        />
+                      )}
                       <div className="min-w-0 flex-1">
                         {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
                             {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
                           </Link>
                         ) : (
@@ -146,6 +166,19 @@ export const AllProjectsNextTen = ({
                           {row.projectName}
                           {row.note ? ` · ${row.note}` : ''}
                         </p>
+                        {row.source === 'Action' && row.approvalRank !== 0 && (
+                          <p className="text-[11px] text-amber-700 dark:text-amber-300">Approval required before completion.</p>
+                        )}
+                        {row.source === 'Lane' && (
+                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=avenues`}>
+                            Open earning opportunity and verify setup
+                          </Link>
+                        )}
+                        {row.source === 'Product' && (
+                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=products`}>
+                            Open product and its production plan
+                          </Link>
+                        )}
                         {kpiOpen === row.key && (
                           <div className="flex items-center gap-2 mt-2">
                             <Input

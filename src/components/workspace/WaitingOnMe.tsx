@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { fetchActionStatusMap, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
-import { isOwnerVisible } from '@/lib/ownerWork';
+import { fetchActionStatusMap, fetchInactiveJobIds, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
+import { isOwnerVisible, pipelineHref } from '@/lib/ownerWork';
 
 export interface WaitingRow {
   id: string;
@@ -19,6 +20,10 @@ export interface WaitingRow {
   status: string | null;
   created_at: string | null;
   due_date: string | null;
+  detail: string | null;
+  source: string | null;
+  jobId: string | null;
+  sourceStepId: string | null;
   snoozed_until: string | null;
   projectId: string | null;
   projectName: string;
@@ -49,24 +54,35 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
+        .select('id,title,detail,source,job_id,facts,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
 
       const now = Date.now();
       const seen = new Set<string>();
-      const statusById = await fetchActionStatusMap((data ?? []) as any[]);
+      const [statusById, inactiveJobIds] = await Promise.all([
+        fetchActionStatusMap((data ?? []) as any[]),
+        fetchInactiveJobIds((data ?? []) as any[]),
+      ]);
       const rows = ((data ?? []) as any[])
         .filter((a) => {
           if (seen.has(a.id)) return false;
           seen.add(a.id);
+          if (a.job_id && inactiveJobIds.has(a.job_id)) return false;
           if (a.approval_status === 'Rejected') return false;
           if (!isOwnerVisible(a, statusById)) return false;
           return a.status !== 'Done';
         })
         .map((a) => {
           const projectId = (a.bar_id ?? a.venue_id) as string | null;
+          let helpFacts: Record<string, unknown> = {};
+          if (a.source === 'brand_help') {
+            try {
+              const parsed = typeof a.facts === 'string' ? JSON.parse(a.facts) : a.facts;
+              helpFacts = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch { /* Legacy non-JSON notes do not have a linked source step. */ }
+          }
           return {
             id: a.id as string,
             title: (a.title as string) ?? 'Untitled action',
@@ -76,6 +92,14 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             status: (a.status as string) ?? null,
             created_at: (a.created_at as string) ?? null,
             due_date: (a.due_date as string) ?? null,
+            detail: (a.detail as string) ?? null,
+            source: (a.source as string) ?? null,
+            jobId: a.source === 'brand_help'
+              ? (typeof helpFacts.source_job_id === 'string' ? helpFacts.source_job_id : null)
+              : (a.job_id as string) ?? null,
+            sourceStepId: a.source === 'brand_help'
+              ? (typeof helpFacts.source_step_id === 'string' ? helpFacts.source_step_id : null)
+              : (a.job_id ? a.id as string : null),
             snoozed_until: (a.snoozed_until as string) ?? null,
             projectId,
             projectName: (projectId && nameById.get(projectId)) || 'Project',
@@ -107,8 +131,10 @@ function useWaitingMutation(ids: string[]) {
       } else if (action === 'unsnooze') {
         patch = { snoozed_until: null };
       }
-      const { error } = await supabase.from('action_items').update(patch).eq('id', id);
+      const { data, error } = await supabase.from('action_items').update(patch)
+        .eq('id', id).select('id').maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error('This decision was not saved. The task may be unavailable or your access may have changed.');
     },
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: waitingOnMeKey(ids) });
@@ -222,6 +248,23 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             </Badge>
           )}
         </div>
+        {row.source === 'brand_help' && row.detail && (
+          <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm whitespace-pre-wrap">
+            <p className="font-medium text-xs mb-1">Message from the brand manager</p>
+            {row.detail}
+          </div>
+        )}
+        {row.projectId && row.jobId && (
+          <Link className="mt-2 inline-flex text-sm text-primary underline"
+            to={pipelineHref(row.projectId, row.jobId, row.sourceStepId)}>
+            Open the related step and instructions
+          </Link>
+        )}
+        {row.source === 'brand_help' && row.projectId && !row.jobId && (
+          <Link className="mt-2 inline-flex text-sm text-primary underline" to={`/project/${row.projectId}`}>
+            Open the related brand
+          </Link>
+        )}
         <div className="mt-2">
           <RowActions
             row={row}

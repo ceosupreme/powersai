@@ -21,6 +21,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ImportPackageDialog } from "@/components/content/ImportPackageDialog";
 import { ProductionItemCard } from "@/components/content/ProductionItemCard";
+import { ContentWorkflowDialog } from "@/components/content/ContentWorkflowDialog";
 import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ const TABS: { key: string; label: string; stages: ContentStage[] }[] = [
   { key: "images", label: "Images", stages: ["design", "thumbnail"] },
   { key: "video", label: "Video", stages: ["record", "edit"] },
   { key: "scheduling", label: "Scheduling", stages: ["scheduled"] },
+  { key: "published", label: "Published", stages: ["published"] },
 ];
 
 export default function ProductionBoard() {
@@ -38,9 +40,6 @@ export default function ProductionBoard() {
   const { data: projects = [], isLoading: loadingProjects } = useBrandProjects();
   const projectIds = useMemo(() => projects.map((p) => p.id), [projects]);
   const { data: items = [], isLoading, refetch } = useProductionBoardItems(projectIds);
-  const advance = useAdvanceStage();
-  const approve = useApproveItem();
-
   const { selectedBar, accessibleBars, setSelectedBar, clearSelectedBar } = useApp();
   const brand = selectedBar?.id ?? 'all';
   const setBrand = (id: string) => { if(id === 'all') clearSelectedBar(); else { const b = accessibleBars.find(b=>b.id===id); if(b) setSelectedBar(b); } };
@@ -50,6 +49,7 @@ export default function ProductionBoard() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('due');
   const [attention, setAttention] = useState('all');
+  const [selectedWork, setSelectedWork] = useState<{ projectId: string; id: string } | null>(null);
 
   const nameById = useMemo(
     () => new Map(projects.map((p) => [p.id, p.name])), [projects],
@@ -97,23 +97,9 @@ export default function ProductionBoard() {
   const offers = mixCounts.find((m) => m.pt === "offer")!.n;
   if (recent.length > 0 && offers / recent.length > 0.2) mixFlags.push("Offers are more than one in five pieces.");
 
-  const doApprove = async (it: BoardItem) => {
-    try { await approve.mutateAsync(it.id); toast.success("Approved"); }
-    catch (e: any) { toast.error(e?.message ?? "Could not approve it"); }
-  };
-
-  const doneCount = filtered.filter((it) => it.stage === "published").length;
-
-  const move = async (it: BoardItem) => {
-    const next = nextStageForFormat(it.stage, it.format);
-    if (next === it.stage) { toast.info("This one is already at the last step."); return; }
-    try {
-      await advance.mutateAsync({ id: it.id, stage: next });
-      toast.success(`Moved to ${STAGE_LABELS[next]}`);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Could not move it");
-    }
-  };
+  const recordedPublishedCount = filtered.filter(it =>
+    it.placements.some(p => p.status === 'published' && !!p.live_url)
+  ).length;
 
   return (
     <div className="p-4 md:p-6 space-y-4 pb-24">
@@ -249,7 +235,7 @@ export default function ProductionBoard() {
               </TabsTrigger>
             ))}
             <span className="ml-2 self-center text-xs text-muted-foreground">
-              Done: {doneCount}
+              Live links recorded: {recordedPublishedCount}
             </span>
           </TabsList>
 
@@ -271,9 +257,7 @@ export default function ProductionBoard() {
                         key={it.id}
                         item={it}
                         brandName={nameById.get(it.project_id) ?? "Brand"}
-                        approving={approve.isPending}
-                        onApprove={doApprove}
-                        onMove={move}
+                        onOpen={item => setSelectedWork({ projectId: item.project_id, id: item.id })}
                       />
                     ))}
                   </div>
@@ -284,6 +268,7 @@ export default function ProductionBoard() {
         </Tabs>
       )}
 
+      <ContentWorkflowDialog projectId={selectedWork?.projectId ?? ''} itemId={selectedWork?.id ?? null} onClose={() => setSelectedWork(null)} />
       <ImportPackageDialog
         open={importOpen}
         onOpenChange={setImportOpen}

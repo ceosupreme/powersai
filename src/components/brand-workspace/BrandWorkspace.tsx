@@ -1,7 +1,7 @@
 import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
 import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { ExternalLink, Loader2, Pencil } from 'lucide-react';
+import { ExternalLink, Loader2, Pencil, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatting';
@@ -22,6 +22,10 @@ import {
 import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
+import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
+import { RevenueLaneCard } from './RevenueLaneCard';
+import { BrandWeeklyNumbers } from './BrandWeeklyNumbers';
+import { ActionInstructionDialog } from './ActionInstructionDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -37,18 +41,18 @@ import { PlaybooksTab } from './PlaybooksTab';
 import { SetupLine, SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
-import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
+import { composePipeline, outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
-  { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
-  { key: 'setup', label: 'Setup', accent: 'border-primary text-primary' },
-  { key: 'channels', label: 'Channels', accent: 'border-signal-green text-signal-green' },
-  { key: 'avenues', label: 'Avenues', accent: 'border-gold text-gold' },
-  { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
-  { key: 'content', label: 'Content', accent: 'border-blue-500 text-blue-600' },
-  { key: 'intel', label: 'Intel', accent: 'border-accent-foreground text-accent-foreground' },
-  { key: 'playbooks', label: 'Playbooks', accent: 'border-foreground text-foreground' },
-  { key: 'assets', label: 'Assets', accent: 'border-muted-foreground text-muted-foreground' },
+  { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
+  { key: 'setup', label: 'Accounts to set up', description: 'See which brand accounts and profiles are ready and which need attention.', accent: 'border-primary text-primary' },
+  { key: 'channels', label: 'Social accounts', description: 'Review your pages, followers, posting activity, and account details.', accent: 'border-signal-green text-signal-green' },
+  { key: 'avenues', label: 'Ways to make money', description: 'Explore revenue opportunities and see which ones are already running.', accent: 'border-gold text-gold' },
+  { key: 'products', label: 'What you sell', description: 'See products and services, their status, and the work to launch them.', accent: 'border-orange text-orange' },
+  { key: 'content', label: 'Posts and videos', description: 'Follow each piece of content from its idea to verified publication.', accent: 'border-blue-500 text-blue-600' },
+  { key: 'intel', label: 'What your audience asks', description: 'Discover customer questions and the content or offers that answer them.', accent: 'border-accent-foreground text-accent-foreground' },
+  { key: 'playbooks', label: 'How-to guides', description: 'Find the instructions HQ uses for repeatable, quality work.', accent: 'border-foreground text-foreground' },
+  { key: 'assets', label: 'Files and documents', description: 'Find brand files, useful links, and reference documents.', accent: 'border-muted-foreground text-muted-foreground' },
 ] as const;
 type TabKey = (typeof WORKSPACE_TABS)[number]['key'];
 
@@ -103,6 +107,10 @@ export function BrandWorkspace({
         ))}
       </nav>
 
+      <p className="text-sm text-muted-foreground" role="status">
+        {WORKSPACE_TABS.find((t) => t.key === tab)?.description}
+      </p>
+
       {tab === 'overview' && (
         <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
       )}
@@ -151,8 +159,11 @@ function OverviewTab({
   });
   const activity = useBrandActivity(projectId);
   const complete = useCompleteNextTenRow();
-  const approve = useApproveItem();
+  const [reviewPostId, setReviewPostId] = useState<string | null>(null);
+  const [standaloneActionId, setStandaloneActionId] = useState<string | null>(null);
   const s = summary.data;
+  const firstAction = s?.waitingActions[0];
+  const firstContent = s?.waitingContent[0];
 
   const tiles: { label: string; value: string }[] = [
     { label: 'Overall score', value: overallScore == null ? '—' : String(overallScore) },
@@ -175,6 +186,23 @@ function OverviewTab({
   return (
     <div className="space-y-6">
       <SetupLine projectId={projectId} onOpen={onOpenSetup} />
+      <Card className="border-primary/40">
+        <CardHeader className="pb-2"><CardTitle className="text-lg">Your next priority</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
+          firstAction ? <>
+            <p className="font-semibold">{firstAction.title}</p>
+            <p className="text-sm text-muted-foreground">This is the highest-priority actionable step currently recorded for the brand. Open it for the work instructions and expected outcome.</p>
+            {firstAction.jobId ?
+              <Button asChild><Link to={pipelineHref(projectId, firstAction.jobId, firstAction.id)}>Start this step</Link></Button> :
+              <Button onClick={() => setStandaloneActionId(firstAction.id)}>Open work instructions</Button>}
+          </> : firstContent ? <>
+            <p className="font-semibold">{firstContent.title}</p>
+            <p className="text-sm text-muted-foreground">The content is ready for review. Check its work and approval requirements first.</p>
+            <Button onClick={() => setReviewPostId(firstContent.id)}>Review this post</Button>
+          </> : <p className="text-sm text-muted-foreground">No owner step is ready right now. Open My Plan or Accounts to set up for other work.</p>}
+        </CardContent>
+      </Card>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {tiles.map((t) => (
           <div key={t.label} className="rounded-xl border border-primary/25 bg-card p-4">
@@ -183,9 +211,10 @@ function OverviewTab({
           </div>
         ))}
       </div>
+      <BrandWeeklyNumbers projectId={projectId} />
 
       <Card className="border-primary/40">
-        <CardHeader className="pb-2"><CardTitle className="text-base">Waiting on you</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-base">Other work needing attention</CardTitle></CardHeader>
         <CardContent>
           {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
             !s || s.waitingCount === 0 ? (
@@ -204,11 +233,12 @@ function OverviewTab({
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" disabled={complete.isPending} onClick={() => markDone(a.id)}>Done</Button>
-                      {a.jobId && (
-                        <Button size="sm" variant="outline" asChild>
-                          <Link to={pipelineHref(projectId, a.jobId)}>Open</Link>
+                      {a.jobId ? (
+                        <Button size="sm" asChild>
+                          <Link to={pipelineHref(projectId, a.jobId, a.id)}>Open step & instructions</Link>
                         </Button>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>
                       )}
                     </div>
                   </li>
@@ -223,19 +253,7 @@ function OverviewTab({
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        disabled={approve.isPending}
-                        onClick={async () => {
-                          try { await approve.mutateAsync(c.id); toast.success('Approved'); summary.refetch(); }
-                          catch (e: any) { toast.error(e?.message ?? 'Could not approve it'); }
-                        }}
-                      >
-                        Done
-                      </Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link to="?tab=content">Open</Link>
-                      </Button>
+                      <Button size="sm" onClick={() => setReviewPostId(c.id)}>Review the post & approve</Button>
                     </div>
                   </li>
                 ))}
@@ -267,6 +285,8 @@ function OverviewTab({
       </Card>
 
       {setup}
+      <ActionInstructionDialog projectId={projectId} projectName="This brand" actionId={standaloneActionId} onClose={() => setStandaloneActionId(null)} />
+      <ContentWorkflowDialog projectId={projectId} itemId={reviewPostId} onClose={() => setReviewPostId(null)} />
     </div>
   );
 }
@@ -277,7 +297,6 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
   const methods = useKnowledgeRows(data.map((c) => c.destination_method_id));
   const [open, setOpen] = useState<BrandChannel | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
-  const [req, setReq] = useState<PipelineRequest | null>(null);
   const [shots, setShots] = useState(false);
   const stats = useChannelStats(data.map((c) => c.id));
 
@@ -342,9 +361,7 @@ function ChannelsTab({ projectId, isAdmin }: { projectId: string; isAdmin: boole
           );
         })}
       </ul>
-      <ChannelDrawer channel={open} stats={open ? stats.data?.get(open.id) ?? [] : []} canEdit={isAdmin} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)}
-        onSetUp={(c) => { setOpen(null); setReq({ projectId, kind: 'channel_setup', title: `Set up ${platformLabel(c.platform)}`, targetKey: c.id, channelMethodId: c.destination_method_id }); }} />
-      <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
+      <ChannelDrawer channel={open} stats={open ? stats.data?.get(open.id) ?? [] : []} canEdit={isAdmin} method={open?.destination_method_id ? methods.data?.get(open.destination_method_id) ?? null : null} onClose={() => setOpen(null)} />
     </>
   );
 }
@@ -412,7 +429,26 @@ function ChannelEditor({ channel, onDone }: { channel: BrandChannel; onDone: () 
   );
 }
 
-function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { channel: BrandChannel | null; stats: import('@/hooks/useBrandSetup').ChannelStatRow[]; canEdit: boolean; method: KnowledgeRow | null; onClose: () => void; onSetUp: (c: BrandChannel) => void }) {
+function ChannelDrawer({ channel, stats, canEdit, method, onClose }: { channel: BrandChannel | null; stats: import('@/hooks/useBrandSetup').ChannelStatRow[]; canEdit: boolean; method: KnowledgeRow | null; onClose: () => void }) {
+  const navigate = useNavigate();
+  const [creatingPlan, setCreatingPlan] = useState(false);
+  const setUp = async () => {
+    if (!channel || !canEdit || creatingPlan) return;
+    setCreatingPlan(true);
+    try {
+      const { jobId } = await composePipeline({
+        project_id: channel.project_id, kind: 'channel_setup',
+        title: 'Set up ' + platformLabel(channel.platform),
+        target_key: channel.id, channel_method_id: channel.destination_method_id,
+        level: 1, goal_text: 'Set up ' + platformLabel(channel.platform) + ' for this brand',
+      });
+      toast.success('Setup plan saved. Opening your first step.');
+      onClose();
+      navigate(pipelineHref(channel.project_id, jobId));
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Could not make the account setup plan.');
+    } finally { setCreatingPlan(false); }
+  };
   const placements = useQuery({
     queryKey: ['brand-workspace', 'channel-placements', channel?.id],
     enabled: !!channel,
@@ -443,12 +479,12 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
             <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
               {([
                 ['Status', channel.status.replace(/_/g, ' ') + (isChannelStale(channel) ? ' · STALE' : '')],
-                ['Level', dash(channel.content_level)],
+                ['Posting level (1 light, 3 full)', dash(channel.content_level)],
                 ['Account', dash(channel.account_label)],
                 ['Followers', channel.followers == null ? '—' : `${channel.followers.toLocaleString()}${channel.follower_date ? ` (${channel.follower_date})` : ''}`],
-                ['Cadence', channel.cadence_target == null ? '—' : `${Number(channel.cadence_target)} per week`],
+                ['Posts per week', channel.cadence_target == null ? '—' : `${Number(channel.cadence_target)} per week`],
                 ['Last post', relativeTime(channel.last_post_at)],
-                ['Scheduler', dash(channel.scheduler)],
+                ['Posting tool', dash(channel.scheduler)],
                 ['URL', dash(channel.url)],
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k} className="min-w-0">
@@ -459,7 +495,7 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
             </dl>
             {channel.notes && <p className="mt-3 text-sm text-muted-foreground whitespace-pre-wrap">{channel.notes}</p>}
             <div className="mt-5">
-              <h4 className="text-sm font-semibold">Method</h4>
+              <h4 className="text-sm font-semibold">How-to guide used</h4>
               {method ? (
                 <div className="mt-1 text-sm">
                   <p className="font-medium">{method.title}{method.version ? ` v${method.version}` : ''}</p>
@@ -490,7 +526,9 @@ function ChannelDrawer({ channel, stats, canEdit, method, onClose, onSetUp }: { 
                 <a href={channel.url} target="_blank" rel="noreferrer">Open <ExternalLink className="h-4 w-4 ml-1" /></a>
               </Button>
             )}
-            <Button variant="outline" className="mt-3 w-full" onClick={() => onSetUp(channel)}>Set up</Button>
+            {canEdit && <Button variant="outline" className="mt-3 w-full" disabled={creatingPlan} onClick={setUp}>
+              {creatingPlan ? 'Creating setup plan…' : 'Make a setup plan and open the first step'}
+            </Button>}
           </>
         )}
       </SheetContent>
@@ -518,7 +556,7 @@ function AvenuesTab({ projectId, canEdit }: { projectId: string; canEdit: boolea
           <h3 className="text-sm font-semibold mb-2">{g.title} <span className="text-muted-foreground font-normal">({g.rows.length})</span></h3>
           {g.rows.length === 0 ? <p className="text-xs text-muted-foreground">None.</p> : (
             <div className="grid gap-3 sm:grid-cols-2">
-              {g.rows.map((i) => <LaneCard key={i.item_key} item={i} projectId={projectId} canEdit={canEdit} />)}
+              {g.rows.map((i) => <RevenueLaneCard key={i.item_key} item={i} projectId={projectId} canEdit={canEdit} />)}
             </div>
           )}
         </section>
@@ -538,71 +576,12 @@ function AvenuesTab({ projectId, canEdit }: { projectId: string; canEdit: boolea
   );
 }
 
-function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; canEdit: boolean }) {
-  const upsert = useUpsertFoundationItemStatus();
-  const [marking, setMarking] = useState(false);
-  const [req, setReq] = useState<PipelineRequest | null>(null);
-  const [evidence, setEvidence] = useState('');
-  const laneQc = useQueryClient();
-  const score = laneScore(item);
-  return (
-    <div className="rounded-2xl border-2 border-gold/40 bg-card p-4 space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-semibold text-foreground">{item.label}</p>
-        <Badge variant="outline" className="text-[10px] capitalize shrink-0">{item.severity}</Badge>
-      </div>
-      <div className="flex gap-4 text-sm">
-        <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">per hour</p></div>
-        <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">est. 90 days</p></div>
-      </div>
-      {canEdit && <EditCrmRecord title="Estimates" record={item} fields={[
-        {key:'est_dollars_90d',label:'Estimated revenue over 90 days ($)',type:'number'},
-        {key:'confidence',label:'Confidence (0 to 1)',type:'number'},
-        {key:'leverage',label:'Leverage multiplier',type:'number'},
-        {key:'est_hours',label:'Estimated hours',type:'number'},
-      ]} onSave={async patch => {
-        if (patch.confidence != null && patch.confidence > 1) throw new Error('Confidence must be between 0 and 1.');
-        if (patch.est_hours != null && patch.est_hours <= 0) throw new Error('Hours must be greater than zero.');
-        const {error} = await (supabase as any).from('project_foundation_item_overrides').upsert({
-          project_id:projectId,item_key:item.item_key,category_key:item.category_key,label:item.label,
-          detection_signal:item.detection_signal,is_manual_only:item.is_manual_only,severity:item.severity,
-          ...patch,
-        },{onConflict:'project_id,item_key'});
-        if(error) throw error;
-        await laneQc.invalidateQueries();
-      }} />}
-      {item.recommended_fix && <p className="text-xs text-muted-foreground">{item.recommended_fix}</p>}
-      <p className="text-xs">Status: <span className="capitalize">{String(item.status).replace(/_/g, ' ')}</span></p>
-      {canEdit && item.status !== 'satisfied' && (
-        marking ? (
-          <div className="flex gap-2 flex-wrap">
-            <Input className="h-8 flex-1 min-w-[10rem]" placeholder="Evidence URL (optional)" value={evidence} onChange={(e) => setEvidence(e.target.value)} />
-            <Button size="sm" className="h-8" disabled={upsert.isPending}
-              onClick={() => upsert.mutate(
-                { venue_id: projectId, item_key: item.item_key, status: 'satisfied', evidence_url: evidence.trim() || null, notes: item.notes ?? null },
-                { onSuccess: () => { toast.success('Marked on'); setMarking(false); }, onError: (e: any) => toast.error(e?.message ?? 'Could not save') },
-              )}>Save</Button>
-            <Button size="sm" variant="ghost" className="h-8" onClick={() => setMarking(false)}>Cancel</Button>
-          </div>
-        ) : (
-          <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Mark on</Button>
-        )
-      )}
-      {item.status !== 'satisfied' && (
-        <Button size="sm" className="h-8 ml-2" onClick={() => setReq({
-          projectId, kind: 'lane', title: `Turn on: ${item.label}`, targetKey: item.item_key, laneItemKey: item.item_key,
-        })}>Turn this on</Button>
-      )}
-      <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
-    </div>
-  );
-}
 
 // ---------------- Products ----------------
 function ProductsTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProjectProducts(projectId);
   const jobs = useProjectJobs(projectId);
-  const byProduct = jobByTarget(jobs.data ?? [], 'channel_products');
+  const byProduct = jobByTarget((jobs.data ?? []).filter(j => j.status !== 'parked' && j.status !== 'finished'), 'channel_products');
   const [req, setReq] = useState<PipelineRequest | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
@@ -618,7 +597,7 @@ function ProductsTab({ projectId }: { projectId: string }) {
           </div>
           <p className="text-xs text-muted-foreground capitalize">
             {p.funnel_stage ? String(p.funnel_stage).replace(/_/g, ' ') : 'No stage'} · {p.price == null ? 'No price' : formatCurrency(Number(p.price))}
-            {' · '}{p.monthly_sales == null ? '— sales/mo' : `${Number(p.monthly_sales)} sales/mo`}
+            {' · '}{p.monthly_sales == null ? 'No monthly sales figure' : `${Number(p.monthly_sales)} sales/month figure (not verified earnings)`}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {p.listings.length === 0 ? <span className="text-xs text-muted-foreground">No listings yet</span> :
@@ -628,14 +607,14 @@ function ProductsTab({ projectId }: { projectId: string }) {
           </div>
           {byProduct.get(p.id) ? (
             <Button size="sm" variant="outline" asChild>
-              <Link to={pipelineHref(projectId, byProduct.get(p.id)!)}>Pipeline</Link>
+              <Link to={pipelineHref(projectId, byProduct.get(p.id)!)}>Open the production plan</Link>
             </Button>
           ) : (
             <Button size="sm" onClick={() => setReq({
               projectId, kind: 'product', title: p.name, targetType: 'channel_products', targetId: p.id,
               productType: productTypeForName(p.name ?? ''),
               destinations: [...new Set(p.listings.map((l: any) => outletToDestination(l.outlet)).filter(Boolean))] as string[],
-            })}>Start production</Button>
+            })}>Make a plan to create this</Button>
           )}
         </div>
       ))}
@@ -648,49 +627,89 @@ function ProductsTab({ projectId }: { projectId: string }) {
 // ---------------- Content ----------------
 function ContentTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProductionBoardItems([projectId]);
-  const approve = useApproveItem();
-  const advance = useAdvanceStage();
-  const [batching, setBatching] = useState(false);
+  const qc = useQueryClient();
+  const [selectedWork, setSelectedWork] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [draftTitle, setDraftTitle] = useState('');
+  const [draftFormat, setDraftFormat] = useState('short');
+  const [creatingBusy, setCreatingBusy] = useState(false);
+
+  const createPost = async () => {
+    if (!draftTitle.trim() || creatingBusy) return;
+    setCreatingBusy(true);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError ?? new Error('Sign in to create a post.');
+      const { data: post, error } = await (supabase as any).from('content_items')
+        .insert({
+          project_id: projectId, title: draftTitle.trim(), format: draftFormat,
+          stage: 'idea', purpose_type: 'teach', brief: {}, created_by: user.id,
+        })
+        .select('id').maybeSingle();
+      if (error || !post?.id) throw error ?? new Error('The post was not saved.');
+      setCreating(false);
+      setDraftTitle('');
+      await qc.invalidateQueries({ queryKey: ['production-board-items'] });
+      setSelectedWork(post.id);
+      toast.success('Draft created. Open its script, caption and files.');
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Could not create the post.');
+    } finally { setCreatingBusy(false); }
+  };
+
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
-  if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
-  const ready = data.filter((it) => !it.approved_at && (it.quality_score ?? 0) >= 80 && !(it.quality_fails ?? []).length);
-  const approveBatch = async () => {
-    setBatching(true);
-    let ok = 0, refused = 0;
-    for (const it of ready) {
-      try { await approve.mutateAsync(it.id); ok++; } catch { refused++; }
-    }
-    setBatching(false);
-    toast.success(`Approved ${ok}. Refused by the database: ${refused}.`);
-    refetch();
-  };
-  const onApprove = async (it: BoardItem) => {
-    if (!canApprove(it)) return;
-    try { await approve.mutateAsync(it.id); toast.success('Approved'); } catch (e: any) { toast.error(e?.message ?? 'Could not approve it'); }
-  };
-  const onMove = async (it: BoardItem) => {
-    const next = nextStageForFormat(it.stage, it.format);
-    if (next === it.stage) return toast.info('This one is already at the last step.');
-    try { await advance.mutateAsync({ id: it.id, stage: next }); toast.success(`Moved to ${STAGE_LABELS[next]}`); }
-    catch (e: any) { toast.error(e?.message ?? 'Could not move it'); }
-  };
   return (
     <div className="space-y-3">
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <p className="text-sm text-muted-foreground">{ready.length} ready to approve</p>
-      <Button size="sm" disabled={batching || ready.length === 0} onClick={approveBatch}>
-        {batching && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Approve batch
-      </Button>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-      {data.map((it) => (
-        <div key={it.id} className="space-y-1">
-          <p className="text-[11px] uppercase tracking-wide text-blue-600">{STAGE_LABELS[it.stage as keyof typeof STAGE_LABELS] ?? it.stage}</p>
-          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} />
+      <div className="flex flex-wrap justify-between items-start gap-3">
+        <p className="text-sm text-muted-foreground max-w-2xl">
+          Open a post to edit its script, attach production links, approve finished work,
+          and record actual scheduling or publication. Changing a label never sends a post.
+        </p>
+        <Button size="sm" onClick={() => setCreating(value => !value)}>
+          <Plus className="h-4 w-4 mr-1"/>Create a post
+        </Button>
+      </div>
+      {creating && <Card className="p-4 space-y-3">
+        <label className="block space-y-1">
+          <span className="text-sm font-medium">New post title</span>
+          <Input value={draftTitle} onChange={e => setDraftTitle(e.target.value)}
+            placeholder="e.g. Three questions buyers ask before booking"/>
+        </label>
+        <label className="block space-y-1">
+          <span className="text-sm font-medium">Format</span>
+          <select className="w-full rounded-md border bg-background px-3 py-2"
+            value={draftFormat} onChange={e => setDraftFormat(e.target.value)}>
+            <option value="short">Short video or Reel</option>
+            <option value="long_form">Long-form video</option>
+            <option value="post">Social post or graphic</option>
+            <option value="article">Article or blog post</option>
+            <option value="email">Email</option>
+          </select>
+        </label>
+        <p className="text-xs text-muted-foreground">Creates a brand-specific draft; nothing is scheduled or published.</p>
+        <div className="flex flex-wrap gap-2">
+          <Button disabled={creatingBusy || !draftTitle.trim()} onClick={createPost}>
+            {creatingBusy ? 'Creating draft…' : 'Create draft and open editor'}
+          </Button>
+          <Button variant="ghost" disabled={creatingBusy} onClick={() => setCreating(false)}>Cancel</Button>
         </div>
-      ))}
-    </div>
+      </Card>}
+      {data.length === 0 ? <p className="text-sm text-muted-foreground">
+        No posts yet. Use Content to create one, or turn an audience question into a production plan.
+      </p> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {data.map(it => (
+            <ProductionItemCard
+              key={it.id}
+              item={it}
+              brandName="This brand"
+              onOpen={item => setSelectedWork(item.id)}
+            />
+          ))}
+        </div>
+      )}
+      <ContentWorkflowDialog projectId={projectId} itemId={selectedWork} onClose={() => setSelectedWork(null)} />
     </div>
   );
 }
@@ -699,15 +718,38 @@ function ContentTab({ projectId }: { projectId: string }) {
 function IntelTab({ projectId }: { projectId: string }) {
   const { data, isLoading, isError, refetch } = useBrandIntel(projectId);
   const jobs = useProjectJobs(projectId);
-  const byContent = jobByTarget(jobs.data ?? [], 'content_items');
+  const byContent = jobByTarget((jobs.data ?? []).filter(job => job.status !== 'parked' && job.status !== 'finished'), 'content_items');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [req, setReq] = useState<PipelineRequest | null>(null);
+  const navigate = useNavigate();
+  const [busyPain, setBusyPain] = useState<string | null>(null);
+  const makeAnswerPost = async (pain: { id: string; pain_text: string }) => {
+    if (busyPain) return;
+    setBusyPain(pain.id);
+    try {
+      const draft = await contentItemFromPain(projectId, pain.pain_text, pain.id);
+      const { jobId } = await composePipeline({
+        new_content: draft.newContent
+          ? { title: draft.newContent.title, summary: draft.newContent.summary } : undefined,
+        project_id: projectId, kind: 'content', title: draft.title,
+        target_type: 'content_items', target_key: draft.targetKey ?? null,
+        product_type: 'social_piece', level: 1,
+        goal_text: 'Answer a real audience question with useful content and measure the response',
+        destinations: [], monetization: [], promotion: [],
+      });
+      await jobs.refetch();
+      toast.success('Post plan created. Opening its steps.');
+      navigate(pipelineHref(projectId, jobId));
+    } catch (error: any) { toast.error(error?.message ?? 'Could not start the post plan.'); }
+    finally { setBusyPain(null); }
+  };
   if (isLoading) return <Loading />;
   if (isError || !data) return <LoadError onRetry={() => refetch()} />;
   return (
     <div className="space-y-6">
       <section>
-        <h3 className="text-lg font-semibold mb-2">Niche Profile</h3>
+        <h3 className="text-lg font-semibold mb-1">Your audience profile</h3>
+        <p className="text-sm text-muted-foreground mb-2">Who you serve, what they care about, and the context for your content and offers.</p>
         {data.niche.length === 0 ? <p className="text-sm text-muted-foreground">No niche profile yet.</p> :
           data.niche.map((n) => {
             const full = expanded[n.id];
@@ -726,7 +768,8 @@ function IntelTab({ projectId }: { projectId: string }) {
           })}
       </section>
       <section>
-        <h3 className="text-lg font-semibold mb-2">Top pains</h3>
+        <h3 className="text-lg font-semibold mb-1">What your audience asks</h3>
+        <p className="text-sm text-muted-foreground mb-2">Common questions and problems. Choose one to create a post that genuinely helps.</p>
         {data.pains.length === 0 ? <p className="text-sm text-muted-foreground">No pains recorded yet.</p> : (
           <ol className="space-y-2">
             {data.pains.map((p, i) => (
@@ -739,17 +782,17 @@ function IntelTab({ projectId }: { projectId: string }) {
                     {p.product_flag && <span className="font-semibold text-foreground">Product</span>}
                   </p>
                 </div>
-                <Button size="sm" variant="outline" onClick={async () => {
-                  try { setReq(await contentItemFromPain(projectId, p.pain_text, p.id)); }
-                  catch (e: any) { toast.error(e?.message ?? 'Could not create the item'); }
-                }}>Make this</Button><PainUsageBadge projectId={projectId} painId={p.id} />
+                <Button size="sm" variant="outline" disabled={!!busyPain} onClick={() => makeAnswerPost(p)}>
+                  {busyPain === p.id ? 'Creating post plan…' : 'Make a post that answers this'}
+                </Button><PainUsageBadge projectId={projectId} painId={p.id} />
               </li>
             ))}
           </ol>
         )}
       </section>
       <section>
-        <h3 className="text-lg font-semibold mb-2">Briefs</h3>
+        <h3 className="text-lg font-semibold mb-1">Content ideas</h3>
+        <p className="text-sm text-muted-foreground mb-2">Scored ideas for useful posts and videos. Open their production plan to get started.</p>
         {data.briefs.length === 0 ? <p className="text-sm text-muted-foreground">No scored ideas yet.</p> : (
           <ul className="space-y-2">
             {data.briefs.map((b) => (
@@ -760,12 +803,12 @@ function IntelTab({ projectId }: { projectId: string }) {
                   <p className="text-xs text-muted-foreground capitalize">{dash(b.format)} · {dash(b.purpose_type)}</p>
                 </div>
                 {byContent.get(b.id) ? (
-                  <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, byContent.get(b.id)!)}>Pipeline</Link></Button>
+                  <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, byContent.get(b.id)!)}>Open production plan</Link></Button>
                 ) : (
                   <Button size="sm" onClick={() => setReq({
                     projectId, kind: 'content', title: b.title, targetType: 'content_items', targetId: b.id,
                     productType: productTypeForFormat(b.format),
-                  })}>Make this</Button>
+                  })}>Build a content plan</Button>
                 )}
               </li>
             ))}
@@ -774,7 +817,8 @@ function IntelTab({ projectId }: { projectId: string }) {
       </section>
       <CreatePipelineDialog request={req} onClose={() => setReq(null)} onCreated={() => jobs.refetch()} />
       <section>
-        <h3 className="text-lg font-semibold mb-2">Dimension library</h3>
+        <h3 className="text-lg font-semibold mb-1">Formats that work in this niche</h3>
+        <p className="text-sm text-muted-foreground mb-2">Creative formats, angles and audience interests to use when developing content.</p>
         {data.dims.length === 0 ? <p className="text-sm text-muted-foreground">No dimensions filed yet.</p> : (
           <ul className="flex flex-wrap gap-2">
             {data.dims.map((d) => {
@@ -802,14 +846,51 @@ function AssetPreview({ path, mime, name }: { path: string; mime: string | null;
 }
 
 function DocRow({ d }: { d: KnowledgeRow }) {
-  const href = d.attachment_url || d.external_url;
+  const [open, setOpen] = useState(false);
+  const current = useQuery({
+    queryKey: ['brand-workspace', 'document-reader', d.id],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from('knowledge_base')
+        .select('id,title,version,summary,full_text,external_url,attachment_url,updated_at')
+        .eq('id', d.id).maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('This document is no longer available to your account.');
+      return data as {
+        id: string; title: string; version: string | null; summary: string | null;
+        full_text: string | null; external_url: string | null;
+        attachment_url: string | null; updated_at: string | null;
+      };
+    },
+  });
+  const src = current.data?.attachment_url || current.data?.external_url;
+  const original = src && /^https?:\/\//i.test(src) ? src : null;
   return (
     <li className="py-2 flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-sm text-foreground">{d.title}{d.version ? ` · v${d.version}` : ''}</p>
+        <p className="text-sm text-foreground">{d.title}{d.version ? ' · v' + d.version : ''}</p>
         <p className="text-xs text-muted-foreground">Review by {dash(d.expiry_date)}{d.status === 'draft' ? ' · planned' : ''}</p>
       </div>
-      {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline shrink-0">Open</a>}
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>Read document</Button>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent className="overflow-y-auto w-full sm:max-w-xl">
+          <SheetHeader>
+            <SheetTitle>{current.data?.title ?? d.title}</SheetTitle>
+            <SheetDescription>Current HQ document text and its original reference, if available.</SheetDescription>
+          </SheetHeader>
+          {current.isLoading ? <div className="pt-5"><Loading /></div> :
+            current.isError ? <div className="pt-5"><LoadError onRetry={() => current.refetch()} /></div> :
+            <div className="pt-5 space-y-3">
+              {current.data?.summary && <p className="text-sm text-muted-foreground">{current.data.summary}</p>}
+              {current.data?.full_text ? (
+                <div className="whitespace-pre-wrap text-sm leading-relaxed rounded-lg border p-4">{current.data.full_text}</div>
+              ) : <p className="text-sm text-muted-foreground">There is no readable text stored for this document yet.</p>}
+              {original && <Button asChild variant="outline" size="sm">
+                <a href={original} target="_blank" rel="noreferrer">Open original source</a>
+              </Button>}
+            </div>}
+        </SheetContent>
+      </Sheet>
     </li>
   );
 }

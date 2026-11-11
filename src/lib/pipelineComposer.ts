@@ -18,6 +18,10 @@ export interface ComposeInput {
   promotion?: string[];
   level: number;
   money_destination?: string | null;
+  /** Concrete business result this plan intends to advance, not a guarantee. */
+  goal_text?: string | null;
+  goal_pillar_key?: string | null;
+  goal_kpi_key?: string | null;
   /** Lane jobs: the foundation item key. */
   lane_item_key?: string | null;
   /** Channel setup jobs: the channel's governing method. */
@@ -66,10 +70,7 @@ const ownerOf = (o?: string): 'claude' | 'owner' => (o === 'claude' ? 'claude' :
 
 export const isPlannedMethod = (m: MethodRow) => m.status === 'draft' || parseKeyPoints(m.key_points).planned === true;
 
-const placeholder = (m: MethodRow): PlannedStep => ({
-  title: `Method not written yet: ${m.title}`, owner_kind: 'claude', method_id: m.id, method_key: methodKey(m),
-});
-
+/* An unfinished guide is a planning prerequisite, not a production step. */
 const PRODUCT_PUBLISH = /^(Click Publish|Publish|List it)/;
 const DEST_PUBLISH = /^(Publish|Create the listing|List it|Click Publish)/;
 
@@ -82,13 +83,26 @@ export function buildRecipeSteps(
   promotion: MethodRow[],
 ): PlannedStep[] {
   const steps: PlannedStep[] = [
-    { title: 'Brand rules check', owner_kind: 'claude', method_id: brandRules?.id ?? null, method_key: brandRules ? methodKey(brandRules) : null },
+    { title: 'Brand rules check', owner_kind: 'claude', method_id: brandRules?.id ?? null,
+      method_key: brandRules ? methodKey(brandRules) : null,
+      detail: 'Review the current brand voice, audience, claims and visual standards before creating work. Record any missing inputs or conflicts for review.',
+      check: 'A clear, brand-aligned brief or documented list of missing inputs exists.' },
   ];
   const fromMethod = (m: MethodRow, skip?: (title: string) => boolean) => {
-    if (isPlannedMethod(m)) { steps.push(placeholder(m)); return; }
+    if (isPlannedMethod(m)) throw new Error(`Finish the how-to guide for "${m.title}" before starting this plan.`);
     for (const s of parseKeyPoints(m.key_points).steps ?? []) {
       if (skip?.(s.title)) continue;
-      steps.push({ title: s.title, owner_kind: ownerOf(s.owner), method_id: m.id, method_key: methodKey(m), check: s.check ?? null });
+      steps.push({
+        title: s.title,
+        owner_kind: ownerOf(s.owner),
+        method_id: m.id,
+        method_key: methodKey(m),
+        check: s.check ?? null,
+        detail: ['Use the production guide "' + m.title + '".',
+          'Your action: ' + s.title + '.',
+          s.check ? 'Before marking it done, verify: ' + s.check : 'Save the resulting work or link before marking this step done.'
+        ].join('\n'),
+      });
     }
   };
   const productHasPublish = !!productType && !isPlannedMethod(productType)
@@ -96,9 +110,13 @@ export function buildRecipeSteps(
   if (productType) fromMethod(productType);
   for (const d of destinations) fromMethod(d, productHasPublish ? (t) => DEST_PUBLISH.test(t) : undefined);
   for (const m of [...monetization, ...promotion]) {
-    if (isPlannedMethod(m)) { steps.push(placeholder(m)); continue; }
+    if (isPlannedMethod(m)) throw new Error(`Finish the how-to guide for "${m.title}" before starting this plan.`);
     for (const a of parseKeyPoints(m.key_points).adds ?? []) {
-      steps.push({ title: a.title, owner_kind: ownerOf(a.owner), method_id: m.id, method_key: methodKey(m) });
+      steps.push({
+        title: a.title, owner_kind: ownerOf(a.owner), method_id: m.id, method_key: methodKey(m),
+        detail: 'Use "' + m.title + '" to complete: ' + a.title + '. Save the relevant destination, draft, or result link for review.',
+        check: 'The relevant deliverable or confirmed setup is linked to this plan.',
+      });
     }
   }
   return steps;
@@ -112,10 +130,18 @@ export function laneSteps(br: MethodRow | null, dest: MethodRow | null, setupDet
   const mkey = dest ? methodKey(dest) : br ? methodKey(br) : null;
   return [
     { title: 'Set up the accounts this avenue needs', owner_kind: 'owner', method_id: mid, method_key: mkey, detail: setupDetail },
-    { title: 'First product or piece for this avenue', owner_kind: 'claude', method_id: mid, method_key: mkey },
-    { title: 'List or publish it', owner_kind: 'owner', method_id: mid, method_key: mkey },
-    { title: 'Promotion plan: three pieces pointing at it', owner_kind: 'claude', method_id: mid, method_key: mkey },
-    { title: '30-day check: what sold or ranked', owner_kind: 'claude', method_id: mid, method_key: mkey, due_in_days: 30 },
+    { title: 'First product or piece for this avenue', owner_kind: 'claude', method_id: mid, method_key: mkey,
+      detail: 'Develop one real deliverable suited to the selected revenue opportunity. Use the existing brand materials and record the draft, intended customer, and destination before requesting approval.',
+      check: 'A reviewable deliverable with a clear destination has been saved.' },
+    { title: 'List or publish it', owner_kind: 'owner', method_id: mid, method_key: mkey,
+      detail: 'Open the approved deliverable and its intended sales or publishing account. Publish or list it there yourself, then attach the actual listing or live URL. Do not count a draft as published.',
+      check: 'A real listing or published URL is saved, or the step stays open.' },
+    { title: 'Promotion plan: three pieces pointing at it', owner_kind: 'claude', method_id: mid, method_key: mkey,
+      detail: 'Draft three audience-relevant promotion ideas that point to the approved listing or live destination. Note the channel and intended outcome for each.',
+      check: 'Three reviewable promotional pieces and the correct destination link are saved.' },
+    { title: '30-day check: what sold or ranked', owner_kind: 'claude', method_id: mid, method_key: mkey, due_in_days: 30,
+      detail: 'Review actual transactions, inquiries and placement results after 30 days. Distinguish recorded outcomes from forecasts and recommend whether to improve, continue or stop.',
+      check: 'A review with evidence and a suggested next decision is saved.' },
   ];
 }
 
@@ -123,16 +149,26 @@ export function channelSetupSteps(br: MethodRow | null, ch: MethodRow | null): P
   const mid = ch?.id ?? br?.id ?? null;
   const mkey = ch ? methodKey(ch) : br ? methodKey(br) : null;
   return [
-    { title: 'Create or confirm the account and handle', owner_kind: 'owner', method_id: mid, method_key: mkey },
-    { title: 'Profile copy, link and brand mark from the kit', owner_kind: 'claude', method_id: mid, method_key: mkey },
-    { title: 'Apply the profile and connect the scheduler', owner_kind: 'owner', method_id: mid, method_key: mkey },
-    { title: "First five pieces at this channel's level", owner_kind: 'claude', method_id: mid, method_key: mkey },
-    { title: 'Cadence check in 14 days', owner_kind: 'claude', method_id: mid, method_key: mkey, due_in_days: 14 },
+    { title: 'Create or confirm the account and handle', owner_kind: 'owner', method_id: mid, method_key: mkey,
+      detail: 'Open the platform directly, sign in securely, create or confirm the brand-owned account, and record its actual profile URL and handle in HQ. Never enter account passwords into the task.',
+      check: 'The correct account or profile URL is saved in HQ.' },
+    { title: 'Profile copy, link and brand mark from the kit', owner_kind: 'claude', method_id: mid, method_key: mkey,
+      detail: 'Prepare profile bio, relevant website or booking link, and correctly sized brand imagery from the approved kit. Save drafts for approval.',
+      check: 'The profile copy, destination link and image assets are ready for review.' },
+    { title: 'Apply the profile and connect the scheduler', owner_kind: 'owner', method_id: mid, method_key: mkey,
+      detail: 'Apply the approved profile details on the real account. If a supported posting tool is available, connect it and confirm access. Otherwise record that scheduling remains manual.',
+      check: 'The profile is live and the scheduling connection is confirmed or explicitly marked manual.' },
+    { title: "First five pieces at this channel's level", owner_kind: 'claude', method_id: mid, method_key: mkey,
+      detail: 'Draft the first five pieces in the brand voice, matching the account platform and available production effort. Record each hook, draft and intended destination.',
+      check: 'Five reviewable content items exist; none is described as published without evidence.' },
+    { title: 'Cadence check in 14 days', owner_kind: 'claude', method_id: mid, method_key: mkey, due_in_days: 14,
+      detail: 'Compare the planned posting cadence with real published placements and available workload. Suggest a practical adjustment if needed.',
+      check: 'A 14-day review references actual publication evidence and a clear next recommendation.' },
   ];
 }
 
 /** Row fields for one step; depends_on is set by the caller. */
-export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; job_id: string; user_id: string | null }, today = new Date()) {
+export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; job_id: string; user_id: string | null; owner_name?: string }, today = new Date()) {
   const owner = s.owner_kind === 'owner';
   const due = s.due_in_days != null ? new Date(today.getTime() + s.due_in_days * 86400000).toISOString().slice(0, 10) : null;
   return {
@@ -148,7 +184,8 @@ export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; jo
     status: 'Open',
     approval_status: owner ? (i === 0 ? 'Approved' : 'Blocked') : 'Auto',
     priority: owner ? 'P2-High' : 'P3-Medium',
-    assignee: owner ? 'Allmighty' : 'Claude',
+    assignee: owner ? (ctx.owner_name || 'Brand owner') : 'Claude',
+    assignee_id: owner ? ctx.user_id : null,
     source: 'pipeline',
     is_manual: true,
     created_by_id: ctx.user_id,
@@ -233,12 +270,19 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     const pick = (ks: string[] = []) => ks.map((k) => by.get(k)).filter(Boolean) as MethodRow[];
     const pt = input.product_type ? by.get(input.product_type) ?? null : null;
     if (!pt) throw new Error('Choose a product type with an available playbook.');
-    if (!isPlannedMethod(pt) && !(parseKeyPoints(pt.key_points).steps ?? []).length) {
-      throw new Error('This product playbook has no production steps. Complete it in Playbooks before creating a pipeline.');
-    }
     const missing = keys.filter(k => k && !by.has(k));
     if (missing.length) throw new Error(`Missing playbooks: ${missing.join(', ')}. Update your selections.`);
     const dest = pick(input.destinations), mon = pick(input.monetization), pro = pick(input.promotion);
+    const unfinished = [pt, ...dest, ...mon, ...pro].filter(m => {
+      if (isPlannedMethod(m)) return true;
+      const info = parseKeyPoints(m.key_points);
+      return m.subcategory === 'product_type' || m.subcategory === 'destination'
+        ? !(info.steps ?? []).length
+        : !(info.adds ?? []).length;
+    });
+    if (unfinished.length) {
+      throw new Error('Complete these guides before creating production steps: ' + unfinished.map(m => m.title).join(', '));
+    }
     recipeRows = orderRecipe(brandRules, niches, [pt, ...dest, ...mon, ...pro]);
     steps = buildRecipeSteps(brandRules, pt, dest, mon, pro);
   }
@@ -249,8 +293,16 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     target_type: input.target_type ?? null, target_id: input.target_id ?? null,
     target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
     recipe, level: input.level, money_destination: input.money_destination || null,
+    goal_text: input.goal_text?.trim() || null,
+    goal_pillar_key: input.goal_pillar_key || null,
+    goal_kpi_key: input.goal_kpi_key || null,
   };
-  const rows = steps.map((step, i) => stepRow(step, i, { project_id: input.project_id, job_id: '', user_id: user?.id ?? null }));
+  const ownerName = typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
+    ? user.user_metadata.full_name.trim()
+    : user?.email ?? 'Brand owner';
+  const rows = steps.map((step, i) => stepRow(step, i, {
+    project_id: input.project_id, job_id: '', user_id: user?.id ?? null, owner_name: ownerName,
+  }));
   const { data: jobId, error } = await (supabase as any).rpc('hq_create_pipeline', {
     p_job: job, p_steps: rows, p_new_content: input.new_content ?? null,
   });

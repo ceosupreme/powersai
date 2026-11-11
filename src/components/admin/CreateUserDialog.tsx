@@ -60,6 +60,7 @@ function plainCreateUserReason(reason: string): string {
 interface Bar {
   id: string;
   name: string;
+  project_type?: string;
 }
 
 interface CreateUserDialogProps {
@@ -80,6 +81,12 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
   const [selectedBarIds, setSelectedBarIds] = useState<string[]>([]);
   const [primaryBarId, setPrimaryBarId] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  // Brand managers only receive internal brands. Clients and bar staff keep
+  // their current assignment model; prospect shells are excluded upstream.
+  const availableProjects = bars.filter(p =>
+    formData.role !== 'owner' || p.project_type === 'internal_brand'
+  );
+  const requiresProject = formData.role !== 'admin';
 
   const resetForm = () => {
     setFormData({ email: '', password: '', full_name: '', role: 'staff', asana_gid: '' });
@@ -129,6 +136,17 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       return;
     }
 
+    if (requiresProject && selectedBarIds.length === 0) {
+      toast.error(formData.role === 'owner'
+        ? 'Choose at least one internal brand before creating this brand manager.'
+        : 'Choose at least one project this person can access.');
+      return;
+    }
+    const assignmentError = async (r: PromiseLike<{error: any}>) => {
+      const { error } = await r;
+      if (error) throw error;
+    };
+    let createdAccountId: string | null = null;
     setIsCreating(true);
     try {
       const effectivePrimary = primaryBarId && selectedBarIds.includes(primaryBarId)
@@ -151,12 +169,14 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       if (data?.error) throw new Error(data.error);
 
       const newUserId = data?.user_id || data?.id;
+      createdAccountId = newUserId ?? null;
+      if (!newUserId) throw new Error('Account creation did not return a user ID; verify the account before trying again.');
 
       // Save asana_gid to profile if provided
       if (newUserId && formData.asana_gid.trim()) {
-        await supabase.from('profiles').update({
+        await assignmentError(supabase.from('profiles').update({
           asana_gid: formData.asana_gid.trim(),
-        } as any).eq('id', newUserId);
+        } as any).eq('id', newUserId));
       }
 
       // Insert venue_assignments for all selected bars
@@ -167,14 +187,14 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
           role_at_venue: formData.role,
           is_primary: barId === effectivePrimary,
         }));
-        await supabase.from('venue_assignments').insert(rows);
+        await assignmentError(supabase.from('venue_assignments').insert(rows));
 
         // Sync user_bar_assignments for RLS
         const barAssignRows = selectedBarIds.map(barId => ({
           user_id: newUserId,
           bar_id: barId,
         }));
-        await supabase.from('user_bar_assignments').insert(barAssignRows);
+        await assignmentError(supabase.from('user_bar_assignments').insert(barAssignRows));
       }
 
       // Sync user_venue_roles so RoleContext stays consistent
@@ -184,14 +204,14 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
         };
         const mappedRole = venueRoleMap[formData.role] || 'foh';
         if (formData.role === 'admin' || formData.role === 'owner') {
-          await supabase.from('user_venue_roles' as any).insert({
+          await assignmentError(supabase.from('user_venue_roles' as any).insert({
             user_id: newUserId, venue_id: null, role: mappedRole,
-          });
+          }));
         } else if (selectedBarIds.length > 0) {
           const venueRoleRows = selectedBarIds.map(vid => ({
             user_id: newUserId, venue_id: vid, role: mappedRole,
           }));
-          await supabase.from('user_venue_roles' as any).insert(venueRoleRows);
+          await assignmentError(supabase.from('user_venue_roles' as any).insert(venueRoleRows));
         }
       }
 
@@ -200,8 +220,16 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       resetForm();
       onUserCreated();
     } catch (error: any) {
-      console.error('Error creating user:', error);
-      toast.error(`Couldn't create the user: ${plainCreateUserReason(await functionErrorMessage(error, 'Failed to create user'))}`);
+      console.error('Error creating or assigning user:', error);
+      const message = plainCreateUserReason(await functionErrorMessage(error, 'Failed to create user'));
+      if (createdAccountId) {
+        // Never imply the entire operation failed: the account already exists.
+        toast.error('Account created but its assignments or settings could not be completed. Open this person in Users > Edit to repair access. ' + message);
+        onUserCreated();
+        setOpen(false);
+      } else {
+        toast.error(`Couldn't create the user: ${message}`);
+      }
     } finally {
       setIsCreating(false);
     }
@@ -222,7 +250,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
           <DialogDescription>
-            Create a new user account with specified role and bar assignment.
+            Give this person a role and choose which real brands or client projects they can access.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -279,14 +307,18 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             <Label htmlFor="role">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as AppRole }))}
+              onValueChange={(value) => {
+                setFormData(prev => ({ ...prev, role: value as AppRole }));
+                setSelectedBarIds([]);
+                setPrimaryBarId(null);
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="owner">Owner</SelectItem>
+                <SelectItem value="owner">Brand manager</SelectItem>
                 <SelectItem value="gm">GM</SelectItem>
                 <SelectItem value="shift_lead">Shift Lead</SelectItem>
                 <SelectItem value="staff">Staff</SelectItem>
@@ -303,12 +335,19 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             />
           </div>
           <div className="grid gap-2">
-            <Label>Assigned Bars</Label>
+            <Label>{formData.role === 'owner' ? 'Brands this person can manage' : 'Projects this person can access'}{requiresProject ? ' *' : ''}</Label>
+            <p className="text-xs text-muted-foreground">
+              {formData.role === 'owner'
+                ? 'Only internal brands are listed. At least one assignment is required before saving.'
+                : requiresProject
+                  ? 'Choose at least one real project. Prospect shells cannot be assigned.'
+                  : 'Admins already have full access; assignments are optional.'}
+            </p>
             <div className="space-y-2 rounded-md border border-border p-3 max-h-[200px] overflow-y-auto">
-              {bars.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No bars available</p>
+              {availableProjects.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No eligible projects available for this role.</p>
               ) : (
-                bars.map(bar => {
+                availableProjects.map(bar => {
                   const isChecked = selectedBarIds.includes(bar.id);
                   const isPrimary = primaryBarId === bar.id;
                   return (
@@ -345,7 +384,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             </div>
             {selectedBarIds.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                {selectedBarIds.length} bar{selectedBarIds.length !== 1 ? 's' : ''} selected
+                {selectedBarIds.length} project{selectedBarIds.length !== 1 ? 's' : ''} selected
               </p>
             )}
           </div>

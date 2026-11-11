@@ -7,14 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
-  composePipeline, methodKey, platformToDestination, recipeVersionString, type JobKind,
+  composePipeline, methodKey, parseKeyPoints, platformToDestination, recipeVersionString, type JobKind,
 } from '@/lib/pipelineComposer';
 
 import { TrafficNotice } from './TrafficNotice';
+import { useProjectKpis } from '@/hooks/useProjectKpis';
 
 const T = (t: string) => (supabase as any).from(t);
 
@@ -32,20 +34,31 @@ export interface PipelineRequest {
   promotion?: string[];
   laneItemKey?: string | null;
   channelMethodId?: string | null;
+  goalText?: string | null;
 }
 
-interface MethodOpt { id: string; title: string; status: string | null; subcategory: string; key: string }
+interface MethodOpt {
+  id: string; title: string; status: string | null; subcategory: string; key: string;
+  /** Incomplete guides must not generate fake production steps. */
+  available?: boolean;
+}
 
 function useMethodOptions(enabled: boolean) {
   return useQuery({
     queryKey: ['pipeline-composer', 'methods'],
     enabled,
     queryFn: async (): Promise<MethodOpt[]> => {
-      const { data, error } = await T('knowledge_base').select('id,title,status,subcategory,tags')
+      const { data, error } = await T('knowledge_base').select('id,title,status,subcategory,tags,key_points')
         .in('subcategory', ['product_type', 'destination', 'monetization', 'promotion'])
         .in('status', ['active', 'draft']).order('title');
       if (error) throw error;
-      return ((data ?? []) as any[]).map((r) => ({ ...r, key: methodKey(r) ?? '' })).filter((r) => r.key);
+      return ((data ?? []) as any[]).map((r) => {
+        const instructions = parseKeyPoints(r.key_points);
+        const hasSteps = ['product_type', 'destination'].includes(r.subcategory)
+          ? (instructions.steps?.length ?? 0) > 0
+          : (instructions.adds?.length ?? 0) > 0;
+        return { ...r, key: methodKey(r) ?? '', available: r.status === 'active' && instructions.planned !== true && hasSteps };
+      }).filter((r) => r.key);
     },
   });
 }
@@ -58,12 +71,15 @@ function MultiPick({ label, options, value, onChange }: { label: string; options
         <div className="flex flex-wrap gap-1.5">
           {options.map((o) => {
             const on = value.includes(o.key);
+            const available = o.available !== false;
             return (
-              <button key={o.id} type="button" aria-pressed={on}
+              <button key={o.id} type="button" aria-pressed={on} disabled={!available}
                 onClick={() => onChange(on ? value.filter((k) => k !== o.key) : [...value, o.key])}
+                title={!available ? 'Guide coming: instructions must be finished before this can be included in a plan.' : undefined}
                 className={cn('rounded-full border px-3 py-1 text-xs min-h-8',
-                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground')}>
-                {on ? '✓ ' : ''}{o.title}{o.status === 'draft' ? ' (planned)' : ''}
+                  on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground',
+                  !available && 'opacity-50 cursor-not-allowed')}>
+                {on ? '✓ ' : ''}{o.title}{!available ? ' (guide coming)' : ''}
               </button>
             );
           })}
@@ -82,6 +98,17 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const methods = useMethodOptions(open);
+  const kpis = useProjectKpis(request?.projectId ?? null);
+  const brandGoal = useQuery({
+    queryKey: ['pipeline-composer', 'brand-goal', request?.projectId],
+    enabled: open && !!request?.projectId,
+    queryFn: async () => {
+      const { data, error } = await T('venues')
+        .select('name,north_star').eq('id', request!.projectId).maybeSingle();
+      if (error) throw error;
+      return data as { name: string; north_star: string | null } | null;
+    },
+  });
   const channels = useQuery({
     queryKey: ['pipeline-composer', 'channels', request?.projectId],
     enabled: open,
@@ -99,21 +126,28 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const [pro, setPro] = useState<string[]>([]);
   const [level, setLevel] = useState('2');
   const [money, setMoney] = useState('');
+  const [goalChoice, setGoalChoice] = useState('brand');
+  const [goalFree, setGoalFree] = useState('');
   const [nicheIds, setNicheIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     if (!request) { setSeeded(false); return; }
+    setShowAdvanced(false);
     setTitle(request.title); setProductType(request.productType ?? ''); setLevel('2'); setMoney('');
-    setMon(request.monetization ?? (request.kind === 'product' ? ['direct_sale'] : request.kind === 'content' ? ['lead_magnet', 'affiliate'] : []));
-    setPro(request.promotion ?? (request.kind === 'product' ? ['video_to_product'] : request.kind === 'content' ? ['post_to_lead_magnet'] : []));
+    setGoalChoice(request.goalText ? 'custom' : 'brand');
+    setGoalFree(request.goalText ?? '');
+    // Do not silently add a sales channel or monetization playbook to product plans.
+    setMon(request.monetization ?? []);
+    setPro(request.promotion ?? []);
     setDest(request.destinations ?? []);
   }, [request]);
 
   useEffect(() => {
-    if (!request || seeded || !channels.data || request.destinations?.length) return;
-    const keys = channels.data.filter((c) => ['live', 'dormant', 'planned'].includes(c.status))
+    if (!request || seeded || !channels.data || request.destinations?.length || request.kind === 'product') return;
+    const keys = channels.data.filter((c) => c.status === 'live')
       .map((c) => platformToDestination(c.platform)).filter(Boolean) as string[];
     setDest([...new Set(keys)]);
     setSeeded(true);
@@ -150,12 +184,29 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
 
   const fixedSteps = request?.kind === 'lane' || request?.kind === 'channel_setup';
 
-  const validProduct = by.product_type.some(m => m.key === productType);
+  const validProduct = by.product_type.some(m => m.key === productType && m.available !== false);
   const submit = async () => {
     if (!request) return;
-    if (!fixedSteps && !validProduct) return toast.error('Choose an available product playbook.');
+    if (!fixedSteps && !validProduct) return toast.error('Choose a product type with a completed how-to guide.');
+    if (!fixedSteps) {
+      const selectedMethods = [...by.destination.filter(m => dest.includes(m.key)),
+        ...by.monetization.filter(m => mon.includes(m.key)),
+        ...by.promotion.filter(m => pro.includes(m.key))];
+      const unavailable = selectedMethods.filter(m => m.available === false);
+      if (unavailable.length) return toast.error(`Complete these guides before building the plan: ${unavailable.map(m => m.title).join(', ')}`);
+    }
     setBusy(true);
     try {
+      const selectedKpi = (kpis.data ?? []).find(k => goalChoice === 'kpi:' + k.pillar_key + ':' + k.kpi_key);
+      const chosenGoal = selectedKpi
+        ? 'Improve ' + selectedKpi.kpi_label + (selectedKpi.target == null ? '' : ' toward ' + selectedKpi.target.toLocaleString())
+        : goalChoice === 'brand' ? brandGoal.data?.north_star ?? null
+          : goalChoice === 'custom' ? goalFree.trim() || null : null;
+      if (!chosenGoal?.trim()) {
+        toast.error('Choose a business goal, a scorecard target, or describe the result this plan should achieve.');
+        setBusy(false);
+        return;
+      }
       const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
       const { jobId, recipe } = await composePipeline({
         new_content: request.newContent,
@@ -166,6 +217,9 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         monetization: fixedSteps ? [] : keep(mon, by.monetization),
         promotion: fixedSteps ? [] : keep(pro, by.promotion),
         level: Number(level), money_destination: money.trim() || null,
+        goal_text: chosenGoal,
+        goal_pillar_key: selectedKpi?.pillar_key ?? null,
+        goal_kpi_key: selectedKpi?.kpi_key ?? null,
         lane_item_key: request.laneItemKey ?? null, channel_method_id: request.channelMethodId ?? null,
         niche_ids: nicheIds.filter((id) => nicheOpts.some((o) => o.id === id)),
       });
@@ -174,6 +228,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         if (error) toast.error('Pipeline created, but the recipe could not be saved on the item.');
       }
       qc.invalidateQueries({ queryKey: ['brand-workspace'] });
+      qc.invalidateQueries({ queryKey: ['brand-goal-plans', request.projectId] });
       qc.invalidateQueries({ queryKey: ['radar'] });
       qc.invalidateQueries({ queryKey: ['pain-pipelines'] });
       toast.success('Pipeline ready');
@@ -189,9 +244,10 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
     <Dialog open={open} onOpenChange={(o) => !o && !busy && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create pipeline</DialogTitle>
+          <DialogTitle>Make a work plan</DialogTitle>
           <DialogDescription>
-            {fixedSteps ? 'This kind of job uses a fixed five-step plan.' : 'Pick the playbooks. Steps are built from them in order.'}
+            Choose what you want to accomplish. HQ saves the steps and opens the first one.
+            {fixedSteps ? ' This setup uses a fixed sequence.' : ' The finished how-to guides determine the steps.'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -199,46 +255,128 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
             <Label htmlFor="pl-title">Title</Label>
             <Input id="pl-title" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-          <MultiPick label="Niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
-          {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /> : !fixedSteps && (
+          <div className="space-y-1.5">
+            <Label>What business result should this plan support?</Label>
+            <Select value={goalChoice} onValueChange={setGoalChoice}>
+              <SelectTrigger aria-label="Business result"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="brand">Brand goal: {brandGoal.data?.north_star || 'Not set yet'}</SelectItem>
+                {(kpis.data ?? []).map(k => (
+                  <SelectItem key={k.pillar_key + ':' + k.kpi_key} value={'kpi:' + k.pillar_key + ':' + k.kpi_key}>
+                    {k.kpi_label}{k.target == null ? '' : ' · Target ' + k.target.toLocaleString()}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">Describe another measurable result</SelectItem>
+                <SelectItem value="none">No result selected yet</SelectItem>
+              </SelectContent>
+            </Select>
+            {goalChoice === 'custom' && <Input value={goalFree} onChange={e => setGoalFree(e.target.value)}
+              placeholder="e.g. Get three qualified event inquiries this month" />}
+            <p className="text-xs text-muted-foreground">This states what the plan aims to improve. Actual results are recorded separately.</p>
+          </div>
+          {request?.kind !== 'product' && (
+            <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
+          )}
+          {methods.isError && !fixedSteps && (
+            <div className="space-y-2">
+              <p role="alert" className="text-sm text-destructive">
+                The how-to guides could not be loaded. Plans cannot be created without their real instructions.
+              </p>
+              <Button size="sm" variant="outline" onClick={() => void methods.refetch()}>Try loading guides again</Button>
+            </div>
+          )}
+          {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin" /> : !fixedSteps && !methods.isError && (
             <>
               <div className="space-y-1.5">
-                <Label>Product type</Label>
-                {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">The suggested product type has no matching playbook. Choose one below.</p>}
+                <Label>{request?.kind === 'product' ? '1. What kind of product is this?' : 'What are you making?'}</Label>
+                {productType && !validProduct && <p role="alert" className="text-sm text-destructive">
+                  This product type needs a finished how-to guide. Choose an available type below.
+                </p>}
                 <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger><SelectValue placeholder="Choose a product type" /></SelectTrigger>
                   <SelectContent>
                     {by.product_type.map((m) => (
-                      <SelectItem key={m.id} value={m.key}>{m.title}{m.status === 'draft' ? ' (planned)' : ''}</SelectItem>
+                      <SelectItem key={m.id} value={m.key} disabled={m.available === false}>
+                        {m.title}{m.available === false ? ' (guide coming)' : ''}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <MultiPick label="Destinations" options={by.destination} value={dest} onChange={setDest} />
-              <MultiPick label="Monetization" options={by.monetization} value={mon} onChange={setMon} />
-              <MultiPick label="Promotion" options={by.promotion} value={pro} onChange={setPro} />
-              {request && <TrafficNotice projectId={request.projectId}
-                methods={[...by.monetization.filter((o) => mon.includes(o.key)), ...by.promotion.filter((o) => pro.includes(o.key))]} />}
+              <MultiPick label={request?.kind === 'product'
+                ? '2. Where will you sell this?'
+                : 'Where will this go?'} options={by.destination} value={dest} onChange={setDest} />
+              {request?.kind === 'product' && <p className="text-xs text-muted-foreground">
+                Only your chosen outlets become steps. You can create the product first and choose selling outlets later.
+              </p>}
             </>
           )}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Level</Label>
-              <Select value={level} onValueChange={setLevel}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{['1', '2', '3'].map((l) => <SelectItem key={l} value={l}>Level {l}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="pl-money">Money destination</Label>
-              <Input id="pl-money" value={money} onChange={(e) => setMoney(e.target.value)} placeholder="e.g. Etsy shop" />
-            </div>
-          </div>
+          {request?.kind === 'product' ? (
+            <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+              <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-primary">
+                <ChevronDown className={'h-4 w-4 transition-transform ' + (showAdvanced ? 'rotate-180' : '')}/>
+                More options (optional)
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-3">
+                <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds}/>
+                <MultiPick label="Ways to earn from this product" options={by.monetization} value={mon} onChange={setMon}/>
+                <MultiPick label="Ways to promote this product" options={by.promotion} value={pro} onChange={setPro}/>
+                <TrafficNotice projectId={request.projectId}
+                  methods={[...by.monetization.filter(o => mon.includes(o.key)), ...by.promotion.filter(o => pro.includes(o.key))]}/>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Level of detail</Label>
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 · Lightweight</SelectItem>
+                        <SelectItem value="2">2 · Standard</SelectItem>
+                        <SelectItem value="3">3 · Detailed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pl-money">Where should sales or leads go?</Label>
+                    <Input id="pl-money" value={money} onChange={e => setMoney(e.target.value)}
+                      placeholder="e.g. own online store"/>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : (
+            <>
+              {!fixedSteps && !methods.isError && (
+                <>
+                  <MultiPick label="How should this make money? (optional)" options={by.monetization} value={mon} onChange={setMon}/>
+                  <MultiPick label="How will you promote it? (optional)" options={by.promotion} value={pro} onChange={setPro}/>
+                  {request && <TrafficNotice projectId={request.projectId}
+                    methods={[...by.monetization.filter(o => mon.includes(o.key)), ...by.promotion.filter(o => pro.includes(o.key))]}/>}
+                </>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>How detailed should the work be?</Label>
+                  <Select value={level} onValueChange={setLevel}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 · Lightweight</SelectItem>
+                      <SelectItem value="2">2 · Standard</SelectItem>
+                      <SelectItem value="3">3 · Detailed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pl-money">Where should sales or leads go?</Label>
+                  <Input id="pl-money" value={money} onChange={e => setMoney(e.target.value)} placeholder="e.g. booking page"/>
+                </div>
+              </div>
+            </>
+          )}
         </div>
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
-          <Button onClick={submit} disabled={busy || methods.isLoading || methods.isError || (!fixedSteps && !validProduct)}>
-            {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create pipeline
+          <Button onClick={submit} disabled={busy || (!fixedSteps && (methods.isLoading || methods.isError || !validProduct))}>
+            {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create plan & open first step
           </Button>
         </DialogFooter>
       </DialogContent>

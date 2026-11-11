@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -56,16 +56,23 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
   const by = (st: string) => rows.filter((r) => r.state === st).sort(byPriority);
   const top = useMemo(() => topMissing(rows, new Set(openJobs.keys())), [rows, openJobs]);
 
-  const run = async (key: string, fn: () => Promise<unknown>, ok?: string) => {
+  const run = async (key: string, fn: () => Promise<unknown>, ok?: string): Promise<boolean> => {
     setBusy(key);
-    try { await fn(); if (ok) toast.success(ok); await refresh(); }
-    catch (e: any) { toast.error(e?.message ?? 'That did not save'); }
-    finally { setBusy(null); }
+    try {
+      await fn();
+      if (ok) toast.success(ok);
+      await refresh();
+      return true;
+    } catch (e: any) {
+      toast.error(e?.message ?? 'That did not save');
+      return false;
+    } finally { setBusy(null); }
   };
 
   const setUp = (r: AssetMapRow) => run(`setup-${r.asset_key}`, async () => {
     const jobId = await startSetup(projectId, r);
-    toast.success(`Setup started for ${r.label}`, { action: { label: 'Open pipeline', onClick: () => navigate(pipelineHref(projectId, jobId)) } });
+    toast.success(`Setup plan created for ${r.label}`);
+    navigate(pipelineHref(projectId, jobId));
   });
 
   const copyBrief = async () => {
@@ -125,7 +132,7 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
         {canEdit && (
           <div className="flex flex-wrap gap-2">
             <Button size="sm" disabled={!top.length} onClick={() => setTop3Open(true)}>Set up the top 3</Button>
-            <Button size="sm" variant="outline" onClick={copyBrief}>Copy setup brief</Button>
+            <Button size="sm" variant="outline" onClick={copyBrief}>Copy instructions for an assistant</Button>
           </div>
         )}
       </header>
@@ -141,11 +148,11 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
                 {canEdit && (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {isFoundation(r) ? (
-                      <Button size="sm" onClick={openBrandKit}>Set it up</Button>
+                      <Button size="sm" onClick={openBrandKit}>Open your brand kit</Button>
                     ) : r.channel_id && openJobs.get(r.channel_id) ? (
-                      <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, openJobs.get(r.channel_id)!)}>Open setup job</Link></Button>
+                      <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, openJobs.get(r.channel_id)!)}>Resume setup plan</Link></Button>
                     ) : (
-                      <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>
+                      <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Make setup plan & open first step</Button>
                     )}
                     {!isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                     <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => run(`later-${r.asset_key}`, () => setDecision(projectId, r.asset_key, 'later'), `${r.label} moved to Later`)}>Later</Button>
@@ -166,9 +173,9 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
               {r.handle && <p className="text-xs text-muted-foreground">{r.handle}</p>}
               {canEdit && (
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {isFoundation(r) ? <Button size="sm" onClick={openBrandKit}>Set it up</Button>
-                    : job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Open setup job</Link></Button>
-                    : <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Set it up</Button>}
+                  {isFoundation(r) ? <Button size="sm" onClick={openBrandKit}>Open your brand kit</Button>
+                    : job ? <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, job)}>Resume setup plan</Link></Button>
+                    : <Button size="sm" disabled={busy === `setup-${r.asset_key}`} onClick={() => setUp(r)}>Make setup plan & open first step</Button>}
                   {r.state === 'planned' && !isFoundation(r) && <Button size="sm" variant="outline" onClick={() => setHaveIt(r)}>I already have it</Button>}
                 </div>
               )}
@@ -222,11 +229,11 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
       </Folded>
 
       <HaveItDialog row={haveIt} onClose={() => setHaveIt(null)}
-        onSave={(v) => run('have', () => recordExisting(projectId, haveIt!, v), `${haveIt!.label} recorded`).then(() => setHaveIt(null))} />
+        onSave={(v) => run('have', () => recordExisting(projectId, haveIt!, v), `${haveIt!.label} recorded`).then(saved => {if (saved) setHaveIt(null);})} />
       <SkipDialog row={skip} onClose={() => setSkip(null)}
-        onSave={(reason) => run('skip', () => setDecision(projectId, skip!.asset_key, 'skip', reason), `${skip!.label} skipped`).then(() => setSkip(null))} />
+        onSave={(reason) => run('skip', () => setDecision(projectId, skip!.asset_key, 'skip', reason), `${skip!.label} skipped`).then(saved => {if (saved) setSkip(null);})} />
       <ProfileDialog open={editProfile} value={profile.data ?? []} onClose={() => setEditProfile(false)}
-        onSave={(v) => run('profile', () => saveBrandProfile(projectId, v), 'Brand type saved').then(() => setEditProfile(false))} />
+        onSave={(v) => run('profile', () => saveBrandProfile(projectId, v), 'Brand type saved').then(saved => {if (saved) setEditProfile(false);})} />
 
       <Dialog open={top3Open} onOpenChange={(o) => !o && setTop3Open(false)}>
         <DialogContent>
@@ -240,8 +247,13 @@ export function SetupTab({ projectId, canEdit }: { projectId: string; canEdit: b
           <DialogFooter>
             <Button variant="ghost" onClick={() => setTop3Open(false)}>Cancel</Button>
             <Button disabled={!!busy} onClick={() => run('top3', async () => {
-              for (const r of top) await startSetup(projectId, r);
-            }, `${top.length} setup pipelines started`).then(() => setTop3Open(false))}>Start all {top.length}</Button>
+              const created: string[] = [];
+              for (const r of top) created.push(await startSetup(projectId, r));
+              if (created.length > 0) {
+                toast.success(`${created.length} setup plans created. Opening the first plan.`);
+                navigate(pipelineHref(projectId, created[0]));
+              }
+            }).then(saved => {if (saved) setTop3Open(false);})}>Create plans & open first step</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -288,7 +300,7 @@ function Row({ title, badge, sub, children }: { title: string; badge: string; su
   );
 }
 
-function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (v: { platform: string; handle: string; url: string; followers: number | null; status: 'live' | 'dormant' }) => void }) {
+export function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (v: { platform: string; handle: string; url: string; followers: number | null; status: 'live' | 'dormant' }) => void }) {
   const [v, setV] = useState({ platform: '', handle: '', url: '', followers: '', status: 'live' as 'live' | 'dormant' });
   const platforms = row?.platforms ?? [];
   const open = !!row;
@@ -332,8 +344,9 @@ function HaveItDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClo
   );
 }
 
-function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (reason: string) => void }) {
+export function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose: () => void; onSave: (reason: string) => void }) {
   const [reason, setReason] = useState('');
+  useEffect(() => { if (!row) setReason(''); }, [row?.asset_key]);
   return (
     <Dialog open={!!row} onOpenChange={(o) => { if (!o) { setReason(''); onClose(); } }}>
       <DialogContent>
@@ -342,14 +355,14 @@ function SkipDialog({ row, onClose, onSave }: { row: AssetMapRow | null; onClose
         <Textarea id="skip-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={!reason.trim()} onClick={() => { onSave(reason.trim()); setReason(''); }}>Skip it</Button>
+          <Button disabled={!reason.trim()} onClick={() => onSave(reason.trim())}>Skip it</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-function ProfileDialog({ open, value, onClose, onSave }: { open: boolean; value: string[]; onClose: () => void; onSave: (v: string[]) => void }) {
+export function ProfileDialog({ open, value, onClose, onSave }: { open: boolean; value: string[]; onClose: () => void; onSave: (v: string[]) => void }) {
   const [sel, setSel] = useState<string[]>(value);
   const [was, setWas] = useState(false);
   if (open !== was) { setWas(open); if (open) setSel(value); }

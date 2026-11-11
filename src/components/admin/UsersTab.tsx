@@ -81,6 +81,7 @@ interface UserWithDetails {
 interface Bar {
   id: string;
   name: string;
+  project_type?: string;
 }
 
 export const UsersTab = () => {
@@ -122,15 +123,19 @@ export const UsersTab = () => {
 
       if (rolesError) throw rolesError;
 
-      // Fetch all bars
+      // Exclude prospect shells from access assignment, without changing
+      // already saved memberships or hiding legitimate client projects.
       const { data: barsData, error: barsError } = await supabase
         .from('venues')
-        .select('id, name')
+        .select('id,name,project_type,is_prospect_shell')
         .order('name');
 
       if (barsError) throw barsError;
 
-      setBars(barsData || []);
+      const assignableProjects = (barsData ?? []).filter(p =>
+        !p.is_prospect_shell && p.project_type !== 'prospect'
+      );
+      setBars(assignableProjects);
 
       // Fetch venue_assignments
       const { data: venueAssignments, error: vaError } = await supabase

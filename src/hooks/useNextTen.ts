@@ -222,6 +222,19 @@ export async function fetchActionStatusMap(
   return map;
 }
 
+/**
+ * A parked or finished production plan keeps its step history but must not
+ * keep generating actionable owner work on dashboards or in notifications.
+ */
+export async function fetchInactiveJobIds(rows: { job_id?: string | null }[]): Promise<Set<string>> {
+  const ids = [...new Set(rows.map(r => r.job_id).filter((id): id is string => !!id))];
+  if (!ids.length) return new Set();
+  const jobs = await fetchRowsIn<{ id: string; status: string }>(
+    'production_jobs', 'id,status', 'id', ids,
+  );
+  return new Set(jobs.filter(j => j.status === 'parked' || j.status === 'finished').map(j => j.id));
+}
+
 type NextTenProject = { projectId: string; projectName: string };
 
 /** (a) Open action items: not done, not rejected, not snoozed, and the owner's turn. */
@@ -230,10 +243,12 @@ function actionNextTenRows(
   actionRows: any[],
   statusById: Map<string, string | null>,
   now: number,
+  inactiveJobIds: Set<string>,
 ): NextTenRow[] {
   const rows: NextTenRow[] = [];
   const seen = new Set<string>();
   for (const a of actionRows) {
+    if (a.job_id && inactiveJobIds.has(a.job_id)) continue;
     if (a.status === 'Done' || a.approval_status === 'Rejected') continue;
     if (seen.has(a.id)) continue;
     seen.add(a.id);
@@ -369,8 +384,10 @@ export async function fetchNextTenForProject(
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
     const actionRows = (actionsRes.data ?? []) as any[];
-    const statusById = await fetchActionStatusMap(actionRows);
-    rows.push(...actionNextTenRows(project, actionRows, statusById, now));
+    const [statusById, inactiveJobIds] = await Promise.all([
+      fetchActionStatusMap(actionRows), fetchInactiveJobIds(actionRows),
+    ]);
+    rows.push(...actionNextTenRows(project, actionRows, statusById, now, inactiveJobIds));
   } catch {
     unavailable.push('action items');
   }
@@ -475,7 +492,7 @@ export function actionRowsFor(rows: any[], projectId: string): any[] {
 export async function fetchNextTenBatch(
   projects: { id: string; name: string }[],
   weekStart: string,
-  shared: { actionRows?: any[]; statusById?: Map<string, string | null>; linkRows?: any[] } = {},
+  shared: { actionRows?: any[]; statusById?: Map<string, string | null>; inactiveJobIds?: Set<string>; linkRows?: any[] } = {},
 ): Promise<Map<string, NextTenResult>> {
   const now = Date.now();
   const ids = projects.map((p) => p.id);
@@ -483,8 +500,11 @@ export async function fetchNextTenBatch(
   const [actions, lanes, products, kpis] = await Promise.allSettled([
     (async () => {
       const rows = shared.actionRows ?? (await fetchActionRowsForProjects(ids));
-      const statusById = shared.statusById ?? (await fetchActionStatusMap(rows));
-      return { rows, statusById };
+      const [statusById, inactiveJobIds] = await Promise.all([
+        shared.statusById ? Promise.resolve(shared.statusById) : fetchActionStatusMap(rows),
+        shared.inactiveJobIds ? Promise.resolve(shared.inactiveJobIds) : fetchInactiveJobIds(rows),
+      ]);
+      return { rows, statusById, inactiveJobIds };
     })(),
     (async () => {
       const venues = await fetchRowsIn<{ id: string; project_type: string | null }>('venues', 'id,project_type', 'id', ids);
@@ -533,7 +553,7 @@ export async function fetchNextTenBatch(
     const unavailable: string[] = [];
     try {
       if (actions.status !== 'fulfilled') throw actions.reason;
-      rows.push(...actionNextTenRows(project, actionRowsFor(actions.value.rows, p.id), actions.value.statusById, now));
+      rows.push(...actionNextTenRows(project, actionRowsFor(actions.value.rows, p.id), actions.value.statusById, now, actions.value.inactiveJobIds));
     } catch {
       unavailable.push('action items');
     }
@@ -604,15 +624,47 @@ export function useCompleteNextTenRow() {
     mutationFn: async (row: NextTenRow) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (row.source === 'Action') {
-        const { error } = await supabase
+        const scoped = `bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`;
+        const { data: current, error: readError } = await supabase
+          .from('action_items')
+          .select('id,status,approval_status,owner_kind,depends_on,job_id')
+          .eq('id', row.refId).or(scoped).maybeSingle();
+        if (readError) throw readError;
+        if (!current) throw new Error('This task could not be found in the selected brand.');
+        if (current.status === 'Done') throw new Error('This step has already been completed.');
+        if (current.approval_status !== 'Approved') throw new Error('This step needs approval before it can be completed.');
+        if (current.owner_kind === 'claude') throw new Error('This step is assigned to Claude. Take it yourself first.');
+        if (current.job_id) {
+          const { data: job, error: jobError } = await (supabase as any).from('production_jobs')
+            .select('status').eq('id', current.job_id).eq('project_id', row.projectId).maybeSingle();
+          if (jobError) throw jobError;
+          if (!job || job.status === 'parked' || job.status === 'finished') {
+            throw new Error('This plan is archived or finished. The step remains in its history.');
+          }
+        }
+        if (current.depends_on) {
+          const { data: prerequisite, error: dependencyError } = await supabase.from('action_items')
+            .select('status').eq('id', current.depends_on).maybeSingle();
+          if (dependencyError) throw dependencyError;
+          if (prerequisite?.status !== 'Done') {
+            throw new Error('Finish the preceding step before completing this one.');
+          }
+        }
+        const { data, error } = await supabase
           .from('action_items')
           .update({
             status: 'Done',
             completed_at: new Date().toISOString(),
             completed_by: user?.id ?? null,
           })
-          .eq('id', row.refId);
+          .eq('id', row.refId)
+          .or(scoped)
+          .eq('approval_status', 'Approved')
+          .neq('status', 'Done')
+          .select('id')
+          .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error('The step was not updated. It may have changed or your access may have been revoked.');
         return;
       }
       if (row.source === 'Lane') {
@@ -634,11 +686,14 @@ export function useCompleteNextTenRow() {
       if (row.source === 'Product') {
         const next = nextProductStage(row.productStatus ?? null);
         if (!next) return;
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('channel_products')
           .update({ status: next })
-          .eq('id', row.refId);
+          .eq('id', row.refId)
+          .select('id')
+          .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error('The product was not updated. It may no longer be editable from this brand.');
       }
     },
     onSuccess: (_d, row) => {
@@ -650,6 +705,7 @@ export function useCompleteNextTenRow() {
       qc.invalidateQueries({ queryKey: foundationStatusKey(row.projectId) });
       qc.invalidateQueries({ queryKey: ['non-client-portfolio'] });
       qc.invalidateQueries({ queryKey: ['pipeline-job'] });
+      qc.invalidateQueries({ queryKey: ['brand-manager-steps', row.projectId] });
       qc.invalidateQueries({ queryKey: ['brand-workspace'] });
       qc.invalidateQueries({ queryKey: ['brand-work-summary'] });
     },

@@ -36,8 +36,10 @@ export function missingDependencyIds(rows: { id: string; depends_on?: string | n
   return [...new Set(rows.map((r) => r.depends_on).filter((d): d is string => !!d && !have.has(d)))];
 }
 
-export function pipelineHref(projectId: string, jobId: string): string {
-  return `/project/${projectId}/jobs/${jobId}`;
+/** Link directly to a particular step without changing existing plan routes. */
+export function pipelineHref(projectId: string, jobId: string, stepId?: string | null): string {
+  const route = `/project/${projectId}/jobs/${jobId}`;
+  return stepId ? `${route}?step=${encodeURIComponent(stepId)}` : route;
 }
 
 /** Content waiting for approval: quality 80+, no hard fails, not approved yet. */
@@ -72,7 +74,7 @@ export const STEP_STATUS_WORD: Record<StepStatus, string> = {
   blocked: 'Blocked',
   ready: 'Ready',
   decision: 'Awaiting your decision',
-  queued: 'Queued',
+  queued: 'Assigned to Claude',
   open: 'Open',
 };
 

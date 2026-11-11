@@ -12,8 +12,21 @@ import { BrandIdentity } from '@/components/shared/BrandIdentity';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { HelpTip } from '@/components/help/HelpTip';
+import { useBrandManagerProjects } from '@/hooks/useBrandManagerProjects';
+import BrandManagerPortal from './BrandManagerPortal';
 
 export default function OwnerDashboard() {
+  const { role, isAdmin } = useAuth();
+  const managed = useBrandManagerProjects();
+  if (role === 'owner' && !isAdmin) {
+    if (managed.isLoading) return <p role="status">Loading your brand workspace…</p>;
+    if (managed.isError) return <Card className="p-5 space-y-3"><p role="alert">We could not verify your assigned brands.</p><Button onClick={() => void managed.refetch()}>Try again</Button></Card>;
+    if ((managed.data?.length ?? 0) > 0) return <BrandManagerPortal brands={managed.data!} />;
+  }
+  return <OwnerDashboardContent />;
+}
+
+function OwnerDashboardContent() {
   const {selectedBar} = useApp();
   const {canAccessPage, isAdmin} = useAuth();
   const directory = useProjectDirectory();

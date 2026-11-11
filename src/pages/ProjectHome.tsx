@@ -34,7 +34,6 @@ import { useBrandKitAssetsView } from '@/hooks/useBrandWorkspace';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { VENUE_ONBOARDING_STEPS } from '@/config/venueOnboardingSteps';
-import { CLIENT_PROJECT_TYPE } from '@/lib/effectivePillars';
 import type { ProjectType } from '@/lib/effectivePillars';
 
 
@@ -42,6 +41,7 @@ interface ProjectMeta {
   id: string;
   name: string;
   project_type: ProjectType | null;
+  is_prospect_shell: boolean | null;
   bar_code: string | null;
   slug: string | null;
   north_star: string | null;
@@ -81,8 +81,12 @@ export default function ProjectHome() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [websiteStats, setWebsiteStats] = useState<WebsiteStats | null>(null);
 
-  // Only admins and owners can operate the setup wizard.
-  const canRunWizard = isAdmin || currentRole === 'owner';
+  // The legacy go-live wizard is only for client businesses, not internal
+  // brands. Both admin and owner roles still work on actual client projects.
+  const isClientProject = !!meta && projectGroup({
+    project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell,
+  }) === 'clients';
+  const canRunWizard = isClientProject && (isAdmin || currentRole === 'owner');
 
   useEffect(() => {
     if (!venueId) return;
@@ -90,7 +94,7 @@ export default function ProjectHome() {
     setLoading(true);
     supabase
       .from('venues')
-      .select('id,name,project_type,bar_code,slug,north_star,monetization_model,focus_status,ownership')
+      .select('id,name,project_type,is_prospect_shell,bar_code,slug,north_star,monetization_model,focus_status,ownership')
       .eq('id', venueId)
       .maybeSingle()
       .then(({ data }) => {
@@ -156,7 +160,7 @@ export default function ProjectHome() {
   const live = useVenueLiveStatus(progress.statusFor);
 
   // Non-client projects get the one-glance view; client projects are untouched.
-  const isNonClient = !!meta && projectGroup({ project_type: meta.project_type, is_prospect_shell: false }) === 'brands';
+  const isNonClient = !!meta && projectGroup({ project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell }) === 'brands';
   const { data: pillars = [], isError: pillarsError } = useEffectivePillars(
     isNonClient ? venueId : null,
     meta?.project_type ?? undefined,
@@ -169,9 +173,9 @@ export default function ProjectHome() {
   // Overall score: the same weighted current-week number the Portfolio card shows.
   const scoreRows = useMemo<ProjectDirectoryRow[]>(
     () => (isNonClient && meta ? [{
-      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: false,
+      id: meta.id, name: meta.name, project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell,
       focus_status: meta.focus_status ?? 'active',
-      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: false }),
+      group: projectGroup({ project_type: meta.project_type, is_prospect_shell: meta.is_prospect_shell }),
     }] : []),
     [isNonClient, meta],
   );
@@ -434,14 +438,14 @@ export default function ProjectHome() {
               )}
             </div>
           )}
-          <div className="pt-2">
+          {isClientProject && <div className="pt-2">
             <VenueLiveBadge
               isLive={live.isLive}
               phase3Pct={live.phase3Pct}
               requiredDone={live.requiredDone}
               requiredTotal={live.requiredTotal}
             />
-          </div>
+          </div>}
         </div>
         {canRunWizard && (
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
@@ -504,20 +508,12 @@ export default function ProjectHome() {
               )}
             </>
           }
-          setup={
-            <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-between">
-                  <span>Setup</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
-            </Collapsible>
-          }
+          setup={null}
         />
-      ) : (
+      ) : isClientProject ? (
         setupBlocks
+      ) : (
+        <p className="text-sm text-muted-foreground">This project does not use the client onboarding wizard.</p>
       )}
 
       {canRunWizard && wizardOpen && venueId && (

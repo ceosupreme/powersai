@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TrafficNotice } from '@/components/pipeline/TrafficNotice';
 import { useApproveItem, canApprove } from '@/hooks/useContentProduction';
@@ -8,10 +8,12 @@ import { playbookStatus } from '@/lib/playbookStatus';
 import { jobStatusWord } from '@/hooks/usePlaybooks';
 import { PlaybookWordBadge } from '@/components/playbooks/PlaybookWordBadge';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -36,7 +38,8 @@ const STATUS_TONE: Record<StepStatus, string> = {
 
 interface Step {
   id: string; title: string; detail: string | null; facts: string | null; status: string | null;
-  owner_kind: string | null; method_id: string | null; output_url: string | null; depends_on: string | null;
+  approval_status: string | null; owner_kind: string | null; assignee_id: string | null; assignee: string | null;
+  method_id: string | null; output_url: string | null; depends_on: string | null;
   step_order: number | null;
 }
 
@@ -52,7 +55,7 @@ function usePipelineJob(jobId: string | undefined) {
       // snoozed_until is deliberately ignored here: every step of the job is shown.
       const [stepsRes, venueRes, kitRes, nicheRes, targetRes] = await Promise.all([
         supabase.from('action_items')
-          .select('id,title,detail,facts,status,owner_kind,method_id,output_url,depends_on,step_order')
+          .select('id,title,detail,facts,status,approval_status,owner_kind,assignee_id,assignee,method_id,output_url,depends_on,step_order')
           .eq('job_id', job.id).order('step_order', { ascending: true }),
         T('venues').select('id,name').eq('id', job.project_id).maybeSingle(),
         T('brand_kits').select('bio_short,brand_voice,content_mode').eq('project_id', job.project_id).eq('archived', false).maybeSingle(),
@@ -100,8 +103,13 @@ function briefText(brief: unknown): string | null {
 
 export default function PipelineJob() {
   const qc = useQueryClient();
+  const { user, profile, isAdmin } = useAuth();
   const [jobBusy,setJobBusy] = useState(false);
+  const [confirmStop, setConfirmStop] = useState(false);
+  const [instructionsFor, setInstructionsFor] = useState<string | null>(null);
   const { venueId, jobId } = useParams<{ venueId: string; jobId: string }>();
+  const [queryParams, setQueryParams] = useSearchParams();
+  const requestedStepId = queryParams.get('step');
   const { data, isLoading, isError, refetch } = usePipelineJob(jobId);
   const recipeIds = useMemo(() => (data?.job.recipe ?? []).map((r) => r.id), [data]);
   const stepMethodIds = useMemo(() => (data?.steps ?? []).map((s) => s.method_id), [data]);
@@ -111,18 +119,23 @@ export default function PipelineJob() {
   const [busyStep, setBusyStep] = useState<string | null>(null);
   const [methodOpen, setMethodOpen] = useState<{ id: string; title: string; version: string; status: string } | null>(null);
   const [stepOpen, setStepOpen] = useState<Step | null>(null);
-  const scrolled = useRef(false);
+  const scrolled = useRef<string | null>(null);
 
   const statusById = useMemo(() => new Map((data?.steps ?? []).map((s) => [s.id, s.status])), [data]);
 
   useEffect(() => {
-    if (!data || scrolled.current || data.job.current_step == null) return;
-    const el = document.getElementById(`step-${data.job.current_step}`);
+    if (!data) return;
+    const targetedStep = requestedStepId
+      ? data.steps.find(step => step.id === requestedStepId)
+      : data.steps.find(step => step.step_order === data.job.current_step);
+    if (!targetedStep || targetedStep.step_order == null || scrolled.current === targetedStep.id) return;
+    const el = document.getElementById(`step-${targetedStep.step_order}`);
     if (el) {
-      scrolled.current = true;
+      scrolled.current = targetedStep.id;
+      setInstructionsFor(targetedStep.id);
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [data]);
+  }, [data, requestedStepId]);
 
   if (isLoading) return <div className="py-24 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   if (isError) return <p role="status" className="p-6 text-sm text-destructive">This job could not be loaded. <button className="underline" onClick={() => refetch()}>Try again</button></p>;
@@ -140,8 +153,17 @@ export default function PipelineJob() {
   const markDone = async (s: Step) => {
     try {
       await complete.mutateAsync({ key: `action-${s.id}`, source: 'Action', step: s.title, projectId: job.project_id, projectName: brandName, refId: s.id, rank: 0 });
-      toast.success('Step done');
-      refetch();
+      const latest = await refetch();
+      const next = latest.data?.steps.find(step => step.step_order === latest.data?.job.current_step);
+      scrolled.current = null;
+      if (next && next.id !== s.id) {
+        setQueryParams({ step: next.id }, { replace: true });
+        setInstructionsFor(next.id);
+        toast.success('Step completed. Opening the next step in this plan.');
+      } else {
+        setQueryParams({}, { replace: true });
+        toast.success('Step completed. No further steps are ready in this plan.');
+      }
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     }
@@ -149,19 +171,34 @@ export default function PipelineJob() {
 
   const updateStep = async (s: Step, patch: Record<string, unknown>, ok: string) => {
     setBusyStep(s.id);
-    const { error } = await supabase.from('action_items').update(patch as any).eq('id', s.id);
-    setBusyStep(null);
-    if (error) return toast.error(error.message);
-    toast.success(ok);
-    refetch();
+    try {
+      const { data: saved, error } = await supabase.from('action_items')
+        .update(patch as any).eq('id', s.id)
+        .or(`bar_id.eq.${job.project_id},venue_id.eq.${job.project_id}`)
+        .neq('status', 'Done').select('id').maybeSingle();
+      if (error || !saved) throw error ?? new Error('The step was not updated. Check its status and your access.');
+      toast.success(ok);
+      await refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not update the step.');
+    } finally {
+      setBusyStep(null);
+    }
   };
-  const queueStep = (s: Step) => {
-    const { facts } = parseFacts(s.facts);
-    const merged = { ...(facts ?? (s.facts ? { note: s.facts } : {})), queued: true, queued_at: new Date().toISOString() };
-    return updateStep(s, { facts: JSON.stringify(merged) }, 'Saved for worker pickup. This does not start a run.');
+  // Assign the work to the person who clicked, not to the HQ administrator.
+  const reclaim = (s: Step) => {
+    if (!user) return toast.error('Sign in to take this step.');
+    return updateStep(s, {
+      owner_kind: 'owner',
+      assignee: profile?.full_name?.trim() || user.email || 'Current user',
+      assignee_id: user.id,
+      approval_status: 'Approved',
+      facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }),
+    }, 'This step is assigned to you.');
   };
-  const reclaim = (s: Step) => updateStep(s, { owner_kind: 'owner', assignee: 'Allmighty', approval_status: 'Approved', facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }) }, 'Assigned to you');
-  const handToClaude = (s: Step) => updateStep(s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' }, 'Handed to Claude');
+  const handToClaude = (s: Step) => updateStep(s, {
+    owner_kind: 'claude', assignee: 'Claude', assignee_id: null, approval_status: 'Auto',
+  }, 'Assigned to Claude for later review. This does not start an automated run.');
   const copyPrompt = async (s: Step) => {
     const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
     const text = buildStarterPrompt({
@@ -191,10 +228,20 @@ export default function PipelineJob() {
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">{job.title}</h1>
         <div className="flex flex-wrap gap-1.5">
           <Badge variant="outline">{jobStatusWord(job.status)}</Badge>
-          {!isPlaybookJob && job.level != null && <Badge variant="outline">Level {job.level}</Badge>}
-          {!isPlaybookJob && job.money_destination && <Badge variant="secondary">Money to: {job.money_destination}</Badge>}
-          <Badge variant="outline">Your time: {job.owner_minutes_est ?? '—'} min est · {job.owner_minutes_actual ?? '—'} min actual</Badge>
+          {isAdmin && !isPlaybookJob && job.level != null && <Badge variant="outline" title="Production detail level selected for this plan">Level {job.level}</Badge>}
+          {isAdmin && !isPlaybookJob && job.money_destination && <Badge variant="secondary" title="Where revenue or conversions from this plan are intended to go">Money to: {job.money_destination}</Badge>}
+          {isAdmin && <Badge variant="outline" title="The plan's estimated and recorded operator time">Your time: {job.owner_minutes_est ?? '—'} min est · {job.owner_minutes_actual ?? '—'} min actual</Badge>}
         </div>
+        {job.goal_text && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-1">
+            <p className="font-semibold">The business result this plan supports</p>
+            <p>{job.goal_text}</p>
+            {job.goal_kpi_key && <p className="text-xs text-muted-foreground">
+              Connected scorecard: {job.goal_pillar_key ?? 'Business'} / {job.goal_kpi_key}
+            </p>}
+            <p className="text-xs text-muted-foreground">This is the intended outcome. Actual results must be recorded separately.</p>
+          </div>
+        )}
         {isPlaybookJob && (
           <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm space-y-1">
             <p className="flex flex-wrap items-center gap-2">
@@ -209,19 +256,25 @@ export default function PipelineJob() {
             {job.money_destination && <p>{/^feeds:/i.test(job.money_destination) ? job.money_destination : `Feeds: ${job.money_destination}`}</p>}
           </div>
         )}
-        {job.status !== 'finished' && <Button variant="outline" disabled={jobBusy} onClick={async () => {
-          setJobBusy(true);
-          try {
-            const {error} = await (supabase as any).rpc('hq_pause_pipeline',{p_job_id:job.id,p_paused:job.status !== 'parked'});
-            if(error) throw error;
-            await qc.invalidateQueries();
-            toast.success(job.status === 'parked' ? 'Pipeline resumed' : 'Pipeline canceled; history retained');
-          } catch(error:any) { toast.error(error.message); } finally { setJobBusy(false); }
-        }}>{job.status === 'parked' ? 'Resume pipeline' : 'Cancel pipeline'}</Button>}
+        {job.status !== 'finished' && (
+          <Button variant="outline" disabled={jobBusy} onClick={async () => {
+            if (job.status !== 'parked') { setConfirmStop(true); return; }
+            setJobBusy(true);
+            try {
+              const { error } = await (supabase as any).rpc('hq_pause_pipeline', { p_job_id: job.id, p_paused: false });
+              if (error) throw error;
+              await qc.invalidateQueries();
+              toast.success('Plan resumed. Open the next eligible step.');
+              scrolled.current = null;
+            } catch (error: any) { toast.error(error?.message ?? 'Could not resume the plan.'); }
+            finally { setJobBusy(false); }
+          }}>{job.status === 'parked' ? 'Resume this plan' : 'Stop this plan'}</Button>
+        )}
       </header>
 
-      <section>
-        <h2 className="text-sm font-semibold mb-2">Recipe</h2>
+      {isAdmin && <section>
+        <h2 className="text-sm font-semibold mb-2">How this plan was built</h2>
+        <p className="text-xs text-muted-foreground mb-2">The saved production guides and their versions. These are planning inputs, not steps you need to click.</p>
         <div className="flex flex-wrap gap-2">
           {(job.recipe ?? []).map((r) => (
             <button key={r.id} type="button" onClick={() => setMethodOpen(r)}
@@ -233,7 +286,7 @@ export default function PipelineJob() {
           {(job.recipe ?? []).length === 0 && <span className="text-sm text-muted-foreground">No playbooks listed.</span>}
         </div>
         <div className="mt-3"><TrafficNotice projectId={job.project_id} methods={(job.recipe ?? []).map((r: any) => ({ key: r.key ?? '', title: r.title }))} /></div>
-      </section>
+      </section>}
 
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-base">Inputs</CardTitle></CardHeader>
@@ -278,8 +331,13 @@ export default function PipelineJob() {
             const link = firstStepLink(facts, s.output_url);
             const method = s.method_id ? kb.data?.get(s.method_id) : null;
             const current = s.step_order != null && s.step_order === job.current_step;
-            const canDone = job.status !== 'parked' && s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
-            const queued = !!(facts as any)?.queued;
+            const showInstructions = instructionsFor === s.id || (instructionsFor === null && current);
+            const parsed = parseFacts(s.facts);
+            const assignedToMe = s.assignee_id === user?.id ||
+              (!s.assignee_id && !!profile?.full_name && s.assignee?.trim().toLowerCase() === profile.full_name.trim().toLowerCase());
+            const canDone = !['parked', 'finished'].includes(job.status) && s.owner_kind === 'owner' &&
+              (isAdmin || assignedToMe) && s.approval_status === 'Approved' &&
+              st !== 'blocked' && st !== 'done';
             const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
               <li key={s.id} id={s.step_order != null ? `step-${s.step_order}` : undefined}
@@ -293,20 +351,39 @@ export default function PipelineJob() {
                       <Badge variant="secondary" className="text-[10px]">{OWNER_WORD[s.owner_kind ?? ''] ?? 'Unassigned'}</Badge>
                       {method && <Badge variant="outline" className="text-[10px]">{method.title}</Badge>}
                       {current && <Badge className="text-[10px]">Current step</Badge>}
+                      {s.approval_status && s.approval_status !== 'Approved' && st !== 'done' &&
+                        <Badge variant="outline" className="text-[10px]">{s.approval_status === 'Blocked' ? 'Waiting for earlier step' : `Approval: ${s.approval_status}`}</Badge>}
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <Button size="sm" variant="outline" onClick={() => setStepOpen(s)}>View instructions</Button>
+                      <Button size="sm" variant="outline" onClick={() => setInstructionsFor(s.id)}>
+                        {showInstructions ? 'Instructions below' : 'Show instructions'}
+                      </Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
-                      {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done</Button>}
-                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Hand to Claude</Button>}
+                      {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done — next step</Button>}
+                      {isAdmin && canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Assign to Claude for later review</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
-                        queued
-                          ? <span className="self-center text-xs text-muted-foreground">Queued · awaiting worker</span>
-                          : <Button size="sm" variant="outline" disabled={busyStep === s.id || st === 'blocked' || job.status === 'parked'} onClick={() => queueStep(s)}>Queue</Button>
+                        <span className="self-center text-xs text-muted-foreground">Assigned to Claude · processing must be confirmed separately; this screen has not started a run</span>
                       )}
-                      {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
-                      {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy prompt</Button>}
+                      {isAdmin && s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
+                      {isAdmin && s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy Claude prompt</Button>}
                     </div>
+                    {showInstructions && (
+                      <div className="mt-3 space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+                        <p className="font-semibold">What to do now</p>
+                        {s.detail ? <p className="whitespace-pre-wrap leading-relaxed">{s.detail}</p> :
+                          <p className="text-muted-foreground">No written instructions for this step yet. Ask the administrator to complete the guide before proceeding.</p>}
+                        {parsed.facts?.expected_output && (
+                          <p><strong>What you'll have afterward:</strong> {parsed.facts.expected_output}</p>
+                        )}
+                        {(parsed.facts?.checks ?? []).length > 0 && <div>
+                          <strong>Before you mark it done:</strong>
+                          <ul className="list-disc pl-5 space-y-1 mt-1">
+                            {parsed.facts!.checks!.map((check, index) => <li key={index}>{String(check)}</li>)}
+                          </ul>
+                        </div>}
+                        {link && <a href={link} target="_blank" rel="noreferrer" className="text-primary underline">Open the existing work or result</a>}
+                      </div>
+                    )}
                     {isGate && target && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md bg-muted/40 p-2 text-xs">
                         <span>Quality score <span className="font-semibold">{target.quality_score ?? '—'}</span></span>
@@ -363,6 +440,29 @@ export default function PipelineJob() {
         </CardContent>
       </Card>
 
+      <AlertDialog open={confirmStop} onOpenChange={setConfirmStop}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Stop this plan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Incomplete steps will be parked. Completed work, documents, and the plan's history will be preserved. You can resume it later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={jobBusy}>Keep working</AlertDialogCancel>
+            <AlertDialogAction disabled={jobBusy} onClick={async () => {
+              setJobBusy(true);
+              try {
+                const { error } = await (supabase as any).rpc('hq_pause_pipeline', { p_job_id: job.id, p_paused: true });
+                if (error) throw error;
+                await qc.invalidateQueries();
+                toast.success('Plan stopped. Completed work and history are preserved.');
+              } catch (error: any) { toast.error(error?.message ?? 'Could not stop the plan.'); }
+              finally { setJobBusy(false); setConfirmStop(false); }
+            }}>Stop plan, keep history</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Sheet open={!!methodOpen} onOpenChange={(o) => !o && setMethodOpen(null)}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
           {methodOpen && (
