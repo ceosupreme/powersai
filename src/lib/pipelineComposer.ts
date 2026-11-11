@@ -66,10 +66,6 @@ const ownerOf = (o?: string): 'claude' | 'owner' => (o === 'claude' ? 'claude' :
 
 export const isPlannedMethod = (m: MethodRow) => m.status === 'draft' || parseKeyPoints(m.key_points).planned === true;
 
-const placeholder = (m: MethodRow): PlannedStep => ({
-  title: `Method not written yet: ${m.title}`, owner_kind: 'claude', method_id: m.id, method_key: methodKey(m),
-});
-
 const PRODUCT_PUBLISH = /^(Click Publish|Publish|List it)/;
 const DEST_PUBLISH = /^(Publish|Create the listing|List it|Click Publish)/;
 
@@ -85,7 +81,7 @@ export function buildRecipeSteps(
     { title: 'Brand rules check', owner_kind: 'claude', method_id: brandRules?.id ?? null, method_key: brandRules ? methodKey(brandRules) : null },
   ];
   const fromMethod = (m: MethodRow, skip?: (title: string) => boolean) => {
-    if (isPlannedMethod(m)) { steps.push(placeholder(m)); return; }
+    if (isPlannedMethod(m)) throw new Error(`Guide not ready: ${m.title}. Choose a written method instead.`);
     for (const s of parseKeyPoints(m.key_points).steps ?? []) {
       if (skip?.(s.title)) continue;
       steps.push({ title: s.title, owner_kind: ownerOf(s.owner), method_id: m.id, method_key: methodKey(m), check: s.check ?? null });
@@ -96,7 +92,7 @@ export function buildRecipeSteps(
   if (productType) fromMethod(productType);
   for (const d of destinations) fromMethod(d, productHasPublish ? (t) => DEST_PUBLISH.test(t) : undefined);
   for (const m of [...monetization, ...promotion]) {
-    if (isPlannedMethod(m)) { steps.push(placeholder(m)); continue; }
+    if (isPlannedMethod(m)) throw new Error(`Guide not ready: ${m.title}. Choose a written method instead.`);
     for (const a of parseKeyPoints(m.key_points).adds ?? []) {
       steps.push({ title: a.title, owner_kind: ownerOf(a.owner), method_id: m.id, method_key: methodKey(m) });
     }
@@ -233,7 +229,8 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     const pick = (ks: string[] = []) => ks.map((k) => by.get(k)).filter(Boolean) as MethodRow[];
     const pt = input.product_type ? by.get(input.product_type) ?? null : null;
     if (!pt) throw new Error('Choose a product type with an available playbook.');
-    if (!isPlannedMethod(pt) && !(parseKeyPoints(pt.key_points).steps ?? []).length) {
+    if (isPlannedMethod(pt)) throw new Error('The selected product guide is not written yet. Choose a written guide first.');
+    if (!(parseKeyPoints(pt.key_points).steps ?? []).length) {
       throw new Error('This product playbook has no production steps. Complete it in Playbooks before creating a pipeline.');
     }
     const missing = keys.filter(k => k && !by.has(k));

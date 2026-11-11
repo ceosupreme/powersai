@@ -24,6 +24,9 @@ const empty = {
   title: "",
   format: "long_form",
   stage: "idea",
+  briefSummary: "",
+  script: "",
+  caption: "",
   hook: "",
   cta: "",
   primary_keyword: "",
@@ -47,6 +50,9 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
         title: item.title ?? "",
         format: item.format ?? "long_form",
         stage: item.stage ?? "idea",
+        briefSummary: typeof item.brief?.summary === 'string' ? item.brief.summary : '',
+        script: typeof item.brief?.script === 'string' ? item.brief.script : '',
+        caption: typeof item.brief?.caption === 'string' ? item.brief.caption : '',
         hook: item.hook ?? "",
         cta: item.cta ?? "",
         primary_keyword: item.primary_keyword ?? "",
@@ -70,10 +76,26 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       toast.error("Title is required");
       return;
     }
+    // A production stage is not a publishing integration. Those transitions
+    // require platform/date or live-link confirmation on the Production Board.
+    if (form.stage === 'scheduled' && item?.stage !== 'scheduled') {
+      toast.error('Use Record scheduling on the Production Board to supply platform and time.');
+      return;
+    }
+    if (form.stage === 'published' && item?.stage !== 'published') {
+      toast.error('Use Add live post link on the Production Board to confirm publication.');
+      return;
+    }
     const payload: any = {
       title: form.title.trim(),
       format: form.format || null,
       stage: form.stage,
+      brief: {
+        ...(item?.brief && !Array.isArray(item.brief) ? item.brief : {}),
+        summary: form.briefSummary.trim(),
+        script: form.script.trim(),
+        caption: form.caption.trim(),
+      },
       hook: form.hook || null,
       cta: form.cta || null,
       primary_keyword: form.primary_keyword || null,
@@ -127,12 +149,25 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
               <Select value={form.stage} onValueChange={(v) => set("stage", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {STAGES.map((s) => (
+                  {STAGES.filter((s) => (s !== 'scheduled' && s !== 'published') || s === form.stage).map((s) => (
                     <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <p className="text-xs text-muted-foreground">Scheduling and publication are confirmed separately with a platform, date and live link. Changing an HQ stage does not post content.</p>
+          <div className="space-y-1">
+            <Label htmlFor="content-summary">Creative brief / summary</Label>
+            <Textarea id="content-summary" rows={3} value={form.briefSummary} onChange={(e) => set("briefSummary", e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="content-script">Script or talking points</Label>
+            <Textarea id="content-script" rows={7} value={form.script} onChange={(e) => set("script", e.target.value)} placeholder="Write or paste the actual script here…" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="content-caption">Caption / post copy</Label>
+            <Textarea id="content-caption" rows={4} value={form.caption} onChange={(e) => set("caption", e.target.value)} placeholder="Write the caption people will see…" />
           </div>
           <div>
             <Label>Hook</Label>

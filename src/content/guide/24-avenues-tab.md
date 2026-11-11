@@ -1,11 +1,11 @@
-# Avenues tab
+# Ways to make money
 <!-- part: Running a brand | order: 24 | slug: avenues-tab | route: /project/:venueId | tags: avenues, money avenues, money lanes, lanes, turn this on, mark on, per hour, 90 days, foundation audit, severity, evidence -->
 
-The "Avenues" tab shows the brand's money avenues: the ways this brand can earn, such as a store, a marketplace or a channel. It sorts them into those that are on, those not on yet, and those whose state is unknown, and shows what each is estimated to be worth. Use it to decide which avenue to switch on next and to start that work with "Turn this on".
+The "Ways to make money" tab shows the brand's money avenues: the ways this brand can earn, such as a store, a marketplace or a channel. It sorts them into those that are on, those not on yet, and those whose state is unknown, and shows what each is estimated to be worth. Use it to decide which avenue to switch on next and to start that work with "Create a setup plan".
 
 ## Where to find it
 
-- Open the brand, then tap "Avenues" in the tab row.
+- Open the brand, then tap "Ways to make money" in the tab row.
 - The address ends in ?tab=avenues.
 
 ## What you see
@@ -17,7 +17,7 @@ The "Avenues" tab shows the brand's money avenues: the ways this brand can earn,
   - A dollar figure over "est. 90 days": the estimated money it could bring in over 90 days.
   - The recommended fix, when there is one.
   - "Status:" and the avenue's current state: "Satisfied", "Missing", "Partial", "Unknown" or "Not Applicable".
-  - On avenues that are not on: "Mark on" (admins only) and "Turn this on".
+  - On avenues that are not on: "Already running" (admins only) and "Turn this on".
 - A "Setup" list at the bottom: the brand's other Foundation Audit items, meaning its setup checks that are not money avenues, each with its status. This list is for reading only.
 - If the brand has no Foundation Audit items at all, the tab says "No Foundation Audit items for this brand yet."
 
@@ -32,7 +32,7 @@ The "Avenues" tab shows the brand's money avenues: the ways this brand can earn,
 ### To mark an avenue as on
 1. Tap "Mark on" on its card.
 2. Paste a link that proves it is live, such as the store page, into "Evidence URL (optional)", or leave it empty.
-3. Tap "Save". HQ shows "Marked on" and the card moves to "On". "Cancel" closes the box without saving.
+3. Tap "Save". HQ records a manual confirmation of the opportunity running and the card moves to "On". "Cancel" closes the box without saving.
 
 ## Words on this screen
 
@@ -41,7 +41,7 @@ The "Avenues" tab shows the brand's money avenues: the ways this brand can earn,
 - "Not on yet": the avenue is not set up. Its status reads "Missing".
 - "Unknown": every other state: "Partial" (partly on), "Not Applicable", or "Unknown" (never checked). The card's "Status:" line says which.
 - Severity: how much the avenue matters to the brand, from "Low" to "Critical".
-- "per hour": the 90-day estimate, times how confident the estimate is, times its leverage, divided by the hours it takes you. It shows a dash when any of those numbers is missing.
+- "estimated per hour": the 90-day estimate, times how confident the estimate is, times its leverage, divided by the hours it takes you. It shows a dash when any of those numbers is missing.
 - "est. 90 days": the estimated money over the next 90 days once the avenue is on.
 - Foundation Audit: HQ's checklist of what a brand should have in place. Avenues are the checklist items that earn money.
 - Evidence URL: a link that shows the avenue is live.

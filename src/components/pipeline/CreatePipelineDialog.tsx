@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
-  composePipeline, methodKey, platformToDestination, recipeVersionString, type JobKind,
+  composePipeline, methodKey, recipeVersionString, type JobKind,
 } from '@/lib/pipelineComposer';
 
 import { TrafficNotice } from './TrafficNotice';
@@ -59,9 +59,10 @@ function MultiPick({ label, options, value, onChange }: { label: string; options
           {options.map((o) => {
             const on = value.includes(o.key);
             return (
-              <button key={o.id} type="button" aria-pressed={on}
+              <button key={o.id} type="button" aria-pressed={on} disabled={o.status === 'draft'}
+                title={o.status === 'draft' ? 'Guide not written yet — complete it before using it in a plan' : undefined}
                 onClick={() => onChange(on ? value.filter((k) => k !== o.key) : [...value, o.key])}
-                className={cn('rounded-full border px-3 py-1 text-xs min-h-8',
+                className={cn('rounded-full border px-3 py-1 text-xs min-h-8 disabled:cursor-not-allowed disabled:opacity-40',
                   on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground')}>
                 {on ? '✓ ' : ''}{o.title}{o.status === 'draft' ? ' (planned)' : ''}
               </button>
@@ -82,15 +83,6 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const methods = useMethodOptions(open);
-  const channels = useQuery({
-    queryKey: ['pipeline-composer', 'channels', request?.projectId],
-    enabled: open,
-    queryFn: async () => {
-      const { data, error } = await T('brand_channels').select('platform,status').eq('project_id', request!.projectId);
-      if (error) throw error;
-      return (data ?? []) as { platform: string; status: string }[];
-    },
-  });
 
   const [title, setTitle] = useState('');
   const [productType, setProductType] = useState('');
@@ -101,23 +93,14 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const [money, setMoney] = useState('');
   const [nicheIds, setNicheIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [seeded, setSeeded] = useState(false);
 
   useEffect(() => {
-    if (!request) { setSeeded(false); return; }
+    if (!request) return;
     setTitle(request.title); setProductType(request.productType ?? ''); setLevel('2'); setMoney('');
     setMon(request.monetization ?? (request.kind === 'product' ? ['direct_sale'] : request.kind === 'content' ? ['lead_magnet', 'affiliate'] : []));
     setPro(request.promotion ?? (request.kind === 'product' ? ['video_to_product'] : request.kind === 'content' ? ['post_to_lead_magnet'] : []));
     setDest(request.destinations ?? []);
   }, [request]);
-
-  useEffect(() => {
-    if (!request || seeded || !channels.data || request.destinations?.length) return;
-    const keys = channels.data.filter((c) => ['live', 'dormant', 'planned'].includes(c.status))
-      .map((c) => platformToDestination(c.platform)).filter(Boolean) as string[];
-    setDest([...new Set(keys)]);
-    setSeeded(true);
-  }, [request, channels.data, seeded]);
 
   const niches = useQuery({
     queryKey: ['pipeline-composer', 'niches', request?.projectId],
@@ -150,13 +133,13 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
 
   const fixedSteps = request?.kind === 'lane' || request?.kind === 'channel_setup';
 
-  const validProduct = by.product_type.some(m => m.key === productType);
+  const validProduct = by.product_type.some(m => m.key === productType && m.status === 'active');
   const submit = async () => {
     if (!request) return;
     if (!fixedSteps && !validProduct) return toast.error('Choose an available product playbook.');
     setBusy(true);
     try {
-      const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
+      const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k && o.status === 'active'));
       const { jobId, recipe } = await composePipeline({
         new_content: request.newContent,
         project_id: request.projectId, kind: request.kind, title: title.trim() || request.title,
@@ -214,7 +197,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
                   </SelectContent>
                 </Select>
               </div>
-              <MultiPick label="Destinations" options={by.destination} value={dest} onChange={setDest} />
+              <p className="text-xs text-muted-foreground">Choose only the outlets this project actually needs. No social accounts are selected automatically.</p>
+              <MultiPick label="Where this will be sold or published" options={by.destination} value={dest} onChange={setDest} />
               <MultiPick label="Monetization" options={by.monetization} value={mon} onChange={setMon} />
               <MultiPick label="Promotion" options={by.promotion} value={pro} onChange={setPro} />
               {request && <TrafficNotice projectId={request.projectId}

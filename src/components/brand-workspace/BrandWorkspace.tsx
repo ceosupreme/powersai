@@ -1,4 +1,5 @@
 import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
+import { useAuth } from '@/context/AuthContext';
 import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ExternalLink, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -22,6 +24,8 @@ import {
 import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
+import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
+import { ContentDetailsDialog } from '@/components/content/ContentDetailsDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -40,15 +44,15 @@ import { useChannelStats } from '@/hooks/useBrandSetup';
 import { outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
 
 export const WORKSPACE_TABS = [
-  { key: 'overview', label: 'Overview', accent: 'border-primary text-primary' },
-  { key: 'setup', label: 'Setup', accent: 'border-primary text-primary' },
-  { key: 'channels', label: 'Channels', accent: 'border-signal-green text-signal-green' },
-  { key: 'avenues', label: 'Avenues', accent: 'border-gold text-gold' },
-  { key: 'products', label: 'Products', accent: 'border-orange text-orange' },
-  { key: 'content', label: 'Content', accent: 'border-blue-500 text-blue-600' },
-  { key: 'intel', label: 'Intel', accent: 'border-accent-foreground text-accent-foreground' },
-  { key: 'playbooks', label: 'Playbooks', accent: 'border-foreground text-foreground' },
-  { key: 'assets', label: 'Assets', accent: 'border-muted-foreground text-muted-foreground' },
+  { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
+  { key: 'setup', label: 'Accounts to set up', description: 'Accounts and profiles this brand needs, what is already active, and what to set up next.', accent: 'border-primary text-primary' },
+  { key: 'channels', label: 'Social accounts', description: 'Where this brand shows up, how its audience is growing, and when it last posted.', accent: 'border-signal-green text-signal-green' },
+  { key: 'avenues', label: 'Ways to make money', description: 'Potential revenue opportunities and the ones already running. Estimates are not earned revenue.', accent: 'border-gold text-gold' },
+  { key: 'products', label: 'What you sell', description: 'Offers and products this brand sells or plans to launch, plus their production plans.', accent: 'border-orange text-orange' },
+  { key: 'content', label: 'Posts and videos', description: 'Content from idea to publication, with the next real action on each item.', accent: 'border-blue-500 text-blue-600' },
+  { key: 'intel', label: 'What your audience asks', description: 'Audience questions, problems, and opportunities to answer them through content or offers.', accent: 'border-accent-foreground text-accent-foreground' },
+  { key: 'playbooks', label: 'How-to guides', description: 'Instructions and methods HQ uses to perform work consistently.', accent: 'border-foreground text-foreground' },
+  { key: 'assets', label: 'Files and documents', description: 'Brand resources and working documents. Open the current file before acting on it.', accent: 'border-muted-foreground text-muted-foreground' },
 ] as const;
 type TabKey = (typeof WORKSPACE_TABS)[number]['key'];
 
@@ -102,6 +106,9 @@ export function BrandWorkspace({
           </button>
         ))}
       </nav>
+      <p className="text-sm text-muted-foreground" role="status">
+        {WORKSPACE_TABS.find((t) => t.key === tab)?.description}
+      </p>
 
       {tab === 'overview' && (
         <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
@@ -552,8 +559,8 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
         <Badge variant="outline" className="text-[10px] capitalize shrink-0">{item.severity}</Badge>
       </div>
       <div className="flex gap-4 text-sm">
-        <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">per hour</p></div>
-        <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">est. 90 days</p></div>
+        <div><p className="text-xl font-bold">{score == null ? '—' : `$${Math.round(score).toLocaleString()}`}</p><p className="text-[11px] text-muted-foreground">estimated per hour of work</p></div>
+        <div><p className="text-xl font-bold">{item.est_dollars_90d == null ? '—' : formatCurrency(Number(item.est_dollars_90d))}</p><p className="text-[11px] text-muted-foreground">estimated 90-day potential</p></div>
       </div>
       {canEdit && <EditCrmRecord title="Estimates" record={item} fields={[
         {key:'est_dollars_90d',label:'Estimated revenue over 90 days ($)',type:'number'},
@@ -576,22 +583,22 @@ function LaneCard({ item, projectId, canEdit }: { item: any; projectId: string; 
       {canEdit && item.status !== 'satisfied' && (
         marking ? (
           <div className="flex gap-2 flex-wrap">
-            <Input className="h-8 flex-1 min-w-[10rem]" placeholder="Evidence URL (optional)" value={evidence} onChange={(e) => setEvidence(e.target.value)} />
+            <Input className="h-8 flex-1 min-w-[10rem]" type="url" aria-label="Evidence link for an already-running revenue opportunity" placeholder="Account or evidence link (optional)" value={evidence} onChange={(e) => setEvidence(e.target.value)} />
             <Button size="sm" className="h-8" disabled={upsert.isPending}
               onClick={() => upsert.mutate(
                 { venue_id: projectId, item_key: item.item_key, status: 'satisfied', evidence_url: evidence.trim() || null, notes: item.notes ?? null },
-                { onSuccess: () => { toast.success('Marked on'); setMarking(false); }, onError: (e: any) => toast.error(e?.message ?? 'Could not save') },
+                { onSuccess: () => { toast.success('Recorded as running (manual confirmation)'); setMarking(false); }, onError: (e: any) => toast.error(e?.message ?? 'Could not save') },
               )}>Save</Button>
             <Button size="sm" variant="ghost" className="h-8" onClick={() => setMarking(false)}>Cancel</Button>
           </div>
         ) : (
-          <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Mark on</Button>
+          <Button size="sm" variant="outline" className="h-8" onClick={() => setMarking(true)}>Already running</Button>
         )
       )}
       {item.status !== 'satisfied' && (
         <Button size="sm" className="h-8 ml-2" onClick={() => setReq({
           projectId, kind: 'lane', title: `Turn on: ${item.label}`, targetKey: item.item_key, laneItemKey: item.item_key,
-        })}>Turn this on</Button>
+        })}>Create a setup plan</Button>
       )}
       <CreatePipelineDialog request={req} onClose={() => setReq(null)} />
     </div>
@@ -651,6 +658,8 @@ function ContentTab({ projectId }: { projectId: string }) {
   const approve = useApproveItem();
   const advance = useAdvanceStage();
   const [batching, setBatching] = useState(false);
+  const [placement, setPlacement] = useState<{ item: BoardItem; mode: 'schedule' | 'publish' } | null>(null);
+  const [detailsItem, setDetailsItem] = useState<BoardItem | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
@@ -672,10 +681,15 @@ function ContentTab({ projectId }: { projectId: string }) {
   const onMove = async (it: BoardItem) => {
     const next = nextStageForFormat(it.stage, it.format);
     if (next === it.stage) return toast.info('This one is already at the last step.');
+    if (next === 'scheduled' || next === 'published') {
+      setPlacement({ item: it, mode: next === 'scheduled' ? 'schedule' : 'publish' });
+      return;
+    }
     try { await advance.mutateAsync({ id: it.id, stage: next }); toast.success(`Moved to ${STAGE_LABELS[next]}`); }
     catch (e: any) { toast.error(e?.message ?? 'Could not move it'); }
   };
   return (
+    <>
     <div className="space-y-3">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-sm text-muted-foreground">{ready.length} ready to approve</p>
@@ -687,11 +701,14 @@ function ContentTab({ projectId }: { projectId: string }) {
       {data.map((it) => (
         <div key={it.id} className="space-y-1">
           <p className="text-[11px] uppercase tracking-wide text-blue-600">{STAGE_LABELS[it.stage as keyof typeof STAGE_LABELS] ?? it.stage}</p>
-          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} />
+          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} onOpen={setDetailsItem} />
         </div>
       ))}
     </div>
     </div>
+    <ManualPlacementDialog item={placement?.item ?? null} mode={placement?.mode ?? 'schedule'} onClose={() => setPlacement(null)} />
+    <ContentDetailsDialog item={detailsItem} onClose={() => setDetailsItem(null)} />
+    </>
   );
 }
 
@@ -801,22 +818,51 @@ function AssetPreview({ path, mime, name }: { path: string; mime: string | null;
   return url ? <img src={url} alt={name} className="aspect-square w-full rounded object-cover" loading="lazy" /> : <div className="aspect-square rounded bg-muted" />;
 }
 
+/** Reveal the text actually stored for this document. An external source link is optional. */
 function DocRow({ d }: { d: KnowledgeRow }) {
+  const [open, setOpen] = useState(false);
   const href = d.attachment_url || d.external_url;
+  const raw = d.description?.trim() || d.key_points?.trim() || d.summary?.trim() || '';
+  let readableText = raw;
+  if (raw.startsWith('{') || raw.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'string') readableText = parsed;
+      else if (Array.isArray(parsed)) readableText = parsed.map((entry) => typeof entry === 'string' ? entry : JSON.stringify(entry, null, 2)).join('\n\n');
+      else if (parsed && typeof parsed === 'object') {
+        readableText = String(parsed.markdown || parsed.content || parsed.body || parsed.text || JSON.stringify(parsed, null, 2));
+      }
+    } catch { /* Preserve the original source text. */ }
+  }
   return (
-    <li className="py-2 flex items-start justify-between gap-3">
+    <li className="py-3 flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-sm text-foreground">{d.title}{d.version ? ` · v${d.version}` : ''}</p>
         <p className="text-xs text-muted-foreground">Review by {dash(d.expiry_date)}{d.status === 'draft' ? ' · planned' : ''}</p>
+        {!raw && !href && <p className="text-xs text-amber-600">The document has no readable text or source link yet.</p>}
       </div>
-      {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline shrink-0">Open</a>}
+      <div className="flex flex-wrap gap-3 shrink-0 text-sm">
+        {raw && <button type="button" onClick={() => setOpen(true)} className="text-primary underline">Read here</button>}
+        {href && <a href={href} target="_blank" rel="noreferrer" className="text-primary underline">Open source</a>}
+      </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{d.title}</DialogTitle>
+            <DialogDescription>Saved in HQ{d.version ? ` · version ${d.version}` : ''}{d.status === 'draft' ? ' · draft' : ''}</DialogDescription>
+          </DialogHeader>
+          <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">{readableText}</div>
+          {href && <a href={href} target="_blank" rel="noreferrer" className="text-sm text-primary underline">Open original source</a>}
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
 
-function AssetsTab({ projectId }: { projectId: string }) {
+export function AssetsTab({ projectId }: { projectId: string }) {
   const kit = useBrandKitAssetsView(projectId);
-  const docs = useProjectDocuments(projectId);
+  const { isAdmin } = useAuth();
+  const docs = useProjectDocuments(projectId, isAdmin);
   if (kit.isLoading || docs.isLoading) return <Loading />;
   if (kit.isError || docs.isError) return <LoadError onRetry={() => { kit.refetch(); docs.refetch(); }} />;
   const links = (kit.data?.links ?? []) as any[];

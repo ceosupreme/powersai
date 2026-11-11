@@ -8,6 +8,7 @@ export interface ContentItem {
   title: string;
   format: string | null;
   stage: string;
+  brief?: Record<string, unknown> | null;
   hook: string | null;
   cta: string | null;
   primary_keyword: string | null;

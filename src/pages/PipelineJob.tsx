@@ -149,19 +149,27 @@ export default function PipelineJob() {
 
   const updateStep = async (s: Step, patch: Record<string, unknown>, ok: string) => {
     setBusyStep(s.id);
-    const { error } = await supabase.from('action_items').update(patch as any).eq('id', s.id);
+    const { data: changed, error } = await supabase.from('action_items')
+      .update(patch as any).eq('id', s.id).select('id').maybeSingle();
     setBusyStep(null);
-    if (error) return toast.error(error.message);
+    if (error || !changed) return toast.error(error?.message ?? 'No step was changed; check your permissions.');
     toast.success(ok);
     refetch();
   };
-  const queueStep = (s: Step) => {
-    const { facts } = parseFacts(s.facts);
-    const merged = { ...(facts ?? (s.facts ? { note: s.facts } : {})), queued: true, queued_at: new Date().toISOString() };
-    return updateStep(s, { facts: JSON.stringify(merged) }, 'Saved for worker pickup. This does not start a run.');
+  const reclaim = async (s: Step) => {
+    const { data: identity, error } = await supabase.auth.getUser();
+    if (error || !identity.user) return toast.error('Sign in again to claim this step.');
+    const name = identity.user.user_metadata?.full_name || identity.user.email || 'Assigned user';
+    return updateStep(s, {
+      owner_kind: 'owner', assignee: name, assignee_id: identity.user.id,
+      approval_status: 'Approved',
+      facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }),
+    }, 'This step is now assigned to you');
   };
-  const reclaim = (s: Step) => updateStep(s, { owner_kind: 'owner', assignee: 'Allmighty', approval_status: 'Approved', facts: JSON.stringify({ ...(parseFacts(s.facts).facts ?? {}), queued: false }) }, 'Assigned to you');
-  const handToClaude = (s: Step) => updateStep(s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' }, 'Handed to Claude');
+  const handToClaude = (s: Step) => updateStep(
+    s, { owner_kind: 'claude', assignee: 'Claude', approval_status: 'Auto' },
+    'Assigned to Claude for the next eligible scheduled run; this did not start a run.',
+  );
   const copyPrompt = async (s: Step) => {
     const m = s.method_id ? kb.data?.get(s.method_id) ?? null : null;
     const text = buildStarterPrompt({
@@ -279,7 +287,6 @@ export default function PipelineJob() {
             const method = s.method_id ? kb.data?.get(s.method_id) : null;
             const current = s.step_order != null && s.step_order === job.current_step;
             const canDone = job.status !== 'parked' && s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
-            const queued = !!(facts as any)?.queued;
             const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
               <li key={s.id} id={s.step_order != null ? `step-${s.step_order}` : undefined}
@@ -294,18 +301,30 @@ export default function PipelineJob() {
                       {method && <Badge variant="outline" className="text-[10px]">{method.title}</Badge>}
                       {current && <Badge className="text-[10px]">Current step</Badge>}
                     </div>
+                    {current && (
+                      <div className="rounded-md border border-primary/20 bg-primary/5 p-3 space-y-2 text-sm">
+                        <p className="font-medium">What to do now</p>
+                        <p className="whitespace-pre-wrap text-foreground">
+                          {s.detail || 'Open the full instructions for this task.'}
+                        </p>
+                        {Array.isArray(facts?.inputs) && facts.inputs.length > 0 && (
+                          <div><p className="font-medium">Before you start</p><ul className="list-disc pl-5">{facts.inputs.map((x, i) => <li key={i}>{String(x)}</li>)}</ul></div>
+                        )}
+                        {facts?.expected_output && <p><strong>Finished result:</strong> {String(facts.expected_output)}</p>}
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <Button size="sm" variant="outline" onClick={() => setStepOpen(s)}>View instructions</Button>
+                      <Button size="sm" variant="outline" onClick={() => setStepOpen(s)}>Full instructions</Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
-                      {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done</Button>}
-                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Hand to Claude</Button>}
+                      {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Mark complete</Button>}
+                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Assign to Claude</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
-                        queued
-                          ? <span className="self-center text-xs text-muted-foreground">Queued · awaiting worker</span>
-                          : <Button size="sm" variant="outline" disabled={busyStep === s.id || st === 'blocked' || job.status === 'parked'} onClick={() => queueStep(s)}>Queue</Button>
+                        <span className="self-center text-xs text-muted-foreground">
+                          Assigned to scheduled agent work. No run starts from this screen.
+                        </span>
                       )}
-                      {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
-                      {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy prompt</Button>}
+                      {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>I'll do this myself</Button>}
+                      {s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy the Claude prompt</Button>}
                     </div>
                     {isGate && target && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md bg-muted/40 p-2 text-xs">

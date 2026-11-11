@@ -252,14 +252,19 @@ export function useKnowledgeRows(ids: (string | null | undefined)[]) {
   });
 }
 
-export function useProjectDocuments(projectId: string | null | undefined) {
+/** Brand documents are scoped to the project. Global documents are fetched only for admins.
+ * The database must additionally enforce this restriction through RLS.
+ */
+export function useProjectDocuments(projectId: string | null | undefined, includeShared = false) {
   return useQuery({
-    queryKey: ['brand-workspace', 'docs', projectId],
+    queryKey: ['brand-workspace', 'docs', projectId, includeShared],
     enabled: !!projectId,
     queryFn: async () => {
       const [own, shared] = await Promise.all([
         T('knowledge_base').select(KB_COLS).eq('venue_id', projectId).in('subcategory', ['brand_rules', 'document']).order('title'),
-        T('knowledge_base').select(KB_COLS).is('venue_id', null).eq('subcategory', 'document').order('title'),
+        includeShared
+          ? T('knowledge_base').select(KB_COLS).is('venue_id', null).eq('subcategory', 'document').order('title')
+          : Promise.resolve({ data: [], error: null }),
       ]);
       if (own.error) throw own.error;
       if (shared.error) throw shared.error;

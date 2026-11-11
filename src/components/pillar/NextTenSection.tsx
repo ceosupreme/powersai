@@ -182,19 +182,23 @@ export const NextTenSection = ({
             {rows.map((row) => (
               <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                 <div className="flex items-start gap-3">
-                  <Checkbox
-                    className="mt-0.5"
-                    checked={false}
-                    disabled={busy === row.key}
-                    aria-label={
-                      row.source === 'KPI'
+                  {row.source === 'Lane' || row.source === 'Product' ? (
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to={`/project/${row.projectId}?tab=${row.source === 'Lane' ? 'avenues' : 'products'}`}>
+                        {row.source === 'Lane' ? 'Review opportunity' : 'Open product'}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Checkbox
+                      className="mt-0.5"
+                      checked={false}
+                      disabled={busy === row.key}
+                      aria-label={row.source === 'KPI'
                         ? `Enter this week's number for ${row.step}`
-                        : row.source === 'Lane'
-                          ? `Mark on: ${row.step}`
-                          : `Mark done: ${row.step}`
-                    }
-                    onCheckedChange={() => onCheck(row)}
-                  />
+                        : `Mark step completed: ${row.step}`}
+                      onCheckedChange={() => onCheck(row)}
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     {row.jobId ? (
                           <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">

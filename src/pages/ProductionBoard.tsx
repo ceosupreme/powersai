@@ -21,6 +21,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ImportPackageDialog } from "@/components/content/ImportPackageDialog";
 import { ProductionItemCard } from "@/components/content/ProductionItemCard";
+import { ManualPlacementDialog } from '@/components/content/ManualPlacementDialog';
+import { ContentDetailsDialog } from '@/components/content/ContentDetailsDialog';
 import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
@@ -47,6 +49,8 @@ export default function ProductionBoard() {
   const [mode, setMode] = useState("all");
   const [channel, setChannel] = useState("all");
   const [importOpen, setImportOpen] = useState(false);
+  const [placement, setPlacement] = useState<{ item: BoardItem; mode: 'schedule' | 'publish' } | null>(null);
+  const [detailsItem, setDetailsItem] = useState<BoardItem | null>(null);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('due');
   const [attention, setAttention] = useState('all');
@@ -107,6 +111,10 @@ export default function ProductionBoard() {
   const move = async (it: BoardItem) => {
     const next = nextStageForFormat(it.stage, it.format);
     if (next === it.stage) { toast.info("This one is already at the last step."); return; }
+    if (next === 'scheduled' || next === 'published') {
+      setPlacement({ item: it, mode: next === 'scheduled' ? 'schedule' : 'publish' });
+      return;
+    }
     try {
       await advance.mutateAsync({ id: it.id, stage: next });
       toast.success(`Moved to ${STAGE_LABELS[next]}`);
@@ -274,6 +282,7 @@ export default function ProductionBoard() {
                         approving={approve.isPending}
                         onApprove={doApprove}
                         onMove={move}
+                        onOpen={setDetailsItem}
                       />
                     ))}
                   </div>
@@ -290,6 +299,8 @@ export default function ProductionBoard() {
         projects={projects}
         onDone={() => refetch()}
       />
+      <ManualPlacementDialog item={placement?.item ?? null} mode={placement?.mode ?? 'schedule'} onClose={() => setPlacement(null)} />
+      <ContentDetailsDialog item={detailsItem} onClose={() => setDetailsItem(null)} />
     </div>
   );
 }
