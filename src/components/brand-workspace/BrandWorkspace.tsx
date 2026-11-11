@@ -847,7 +847,7 @@ function DocRow({ d }: { d: KnowledgeRow }) {
   );
 }
 
-function AssetsTab({ projectId }: { projectId: string }) {
+export function AssetsTab({ projectId }: { projectId: string }) {
   const kit = useBrandKitAssetsView(projectId);
   const { isAdmin } = useAuth();
   const docs = useProjectDocuments(projectId, isAdmin);
