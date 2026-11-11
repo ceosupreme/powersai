@@ -272,7 +272,9 @@ export function useProjectDocuments(projectId: string | null | undefined) {
 export interface ProductionJob {
   id: string; project_id: string; kind: string; title: string; target_type: string | null; target_id: string | null;
   recipe: { id: string; key: string; title: string; version: string; status: string }[] | null;
-  level: number | null; status: string; money_destination: string | null; owner_minutes_est: number | null;
+  level: number | null; status: string; money_destination: string | null;
+  goal_text: string | null; goal_pillar_key: string | null; goal_kpi_key: string | null;
+  owner_minutes_est: number | null;
   owner_minutes_actual: number | null; current_step: number | null; result_links: { label: string; url: string }[] | null;
   created_at: string;
 }
