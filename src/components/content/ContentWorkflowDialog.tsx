@@ -134,6 +134,8 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   const next = item ? nextStageForFormat(item.stage, item.format) : null;
   const assets = assetText.split('\n').map(v => v.trim()).filter(Boolean);
   const badAsset = assets.find(v => !linkValid(v));
+  const requiresMedia = item ? flowForFormat(item.format).some(stage =>
+    ['design', 'record', 'edit', 'thumbnail'].includes(stage)) : false;
 
   const refresh = async () => {
     await Promise.all([
@@ -162,7 +164,12 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
       // Save the latest caption, script and media before opening the scheduler.
       setBusy(true);
       try {
-        if (!assets.length) throw new Error('Add the completed production file link before scheduling.');
+        if (requiresMedia && !assets.length) {
+          throw new Error('Add the completed image or video file link before scheduling.');
+        }
+        if (!requiresMedia && !script.trim()) {
+          throw new Error('Write the post or email text before scheduling.');
+        }
         await persistWork();
         await refresh();
         setMode('schedule');
@@ -170,7 +177,16 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
       finally { setBusy(false); }
       return;
     }
-    if (advance && next === 'published') { setMode('publish'); return; }
+    if (advance && next === 'published') {
+      setBusy(true);
+      try {
+        await persistWork();
+        await refresh();
+        setMode('publish');
+      } catch (e: any) { toast.error(e?.message ?? 'Could not save work before publication.'); }
+      finally { setBusy(false); }
+      return;
+    }
     if (advance && item.stage === 'script' && !script.trim()) return toast.error('Write the script before advancing.');
     if (advance && ['record','edit','design','thumbnail'].includes(item.stage) && !assets.length)
       return toast.error('Add the link to the completed production file before advancing.');
@@ -185,6 +201,18 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
       toast.success(advance && next ? 'Work saved and moved to ' + next : 'Script, caption and links saved.');
       await refresh();
     } catch (e: any) { toast.error(e?.message ?? 'Could not save.'); }
+    finally { setBusy(false); }
+  };
+  const openMode = async (target: Mode) => {
+    if (target === 'work' || mode !== 'work') { setMode(target); return; }
+    if (busy) return;
+    // The top-level Schedule/Publish tabs must not discard unsaved writing.
+    setBusy(true);
+    try {
+      await persistWork();
+      await refresh();
+      setMode(target);
+    } catch (e: any) { toast.error(e?.message ?? 'Could not save your draft.'); }
     finally { setBusy(false); }
   };
   const approve = async () => {
@@ -319,9 +347,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
             <Badge variant="outline">Quality {item.quality_score ?? 'Not scored'}</Badge>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Button variant={mode === 'work' ? 'default' : 'outline'} size="sm" onClick={() => setMode('work')}>Create & edit</Button>
-            <Button variant={mode === 'schedule' ? 'default' : 'outline'} size="sm" onClick={() => setMode('schedule')}>Schedule</Button>
-            <Button variant={mode === 'publish' ? 'default' : 'outline'} size="sm" onClick={() => setMode('publish')}>Record publication</Button>
+            <Button variant={mode === 'work' ? 'default' : 'outline'} size="sm" disabled={busy} onClick={() => void openMode('work')}>Create & edit</Button>
+            <Button variant={mode === 'schedule' ? 'default' : 'outline'} size="sm" disabled={busy} onClick={() => void openMode('schedule')}>Schedule</Button>
+            <Button variant={mode === 'publish' ? 'default' : 'outline'} size="sm" disabled={busy} onClick={() => void openMode('publish')}>Record publication</Button>
           </div>
           {mode === 'work' && <div className="space-y-3">
             <label className="block space-y-1"><Label>Title</Label><Input value={title} onChange={e => setTitle(e.target.value)}/></label>

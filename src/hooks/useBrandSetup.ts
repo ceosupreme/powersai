@@ -135,7 +135,19 @@ export async function insertStats(row: Partial<ChannelStatRow> & { channel_id: s
 }
 
 export async function recordExisting(projectId: string, row: AssetMapRow, v: { platform: string; handle: string; url: string; followers: number | null; status: 'live' | 'dormant' }) {
-  const patch = { platform: v.platform, handle: v.handle || null, url: v.url || null, status: v.status, account_label: row.label };
+  const handle = v.handle.trim();
+  const url = v.url.trim();
+  if (!handle && !url) throw new Error('Enter an existing handle or the account link.');
+  if (v.followers != null && (!Number.isSafeInteger(v.followers) || v.followers < 0)) {
+    throw new Error('Followers must be a nonnegative whole number.');
+  }
+  if (url) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') throw new Error();
+    } catch { throw new Error('Account links must start with https:// or http://.'); }
+  }
+  const patch = { platform: v.platform, handle: handle || null, url: url || null, status: v.status, account_label: row.label };
   let channelId = row.channel_id;
   if (channelId) {
     const { data: saved, error } = await T('brand_channels').update(patch)

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { fetchEffectiveFoundationBatch, fetchEffectiveFoundationItems, laneScore, type EffectiveFoundationItem } from '@/lib/effectiveFoundation';
 import { fetchAllPages, fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
@@ -620,20 +621,28 @@ export function useNextTenAcrossProjects(
 /** Apply a Next 10 checkbox. KPI rows are handled inline by the UI. */
 export function useCompleteNextTenRow() {
   const qc = useQueryClient();
+  const { isAdmin, profile } = useAuth();
   return useMutation({
     mutationFn: async (row: NextTenRow) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError ?? new Error('Sign in again to complete this step.');
       if (row.source === 'Action') {
         const scoped = `bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`;
         const { data: current, error: readError } = await supabase
           .from('action_items')
-          .select('id,status,approval_status,owner_kind,depends_on,job_id')
+          .select('id,status,approval_status,owner_kind,assignee_id,assignee,depends_on,job_id')
           .eq('id', row.refId).or(scoped).maybeSingle();
         if (readError) throw readError;
         if (!current) throw new Error('This task could not be found in the selected brand.');
         if (current.status === 'Done') throw new Error('This step has already been completed.');
         if (current.approval_status !== 'Approved') throw new Error('This step needs approval before it can be completed.');
         if (current.owner_kind === 'claude') throw new Error('This step is assigned to Claude. Take it yourself first.');
+        const legacyNameMatches = !current.assignee_id && !!profile?.full_name &&
+          current.assignee?.trim().toLowerCase() === profile.full_name.trim().toLowerCase();
+        if (!isAdmin && (current.owner_kind !== 'owner' ||
+          (current.assignee_id !== user.id && !legacyNameMatches))) {
+          throw new Error('This step is assigned to someone else. Open your own task instead.');
+        }
         if (current.job_id) {
           const { data: job, error: jobError } = await (supabase as any).from('production_jobs')
             .select('status').eq('id', current.job_id).eq('project_id', row.projectId).maybeSingle();
@@ -650,19 +659,24 @@ export function useCompleteNextTenRow() {
             throw new Error('Finish the preceding step before completing this one.');
           }
         }
-        const { data, error } = await supabase
-          .from('action_items')
+        let update = supabase.from('action_items')
           .update({
             status: 'Done',
             completed_at: new Date().toISOString(),
-            completed_by: user?.id ?? null,
+            completed_by: user.id,
           })
           .eq('id', row.refId)
           .or(scoped)
           .eq('approval_status', 'Approved')
-          .neq('status', 'Done')
-          .select('id')
-          .maybeSingle();
+          .neq('status', 'Done');
+        // Re-check the assignment in the write itself, in case the task was
+        // reassigned between the initial read and the completion click.
+        if (!isAdmin) {
+          update = current.assignee_id
+            ? update.eq('assignee_id', user.id)
+            : update.is('assignee_id', null).eq('assignee', current.assignee!);
+        }
+        const { data, error } = await update.select('id').maybeSingle();
         if (error) throw error;
         if (!data) throw new Error('The step was not updated. It may have changed or your access may have been revoked.');
         return;
