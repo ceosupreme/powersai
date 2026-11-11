@@ -662,12 +662,34 @@ function IntelTab({ projectId }: { projectId: string }) {
   const byContent = jobByTarget(jobs.data ?? [], 'content_items');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [req, setReq] = useState<PipelineRequest | null>(null);
+  const navigate = useNavigate();
+  const [busyPain, setBusyPain] = useState<string | null>(null);
+  const makeAnswerPost = async (pain: { id: string; pain_text: string }) => {
+    if (busyPain) return;
+    setBusyPain(pain.id);
+    try {
+      const draft = await contentItemFromPain(projectId, pain.pain_text, pain.id);
+      const { jobId } = await composePipeline({
+        new_content: draft.newContent
+          ? { title: draft.newContent.title, summary: draft.newContent.summary } : undefined,
+        project_id: projectId, kind: 'content', title: draft.title,
+        target_type: 'content_items', target_key: draft.targetKey ?? null,
+        product_type: 'social_piece', level: 1,
+        destinations: [], monetization: [], promotion: [],
+      });
+      await jobs.refetch();
+      toast.success('Post plan created. Opening its steps.');
+      navigate(pipelineHref(projectId, jobId));
+    } catch (error: any) { toast.error(error?.message ?? 'Could not start the post plan.'); }
+    finally { setBusyPain(null); }
+  };
   if (isLoading) return <Loading />;
   if (isError || !data) return <LoadError onRetry={() => refetch()} />;
   return (
     <div className="space-y-6">
       <section>
-        <h3 className="text-lg font-semibold mb-2">Niche Profile</h3>
+        <h3 className="text-lg font-semibold mb-1">Your audience profile</h3>
+        <p className="text-sm text-muted-foreground mb-2">Who you serve, what they care about, and the context for your content and offers.</p>
         {data.niche.length === 0 ? <p className="text-sm text-muted-foreground">No niche profile yet.</p> :
           data.niche.map((n) => {
             const full = expanded[n.id];
@@ -686,7 +708,8 @@ function IntelTab({ projectId }: { projectId: string }) {
           })}
       </section>
       <section>
-        <h3 className="text-lg font-semibold mb-2">Top pains</h3>
+        <h3 className="text-lg font-semibold mb-1">What your audience asks</h3>
+        <p className="text-sm text-muted-foreground mb-2">Common questions and problems. Choose one to create a post that genuinely helps.</p>
         {data.pains.length === 0 ? <p className="text-sm text-muted-foreground">No pains recorded yet.</p> : (
           <ol className="space-y-2">
             {data.pains.map((p, i) => (
@@ -699,17 +722,17 @@ function IntelTab({ projectId }: { projectId: string }) {
                     {p.product_flag && <span className="font-semibold text-foreground">Product</span>}
                   </p>
                 </div>
-                <Button size="sm" variant="outline" onClick={async () => {
-                  try { setReq(await contentItemFromPain(projectId, p.pain_text, p.id)); }
-                  catch (e: any) { toast.error(e?.message ?? 'Could not create the item'); }
-                }}>Make this</Button><PainUsageBadge projectId={projectId} painId={p.id} />
+                <Button size="sm" variant="outline" disabled={!!busyPain} onClick={() => makeAnswerPost(p)}>
+                  {busyPain === p.id ? 'Creating post plan…' : 'Make a post that answers this'}
+                </Button><PainUsageBadge projectId={projectId} painId={p.id} />
               </li>
             ))}
           </ol>
         )}
       </section>
       <section>
-        <h3 className="text-lg font-semibold mb-2">Briefs</h3>
+        <h3 className="text-lg font-semibold mb-1">Content ideas</h3>
+        <p className="text-sm text-muted-foreground mb-2">Scored ideas for useful posts and videos. Open their production plan to get started.</p>
         {data.briefs.length === 0 ? <p className="text-sm text-muted-foreground">No scored ideas yet.</p> : (
           <ul className="space-y-2">
             {data.briefs.map((b) => (
@@ -720,12 +743,12 @@ function IntelTab({ projectId }: { projectId: string }) {
                   <p className="text-xs text-muted-foreground capitalize">{dash(b.format)} · {dash(b.purpose_type)}</p>
                 </div>
                 {byContent.get(b.id) ? (
-                  <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, byContent.get(b.id)!)}>Pipeline</Link></Button>
+                  <Button size="sm" variant="outline" asChild><Link to={pipelineHref(projectId, byContent.get(b.id)!)}>Open production plan</Link></Button>
                 ) : (
                   <Button size="sm" onClick={() => setReq({
                     projectId, kind: 'content', title: b.title, targetType: 'content_items', targetId: b.id,
                     productType: productTypeForFormat(b.format),
-                  })}>Make this</Button>
+                  })}>Build a content plan</Button>
                 )}
               </li>
             ))}
@@ -734,7 +757,8 @@ function IntelTab({ projectId }: { projectId: string }) {
       </section>
       <CreatePipelineDialog request={req} onClose={() => setReq(null)} onCreated={() => jobs.refetch()} />
       <section>
-        <h3 className="text-lg font-semibold mb-2">Dimension library</h3>
+        <h3 className="text-lg font-semibold mb-1">Formats that work in this niche</h3>
+        <p className="text-sm text-muted-foreground mb-2">Creative formats, angles and audience interests to use when developing content.</p>
         {data.dims.length === 0 ? <p className="text-sm text-muted-foreground">No dimensions filed yet.</p> : (
           <ul className="flex flex-wrap gap-2">
             {data.dims.map((d) => {
