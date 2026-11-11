@@ -34,7 +34,7 @@ At the top:
 - An owner badge: "Claude", "You", "Agent", "Tool" or "Unassigned".
 - The name of the playbook the step came from.
 - "Current step" on the step the job is on now. That card has a highlighted border, and the page scrolls to it when it opens. Finished steps look slightly faded.
-- Buttons, depending on the step: "View instructions", "Open", "Done", "Hand to Claude", "Queue" (or "Queued · awaiting worker"), and "Copy prompt".
+- Buttons, depending on the step: "Full instructions", "Open", "Mark complete", "Assign to Claude", "I'll do this myself", and "Copy the Claude prompt". There is no Queue action because that flag did not start worker execution.
 - On a content job, a step whose title starts with "Gate" or "Quality gate" also shows a gate strip: "Quality score", "Fails:" (or "none"), and an "Approve" button, or the word "Approved" once it is.
 
 "Outputs": links to what the job has produced, or "No outputs recorded yet."
@@ -46,16 +46,16 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 ## How to use it
 
 ### To read a step's instructions
-1. Tap "View instructions" on the step.
+1. Read the current step's instructions inline, or tap "Full instructions" for the complete detail panel.
 2. A side panel shows "Step" and its number, the step's title, and its written instructions (or "No written instructions."). When the step has them, it also shows "Playbook:" with the playbook's short key, "Inputs", "Expected output", "Checks", link buttons, and an "Output" button.
 
 ### To mark your step done
 1. Do the work for the step.
-2. Tap "Done". HQ shows "Step done".
+2. Tap "Mark complete". HQ shows "Step done".
 3. HQ moves the job to its next step by itself, and the page updates.
 
 ### To hand your step to Claude
-1. Tap "Hand to Claude" on your step. HQ shows "Handed to Claude".
+1. Tap "Assign to Claude" on your step. HQ indicates assignment for an eligible scheduled run, not immediate execution.
 2. The step's owner becomes "Claude". It leaves your lists and becomes eligible for the external worker. This does not start a run or confirm pickup.
 
 ### To queue a Claude step for the next run
