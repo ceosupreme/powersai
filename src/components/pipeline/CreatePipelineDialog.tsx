@@ -199,6 +199,11 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         ? 'Improve ' + selectedKpi.kpi_label + (selectedKpi.target == null ? '' : ' toward ' + selectedKpi.target.toLocaleString())
         : goalChoice === 'brand' ? brandGoal.data?.north_star ?? null
           : goalChoice === 'custom' ? goalFree.trim() || null : null;
+      if (!chosenGoal?.trim()) {
+        toast.error('Choose a business goal, a scorecard target, or describe the result this plan should achieve.');
+        setBusy(false);
+        return;
+      }
       const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
       const { jobId, recipe } = await composePipeline({
         new_content: request.newContent,
