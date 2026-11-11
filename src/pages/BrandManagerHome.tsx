@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format, startOfWeek } from 'date-fns';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, CalendarCheck, CircleHelp, ClipboardList, Film, FolderOpen, Plus } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -34,6 +35,13 @@ export default function BrandManagerHome() {
   const first = actions[0];
   const upcoming = actions.slice(1, 4);
   const availableJobs = (jobs.data ?? []).filter((j) => j.status !== 'finished');
+  const stepsByWeek = new Map<string, NextTenRow[]>();
+  for (const action of actions) {
+    const label = action.dueDate
+      ? `Week of ${format(startOfWeek(new Date(`${action.dueDate.slice(0, 10)}T12:00:00`), { weekStartsOn: 1 }), 'MMM d, yyyy')}`
+      : 'Dates not yet set';
+    stepsByWeek.set(label, [...(stepsByWeek.get(label) ?? []), action]);
+  }
 
   const go = (tab: string) => {
     const p = new URLSearchParams(params);
@@ -117,11 +125,22 @@ export default function BrandManagerHome() {
             <ArrowRight className="h-4 w-4 text-primary shrink-0" />
           </Link>)}
       </CardContent></Card>
-      {actions.length > 0 && <Card><CardHeader><CardTitle className="text-base">Your next actionable steps</CardTitle></CardHeader><CardContent className="space-y-2">
-        {actions.map((row) => <div key={row.key} className="flex items-start gap-3 justify-between border-b pb-3 last:border-0">
-          <div className="min-w-0"><p className="text-sm font-medium">{row.step}</p><p className="text-xs text-muted-foreground">{row.note || 'View instructions and finish the step'}</p></div>
-          <Button variant="outline" size="sm" onClick={() => begin(row)}>Start</Button>
-        </div>)}
+      {actions.length > 0 && <Card><CardHeader><CardTitle className="text-base">Your assigned steps</CardTitle></CardHeader><CardContent className="space-y-5">
+        {[...stepsByWeek.entries()].map(([week, rows]) => (
+          <section key={week} className="space-y-2">
+            <h3 className="font-semibold text-sm">{week}</h3>
+            <div className="divide-y">
+              {rows.map((row) => <div key={row.key} className="flex items-start gap-3 justify-between py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{row.step}</p>
+                  <p className="text-xs text-muted-foreground">{row.note || 'View instructions and finish the step'}</p>
+                  {row.dueDate && <p className="text-xs text-muted-foreground">Due {row.dueDate.slice(0, 10)}</p>}
+                </div>
+                <Button variant="outline" size="sm" onClick={() => begin(row)}>Start</Button>
+              </div>)}
+            </div>
+          </section>
+        ))}
       </CardContent></Card>}
     </>}
     {section === 'posts' && <>
