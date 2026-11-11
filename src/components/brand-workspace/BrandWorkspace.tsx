@@ -156,7 +156,7 @@ function OverviewTab({
   });
   const activity = useBrandActivity(projectId);
   const complete = useCompleteNextTenRow();
-  const approve = useApproveItem();
+  const [reviewPostId, setReviewPostId] = useState<string | null>(null);
   const s = summary.data;
 
   const tiles: { label: string; value: string }[] = [
@@ -209,11 +209,12 @@ function OverviewTab({
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" disabled={complete.isPending} onClick={() => markDone(a.id)}>Done</Button>
-                      {a.jobId && (
-                        <Button size="sm" variant="outline" asChild>
-                          <Link to={pipelineHref(projectId, a.jobId)}>Open</Link>
+                      {a.jobId ? (
+                        <Button size="sm" asChild>
+                          <Link to={pipelineHref(projectId, a.jobId)}>Open step & instructions</Link>
                         </Button>
+                      ) : (
+                        <Button size="sm" variant="outline" disabled={complete.isPending} onClick={() => markDone(a.id)}>Mark completed</Button>
                       )}
                     </div>
                   </li>
@@ -228,19 +229,7 @@ function OverviewTab({
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        disabled={approve.isPending}
-                        onClick={async () => {
-                          try { await approve.mutateAsync(c.id); toast.success('Approved'); summary.refetch(); }
-                          catch (e: any) { toast.error(e?.message ?? 'Could not approve it'); }
-                        }}
-                      >
-                        Done
-                      </Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link to="?tab=content">Open</Link>
-                      </Button>
+                      <Button size="sm" onClick={() => setReviewPostId(c.id)}>Review the post & approve</Button>
                     </div>
                   </li>
                 ))}
@@ -272,6 +261,7 @@ function OverviewTab({
       </Card>
 
       {setup}
+      <ContentWorkflowDialog projectId={projectId} itemId={reviewPostId} onClose={() => setReviewPostId(null)} />
     </div>
   );
 }
