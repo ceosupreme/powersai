@@ -265,7 +265,7 @@ export default function PipelineJob() {
               if (error) throw error;
               await qc.invalidateQueries();
               toast.success('Plan resumed. Open the next eligible step.');
-              scrolled.current = false;
+              scrolled.current = null;
             } catch (error: any) { toast.error(error?.message ?? 'Could not resume the plan.'); }
             finally { setJobBusy(false); }
           }}>{job.status === 'parked' ? 'Resume this plan' : 'Stop this plan'}</Button>
