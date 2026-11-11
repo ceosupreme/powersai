@@ -71,7 +71,7 @@ export function ManualPlacementDialog({ item, mode, onClose }: {
       const current = existing?.id ?? null;
       const placementPatch = mode === 'schedule'
         ? { status: 'scheduled', scheduled_for: new Date(when).toISOString(), account_label: account.trim() || null }
-        : { status: 'published', live_url: url, account_label: account.trim() || null };
+        : { status: 'published', live_url: url, verified_at: new Date().toISOString(), account_label: account.trim() || null };
       const placement = current
         ? await T('content_placements').update(placementPatch).eq('id', current).eq('project_id', item.project_id).select('id').maybeSingle()
         : await T('content_placements').insert({
@@ -97,7 +97,7 @@ export function ManualPlacementDialog({ item, mode, onClose }: {
       ]);
       toast.success(mode === 'schedule'
         ? 'Manual scheduling recorded. HQ did not send this to the platform.'
-        : 'Publication recorded from the live URL you supplied.');
+        : 'Publication manually confirmed from your live URL; no platform API verification occurred.');
       onClose();
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not record the platform action.');
@@ -113,7 +113,7 @@ export function ManualPlacementDialog({ item, mode, onClose }: {
       <p className="text-sm text-muted-foreground">
         {mode === 'schedule'
           ? 'First schedule this post in the actual platform or publishing tool. HQ does not send it for you. Then record the details below.'
-          : 'Only confirm publication after the post is live on the platform. HQ saves the link you provide.'}
+          : 'Only confirm publication after opening the real post on the platform. HQ records this as your manual verification, not an API-confirmed publication.'}
       </p>
       <div className="space-y-3">
         <div className="space-y-1"><Label htmlFor="manual-platform">Platform</Label>
