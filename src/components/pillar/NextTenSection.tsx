@@ -46,6 +46,9 @@ export const NextTenSection = ({
       setKpiValue('');
       return;
     }
+    if (row.source === 'Action' && row.approvalRank !== 0) {
+      return toast.error('This step must be approved before it can be completed.');
+    }
     // Never turn on a money lane or advance a product by ticking a box.
     // Those require confirmation and a real setup or production workflow.
     if (row.source !== 'Action') return;
@@ -185,7 +188,7 @@ export const NextTenSection = ({
             {rows.map((row) => (
               <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                 <div className="flex items-start gap-3">
-                  {(row.source === 'Action' || row.source === 'KPI') && (
+                  {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
                     <Checkbox
                       className="mt-0.5"
                       checked={false}
@@ -206,6 +209,11 @@ export const NextTenSection = ({
                         )}
                     {row.note && (
                       <p className="text-[11px] text-muted-foreground">{row.note}</p>
+                    )}
+                    {row.source === 'Action' && row.approvalRank !== 0 && (
+                      <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                        Approval required before this step can be completed.
+                      </p>
                     )}
                     {row.source === 'Lane' && (
                       <Link to={`/project/${row.projectId}?tab=avenues`} className="text-sm text-primary underline-offset-2 hover:underline">
