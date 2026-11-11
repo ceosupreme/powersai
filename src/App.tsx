@@ -258,12 +258,12 @@ const App = () => {
                 <Route path="/social-media" element={<Navigate to="/marketing-hub" replace />} />
                 <Route path="/marketing" element={<Navigate to="/marketing-hub" replace />} />
                 <Route path="/admin" element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute adminOnly>
                     <AppLayout><Admin /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/sync-health" element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute adminOnly>
                     <AppLayout><AdminSyncHealth /></AppLayout>
                   </ProtectedRoute>
                 } />
