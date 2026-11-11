@@ -222,6 +222,19 @@ export async function fetchActionStatusMap(
   return map;
 }
 
+/**
+ * A parked or finished production plan keeps its step history but must not
+ * keep generating actionable owner work on dashboards or in notifications.
+ */
+export async function fetchInactiveJobIds(rows: { job_id?: string | null }[]): Promise<Set<string>> {
+  const ids = [...new Set(rows.map(r => r.job_id).filter((id): id is string => !!id))];
+  if (!ids.length) return new Set();
+  const jobs = await fetchRowsIn<{ id: string; status: string }>(
+    'production_jobs', 'id,status', 'id', ids,
+  );
+  return new Set(jobs.filter(j => j.status === 'parked' || j.status === 'finished').map(j => j.id));
+}
+
 type NextTenProject = { projectId: string; projectName: string };
 
 /** (a) Open action items: not done, not rejected, not snoozed, and the owner's turn. */
@@ -230,10 +243,12 @@ function actionNextTenRows(
   actionRows: any[],
   statusById: Map<string, string | null>,
   now: number,
+  inactiveJobIds: Set<string>,
 ): NextTenRow[] {
   const rows: NextTenRow[] = [];
   const seen = new Set<string>();
   for (const a of actionRows) {
+    if (a.job_id && inactiveJobIds.has(a.job_id)) continue;
     if (a.status === 'Done' || a.approval_status === 'Rejected') continue;
     if (seen.has(a.id)) continue;
     seen.add(a.id);
@@ -369,8 +384,10 @@ export async function fetchNextTenForProject(
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
     const actionRows = (actionsRes.data ?? []) as any[];
-    const statusById = await fetchActionStatusMap(actionRows);
-    rows.push(...actionNextTenRows(project, actionRows, statusById, now));
+    const [statusById, inactiveJobIds] = await Promise.all([
+      fetchActionStatusMap(actionRows), fetchInactiveJobIds(actionRows),
+    ]);
+    rows.push(...actionNextTenRows(project, actionRows, statusById, now, inactiveJobIds));
   } catch {
     unavailable.push('action items');
   }
@@ -483,8 +500,11 @@ export async function fetchNextTenBatch(
   const [actions, lanes, products, kpis] = await Promise.allSettled([
     (async () => {
       const rows = shared.actionRows ?? (await fetchActionRowsForProjects(ids));
-      const statusById = shared.statusById ?? (await fetchActionStatusMap(rows));
-      return { rows, statusById };
+      const [statusById, inactiveJobIds] = await Promise.all([
+        shared.statusById ? Promise.resolve(shared.statusById) : fetchActionStatusMap(rows),
+        fetchInactiveJobIds(rows),
+      ]);
+      return { rows, statusById, inactiveJobIds };
     })(),
     (async () => {
       const venues = await fetchRowsIn<{ id: string; project_type: string | null }>('venues', 'id,project_type', 'id', ids);
@@ -533,7 +553,7 @@ export async function fetchNextTenBatch(
     const unavailable: string[] = [];
     try {
       if (actions.status !== 'fulfilled') throw actions.reason;
-      rows.push(...actionNextTenRows(project, actionRowsFor(actions.value.rows, p.id), actions.value.statusById, now));
+      rows.push(...actionNextTenRows(project, actionRowsFor(actions.value.rows, p.id), actions.value.statusById, now, actions.value.inactiveJobIds));
     } catch {
       unavailable.push('action items');
     }
