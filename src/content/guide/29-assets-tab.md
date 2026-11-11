@@ -1,11 +1,11 @@
-# Assets tab
+# Files and documents
 <!-- part: Running a brand | order: 29 | slug: assets-tab | route: /project/:venueId | tags: assets, files, brand kit, logos, images, links, documents, brand rules, shared plans, review by -->
 
-The "Assets" tab is a read-only shelf of this brand's material: the files and links saved in its brand kit, its own documents and brand rules, and the shared plans that apply across your work. Use it to find a logo, a link or a document quickly without leaving the brand.
+The "Files and documents" tab is a read-only shelf of this brand's material: the files and links saved in its brand kit, its own documents and brand rules, and the shared plans that apply across your work. Use it to find a logo, a link or a document quickly without leaving the brand.
 
 ## Where to find it
 
-- Open the brand, then tap "Assets", the last tab in the tab row. On a phone, swipe the tab row left to reach it.
+- Open the brand, then tap "Files and documents", the last tab in the tab row. On a phone, swipe the tab row left to reach it.
 - The address ends in ?tab=assets.
 
 ## What you see
@@ -14,7 +14,7 @@ The "Assets" tab is a read-only shelf of this brand's material: the files and li
   - If the brand has no brand kit yet, it says "No brand kit yet." with an "Open Brand kit" link.
   - If the kit has no files, it says "No files in the brand kit yet."
 - "Links": the brand kit's saved links, in boxes by category. Links without a category go under "Other". With none, it says "No links saved."
-- "Documents": this brand's own documents and its brand rules. Each row shows the title and version, "Review by" and a date, "· planned" when it is not written yet, and an "Open" link when it has a file or web link. With none, it says "No brand documents yet."
+- "Documents": this brand's own documents and its brand rules. Each row shows the title and version, "Review by" and a date, and a "Read here" action when HQ has stored text; "Open source" is available when an external file or web link exists. With none, it says "No brand documents yet."
 - "Shared plans": documents that belong to no single brand, shown the same way. With none, it says "No shared plans."
 
 ## How to use it
@@ -24,7 +24,7 @@ The "Assets" tab is a read-only shelf of this brand's material: the files and li
 
 ### To open a document
 1. Find it under "Documents" or "Shared plans".
-2. Tap "Open" on its row. A document with no file or link has no "Open".
+2. Tap "Read here" to view HQ's saved text, or "Open source" to follow the stored external link. Rows without either say the content is missing.
 
 ### To add or change files and links
 1. If the brand has no kit, tap "Open Brand kit" under "Files". Otherwise tap "Brand kit" in the brand header.
@@ -37,7 +37,7 @@ The "Assets" tab is a read-only shelf of this brand's material: the files and li
 - Brand rules: the brand's written rules. Every content and product pipeline starts with a "Brand rules check" step that uses them.
 - "Review by": the date by which the document should be checked again.
 - "· planned": the document is listed but not written yet.
-- "Shared plans": company-wide documents that apply to more than one brand.
+- "Shared plans": company-wide documents. The shared shelf is visible to HQ administrators; brand managers see brand-scoped documents only, subject to database permission enforcement.
 
 ## Good to know
 
