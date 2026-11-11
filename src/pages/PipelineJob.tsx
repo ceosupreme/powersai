@@ -360,11 +360,11 @@ export default function PipelineJob() {
                       </Button>
                       {link && <Button size="sm" variant="outline" asChild><a href={link} target="_blank" rel="noreferrer">Open</a></Button>}
                       {canDone && <Button size="sm" disabled={complete.isPending} onClick={() => markDone(s)}>Done — next step</Button>}
-                      {canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Assign to Claude for later review</Button>}
+                      {isAdmin && canDone && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => handToClaude(s)}>Assign to Claude for later review</Button>}
                       {s.owner_kind === 'claude' && st !== 'done' && (
                         <span className="self-center text-xs text-muted-foreground">Assigned to Claude · processing must be confirmed separately; this screen has not started a run</span>
                       )}
-                      {s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
+                      {isAdmin && s.owner_kind === 'claude' && st !== 'done' && st !== 'blocked' && job.status !== 'parked' && <Button size="sm" variant="ghost" disabled={busyStep === s.id} onClick={() => reclaim(s)}>Take this step</Button>}
                       {isAdmin && s.owner_kind === 'claude' && <Button size="sm" variant="outline" onClick={() => copyPrompt(s)}>Copy Claude prompt</Button>}
                     </div>
                     {showInstructions && (
