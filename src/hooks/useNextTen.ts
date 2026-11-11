@@ -604,15 +604,19 @@ export function useCompleteNextTenRow() {
     mutationFn: async (row: NextTenRow) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (row.source === 'Action') {
-        const { error } = await supabase
+        if (!user?.id) throw new Error('Sign in again to complete the step.');
+        const { data: changed, error } = await supabase
           .from('action_items')
           .update({
             status: 'Done',
             completed_at: new Date().toISOString(),
-            completed_by: user?.id ?? null,
+            completed_by: user.id,
           })
-          .eq('id', row.refId);
-        if (error) throw error;
+          .eq('id', row.refId)
+          .or(`bar_id.eq.${row.projectId},venue_id.eq.${row.projectId}`)
+          .select('id')
+          .maybeSingle();
+        if (error || !changed) throw error ?? new Error('The step was not updated. Check your brand permissions.');
         return;
       }
       if (row.source === 'Lane') {
@@ -634,11 +638,13 @@ export function useCompleteNextTenRow() {
       if (row.source === 'Product') {
         const next = nextProductStage(row.productStatus ?? null);
         if (!next) return;
-        const { error } = await supabase
+        const { data: changed, error } = await supabase
           .from('channel_products')
           .update({ status: next })
-          .eq('id', row.refId);
-        if (error) throw error;
+          .eq('id', row.refId)
+          .select('id')
+          .maybeSingle();
+        if (error || !changed) throw error ?? new Error('Product status was not updated. Check your permissions.');
       }
     },
     onSuccess: (_d, row) => {
