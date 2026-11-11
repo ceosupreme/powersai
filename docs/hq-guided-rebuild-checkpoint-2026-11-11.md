@@ -144,3 +144,11 @@ Milestone 0's code baseline, targeted data backup, independent export, SQL/RLS s
 - Use GitHub source edits and scoped SQL directly; reserve paid Lovable agent messages for work it does materially better.
 - New database changes should be additive or tightly preconditioned, source-controlled, and recoverable. Do not broaden membership or RLS merely to make an interface work.
 - No full acceptance testing or release until implementation is complete; a crucial build/dependency check may be performed earlier if needed. User does not need repeated "continue" prompts while a task is being actively handled.
+
+### Action readiness and setup-save safety follow-up
+
+- The audit's 37-action list was read directly from `HQ_Brand_Pages_Fix_Plan.pdf` pages 3–4. Continue mapping each action to real handling before the final acceptance gate. Existing Next Ten lane/product controls already link to setup/product workflows instead of ticking a misleading checkbox.
+- The shared `useCompleteNextTenRow` action mutation now rereads the scoped live task, requires `approval_status='Approved'`, rejects Done/Claude-owned tasks, verifies any predecessor is Done, checks the production plan is not parked/finished, and scopes the final update by project and approved status. Any failed/zero-row update reports an error instead of success.
+- The project-level `NextTenSection` no longer displays a mark-Done checkbox for unapproved action rows; it shows approval required instead.
+- In `SetupTab`, the generic async helper returns whether a save actually succeeded. The Have It, Skip, Brand type and Top 3 setup dialogs now stay open on errors rather than silently closing when an underlying save failed.
+- These are protected-branch source changes; full checks will run at the planned release gate. No feature build was merged or published here.
