@@ -70,6 +70,16 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       toast.error("Title is required");
       return;
     }
+    // A production stage is not a publishing integration. Those transitions
+    // require platform/date or live-link confirmation on the Production Board.
+    if (form.stage === 'scheduled' && item?.stage !== 'scheduled') {
+      toast.error('Use Record scheduling on the Production Board to supply platform and time.');
+      return;
+    }
+    if (form.stage === 'published' && item?.stage !== 'published') {
+      toast.error('Use Add live post link on the Production Board to confirm publication.');
+      return;
+    }
     const payload: any = {
       title: form.title.trim(),
       format: form.format || null,
@@ -127,13 +137,14 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
               <Select value={form.stage} onValueChange={(v) => set("stage", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {STAGES.map((s) => (
+                  {STAGES.filter((s) => (s !== 'scheduled' && s !== 'published') || s === form.stage).map((s) => (
                     <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Scheduling and publication are confirmed separately with a platform, date and live link. Changing an HQ stage does not post content.</p>
           <div>
             <Label>Hook</Label>
             <Textarea rows={2} value={form.hook} onChange={(e) => set("hook", e.target.value)} />
