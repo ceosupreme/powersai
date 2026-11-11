@@ -235,9 +235,10 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
     <Dialog open={open} onOpenChange={(o) => !o && !busy && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create pipeline</DialogTitle>
+          <DialogTitle>Make a work plan</DialogTitle>
           <DialogDescription>
-            {fixedSteps ? 'This kind of job uses a fixed five-step plan.' : 'Pick the playbooks. Steps are built from them in order.'}
+            Choose what you want to accomplish. HQ saves the steps and opens the first one.
+            {fixedSteps ? ' This setup uses a fixed sequence.' : ' The finished how-to guides determine the steps.'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -245,11 +246,30 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
             <Label htmlFor="pl-title">Title</Label>
             <Input id="pl-title" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-          <MultiPick label="Niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
+          <div className="space-y-1.5">
+            <Label>What business result should this plan support?</Label>
+            <Select value={goalChoice} onValueChange={setGoalChoice}>
+              <SelectTrigger aria-label="Business result"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="brand">Brand goal: {brandGoal.data?.north_star || 'Not set yet'}</SelectItem>
+                {(kpis.data ?? []).map(k => (
+                  <SelectItem key={k.pillar_key + ':' + k.kpi_key} value={'kpi:' + k.pillar_key + ':' + k.kpi_key}>
+                    {k.kpi_label}{k.target == null ? '' : ' · Target ' + k.target.toLocaleString()}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">Describe another measurable result</SelectItem>
+                <SelectItem value="none">No result selected yet</SelectItem>
+              </SelectContent>
+            </Select>
+            {goalChoice === 'custom' && <Input value={goalFree} onChange={e => setGoalFree(e.target.value)}
+              placeholder="e.g. Get three qualified event inquiries this month" />}
+            <p className="text-xs text-muted-foreground">This states what the plan aims to improve. Actual results are recorded separately.</p>
+          </div>
+          <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
           {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /> : !fixedSteps && (
             <>
               <div className="space-y-1.5">
-                <Label>Product type</Label>
+                <Label>What are you making?</Label>
                 {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">This product type needs a finished how-to guide. Choose an available type below.</p>}
                 <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger><SelectValue placeholder="Choose a product type" /></SelectTrigger>
@@ -267,22 +287,26 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
                   If you choose none, the plan will cover creating the product, without listing it on a sales outlet.
                 </p>
               )}
-              <MultiPick label="Monetization" options={by.monetization} value={mon} onChange={setMon} />
-              <MultiPick label="Promotion" options={by.promotion} value={pro} onChange={setPro} />
+              <MultiPick label="How should this make money? (optional)" options={by.monetization} value={mon} onChange={setMon} />
+              <MultiPick label="How will you promote it? (optional)" options={by.promotion} value={pro} onChange={setPro} />
               {request && <TrafficNotice projectId={request.projectId}
                 methods={[...by.monetization.filter((o) => mon.includes(o.key)), ...by.promotion.filter((o) => pro.includes(o.key))]} />}
             </>
           )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Level</Label>
+              <Label>How detailed should the work be?</Label>
               <Select value={level} onValueChange={setLevel}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{['1', '2', '3'].map((l) => <SelectItem key={l} value={l}>Level {l}</SelectItem>)}</SelectContent>
+                <SelectContent>
+                  <SelectItem value="1">1 · Lightweight</SelectItem>
+                  <SelectItem value="2">2 · Standard</SelectItem>
+                  <SelectItem value="3">3 · Detailed</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="pl-money">Money destination</Label>
+              <Label htmlFor="pl-money">Where should sales or leads go?</Label>
               <Input id="pl-money" value={money} onChange={(e) => setMoney(e.target.value)} placeholder="e.g. Etsy shop" />
             </div>
           </div>
@@ -290,7 +314,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
           <Button onClick={submit} disabled={busy || methods.isLoading || methods.isError || (!fixedSteps && !validProduct)}>
-            {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create pipeline
+            {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create plan & open first step
           </Button>
         </DialogFooter>
       </DialogContent>
