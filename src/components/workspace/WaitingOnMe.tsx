@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,9 @@ export interface WaitingRow {
   status: string | null;
   created_at: string | null;
   due_date: string | null;
+  detail: string | null;
+  source: string | null;
+  jobId: string | null;
   snoozed_until: string | null;
   projectId: string | null;
   projectName: string;
@@ -49,7 +53,7 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
+        .select('id,title,detail,source,job_id,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -76,6 +80,9 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             status: (a.status as string) ?? null,
             created_at: (a.created_at as string) ?? null,
             due_date: (a.due_date as string) ?? null,
+            detail: (a.detail as string) ?? null,
+            source: (a.source as string) ?? null,
+            jobId: (a.job_id as string) ?? null,
             snoozed_until: (a.snoozed_until as string) ?? null,
             projectId,
             projectName: (projectId && nameById.get(projectId)) || 'Project',
@@ -222,6 +229,17 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             </Badge>
           )}
         </div>
+        {row.source === 'brand_help' && row.detail && (
+          <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm whitespace-pre-wrap">
+            <p className="font-medium text-xs mb-1">Message from the brand manager</p>
+            {row.detail}
+          </div>
+        )}
+        {row.source === 'brand_help' && row.projectId && row.jobId && (
+          <Link className="mt-2 inline-flex text-sm text-primary underline" to={'/project/' + row.projectId + '/jobs/' + row.jobId}>
+            Open the related work
+          </Link>
+        )}
         <div className="mt-2">
           <RowActions
             row={row}
