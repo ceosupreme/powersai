@@ -74,7 +74,7 @@ export const STEP_STATUS_WORD: Record<StepStatus, string> = {
   blocked: 'Blocked',
   ready: 'Ready',
   decision: 'Awaiting your decision',
-  queued: 'Queued',
+  queued: 'Assigned to Claude',
   open: 'Open',
 };
 
