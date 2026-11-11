@@ -55,6 +55,8 @@ export const NextTenSection = ({
     setBusy(row.key);
     try {
       await complete.mutateAsync(row);
+      await refetch();
+      toast.success('Step completed. Your next priorities are now shown.');
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     } finally {
@@ -64,7 +66,13 @@ export const NextTenSection = ({
 
   const saveKpi = async (row: NextTenRow) => {
     const num = kpiValue.trim() === '' ? null : Number(kpiValue);
-    if (num == null || !Number.isFinite(num)) return toast.error('Enter a finite number');
+    if (num == null || !Number.isFinite(num) || num < 0) return toast.error('Enter a nonnegative number.');
+    const def = kpiDefs.find(
+      (d) => d.pillar_key === row.pillarKey && d.kpi_key === row.kpiKey,
+    );
+    if (def?.direction === 'checklist' && num !== 0 && num !== 1) {
+      return toast.error('Enter 1 for complete or 0 for not completed.');
+    }
     const def = kpiDefs.find(
       (d) => d.pillar_key === row.pillarKey && d.kpi_key === row.kpiKey,
     );
@@ -76,7 +84,10 @@ export const NextTenSection = ({
         pillar_key: row.pillarKey!,
         kpi_key: row.kpiKey!,
         actual: num,
-        score: def ? scoreKpi(def.direction, num, def.target) : null,
+        score: def
+          ? scoreKpi(def.direction, def.direction === 'checklist' ? (num === 1 ? 100 : 0) : num, def.target)
+          : null,
+        note: 'Manual weekly entry from brand Next 10',
       });
       setKpiOpen(null);
       setKpiValue('');
