@@ -1,11 +1,11 @@
 # Setup tab
 <!-- part: Running a brand | order: 22 | slug: setup-tab | route: /project/:venueId | tags: setup, setup map, setup score, accounts, assets, to set up, in place, needs attention, i already have it, later, skip, set it up, top 3, setup brief, brand type, ready to grow, caution, set up first -->
 
-The "Setup" tab is the map of every account and asset this brand should have, such as its website, social accounts, stores and money accounts, and which of them are already in place. It gives the brand a setup score, says why each item matters and roughly how much of your time it takes, and starts setup pipelines for the gaps. Use it when you start a brand, when its setup score is low, or when you want a ready-made list of accounts to create.
+The "Accounts to set up" tab is the map of every account and asset this brand should have, such as its website, social accounts, stores and money accounts, and which of them are already in place. It gives the brand a setup score, says why each item matters and roughly how much of your time it takes, and starts setup pipelines for the gaps. Use it when you start a brand, when its setup score is low, or when you want a ready-made list of accounts to create.
 
 ## Where to find it
 
-- Open the brand, then tap "Setup" in the tab row.
+- Open the brand, then tap "Accounts to set up" in the tab row.
 - Or tap "Open Setup" in the setup line at the top of "Overview".
 - Or tap "Open the Setup tab" in a traffic check notice on a pipeline.
 - The address ends in ?tab=setup.
@@ -42,13 +42,13 @@ Only admins see the buttons. Everyone else sees the map without them.
 ### To start setup for one item
 1. In "To set up" or "Needs attention", find the item and tap "Set it up".
 2. For a Foundation item, HQ opens the Brand Kit page for this brand. Fill it in there.
-3. For any other item, HQ starts a setup pipeline straight away, with no form, and shows "Setup started for" and the item's name, with an "Open pipeline" button. If the brand had no record of that account yet, HQ adds one marked planned, so the row moves to "Needs attention".
-4. Tap "Open pipeline" to see the steps. The row's button now reads "Open setup job".
+3. For any other item, HQ creates a setup pipeline and immediately opens that plan. If the brand had no record of the account, HQ marks one as planned.
+4. On return to Accounts to set up, the row provides an "Open setup job" link so you can resume.
 
 ### To start the three most important items at once
 1. Tap "Set up the top 3".
 2. Read the list and the total, for example "About 40 minutes of your time in total."
-3. Tap "Start all 3". HQ shows "3 setup pipelines started". Tap "Cancel" to back out.
+3. Tap "Start all 3". HQ creates the plans and opens the first one. The others remain available in the plans list; partial failures are reported. Tap "Cancel" to back out.
 
 ### To record an account you already have
 1. Tap "I already have it" on the row.
