@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TrafficNotice } from '@/components/pipeline/TrafficNotice';
 import { useApproveItem, canApprove } from '@/hooks/useContentProduction';
@@ -38,7 +38,8 @@ const STATUS_TONE: Record<StepStatus, string> = {
 
 interface Step {
   id: string; title: string; detail: string | null; facts: string | null; status: string | null;
-  owner_kind: string | null; method_id: string | null; output_url: string | null; depends_on: string | null;
+  approval_status: string | null; owner_kind: string | null; assignee_id: string | null; assignee: string | null;
+  method_id: string | null; output_url: string | null; depends_on: string | null;
   step_order: number | null;
 }
 
@@ -54,7 +55,7 @@ function usePipelineJob(jobId: string | undefined) {
       // snoozed_until is deliberately ignored here: every step of the job is shown.
       const [stepsRes, venueRes, kitRes, nicheRes, targetRes] = await Promise.all([
         supabase.from('action_items')
-          .select('id,title,detail,facts,status,owner_kind,method_id,output_url,depends_on,step_order')
+          .select('id,title,detail,facts,status,approval_status,owner_kind,assignee_id,assignee,method_id,output_url,depends_on,step_order')
           .eq('job_id', job.id).order('step_order', { ascending: true }),
         T('venues').select('id,name').eq('id', job.project_id).maybeSingle(),
         T('brand_kits').select('bio_short,brand_voice,content_mode').eq('project_id', job.project_id).eq('archived', false).maybeSingle(),
@@ -107,6 +108,8 @@ export default function PipelineJob() {
   const [confirmStop, setConfirmStop] = useState(false);
   const [instructionsFor, setInstructionsFor] = useState<string | null>(null);
   const { venueId, jobId } = useParams<{ venueId: string; jobId: string }>();
+  const [queryParams, setQueryParams] = useSearchParams();
+  const requestedStepId = queryParams.get('step');
   const { data, isLoading, isError, refetch } = usePipelineJob(jobId);
   const recipeIds = useMemo(() => (data?.job.recipe ?? []).map((r) => r.id), [data]);
   const stepMethodIds = useMemo(() => (data?.steps ?? []).map((s) => s.method_id), [data]);
@@ -116,18 +119,23 @@ export default function PipelineJob() {
   const [busyStep, setBusyStep] = useState<string | null>(null);
   const [methodOpen, setMethodOpen] = useState<{ id: string; title: string; version: string; status: string } | null>(null);
   const [stepOpen, setStepOpen] = useState<Step | null>(null);
-  const scrolled = useRef(false);
+  const scrolled = useRef<string | null>(null);
 
   const statusById = useMemo(() => new Map((data?.steps ?? []).map((s) => [s.id, s.status])), [data]);
 
   useEffect(() => {
-    if (!data || scrolled.current || data.job.current_step == null) return;
-    const el = document.getElementById(`step-${data.job.current_step}`);
+    if (!data) return;
+    const targetedStep = requestedStepId
+      ? data.steps.find(step => step.id === requestedStepId)
+      : data.steps.find(step => step.step_order === data.job.current_step);
+    if (!targetedStep || targetedStep.step_order == null || scrolled.current === targetedStep.id) return;
+    const el = document.getElementById(`step-${targetedStep.step_order}`);
     if (el) {
-      scrolled.current = true;
+      scrolled.current = targetedStep.id;
+      setInstructionsFor(targetedStep.id);
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [data]);
+  }, [data, requestedStepId]);
 
   if (isLoading) return <div className="py-24 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   if (isError) return <p role="status" className="p-6 text-sm text-destructive">This job could not be loaded. <button className="underline" onClick={() => refetch()}>Try again</button></p>;
@@ -145,9 +153,17 @@ export default function PipelineJob() {
   const markDone = async (s: Step) => {
     try {
       await complete.mutateAsync({ key: `action-${s.id}`, source: 'Action', step: s.title, projectId: job.project_id, projectName: brandName, refId: s.id, rank: 0 });
-      toast.success('Step completed. Moving to the next available step.');
-      scrolled.current = false;
-      await refetch();
+      const latest = await refetch();
+      const next = latest.data?.steps.find(step => step.step_order === latest.data?.job.current_step);
+      scrolled.current = null;
+      if (next && next.id !== s.id) {
+        setQueryParams({ step: next.id }, { replace: true });
+        setInstructionsFor(next.id);
+        toast.success('Step completed. Opening the next step in this plan.');
+      } else {
+        setQueryParams({}, { replace: true });
+        toast.success('Step completed. No further steps are ready in this plan.');
+      }
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not save that step');
     }
@@ -155,12 +171,19 @@ export default function PipelineJob() {
 
   const updateStep = async (s: Step, patch: Record<string, unknown>, ok: string) => {
     setBusyStep(s.id);
-    const { data: saved, error } = await supabase.from('action_items')
-      .update(patch as any).eq('id', s.id).select('id').maybeSingle();
-    setBusyStep(null);
-    if (error || !saved) return toast.error(error?.message ?? 'The step was not updated. Check your access and try again.');
-    toast.success(ok);
-    refetch();
+    try {
+      const { data: saved, error } = await supabase.from('action_items')
+        .update(patch as any).eq('id', s.id)
+        .or(`bar_id.eq.${job.project_id},venue_id.eq.${job.project_id}`)
+        .neq('status', 'Done').select('id').maybeSingle();
+      if (error || !saved) throw error ?? new Error('The step was not updated. Check its status and your access.');
+      toast.success(ok);
+      await refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not update the step.');
+    } finally {
+      setBusyStep(null);
+    }
   };
   // Assign the work to the person who clicked, not to the HQ administrator.
   const reclaim = (s: Step) => {
@@ -310,7 +333,11 @@ export default function PipelineJob() {
             const current = s.step_order != null && s.step_order === job.current_step;
             const showInstructions = instructionsFor === s.id || (instructionsFor === null && current);
             const parsed = parseFacts(s.facts);
-            const canDone = job.status !== 'parked' && s.owner_kind === 'owner' && st !== 'blocked' && st !== 'done';
+            const assignedToMe = s.assignee_id === user?.id ||
+              (!s.assignee_id && !!profile?.full_name && s.assignee?.trim().toLowerCase() === profile.full_name.trim().toLowerCase());
+            const canDone = !['parked', 'finished'].includes(job.status) && s.owner_kind === 'owner' &&
+              (isAdmin || assignedToMe) && s.approval_status === 'Approved' &&
+              st !== 'blocked' && st !== 'done';
             const isGate = job.target_type === 'content_items' && /^(Gate|Quality gate)/.test(s.title);
             return (
               <li key={s.id} id={s.step_order != null ? `step-${s.step_order}` : undefined}
@@ -324,6 +351,8 @@ export default function PipelineJob() {
                       <Badge variant="secondary" className="text-[10px]">{OWNER_WORD[s.owner_kind ?? ''] ?? 'Unassigned'}</Badge>
                       {method && <Badge variant="outline" className="text-[10px]">{method.title}</Badge>}
                       {current && <Badge className="text-[10px]">Current step</Badge>}
+                      {s.approval_status && s.approval_status !== 'Approved' && st !== 'done' &&
+                        <Badge variant="outline" className="text-[10px]">{s.approval_status === 'Blocked' ? 'Waiting for earlier step' : `Approval: ${s.approval_status}`}</Badge>}
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
                       <Button size="sm" variant="outline" onClick={() => setInstructionsFor(s.id)}>
