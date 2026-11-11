@@ -61,6 +61,10 @@ export function ProductionItemCard({
           </ul>
         )}
         {!it.approved_at && (() => {
+          // An idea or a script in progress has nothing to approve yet, so say that instead of showing a locked button.
+          if ((it.stage === "idea" || it.stage === "script") && it.quality_score == null) {
+            return <p className="text-xs text-muted-foreground">Not written yet. Approve appears once it's written and scored.</p>;
+          }
           const ok = canApprove(it);
           const why = it.quality_score == null
             ? "Needs a Quality Score before it can be approved."

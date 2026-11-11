@@ -30,7 +30,8 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 
 ### To approve one piece
 1. Find its card and tap "Approve". HQ shows "Approved".
-2. If the button is grey, the piece is not ready. On a computer, point at the button to see why: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+2. If the button is grey, the piece is not ready. The reason shows below it: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+3. A piece still at "Idea" or "Script" with no score shows "Not written yet. Approve appears once it's written and scored." instead of the button.
 
 ### To move a piece to its next stage
 1. Tap "Move to next step" on the card. HQ shows "Moved to" and the new stage.

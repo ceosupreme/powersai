@@ -20,10 +20,42 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Plus, Star } from 'lucide-react';
+import { Copy, Eye, EyeOff, Loader2, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
 import { functionErrorMessage } from '@/lib/functionError';
+
+/** A random temporary password, easy to read out or text: four groups of four, no look-alike characters. */
+function makeTemporaryPassword(): string {
+  const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const all = upper + lower + digits;
+  const pick = (set: string) => {
+    // Rejection sampling keeps every character equally likely.
+    const limit = 256 - (256 % set.length);
+    const byte = new Uint8Array(1);
+    do { crypto.getRandomValues(byte); } while (byte[0] >= limit);
+    return set[byte[0] % set.length];
+  };
+  for (;;) {
+    const chars = Array.from({ length: 16 }, () => pick(all)).join('');
+    if (/[A-Z]/.test(chars) && /[a-z]/.test(chars) && /[0-9]/.test(chars)) {
+      return chars.match(/.{4}/g)!.join('-');
+    }
+  }
+}
+
+/** The sign-in service's reasons, said the way the person creating the account needs to hear them. */
+function plainCreateUserReason(reason: string): string {
+  if (/known to be weak|easy to guess|pwned/i.test(reason)) {
+    return 'That password has shown up in data leaks on other sites, so it can\'t be used. Pick a different one, or tap Generate.';
+  }
+  if (/already (been )?registered|already exists|email_exists/i.test(reason)) {
+    return 'That email already has an account. Find the person in the list and tap Edit instead.';
+  }
+  return reason;
+}
 
 interface Bar {
   id: string;
@@ -47,11 +79,27 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
   });
   const [selectedBarIds, setSelectedBarIds] = useState<string[]>([]);
   const [primaryBarId, setPrimaryBarId] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const resetForm = () => {
     setFormData({ email: '', password: '', full_name: '', role: 'staff', asana_gid: '' });
     setSelectedBarIds([]);
     setPrimaryBarId(null);
+    setShowPassword(false);
+  };
+
+  const generatePassword = () => {
+    setFormData(prev => ({ ...prev, password: makeTemporaryPassword() }));
+    setShowPassword(true);
+  };
+
+  const copyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(formData.password);
+      toast.success('Password copied');
+    } catch {
+      toast.error('Couldn\'t copy it. Select the password and copy it instead.');
+    }
   };
 
   const toggleBar = (barId: string) => {
@@ -75,7 +123,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       toast.error('Please fill in all required fields');
       return;
     }
-    // Same minimum as sign-up and password reset (the sign-in service rejects shorter ones).
+    // Same minimum as the sign-up form.
     if (formData.password.length < 8) {
       toast.error('Password must be at least 8 characters');
       return;
@@ -153,7 +201,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       onUserCreated();
     } catch (error: any) {
       console.error('Error creating user:', error);
-      toast.error(`Couldn't create the user: ${await functionErrorMessage(error, 'Failed to create user')}`);
+      toast.error(`Couldn't create the user: ${plainCreateUserReason(await functionErrorMessage(error, 'Failed to create user'))}`);
     } finally {
       setIsCreating(false);
     }
@@ -198,14 +246,34 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Temporary Password *</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="At least 8 characters"
-              value={formData.password}
-              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-            />
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="password">Temporary Password *</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={generatePassword}>
+                Generate
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              />
+              <Button type="button" variant="outline" size="icon" className="shrink-0"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword(s => !s)}>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+              <Button type="button" variant="outline" size="icon" className="shrink-0"
+                aria-label="Copy password" disabled={!formData.password} onClick={copyPassword}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Passwords that have leaked from other sites are refused. Generate makes a fresh one you can copy and send.
+            </p>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="role">Role</Label>

@@ -38,6 +38,7 @@ The Production Board shows the content pieces of all your brands in one place, s
 1. Find its card and check "Quality" and any hard fails.
 2. Tap "Approve". HQ shows "Approved".
 3. If "Approve" is grey, the piece is not ready. Read the reason below it: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+4. Cards still at "Idea" or "Script" with no score show "Not written yet. Approve appears once it's written and scored." instead of the button. There is nothing to approve until the piece is written.
 
 ### To approve several pieces at once
 1. The board has no batch button. Open the brand from "Portfolio" under "My brands".
