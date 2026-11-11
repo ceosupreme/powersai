@@ -46,6 +46,9 @@ export const NextTenSection = ({
       setKpiValue('');
       return;
     }
+    // Never turn on a money lane or advance a product by ticking a box.
+    // Those require confirmation and a real setup or production workflow.
+    if (row.source !== 'Action') return;
     setBusy(row.key);
     try {
       await complete.mutateAsync(row);
@@ -182,19 +185,17 @@ export const NextTenSection = ({
             {rows.map((row) => (
               <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
                 <div className="flex items-start gap-3">
-                  <Checkbox
-                    className="mt-0.5"
-                    checked={false}
-                    disabled={busy === row.key}
-                    aria-label={
-                      row.source === 'KPI'
+                  {(row.source === 'Action' || row.source === 'KPI') && (
+                    <Checkbox
+                      className="mt-0.5"
+                      checked={false}
+                      disabled={busy === row.key}
+                      aria-label={row.source === 'KPI'
                         ? `Enter this week's number for ${row.step}`
-                        : row.source === 'Lane'
-                          ? `Mark on: ${row.step}`
-                          : `Mark done: ${row.step}`
-                    }
-                    onCheckedChange={() => onCheck(row)}
-                  />
+                        : `Mark finished after completing: ${row.step}`}
+                      onCheckedChange={() => onCheck(row)}
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     {row.jobId ? (
                           <Link to={pipelineHref(row.projectId, row.jobId)} className="text-sm text-foreground underline-offset-2 hover:underline">
@@ -205,6 +206,16 @@ export const NextTenSection = ({
                         )}
                     {row.note && (
                       <p className="text-[11px] text-muted-foreground">{row.note}</p>
+                    )}
+                    {row.source === 'Lane' && (
+                      <Link to={`/project/${row.projectId}?tab=avenues`} className="text-sm text-primary underline-offset-2 hover:underline">
+                        See how to start this revenue opportunity →
+                      </Link>
+                    )}
+                    {row.source === 'Product' && (
+                      <Link to={`/project/${row.projectId}?tab=products`} className="text-sm text-primary underline-offset-2 hover:underline">
+                        Open product and production plan →
+                      </Link>
                     )}
                     {kpiOpen === row.key && (
                       <div className="flex items-center gap-2 mt-2">
