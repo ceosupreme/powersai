@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
@@ -130,9 +131,11 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const [nicheIds, setNicheIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     if (!request) { setSeeded(false); return; }
+    setShowAdvanced(false);
     setTitle(request.title); setProductType(request.productType ?? ''); setLevel('2'); setMoney('');
     setGoalChoice(request.goalText ? 'custom' : 'brand');
     setGoalFree(request.goalText ?? '');
@@ -271,55 +274,108 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
               placeholder="e.g. Get three qualified event inquiries this month" />}
             <p className="text-xs text-muted-foreground">This states what the plan aims to improve. Actual results are recorded separately.</p>
           </div>
-          <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
-          {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /> : !fixedSteps && (
+          {request?.kind !== 'product' && (
+            <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds} />
+          )}
+          {methods.isError && !fixedSteps && (
+            <div className="space-y-2">
+              <p role="alert" className="text-sm text-destructive">
+                The how-to guides could not be loaded. Plans cannot be created without their real instructions.
+              </p>
+              <Button size="sm" variant="outline" onClick={() => void methods.refetch()}>Try loading guides again</Button>
+            </div>
+          )}
+          {methods.isLoading && !fixedSteps ? <Loader2 className="h-5 w-5 animate-spin" /> : !fixedSteps && !methods.isError && (
             <>
               <div className="space-y-1.5">
-                <Label>What are you making?</Label>
-                {productType && !validProduct && !methods.isLoading && <p role="alert" className="text-sm text-destructive">This product type needs a finished how-to guide. Choose an available type below.</p>}
+                <Label>{request?.kind === 'product' ? '1. What kind of product is this?' : 'What are you making?'}</Label>
+                {productType && !validProduct && <p role="alert" className="text-sm text-destructive">
+                  This product type needs a finished how-to guide. Choose an available type below.
+                </p>}
                 <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger><SelectValue placeholder="Choose a product type" /></SelectTrigger>
                   <SelectContent>
                     {by.product_type.map((m) => (
-                      <SelectItem key={m.id} value={m.key} disabled={m.available === false}>{m.title}{m.available === false ? ' (guide coming)' : ''}</SelectItem>
+                      <SelectItem key={m.id} value={m.key} disabled={m.available === false}>
+                        {m.title}{m.available === false ? ' (guide coming)' : ''}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <MultiPick label={request?.kind === 'product' ? 'Where will you sell this?' : 'Where will this go?'} options={by.destination} value={dest} onChange={setDest} />
-              {request?.kind === 'product' && (
-                <p className="text-xs text-muted-foreground">
-                  Choose only the selling outlets you want included. Nothing is selected automatically.
-                  If you choose none, the plan will cover creating the product, without listing it on a sales outlet.
-                </p>
-              )}
-              <MultiPick label="How should this make money? (optional)" options={by.monetization} value={mon} onChange={setMon} />
-              <MultiPick label="How will you promote it? (optional)" options={by.promotion} value={pro} onChange={setPro} />
-              {request && <TrafficNotice projectId={request.projectId}
-                methods={[...by.monetization.filter((o) => mon.includes(o.key)), ...by.promotion.filter((o) => pro.includes(o.key))]} />}
+              <MultiPick label={request?.kind === 'product'
+                ? '2. Where will you sell this?'
+                : 'Where will this go?'} options={by.destination} value={dest} onChange={setDest} />
+              {request?.kind === 'product' && <p className="text-xs text-muted-foreground">
+                Only your chosen outlets become steps. You can create the product first and choose selling outlets later.
+              </p>}
             </>
           )}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>How detailed should the work be?</Label>
-              <Select value={level} onValueChange={setLevel}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 · Lightweight</SelectItem>
-                  <SelectItem value="2">2 · Standard</SelectItem>
-                  <SelectItem value="3">3 · Detailed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="pl-money">Where should sales or leads go?</Label>
-              <Input id="pl-money" value={money} onChange={(e) => setMoney(e.target.value)} placeholder="e.g. Etsy shop" />
-            </div>
-          </div>
+          {request?.kind === 'product' ? (
+            <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+              <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-primary">
+                <ChevronDown className={'h-4 w-4 transition-transform ' + (showAdvanced ? 'rotate-180' : '')}/>
+                More options (optional)
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-3">
+                <MultiPick label="Audience or niche" options={nicheOpts} value={nicheIds} onChange={setNicheIds}/>
+                <MultiPick label="Ways to earn from this product" options={by.monetization} value={mon} onChange={setMon}/>
+                <MultiPick label="Ways to promote this product" options={by.promotion} value={pro} onChange={setPro}/>
+                <TrafficNotice projectId={request.projectId}
+                  methods={[...by.monetization.filter(o => mon.includes(o.key)), ...by.promotion.filter(o => pro.includes(o.key))]}/>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Level of detail</Label>
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 · Lightweight</SelectItem>
+                        <SelectItem value="2">2 · Standard</SelectItem>
+                        <SelectItem value="3">3 · Detailed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pl-money">Where should sales or leads go?</Label>
+                    <Input id="pl-money" value={money} onChange={e => setMoney(e.target.value)}
+                      placeholder="e.g. own online store"/>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : (
+            <>
+              {!fixedSteps && !methods.isError && (
+                <>
+                  <MultiPick label="How should this make money? (optional)" options={by.monetization} value={mon} onChange={setMon}/>
+                  <MultiPick label="How will you promote it? (optional)" options={by.promotion} value={pro} onChange={setPro}/>
+                  {request && <TrafficNotice projectId={request.projectId}
+                    methods={[...by.monetization.filter(o => mon.includes(o.key)), ...by.promotion.filter(o => pro.includes(o.key))]}/>}
+                </>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>How detailed should the work be?</Label>
+                  <Select value={level} onValueChange={setLevel}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 · Lightweight</SelectItem>
+                      <SelectItem value="2">2 · Standard</SelectItem>
+                      <SelectItem value="3">3 · Detailed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pl-money">Where should sales or leads go?</Label>
+                  <Input id="pl-money" value={money} onChange={e => setMoney(e.target.value)} placeholder="e.g. booking page"/>
+                </div>
+              </div>
+            </>
+          )}
         </div>
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
-          <Button onClick={submit} disabled={busy || methods.isLoading || methods.isError || (!fixedSteps && !validProduct)}>
+          <Button onClick={submit} disabled={busy || (!fixedSteps && (methods.isLoading || methods.isError || !validProduct))}>
             {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Create plan & open first step
           </Button>
         </DialogFooter>
