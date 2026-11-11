@@ -126,8 +126,8 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (options.length && !options.includes(channel)) setChannel(options[0]);
   }, [options, channel]);
   const accountUrl = (brandChannels.data ?? []).find(c => outlet(c.platform) === channel && c.url)?.url;
-  const matching = (placements.data ?? []).find(p => p.channel === channel &&
-    (p.account_label ?? '') === account.trim() && p.status !== 'published');
+  const matchingPlacements = (placements.data ?? []).filter(p => p.channel === channel &&
+    (p.account_label ?? '') === account.trim());
   const next = item ? nextStageForFormat(item.stage, item.format) : null;
   const assets = assetText.split('\n').map(v => v.trim()).filter(Boolean);
   const badAsset = assets.find(v => !linkValid(v));
@@ -155,7 +155,18 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (!item) return;
     // Publishing or scheduling requires a record with the platform and evidence.
     // Never advance either stage through the generic content-step button.
-    if (advance && next === 'scheduled') { setMode('schedule'); return; }
+    if (advance && next === 'scheduled') {
+      // Save the latest caption, script and media before opening the scheduler.
+      setBusy(true);
+      try {
+        if (!assets.length) throw new Error('Add the completed production file link before scheduling.');
+        await persistWork();
+        await refresh();
+        setMode('schedule');
+      } catch (e: any) { toast.error(e?.message ?? 'Could not save the post.'); }
+      finally { setBusy(false); }
+      return;
+    }
     if (advance && next === 'published') { setMode('publish'); return; }
     if (advance && item.stage === 'script' && !script.trim()) return toast.error('Write the script before advancing.');
     if (advance && ['record','edit','design','thumbnail'].includes(item.stage) && !assets.length)
@@ -183,10 +194,22 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   };
   const persistPlacement = async (values: Record<string, unknown>) => {
     if (!item) throw new Error('No post selected.');
-    if (matching) {
+    if (placements.isLoading || placements.isError) {
+      throw new Error('Publishing history could not be checked. Retry loading the records before saving.');
+    }
+    const targetStatus = String(values.status ?? 'draft');
+    // A new unconfirmed plan must never overwrite a confirmed external schedule.
+    // When publishing, promote the latest existing schedule instead of duplicating history.
+    const existing = targetStatus === 'published'
+      ? matchingPlacements.find(p => p.status === 'scheduled') ??
+        matchingPlacements.find(p => p.status === 'draft')
+      : matchingPlacements.find(p => p.status === 'draft');
+    if (existing) {
       const { data, error } = await T('content_placements').update(values)
-        .eq('id', matching.id).eq('project_id', projectId).select('id').maybeSingle();
-      if (error || !data) throw error ?? new Error('Placement update was refused.');
+        .eq('id', existing.id).eq('content_item_id', item.id)
+        .eq('project_id', projectId).eq('status', existing.status)
+        .select('id').maybeSingle();
+      if (error || !data) throw error ?? new Error('The publishing record changed or could not be updated.');
     } else {
       const { data, error } = await T('content_placements').insert({
         ...values, content_item_id: item.id, project_id: projectId,
@@ -198,6 +221,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (!item || !when) return toast.error('Choose a date and time.');
     const date = new Date(when);
     if (!Number.isFinite(date.valueOf())) return toast.error('Choose a valid date and time.');
+    if (date.valueOf() <= Date.now()) return toast.error('Scheduling needs a future date and time. For a post already live, use Record publication.');
     if (externalConfirmation && !item.approved_at) return toast.error('Approve the post before confirming scheduling.');
     if (externalConfirmation && !reference.trim()) return toast.error('Add the external scheduling confirmation or reference.');
     setBusy(true);
@@ -284,7 +308,12 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
               </Button>}
               {!item.approved_at && <Button disabled={busy || !canApprove(item)} variant="outline" onClick={approve}>Approve finished content</Button>}
             </div>
-            {!item.approved_at && !canApprove(item) && <p className="text-xs text-muted-foreground">Approval requires a quality score of at least 80 and no hard failures. Saving does not approve anything.</p>}
+            {!item.approved_at && !canApprove(item) && <div className="text-xs text-muted-foreground space-y-1">
+              <p>Approval requires a quality score of at least 80 and no hard failures. Saving does not approve anything.</p>
+              <p>Current score: {item.quality_score == null ? 'not scored' : item.quality_score + '/100'}.</p>
+              {(item.quality_fails ?? []).length > 0 &&
+                <p className="text-destructive">Fix before approval: {item.quality_fails!.join('; ')}</p>}
+            </div>}
             <p className="text-xs text-muted-foreground">Production route: {flowForFormat(item.format).map(s => STAGE_LABELS[s]).join(' → ')}</p>
           </div>}
           {(mode === 'schedule' || mode === 'publish') && <div className="space-y-3">
