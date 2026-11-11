@@ -5,7 +5,8 @@ import { useApp } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useNextTen, type NextTenRow } from '@/hooks/useNextTen';
+import type { NextTenRow } from '@/hooks/useNextTen';
+import { useBrandOperatorSteps } from '@/hooks/useBrandOperatorSteps';
 import { useBrandWorkSummary, useProjectJobs } from '@/hooks/useBrandWorkspace';
 import { useContentItems, type ContentItem } from '@/hooks/useContentItems';
 import { ContentItemDialog } from '@/components/content/ContentItemDialog';
@@ -21,7 +22,7 @@ export default function BrandManagerHome() {
   const id = selectedBar?.id || null;
   const name = selectedBar?.bar_name || 'Your brand';
   const section = params.get('tab') || 'today';
-  const next = useNextTen(id, name);
+  const next = useBrandOperatorSteps(id, name);
   const summary = useBrandWorkSummary(id);
   const jobs = useProjectJobs(id);
   const posts = useContentItems(id);
@@ -29,7 +30,7 @@ export default function BrandManagerHome() {
   const [editingPost, setEditingPost] = useState<ContentItem | null>(null);
   const [postDialog, setPostDialog] = useState(false);
 
-  const actions = (next.data?.rows ?? []).filter((row) => row.source === 'Action');
+  const actions = next.data?.rows ?? [];
   const first = actions[0];
   const upcoming = actions.slice(1, 4);
   const availableJobs = (jobs.data ?? []).filter((j) => j.status !== 'finished');
@@ -83,7 +84,7 @@ export default function BrandManagerHome() {
             </> :
             <div className="space-y-2 text-sm">
               <p>No actionable steps are available from the sources checked.</p>
-              {!!next.data?.unavailable.length && <p className="text-amber-600">Some sources could not be checked: {next.data.unavailable.join(', ')}.</p>}
+              {!!next.data?.blocked && <p className="text-amber-600">{next.data.blocked} assigned step(s) have unfinished prerequisites or are awaiting approval.</p>}
               <Button variant="outline" onClick={() => go('plan')}>Review my plan</Button>
             </div>}
         </CardContent>
