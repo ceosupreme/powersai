@@ -251,10 +251,13 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     }
     try {
       await complete.mutateAsync({ key: `action-${step.id}`, source: 'Action', refId: step.id, step: step.title, projectId: brand.id, projectName: brand.name, rank: 0 });
-      const refreshed = await stepsQuery.refetch();
+      const [refreshed, updatedJobs] = await Promise.all([stepsQuery.refetch(), jobsQuery.refetch()]);
       const current = refreshed.data ?? [];
+      const latestInactiveJobs = new Set((updatedJobs.data ?? [])
+        .filter(j => j.status === 'parked' || j.status === 'finished').map(j => j.id));
       const currentById = new Map(current.map(s => [s.id, s]));
       const candidates = current.filter(s =>
+        (!s.job_id || !latestInactiveJobs.has(s.job_id)) &&
         s.status !== 'Done' && s.approval_status === 'Approved' &&
         s.owner_kind === 'owner' &&
         (s.assignee_id === user.id || (!!fullName && s.assignee?.trim().toLowerCase() === fullName)) &&
