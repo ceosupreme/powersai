@@ -24,6 +24,9 @@ const empty = {
   title: "",
   format: "long_form",
   stage: "idea",
+  briefSummary: "",
+  script: "",
+  caption: "",
   hook: "",
   cta: "",
   primary_keyword: "",
@@ -47,6 +50,9 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
         title: item.title ?? "",
         format: item.format ?? "long_form",
         stage: item.stage ?? "idea",
+        briefSummary: typeof item.brief?.summary === 'string' ? item.brief.summary : '',
+        script: typeof item.brief?.script === 'string' ? item.brief.script : '',
+        caption: typeof item.brief?.caption === 'string' ? item.brief.caption : '',
         hook: item.hook ?? "",
         cta: item.cta ?? "",
         primary_keyword: item.primary_keyword ?? "",
@@ -84,6 +90,12 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       title: form.title.trim(),
       format: form.format || null,
       stage: form.stage,
+      brief: {
+        ...(item?.brief && !Array.isArray(item.brief) ? item.brief : {}),
+        summary: form.briefSummary.trim(),
+        script: form.script.trim(),
+        caption: form.caption.trim(),
+      },
       hook: form.hook || null,
       cta: form.cta || null,
       primary_keyword: form.primary_keyword || null,
@@ -145,6 +157,18 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Scheduling and publication are confirmed separately with a platform, date and live link. Changing an HQ stage does not post content.</p>
+          <div className="space-y-1">
+            <Label htmlFor="content-summary">Creative brief / summary</Label>
+            <Textarea id="content-summary" rows={3} value={form.briefSummary} onChange={(e) => set("briefSummary", e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="content-script">Script or talking points</Label>
+            <Textarea id="content-script" rows={7} value={form.script} onChange={(e) => set("script", e.target.value)} placeholder="Write or paste the actual script here…" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="content-caption">Caption / post copy</Label>
+            <Textarea id="content-caption" rows={4} value={form.caption} onChange={(e) => set("caption", e.target.value)} placeholder="Write the caption people will see…" />
+          </div>
           <div>
             <Label>Hook</Label>
             <Textarea rows={2} value={form.hook} onChange={(e) => set("hook", e.target.value)} />
