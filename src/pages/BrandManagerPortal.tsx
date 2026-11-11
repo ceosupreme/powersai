@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useCompleteNextTenRow } from '@/hooks/useNextTen';
+import { useBrandKitAssetsView } from '@/hooks/useBrandWorkspace';
+import { getSignedUrl } from '@/hooks/useBrandKit';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { BrandWeeklyNumbers } from '@/components/brand-workspace/BrandWeeklyNumbers';
 import { BrandProductPlans } from '@/components/brand-workspace/BrandProductPlans';
@@ -147,6 +149,24 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     },
     enabled: view === 'posts',
   });
+  const brandFiles = useBrandKitAssetsView(view === 'files' ? brand.id : null);
+  const [openingFile, setOpeningFile] = useState<string | null>(null);
+  const openBrandFile = async (storagePath: string) => {
+    setOpeningFile(storagePath);
+    try {
+      const url = await getSignedUrl(storagePath);
+      if (!url || !/^https?:\/\//.test(url)) throw new Error('The file has no valid download link.');
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Could not open this file.');
+    } finally { setOpeningFile(null); }
+  };
   const docsQuery = useQuery({
     queryKey: ['brand-manager-docs', brand.id],
     queryFn: async (): Promise<BrandDocument[]> => {
@@ -505,6 +525,31 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
 
     {view === 'files' && <section className="space-y-4">
       <div><h2 className="text-xl font-semibold">Files & documents</h2><p className="text-sm text-muted-foreground">Read this brand's reference documents without opening the full administrative library.</p></div>
+      {brandFiles.isLoading && <p className="text-sm text-muted-foreground">Loading this brand's files and links…</p>}
+      {brandFiles.isError && <p role="alert">Brand files could not be loaded. <Button variant="outline" size="sm" onClick={() => brandFiles.refetch()}>Try again</Button></p>}
+      {(brandFiles.data?.links ?? []).length > 0 && <Card className="p-4 space-y-3">
+        <h3 className="font-semibold">Your useful links and upload folders</h3>
+        <p className="text-xs text-muted-foreground">These are the brand's current saved links. Open them directly, rather than searching through old messages.</p>
+        <div className="space-y-2">
+          {(brandFiles.data?.links ?? []).filter((l: any) => /^https?:\/\//.test(l.url ?? '')).map((l: any) =>
+            <a key={l.id} href={l.url} target="_blank" rel="noreferrer" className="flex justify-between gap-3 items-center border rounded-md p-3 text-sm text-primary hover:bg-muted/40">
+              <span>{l.label || l.url}</span><ExternalLink className="h-4 w-4 shrink-0"/>
+            </a>)}
+        </div>
+      </Card>}
+      {(brandFiles.data?.assets ?? []).length > 0 && <Card className="p-4 space-y-3">
+        <h3 className="font-semibold">Saved brand files</h3>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {(brandFiles.data?.assets ?? []).map((a: any) =>
+            <button key={a.id} type="button" disabled={openingFile === a.storage_path}
+              onClick={() => openBrandFile(a.storage_path)}
+              className="text-left border rounded-md p-3 hover:border-primary">
+              <span className="font-medium text-sm block">{a.file_name}</span>
+              {a.description && <span className="text-xs block text-muted-foreground">{a.description}</span>}
+              <span className="text-xs text-primary">{openingFile === a.storage_path ? 'Opening…' : 'Open saved file'}</span>
+            </button>)}
+        </div>
+      </Card>}
       {docsQuery.isLoading && <p>Loading documents…</p>}
       {docsQuery.isError && <p role="alert">Documents could not be loaded. <Button onClick={() => docsQuery.refetch()}>Try again</Button></p>}
       {selectedDocument ? <div className="space-y-3">
