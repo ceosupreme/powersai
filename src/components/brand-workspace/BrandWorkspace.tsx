@@ -22,6 +22,7 @@ import {
 import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
+import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -652,49 +653,30 @@ function ProductsTab({ projectId }: { projectId: string }) {
 // ---------------- Content ----------------
 function ContentTab({ projectId }: { projectId: string }) {
   const { data = [], isLoading, isError, refetch } = useProductionBoardItems([projectId]);
-  const approve = useApproveItem();
-  const advance = useAdvanceStage();
-  const [batching, setBatching] = useState(false);
+  const [selectedWork, setSelectedWork] = useState<string | null>(null);
   if (isLoading) return <Loading />;
   if (isError) return <LoadError onRetry={() => refetch()} />;
-  if (!data.length) return <p className="text-sm text-muted-foreground">No content items for this brand yet.</p>;
-  const ready = data.filter((it) => !it.approved_at && (it.quality_score ?? 0) >= 80 && !(it.quality_fails ?? []).length);
-  const approveBatch = async () => {
-    setBatching(true);
-    let ok = 0, refused = 0;
-    for (const it of ready) {
-      try { await approve.mutateAsync(it.id); ok++; } catch { refused++; }
-    }
-    setBatching(false);
-    toast.success(`Approved ${ok}. Refused by the database: ${refused}.`);
-    refetch();
-  };
-  const onApprove = async (it: BoardItem) => {
-    if (!canApprove(it)) return;
-    try { await approve.mutateAsync(it.id); toast.success('Approved'); } catch (e: any) { toast.error(e?.message ?? 'Could not approve it'); }
-  };
-  const onMove = async (it: BoardItem) => {
-    const next = nextStageForFormat(it.stage, it.format);
-    if (next === it.stage) return toast.info('This one is already at the last step.');
-    try { await advance.mutateAsync({ id: it.id, stage: next }); toast.success(`Moved to ${STAGE_LABELS[next]}`); }
-    catch (e: any) { toast.error(e?.message ?? 'Could not move it'); }
-  };
   return (
     <div className="space-y-3">
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <p className="text-sm text-muted-foreground">{ready.length} ready to approve</p>
-      <Button size="sm" disabled={batching || ready.length === 0} onClick={approveBatch}>
-        {batching && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Approve batch
-      </Button>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-      {data.map((it) => (
-        <div key={it.id} className="space-y-1">
-          <p className="text-[11px] uppercase tracking-wide text-blue-600">{STAGE_LABELS[it.stage as keyof typeof STAGE_LABELS] ?? it.stage}</p>
-          <ProductionItemCard item={it} brandName="This brand" approving={approve.isPending} onApprove={onApprove} onMove={onMove} />
+      <p className="text-sm text-muted-foreground">
+        Open a post to read or edit its script, attach file links, approve the finished work,
+        and record actual scheduling or publication. Changing a label does not schedule a post.
+      </p>
+      {data.length === 0 ? <p className="text-sm text-muted-foreground">
+        No posts yet. Use Content to create one, or turn an audience question into a production plan.
+      </p> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {data.map(it => (
+            <ProductionItemCard
+              key={it.id}
+              item={it}
+              brandName="This brand"
+              onOpen={item => setSelectedWork(item.id)}
+            />
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+      <ContentWorkflowDialog projectId={projectId} itemId={selectedWork} onClose={() => setSelectedWork(null)} />
     </div>
   );
 }
