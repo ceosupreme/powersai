@@ -244,10 +244,23 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
         },
       });
       if (externalConfirmation) {
-        const { data, error } = await T('content_items')
-          .update({ stage: 'scheduled', scheduled_at: date.toISOString() })
-          .eq('id', item.id).eq('project_id', projectId).select('id').maybeSingle();
-        if (error || !data) throw error ?? new Error('Schedule recorded but the content stage update failed.');
+        // A post can be live on one channel while a second channel is scheduled.
+        // The channel-level placement records the new schedule; never downgrade
+        // an already published content item back to Scheduled.
+        if (item.stage !== 'published') {
+          const { data, error } = await T('content_items')
+            .update({ stage: 'scheduled', scheduled_at: date.toISOString() })
+            .eq('id', item.id).eq('project_id', projectId)
+            .neq('stage', 'published').select('id').maybeSingle();
+          if (error) throw error;
+          if (!data) {
+            const current = await T('content_items').select('stage')
+              .eq('id', item.id).eq('project_id', projectId).maybeSingle();
+            if (current.error || current.data?.stage !== 'published') {
+              throw current.error ?? new Error('Schedule saved, but the content stage could not be updated.');
+            }
+          }
+        }
         toast.success('Manual scheduling confirmation recorded. HQ did not post anything.');
       } else toast.success('Date saved as a plan only. Nothing was scheduled externally.');
       await refresh();
@@ -269,10 +282,22 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
         receipt: { source: 'manual', recorded_by: user?.id ?? null, recorded_at: now,
           intent: 'operator_confirmed_publication', live_url: liveUrl.trim() },
       });
-      const { data, error } = await T('content_items')
-        .update({ stage: 'published', published_at: now })
-        .eq('id', item.id).eq('project_id', projectId).select('id').maybeSingle();
-      if (error || !data) throw error ?? new Error('Live link was saved but stage update failed.');
+      // Record additional channels without erasing the original first-published
+      // timestamp. The per-channel placements remain the publication history.
+      if (item.stage !== 'published') {
+        const { data, error } = await T('content_items')
+          .update({ stage: 'published', published_at: now })
+          .eq('id', item.id).eq('project_id', projectId)
+          .neq('stage', 'published').select('id').maybeSingle();
+        if (error) throw error;
+        if (!data) {
+          const current = await T('content_items').select('stage')
+            .eq('id', item.id).eq('project_id', projectId).maybeSingle();
+          if (current.error || current.data?.stage !== 'published') {
+            throw current.error ?? new Error('Live link saved, but the content stage could not be updated.');
+          }
+        }
+      }
       toast.success('Live link recorded by you. It has not been independently verified.');
       await refresh();
     } catch (e: any) { toast.error(e?.message ?? 'Could not record publication.'); }
