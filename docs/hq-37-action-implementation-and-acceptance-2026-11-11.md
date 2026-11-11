@@ -15,7 +15,7 @@ Source: the agreed `HQ_Brand_Pages_Fix_Plan.pdf` pages 3–4 and `HQ_Combined_Re
 | 6 | Today — Setup wizard/Continue | Client/bar wizard only on client projects | `ProjectHome`, `BrandWorkspace` | Implemented | NOT RUN |
 | 7 | Accounts — Set up top 3 | Create needed plans, open the first, retain others | `SetupTab`, `BrandAccountSetup` | Implemented | NOT RUN |
 | 8 | Accounts — Set up one account | Create/resume account plan and open its first step | `startSetup`, `SetupTab`, `BrandAccountSetup` | Implemented | NOT RUN |
-| 9 | Accounts — Logo/fonts/colors setup | Open brand kit or relevant brand files | `SetupTab`, `BrandAccountSetup` | Partial: simple manager screen opens Files; actual brand-kit editing requires a separate eligible surface | NOT RUN |
+| 9 | Accounts — Logo/fonts/colors setup | Open brand kit or relevant files; add logos and images to the assigned brand | `SetupTab`, `BrandAccountSetup`, `BrandManagerFileUpload` | Partial: brand manager can now upload files; changing brand-kit fonts and colors remains in the dedicated editor | NOT RUN |
 | 10 | Accounts — Copy setup brief | Copy useful brand/setup guide with clear label | `SetupTab`, `BrandAccountSetup`, `buildSetupBrief` | Implemented | NOT RUN |
 | 11 | Accounts — Owner use of controls | Scoped account confirmation, later, skip, undo, brand type, stats | `BrandAccountSetup`, `useBrandSetup`, scoped RLS migration 214500 | Implemented; assigned-brand INSERT and cross-brand denial checked in rollback | NOT RUN |
 | 12 | Social accounts — Set up | Create/resume channel setup plan | `BrandWorkspace.ChannelDrawer` | Implemented | NOT RUN |
@@ -47,6 +47,7 @@ Source: the agreed `HQ_Brand_Pages_Fix_Plan.pdf` pages 3–4 and `HQ_Combined_Re
 
 ## Additional repaired paths not on the original button inventory
 
+- The brand-manager Files page has a focused upload control for logo, images and documents, using existing project-scoped Supabase object storage and brand_kit_assets RLS; it has no destructive delete/archive controls. Full kit font/color editing stays in the dedicated owner/admin kit editor.
 - Admin brand page can create and open an individual `content_items` draft in the same post editor.
 - Production Board has a Published tab and reports a count from records with a saved live URL rather than a stage label alone.
 - Manual posting plans cannot overwrite existing confirmed schedules. Duplicate manual schedule records for the same account/time and duplicate live links are blocked at the guided-editor level.
