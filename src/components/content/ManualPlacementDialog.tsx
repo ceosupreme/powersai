@@ -51,8 +51,17 @@ export function ManualPlacementDialog({ item, mode, onClose }: {
     setBusy(true);
     try {
       const T = (table: string) => (supabase as any).from(table);
-      const matching = (item.placements ?? []).find((p) => p.channel === channel);
-      const current = matching?.id ?? null;
+      // Re-check the database so retrying a partially saved action cannot create duplicates.
+      const { data: existing, error: lookupError } = await T('content_placements')
+        .select('id')
+        .eq('content_item_id', item.id)
+        .eq('project_id', item.project_id)
+        .eq('channel', channel)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lookupError) throw lookupError;
+      const current = existing?.id ?? null;
       const placementPatch = mode === 'schedule'
         ? { status: 'scheduled', scheduled_for: new Date(when).toISOString(), account_label: account.trim() || null }
         : { status: 'published', live_url: url, account_label: account.trim() || null };
