@@ -9,7 +9,7 @@ import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { fetchActionStatusMap, fetchInactiveJobIds, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
-import { isOwnerVisible } from '@/lib/ownerWork';
+import { isOwnerVisible, pipelineHref } from '@/lib/ownerWork';
 
 export interface WaitingRow {
   id: string;
@@ -23,6 +23,7 @@ export interface WaitingRow {
   detail: string | null;
   source: string | null;
   jobId: string | null;
+  sourceStepId: string | null;
   snoozed_until: string | null;
   projectId: string | null;
   projectName: string;
@@ -75,6 +76,13 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
         })
         .map((a) => {
           const projectId = (a.bar_id ?? a.venue_id) as string | null;
+          let helpFacts: Record<string, unknown> = {};
+          if (a.source === 'brand_help') {
+            try {
+              const parsed = typeof a.facts === 'string' ? JSON.parse(a.facts) : a.facts;
+              helpFacts = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch { /* Legacy non-JSON notes do not have a linked source step. */ }
+          }
           return {
             id: a.id as string,
             title: (a.title as string) ?? 'Untitled action',
@@ -86,13 +94,12 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             due_date: (a.due_date as string) ?? null,
             detail: (a.detail as string) ?? null,
             source: (a.source as string) ?? null,
-            jobId: (() => {
-              if (a.source !== 'brand_help') return (a.job_id as string) ?? null;
-              try {
-                const facts = typeof a.facts === 'string' ? JSON.parse(a.facts) : a.facts;
-                return typeof facts?.source_job_id === 'string' ? facts.source_job_id : null;
-              } catch { return null; }
-            })(),
+            jobId: a.source === 'brand_help'
+              ? (typeof helpFacts.source_job_id === 'string' ? helpFacts.source_job_id : null)
+              : (a.job_id as string) ?? null,
+            sourceStepId: a.source === 'brand_help'
+              ? (typeof helpFacts.source_step_id === 'string' ? helpFacts.source_step_id : null)
+              : (a.job_id ? a.id as string : null),
             snoozed_until: (a.snoozed_until as string) ?? null,
             projectId,
             projectName: (projectId && nameById.get(projectId)) || 'Project',
@@ -247,9 +254,15 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             {row.detail}
           </div>
         )}
-        {row.source === 'brand_help' && row.projectId && row.jobId && (
-          <Link className="mt-2 inline-flex text-sm text-primary underline" to={'/project/' + row.projectId + '/jobs/' + row.jobId}>
-            Open the related work
+        {row.projectId && row.jobId && (
+          <Link className="mt-2 inline-flex text-sm text-primary underline"
+            to={pipelineHref(row.projectId, row.jobId, row.sourceStepId)}>
+            Open the related step and instructions
+          </Link>
+        )}
+        {row.source === 'brand_help' && row.projectId && !row.jobId && (
+          <Link className="mt-2 inline-flex text-sm text-primary underline" to={`/project/${row.projectId}`}>
+            Open the related brand
           </Link>
         )}
         <div className="mt-2">
