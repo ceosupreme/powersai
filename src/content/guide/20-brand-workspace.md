@@ -21,20 +21,20 @@ The brand header sits at the top:
 - "Ultimate goal": one line saying what winning looks like for this brand.
 - A small line under the goal with the brand's money model, when one is recorded. It cannot be changed here.
 - A live badge. It reads "LIVE — capturing leads" when the brand's go-live steps are finished, or "Go-live" with a count such as 3/5 when they are not. Next to it is the percent "fully configured" and a thin progress bar.
-- A "Setup wizard" button on the right. It opens the step-by-step setup wizard for the go-live steps, such as lead capture.
+- The go-live setup wizard and its lead-capture configuration are for client projects; an internal brand uses its Accounts to set up tab instead.
 
 On the Supreme Team Media brand only, a "Website, last 7 days" card follows the header, with "Page views", "CTA clicks", "Call requests", "First-response rate", "Inquiries by industry" and orders from the last 30 days.
 
 Below the header is the tab row. On a phone it scrolls sideways, so swipe it left to reach the later tabs.
-- "Overview": the brand at a glance, with headline numbers, what is waiting on you, the brand's Next 10, its scores and recent activity.
-- "Setup": the map of every account and asset this brand should have, what is in place, and what is still to set up.
-- "Channels": every social account, site and store on file, with follower numbers, posting targets and STALE warnings.
-- "Avenues": the brand's money avenues (the ways it can earn), which ones are on, and what each is worth per hour of your time.
-- "Products": the products linked to this brand, their listings, and a way to start making them.
-- "Content": every content piece for this brand, with approvals.
-- "Intel": research, meaning the niche profile, the audience's top pains and scored idea briefs.
-- "Playbooks": the written playbooks this brand relies on and how complete they are.
-- "Assets": brand kit files and links, brand documents and shared plans.
+- "Today": the brand at a glance, with headline numbers, what is waiting on you, the brand's Next 10, its scores and recent activity.
+- "Accounts to set up": the map of every account and asset this brand should have, what is in place, and what is still to set up.
+- "Social accounts": every social account, site and store on file, with follower numbers, posting targets and STALE warnings.
+- "Ways to make money": the brand's money avenues (the ways it can earn), which ones are on, and what each is worth per hour of your time.
+- "What you sell": the products linked to this brand, their listings, and a way to start making them.
+- "Posts and videos": every content piece for this brand, with approvals.
+- "What your audience asks": research, meaning the niche profile, the audience's top pains and scored idea briefs.
+- "How-to guides": the written playbooks this brand relies on and how complete they are.
+- "Files and documents": brand kit files and links, brand documents and shared plans.
 
 ## How to use it
 
