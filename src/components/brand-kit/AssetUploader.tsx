@@ -86,8 +86,10 @@ export function AssetUploader({
                 <span>{fmtBytes(a.file_size)}</span>
               </div>
               <Button variant="ghost" size="sm" disabled={a.asset_type === 'logo'} onClick={async () => {
-                const { error } = await supabase.from('brand_kit_assets').update({ asset_type: 'logo' }).eq('id', a.id);
-                if (error) return toast.error(error.message);
+                const { data, error } = await supabase.from('brand_kit_assets')
+                  .update({ asset_type: 'logo' }).eq('id', a.id).eq('kit_id', kitId)
+                  .select('id').maybeSingle();
+                if (error || !data) return toast.error(error?.message ?? 'The file could not be marked as a logo. Check your access.');
                 await qc.invalidateQueries({ queryKey: ['brand-assets', kitId] });
                 toast.success('Marked as logo. Refresh the foundation audit to update its check.');
               }}>{a.asset_type === 'logo' ? 'Brand logo' : 'Use as logo'}</Button>
