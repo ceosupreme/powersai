@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { ChevronDown, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProjectKpis, useProjectKpiValues, useUpsertProjectKpiValue } from '@/hooks/useProjectKpis';
@@ -23,6 +26,19 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
   const week = currentWeekRange().week_start;
   const values = useProjectKpiValues(projectId, week);
   const save = useUpsertProjectKpiValue();
+  const linkedPlans = useQuery({
+    queryKey: ['brand-goal-plans', projectId],
+    enabled: open,
+    queryFn: async (): Promise<{ id: string; title: string; status: string; goal_pillar_key: string | null; goal_kpi_key: string | null }[]> => {
+      const { data, error } = await (supabase as any).from('production_jobs')
+        .select('id,title,status,goal_pillar_key,goal_kpi_key')
+        .eq('project_id', projectId)
+        .not('goal_kpi_key', 'is', null)
+        .order('created_at', { ascending: false }).limit(150);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const manual = (defs.data ?? []).filter(d => d.source === 'manual');
   const byGroup = [...new Set(manual.map(d => d.pillar_key))].sort();
 
@@ -74,6 +90,8 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
               {manual.filter(d => d.pillar_key === group).map(def => {
                 const key = def.pillar_key + ':' + def.kpi_key;
                 const recorded = (values.data ?? []).find(v => v.pillar_key === def.pillar_key && v.kpi_key === def.kpi_key);
+                const plans = (linkedPlans.data ?? []).filter(p =>
+                  p.goal_pillar_key === def.pillar_key && p.goal_kpi_key === def.kpi_key);
                 return <div className="p-3 space-y-2" key={key}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -87,6 +105,16 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
                       {recorded?.actual == null ? 'Enter' : 'Update'}
                     </Button>}
                   </div>
+                  {plans.length > 0 && <div className="rounded-md bg-muted/40 px-3 py-2 space-y-1">
+                    <p className="text-xs font-semibold">Work plans supporting this number</p>
+                    {plans.slice(0, 3).map(plan => <Link key={plan.id}
+                      className="block text-xs text-primary underline underline-offset-2"
+                      to={`/project/${projectId}/jobs/${plan.id}`}>
+                      {plan.title} · {plan.status === 'finished' ? 'Finished' : plan.status === 'parked' ? 'Parked' : 'In progress'}
+                    </Link>)}
+                    {plans.length > 3 && <p className="text-xs text-muted-foreground">{plans.length - 3} more linked plans</p>}
+                    <p className="text-xs text-muted-foreground">These plans target this metric; they do not prove the result was achieved.</p>
+                  </div>}
                   {editing === key && <div className="space-y-2">
                     <Input type="number" inputMode="decimal" step={def.direction === 'checklist' ? '1' : 'any'} value={draft} onChange={e => setDraft(e.target.value)}
                       aria-label={def.kpi_label} placeholder={def.direction === 'checklist' ? '0 or 1' : 'Actual number'}/>
