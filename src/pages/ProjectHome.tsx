@@ -81,8 +81,10 @@ export default function ProjectHome() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [websiteStats, setWebsiteStats] = useState<WebsiteStats | null>(null);
 
-  // Only admins and owners can operate the setup wizard.
-  const canRunWizard = isAdmin || currentRole === 'owner';
+  // The legacy go-live wizard is only for client businesses, not internal
+  // brands. Both admin and owner roles still work on actual client projects.
+  const isClientProject = meta?.project_type === CLIENT_PROJECT_TYPE;
+  const canRunWizard = isClientProject && (isAdmin || currentRole === 'owner');
 
   useEffect(() => {
     if (!venueId) return;
@@ -434,14 +436,14 @@ export default function ProjectHome() {
               )}
             </div>
           )}
-          <div className="pt-2">
+          {isClientProject && <div className="pt-2">
             <VenueLiveBadge
               isLive={live.isLive}
               phase3Pct={live.phase3Pct}
               requiredDone={live.requiredDone}
               requiredTotal={live.requiredTotal}
             />
-          </div>
+          </div>}
         </div>
         {canRunWizard && (
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
@@ -504,20 +506,15 @@ export default function ProjectHome() {
               )}
             </>
           }
-          setup={
-            <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-between">
-                  <span>Setup</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${setupOpen ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4 space-y-6">{setupBlocks}</CollapsibleContent>
-            </Collapsible>
-          }
+          // Personal-brand setup is handled inside "Accounts to set up".
+          // Client go-live forms, capture links and email switches must never
+          // appear inside an internal brand workspace.
+          setup={null}
         />
-      ) : (
+      ) : isClientProject ? (
         setupBlocks
+      ) : (
+        <p className="text-sm text-muted-foreground">This project does not use the client onboarding wizard.</p>
       )}
 
       {canRunWizard && wizardOpen && venueId && (
