@@ -26,7 +26,7 @@ Date: 2026-11-11 (America/Los_Angeles)
 - `supabase/migrations/`: 220 tracked migration files at inspection.
 - `supabase/functions/`: 121 top-level function/shared directories at inspection.
 
-## Production backup gate — BLOCKED pending verified database access
+## Production backup gate — targeted snapshots exported and verified
 
 Required BEFORE applying ANY database migration or RLS change:
 1. Export tables used by the upgrade to a secured independent backup, including `user_roles`, `user_venue_roles`, `user_bar_assignments`, `role_page_defaults`, `user_page_permissions`, `venues`, `production_jobs`, `action_items`, `content_items`, `content_placements`, `channel_products`, `channel_product_channels`, `knowledge_base`, `brand_channels`, `venue_foundation_item_status`, and all other dependent tables found by schema inspection.
@@ -35,6 +35,12 @@ Required BEFORE applying ANY database migration or RLS change:
 4. Save a clear database restoration procedure, not just backups of copies in the same production instance.
 5. Ensure a brand manager can read/write only authorized brand records and that other brand and admin records are refused by RLS.
 6. Store backups outside the public GitHub repository, with access restricted to the operator.
+
+## Recovery references
+- Restricted source schema: `hq_recovery_20261111` (public-table metadata and targeted operational rows; excludes secrets and auth passwords).
+- Independent private backup: Google Drive folder `STM HQ - Recovery snapshots` (folder ID `1S8KMrBC9xJGMljmaktmWEmL6x412Sl-k`; owner-only). Manifest includes exact sorted JSONL row counts and MD5 values.
+- All 16 Google Drive backup files were verified by raw document readback. Do not share backup links publicly or put their data in this public repository.
+- Restore-format check: `role_page_defaults` deserialized as native typed records in read-only SQL and matched its original MD5 for 59 rows.
 
 ## Execution and automation compatibility
 
@@ -72,8 +78,8 @@ The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pag
 
 ## Blockers / decisions
 
-- [BLOCKED] Lovable project and database connector returned internal error. No live DB backup or RLS snapshot yet.
-- [OPEN] Verify independent backup and sample restore.
+- [RESOLVED] Lovable connector restored. Backed up 33 operational tables (including the discovered `venue_assignments` membership table) and six schema-definition datasets to restricted `hq_recovery_20261111` within Supabase and to a private Google Drive recovery folder.
+- [CHECKED] Independent private Google Drive export: 16 documents (one manifest and 15 data/schema parts), each verified against its source text, with folder confirmed owner-only. Tested typed read-only deserialization of role_page_defaults: 59 rows and MD5 match. This is a targeted rollback archive, NOT a full disaster-recovery backup of auth credentials, storage objects or secrets. Full nonproduction data restoration remains untested.
 - [OPEN] Assign Jenna to approved brands after permissions are verified.
 - [OPEN] Confirm Big Paws email list setup, Amazon Associates status and paid-call booking/payment decision before data cleanup.
 - [OPEN] Approve exact overdue-task changes before editing any dates or statuses.
@@ -81,4 +87,4 @@ The detailed 37-action inventory remains the baseline checklist in `HQ_Brand_Pag
 
 ## Milestone gate
 
-Milestone 0 is **in progress, not passed**. Source branch isolation and inventory begun; database backup is still outstanding. No migration, authorization change, production data cleanup, merge or publish is authorized by this control record.
+Milestone 0's code baseline, targeted data snapshot, external export and schema/RLS capture are **complete and verified**. Automated-run dependency inventory, read/write RLS simulations, and a complete nonproduction restore are still open before any live permission migration, merge or publish. No migration, authorization change, production data cleanup, merge or publish is authorized by this control record.
