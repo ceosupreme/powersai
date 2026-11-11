@@ -184,12 +184,12 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     setHelpBusy(true);
     try {
       const { error } = await (supabase as any).from('action_items').insert({
-        bar_id: brand.id, venue_id: brand.id, job_id: selectedStep.job_id,
+        bar_id: brand.id, venue_id: brand.id,
         title: `${helpKind === 'blocked' ? 'Help needed' : 'Change requested'}: ${selectedStep.title}`,
         detail: helpNote.trim(), source: 'brand_help', status: 'Open',
         approval_status: 'Proposed', priority: 'P2-High', is_manual: true,
         owner_kind: 'owner', assignee: 'Allmighty', created_by_id: user.id,
-        facts: JSON.stringify({ source_step_id: selectedStep.id, requested_by: user.id, request_kind: helpKind }),
+        facts: JSON.stringify({ source_step_id: selectedStep.id, source_job_id: selectedStep.job_id, requested_by: user.id, request_kind: helpKind }),
       });
       if (error) throw error;
       toast.success('Your request is saved for administrator review.');
