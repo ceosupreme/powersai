@@ -257,9 +257,20 @@ export function useDeleteAsset(kitId: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (asset: BrandAsset) => {
-      await supabase.storage.from(BRAND_BUCKET).remove([asset.storage_path]);
-      const { error } = await supabase.from('brand_kit_assets').delete().eq('id', asset.id);
-      if (error) throw error;
+      if (!kitId || asset.kit_id !== kitId) {
+        throw new Error('The file is not part of the selected brand kit.');
+      }
+      // Storage API deletion can be refused (e.g. the file belongs to another
+      // uploader). Never remove the visible metadata or report success then.
+      const { error: storageError } = await supabase.storage.from(BRAND_BUCKET)
+        .remove([asset.storage_path]);
+      if (storageError) throw storageError;
+      const { data, error } = await supabase.from('brand_kit_assets')
+        .delete().eq('id', asset.id).eq('kit_id', kitId)
+        .select('id').maybeSingle();
+      if (error || !data) {
+        throw error ?? new Error('The storage file was removed, but its HQ record could not be removed. Refresh and ask an administrator to reconcile it.');
+      }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['brand-assets', kitId] }),
     onError: (e: any) => toast.error(e.message ?? 'Delete failed'),
