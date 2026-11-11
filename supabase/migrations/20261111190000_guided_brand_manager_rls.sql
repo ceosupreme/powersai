@@ -69,9 +69,9 @@ CREATE POLICY "Brand manager can update exclusive products"
   USING (public.user_can_edit_brand_product(id))
   WITH CHECK (public.user_can_edit_brand_product(id));
 
--- Keep the existing link-table SELECT policy for this milestone.
--- It is broader than desired; change it only after client/staff regression tests
--- demonstrate no dependent screens rely on its current behavior.
+-- Product-link SELECT is scoped separately by the following migration:
+-- 20261111192500_scope_product_link_reads.sql.
+-- Verify client/staff product-link dependencies and authorization before release.
 
 DROP POLICY IF EXISTS "Brand manager can record content placements" ON public.content_placements;
 CREATE POLICY "Brand manager can record content placements"
