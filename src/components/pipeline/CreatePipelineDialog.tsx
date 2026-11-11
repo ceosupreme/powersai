@@ -15,6 +15,7 @@ import {
 } from '@/lib/pipelineComposer';
 
 import { TrafficNotice } from './TrafficNotice';
+import { useProjectKpis } from '@/hooks/useProjectKpis';
 
 const T = (t: string) => (supabase as any).from(t);
 
@@ -32,6 +33,7 @@ export interface PipelineRequest {
   promotion?: string[];
   laneItemKey?: string | null;
   channelMethodId?: string | null;
+  goalText?: string | null;
 }
 
 interface MethodOpt {
@@ -95,6 +97,17 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const methods = useMethodOptions(open);
+  const kpis = useProjectKpis(request?.projectId ?? null);
+  const brandGoal = useQuery({
+    queryKey: ['pipeline-composer', 'brand-goal', request?.projectId],
+    enabled: open && !!request?.projectId,
+    queryFn: async () => {
+      const { data, error } = await T('venues')
+        .select('name,north_star').eq('id', request!.projectId).maybeSingle();
+      if (error) throw error;
+      return data as { name: string; north_star: string | null } | null;
+    },
+  });
   const channels = useQuery({
     queryKey: ['pipeline-composer', 'channels', request?.projectId],
     enabled: open,
@@ -112,6 +125,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   const [pro, setPro] = useState<string[]>([]);
   const [level, setLevel] = useState('2');
   const [money, setMoney] = useState('');
+  const [goalChoice, setGoalChoice] = useState('brand');
+  const [goalFree, setGoalFree] = useState('');
   const [nicheIds, setNicheIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [seeded, setSeeded] = useState(false);
@@ -119,9 +134,11 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
   useEffect(() => {
     if (!request) { setSeeded(false); return; }
     setTitle(request.title); setProductType(request.productType ?? ''); setLevel('2'); setMoney('');
+    setGoalChoice(request.goalText ? 'custom' : 'brand');
+    setGoalFree(request.goalText ?? '');
     // Do not silently add a sales channel or monetization playbook to product plans.
-    setMon(request.monetization ?? (request.kind === 'content' ? ['lead_magnet', 'affiliate'] : []));
-    setPro(request.promotion ?? (request.kind === 'content' ? ['post_to_lead_magnet'] : []));
+    setMon(request.monetization ?? []);
+    setPro(request.promotion ?? []);
     setDest(request.destinations ?? []);
   }, [request]);
 
@@ -177,6 +194,11 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
     }
     setBusy(true);
     try {
+      const selectedKpi = (kpis.data ?? []).find(k => goalChoice === 'kpi:' + k.pillar_key + ':' + k.kpi_key);
+      const chosenGoal = selectedKpi
+        ? 'Improve ' + selectedKpi.kpi_label + (selectedKpi.target == null ? '' : ' toward ' + selectedKpi.target.toLocaleString())
+        : goalChoice === 'brand' ? brandGoal.data?.north_star ?? null
+          : goalChoice === 'custom' ? goalFree.trim() || null : null;
       const keep = (ks: string[], opts: MethodOpt[]) => ks.filter((k) => opts.some((o) => o.key === k));
       const { jobId, recipe } = await composePipeline({
         new_content: request.newContent,
@@ -187,6 +209,9 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
         monetization: fixedSteps ? [] : keep(mon, by.monetization),
         promotion: fixedSteps ? [] : keep(pro, by.promotion),
         level: Number(level), money_destination: money.trim() || null,
+        goal_text: chosenGoal,
+        goal_pillar_key: selectedKpi?.pillar_key ?? null,
+        goal_kpi_key: selectedKpi?.kpi_key ?? null,
         lane_item_key: request.laneItemKey ?? null, channel_method_id: request.channelMethodId ?? null,
         niche_ids: nicheIds.filter((id) => nicheOpts.some((o) => o.id === id)),
       });
