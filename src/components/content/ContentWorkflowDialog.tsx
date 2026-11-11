@@ -224,6 +224,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (date.valueOf() <= Date.now()) return toast.error('Scheduling needs a future date and time. For a post already live, use Record publication.');
     if (externalConfirmation && !item.approved_at) return toast.error('Approve the post before confirming scheduling.');
     if (externalConfirmation && !reference.trim()) return toast.error('Add the external scheduling confirmation or reference.');
+    if (externalConfirmation && matchingPlacements.some(p => p.status === 'scheduled' && p.scheduled_for === date.toISOString())) {
+      return toast.error('This date and account already have a confirmed scheduling record.');
+    }
     setBusy(true);
     try {
       const now = new Date().toISOString();
@@ -251,6 +254,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   const publish = async () => {
     if (!item || !linkValid(liveUrl.trim())) return toast.error('Add the real public link to the live post.');
     if (!item.approved_at) return toast.error('Approve the post before recording publication.');
+    if (matchingPlacements.some(p => p.status === 'published' && p.live_url === liveUrl.trim())) {
+      return toast.error('This live link is already recorded for this account. Open the existing publishing record instead.');
+    }
     setBusy(true);
     try {
       const now = new Date().toISOString();
