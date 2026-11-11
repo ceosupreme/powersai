@@ -112,11 +112,14 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     setScript(str(v.script));
     setCaption(str(v.caption));
     setAssetText(assetLines(v.asset_urls).join('\n'));
+  }, [item?.id, item?.updated_at]);
+  // Refetching saved post text must not silently close the schedule or publish step.
+  useEffect(() => {
     setMode('work');
     setExternalConfirmation(false);
     setReference('');
     setLiveUrl('');
-  }, [item?.id, item?.updated_at]);
+  }, [item?.id]);
 
   const options = useMemo(() => {
     const live = new Set((brandChannels.data ?? []).filter(c => c.status === 'live').map(c => outlet(c.platform)));
