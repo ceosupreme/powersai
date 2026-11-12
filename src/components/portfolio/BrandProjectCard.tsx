@@ -77,6 +77,10 @@ export function BrandProjectCard({
         )}
       </div>
 
+      {data.overall != null && <p className="text-xs text-muted-foreground mb-2">
+        Weekly score from HQ's tracked measures—not an overall judgment of the business.
+        Open the brand for the measurements and next steps.
+      </p>}
       <ScoreDataStatus coverage={data.coverage} className="mb-3" />
 
       {channels && (
