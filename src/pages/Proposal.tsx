@@ -4,6 +4,7 @@ import { ArrowRight, Check, FileDown, Mail, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
+import { BookingCta } from "@/components/marketing/BookingCta";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import { getProposal, hlsFor, isVideoFile, PROPOSAL_REDIRECTS, toEmbedUrl, type ProposalRecord } from "@/content/proposals";
 import { getPackageProposal } from "@/content/packageProposals";
@@ -128,6 +129,9 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
             <p className="proposal-program-name">{p.title}</p>
             <h1 className="proposal-title">{p.headline.map((line, i) => <span key={i} className={i === p.headline.length - 1 ? "proposal-title-accent" : undefined}>{line}</span>)}</h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
+            <div className="proposal-booking-cta">
+              <BookingCta src="proposal-intro-call" biz={p.client.company} className="proposal-booking-btn" />
+            </div>
 
             {(embed || videoFile) && (
               <div className="proposal-video">
@@ -434,6 +438,7 @@ function ProposalView({ proposal: p }: { proposal: ProposalRecord }) {
                 ))}
               </ol>
               <div className="proposal-side-actions">
+                <BookingCta src="proposal-review" biz={p.client.company} className="proposal-booking-btn" />
                 <a href={`mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.client.company}: proposal review`)}&body=${encodeURIComponent("I would like to review the program together. Please send a few available times.")}`} onClick={() => track("proposal_review")}>
                   <Mail aria-hidden size={18} /> Arrange a quick proposal review
                 </a>
