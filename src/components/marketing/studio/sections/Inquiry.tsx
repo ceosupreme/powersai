@@ -331,7 +331,7 @@ export function Inquiry({ servicePage, source, section, scene }: { servicePage?:
             <p className="mt-7 text-[1.15rem] leading-relaxed text-muted-foreground">
                {pageCopy?.intro ?? "We’ve built brands and websites since 2002, from North County San Diego. Tell us about the business and we’ll reply personally within one business day."}
             </p>
-             {servicePage && <div className="mt-7"><BookingCta src={pageCopy?.src} /></div>}
+             <div className="mt-7"><BookingCta src={pageCopy?.src ?? 'site-contact'} /></div>
             <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-[1rem] underline underline-offset-4">
               {CONTACT_EMAIL}
             </a>
