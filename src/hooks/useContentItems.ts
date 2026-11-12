@@ -51,7 +51,13 @@ export function useContentItemMutations(projectId: string | null | undefined) {
   const qc = useQueryClient();
   const { user } = useAuth();
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: key(projectId) });
+  const invalidate = () => Promise.all([
+    qc.invalidateQueries({ queryKey: key(projectId) }),
+    qc.invalidateQueries({ queryKey: ["production-board-items"] }),
+    qc.invalidateQueries({ queryKey: ["brand-manager-posts", projectId] }),
+    qc.invalidateQueries({ queryKey: ["brand-workspace"] }),
+    qc.invalidateQueries({ queryKey: ["brand-work-summary"] }),
+  ]);
 
   const create = useMutation({
     mutationFn: async (input: Partial<NewContentItem> & { title: string }) => {
@@ -79,6 +85,7 @@ export function useContentItemMutations(projectId: string | null | undefined) {
         .from("content_items" as any)
         .update(patch as any)
         .eq("id", id)
+        .eq("project_id", projectId)
         .select("*")
         .single();
       if (error) throw error;
@@ -89,8 +96,11 @@ export function useContentItemMutations(projectId: string | null | undefined) {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("content_items" as any).delete().eq("id", id);
+      if (!projectId) throw new Error("No project selected.");
+      const { data, error } = await supabase.from("content_items" as any)
+        .delete().eq("id", id).eq("project_id", projectId).select("id").maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("The content item was not removed. Check your access and selected project.");
     },
     onSuccess: invalidate,
   });
