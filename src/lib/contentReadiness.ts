@@ -18,6 +18,7 @@ export interface ReadinessContent {
 }
 
 const TEXT_FORMATS = new Set(['article', 'email', 'community']);
+const SOCIAL_FORMATS = new Set(['reel', 'short', 'carousel', 'post', 'story', 'pin']);
 
 function briefRecord(brief: unknown): Record<string, unknown> {
   if (brief && typeof brief === 'object' && !Array.isArray(brief)) return brief as Record<string, unknown>;
@@ -63,8 +64,11 @@ export function contentDeliveryGaps(item: ReadinessContent): string[] {
       ? 'Attach the finished printable file (not a cover or preview)'
       : 'Attach a link to the finished production file');
   }
-  if (item.purpose_type === 'offer' && !nonempty(item.cta) && !nonempty(brief.cta)) {
+  const hasCta = nonempty(item.cta) || nonempty(brief.cta);
+  if (item.purpose_type === 'offer' && !hasCta) {
     gaps.push('Add the offer call to action');
+  } else if (SOCIAL_FORMATS.has(format) && !hasCta && brief.cta_not_needed !== true) {
+    gaps.push('Add a call to action or confirm one is intentionally unnecessary');
   }
   return gaps;
 }
@@ -87,11 +91,7 @@ export function contentApprovalLabel(item: ReadinessContent): string {
 
 /** Missing CTA is useful production guidance even for non-offer posts. */
 export function contentQualityHints(item: ReadinessContent): string[] {
-  const brief = briefRecord(item.brief);
   const hints = contentDeliveryGaps(item);
-  if (!nonempty(item.cta) && !nonempty(brief.cta) && item.purpose_type !== 'offer') {
-    hints.push('CTA not recorded — add one if this post should drive an action');
-  }
   if ((item.quality_fails ?? []).length) hints.push(...(item.quality_fails ?? []));
   return hints;
 }

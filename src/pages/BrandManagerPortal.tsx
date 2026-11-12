@@ -510,7 +510,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
           <select className="w-full rounded-md border bg-background px-3 py-2" value={newPostFormat} onChange={e => setNewPostFormat(e.target.value)}>
             <option value="short">Short video or Reel</option>
             <option value="long_form">Long video</option>
-            <option value="post">Social post or graphic</option>
+            <option value="community">Text-only social post</option>
+            <option value="post">Graphic social post</option>
             <option value="article">Article or blog post</option>
             <option value="email">Email</option>
           </select>
