@@ -682,7 +682,8 @@ function ContentTab({ projectId }: { projectId: string }) {
             value={draftFormat} onChange={e => setDraftFormat(e.target.value)}>
             <option value="short">Short video or Reel</option>
             <option value="long_form">Long-form video</option>
-            <option value="post">Social post or graphic</option>
+            <option value="community">Text-only social post</option>
+            <option value="post">Graphic social post</option>
             <option value="article">Article or blog post</option>
             <option value="email">Email</option>
           </select>
