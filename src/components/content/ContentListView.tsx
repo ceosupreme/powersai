@@ -1,13 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  ContentStage,
   FORMAT_LABELS,
-  STAGES,
   STAGE_LABELS,
 } from "./contentStages";
 import { ContentItem, useContentItemMutations } from "@/hooks/useContentItems";
@@ -16,18 +13,11 @@ interface Props {
   items: ContentItem[];
   projectId: string;
   onEdit: (item: ContentItem) => void;
+  onOpenWorkflow: (item: ContentItem) => void;
 }
 
-export function ContentListView({ items, projectId, onEdit }: Props) {
-  const { update, remove } = useContentItemMutations(projectId);
-
-  const changeStage = async (id: string, stage: string) => {
-    try {
-      await update.mutateAsync({ id, patch: { stage } });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed");
-    }
-  };
+export function ContentListView({ items, projectId, onEdit, onOpenWorkflow }: Props) {
+  const { remove } = useContentItemMutations(projectId);
 
   const onDelete = async (id: string) => {
     if (!confirm("Delete this content item?")) return;
@@ -68,14 +58,7 @@ export function ContentListView({ items, projectId, onEdit }: Props) {
                 {it.format ? (FORMAT_LABELS as any)[it.format] ?? it.format : "—"}
               </TableCell>
               <TableCell>
-                <Select value={it.stage} onValueChange={(v) => changeStage(it.id, v)}>
-                  <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STAGES.map((s) => (
-                      <SelectItem key={s} value={s}>{STAGE_LABELS[s as ContentStage]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Badge variant="outline">{STAGE_LABELS[it.stage as keyof typeof STAGE_LABELS] ?? it.stage}</Badge>
               </TableCell>
               <TableCell className="text-sm">{it.due_date ?? "—"}</TableCell>
               <TableCell className="space-x-1">
@@ -83,7 +66,10 @@ export function ContentListView({ items, projectId, onEdit }: Props) {
                 {it.is_monetized && <Badge variant="secondary">Monetized</Badge>}
               </TableCell>
               <TableCell className="text-right">
-                <Button size="icon" variant="ghost" onClick={() => onEdit(it)}>
+                <Button size="sm" variant="outline" className="mr-1" onClick={() => onOpenWorkflow(it)}>
+                  Open work
+                </Button>
+                <Button size="icon" variant="ghost" aria-label="Edit content details" onClick={() => onEdit(it)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="ghost" onClick={() => onDelete(it.id)}>
