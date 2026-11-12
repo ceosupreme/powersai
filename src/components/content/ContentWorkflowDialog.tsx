@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { nextStageForFormat, flowForFormat, STAGE_LABELS } from './contentStages';
 import { canApprove, useApproveItem } from '@/hooks/useContentProduction';
+import { contentApprovalLabel, contentDeliveryGaps, contentQualityHints } from '@/lib/contentReadiness';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 type Mode = 'work' | 'schedule' | 'publish';
 type WorkItem = {
   id: string; title: string; format: string | null; stage: string;
-  brief: unknown; hook: string | null; cta: string | null;
+  brief: unknown; hook: string | null; cta: string | null; purpose_type: string | null;
   approved_at: string | null; quality_score: number | null;
   quality_fails: string[] | null; updated_at: string;
 };
@@ -61,6 +62,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   const [title, setTitle] = useState('');
   const [script, setScript] = useState('');
   const [caption, setCaption] = useState('');
+  const [ctaText, setCtaText] = useState('');
   const [assetText, setAssetText] = useState('');
   const [channel, setChannel] = useState('instagram');
   const [account, setAccount] = useState('');
@@ -74,7 +76,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     enabled: !!itemId,
     queryFn: async (): Promise<WorkItem> => {
       const { data, error } = await T('content_items')
-        .select('id,title,format,stage,brief,hook,cta,approved_at,quality_score,quality_fails,updated_at')
+        .select('id,title,format,stage,brief,hook,cta,purpose_type,approved_at,quality_score,quality_fails,updated_at')
         .eq('id', itemId).eq('project_id', projectId).maybeSingle();
       if (error) throw error;
       if (!data) throw new Error('This post is not available in the selected brand.');
@@ -111,6 +113,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     setTitle(item.title);
     setScript(str(v.script));
     setCaption(str(v.caption));
+    setCtaText(item.cta ?? '');
     setAssetText(assetLines(v.asset_urls).join('\n'));
   }, [item?.id, item?.updated_at]);
   // Refetching saved post text must not silently close the schedule or publish step.
@@ -151,7 +154,8 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (!item || !title.trim()) throw new Error('This post needs a title.');
     if (badAsset) throw new Error('The production file link is invalid: ' + badAsset);
     const { data, error } = await T('content_items')
-      .update({ title: title.trim(), brief: { ...brief, script, caption, asset_urls: assets } })
+      .update({ title: title.trim(), cta: ctaText.trim() || null,
+        brief: { ...brief, script, caption, asset_urls: assets } })
       .eq('id', item.id).eq('project_id', projectId).select('id').maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('The post could not be saved with your permissions.');
@@ -217,7 +221,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   };
   const approve = async () => {
     if (!item) return;
-    if (!canApprove(item)) return toast.error('Approval requires quality 80 or higher and no hard failures.');
+    if (!canApprove(item)) return toast.error('Finish the production work and resolve the quality issues shown below before approving.');
     setBusy(true);
     try { await approval.mutateAsync(item.id); await refresh(); toast.success('Content approved.'); }
     catch (e: any) { toast.error(e?.message ?? 'Could not approve.'); }
@@ -254,6 +258,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (!Number.isFinite(date.valueOf())) return toast.error('Choose a valid date and time.');
     if (date.valueOf() <= Date.now()) return toast.error('Scheduling needs a future date and time. For a post already live, use Record publication.');
     if (externalConfirmation && !item.approved_at) return toast.error('Approve the post before confirming scheduling.');
+    if (externalConfirmation && contentDeliveryGaps(item).length) {
+      return toast.error('This post is not ready to schedule: ' + contentDeliveryGaps(item).join('; '));
+    }
     if (externalConfirmation && !reference.trim()) return toast.error('Add the external scheduling confirmation or reference.');
     if (externalConfirmation && matchingPlacements.some(p => p.status === 'scheduled' && p.scheduled_for === date.toISOString())) {
       return toast.error('This date and account already have a confirmed scheduling record.');
@@ -298,6 +305,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   const publish = async () => {
     if (!item || !linkValid(liveUrl.trim())) return toast.error('Add the real public link to the live post.');
     if (!item.approved_at) return toast.error('Approve the post before recording publication.');
+    if (contentDeliveryGaps(item).length) {
+      return toast.error('Finish the production work first: ' + contentDeliveryGaps(item).join('; '));
+    }
     if (matchingPlacements.some(p => p.status === 'published' && p.live_url === liveUrl.trim())) {
       return toast.error('This live link is already recorded for this account. Open the existing publishing record instead.');
     }
@@ -343,8 +353,8 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
         : item ? <div className="space-y-4">
           <div className="flex gap-2 flex-wrap">
             <Badge variant="outline">{STAGE_LABELS[item.stage as keyof typeof STAGE_LABELS] ?? item.stage}</Badge>
-            <Badge>{item.approved_at ? 'Approved' : 'Needs approval'}</Badge>
-            <Badge variant="outline">Quality {item.quality_score ?? 'Not scored'}</Badge>
+            <Badge variant="outline">{contentApprovalLabel(item)}</Badge>
+            <Badge variant="outline">Concept quality {item.quality_score == null ? 'Not scored' : `${item.quality_score}/100`}</Badge>
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button variant={mode === 'work' ? 'default' : 'outline'} size="sm" disabled={busy} onClick={() => void openMode('work')}>Create & edit</Button>
@@ -355,12 +365,16 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
             <label className="block space-y-1"><Label>Title</Label><Input value={title} onChange={e => setTitle(e.target.value)}/></label>
             <label className="block space-y-1"><Label>Script or main text</Label><Textarea rows={8} value={script} onChange={e => setScript(e.target.value)}/></label>
             <label className="block space-y-1"><Label>Caption</Label><Textarea rows={4} value={caption} onChange={e => setCaption(e.target.value)}/></label>
+            <label className="block space-y-1"><Label>Call to action (if this should drive a response)</Label>
+              <Input value={ctaText} onChange={e => setCtaText(e.target.value)}
+                placeholder="e.g. Book your spot, download the guide, ask for details"/>
+            </label>
             <label className="block space-y-1"><Label>Production file links (one per line)</Label>
               <Textarea rows={3} value={assetText} onChange={e => setAssetText(e.target.value)} placeholder="https://..."/>
               <span className="block text-xs text-muted-foreground">Links to existing files; this form does not upload media.</span>
             </label>
             {item.hook && <p className="text-xs"><strong>Hook:</strong> {item.hook}</p>}
-            {item.cta && <p className="text-xs"><strong>Call to action:</strong> {item.cta}</p>}
+            {item.cta && <p className="text-xs"><strong>Saved call to action:</strong> {item.cta}</p>}
             <div className="flex gap-2 flex-wrap">
               <Button disabled={busy} onClick={() => saveWork()}>{busy && <Loader2 className="h-4 w-4 mr-2 animate-spin"/>}Save work</Button>
               {next && next !== item.stage && <Button disabled={busy} variant="outline" onClick={() => saveWork(true)}>
@@ -370,11 +384,14 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
               </Button>}
               {!item.approved_at && <Button disabled={busy || !canApprove(item)} variant="outline" onClick={approve}>Approve finished content</Button>}
             </div>
-            {!item.approved_at && !canApprove(item) && <div className="text-xs text-muted-foreground space-y-1">
-              <p>Approval requires a quality score of at least 80 and no hard failures. Saving does not approve anything.</p>
-              <p>Current score: {item.quality_score == null ? 'not scored' : item.quality_score + '/100'}.</p>
-              {(item.quality_fails ?? []).length > 0 &&
-                <p className="text-destructive">Fix before approval: {item.quality_fails!.join('; ')}</p>}
+            {!canApprove(item) && item.stage !== 'published' && <div className="rounded-md border p-3 text-xs space-y-2">
+              <p className="font-semibold">What needs to be finished?</p>
+              <p>A quality score of at least 80 means the concept passed review. It does not mean the finished file is ready.</p>
+              <ul className="list-disc pl-4 space-y-1">
+                {contentQualityHints(item).map((reason, i) => <li key={i}>{reason}</li>)}
+                {(item.quality_score ?? 0) < 80 && <li>Raise the recorded quality score to at least 80/100</li>}
+              </ul>
+              <p>Save your finished work, then approve it. Existing concept approvals remain in history.</p>
             </div>}
             <p className="text-xs text-muted-foreground">Production route: {flowForFormat(item.format).map(s => STAGE_LABELS[s]).join(' → ')}</p>
           </div>}

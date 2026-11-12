@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import type { BoardItem } from '@/hooks/useContentProduction';
 import { FORMAT_LABELS, STAGE_LABELS } from './contentStages';
+import { contentApprovalLabel, contentQualityHints, contentDeliveryGaps } from '@/lib/contentReadiness';
 
 /**
  * A production card describes progress; it never changes the content stage on
@@ -14,6 +15,8 @@ export function ProductionItemCard({ item, brandName, onOpen }: {
   brandName: string;
   onOpen: (item: BoardItem) => void;
 }) {
+  const missing = item.stage === 'published' ? [] : contentQualityHints(item);
+  const approvedForRelease = item.approved_at && contentDeliveryGaps(item).length === 0;
   return (
     <Card className="bg-card text-card-foreground border-border">
       <CardContent className="p-5 space-y-3">
@@ -31,14 +34,18 @@ export function ProductionItemCard({ item, brandName, onOpen }: {
         {item.due_date && <p className="text-xs text-muted-foreground">Due {item.due_date.slice(0, 10)}</p>}
         {item.family?.title && <p className="text-xs text-muted-foreground">{item.family.title}</p>}
         <div className="flex flex-wrap gap-2 text-xs">
-          <Badge variant={item.approved_at ? 'default' : 'outline'}>
-            {item.approved_at ? 'Approved' : 'Not approved'}
+          <Badge variant={approvedForRelease ? 'default' : 'outline'}>
+            {contentApprovalLabel(item)}
           </Badge>
-          <Badge variant="secondary">Quality {item.quality_score ?? 'Not scored'}</Badge>
+          <Badge variant="secondary">Concept quality {item.quality_score == null ? 'Not scored' : `${item.quality_score}/100`}</Badge>
         </div>
-        {(item.quality_fails ?? []).length > 0 && <p className="text-xs text-destructive">
-          Fix before approval: {(item.quality_fails ?? []).join(', ')}
-        </p>}
+        {missing.length > 0 && <div className="rounded-md bg-muted/40 p-2 text-xs text-muted-foreground space-y-1">
+          <p className="font-medium text-foreground">To finish this piece:</p>
+          <ul className="list-disc pl-4 space-y-0.5">
+            {missing.slice(0, 3).map((reason, i) => <li key={i}>{reason}</li>)}
+          </ul>
+          {missing.length > 3 && <p>{missing.length - 3} other items need attention</p>}
+        </div>}
         {item.placements.length > 0 ? <div className="text-xs text-muted-foreground space-y-1">
           {item.placements.map(p => <p key={p.id}>
             {p.channel}{p.account_label ? ' · ' + p.account_label : ''}:
