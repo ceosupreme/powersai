@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { STAGES, STAGE_LABELS, FORMATS, FORMAT_LABELS } from "./contentStages";
+import { STAGE_LABELS, FORMATS, FORMAT_LABELS } from "./contentStages";
 import { ContentItem, useContentItemMutations } from "@/hooks/useContentItems";
 import { ContentItemLinkedTasks } from "./ContentItemLinkedTasks";
 import { ContentAutomationRuns } from "./ContentAutomationRuns";
@@ -70,14 +70,9 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       toast.error("Title is required");
       return;
     }
-    if (['scheduled','published'].includes(form.stage) && form.stage !== item?.stage) {
-      toast.error('Record external scheduling or the real live link in Open Work, not by changing a stage label.');
-      return;
-    }
     const payload: any = {
       title: form.title.trim(),
       format: form.format || null,
-      stage: form.stage,
       hook: form.hook || null,
       cta: form.cta || null,
       primary_keyword: form.primary_keyword || null,
@@ -89,10 +84,11 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
     };
     try {
       if (item) {
+        // This dialog edits metadata. The production workflow owns all stage transitions.
         await update.mutateAsync({ id: item.id, patch: payload });
         toast.success("Content item updated");
       } else {
-        await create.mutateAsync(payload);
+        await create.mutateAsync({ ...payload, stage: 'idea' });
         toast.success("Content item created");
       }
       onOpenChange(false);
@@ -126,18 +122,12 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
             </div>
             <div>
               <Label>Production stage</Label>
-              <Select value={form.stage} disabled={item?.stage === 'published' || item?.stage === 'scheduled'}
-                onValueChange={(v) => set("stage", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {STAGES.filter(stage => !['scheduled','published'].includes(stage) || stage === item?.stage)
-                    .map(stage => (
-                      <SelectItem key={stage} value={stage}>{STAGE_LABELS[stage]}</SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              <div className="rounded-md border px-3 py-2 text-sm">
+                {item ? (STAGE_LABELS[item.stage as keyof typeof STAGE_LABELS] ?? item.stage) : 'Idea'}
+              </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Scheduling and publishing require platform confirmation in Open Work.
+                Use Open work to advance, approve, schedule, or record a live post.
+                This form edits content details only.
               </p>
             </div>
           </div>
