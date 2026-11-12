@@ -357,6 +357,7 @@ export default function PortfolioOverview() {
   const { accessibleBars, setSelectedBar, selectedWeek } = useApp();
   const { venues, gmRankings, isLoading } = usePortfolioData();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [revenueProjectId, setRevenueProjectId] = useState('none');
   const [group, setGroup] = useState<PortfolioGroup>('brands');
   const { data: directory = [], isError: directoryError, refetch: refetchDirectory } = useProjectDirectory();
 
@@ -538,6 +539,18 @@ export default function PortfolioOverview() {
     navigate(`/project/${projectId}`);
   }
 
+  function handleRecordRevenue(projectId: string) {
+    const matchingBar = accessibleBars.find(bar => bar.id === projectId);
+    if (!matchingBar) {
+      // The direct revenue page requires a project selected in AppContext.
+      // Do not silently open an empty revenue screen.
+      handleProjectDrillIn(projectId);
+      return;
+    }
+    setSelectedBar(matchingBar);
+    navigate('/channel-revenue');
+  }
+
   if (selectedSingleBar) {
     return (
       <OwnerBarDetail
@@ -589,7 +602,12 @@ export default function PortfolioOverview() {
                 {portfolioStats.revenueChangePct >= 0 ? '+' : ''}{formatPercent(portfolioStats.revenueChangePct)} vs last week
               </p>
             ) : (
-              <p className="text-sm text-muted-foreground">Awaiting data</p>
+              group === 'brands' ? (
+                <button type="button" className="text-sm text-primary underline underline-offset-2"
+                  onClick={() => document.getElementById('portfolio-revenue')?.scrollIntoView({ behavior: 'smooth' })}>
+                  No earnings entered — choose a brand below to record them
+                </button>
+              ) : <p className="text-sm text-muted-foreground">Awaiting data</p>
             )}
           </div>
 
@@ -795,12 +813,32 @@ export default function PortfolioOverview() {
       </section>
 
       {group === 'brands' && (
-        <section>
-          <h2 className="text-lg font-semibold text-foreground mb-4">Revenue this month by project</h2>
+        <section id="portfolio-revenue">
+          <h2 className="text-lg font-semibold text-foreground mb-2">Revenue this month by project</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            Only recorded income appears here. Missing entries do not mean a brand made no sales.
+            Select a brand to record real payments, affiliate earnings, or other received income.
+          </p>
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <Select value={revenueProjectId} onValueChange={setRevenueProjectId}>
+              <SelectTrigger className="w-full sm:w-[260px]" aria-label="Brand to record revenue for">
+                <SelectValue placeholder="Choose a brand"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Choose a brand</SelectItem>
+                {activeCards.map(card => <SelectItem key={card.id} value={card.id}>{card.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <button type="button" disabled={revenueProjectId === 'none'} 
+              className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              onClick={() => handleRecordRevenue(revenueProjectId)}>
+              Record actual income
+            </button>
+          </div>
           <div className="bg-card border border-border rounded-lg divide-y divide-border">
             {monthRevenueRows.length === 0 ? (
               <p className="p-4 text-sm text-muted-foreground">
-                No revenue recorded for this month yet.
+                No earnings have been entered for this month. Use the brand selector above to record an actual payment.
               </p>
             ) : (
               monthRevenueRows.map((row) => (
