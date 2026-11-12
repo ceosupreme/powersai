@@ -70,6 +70,10 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       toast.error("Title is required");
       return;
     }
+    if (['scheduled','published'].includes(form.stage) && form.stage !== item?.stage) {
+      toast.error('Record external scheduling or the real live link in Open Work, not by changing a stage label.');
+      return;
+    }
     const payload: any = {
       title: form.title.trim(),
       format: form.format || null,
@@ -80,8 +84,6 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
       affiliate_link: form.affiliate_link || null,
       product_id: form.product_id || null,
       due_date: form.due_date || null,
-      scheduled_at: form.scheduled_at ? new Date(form.scheduled_at).toISOString() : null,
-      published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
       is_repurposed: !!form.is_repurposed,
       is_monetized: !!form.is_monetized,
     };
@@ -123,15 +125,20 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
               </Select>
             </div>
             <div>
-              <Label>Stage</Label>
-              <Select value={form.stage} onValueChange={(v) => set("stage", v)}>
+              <Label>Production stage</Label>
+              <Select value={form.stage} disabled={item?.stage === 'published' || item?.stage === 'scheduled'}
+                onValueChange={(v) => set("stage", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {STAGES.map((s) => (
-                    <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>
-                  ))}
+                  {STAGES.filter(stage => !['scheduled','published'].includes(stage) || stage === item?.stage)
+                    .map(stage => (
+                      <SelectItem key={stage} value={stage}>{STAGE_LABELS[stage]}</SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Scheduling and publishing require platform confirmation in Open Work.
+              </p>
             </div>
           </div>
           <div>
@@ -164,19 +171,12 @@ export function ContentItemDialog({ open, onOpenChange, projectId, item }: Props
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label>Due Date</Label>
-              <Input type="date" value={form.due_date} onChange={(e) => set("due_date", e.target.value)} />
-            </div>
-            <div>
-              <Label>Scheduled</Label>
-              <Input type="datetime-local" value={form.scheduled_at} onChange={(e) => set("scheduled_at", e.target.value)} />
-            </div>
-            <div>
-              <Label>Published</Label>
-              <Input type="datetime-local" value={form.published_at} onChange={(e) => set("published_at", e.target.value)} />
-            </div>
+          <div className="space-y-1">
+            <Label>Due date</Label>
+            <Input type="date" value={form.due_date} onChange={(e) => set("due_date", e.target.value)} />
+            <p className="text-xs text-muted-foreground">
+              Actual scheduling and publication dates are saved through the production workflow with platform evidence.
+            </p>
           </div>
           <div className="flex gap-6">
             <label className="flex items-center gap-2 text-sm">
