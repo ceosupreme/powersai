@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronDown, Mail, Minus, Plus, Printer } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { trackSiteEvent } from "@/lib/studioAnalytics";
 import { getStudioMedia } from "@/config/studioMedia";
+import { BookingCta } from "@/components/marketing/BookingCta";
 import { useStudioHead } from "@/components/marketing/studio/useStudioHead";
 import type { CompareCell, PackagePlan, PackageProposalRecord, PlanId } from "@/content/packageProposals";
 import { hlsFor, isVideoFile, toEmbedUrl } from "@/content/proposals";
@@ -125,6 +126,9 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
             </h1>
             <p className="proposal-subtitle">{p.subtitle}</p>
             <p className="pp-promise">{p.promise}</p>
+            <div className="proposal-booking-cta">
+              <BookingCta src="package-proposal-intro-call" biz={p.client.company} className="proposal-booking-btn" />
+            </div>
             {(embed || videoFile) && (
               <div className="proposal-video pp-video">
                 {videoFile ? (
@@ -496,6 +500,7 @@ export default function PackageProposalView({ proposal: p }: { proposal: Package
                 {p.start.items.map((item, i) => <li key={i}><span>{i + 1}</span>{item}</li>)}
               </ol>
               <div className="proposal-side-actions">
+                <BookingCta src="package-proposal-review" biz={p.client.company} className="proposal-booking-btn" />
                 <a href={`mailto:${p.preparedBy.email}?subject=${encodeURIComponent(`${p.client.company}: review the plan`)}&body=${encodeURIComponent("I would like to review the packages together. Please send a few available times.")}`} onClick={() => track("proposal_review")}>
                   <Mail aria-hidden size={18} /> Review the plan with us
                 </a>
