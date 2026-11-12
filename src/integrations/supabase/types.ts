@@ -2056,7 +2056,10 @@ export type Database = {
           amount: number
           created_at: string
           created_by: string | null
+          entry_source: string | null
+          evidence_url: string | null
           id: string
+          lane_item_key: string | null
           period_month: string
           product_id: string | null
           project_id: string
@@ -2068,7 +2071,10 @@ export type Database = {
           amount?: number
           created_at?: string
           created_by?: string | null
+          entry_source?: string | null
+          evidence_url?: string | null
           id?: string
+          lane_item_key?: string | null
           period_month: string
           product_id?: string | null
           project_id: string
@@ -2080,7 +2086,10 @@ export type Database = {
           amount?: number
           created_at?: string
           created_by?: string | null
+          entry_source?: string | null
+          evidence_url?: string | null
           id?: string
+          lane_item_key?: string | null
           period_month?: string
           product_id?: string | null
           project_id?: string
@@ -2998,6 +3007,142 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      crew_http_calls: {
+        Row: {
+          crew_key: string
+          error: string | null
+          request_id: number
+          requested_at: string
+          resolved_at: string | null
+          status_code: number | null
+          timed_out: boolean | null
+        }
+        Insert: {
+          crew_key: string
+          error?: string | null
+          request_id: number
+          requested_at?: string
+          resolved_at?: string | null
+          status_code?: number | null
+          timed_out?: boolean | null
+        }
+        Update: {
+          crew_key?: string
+          error?: string | null
+          request_id?: number
+          requested_at?: string
+          resolved_at?: string | null
+          status_code?: number | null
+          timed_out?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_http_calls_crew_key_fkey"
+            columns: ["crew_key"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      crew_runs: {
+        Row: {
+          created_at: string
+          crew_key: string
+          details: Json
+          done: string | null
+          finished_at: string
+          flagged: string | null
+          id: string
+          started_at: string | null
+          status: string
+          tried: string | null
+        }
+        Insert: {
+          created_at?: string
+          crew_key: string
+          details?: Json
+          done?: string | null
+          finished_at?: string
+          flagged?: string | null
+          id?: string
+          started_at?: string | null
+          status: string
+          tried?: string | null
+        }
+        Update: {
+          created_at?: string
+          crew_key?: string
+          details?: Json
+          done?: string | null
+          finished_at?: string
+          flagged?: string | null
+          id?: string
+          started_at?: string | null
+          status?: string
+          tried?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_runs_crew_key_fkey"
+            columns: ["crew_key"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      crews: {
+        Row: {
+          active: boolean
+          calls_function: string | null
+          created_at: string
+          cron_jobname: string | null
+          key: string
+          kind: string
+          max_gap: string
+          name: string
+          report_to: string | null
+          schedule_text: string
+          sort_order: number
+          trigger_id: string | null
+          updated_at: string
+          what_it_does: string | null
+        }
+        Insert: {
+          active?: boolean
+          calls_function?: string | null
+          created_at?: string
+          cron_jobname?: string | null
+          key: string
+          kind: string
+          max_gap: string
+          name: string
+          report_to?: string | null
+          schedule_text: string
+          sort_order?: number
+          trigger_id?: string | null
+          updated_at?: string
+          what_it_does?: string | null
+        }
+        Update: {
+          active?: boolean
+          calls_function?: string | null
+          created_at?: string
+          cron_jobname?: string | null
+          key?: string
+          kind?: string
+          max_gap?: string
+          name?: string
+          report_to?: string | null
+          schedule_text?: string
+          sort_order?: number
+          trigger_id?: string | null
+          updated_at?: string
+          what_it_does?: string | null
+        }
+        Relationships: []
       }
       crm_companies: {
         Row: {
@@ -8896,6 +9041,9 @@ export type Database = {
           created_at: string
           created_by: string
           current_step: number | null
+          goal_kpi_key: string | null
+          goal_pillar_key: string | null
+          goal_text: string | null
           id: string
           kind: string
           level: number
@@ -8917,6 +9065,9 @@ export type Database = {
           created_at?: string
           created_by?: string
           current_step?: number | null
+          goal_kpi_key?: string | null
+          goal_pillar_key?: string | null
+          goal_text?: string | null
           id?: string
           kind: string
           level?: number
@@ -8938,6 +9089,9 @@ export type Database = {
           created_at?: string
           created_by?: string
           current_step?: number | null
+          goal_kpi_key?: string | null
+          goal_pillar_key?: string | null
+          goal_text?: string | null
           id?: string
           kind?: string
           level?: number
@@ -12565,6 +12719,122 @@ export type Database = {
           },
         ]
       }
+      trend_watch: {
+        Row: {
+          captured_on: string
+          content_item_id: string | null
+          created_at: string
+          data: Json
+          direction: string
+          geo: string
+          id: string
+          keyword: string
+          notes: string | null
+          peak_months: string[] | null
+          search_cost: number
+          season_opens: string | null
+          source: string
+          timeframe: string
+          venue_id: string | null
+          yoy_pct: number | null
+        }
+        Insert: {
+          captured_on?: string
+          content_item_id?: string | null
+          created_at?: string
+          data?: Json
+          direction?: string
+          geo?: string
+          id?: string
+          keyword: string
+          notes?: string | null
+          peak_months?: string[] | null
+          search_cost?: number
+          season_opens?: string | null
+          source: string
+          timeframe?: string
+          venue_id?: string | null
+          yoy_pct?: number | null
+        }
+        Update: {
+          captured_on?: string
+          content_item_id?: string | null
+          created_at?: string
+          data?: Json
+          direction?: string
+          geo?: string
+          id?: string
+          keyword?: string
+          notes?: string | null
+          peak_months?: string[] | null
+          search_cost?: number
+          season_opens?: string | null
+          source?: string
+          timeframe?: string
+          venue_id?: string | null
+          yoy_pct?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trend_watch_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trend_watch_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "trend_watch_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "trend_watch_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trend_watch_requests: {
+        Row: {
+          content_item_id: string | null
+          created_at: string
+          geo: string
+          keyword: string
+          request_id: number
+          source: string
+          venue_id: string | null
+        }
+        Insert: {
+          content_item_id?: string | null
+          created_at?: string
+          geo?: string
+          keyword: string
+          request_id: number
+          source: string
+          venue_id?: string | null
+        }
+        Update: {
+          content_item_id?: string | null
+          created_at?: string
+          geo?: string
+          keyword?: string
+          request_id?: number
+          source?: string
+          venue_id?: string | null
+        }
+        Relationships: []
+      }
       user_bar_assignments: {
         Row: {
           bar_id: string
@@ -15476,6 +15746,30 @@ export type Database = {
       }
     }
     Functions: {
+      brand_setup_summaries: {
+        Args: { p_venue_ids: string[] }
+        Returns: {
+          brand: string | null
+          extra_on_file: number | null
+          gaps: number | null
+          in_place: number | null
+          later: number | null
+          missing: number | null
+          needed_count: number | null
+          needs_access: number | null
+          planned: number | null
+          setup_gate: string | null
+          setup_score: number | null
+          skipped: number | null
+          venue_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "v_brand_setup_summary"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       can_view_log_type: {
         Args: {
           _log_type: Database["public"]["Enums"]["log_type"]
@@ -15496,6 +15790,34 @@ export type Database = {
           p_window_seconds: number
         }
         Returns: Json
+      }
+      crew_http_harvest: { Args: never; Returns: number }
+      crew_status: {
+        Args: never
+        Returns: {
+          crew_key: string
+          crew_kind: string
+          crew_name: string
+          due_by: string
+          failures_7d: number
+          last_done: string
+          last_finished_at: string
+          last_flagged: string
+          last_started_at: string
+          last_status: string
+          last_tried: string
+          problem: string
+          report_to: string
+          runs_7d: number
+          schedule: string
+          sort_order: number
+          state: string
+          what_it_does: string
+        }[]
+      }
+      crew_track_request: {
+        Args: { p_crew: string; p_request_id: number }
+        Returns: number
       }
       get_grade: {
         Args: { score: number }
@@ -15532,6 +15854,10 @@ export type Database = {
       hq_create_pipeline: {
         Args: { p_job: Json; p_new_content?: Json; p_steps: Json }
         Returns: string
+      }
+      hq_dispatch_edge_function: {
+        Args: { p_body?: Json; p_function: string }
+        Returns: number
       }
       hq_finish_automation_send: {
         Args: {
@@ -15622,6 +15948,18 @@ export type Database = {
         Args: { _channel_id: string; _user_id: string }
         Returns: boolean
       }
+      log_crew_run: {
+        Args: {
+          p_crew: string
+          p_details?: Json
+          p_done?: string
+          p_flagged?: string
+          p_started_at?: string
+          p_status: string
+          p_tried?: string
+        }
+        Returns: string
+      }
       net_http_post: {
         Args: { body_json?: string; headers_json?: string; url: string }
         Returns: number
@@ -15640,6 +15978,12 @@ export type Database = {
           parent_id: string
         }[]
       }
+      trend_urlencode: { Args: { t: string }; Returns: string }
+      trend_watch_collect: {
+        Args: { p_autocomplete?: boolean }
+        Returns: number
+      }
+      trend_watch_ingest: { Args: never; Returns: Json }
       unlock_public_audit_once: {
         Args: {
           p_email: string
@@ -15663,6 +16007,11 @@ export type Database = {
         Args: { _automation_key: string; _project_id: string }
         Returns: boolean
       }
+      user_can_edit_brand_product: {
+        Args: { _product_id: string }
+        Returns: boolean
+      }
+      user_can_manage_brand: { Args: { _project_id: string }; Returns: boolean }
       user_can_manage_project: {
         Args: { _project_id: string }
         Returns: boolean
