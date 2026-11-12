@@ -63,6 +63,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   const [script, setScript] = useState('');
   const [caption, setCaption] = useState('');
   const [ctaText, setCtaText] = useState('');
+  const [noCtaNeeded, setNoCtaNeeded] = useState(false);
   const [assetText, setAssetText] = useState('');
   const [channel, setChannel] = useState('instagram');
   const [account, setAccount] = useState('');
@@ -114,6 +115,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     setScript(str(v.script));
     setCaption(str(v.caption));
     setCtaText(item.cta ?? '');
+    setNoCtaNeeded(v.cta_not_needed === true);
     setAssetText(assetLines(v.asset_urls).join('\n'));
   }, [item?.id, item?.updated_at]);
   // Refetching saved post text must not silently close the schedule or publish step.
@@ -155,7 +157,8 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
     if (badAsset) throw new Error('The production file link is invalid: ' + badAsset);
     const { data, error } = await T('content_items')
       .update({ title: title.trim(), cta: ctaText.trim() || null,
-        brief: { ...brief, script, caption, asset_urls: assets } })
+        brief: { ...brief, script, caption, asset_urls: assets,
+          cta_not_needed: noCtaNeeded && !ctaText.trim() && item.purpose_type !== 'offer' } })
       .eq('id', item.id).eq('project_id', projectId).select('id').maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('The post could not be saved with your permissions.');
@@ -366,9 +369,19 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
             <label className="block space-y-1"><Label>Script or main text</Label><Textarea rows={8} value={script} onChange={e => setScript(e.target.value)}/></label>
             <label className="block space-y-1"><Label>Caption</Label><Textarea rows={4} value={caption} onChange={e => setCaption(e.target.value)}/></label>
             <label className="block space-y-1"><Label>Call to action (if this should drive a response)</Label>
-              <Input value={ctaText} onChange={e => setCtaText(e.target.value)}
-                placeholder="e.g. Book your spot, download the guide, ask for details"/>
+              <Input value={ctaText} onChange={e => {
+                setCtaText(e.target.value);
+                if (e.target.value.trim()) setNoCtaNeeded(false);
+              }} placeholder="e.g. Book your spot, download the guide, ask for details"/>
             </label>
+            {item.purpose_type !== 'offer' && ['reel','short','carousel','post','story','pin'].includes(item.format ?? '') && (
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" className="mt-0.5" checked={noCtaNeeded}
+                  disabled={!!ctaText.trim()}
+                  onChange={e => setNoCtaNeeded(e.target.checked)} />
+                No call to action is intentionally needed for this piece.
+              </label>
+            )}
             <label className="block space-y-1"><Label>Production file links (one per line)</Label>
               <Textarea rows={3} value={assetText} onChange={e => setAssetText(e.target.value)} placeholder="https://..."/>
               <span className="block text-xs text-muted-foreground">Links to existing files; this form does not upload media.</span>
