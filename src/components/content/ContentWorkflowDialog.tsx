@@ -392,7 +392,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
                 {(item.quality_score ?? 0) < 80 && <li>Raise the recorded quality score to at least 80/100</li>}
               </ul>
               <p>Save your finished work, then approve it. Existing concept approvals remain in history.</p>
-            </div>
+            </div>}
             <p className="text-xs text-muted-foreground">Production route: {flowForFormat(item.format).map(s => STAGE_LABELS[s]).join(' → ')}</p>
           </div>}
           {(mode === 'schedule' || mode === 'publish') && <div className="space-y-3">
