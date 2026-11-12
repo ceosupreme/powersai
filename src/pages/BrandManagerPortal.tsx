@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Plus, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,11 @@ import { Badge } from '@/components/ui/badge';
 import { BusinessPathTab, pathStageTitle } from '@/components/brand-workspace/BusinessPathTab';
 import { useBusinessPath } from '@/hooks/useBusinessPath';
 import { PATH_STATUSES, isPathDone } from '@/lib/businessPath';
+
+const PORTAL_TABS = [
+  { key: 'today', label: 'Today' }, { key: 'plan', label: 'My plan' },
+  { key: 'posts', label: 'Posts & videos' }, { key: 'files', label: 'Files' },
+] as const;
 
 type Step = {
   id: string; title: string; detail: string | null; facts: string | null;
@@ -359,6 +364,12 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
         </label>}
       </div>
       {brand.north_star && <p className="flex items-start gap-2 text-sm text-muted-foreground"><Target className="h-4 w-4 mt-0.5 shrink-0" /> Goal: {brand.north_star}</p>}
+      <nav aria-label="Brand workspace views" className="flex flex-wrap gap-2 pt-2">
+        {PORTAL_TABS.map(t => <Button key={t.key} type="button" size="sm" className="min-h-11"
+          variant={view === t.key ? 'default' : 'outline'} aria-current={view === t.key ? 'page' : undefined}
+          onClick={() => go(t.key)}>{t.label}</Button>)}
+        <Button asChild size="sm" variant="ghost" className="min-h-11"><Link to={`/project/${brand.id}`}>Brand page <ExternalLink className="h-4 w-4 ml-1" /></Link></Button>
+      </nav>
     </header>
 
     {view === 'today' && <>

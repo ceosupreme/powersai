@@ -3,7 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { queryClient } from '@/lib/queryClient';
 import { Profile, AppRole } from '@/types/auth';
-import { resolvePageAccess } from '@/lib/pageAccess';
+import { resolvePageAccess, applyUserOverrides } from '@/lib/pageAccess';
 import { PageKey, PAGE_CONFIG, STAFF_PORTAL_ROLES } from '@/types/permissions';
 
 interface AuthContextType {
@@ -87,16 +87,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (userRole === 'admin') {
         pages = resolvePageAccess(userRole, [], PAGE_CONFIG.map(p => p.key));
       } else if (userRole) {
-        const { data, error } = await supabase
-          .from('role_page_defaults')
-          .select('page_key, enabled')
-          .eq('role', userRole);
+        const [{ data, error }, overrides] = await Promise.all([
+          supabase.from('role_page_defaults').select('page_key, enabled').eq('role', userRole),
+          supabase.from('user_page_permissions').select('page_key, enabled').eq('user_id', userId),
+        ]);
         if (!isCurrent()) return;
-        pages = resolvePageAccess(userRole, data, PAGE_CONFIG.map(p => p.key), !!error);
+        const known = PAGE_CONFIG.map(p => p.key);
+        pages = resolvePageAccess(userRole, data, known, !!error);
         if (error) {
           console.error('Error fetching role page defaults:', error);
           accessError = 'Could not verify your page permissions. Try again or contact your admin.';
-        } else if (!pages.length) {
+        } else if (overrides.error) {
+          // Fail closed to the role defaults when per-person switches can't be read.
+          console.error('Error fetching personal page permissions:', overrides.error);
+          accessError = 'Could not load your personal menu settings. Try again or contact your admin.';
+        } else {
+          pages = applyUserOverrides(pages, overrides.data, known);
+        }
+        if (!error && !pages.length) {
           accessError = 'No pages have been assigned to this account. Contact your admin for access.';
         }
       }

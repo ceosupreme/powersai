@@ -5,6 +5,7 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 
 ## Where to find it
 - Side menu: Workspace, then Dashboard. On a phone, Dashboard is the first bottom-bar button.
+- Brand managers see their brand workspace here instead. A row of tabs at the top switches between "Today", "My plan", "Posts & videos" and "Files"; "Brand page" opens the selected brand's page, and "Switch brand" appears when they manage more than one brand.
 - The address remains /workspace. Signing in normally opens this screen; a direct link can take you back to the page you requested.
 
 ## What you see

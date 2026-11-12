@@ -22,6 +22,8 @@ On a computer, the side menu runs down the left in seven groups:
 - "Tools": "Tasks", "Logs", "Chat", "Outreach Templates".
 - "System": "Guide", "Launch Checklist", "Admin Panel".
 
+Everyone who signs in to the back office, including brand managers, gets this same menu. It only lists the items your role and your own settings allow: an admin sets the starting items for each role in Admin Panel, "Permissions", and can turn single items on or off for one person in Admin Panel, "Users", "Edit". The bottom bar and "More" sheet follow the same settings. Admins see every item.
+
 Below the groups sit "Preview Role", your name with a small role tag, and "Collapse".
 
 On a phone (any screen narrower than 768 pixels), a bottom bar replaces the side menu: "Dashboard", "Portfolio", "Inbox" and "More". "More" opens a sheet with the same groups as tiles, minus those three screens. In the sheet, "Outreach Templates" is called "Templates", "Admin Panel" is called "Settings", and "Sign Out" sits at the bottom.

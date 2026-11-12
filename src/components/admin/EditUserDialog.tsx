@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
+import { UserMenuItems } from './UserMenuItems';
 
 interface Bar {
   id: string;
@@ -335,9 +336,7 @@ export const EditUserDialog = ({
             </p>}
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            Page access is controlled per role in the Permissions tab.
-          </p>
+          <UserMenuItems userId={user.id} role={editedRole} savedRole={user.role} />
         </div>
 
         <DialogFooter>

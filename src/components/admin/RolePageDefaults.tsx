@@ -101,6 +101,7 @@ export const RolePageDefaults = () => {
         <div>
           <CardTitle className="text-base font-semibold">Role Page Access</CardTitle>
           <CardDescription>Control which pages each role can access by default.</CardDescription>
+          <p className="text-xs text-muted-foreground mt-1">These are the starting menu items for each role. To change them for one person, open Users, then Edit User.</p>
         </div>
         <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

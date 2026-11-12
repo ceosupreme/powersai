@@ -39,13 +39,21 @@ The Admin Panel is where you control who can sign in to HQ, what each person can
 2. Change "Role", "Asana GID" or the ticks under "Assigned Bars".
 3. Tap "Save Changes". You see "User updated successfully".
 
+### Choose which menu items one person sees
+1. Tap "Edit" on their row and scroll to "Menu items this person sees". For an admin it only says "Admins see every menu item."
+2. The list matches the side menu: the same group headings, names and order. Items that open the same page share one switch, for example "Dashboard, Portfolio, Guide, Launch Checklist" or "Content, Radar". That first row is marked "Always on". "Playbooks", "Production Board", "Answer Bank" and "Admin Panel" are greyed out and marked "Admins only".
+3. Under "Pages opened from inside HQ", "Brand and project pages" controls the brand and project screens opened from Portfolio or links.
+4. Each switch starts at what the person sees today. On shows the item and lets them open it; Off hides it. "Changed for this person" appears beside any switch that differs from their role's starting items.
+5. Tap "Save menu items". You see "Menu items saved" only after HQ reads the saved switches back; otherwise an error says nothing was confirmed. "Reset to role defaults" clears every personal change for this person.
+6. The person gets the change the next time they open or reload HQ. If you also changed their role, save the role first with "Save Changes".
+
 ### Remove someone
 1. Tap the trash button on their row. Your own row has none.
 2. Read "Delete User" and tap "Delete". This cannot be undone.
 
 ### Choose which pages each role can open
 1. Open "Permissions".
-2. Flip the switches for each page under "Owner", "GM", "Shift Lead" and "Staff".
+2. Flip the switches for each page under "Owner", "GM", "Shift Lead" and "Staff". These are the starting menu items for each role; a person's own switches in "Edit" win over them.
 3. Tap "Save". You see "Role page defaults saved". People get the change the next time they open or reload HQ.
 
 ## Words on this screen

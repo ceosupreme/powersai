@@ -10,7 +10,6 @@ import { PortfolioLayout } from './PortfolioLayout';
 import { VenueLeadershipLayout } from './VenueLeadershipLayout';
 import { ShiftExecutionLayout } from './ShiftExecutionLayout';
 import { ClientLayout } from './ClientLayout';
-import { BrandManagerLayout } from './BrandManagerLayout';
 import { useBrandManagerProjects } from '@/hooks/useBrandManagerProjects';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Badge } from '@/components/ui/badge';
@@ -71,8 +70,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     </>
   );
 
-  // Only verified internal-brand owners enter the guided workspace.
-  // Client and bar staff keep their existing screens. Errors fail closed.
+  // Brand managers use the same menu as every owner; wait for their brand check
+  // so the screen never flashes a different layout. Errors fail closed.
   if (legacyRole === 'owner' && !isAdmin) {
     if (managedBrands.isLoading) {
       return <div className="min-h-screen flex items-center justify-center"><LoadingState message="Checking your brands..." /></div>;
@@ -83,7 +82,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         <Button onClick={() => void managedBrands.refetch()}>Try again</Button>
       </div>;
     }
-    if ((managedBrands.data?.length ?? 0) > 0) return <BrandManagerLayout>{wrappedChildren}</BrandManagerLayout>;
   }
 
   switch (effectiveLayout) {
