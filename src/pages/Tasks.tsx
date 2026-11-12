@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { useProjectDirectory } from '@/hooks/usePortfolioData';
+import { AllProjectsNextTen } from '@/components/workspace/AllProjectsNextTen';
 
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { TaskFiltersComponent } from '@/components/tasks/TaskFilters';
@@ -18,6 +21,11 @@ import { toast } from '@/hooks/use-toast';
 
 const Tasks = () => {
   const [searchParams] = useSearchParams();
+  const { isAdmin } = useAuth();
+  const directory = useProjectDirectory();
+  const activeBrands = (directory.data ?? []).filter(project =>
+    project.group === 'brands' && project.focus_status !== 'parked'
+  );
   const [filters, setFilters] = useState<TaskFilters>({
     status: 'all',
     priority: 'all',
@@ -134,8 +142,8 @@ const Tasks = () => {
               <CheckSquare className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
-              <p className="text-muted-foreground text-sm">Manage and track your team's tasks</p>
+              <h1 className="text-2xl font-bold text-foreground">Tasks & work plans</h1>
+              <p className="text-muted-foreground text-sm">Production steps and standalone checklist tasks have different purposes.</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -190,7 +198,34 @@ const Tasks = () => {
           </div>
         </div>
 
-        {/* Stats */}
+        {isAdmin && <section className="space-y-3 rounded-xl border border-primary/30 p-4">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold">Active brand work plans</h2>
+            <p className="text-sm text-muted-foreground">
+              This is your prioritized work from real production plans and brand goals.
+              It is separate from the standalone task list below. Finishing one checklist task
+              does not mean all your brand work is complete.
+            </p>
+          </div>
+          {directory.isLoading ? <p className="text-sm text-muted-foreground">Loading brand work…</p> :
+            directory.isError ? <div className="space-y-2">
+              <p role="alert" className="text-sm text-destructive">Could not load your active brands.</p>
+              <Button variant="outline" size="sm" onClick={() => void directory.refetch()}>Try again</Button>
+            </div> : activeBrands.length > 0 ?
+              <AllProjectsNextTen projects={activeBrands} /> :
+              <p className="text-sm text-muted-foreground">No active internal brands are available to this account.</p>}
+          <Button variant="outline" size="sm" asChild><Link to="/workspace">Open your full dashboard and decisions</Link></Button>
+        </section>}
+
+        <section className="space-y-1">
+          <h2 className="text-lg font-semibold">Standalone checklist tasks</h2>
+          <p className="text-sm text-muted-foreground">
+            These are manually created tasks. Your production steps, content deadlines and approvals
+            are tracked in the work-plan queue and brand workspace above.
+          </p>
+        </section>
+
+        {/* Standalone task stats */}
         <div className="animate-fade-in-up stagger-1">
           <TaskStatsRow />
         </div>
@@ -218,7 +253,7 @@ const Tasks = () => {
             <p className="text-muted-foreground text-sm mb-4">
               {filters.search || filters.status !== 'all' || filters.priority !== 'all'
                 ? 'Try adjusting your filters'
-                : 'Create your first task to get started'}
+                : 'No standalone checklist tasks are open here; check Active brand work plans above for production work.'}
             </p>
             <Button onClick={() => setCreateDialogOpen(true)} className="rounded-xl">
               <Plus className="w-4 h-4 mr-2" />
