@@ -1,5 +1,10 @@
 # Roadmap
 
+## Business Path
+- [x] Create empty path tables with scoped policies and required grants (zero rows)
+- [x] Shared progress logic, admin brand tab, and gated manager Today/path view
+- [x] Verify rules and admin phone/desktop preview; intercepted save/readback verified without database writes. Real populated manager flow awaits owner-loaded content; unrelated guide route test failure reported.
+
 ## Brand workspace (Build 1 of 2)
 - [x] Owner filters for Next 10 / Waiting on me, Portfolio card workload, brand workspace tabs, pipeline page
 

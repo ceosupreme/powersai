@@ -20,6 +20,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { BusinessPathTab, pathStageTitle } from '@/components/brand-workspace/BusinessPathTab';
+import { useBusinessPath } from '@/hooks/useBusinessPath';
+import { PATH_STATUSES, isPathDone } from '@/lib/businessPath';
 
 type Step = {
   id: string; title: string; detail: string | null; facts: string | null;
@@ -94,6 +97,8 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
   const [params, setParams] = useSearchParams();
   const brand = brands.find((b) => b.id === params.get('brand')) ?? brands[0];
   const view = params.get('view') ?? 'today';
+  const businessPath = useBusinessPath(brand.id);
+  const pathVisible = businessPath.data?.settings?.visible_to_managers === true;
   const stepId = params.get('step');
   const postId = params.get('post');
   const docId = params.get('doc');
@@ -357,6 +362,19 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
     </header>
 
     {view === 'today' && <>
+      {pathVisible && businessPath.data && <Card>
+        <CardHeader><CardTitle className="text-xl">Your business path</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          {businessPath.data.stages.length ? <>
+            <h2 className="text-2xl font-bold break-words">{pathStageTitle(businessPath.data)}</h2>
+            {businessPath.data.current && <p className="text-base whitespace-pre-wrap">Done when: {businessPath.data.current.done_when}</p>}
+            {businessPath.data.current?.steps.filter(step => !isPathDone(step.status)).slice(0, 3).map(step => <Button key={step.key} variant="outline" className="w-full min-h-11 h-auto py-3 justify-between gap-3 whitespace-normal text-left" onClick={() => go('path', { path_step: step.key })}>
+              <span className="text-base break-words">{step.title}</span><Badge variant="outline" className="text-sm shrink-0">{PATH_STATUSES[step.status]}</Badge>
+            </Button>)}
+          </> : <p>The business path hasn't been loaded yet.</p>}
+          <Button className="min-h-11" onClick={() => go('path')}>See the whole path</Button>
+        </CardContent>
+      </Card>}
       <Card className="border-primary/40">
         <CardHeader><CardTitle className="text-lg">Your next step</CardTitle></CardHeader>
         <CardContent className="space-y-4">
@@ -396,6 +414,11 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
       </section>
       <BrandWeeklyNumbers projectId={brand.id} />
     </>}
+
+    {view === 'path' && <section className="space-y-4">
+      <Button className="min-h-11" variant="outline" onClick={() => go('today')}><ArrowLeft className="h-4 w-4 mr-2" />Back to Today</Button>
+      {pathVisible && <BusinessPathTab key={brand.id} projectId={brand.id} isAdmin={false} openStepKey={params.get('path_step')} />}
+    </section>}
 
     {view === 'step' && <section className="space-y-4">
       <Button variant="outline" size="sm" onClick={() => go('plan')}><ArrowLeft className="h-4 w-4 mr-2"/>My plan</Button>
@@ -594,7 +617,7 @@ export default function BrandManagerPortal({ brands }: { brands: ManagedBrand[] 
       </button>)}</div> : !docsQuery.isLoading && !docsQuery.isError && <Card className="p-5"><p>No documents are available to this brand yet.</p></Card>}
     </section>}
 
-    {!['today','step','plan','posts','files'].includes(view) && <Card className="p-5 flex items-center gap-3"><AlertCircle className="h-5 w-5"/><span>This section was not found.</span><Button variant="outline" onClick={() => go('today')}>Go to Today</Button></Card>}
+    {!['today','step','plan','posts','files','path'].includes(view) && <Card className="p-5 flex items-center gap-3"><AlertCircle className="h-5 w-5"/><span>This section was not found.</span><Button variant="outline" onClick={() => go('today')}>Go to Today</Button></Card>}
     <ContentWorkflowDialog projectId={brand.id} itemId={selectedWorkflow} onClose={() => setSelectedWorkflow(null)} />
   </div>;
 }
