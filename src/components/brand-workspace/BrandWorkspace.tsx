@@ -39,6 +39,7 @@ import {
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
 import { PlaybooksTab } from './PlaybooksTab';
 import { BusinessPathTab } from './BusinessPathTab';
+import { useBusinessPath } from '@/hooks/useBusinessPath';
 import { SetupLine, SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
@@ -76,8 +77,12 @@ export function BrandWorkspace({
   setup: ReactNode;
 }) {
   const [params, setParams] = useSearchParams();
+  // Managers see the Business path tab only after an admin turns on "Show this path to brand managers".
+  const businessPath = useBusinessPath(projectId);
+  const pathVisible = isAdmin || businessPath.data?.settings?.visible_to_managers === true;
+  const tabs = WORKSPACE_TABS.filter((t) => t.key !== 'path' || pathVisible);
   const raw = params.get('tab');
-  const tab: TabKey = (WORKSPACE_TABS.find((t) => t.key === raw)?.key ?? 'overview') as TabKey;
+  const tab: TabKey = (tabs.find((t) => t.key === raw)?.key ?? 'overview') as TabKey;
   const select = (key: TabKey) => {
     const next = new URLSearchParams(params);
     if (key === 'overview') next.delete('tab');
@@ -92,7 +97,7 @@ export function BrandWorkspace({
         aria-label="Brand workspace"
         className="-mx-4 px-4 sm:mx-0 sm:px-0 flex gap-1 overflow-x-auto border-b border-border [scrollbar-width:none]"
       >
-        {WORKSPACE_TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.key}
             role="tab"
@@ -110,7 +115,7 @@ export function BrandWorkspace({
       </nav>
 
       <p className="text-sm text-muted-foreground" role="status">
-        {WORKSPACE_TABS.find((t) => t.key === tab)?.description}
+        {tabs.find((t) => t.key === tab)?.description}
       </p>
 
       {tab === 'overview' && (

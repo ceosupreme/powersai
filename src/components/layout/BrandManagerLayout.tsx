@@ -1,7 +1,8 @@
 import { type ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { CalendarDays, ClipboardList, Film, FolderOpen, LogOut } from 'lucide-react';
+import { CalendarDays, ClipboardList, Film, FolderOpen, LayoutGrid, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useBrandManagerProjects } from '@/hooks/useBrandManagerProjects';
 import { cn } from '@/lib/utils';
 
 const NAV = [
@@ -9,6 +10,7 @@ const NAV = [
   { key: 'plan', label: 'My plan', icon: ClipboardList },
   { key: 'posts', label: 'Posts & videos', icon: Film },
   { key: 'files', label: 'Files', icon: FolderOpen },
+  { key: 'brand', label: 'Brand page', icon: LayoutGrid },
 ] as const;
 
 export function BrandManagerLayout({ children }: { children: ReactNode }) {
@@ -16,9 +18,16 @@ export function BrandManagerLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
-  const view = location.pathname === '/workspace' ? (params.get('view') ?? 'today') : '';
-  const brandId = params.get('brand');
+  const managed = useBrandManagerProjects();
+  const managedIds = (managed.data ?? []).map((brand) => brand.id);
+  // The brand page lives at /project/:id; keep whichever managed brand the person is on.
+  const routeBrandId = location.pathname.match(/^\/project\/([^/]+)/)?.[1] ?? null;
+  const requested = routeBrandId ?? params.get('brand');
+  const brandId = requested && managedIds.includes(requested) ? requested : (managedIds[0] ?? null);
+  const onBrandPage = /^\/project\/[^/]+\/?$/.test(location.pathname);
+  const view = location.pathname === '/workspace' ? (params.get('view') ?? 'today') : onBrandPage ? 'brand' : '';
   const href = (key: string) => {
+    if (key === 'brand') return brandId ? `/project/${brandId}` : '/workspace';
     const search = new URLSearchParams({ view: key });
     if (brandId) search.set('brand', brandId);
     return `/workspace?${search.toString()}`;
