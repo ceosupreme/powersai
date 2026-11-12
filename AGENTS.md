@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Business Path progress and proof validation live in `src/lib/businessPath.ts`, loaded and saved only through `useBusinessPath`; admin and manager screens share `BusinessPathTab` so counts, completion, and proof rules agree. Manager visibility is a UI rollout switch, not an additional RLS permission.
+
 - Radar reads existing research tables through paginated, RLS-respecting queries and shares the content_pipeline permission; it never writes research data or introduces a separate permission model.
 
 - Public-site media replacements use named entries in `src/config/studioMedia.ts`; do not build media-management UI or storage because the owner replaces assets through conversation uploads.

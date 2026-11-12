@@ -38,6 +38,7 @@ import {
 } from '@/lib/ownerWork';
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
 import { PlaybooksTab } from './PlaybooksTab';
+import { BusinessPathTab } from './BusinessPathTab';
 import { SetupLine, SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
@@ -45,6 +46,7 @@ import { composePipeline, outletToDestination, productTypeForFormat, productType
 
 export const WORKSPACE_TABS = [
   { key: 'overview', label: 'Today', description: 'Your next step, upcoming work, and how this brand is doing.', accent: 'border-primary text-primary' },
+  { key: 'path', label: 'Business path', description: 'The 8 stages this brand moves through, where it stands now and the next steps.', accent: 'border-primary text-primary' },
   { key: 'setup', label: 'Accounts to set up', description: 'See which brand accounts and profiles are ready and which need attention.', accent: 'border-primary text-primary' },
   { key: 'channels', label: 'Social accounts', description: 'Review your pages, followers, posting activity, and account details.', accent: 'border-signal-green text-signal-green' },
   { key: 'avenues', label: 'Ways to make money', description: 'Explore revenue opportunities and see which ones are already running.', accent: 'border-gold text-gold' },
@@ -114,6 +116,7 @@ export function BrandWorkspace({
       {tab === 'overview' && (
         <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
       )}
+      {tab === 'path' && <BusinessPathTab projectId={projectId} isAdmin={isAdmin} />}
       {tab === 'setup' && <SetupTab projectId={projectId} canEdit={isAdmin} />}
       {tab === 'channels' && <ChannelsTab projectId={projectId} isAdmin={isAdmin} />}
       {tab === 'avenues' && <AvenuesTab projectId={projectId} canEdit={isAdmin} />}

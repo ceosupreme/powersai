@@ -1809,6 +1809,126 @@ export type Database = {
           },
         ]
       }
+      brand_path_settings: {
+        Row: {
+          business_types: string[]
+          created_at: string
+          hours_per_week: number | null
+          money_goal: string | null
+          updated_at: string
+          updated_by: string | null
+          venue_id: string
+          visible_to_managers: boolean
+        }
+        Insert: {
+          business_types?: string[]
+          created_at?: string
+          hours_per_week?: number | null
+          money_goal?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          venue_id: string
+          visible_to_managers?: boolean
+        }
+        Update: {
+          business_types?: string[]
+          created_at?: string
+          hours_per_week?: number | null
+          money_goal?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          venue_id?: string
+          visible_to_managers?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_path_settings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_path_settings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_path_settings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_path_step_status: {
+        Row: {
+          created_at: string
+          evidence_url: string | null
+          id: string
+          note: string | null
+          status: string
+          step_key: string
+          updated_at: string
+          updated_by: string | null
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          note?: string | null
+          status?: string
+          step_key: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          note?: string | null
+          status?: string
+          step_key?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_path_step_status_step_key_fkey"
+            columns: ["step_key"]
+            isOneToOne: false
+            referencedRelation: "business_path_steps"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "brand_path_step_status_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_path_step_status_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "brand_path_step_status_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_profiles: {
         Row: {
           notes: string | null
@@ -1849,6 +1969,92 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "venues"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_path_stages: {
+        Row: {
+          created_at: string
+          done_when: string
+          is_active: boolean
+          key: string
+          name: string
+          sort_order: number
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          done_when: string
+          is_active?: boolean
+          key: string
+          name: string
+          sort_order: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          done_when?: string
+          is_active?: boolean
+          key?: string
+          name?: string
+          sort_order?: number
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      business_path_steps: {
+        Row: {
+          auto_check: string | null
+          business_types: string[]
+          created_at: string
+          guide_key: string | null
+          instructions: string
+          is_active: boolean
+          key: string
+          proof: string | null
+          sort_order: number
+          stage_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          auto_check?: string | null
+          business_types?: string[]
+          created_at?: string
+          guide_key?: string | null
+          instructions: string
+          is_active?: boolean
+          key: string
+          proof?: string | null
+          sort_order: number
+          stage_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          auto_check?: string | null
+          business_types?: string[]
+          created_at?: string
+          guide_key?: string | null
+          instructions?: string
+          is_active?: boolean
+          key?: string
+          proof?: string | null
+          sort_order?: number
+          stage_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_path_steps_stage_key_fkey"
+            columns: ["stage_key"]
+            isOneToOne: false
+            referencedRelation: "business_path_stages"
+            referencedColumns: ["key"]
           },
         ]
       }
