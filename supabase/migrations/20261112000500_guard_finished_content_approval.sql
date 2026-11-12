@@ -73,6 +73,10 @@ BEGIN
      NULLIF(btrim(NEW.brief->>'cta'),''), '');
   IF NEW.purpose_type='offer' AND _cta='' THEN
     RAISE EXCEPTION 'Add the offer call to action before final approval or publication.';
+  ELSIF _fmt IN ('reel','short','carousel','post','story','pin')
+      AND _cta=''
+      AND COALESCE(NEW.brief->>'cta_not_needed','false') <> 'true' THEN
+    RAISE EXCEPTION 'Add a call to action or explicitly confirm that one is not needed before final approval or publication.';
   END IF;
 
   RETURN NEW;
