@@ -308,3 +308,30 @@
 .proposal-page .proposal-btn-quiet:hover { background: hsl(var(--ink) / .06); }
 @media (max-width: 640px) { .proposal-page .proposal-video-actions .proposal-btn { flex: 1 1 100%; } }
 @media print { .proposal-page .proposal-video-actions { display: none !important; } }
+
+/* Direct appointment booking on every client proposal. The core agreement
+   request remains separate: booking a call never approves a proposal. */
+.proposal-page .proposal-booking-cta { margin: 24px 0 14px; display: flex; flex-wrap: wrap; }
+.proposal-page .proposal-booking-btn {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 0.95rem;
+  font-weight: 750;
+  border-radius: 999px;
+  padding: 11px 22px;
+  white-space: normal;
+  color: hsl(var(--ink));
+  border: 1px solid hsl(var(--rule));
+  background: hsl(var(--surface));
+  cursor: pointer;
+}
+.proposal-page .proposal-booking-btn:hover { border-color: hsl(var(--ink)); background: hsl(var(--surface) / .85); }
+.proposal-page .proposal-side-actions .proposal-booking-btn { text-align: left; width: fit-content; }
+@media (max-width: 640px) {
+  .proposal-page .proposal-booking-cta,
+  .proposal-page .proposal-booking-btn { width: 100%; }
+}
+@media print { .proposal-page .proposal-booking-cta, .proposal-page .proposal-side-actions .proposal-booking-btn { display: none !important; } }
