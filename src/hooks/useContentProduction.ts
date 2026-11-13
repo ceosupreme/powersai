@@ -221,17 +221,17 @@ export function useApproveItem() {
       if (!canApprove(current)) {
         const gaps = contentDeliveryGaps(current);
         throw new Error([
-          'Final approval requires quality 80+, no hard failures, and finished production.',
+          'Final approval requires finished production.',
           ...gaps,
         ].join(' '));
       }
       const { data: saved, error } = await T("content_items")
         .update({ approved_at: new Date().toISOString(), approved_by: u.user.id })
-        .eq("id", id).is('approved_at', null).gte('quality_score', 80)
+        .eq("id", id).is('approved_at', null)
         .eq('stage', current.stage)
         .select('id').maybeSingle();
       if (error) throw error;
-      if (!saved) throw new Error('Approval was not saved. Content quality, access or approval state may have changed.');
+      if (!saved) throw new Error('Approval was not saved. Access or approval state may have changed.');
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["production-board-items"] });

@@ -224,7 +224,7 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
   };
   const approve = async () => {
     if (!item) return;
-    if (!canApprove(item)) return toast.error('Finish the production work and resolve the quality issues shown below before approving.');
+    if (!canApprove(item)) return toast.error('Finish the production work shown below before approving.');
     setBusy(true);
     try { await approval.mutateAsync(item.id); await refresh(); toast.success('Content approved.'); }
     catch (e: any) { toast.error(e?.message ?? 'Could not approve.'); }
@@ -399,10 +399,9 @@ export function ContentWorkflowDialog(props: { projectId: string; itemId: string
             </div>
             {!canApprove(item) && item.stage !== 'published' && <div className="rounded-md border p-3 text-xs space-y-2">
               <p className="font-semibold">What needs to be finished?</p>
-              <p>A quality score of at least 80 means the concept passed review. It does not mean the finished file is ready.</p>
+              <p>The quality score and any hard fails are shown for your judgment; they don't block approval.</p>
               <ul className="list-disc pl-4 space-y-1">
                 {contentQualityHints(item).map((reason, i) => <li key={i}>{reason}</li>)}
-                {(item.quality_score ?? 0) < 80 && <li>Raise the recorded quality score to at least 80/100</li>}
               </ul>
               <p>Save your finished work, then approve it. Existing concept approvals remain in history.</p>
             </div>}

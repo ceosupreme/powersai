@@ -37,7 +37,7 @@ The Production Board shows the content pieces of all your brands in one place, s
 ### To approve a piece
 1. Find its card and check "Quality" and any hard fails.
 2. Tap "Approve". HQ shows "Approved".
-3. If "Approve" is grey, the piece is not ready. Read the reason below it: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+3. If "Approve" is grey, the production work isn't finished. Open the piece and read "What needs to be finished?", such as a missing file link, missing text or a missing call to action. The quality score and any hard fails show for your judgment; they don't block approval.
 4. Cards still at "Idea" or "Script" with no score show "Not written yet. Approve appears once it's written and scored." instead of the button. There is nothing to approve until the piece is written.
 
 ### To approve several pieces at once
@@ -71,9 +71,9 @@ The Production Board shows the content pieces of all your brands in one place, s
 
 - Content piece: one thing to publish, such as a video, post or article.
 - Stage: the production step a piece is at, from Idea to Published.
-- Quality score: how the finished piece scored against the quality standard. HQ allows approval at 80 or more.
+- Quality score: how the finished piece scored against the quality standard. It informs your approval; it doesn't block it.
 - Idea score: how the idea scored in research, before it was made.
-- Hard fail: a rule the piece breaks that blocks approval whatever the score.
+- Hard fail: a rule the piece breaks. It shows on the card for your judgment and doesn't block approval.
 - "Approve": mark the piece as cleared to schedule. It does not publish it.
 - Content mode: the brand kit's production setting. Growth gets full weekly production, Baseline runs evergreen work on the clock, Parked gets none.
 - Purpose: what a piece is for: teach, entertain, story, community, proof or offer.
@@ -85,7 +85,7 @@ The Production Board shows the content pieces of all your brands in one place, s
 
 ## Good to know
 
-- A piece can only be approved with a quality score of 80 or more and no hard fails, and it must be approved before it can move into Scheduled or Published.
+- A piece can be approved once its production work is finished, whatever its quality score, and it must be approved before it can move into Scheduled or Published.
 - Each format follows its own route. Videos go through Record, Edit and Thumbnail; graphics go through Design; text skips both.
 - Published pieces leave the tabs and are only counted in "Done:".
 - Moving a piece to "Published" only changes its record. Nothing in HQ posts to any platform by itself.

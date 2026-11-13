@@ -35,8 +35,8 @@ When something in HQ looks wrong, it is usually one of a handful of known causes
 
 ## Content will not move forward
 
-- "Cannot move to scheduled until the item is approved": your own brands' pieces must be approved before they can be scheduled or published. Approval needs a quality score of 80 or more and no hard fails.
-- A piece cannot be approved: open it and look at its quality score and its "Fails:" line. Fix the hard fails first.
+- "Cannot move to scheduled until the item is approved": your own brands' pieces must be approved before they can be scheduled or published. Approve it once its production work is finished.
+- A piece cannot be approved: open it and read "What needs to be finished?". Approval waits only on finished production (the file or text attached and any call to action added), not on the quality score or hard fails.
 
 ## Numbers and followers
 

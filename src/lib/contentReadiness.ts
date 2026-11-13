@@ -77,15 +77,16 @@ export function hasQualityApproval(item: ReadinessContent): boolean {
   return (item.quality_score ?? 0) >= 80 && (item.quality_fails ?? []).length === 0;
 }
 
+/** The quality score and any hard fails inform the owner; his approval decides (Nov 13 2026). */
 export function canApproveFinishedContent(item: ReadinessContent): boolean {
-  return hasQualityApproval(item) && contentDeliveryGaps(item).length === 0;
+  return contentDeliveryGaps(item).length === 0;
 }
 
 export function contentApprovalLabel(item: ReadinessContent): string {
   if (item.stage === 'published') return 'Published';
   const finished = contentDeliveryGaps(item).length === 0;
   if (item.approved_at) return finished ? 'Release approved' : 'Concept approved · finish production';
-  if (finished && hasQualityApproval(item)) return 'Ready for final approval';
+  if (finished) return 'Ready for final approval';
   return 'Not release-ready';
 }
 

@@ -209,7 +209,7 @@ export default function PipelineJob() {
     catch { toast.error('Could not copy. Your browser blocked the clipboard.'); }
   };
   const approveTarget = async () => {
-    if (!canApprove(target)) return toast.error('Approval needs a quality score of at least 80 and no hard failures.');
+    if (!canApprove(target)) return toast.error('Finish the production work for this piece before approving.');
     try { await approve.mutateAsync(target.id); toast.success('Approved'); refetch(); }
     catch (e: any) { toast.error(e?.message ?? 'The database refused the approval'); }
   };

@@ -30,7 +30,7 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 
 ### To approve one piece
 1. Find its card and tap "Approve". HQ shows "Approved".
-2. If the button is grey, the piece is not ready. The reason shows below it: "Needs a Quality Score before it can be approved.", "Has hard fails that must be fixed first." or "Needs a Quality Score of 80 or more."
+2. If the button is grey, the production work isn't finished. Open the piece and read "What needs to be finished?". The quality score and any hard fails show for your judgment; they don't block approval.
 3. A piece still at "Idea" or "Script" with no score shows "Not written yet. Approve appears once it's written and scored." instead of the button.
 
 ### To move a piece to its next stage
@@ -42,9 +42,9 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 - Content piece: one thing to publish, such as a video, a post or an article. HQ also calls it a content item.
 - Stage: the production step the piece is at, from "Idea" to "Published".
 - Idea score: how the idea scored in research, before it was made.
-- Quality score: how the finished piece scored against the quality standard. HQ allows approval at 80 or more.
-- Hard fail: a rule the piece breaks that blocks approval whatever the score.
-- "Ready to approve": a quality score of 80 or more, no hard fails, and no approval yet.
+- Quality score: how the finished piece scored against the quality standard. It informs your approval; it doesn't block it.
+- Hard fail: a rule the piece breaks. It shows on the card for your judgment and doesn't block approval.
+- "Ready to approve": a finished piece (production done, file or text attached) with no approval yet, whatever its score.
 - "Approve batch": approve every ready piece on this tab in one go.
 - Family: a group of pieces made from the same source, such as one article turned into several posts.
 - Placement: the piece on one channel and account, with its own status.

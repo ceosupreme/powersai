@@ -53,7 +53,7 @@ From top to bottom:
 - "Waiting on you": open steps that are yours to do for this brand, plus content ready for your approval.
 - "P1" to "P4": priority, from P1 (most urgent) to P4 (low).
 - "Step": a single task. It may stand alone or belong to a pipeline.
-- "Ready to approve": a piece with a quality score of 80 or more, no hard fails, and no approval yet.
+- "Ready to approve": a finished piece (production done, file or text attached) with no approval yet, whatever its score.
 
 ## Good to know
 

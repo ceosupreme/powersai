@@ -70,7 +70,7 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 ### To approve a piece at a quality gate
 1. Find the gate strip on the gate step.
 2. Read the "Quality score" and the "Fails:" list.
-3. When the score is at least 80 and there are no hard failures, tap "Approve". HQ shows "Approved", and the strip then reads "Approved".
+3. When the production work is finished, tap "Approve". The score and fails are there for your judgment and don't block it. HQ shows "Approved", and the strip then reads "Approved".
 
 ### To look at a playbook in the recipe
 1. Tap its chip under "Recipe".
@@ -103,7 +103,7 @@ Playbook jobs look a little different. The "Level" and "Money to:" badges are hi
 - "Copy prompt" stays on Claude steps even after they are done, so you can have Claude redo one.
 - In this build, "Queue" only marks the step. The external worker's schedule and selection rules must be verified separately; this button does not guarantee a run or move the step ahead of other work. To work on a step now, use "Copy prompt" and paste it into a Claude chat, or use "Take this step" when available.
 - "Open" only appears once a step has a link or an output saved on it.
-- Approve is available only with a quality score of at least 80 and no hard failures. The database enforces the same rule for direct writes.
+- Approve is available once the production work is finished, whatever the quality score. The database still requires approval before anything moves into Scheduled or Published.
 - Not confirmed: what fills in "Your time"; nothing on this page sets it.
 - This page shows every step of the job, including snoozed ones that are hidden from your lists.
 - "Cancel pipeline" pauses the job without deleting history or outputs. Its steps cannot be updated while paused. "Resume pipeline" resumes at the first unfinished step.

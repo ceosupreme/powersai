@@ -88,9 +88,9 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Placement: one piece on one channel and account, with its own status.
 - Family: pieces made from the same source, such as one article turned into several posts.
 - Idea score: how an idea scored in research, before it was made.
-- Quality score: how a finished piece scored against the quality standard. Approval needs 80 or more.
-- Hard fail: a rule a piece breaks that blocks approval whatever its score.
-- "Ready to approve": a quality score of 80 or more, no hard fails, and no approval yet.
+- Quality score: how a finished piece scored against the quality standard. It informs your approval; it doesn't block it.
+- Hard fail: a rule a piece breaks. It shows on the piece for your judgment and doesn't block approval.
+- "Ready to approve": a finished piece (production steps done, file or text attached) with no approval yet, whatever its score.
 - "Approve batch": approve every ready piece on a brand's Content tab at once.
 - Content mode: how much content HQ produces for a brand: "Growth", "Baseline" or "Parked".
 - Hook: the opening line or angle meant to grab attention.

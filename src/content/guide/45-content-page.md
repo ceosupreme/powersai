@@ -50,7 +50,7 @@ The Content screen, headed "Content Pipeline", is the running list of content pi
 
 ## Good to know
 - The first time a Long-form piece moves to "Published", HQ creates eight follow-up tasks: five "Create Short" tasks, a blog post, an email, and a review of the affiliate call to action. They appear under "Linked Tasks" and as "Long-form publish kit" under "Automation Runs". "Undo" deletes them; if you later move the piece out of "Published" and back in, HQ makes a new batch.
-- For your own brands (not client projects), HQ will not let a piece move to "Scheduled" or "Published" until it is approved, and shows a message such as "Cannot move to scheduled until the item is approved". Approval happens on the Production Board or the brand's "Content" tab, and needs a quality score of 80 or more with no hard fails.
+- For your own brands (not client projects), HQ will not let a piece move to "Scheduled" or "Published" until it is approved, and shows a message such as "Cannot move to scheduled until the item is approved". Approval happens on the Production Board or the brand's "Content" tab once the production work is finished, whatever the quality score.
 - The Kanban arrow always moves a piece to the next column in the fixed order, even when that stage doesn't fit the format; a video at "Script" moves to "Design". Use the "Stage" dropdown to jump to the right stage.
 - There is no drag and drop on the Kanban, even though the tip box mentions it.
 - A piece whose stage is not one of the eight sits in the "Idea" column on the Kanban, and its "Stage" dropdown in "List" may look blank.
