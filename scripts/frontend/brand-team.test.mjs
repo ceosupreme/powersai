@@ -54,6 +54,32 @@ test('questions show rejected as closed before done as answered', () => {
   assert.equal(team.questionStatus(step({ status: 'Done' })), 'Answered');
   assert.equal(team.questionStatus(step({ status: 'Done', approval_status: 'Rejected' })), 'Closed');
 });
+test('step titles drop a leading owner name only when it names the step owner', () => {
+  assert.equal(team.displayTitle(step({ title: 'Brand Helper: check your offers', assignee: 'Brand Helper' })), 'Check your offers');
+  assert.equal(team.displayTitle(step({ title: 'BRAND HELPER:   read the guide (10 minutes)', assignee: ' brand helper ' })), 'Read the guide (10 minutes)');
+  assert.equal(team.displayTitle(step({ title: 'Claude: draft the first week of posts', assignee: null, owner_kind: 'claude' })), 'Draft the first week of posts');
+  assert.equal(team.displayTitle(step({ title: 'Decision: pick the launch offer', assignee: 'Brand Helper' })), 'Decision: pick the launch offer');
+  assert.equal(team.displayTitle(step({ title: 'Sean: send the folder', assignee: 'Brand Helper' })), 'Sean: send the folder');
+  assert.equal(team.displayTitle(step({ title: 'Brand Helper:', assignee: 'Brand Helper' })), 'Brand Helper:');
+  assert.equal(team.displayTitle(step({ title: 'Plain title', assignee: null, owner_kind: null })), 'Plain title');
+});
+test('minutes read naturally for one and for many', () => {
+  assert.equal(team.minutesText(1), 'About 1 minute');
+  assert.equal(team.minutesText(10), 'About 10 minutes');
+});
+test('next step is the earliest due, then the highest priority, then plan order', () => {
+  const rows = [
+    step({ id: 'late', due_date: '2027-01-05', step_order: 1 }),
+    step({ id: 'soon-p2', due_date: '2026-11-04', priority: 'P2', step_order: 1 }),
+    step({ id: 'soon-p1-later', due_date: '2026-11-04', priority: 'P1', step_order: 9 }),
+    step({ id: 'soon-p1', due_date: '2026-11-04', priority: 'P1', step_order: 3 }),
+    step({ id: 'undated', due_date: null, step_order: 0 }),
+  ];
+  assert.equal(team.firstDue(rows).id, 'soon-p1');
+  assert.equal(team.firstDue([rows[0], rows[4]]).id, 'late');
+  assert.equal(team.firstDue([]), undefined);
+  assert.deepEqual(rows.map(r => r.id), ['late', 'soon-p2', 'soon-p1-later', 'soon-p1', 'undated']);
+});
 
 test('managed brands include all four own-brand types, exclude prospect shells and retain owner memberships', async () => {
   const calls = [];

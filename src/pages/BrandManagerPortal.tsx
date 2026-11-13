@@ -26,7 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BrandTeamAbout } from '@/components/brand-workspace/BrandTeamAbout';
-import { assignedTo, ownerLabel, dependencyFinished, readyFor, teamStepState, orderedSteps, planPosition, teamPeople, defaultTeamViewer, weeklyCompletion, questionStatus } from '@/lib/brandTeam';
+import { assignedTo, ownerLabel, dependencyFinished, readyFor, teamStepState, orderedSteps, planPosition, teamPeople, defaultTeamViewer, weeklyCompletion, questionStatus, displayTitle, firstDue, minutesText } from '@/lib/brandTeam';
 import { fetchAllPages } from '@/lib/batchFetch';
 
 const PORTAL_TABS = [
@@ -96,11 +96,7 @@ function weekLabel(value: string): string {
   return 'Week of ' + d.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
 }
 function chooseFirst(steps: Step[]): Step | undefined {
-  return [...steps].sort((a, b) =>
-    (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') ||
-    (a.priority ?? '').localeCompare(b.priority ?? '') ||
-    (a.step_order ?? 9999) - (b.step_order ?? 9999)
-  )[0];
+  return firstDue(steps);
 }
 
 export default function BrandManagerPortal({ brands, preview = false }: { brands: ManagedBrand[]; preview?: boolean }) {
@@ -113,6 +109,7 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
   const businessPath = useBusinessPath(brand.id);
   const pathVisible = !!businessPath.data;
   const [wholePlan, setWholePlan] = useState(false);
+  const [goalOpen, setGoalOpen] = useState(false);
   const stepId = params.get('step');
   const postId = params.get('post');
   const docId = params.get('doc');
@@ -235,6 +232,8 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
   const editableStep = assignedStep && !preview && !archivedStep;
   const week = weeklyCompletion(steps, viewer);
   const dependents = (step: Step) => steps.filter(s => s.depends_on === step.id && s.status !== 'Done');
+  const othersWaiting = (step: Step) => dependents(step).filter(s => !assignedTo(s, viewer));
+  const ownFollowUp = (step: Step): Step | undefined => dependents(step).find(s => assignedTo(s, viewer));
   const samePlan = selectedStep?.job_id ? orderedSteps(steps.filter(s => s.job_id === selectedStep.job_id)) : [];
   const position = selectedStep ? planPosition(selectedStep, steps) : { position: 0, count: 0 };
   const followingStep = selectedStep ? samePlan[samePlan.findIndex(s => s.id === selectedStep.id) + 1] : undefined;
@@ -402,7 +401,10 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
           return <Button key={b.id} className="min-h-11 h-auto whitespace-normal text-left" variant={b.id === brand.id ? 'default' : 'outline'} onClick={() => go('today', { brand: b.id })}>{b.name}{counts.isSuccess && count > 0 && <Badge variant="secondary" className="ml-2">{count}</Badge>}</Button>;
         })}{counts.isError && <p role="alert">Ready counts could not be loaded.</p>}</div>}
       </div>
-      {brand.north_star && <p className="flex items-start gap-2 text-sm text-muted-foreground"><Target className="h-4 w-4 mt-0.5 shrink-0" /> Goal: {brand.north_star}</p>}
+      {brand.north_star && view !== 'about' && <div className="flex items-start gap-2 text-muted-foreground"><Target className="h-4 w-4 mt-1 shrink-0" /><div className="min-w-0">
+        <p className={goalOpen ? '' : 'line-clamp-2'}>Goal: {brand.north_star}</p>
+        {brand.north_star.length > 110 && <Button variant="link" className="h-auto p-0" aria-expanded={goalOpen} onClick={() => setGoalOpen(open => !open)}>{goalOpen ? 'Show less' : 'Show the full goal'}</Button>}
+      </div></div>}
       <nav aria-label="Brand workspace views" className="flex flex-wrap gap-2 pt-2">
         {PORTAL_TABS.map(t => <Button key={t.key} type="button" size="sm" className="min-h-11"
           variant={view === t.key ? 'default' : 'outline'} aria-current={view === t.key ? 'page' : undefined}
@@ -413,13 +415,53 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
     </header>
 
     {view === 'today' && <>
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-3" aria-label="Your progress">
-        <Card className="p-4 space-y-2"><p className="text-muted-foreground">This week</p><p className="text-xl font-semibold">{week.done} of {week.total}</p><Progress value={week.total ? week.done / week.total * 100 : 0} aria-label={`${week.done} of ${week.total} steps done this week`} /></Card>
-        <Card className="p-4 space-y-2"><p className="text-muted-foreground">Ready now</p><p className="text-xl font-semibold">{jobsQuery.isSuccess ? eligible.length : '—'}</p></Card>
-        {businessPath.data && <Card className="p-4 space-y-2"><p className="text-muted-foreground">Stage</p><p className="text-xl font-semibold">{businessPath.data.current ? `Stage ${businessPath.data.current.number} of 8` : businessPath.data.stages.length ? 'All stages done' : '—'}</p><p>{businessPath.data.current?.name}</p><Progress value={businessPath.data.total ? businessPath.data.done / businessPath.data.total * 100 : 0} aria-label={`${businessPath.data.done} of ${businessPath.data.total} path steps done`} /></Card>}
-      </section>
       {jobsQuery.isError && <p role="alert">Plans could not be loaded. Ready steps cannot be confirmed.<Button variant="link" onClick={() => jobsQuery.refetch()}>Try again</Button></p>}
-
+      <Card className="border-primary/40">
+        <CardHeader><CardTitle className="text-lg">Your next step</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          {nextStep ? <>
+            <div>
+              <p className="text-lg font-semibold">{displayTitle(nextStep)}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{plain(factsObject(nextStep.facts).why) ||
+                (nextStep.detail ? nextStep.detail.slice(0, 220) + (nextStep.detail.length > 220 ? '…' : '') :
+                  'Open this step for its instructions and expected result.')}</p>
+              {nextJob?.goal_text && <p className="mt-2 text-sm"><strong>Business result:</strong> {nextJob.goal_text}</p>}
+            </div>
+            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+              <span className="inline-flex gap-1 items-center"><Clock3 className="h-4 w-4" />{minutesFor(nextStep) == null ? 'Time not estimated' : minutesText(minutesFor(nextStep) as number)}</span>
+              <span>Due: {dueText(nextStep.due_date)}</span>
+            </div>
+            {othersWaiting(nextStep).length > 0 && <p className="text-muted-foreground"><strong>Waiting on this:</strong> {othersWaiting(nextStep).slice(0, 2).map(s => `${label(s)}: ${displayTitle(s)}`).join('; ')}</p>}
+            {ownFollowUp(nextStep) && <p className="text-muted-foreground"><strong>Then you:</strong> {displayTitle(ownFollowUp(nextStep) as Step)}</p>}
+            <Button onClick={() => go('step', {step: nextStep.id})}>Start this step <ArrowRight className="h-4 w-4 ml-2"/></Button>
+          </> : <div className="space-y-2">
+            <p className="font-medium">No steps are ready for you right now.</p>
+            {pending.length ? <div className="space-y-2"><h3 className="font-semibold">What you're waiting on</h3>{pending.filter(s => !dependencyFinished(s, byId) || s.approval_status !== 'Approved').slice(0, 3).map(s => {
+              const blocking = s.depends_on ? byId.get(s.depends_on) : undefined;
+              return <Button key={s.id} variant="outline" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: s.id })}>
+                <span>{!dependencyFinished(s, byId) ? `Waiting on ${blocking ? label(blocking) : 'Not assigned'} to finish: ${blocking ? displayTitle(blocking) : 'Earlier step unavailable'}` : `Waiting for Allmighty to approve: ${displayTitle(s)}`}
+                {blocking && <span className="block text-muted-foreground">{dueText(blocking.due_date)}</span>}</span>
+              </Button>;
+            })}</div> : <p className="text-muted-foreground">No work is assigned to you at the moment. Your plan will appear here when it is assigned.</p>}
+            <Button variant="outline" onClick={() => go('plan')}>Review My plan</Button>
+          </div>}
+        </CardContent>
+      </Card>
+      <section className={`grid gap-2 ${businessPath.data ? 'grid-cols-3' : 'grid-cols-2'}`} aria-label="Your progress">
+        <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">This week</p><p className="text-lg font-semibold leading-tight">{week.done} of {week.total}</p><Progress className="h-1.5" value={week.total ? week.done / week.total * 100 : 0} aria-label={`${week.done} of ${week.total} steps done this week`} /></Card>
+        <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">Ready now</p><p className="text-lg font-semibold leading-tight">{jobsQuery.isSuccess ? eligible.length : '—'}</p></Card>
+        {businessPath.data && <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">Stage</p><p className="text-lg font-semibold leading-tight">{businessPath.data.current ? `${businessPath.data.current.number} of ${businessPath.data.stages.length}` : businessPath.data.stages.length ? 'Done' : '—'}</p>{businessPath.data.current && <p className="text-[13px] leading-tight line-clamp-2">{businessPath.data.current.name}</p>}<Progress className="h-1.5" value={businessPath.data.total ? businessPath.data.done / businessPath.data.total * 100 : 0} aria-label={`${businessPath.data.done} of ${businessPath.data.total} path steps done`} /></Card>}
+      </section>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Coming up</h2>
+        {eligible.filter(s => s.id !== nextStep?.id).length
+          ? eligible.filter(s => s.id !== nextStep?.id).slice(0, 3).map(s => <Card key={s.id} className="p-4 flex items-center justify-between gap-3">
+              <div><p className="font-medium">{displayTitle(s)}</p><p className="text-xs text-muted-foreground">{dueText(s.due_date)}</p></div>
+              <Button size="sm" variant="outline" onClick={() => go('step', {step: s.id})}>Open</Button>
+            </Card>)
+          : <p className="text-sm text-muted-foreground">No additional ready steps. Your next steps will appear here.</p>}
+      </section>
+      {!!questions.length && <Card><CardHeader><CardTitle>Questions you sent</CardTitle></CardHeader><CardContent className="space-y-3">{questions.map(q => <Button key={q.id} variant="ghost" className="w-full h-auto py-3 whitespace-normal text-left justify-start" onClick={() => go('step', { step: q.id })}><span><span className="block font-medium">{q.title}</span><span className="block text-muted-foreground">{questionStatus(q)}</span>{q.status === 'Done' && q.approval_status !== 'Rejected' && q.feedback_note && <span className="block line-clamp-3">{q.feedback_note}</span>}</span></Button>)}</CardContent></Card>}
       {pathVisible && businessPath.data && <Card>
         <CardHeader><CardTitle className="text-xl">Your business path</CardTitle></CardHeader>
         <CardContent className="space-y-4">
@@ -433,46 +475,6 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
           <Button className="min-h-11" onClick={() => go('path')}>See the whole path</Button>
         </CardContent>
       </Card>}
-      <Card className="border-primary/40">
-        <CardHeader><CardTitle className="text-lg">Your next step</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          {nextStep ? <>
-            <div>
-              <p className="text-lg font-semibold">{nextStep.title}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{plain(factsObject(nextStep.facts).why) ||
-                (nextStep.detail ? nextStep.detail.slice(0, 220) + (nextStep.detail.length > 220 ? '…' : '') :
-                  'Open this step for its instructions and expected result.')}</p>
-              {nextJob?.goal_text && <p className="mt-2 text-sm"><strong>Business result:</strong> {nextJob.goal_text}</p>}
-            </div>
-            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-              <span className="inline-flex gap-1 items-center"><Clock3 className="h-4 w-4" />{minutesFor(nextStep) == null ? 'Time not estimated' : `About ${minutesFor(nextStep)} minutes`}</span>
-              <span>Due: {dueText(nextStep.due_date)}</span>
-            </div>
-            {!!dependents(nextStep).length && <p className="text-muted-foreground"><strong>After you finish:</strong> {dependents(nextStep).slice(0, 2).map(s => `${label(s)}: ${s.title}`).join('; ')}</p>}
-            <Button onClick={() => go('step', {step: nextStep.id})}>Start this step <ArrowRight className="h-4 w-4 ml-2"/></Button>
-          </> : <div className="space-y-2">
-            <p className="font-medium">No steps are ready for you right now.</p>
-            {pending.length ? <div className="space-y-2"><h3 className="font-semibold">What you're waiting on</h3>{pending.filter(s => !dependencyFinished(s, byId) || s.approval_status !== 'Approved').slice(0, 3).map(s => {
-              const blocking = s.depends_on ? byId.get(s.depends_on) : undefined;
-              return <Button key={s.id} variant="outline" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: s.id })}>
-                <span>{!dependencyFinished(s, byId) ? `Waiting on ${blocking ? label(blocking) : 'Not assigned'} to finish: ${blocking?.title ?? 'Earlier step unavailable'}` : `Waiting for Allmighty to approve: ${s.title}`}
-                {blocking && <span className="block text-muted-foreground">{dueText(blocking.due_date)}</span>}</span>
-              </Button>;
-            })}</div> : <p className="text-muted-foreground">No work is assigned to you at the moment. Your plan will appear here when it is assigned.</p>}
-            <Button variant="outline" onClick={() => go('plan')}>Review My plan</Button>
-          </div>}
-        </CardContent>
-      </Card>
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Coming up</h2>
-        {eligible.filter(s => s.id !== nextStep?.id).length
-          ? eligible.filter(s => s.id !== nextStep?.id).slice(0, 3).map(s => <Card key={s.id} className="p-4 flex items-center justify-between gap-3">
-              <div><p className="font-medium">{s.title}</p><p className="text-xs text-muted-foreground">{dueText(s.due_date)}</p></div>
-              <Button size="sm" variant="outline" onClick={() => go('step', {step: s.id})}>Open</Button>
-            </Card>)
-          : <p className="text-sm text-muted-foreground">No additional ready steps. Your next steps will appear here.</p>}
-      </section>
-      {!!questions.length && <Card><CardHeader><CardTitle>Questions you sent</CardTitle></CardHeader><CardContent className="space-y-3">{questions.map(q => <Button key={q.id} variant="ghost" className="w-full h-auto py-3 whitespace-normal text-left justify-start" onClick={() => go('step', { step: q.id })}><span><span className="block font-medium">{q.title}</span><span className="block text-muted-foreground">{questionStatus(q)}</span>{q.status === 'Done' && q.approval_status !== 'Rejected' && q.feedback_note && <span className="block line-clamp-3">{q.feedback_note}</span>}</span></Button>)}</CardContent></Card>}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card className="p-3"><p className="text-xl font-semibold">{numbers.isError ? '—' : numbers.data?.followers.toLocaleString() ?? '—'}</p><p className="text-xs text-muted-foreground">Followers recorded</p></Card>
         <Card className="p-3"><p className="text-xl font-semibold">{numbers.isError ? '—' : numbers.data?.revenue == null ? '—' : `$${numbers.data.revenue.toLocaleString()}`}</p><p className="text-xs text-muted-foreground">Revenue recorded this month</p></Card>
@@ -492,7 +494,7 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
         {!assignedStep && <p className="rounded-md border bg-muted p-4">This is {label(selectedStep)}'s step. You can read it, but only they can mark it done.</p>}
         <div>
           <p className="text-sm text-muted-foreground">{selectedStep.job_id ? `${activeJob?.title ?? 'Plan'} · step ${position.position} of ${position.count}` : 'Step'} · {dueText(selectedStep.due_date)}</p>
-          <h2 className="text-2xl font-bold mt-1">{selectedStep.title}</h2>
+          <h2 className="text-2xl font-bold mt-1">{displayTitle(selectedStep)}</h2>
           {activeJob?.goal_text && <p className="mt-2 text-sm text-muted-foreground"><strong>Business goal:</strong> {activeJob.goal_text}</p>}
         </div>
         {archivedStep && <p role="status" className="rounded-md border p-3 text-sm text-muted-foreground">This plan is archived or finished. Its history is preserved, but you cannot complete new work in this plan.</p>}
@@ -503,7 +505,11 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
         </CollapsibleContent></Collapsible>}
         {plain(factsObject(selectedStep.facts).expected_output) && <section className="space-y-2"><h3 className="font-semibold">Done looks like</h3><p className="whitespace-pre-wrap">{plain(factsObject(selectedStep.facts).expected_output)}</p></section>}
         {Array.isArray(factsObject(selectedStep.facts).checks) && (factsObject(selectedStep.facts).checks as unknown[]).length > 0 && <section className="space-y-2"><h3 className="font-semibold">Before you finish, check</h3><ul className="list-disc pl-5 space-y-2">{(factsObject(selectedStep.facts).checks as unknown[]).map((c, i) => <li key={i}>{String(c)}</li>)}</ul></section>}
-        {(dependents(selectedStep).length > 0 || followingStep) && <section className="space-y-2"><h3 className="font-semibold">Who is waiting on this</h3>{dependents(selectedStep).length ? dependents(selectedStep).map(s => <Button key={s.id} variant="ghost" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: s.id })}>{label(s)}: {s.title}</Button>) : followingStep && <Button variant="ghost" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: followingStep.id })}>Next in this plan: {label(followingStep)}: {followingStep.title}</Button>}</section>}
+        {(dependents(selectedStep).length > 0 || followingStep) && <section className="space-y-2"><h3 className="font-semibold">{othersWaiting(selectedStep).length ? 'Who is waiting on this' : 'What comes next'}</h3>
+          {othersWaiting(selectedStep).map(s => <Button key={s.id} variant="ghost" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: s.id })}>{label(s)}: {displayTitle(s)}</Button>)}
+          {dependents(selectedStep).filter(s => assignedTo(s, viewer)).map(s => <Button key={s.id} variant="ghost" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: s.id })}>Then you: {displayTitle(s)}</Button>)}
+          {dependents(selectedStep).length === 0 && followingStep && <Button variant="ghost" className="w-full h-auto py-3 whitespace-normal justify-start text-left" onClick={() => go('step', { step: followingStep.id })}>Next in this plan: {assignedTo(followingStep, viewer) ? '' : `${label(followingStep)}: `}{displayTitle(followingStep)}</Button>}
+        </section>}
         <section className="space-y-3">
           {selectedStep.output_url && <a className="inline-flex gap-1 items-center text-primary underline text-sm" href={selectedStep.output_url} target="_blank" rel="noreferrer">Open the work or result <ExternalLink className="h-4 w-4"/></a>}
           {(brandFiles.data?.links ?? []).filter((l: any) =>
@@ -573,8 +579,8 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
                   <span className="text-xs text-muted-foreground">{within.filter(s => s.status === 'Done').length} of {within.length} done</span>
                 </div>
                 <div className="divide-y">{within.map(s => <Button key={s.id} variant="ghost" className="w-full h-auto whitespace-normal text-left py-3 flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3" onClick={() => go('step',{step:s.id})}>
-                  <span><span className="font-medium">{s.title}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
-                  <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-primary"/> : <Badge variant="outline">{s.approval_status !== 'Approved' ? 'Waiting for approval' : 'To do'}</Badge>}<ArrowRight className="h-4 w-4"/></span>
+                  <span><span className="font-medium">{displayTitle(s)}</span><span className="block text-xs text-muted-foreground">{dueText(s.due_date)}</span></span>
+                  <span className="flex items-center gap-2 shrink-0">{s.status === 'Done' ? <CheckCircle2 className="h-4 w-4 text-primary"/> : <Badge variant="outline">{teamStepState(s, byId)}</Badge>}<ArrowRight className="h-4 w-4"/></span>
                 </Button>)}</div>
               </section>;
             })}
@@ -695,7 +701,7 @@ function WholePlan({ steps, jobs, inactive, label, go }: { steps: Step[]; jobs: 
   if (!visible.length) return <p>No steps are recorded in the current plan.</p>;
   return <div className="space-y-5">{[...new Set(visible.map(s => s.job_id ?? 'other'))].map(group => {
     const items = orderedSteps(visible.filter(s => (s.job_id ?? 'other') === group));
-    const row = (s: Step) => <Button key={s.id} variant="ghost" className="w-full h-auto whitespace-normal py-4 text-left justify-start" onClick={() => go('step', { step: s.id })}><span className="w-full space-y-2"><span className="block font-medium">{s.title}</span><span className="block text-muted-foreground">{dueText(s.due_date)}</span><span className="flex flex-wrap gap-2"><Badge variant="secondary">{label(s)}</Badge><Badge variant="outline">{teamStepState(s, byId)}</Badge></span></span></Button>;
+    const row = (s: Step) => <Button key={s.id} variant="ghost" className="w-full h-auto whitespace-normal py-4 text-left justify-start" onClick={() => go('step', { step: s.id })}><span className="w-full space-y-2"><span className="block font-medium">{displayTitle(s)}</span><span className="block text-muted-foreground">{dueText(s.due_date)}</span><span className="flex flex-wrap gap-2"><Badge variant="secondary">{label(s)}</Badge><Badge variant="outline">{teamStepState(s, byId)}</Badge></span></span></Button>;
     const finished = items.filter(s => s.status === 'Done');
     return <Card key={group}><CardHeader><CardTitle className="text-lg">{jobs.find(j => j.id === group)?.title ?? (group === 'other' ? 'Other steps' : 'Plan')}</CardTitle></CardHeader><CardContent className="divide-y">{items.filter(s => s.status !== 'Done').map(row)}{!!finished.length && <Collapsible><CollapsibleTrigger asChild><Button variant="ghost" className="min-h-11">Show finished ({finished.length})</Button></CollapsibleTrigger><CollapsibleContent>{finished.map(row)}</CollapsibleContent></Collapsible>}</CardContent></Card>;
   })}</div>;

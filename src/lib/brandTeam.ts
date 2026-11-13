@@ -4,7 +4,7 @@ export type TeamStep = {
   id: string; title: string; status: string; approval_status: string | null;
   owner_kind: string | null; assignee: string | null; assignee_id: string | null;
   depends_on: string | null; job_id: string | null; step_order: number | null;
-  due_date: string | null;
+  due_date: string | null; priority?: string | null;
 };
 export const assignedTo = (step: TeamStep, viewer: TeamViewer) =>
   step.assignee_id != null ? !!viewer.id && step.assignee_id === viewer.id :
@@ -15,6 +15,25 @@ export function ownerLabel(step: TeamStep, viewer: TeamViewer): string {
   if (step.owner_kind === 'agent') return 'AI agent';
   return step.assignee?.trim() || 'Not assigned';
 }
+/** A step title without a leading "Name: " when that name is the step's own owner, because the owner is shown beside it. */
+export function displayTitle(step: Pick<TeamStep, 'title' | 'assignee' | 'owner_kind'>): string {
+  const title = (step.title ?? '').trim();
+  const names = [step.assignee?.trim(), step.owner_kind === 'claude' ? 'Claude' : ''].filter(Boolean) as string[];
+  for (const name of names) {
+    const prefix = `${name.toLowerCase()}:`;
+    if (title.toLowerCase().startsWith(prefix)) {
+      const rest = title.slice(prefix.length).trim();
+      return rest ? rest.charAt(0).toUpperCase() + rest.slice(1) : title;
+    }
+  }
+  return title;
+}
+export const minutesText = (minutes: number) => `About ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+/** The order Today uses for "next": earliest due date, then priority, then plan order. */
+export const firstDue = <T extends TeamStep>(steps: T[]): T | undefined => [...steps].sort((a, b) =>
+  (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') ||
+  (a.priority ?? '').localeCompare(b.priority ?? '') ||
+  (a.step_order ?? 9999) - (b.step_order ?? 9999))[0];
 export const dependencyFinished = (step: TeamStep, byId: Map<string, TeamStep>) =>
   !step.depends_on || byId.get(step.depends_on)?.status === 'Done';
 export const readyFor = (step: TeamStep, viewer: TeamViewer, byId: Map<string, TeamStep>, inactive: Set<string>) =>

@@ -6,7 +6,7 @@ import { useBrandChannels, useBrandKitAssetsView, useProjectProducts } from '@/h
 import { useBusinessPath } from '@/hooks/useBusinessPath';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { platformLabel } from '@/lib/ownerWork';
-import { dependencyFinished, ownerLabel, orderedSteps, type TeamStep, type TeamViewer } from '@/lib/brandTeam';
+import { dependencyFinished, displayTitle, firstDue, ownerLabel, type TeamStep, type TeamViewer } from '@/lib/brandTeam';
 import { BrandProductPlans } from './BrandProductPlans';
 import { BrandRevenueOpportunities } from './BrandRevenueOpportunities';
 import { Button } from '@/components/ui/button';
@@ -61,8 +61,8 @@ export function BrandTeamAbout({ projectId, goal, steps, viewer, inactive, go }:
     </div>)}</section>}
     {!!owners.length && <section className="space-y-3"><h2 className="text-xl font-semibold">Who does what</h2>{owners.map(label => {
       const owned = open.filter(s => ownerLabel(s, viewer) === label);
-      const next = orderedSteps(owned).find(s => s.approval_status === 'Approved' && dependencyFinished(s, byId) && (!s.job_id || !inactive.has(s.job_id)));
-      return <div key={label} className="border-b py-3"><p className="font-medium">{label} · {owned.length} open steps</p>{next && <p className="text-muted-foreground">Next: {next.title}</p>}</div>;
+      const next = firstDue(owned.filter(s => (s.approval_status === 'Approved' || s.approval_status === 'Auto') && dependencyFinished(s, byId) && (!s.job_id || !inactive.has(s.job_id))));
+      return <div key={label} className="border-b py-3"><p className="font-medium">{label} · {owned.length} open steps</p>{next && <p className="text-muted-foreground">Next: {displayTitle(next)}</p>}</div>;
     })}</section>}
     {hasVoice && <section className="space-y-3"><h2 className="text-xl font-semibold">How it sounds</h2>
       {voice.data?.brand_voice && <><p className="whitespace-pre-wrap">{expanded ? voice.data.brand_voice : voice.data.brand_voice.slice(0, 400)}{!expanded && voice.data.brand_voice.length > 400 ? '…' : ''}</p>
