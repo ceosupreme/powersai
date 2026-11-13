@@ -26,7 +26,7 @@ export function useBusinessPath(projectId: string) {
         allRows<PathStatusRow>((from, to) => supabase.from('brand_path_step_status').select('*').eq('venue_id', projectId).order('id').range(from, to)),
       ]);
       if (settings.error) throw settings.error;
-      return { settings: settings.data, ...businessPathProgress(stages, steps, settings.data, statuses) };
+      return { settings: settings.data, hasSavedStatus: statuses.length > 0, ...businessPathProgress(stages, steps, settings.data, statuses) };
     },
   });
   const refresh = () => qc.invalidateQueries({ queryKey });

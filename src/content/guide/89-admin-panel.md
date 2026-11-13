@@ -38,6 +38,7 @@ The Admin Panel is where you control who can sign in to HQ, what each person can
 1. Tap "Edit" on their row.
 2. Change "Role", "Asana GID" or the ticks under "Assigned Bars".
 3. Tap "Save Changes". You see "User updated successfully".
+For an Owner role, pick any of your own brand types: internal brand, content channel, app build or service offer. Choose at least one. Prospect shells are not offered; the person only sees their assigned brands.
 
 ### Choose which menu items one person sees
 1. Tap "Edit" on their row and scroll to "Menu items this person sees". For an admin it only says "Admins see every menu item."

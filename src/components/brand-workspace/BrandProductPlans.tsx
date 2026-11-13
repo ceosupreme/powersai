@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
-export function BrandProductPlans({ projectId }: { projectId: string }) {
+export function BrandProductPlans({ projectId, readOnly = false }: { projectId: string; readOnly?: boolean }) {
   const products = useProjectProducts(projectId);
   const jobs = useProjectJobs(projectId);
   const [open, setOpen] = useState(false);
@@ -23,6 +23,11 @@ export function BrandProductPlans({ projectId }: { projectId: string }) {
   );
   const items = products.data ?? [];
   const displayed = expanded ? items : items.slice(0, 6);
+
+  if (readOnly) return items.length ? <section className="space-y-3"><h2 className="text-xl font-semibold">What it sells</h2>
+    {displayed.map(p => <div key={p.id} className="border-b py-3"><p className="font-medium">{p.name}</p><p className="text-muted-foreground">{p.status || 'Not started'}{p.price != null ? ` · ${formatCurrency(Number(p.price))}` : ''}</p></div>)}
+    {items.length > 6 && <Button variant="ghost" className="min-h-11" onClick={() => setExpanded(v => !v)}>{expanded ? 'Show fewer' : 'Show all products'}</Button>}
+  </section> : null;
 
   return <Card>
     <CardContent className="p-4">

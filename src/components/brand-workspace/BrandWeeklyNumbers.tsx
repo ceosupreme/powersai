@@ -17,7 +17,7 @@ const GROUP_NAMES: Record<string, string> = {
   revenue: 'Revenue', operations: 'Operations',
 };
 
-export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
+export function BrandWeeklyNumbers({ projectId, readOnly = false }: { projectId: string; readOnly?: boolean }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
@@ -48,6 +48,7 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
     setNote('');
   };
   const submit = async (def: typeof manual[number]) => {
+    if (readOnly) return;
     const actual = Number(draft);
     if (!draft.trim() || !Number.isFinite(actual)) return toast.error('Enter a valid number.');
     if (def.direction === 'checklist' && actual !== 0 && actual !== 1) return toast.error('Enter 1 for complete or 0 for not completed.');
@@ -101,13 +102,13 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
                         {def.target == null ? '' : ' · Target ' + def.target.toLocaleString()}
                       </p>
                     </div>
-                    {editing !== key && <Button size="sm" variant="outline" onClick={() => begin(key, recorded?.actual ?? null)}>
+                    {!readOnly && editing !== key && <Button size="sm" variant="outline" onClick={() => begin(key, recorded?.actual ?? null)}>
                       {recorded?.actual == null ? 'Enter' : 'Update'}
                     </Button>}
                   </div>
                   {plans.length > 0 && <div className="rounded-md bg-muted/40 px-3 py-2 space-y-1">
                     <p className="text-xs font-semibold">Work plans supporting this number</p>
-                    {plans.slice(0, 3).map(plan => <Link key={plan.id}
+                    {plans.slice(0, 3).map(plan => readOnly ? <p key={plan.id}>{plan.title}</p> : <Link key={plan.id}
                       className="block text-xs text-primary underline underline-offset-2"
                       to={`/project/${projectId}/jobs/${plan.id}`}>
                       {plan.title} · {plan.status === 'finished' ? 'Finished' : plan.status === 'parked' ? 'Parked' : 'In progress'}
@@ -115,7 +116,7 @@ export function BrandWeeklyNumbers({ projectId }: { projectId: string }) {
                     {plans.length > 3 && <p className="text-xs text-muted-foreground">{plans.length - 3} more linked plans</p>}
                     <p className="text-xs text-muted-foreground">These plans target this metric; they do not prove the result was achieved.</p>
                   </div>}
-                  {editing === key && <div className="space-y-2">
+                  {!readOnly && editing === key && <div className="space-y-2">
                     <Input type="number" inputMode="decimal" step={def.direction === 'checklist' ? '1' : 'any'} value={draft} onChange={e => setDraft(e.target.value)}
                       aria-label={def.kpi_label} placeholder={def.direction === 'checklist' ? '0 or 1' : 'Actual number'}/>
                     <Input value={note} onChange={e => setNote(e.target.value)} placeholder="Source or context (optional)"/>

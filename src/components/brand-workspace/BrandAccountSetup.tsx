@@ -22,7 +22,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
  * existing account, defer or skip an asset and edit the profile of their
  * assigned brand. All writes remain scoped by database RLS.
  */
-export function BrandAccountSetup({ projectId }: { projectId: string }) {
+export function BrandAccountSetup({ projectId, readOnly = false }: { projectId: string; readOnly?: boolean }) {
   const map = useAssetMap(projectId);
   const jobs = useOpenSetupJobs(projectId);
   const profile = useBrandProfile(projectId);
@@ -48,6 +48,7 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
   const unstarted = ready.filter(r => !r.channel_id || !jobs.data?.has(r.channel_id)).slice(0, 3);
 
   const perform = async (key: string, fn: () => Promise<unknown>, ok: string): Promise<boolean> => {
+    if (readOnly) return false;
     if (busyKey) return false;
     setBusyKey(key);
     try {
@@ -64,6 +65,7 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
   };
 
   const begin = async (row: AssetMapRow) => {
+    if (readOnly) return;
     if (busyKey) return;
     const existing = row.channel_id && jobs.data?.get(row.channel_id);
     if (existing) { navigate(pipelineHref(projectId, existing)); return; }
@@ -79,6 +81,7 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
   };
 
   const beginTopThree = async () => {
+    if (readOnly) return;
     if (busyKey || !unstarted.length) return;
     setBusyKey('top-three');
     const created: string[] = [];
@@ -156,12 +159,12 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
           <p className="text-sm text-muted-foreground">
             {ready.length} accounts need attention. {running.length} already have setup plans in progress.
           </p>
-          {rows.some(isFoundation) && <p className="text-xs text-muted-foreground">
+          {!readOnly && rows.some(isFoundation) && <p className="text-xs text-muted-foreground">
             Need your logo, brand colors or fonts? <Link className="text-primary underline"
               to={`/workspace?view=files&brand=${projectId}`}>Find your brand files</Link>.
             Ask the HQ administrator to add anything missing.
           </p>}
-          {unstarted.length > 1 && <Button size="sm" variant="outline" disabled={busyKey !== null}
+          {!readOnly && unstarted.length > 1 && <Button size="sm" variant="outline" disabled={busyKey !== null}
             onClick={beginTopThree}>Make setup plans for the top {unstarted.length}</Button>}
           {!ready.length ? <p className="text-sm text-muted-foreground">
             No required accounts need setup right now. Deferred accounts remain listed below.
@@ -176,7 +179,7 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
                 {whyLine(row) && <p className="text-sm text-muted-foreground">{whyLine(row)}</p>}
                 {row.unlocks && <p className="text-sm">When ready: {row.unlocks}</p>}
                 <p className="text-xs text-muted-foreground">{minutesText(row.setup_minutes)}</p>
-                <div className="flex flex-wrap gap-2">
+                {!readOnly && <div className="flex flex-wrap gap-2">
                   <Button size="sm" disabled={busyKey !== null} onClick={() => begin(row)}>
                     {existing ? 'Resume setup plan' : 'Make setup plan and open first step'}
                   </Button>
@@ -188,7 +191,7 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
                       `${row.label} moved to Later`)}>Later</Button>
                   <Button size="sm" variant="ghost" disabled={busyKey !== null}
                     onClick={() => setSkip(row)}>Skip</Button>
-                </div>
+                </div>}
               </div>;
             })}
           </div>}
@@ -208,13 +211,13 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
                     {row.decision_reason ? ' · ' + row.decision_reason : ''}
                   </p>
                 </div>
-                <Button size="sm" variant="outline" disabled={busyKey !== null}
+                {!readOnly && <Button size="sm" variant="outline" disabled={busyKey !== null}
                   onClick={() => void perform('undo-'+row.asset_key,
-                    () => clearDecision(projectId, row.asset_key), 'Setup choice restored')}>Undo</Button>
+                    () => clearDecision(projectId, row.asset_key), 'Setup choice restored')}>Undo</Button>}
               </div>)}
             </CollapsibleContent>
           </Collapsible>}
-          <Collapsible open={advanced} onOpenChange={setAdvanced}>
+          {!readOnly && <Collapsible open={advanced} onOpenChange={setAdvanced}>
             <CollapsibleTrigger className="inline-flex items-center gap-2 text-sm font-medium">
               <ChevronDown className={'h-4 w-4 transition-transform ' + (advanced ? 'rotate-180' : '')}/>
               More setup options
@@ -230,12 +233,12 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
                   onClick={copyBrief}>Copy a setup brief for an assistant</Button>
               </div>
             </CollapsibleContent>
-          </Collapsible>
+          </Collapsible>}
         </>}
       </CollapsibleContent>
     </Collapsible>
 
-    <HaveItDialog row={haveIt} onClose={() => { if (!busyKey) setHaveIt(null); }}
+    {!readOnly && <><HaveItDialog row={haveIt} onClose={() => { if (!busyKey) setHaveIt(null); }}
       onSave={(v) => { if (!haveIt) return; void perform('existing',
         () => recordExisting(projectId, haveIt, v), 'Existing account saved')
         .then(saved => { if (saved) setHaveIt(null); }); }} />
@@ -247,6 +250,6 @@ export function BrandAccountSetup({ projectId }: { projectId: string }) {
       onClose={() => { if (!busyKey) setEditingProfile(false); }}
       onSave={(v) => { void perform('profile',
         () => saveBrandProfile(projectId, v), 'Brand type saved')
-        .then(saved => { if (saved) setEditingProfile(false); }); }} />
+         .then(saved => { if (saved) setEditingProfile(false); }); }} /></>}
   </CardContent></Card>;
 }

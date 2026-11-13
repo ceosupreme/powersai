@@ -5,7 +5,8 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 
 ## Where to find it
 - Side menu: Workspace, then Dashboard. On a phone, Dashboard is the first bottom-bar button.
-- Brand managers see their brand workspace here instead. A row of tabs at the top switches between "Today", "My plan", "Posts & videos" and "Files"; "Brand page" opens the selected brand's page, and "Switch brand" appears when they manage more than one brand.
+- Brand people see their assigned brand here instead. Tabs are "Today", "About", "My plan", "Posts & videos" and "Files". "Brand page" opens the brand's page. When they help run several brands, brand chips switch between them and show ready-step counts when above zero.
+- Today shows weekly completion, ready steps, the current map stage, what follows the next step, what is blocking pending steps, and their latest questions. About is a read-only brand brief. My plan starts with My steps; Whole plan shows everyone's part, with finished steps tucked away per plan. A step opens its instructions, expected result, checks, available how-to guide and who is waiting on it. Only the assigned person sees completion and help controls.
 - The address remains /workspace. Signing in normally opens this screen; a direct link can take you back to the page you requested.
 
 ## What you see

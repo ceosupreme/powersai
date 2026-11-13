@@ -24,6 +24,7 @@ import { Loader2, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
 import { UserMenuItems } from './UserMenuItems';
+import { MY_BRAND_TYPES } from '@/hooks/usePortfolioData';
 
 interface Bar {
   id: string;
@@ -62,7 +63,7 @@ export const EditUserDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
   const visibleProjects = bars.filter(p =>
-    editedRole !== 'owner' || p.project_type === 'internal_brand'
+    editedRole !== 'owner' || (MY_BRAND_TYPES as readonly string[]).includes(p.project_type ?? '')
   );
   const inaccessibleSelection = selectedBarIds.filter(id =>
     !visibleProjects.some(p => p.id === id)
@@ -271,7 +272,7 @@ export const EditUserDialog = ({
               <Label>{editedRole === 'owner' ? 'Brands this person can manage' : 'Projects this person can access'}{editedRole !== 'admin' ? ' *' : ''}</Label>
               <p className="text-xs text-muted-foreground">
                 {editedRole === 'owner'
-                  ? 'Brand managers may be assigned internal brands only; choose at least one.'
+                  ? 'Pick the brands this person helps run. They only see these brands. Choose at least one.'
                   : editedRole === 'admin'
                     ? 'Admins have full access. Project assignments are optional.'
                     : 'Choose at least one real project. Prospect shells are not assignable.'}

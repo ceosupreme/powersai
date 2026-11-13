@@ -24,6 +24,7 @@ import { Copy, Eye, EyeOff, Loader2, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
 import { functionErrorMessage } from '@/lib/functionError';
+import { MY_BRAND_TYPES } from '@/hooks/usePortfolioData';
 
 /** A random temporary password, easy to read out or text: four groups of four, no look-alike characters. */
 function makeTemporaryPassword(): string {
@@ -81,10 +82,10 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
   const [selectedBarIds, setSelectedBarIds] = useState<string[]>([]);
   const [primaryBarId, setPrimaryBarId] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  // Brand managers only receive internal brands. Clients and bar staff keep
+  // Brand managers can receive any of the owner's brand types. Clients and staff keep
   // their current assignment model; prospect shells are excluded upstream.
   const availableProjects = bars.filter(p =>
-    formData.role !== 'owner' || p.project_type === 'internal_brand'
+    formData.role !== 'owner' || (MY_BRAND_TYPES as readonly string[]).includes(p.project_type ?? '')
   );
   const requiresProject = formData.role !== 'admin';
 
@@ -338,7 +339,7 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
             <Label>{formData.role === 'owner' ? 'Brands this person can manage' : 'Projects this person can access'}{requiresProject ? ' *' : ''}</Label>
             <p className="text-xs text-muted-foreground">
               {formData.role === 'owner'
-                ? 'Only internal brands are listed. At least one assignment is required before saving.'
+                ? 'Pick the brands this person helps run. They only see these brands. Choose at least one.'
                 : requiresProject
                   ? 'Choose at least one real project. Prospect shells cannot be assigned.'
                   : 'Admins already have full access; assignments are optional.'}

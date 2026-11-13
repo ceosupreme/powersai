@@ -39,7 +39,6 @@ import {
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
 import { PlaybooksTab } from './PlaybooksTab';
 import { BusinessPathTab } from './BusinessPathTab';
-import { useBusinessPath } from '@/hooks/useBusinessPath';
 import { SetupLine, SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
@@ -77,10 +76,7 @@ export function BrandWorkspace({
   setup: ReactNode;
 }) {
   const [params, setParams] = useSearchParams();
-  // Managers see the Business path tab only after an admin turns on "Show this path to brand managers".
-  const businessPath = useBusinessPath(projectId);
-  const pathVisible = isAdmin || businessPath.data?.settings?.visible_to_managers === true;
-  const tabs = WORKSPACE_TABS.filter((t) => t.key !== 'path' || pathVisible);
+  const tabs = WORKSPACE_TABS;
   const raw = params.get('tab');
   const tab: TabKey = (tabs.find((t) => t.key === raw)?.key ?? 'overview') as TabKey;
   const select = (key: TabKey) => {

@@ -365,6 +365,7 @@ export default function ProjectHome() {
                 <ToggleGroupItem value="parked" className="h-7 px-2 text-xs">Parked</ToggleGroupItem>
               </ToggleGroup>
             )}
+            {isNonClient && isAdmin && <Button asChild variant="outline" className="min-h-11"><Link to={`/workspace?team_view=1&brand=${venueId}`}>See what the team sees</Link></Button>}
             {isNonClient && isAdmin && (
               <Select
                 value={meta.ownership ?? 'owned'}

@@ -9,7 +9,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 
 const PRIORITY: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
 
-export function BrandRevenueOpportunities({ projectId }: { projectId: string }) {
+export function BrandRevenueOpportunities({ projectId, readOnly = false }: { projectId: string; readOnly?: boolean }) {
   const foundation = useFoundationScores(projectId);
   const [open, setOpen] = useState(false);
   const [all, setAll] = useState(false);
@@ -23,6 +23,12 @@ export function BrandRevenueOpportunities({ projectId }: { projectId: string }) 
   }, [foundation.result]);
   const running = lanes.filter(x => x.status === 'satisfied').length;
   const shown = all ? lanes : lanes.slice(0, 4);
+
+  if (readOnly) return lanes.length ? <section className="space-y-3"><h2 className="text-xl font-semibold">How it makes money</h2>
+    <p className="text-muted-foreground">{running} of {lanes.length} opportunities running</p>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">{shown.map(lane => <RevenueLaneCard key={lane.item_key} item={lane} projectId={projectId} canEdit={false} />)}</div>
+    {lanes.length > 4 && <Button className="min-h-11" variant="ghost" onClick={() => setAll(v => !v)}>{all ? 'Show fewer' : 'See all opportunities'}</Button>}
+  </section> : null;
 
   return <Card>
     <CardContent className="p-4">

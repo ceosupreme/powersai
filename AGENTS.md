@@ -1,6 +1,7 @@
 # Project architecture rules
 
-- Business Path progress and proof validation live in `src/lib/businessPath.ts`, loaded and saved only through `useBusinessPath`; admin and manager screens share `BusinessPathTab` so counts, completion, and proof rules agree. Manager visibility is a UI rollout switch, not an additional RLS permission.
+- Business Path progress and proof validation live in `src/lib/businessPath.ts`, loaded and saved only through `useBusinessPath`; admin and manager screens share `BusinessPathTab` so counts, completion, and proof rules agree. The map is always available to assigned brand teams; settings saves preserve the legacy visibility value.
+- Brand-team viewer labels, readiness, plan ordering and Pacific-week counts live in `src/lib/brandTeam.ts`; admin team view uses URL-scoped presentation identity and read-only child controls, never impersonated write credentials.
 
 - Radar reads existing research tables through paginated, RLS-respecting queries and shares the content_pipeline permission; it never writes research data or introduces a separate permission model.
 

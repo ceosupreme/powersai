@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { LayoutDashboard, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
@@ -18,10 +20,24 @@ import BrandManagerPortal from './BrandManagerPortal';
 export default function OwnerDashboard() {
   const { role, isAdmin } = useAuth();
   const managed = useBrandManagerProjects();
+  const [params] = useSearchParams();
+  const previewId = params.get('brand');
+  const teamView = isAdmin && params.get('team_view') === '1' && !!previewId;
+  const previewBrand = useQuery({ queryKey: ['team-view-brand', previewId], enabled: teamView, queryFn: async () => {
+    if (!previewId) return null;
+    const { data, error } = await supabase.from('venues').select('id,name,north_star,project_type').eq('id', previewId).maybeSingle();
+    if (error) throw error;
+    return data;
+  } });
+  if (teamView) {
+    if (previewBrand.isLoading) return <p role="status">Loading team view…</p>;
+    if (previewBrand.isError || !previewBrand.data) return <Card className="p-5 space-y-3"><p role="alert">This brand could not be loaded.</p><Button asChild><Link to="/workspace">Back to my dashboard</Link></Button></Card>;
+    return <BrandManagerPortal brands={[{ ...previewBrand.data, project_type: previewBrand.data.project_type ?? '' }]} preview />;
+  }
   if (role === 'owner' && !isAdmin) {
     if (managed.isLoading) return <p role="status">Loading your brand workspace…</p>;
     if (managed.isError) return <Card className="p-5 space-y-3"><p role="alert">We could not verify your assigned brands.</p><Button onClick={() => void managed.refetch()}>Try again</Button></Card>;
-    if ((managed.data?.length ?? 0) > 0) return <BrandManagerPortal brands={managed.data!} />;
+    if (managed.data?.length) return <BrandManagerPortal brands={managed.data} />;
   }
   return <OwnerDashboardContent />;
 }

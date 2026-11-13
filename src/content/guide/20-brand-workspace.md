@@ -22,12 +22,13 @@ The brand header sits at the top:
 - A small line under the goal with the brand's money model, when one is recorded. It cannot be changed here.
 - A live badge. It reads "LIVE — capturing leads" when the brand's go-live steps are finished, or "Go-live" with a count such as 3/5 when they are not. Next to it is the percent "fully configured" and a thin progress bar.
 - A "Setup wizard" button on the right. It opens the step-by-step setup wizard for the go-live steps, such as lead capture.
+- Admins can tap "See what the team sees" to open a read-only team view. "Viewing as" chooses a person assigned steps on this brand. Tabs and step links keep that choice. Save, completion, help, post editing, uploads and other write controls are hidden; "Back to my dashboard" exits the preview.
 
 On the Supreme Team Media brand only, a "Website, last 7 days" card follows the header, with "Page views", "CTA clicks", "Call requests", "First-response rate", "Inquiries by industry" and orders from the last 30 days.
 
 Below the header is the tab row. On a phone it scrolls sideways, so swipe it left to reach the later tabs.
 - "Overview": the brand at a glance, with headline numbers, what is waiting on you, the brand's Next 10, its scores and recent activity.
-- "Business path": the brand's current stage and applicable steps, with saved status, notes and proof links. Admins set its business types, money goal, weekly hours and whether managers see it on Today. Done requires a secure proof link; Not needed also counts toward completion. Open a step, choose its status and save. Managers can update their own brand's steps but cannot change path settings. Brand managers reach this page from the "Brand page" button at the top of their Dashboard, and they see the "Business path" tab only after an admin turns on "Show this path to brand managers". Until stages are loaded, this tab says the business path hasn't been loaded yet.
+- "Business path": always available to the brand team, showing the current stage and applicable steps with saved status, notes and proof links. Admins set business types, money goal and weekly hours. Done requires a secure proof link; Not needed also counts toward completion. Managers can update their assigned brand's map steps but cannot change settings. When no status is saved, the map explains that the brand has not been placed yet. Until stages are loaded, it says the business path hasn't been loaded yet.
 - "Setup": the map of every account and asset this brand should have, what is in place, and what is still to set up.
 - "Channels": every social account, site and store on file, with follower numbers, posting targets and STALE warnings.
 - "Avenues": the brand's money avenues (the ways it can earn), which ones are on, and what each is worth per hour of your time.

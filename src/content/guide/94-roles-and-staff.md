@@ -7,7 +7,7 @@ Every login has a role, and the role decides which screens a person can open, wh
 
 - Give or change a role: Admin Panel, "Users", "Edit". See "Admin Panel: users and permissions".
 - Turn pages on or off for a role: Admin Panel, "Permissions". For one person: Admin Panel, "Users", "Edit", "Menu items this person sees".
-- Brand managers (the owner role with assigned internal brands) use the same side menu, bottom bar and "More" sheet as every owner. Their Dashboard opens their brand workspace with a tab row: "Today", "My plan", "Posts & videos" and "Files", plus a "Brand page" button that opens the selected brand's page.
+- Brand people (the owner role with assigned own-brand types) use the same side menu, bottom bar and "More" sheet as every owner. Their Dashboard has "Today", "About", "My plan", "Posts & videos" and "Files", plus "Brand page". The business map is always visible. Admins can open "See what the team sees" on a brand page for a read-only preview as an assigned person; this does not change sign-in or brand access.
 - Preview on a computer: tap "Preview Role" at the bottom of the side menu. On a phone there is no menu for it; add /preview/ and then owner, gm, lead, foh or boh to the site address.
 - Staff screens: /staff/my-shift, /staff/shift, /staff/tasks, /staff/chat and /staff/logs. The address /staff opens the staff tasks screen.
 

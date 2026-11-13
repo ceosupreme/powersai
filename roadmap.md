@@ -1,5 +1,10 @@
 # Roadmap
 
+## Brand team screen
+- [x] Expand brand assignments and always-visible Business path
+- [x] Today progress, step context/how-to, Whole plan and About
+- [x] Read-only admin team view, guide updates and verification (no live data writes); real signed-in admin preview checked, non-admin save flow intentionally not exercised
+
 ## Business Path
 - [x] Create empty path tables with scoped policies and required grants (zero rows)
 - [x] Shared progress logic, admin brand tab, and gated manager Today/path view
