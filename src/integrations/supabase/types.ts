@@ -5475,6 +5475,42 @@ export type Database = {
           },
         ]
       }
+      ghl_sync: {
+        Row: {
+          ghl_contact_id: string | null
+          ghl_location_id: string
+          ghl_opportunity_id: string | null
+          id: string
+          note: string | null
+          source: string
+          source_id: string
+          status: string
+          synced_at: string
+        }
+        Insert: {
+          ghl_contact_id?: string | null
+          ghl_location_id: string
+          ghl_opportunity_id?: string | null
+          id?: string
+          note?: string | null
+          source: string
+          source_id: string
+          status?: string
+          synced_at?: string
+        }
+        Update: {
+          ghl_contact_id?: string | null
+          ghl_location_id?: string
+          ghl_opportunity_id?: string | null
+          id?: string
+          note?: string | null
+          source?: string
+          source_id?: string
+          status?: string
+          synced_at?: string
+        }
+        Relationships: []
+      }
       gm_logs: {
         Row: {
           asana_comment_gid: string | null
@@ -16220,6 +16256,10 @@ export type Database = {
       user_can_manage_brand: { Args: { _project_id: string }; Returns: boolean }
       user_can_manage_project: {
         Args: { _project_id: string }
+        Returns: boolean
+      }
+      user_can_read_step_guide: {
+        Args: { _guide_id: string }
         Returns: boolean
       }
       user_has_bar_access: {
