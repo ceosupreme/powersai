@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { priorityLabel } from '@/hooks/useNextTen';
 import { pipelineHref } from '@/lib/ownerWork';
+import { TaskExplainer } from '@/components/tasks/TaskExplainer';
 import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
 
 export const PRIORITY_CHIP: Record<number, string> = {
@@ -38,20 +39,32 @@ export function AllBrandsWaitingStrip({
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((r) => (
-            <li key={r.id}>
-              <button
-                type="button"
-                className="w-full text-left py-2 flex items-start gap-3 hover:bg-primary/5 rounded"
-                onClick={() => (r.jobId ? navigate(pipelineHref(r.projectId, r.jobId, r.id)) : onOpenProject(r.projectId))}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{r.brand}</p>
-                  <p className="text-sm text-foreground">{r.title}</p>
-                </div>
-                <Badge variant="outline" className={cn('text-[10px] shrink-0', PRIORITY_CHIP[r.priorityRank])}>
-                  {priorityLabel(r.priorityRank) === '—' ? 'No priority' : priorityLabel(r.priorityRank)}
-                </Badge>
-              </button>
+            <li key={r.id} className="py-2">
+              <TaskExplainer
+                task={{
+                  title: r.title, detail: r.detail, why: r.why, ownerKind: r.ownerKind, minutes: r.minutes,
+                  brand: r.brand, priority: priorityLabel(r.priorityRank) === '—' ? null : priorityLabel(r.priorityRank),
+                  dueDate: r.dueDate, pillar: r.pillar, status: r.status, projectId: r.projectId,
+                }}
+                header={<>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.brand}</p>
+                  <p className="text-sm text-foreground font-medium">{r.title}</p>
+                </>}
+                trailing={
+                  <Badge variant="outline" className={cn('text-xs shrink-0 mt-2', PRIORITY_CHIP[r.priorityRank])}>
+                    {priorityLabel(r.priorityRank) === '—' ? 'No priority' : priorityLabel(r.priorityRank)}
+                  </Badge>
+                }
+                actions={
+                  <button
+                    type="button"
+                    className="mt-1 text-sm text-primary underline underline-offset-2 min-h-11"
+                    onClick={() => (r.jobId ? navigate(pipelineHref(r.projectId, r.jobId, r.id)) : onOpenProject(r.projectId))}
+                  >
+                    {r.jobId ? 'Open the related step and instructions' : 'Open the brand'}
+                  </button>
+                }
+              />
             </li>
           ))}
         </ul>

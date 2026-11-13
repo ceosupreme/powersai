@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { streamAskBarPulse } from '@/lib/askStream';
 import { Lightbulb, Send, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,6 @@ interface AskBarPulseWidgetProps {
   };
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ask-barpulse`;
 
 export const AskBarPulseWidget = ({ context }: AskBarPulseWidgetProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -57,93 +56,22 @@ export const AskBarPulseWidget = ({ context }: AskBarPulseWidgetProps) => {
     setIsLoading(true);
     setIsExpanded(true);
 
-    let assistantContent = '';
-    let assistantEvidence: ToolCallRecord[] = [];
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Not authenticated');
-
-      const response = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          question: input.trim(),
-          context: {
-            ...contextRef.current,
-            bar_id: contextRef.current.bar_id || contextRef.current.barId,
-          },
-          messages: messages.slice(-20).map(m => ({ role: m.role, content: m.content })),
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        if (response.status === 401) {
-          throw new Error('Your session expired. Please sign in again.');
-        } else if (response.status === 429) {
-          throw new Error('Too many requests. Please try again in a minute.');
-        } else {
-          throw new Error(errorData.error || 'AI assistant is temporarily unavailable.');
-        }
-      }
-
-      if (!response.body) throw new Error('No response body');
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = '';
-
       setMessages(prev => [...prev, { role: 'assistant', content: '', evidence: [] }]);
-
-      const handleLine = (raw: string) => {
-        let line = raw.endsWith('\r') ? raw.slice(0, -1) : raw;
-        if (line.startsWith(':') || line.trim() === '' || !line.startsWith('data: ')) return;
-        const jsonStr = line.slice(6).trim();
-        if (jsonStr === '[DONE]') return;
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const delta = parsed.choices?.[0]?.delta;
-          if (delta?.content) {
-            assistantContent += delta.content;
-            setMessages(prev => {
-              const updated = [...prev];
-              const last = updated[updated.length - 1];
-              if (last?.role === 'assistant') {
-                updated[updated.length - 1] = { ...last, content: assistantContent };
-              }
-              return updated;
-            });
-          }
-          if (Array.isArray(delta?.tool_evidence) && delta.tool_evidence.length) {
-            assistantEvidence = [...assistantEvidence, ...delta.tool_evidence];
-            setMessages(prev => {
-              const updated = [...prev];
-              const last = updated[updated.length - 1];
-              if (last?.role === 'assistant') {
-                updated[updated.length - 1] = { ...last, evidence: assistantEvidence };
-              }
-              return updated;
-            });
-          }
-        } catch { /* malformed event, ignore */ }
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-        let idx: number;
-        while ((idx = textBuffer.indexOf('\n')) !== -1) {
-          handleLine(textBuffer.slice(0, idx));
-          textBuffer = textBuffer.slice(idx + 1);
-        }
-      }
-      if (textBuffer.trim()) textBuffer.split('\n').forEach(handleLine);
+      const patchLast = (patch: Partial<Message>) => setMessages(prev => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last?.role === 'assistant') updated[updated.length - 1] = { ...last, ...patch };
+        return updated;
+      });
+      await streamAskBarPulse({
+        question: userMessage.content,
+        context: { ...contextRef.current, bar_id: contextRef.current.bar_id || contextRef.current.barId },
+        history: messages.map(m => ({ role: m.role, content: m.content })),
+        onText: (content) => patchLast({ content }),
+        onEvidence: (evidence) => patchLast({ evidence }),
+      });
     } catch (error) {
       console.error('Error asking BarPulse:', error);
       setMessages(prev => {

@@ -69,10 +69,12 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data: allVenues } = await supabase.from("venues").select("id, name, bar_code");
+    const { data: allVenues } = await supabase.from("venues").select("id, name, bar_code, project_type");
     const venues = allVenues || [];
 
-    const mentioned = detectVenueMention(question, venues);
+    // Task questions stay scoped to the task's own project.
+    const task = context?.task && typeof context.task === "object" ? context.task : null;
+    const mentioned = task ? null : detectVenueMention(question, venues);
     let venueId: string;
     let venueName: string;
     let barCode: string | null;
@@ -92,7 +94,21 @@ serve(async (req) => {
     }
 
     const scope: ToolScope = { venueId, barCode, venueName };
-    const tools = buildTools(supabase, scope);
+    const projectType: string | null = venues.find((x: any) => x.id === venueId)?.project_type ?? null;
+    // Bar data tools only make sense for bar/restaurant projects; brand projects answer from the task context.
+    const isBar = projectType === "bars_restaurants" || (!projectType && !!barCode);
+    const tools = isBar ? buildTools(supabase, scope) : [];
+    const clip = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : "");
+    const taskBlock = task ? `
+
+TASK THE USER IS ASKING ABOUT (saved in Supreme Team HQ):
+Title: ${clip(task.title, 300)}
+What this is: ${clip(task.detail, 4000) || "No explanation saved."}
+Why it matters: ${clip(task.why, 2000) || "Not recorded."}
+Brand/project: ${clip(task.brand, 200) || venueName}
+Who does it: ${clip(task.owner_kind, 40) || "not set"}
+Status: ${clip(task.status, 60) || "not set"}
+Answer about this task. Use only the saved text above plus general, plainly-labelled business sense. If the saved text does not say something, say it is not recorded instead of inventing it.` : "";
 
     const today = new Date();
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -102,7 +118,11 @@ serve(async (req) => {
       ? `The user mentioned "${mentioned.name}" in their question — answer about ${mentioned.name}.`
       : `The user is currently viewing ${venueName} — default to ${venueName} unless a specific venue is named.`;
 
-    const sys = `You are BarPulse AI, a data-grounded assistant for bar and restaurant managers.
+    const brandSys = `You are Supreme HQ's assistant helping the owner of ${venueName} (project type ${projectType ?? "unknown"}) understand their work.
+TODAY: ${todayStr}
+Reply in plain text (no markdown, no asterisks), 2-6 short sentences or a short dash list. No data tools are available for this project; never invent numbers, dates, results or prices.${taskBlock}`;
+
+    const sys = !isBar ? brandSys : `You are BarPulse AI, a data-grounded assistant for bar and restaurant managers.
 
 TODAY: ${todayStr}
 VENUE: ${venueName} (id ${venueId})${barCode ? `, bar_code ${barCode}` : ""}
@@ -122,7 +142,7 @@ Response rules:
 - If a tool returns no data, say so directly (e.g. "No metrics recorded for May 12.") — do not explain the lookup.
 - NEVER fabricate numbers. If you don't have a tool result, call a tool or say you don't have the data.
 - Cite the exact numbers you used.
-- Other venues available if the user names one: ${venues.map((v: any) => v.name).filter(Boolean).join(", ")}.`;
+- Other venues available if the user names one: ${venues.map((v: any) => v.name).filter(Boolean).join(", ")}.${taskBlock}`;
 
 
     const convo: Message[] = [];

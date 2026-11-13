@@ -16,6 +16,13 @@ export interface WaitingAction {
   priorityRank: number;
   jobId: string | null;
   projectId: string;
+  detail?: string | null;
+  why?: string | null;
+  ownerKind?: string | null;
+  minutes?: number | null;
+  pillar?: string | null;
+  dueDate?: string | null;
+  status?: string | null;
 }
 export interface WaitingContent {
   id: string;
@@ -65,6 +72,8 @@ function deriveBrandWorkSummary(projectId: string, x: BrandWorkInputs, now: numb
     .map((a) => ({
       id: a.id, title: a.title ?? 'Untitled step', priority: a.priority ?? null,
       priorityRank: priorityRank(a.priority), jobId: a.job_id ?? null, projectId,
+      detail: a.detail ?? null, why: a.insight_summary || a.problem_detail || null, ownerKind: a.owner_kind ?? null,
+      minutes: a.estimated_minutes ?? null, pillar: a.pillar ?? null, dueDate: a.due_date ?? null, status: a.status ?? null,
     }))
     .sort((a, b) => a.priorityRank - b.priorityRank);
 
@@ -99,7 +108,7 @@ export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWor
   const [actionsRes, contentRes, channelsRes, linksRes, placementsRes, revenueRes] = await Promise.all([
     supabase
       .from('action_items')
-      .select('id,title,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at')
+      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`),
     T('content_items').select('id,title,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at,idea_score').eq('project_id', projectId),
     T('brand_channels').select('status,cadence_target,last_post_at,followers').eq('project_id', projectId),

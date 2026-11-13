@@ -41,6 +41,15 @@ export interface NextTenRow {
    * outrank a low-priority action. Higher is sooner. See rankScore().
    */
   rank: number;
+  /** Saved explanation shown when the row is expanded (see TaskExplainer). */
+  explain?: {
+    detail?: string | null;
+    why?: string | null;
+    ownerKind?: string | null;
+    minutes?: number | null;
+    pillar?: string | null;
+    status?: string | null;
+  };
 }
 
 /** What a Next 10 query returns: the ranked rows plus any source that could not be checked. */
@@ -273,6 +282,14 @@ function actionNextTenRows(
           dueDate: a.due_date ?? null,
           createdAt: a.created_at ?? null,
           note: bits.length ? bits.join(' · ') : undefined,
+          explain: {
+            detail: a.detail ?? null,
+            why: a.insight_summary || a.problem_detail || null,
+            ownerKind: a.owner_kind ?? null,
+            minutes: a.estimated_minutes ?? null,
+            pillar: a.pillar ?? null,
+            status: a.approval_status === 'Approved' ? (a.status ?? 'Open') : (a.approval_status ?? 'Proposed'),
+          },
         },
         now,
       ),
@@ -306,6 +323,11 @@ function laneNextTenRows(
           refId: i.item_key,
           note: score == null ? undefined : `about $${Math.round(score).toLocaleString()}/hr`,
           laneValue: score,
+          explain: {
+            detail: [i.label !== (i.recommended_fix || i.label) ? i.label : null, i.description].filter(Boolean).join('\n\n')
+              || 'This is a money lane: a way this brand can earn that is not set up yet. Completing it means setting the lane up and confirming it works on the brand page.',
+            why: i.severity === 'critical' ? 'Marked critical for this kind of brand.' : 'Marked high importance for this kind of brand.',
+          },
         },
         now,
       );
@@ -315,7 +337,7 @@ function laneNextTenRows(
 /** (c) Linked products mid-production. */
 function productNextTenRows(
   { projectId, projectName }: NextTenProject,
-  productRows: { id: string; name: string; status: string }[],
+  productRows: { id: string; name: string; status: string; notes?: string | null }[],
   now: number,
 ): NextTenRow[] {
   return productRows
@@ -331,6 +353,9 @@ function productNextTenRows(
           projectName,
           refId: p.id,
           productStatus: p.status,
+          explain: {
+            detail: (p as any).notes || `This is a product linked to this brand, currently at "${p.status}". Completing it means moving the product to its next production stage on the Products tab.`,
+          },
         },
         now,
       );
@@ -359,6 +384,10 @@ function kpiNextTenRows(
           refId: d.kpi_key,
           pillarKey: d.pillar_key,
           kpiKey: d.kpi_key,
+          explain: {
+            detail: `This is a weekly number on the brand scorecard: ${d.kpi_label}${d.target != null ? ` (target ${d.target}${d.unit ? ` ${d.unit}` : ''})` : ''}. No number has been entered for this week yet. Tick the box and type this week's actual; the scorecard then scores it against the target.`,
+            pillar: d.pillar_key ?? null,
+          },
         },
         now,
       ),
@@ -381,7 +410,7 @@ export async function fetchNextTenForProject(
   try {
     const actionsRes = await supabase
       .from('action_items')
-      .select('id,title,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id')
+      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
     const actionRows = (actionsRes.data ?? []) as any[];
@@ -427,7 +456,7 @@ export async function fetchNextTenForProject(
     if (productIds.length) {
       const prodsRes = await supabase
         .from('channel_products')
-        .select('id,name,status')
+        .select('id,name,status,notes')
         .in('id', productIds);
       if (prodsRes.error) throw prodsRes.error;
       rows.push(...productNextTenRows(project, (prodsRes.data ?? []) as any[], now));
@@ -441,7 +470,7 @@ export async function fetchNextTenForProject(
     const [defsRes, valuesRes] = await Promise.all([
       supabase
         .from('project_kpis')
-        .select('pillar_key,kpi_key,kpi_label,target,sort_order,source')
+        .select('pillar_key,kpi_key,kpi_label,target,unit,sort_order,source')
         .eq('project_id', projectId)
         .eq('is_active', true)
         .not('target', 'is', null),
@@ -463,7 +492,7 @@ export async function fetchNextTenForProject(
 
 /** Action item columns the Next 10 and the brand work summaries both read, plus the two project keys. */
 const ACTION_BATCH_COLUMNS =
-  'id,title,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id';
+  'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id';
 
 /** Action items for many projects at once. A row belongs to a project through bar_id or venue_id. */
 export async function fetchActionRowsForProjects(projectIds: string[]): Promise<any[]> {
@@ -530,7 +559,7 @@ export async function fetchNextTenBatch(
       const productIds = [...new Set((links as any[]).map((l) => l.product_id))].filter(Boolean);
       // Only projects with linked products read them, so only they can be marked unavailable by a failed read.
       try {
-        const productRows = await fetchRowsIn<{ id: string; name: string; status: string }>('channel_products', 'id,name,status', 'id', productIds);
+        const productRows = await fetchRowsIn<{ id: string; name: string; status: string }>('channel_products', 'id,name,status,notes', 'id', productIds);
         return { linksBy: groupBy(links as any[], 'project_id'), productRows, error: null as unknown };
       } catch (error) {
         return { linksBy: groupBy(links as any[], 'project_id'), productRows: [] as { id: string; name: string; status: string }[], error };
@@ -538,7 +567,7 @@ export async function fetchNextTenBatch(
     })(),
     (async () => {
       const [definitions, values] = await Promise.all([
-        fetchRowsIn('project_kpis', 'project_id,pillar_key,kpi_key,kpi_label,target,sort_order,source', 'project_id', ids,
+        fetchRowsIn('project_kpis', 'project_id,pillar_key,kpi_key,kpi_label,target,unit,sort_order,source', 'project_id', ids,
           (q) => q.eq('is_active', true).not('target', 'is', null)),
         fetchRowsIn('project_kpi_values', 'project_id,pillar_key,kpi_key,actual', 'project_id', ids,
           (q) => q.eq('week_start', weekStart)),

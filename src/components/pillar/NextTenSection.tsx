@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { pipelineHref } from '@/lib/ownerWork';
+import { TaskExplainer } from '@/components/tasks/TaskExplainer';
+import { nextTenTask } from '@/components/tasks/nextTenTask';
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -195,8 +197,9 @@ export const NextTenSection = ({
           <ul>
             {rows.map((row) => (
               <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
-                <div className="flex items-start gap-3">
-                  {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
+                    <TaskExplainer
+                      task={nextTenTask(row)}
+                      leading={<div className="pt-3 w-4 shrink-0">{((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
                     <Checkbox
                       className="mt-0.5"
                       checked={false}
@@ -206,34 +209,36 @@ export const NextTenSection = ({
                         : `Mark finished after completing: ${row.step}`}
                       onCheckedChange={() => onCheck(row)}
                     />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
-                            {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
-                          </Link>
-                        ) : (
-                          <p className="text-sm text-foreground">{row.step}</p>
-                        )}
-                    {row.note && (
-                      <p className="text-[11px] text-muted-foreground">{row.note}</p>
-                    )}
-                    {row.source === 'Action' && row.approvalRank !== 0 && (
-                      <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                  )}</div>}
+                      trailing={<div className="pt-3"><Badge variant="outline" className={`text-xs shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
+                    {row.source}
+                  </Badge></div>}
+                      header={<>
+                        <p className="text-sm text-foreground font-medium">{row.step}</p>
+                        {row.note && <p className="text-sm text-muted-foreground">{row.note}</p>}
+                      </>}
+                      actions={<div className="pl-7 space-y-1">
+                        {row.source === 'Action' && row.approvalRank !== 0 && (
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
                         Approval required before this step can be completed.
                       </p>
                     )}
-                    {row.source === 'Lane' && (
+                        {row.jobId && (
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="inline-flex text-sm text-primary underline-offset-2 hover:underline">
+                            Open the related step and instructions →
+                          </Link>
+                        )}
+                        {row.source === 'Lane' && (
                       <Link to={`/project/${row.projectId}?tab=avenues`} className="text-sm text-primary underline-offset-2 hover:underline">
                         See how to start this revenue opportunity →
                       </Link>
                     )}
-                    {row.source === 'Product' && (
+                        {row.source === 'Product' && (
                       <Link to={`/project/${row.projectId}?tab=products`} className="text-sm text-primary underline-offset-2 hover:underline">
                         Open product and production plan →
                       </Link>
                     )}
-                    {kpiOpen === row.key && (
+                        {kpiOpen === row.key && (
                       <div className="flex items-center gap-2 mt-2">
                         <Input
                           type="number"
@@ -256,12 +261,9 @@ export const NextTenSection = ({
                         </Button>
                       </div>
                     )}
-                  </div>
-                  <Badge variant="outline" className={`text-[10px] shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
-                    {row.source}
-                  </Badge>
-                </div>
-              </li>
+                      </div>}
+                    />
+                  </li>
             ))}
           </ul>
         )}

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { pipelineHref } from '@/lib/ownerWork';
+import { TaskExplainer } from '@/components/tasks/TaskExplainer';
+import { nextTenTask } from '@/components/tasks/nextTenTask';
 import { supabase } from '@/integrations/supabase/client';
 import { scoreKpi, type KpiDirection } from '@/lib/kpiScoring';
 import { useMemo, useState } from 'react';
@@ -142,8 +144,9 @@ export const AllProjectsNextTen = ({
               <ul>
                 {rows.map((row) => (
                   <li key={row.key} className="py-2 border-t border-border first:border-0 first:pt-0">
-                    <div className="flex items-start gap-3">
-                      {((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
+                    <TaskExplainer
+                      task={nextTenTask(row)}
+                      leading={<div className="pt-3 w-4 shrink-0">{((row.source === 'Action' && row.approvalRank === 0) || row.source === 'KPI') && (
                         <Checkbox
                           className="mt-0.5"
                           checked={false}
@@ -153,29 +156,30 @@ export const AllProjectsNextTen = ({
                             : `Mark finished after completing: ${row.step}`}
                           onCheckedChange={() => onCheck(row)}
                         />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        {row.jobId ? (
-                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="text-sm text-foreground underline-offset-2 hover:underline">
-                            {row.step} <span className="text-[11px] text-primary">· Pipeline</span>
-                          </Link>
-                        ) : (
-                          <p className="text-sm text-foreground">{row.step}</p>
-                        )}
-                        <p className="text-[11px] text-muted-foreground">
-                          {row.projectName}
-                          {row.note ? ` · ${row.note}` : ''}
-                        </p>
+                      )}</div>}
+                      trailing={<div className="pt-3"><Badge variant="outline" className={`text-xs shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
+                        {row.source}
+                      </Badge></div>}
+                      header={<>
+                        <p className="text-sm text-foreground font-medium">{row.step}</p>
+                        <p className="text-sm text-muted-foreground">{row.projectName}{row.note ? ` · ${row.note}` : ''}</p>
+                      </>}
+                      actions={<div className="pl-7 space-y-1">
                         {row.source === 'Action' && row.approvalRank !== 0 && (
-                          <p className="text-[11px] text-amber-700 dark:text-amber-300">Approval required before completion.</p>
+                          <p className="text-sm text-amber-700 dark:text-amber-300">Approval required before completion.</p>
+                        )}
+                        {row.jobId && (
+                          <Link to={pipelineHref(row.projectId, row.jobId, row.source === 'Action' ? row.refId : null)} className="inline-flex text-sm text-primary underline-offset-2 hover:underline">
+                            Open the related step and instructions →
+                          </Link>
                         )}
                         {row.source === 'Lane' && (
-                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=avenues`}>
+                          <Link className="text-sm text-primary underline" to={`/project/${row.projectId}?tab=avenues`}>
                             Open earning opportunity and verify setup
                           </Link>
                         )}
                         {row.source === 'Product' && (
-                          <Link className="text-xs text-primary underline" to={`/project/${row.projectId}?tab=products`}>
+                          <Link className="text-sm text-primary underline" to={`/project/${row.projectId}?tab=products`}>
                             Open product and its production plan
                           </Link>
                         )}
@@ -202,11 +206,8 @@ export const AllProjectsNextTen = ({
                             </Button>
                           </div>
                         )}
-                      </div>
-                      <Badge variant="outline" className={`text-[10px] shrink-0 ${SOURCE_TONE[row.source] ?? ''}`}>
-                        {row.source}
-                      </Badge>
-                    </div>
+                      </div>}
+                    />
                   </li>
                 ))}
               </ul>

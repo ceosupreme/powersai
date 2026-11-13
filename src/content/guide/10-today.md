@@ -28,3 +28,9 @@ Each brand has a project: its workspace for content, channels, products, tasks, 
 
 ## Good to know
 Counts describe saved records, not unrecorded activity. The Dashboard does not generate campaign results or publish content automatically. Current work lists are current, even when a report elsewhere is set to an earlier week.
+
+## Every task explains itself
+
+Tap any task in Waiting on me, Next 10, All brands: waiting on you, or a brand's Overview list to open it. You see **What this is**, **Why it matters** (when saved), **Your part** (whether you do it or an agent does and you approve), and the brand, priority, due date and area. The top item in Waiting on me opens by itself.
+
+Tap **Ask about this** to chat about that one task. Pick a starter question ("What exactly do I need to do?", "Why does this matter for this brand?", "What happens if I skip it?") or type your own. For brands, answers come only from what is saved on the task; anything not saved is called "not recorded".

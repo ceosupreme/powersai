@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { fetchActionStatusMap, fetchInactiveJobIds, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
 import { isOwnerVisible, pipelineHref } from '@/lib/ownerWork';
+import { TaskExplainer } from '@/components/tasks/TaskExplainer';
 
 export interface WaitingRow {
   id: string;
@@ -27,6 +28,10 @@ export interface WaitingRow {
   snoozed_until: string | null;
   projectId: string | null;
   projectName: string;
+  why: string | null;
+  ownerKind: string | null;
+  minutes: number | null;
+  pillar: string | null;
 }
 
 /** Badge colors keyed by priority rank (1 = critical … 4 = low). */
@@ -54,7 +59,7 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,detail,source,job_id,facts,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
+        .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,source,job_id,facts,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -103,6 +108,10 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             snoozed_until: (a.snoozed_until as string) ?? null,
             projectId,
             projectName: (projectId && nameById.get(projectId)) || 'Project',
+            why: (a.insight_summary || a.problem_detail || null) as string | null,
+            ownerKind: (a.owner_kind as string) ?? null,
+            minutes: (a.estimated_minutes as number) ?? null,
+            pillar: (a.pillar as string) ?? null,
           } as WaitingRow;
         });
       return {
@@ -219,7 +228,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
   const rest = ranked.slice(3);
   const decisions = open.filter((r) => needsDecision(r.approval_status)).length;
 
-  const renderRow = (row: WaitingRow, highlight = false) => {
+  const renderRow = (row: WaitingRow, highlight = false, defaultOpen = false) => {
     const due = fmtDate(row.due_date);
     const overdue = row.due_date ? new Date(row.due_date).getTime() < Date.now() - 86400_000 : false;
     return (
@@ -230,48 +239,68 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           highlight && 'px-3 rounded-md bg-muted/40 border-0 mb-2',
         )}
       >
-        <div className="flex items-start justify-between gap-2 flex-wrap">
-          <div className="min-w-0">
-            <p className="text-sm text-foreground">{row.title}</p>
-            <p className="text-[11px] text-muted-foreground">
-              {row.projectName}
-              {needsDecision(row.approval_status) ? ' · needs your decision' : row.approval_status ? ` · ${row.approval_status}` : ''}
-              {due ? (
-                <span className={cn(overdue && 'text-destructive')}>{` · due ${due}`}</span>
-              ) : null}
-              {row.snoozed_until ? ` · snoozed until ${fmtDate(row.snoozed_until)}` : ''}
-            </p>
-          </div>
-          {row.priorityRank <= 4 && (
-            <Badge variant="outline" className={cn('text-[10px] shrink-0', PRIORITY_TONE[row.priorityRank])}>
-              {priorityLabel(row.priorityRank)}
-            </Badge>
-          )}
-        </div>
-        {row.source === 'brand_help' && row.detail && (
-          <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm whitespace-pre-wrap">
-            <p className="font-medium text-xs mb-1">Message from the brand manager</p>
-            {row.detail}
-          </div>
-        )}
-        {row.projectId && row.jobId && (
-          <Link className="mt-2 inline-flex text-sm text-primary underline"
-            to={pipelineHref(row.projectId, row.jobId, row.sourceStepId)}>
-            Open the related step and instructions
-          </Link>
-        )}
-        {row.source === 'brand_help' && row.projectId && !row.jobId && (
-          <Link className="mt-2 inline-flex text-sm text-primary underline" to={`/project/${row.projectId}`}>
-            Open the related brand
-          </Link>
-        )}
-        <div className="mt-2">
-          <RowActions
-            row={row}
-            busy={mutation.isPending}
-            onRun={(action) => mutation.mutate({ id: row.id, action })}
-          />
-        </div>
+        <TaskExplainer
+          defaultOpen={defaultOpen}
+          task={{
+            title: row.title,
+            detail: row.source === 'brand_help' ? null : row.detail,
+            why: row.why,
+            ownerKind: row.ownerKind,
+            minutes: row.minutes,
+            brand: row.projectName,
+            priority: row.priorityRank <= 4 ? priorityLabel(row.priorityRank) : null,
+            dueDate: row.due_date,
+            pillar: row.pillar,
+            status: needsDecision(row.approval_status) ? 'Needs your decision' : row.approval_status ?? row.status,
+            projectId: row.projectId,
+          }}
+          header={
+            <div className="flex items-start justify-between gap-2 flex-wrap">
+              <div className="min-w-0">
+                <p className="text-sm text-foreground font-medium">{row.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {row.projectName}
+                  {needsDecision(row.approval_status) ? ' · needs your decision' : row.approval_status ? ` · ${row.approval_status}` : ''}
+                  {due ? (
+                    <span className={cn(overdue && 'text-destructive')}>{` · due ${due}`}</span>
+                  ) : null}
+                  {row.snoozed_until ? ` · snoozed until ${fmtDate(row.snoozed_until)}` : ''}
+                </p>
+              </div>
+              {row.priorityRank <= 4 && (
+                <Badge variant="outline" className={cn('text-xs shrink-0', PRIORITY_TONE[row.priorityRank])}>
+                  {priorityLabel(row.priorityRank)}
+                </Badge>
+              )}
+            </div>
+          }
+          actions={<>
+            {row.source === 'brand_help' && row.detail && (
+              <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm whitespace-pre-wrap">
+                <p className="font-medium text-xs mb-1">Message from the brand manager</p>
+                {row.detail}
+              </div>
+            )}
+            {row.projectId && row.jobId && (
+              <Link className="mt-2 inline-flex text-sm text-primary underline"
+                to={pipelineHref(row.projectId, row.jobId, row.sourceStepId)}>
+                Open the related step and instructions
+              </Link>
+            )}
+            {row.source === 'brand_help' && row.projectId && !row.jobId && (
+              <Link className="mt-2 inline-flex text-sm text-primary underline" to={`/project/${row.projectId}`}>
+                Open the related brand
+              </Link>
+            )}
+            <div className="mt-2">
+              <RowActions
+                row={row}
+                busy={mutation.isPending}
+                onRun={(action) => mutation.mutate({ id: row.id, action })}
+              />
+            </div>
+          </>}
+        />
       </li>
     );
   };
@@ -307,7 +336,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
         ) : (
           <>
             {top.length > 0 && (
-              <ul className="mb-3">{top.map((row) => renderRow(row, true))}</ul>
+              <ul className="mb-3">{top.map((row, i) => renderRow(row, true, i === 0))}</ul>
             )}
             <ul>{rest.map((row) => renderRow(row))}</ul>
             {snoozed.length > 0 && (

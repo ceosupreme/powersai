@@ -26,6 +26,7 @@ import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialo
 import { RevenueLaneCard } from './RevenueLaneCard';
 import { BrandWeeklyNumbers } from './BrandWeeklyNumbers';
 import { ActionInstructionDialog } from './ActionInstructionDialog';
+import { TaskExplainer } from '@/components/tasks/TaskExplainer';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
 import { useFoundationScores } from '@/components/foundation-audit/useFoundationScores';
 import { useUpsertFoundationItemStatus } from '@/hooks/useFoundationItemStatus';
@@ -226,17 +227,23 @@ function OverviewTab({
             ) : (
               <ul className="divide-y divide-border">
                 {s.waitingActions.map((a) => (
-                  <li key={a.id} className="py-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-foreground">{a.title}</p>
-                      <div className="mt-1 flex gap-1.5 flex-wrap">
-                        <Badge variant="outline" className={cn('text-[10px]', PRIORITY_CHIP[a.priorityRank])}>
-                          {priorityLabel(a.priorityRank) === '—' ? 'No priority' : priorityLabel(a.priorityRank)}
-                        </Badge>
-                        <Badge variant="outline" className="text-[10px]">Step</Badge>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
+                  <li key={a.id} className="py-3">
+                    <TaskExplainer
+                      task={{
+                        title: a.title, detail: a.detail, why: a.why, ownerKind: a.ownerKind, minutes: a.minutes,
+                        priority: priorityLabel(a.priorityRank) === '—' ? null : priorityLabel(a.priorityRank),
+                        dueDate: a.dueDate, pillar: a.pillar, status: a.status, projectId,
+                      }}
+                      header={<>
+                        <p className="text-sm text-foreground font-medium">{a.title}</p>
+                        <div className="mt-1 flex gap-1.5 flex-wrap">
+                          <Badge variant="outline" className={cn('text-xs', PRIORITY_CHIP[a.priorityRank])}>
+                            {priorityLabel(a.priorityRank) === '—' ? 'No priority' : priorityLabel(a.priorityRank)}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">Step</Badge>
+                        </div>
+                      </>}
+                      actions={<div className="flex gap-2 mt-2">
                       {a.jobId ? (
                         <Button size="sm" asChild>
                           <Link to={pipelineHref(projectId, a.jobId, a.id)}>Open step & instructions</Link>
@@ -244,7 +251,8 @@ function OverviewTab({
                       ) : (
                         <Button size="sm" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>
                       )}
-                    </div>
+                    </div>}
+                    />
                   </li>
                 ))}
                 {s.waitingContent.map((c) => (
