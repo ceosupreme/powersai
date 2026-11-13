@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, FileText, MessageCircle, Pencil, Plus, Target } from 'lucide-react';
@@ -98,6 +98,13 @@ function weekLabel(value: string): string {
 function chooseFirst(steps: Step[]): Step | undefined {
   return firstDue(steps);
 }
+function scrollParent(el: HTMLElement): HTMLElement | null {
+  for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+    const overflowY = getComputedStyle(parent).overflowY;
+    if ((overflowY === 'auto' || overflowY === 'scroll') && parent.scrollHeight > parent.clientHeight) return parent;
+  }
+  return null;
+}
 
 export default function BrandManagerPortal({ brands, preview = false }: { brands: ManagedBrand[]; preview?: boolean }) {
   const { user, profile } = useAuth();
@@ -108,6 +115,7 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
   const view = params.get('view') ?? 'today';
   const businessPath = useBusinessPath(brand.id);
   const pathVisible = !!businessPath.data;
+  const stageCount = businessPath.data?.stages.length ?? 0;
   const [wholePlan, setWholePlan] = useState(false);
   const [goalOpen, setGoalOpen] = useState(false);
   const stepId = params.get('step');
@@ -264,6 +272,21 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
     setResultUrl(selectedStep?.output_url ?? '');
   }, [selectedStep?.id, selectedStep?.feedback_note, selectedStep?.output_url]);
 
+  // Opening a step, post, document or tab from lower on a screen starts the new screen at its top.
+  const headerRef = useRef<HTMLElement>(null);
+  const screenKey = [brand.id, view, stepId ?? '', postId ?? '', docId ?? '', params.get('path_step') ?? ''].join('|');
+  const lastScreen = useRef(screenKey);
+  useEffect(() => {
+    if (lastScreen.current === screenKey) return;
+    lastScreen.current = screenKey;
+    const header = headerRef.current;
+    if (!header) return;
+    const parent = scrollParent(header);
+    const past = header.getBoundingClientRect().bottom - (parent ? parent.getBoundingClientRect().top : 0);
+    if (past >= 0) return;
+    if (parent) parent.scrollBy({ top: past }); else window.scrollBy({ top: past });
+  }, [screenKey]);
+
   const saveProgress = async () => {
     if (preview || !selectedStep || !editableStep) return toast.error('This step is not assigned to you.');
     if (resultUrl.trim()) {
@@ -389,12 +412,13 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
       </Select></div>
       <div className="flex gap-2 flex-wrap"><Button asChild variant="outline"><Link to="/workspace">Back to my dashboard</Link></Button><Button asChild variant="outline"><Link to={`/project/${brand.id}`}>Open brand page</Link></Button></div>
     </section>}
-    <header className="space-y-2">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
+    <header ref={headerRef} className="space-y-2">
+      <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
+        <div className="min-w-0">
           <p className="text-xs text-muted-foreground">Your current brand</p>
-          <h1 className="text-2xl sm:text-3xl font-bold">{brand.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold break-words">{brand.name}</h1>
         </div>
+        <Button asChild size="sm" variant="ghost" className="min-h-11 shrink-0"><Link to={`/project/${brand.id}`}>Brand page <ExternalLink className="h-4 w-4 ml-1" /></Link></Button>
         {brands.length > 1 && <div className="flex flex-wrap gap-2 w-full" aria-label="Choose brand">{brands.map(b => {
           const all = counts.data?.steps ?? []; const by = new Map(all.map(s => [s.id, s]));
           const count = all.filter(s => (s.venue_id === b.id || s.bar_id === b.id) && readyFor(s, viewer, by, counts.data?.inactive ?? new Set())).length;
@@ -409,9 +433,8 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
         {PORTAL_TABS.map(t => <Button key={t.key} type="button" size="sm" className="min-h-11"
           variant={view === t.key ? 'default' : 'outline'} aria-current={view === t.key ? 'page' : undefined}
           onClick={() => go(t.key)}>{t.label}</Button>)}
-        <Button asChild size="sm" variant="ghost" className="min-h-11"><Link to={`/project/${brand.id}`}>Brand page <ExternalLink className="h-4 w-4 ml-1" /></Link></Button>
       </nav>
-      {TAB_LINES[view] && <p className="text-muted-foreground">{TAB_LINES[view]}</p>}
+      {TAB_LINES[view] && <p className={`text-muted-foreground ${view === 'today' ? 'hidden sm:block' : ''}`}>{TAB_LINES[view]}</p>}
     </header>
 
     {view === 'today' && <>
@@ -447,17 +470,20 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
           </div>}
         </CardContent>
       </Card>
-      <section className={`grid gap-2 ${businessPath.data ? 'grid-cols-3' : 'grid-cols-2'}`} aria-label="Your progress">
+      <section className={`grid grid-cols-2 gap-2 ${businessPath.data ? 'sm:grid-cols-3' : ''}`} aria-label="Your progress">
         <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">This week</p><p className="text-lg font-semibold leading-tight">{week.done} of {week.total}</p><Progress className="h-1.5" value={week.total ? week.done / week.total * 100 : 0} aria-label={`${week.done} of ${week.total} steps done this week`} /></Card>
         <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">Ready now</p><p className="text-lg font-semibold leading-tight">{jobsQuery.isSuccess ? eligible.length : '—'}</p></Card>
-        {businessPath.data && <Card className="p-3 space-y-1"><p className="text-muted-foreground leading-tight">Stage</p><p className="text-lg font-semibold leading-tight">{businessPath.data.current ? `${businessPath.data.current.number} of ${businessPath.data.stages.length}` : businessPath.data.stages.length ? 'Done' : '—'}</p>{businessPath.data.current && <p className="text-[13px] leading-tight line-clamp-2">{businessPath.data.current.name}</p>}<Progress className="h-1.5" value={businessPath.data.total ? businessPath.data.done / businessPath.data.total * 100 : 0} aria-label={`${businessPath.data.done} of ${businessPath.data.total} path steps done`} /></Card>}
+        {businessPath.data && <Card className="col-span-2 sm:col-span-1 p-3 space-y-1">
+          <p className="leading-tight"><span className="text-muted-foreground sm:block sm:mb-1">Stage </span><span className="text-lg font-semibold">{stageCount ? `${businessPath.data.current?.number ?? stageCount} of ${stageCount}` : '—'}</span>{stageCount > 0 && <span className="text-muted-foreground"> · {businessPath.data.current?.name ?? 'All stages done'}</span>}</p>
+          <Progress className="h-1.5" value={businessPath.data.total ? businessPath.data.done / businessPath.data.total * 100 : 0} aria-label={`${businessPath.data.done} of ${businessPath.data.total} path steps done`} />
+        </Card>}
       </section>
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Coming up</h2>
         {eligible.filter(s => s.id !== nextStep?.id).length
           ? eligible.filter(s => s.id !== nextStep?.id).slice(0, 3).map(s => <Card key={s.id} className="p-4 flex items-center justify-between gap-3">
-              <div><p className="font-medium">{displayTitle(s)}</p><p className="text-xs text-muted-foreground">{dueText(s.due_date)}</p></div>
-              <Button size="sm" variant="outline" onClick={() => go('step', {step: s.id})}>Open</Button>
+              <div className="min-w-0"><p className="font-medium">{displayTitle(s)}</p><p className="text-xs text-muted-foreground">{dueText(s.due_date)}</p></div>
+              <Button size="sm" variant="outline" className="shrink-0" onClick={() => go('step', {step: s.id})}>Open</Button>
             </Card>)
           : <p className="text-sm text-muted-foreground">No additional ready steps. Your next steps will appear here.</p>}
       </section>
