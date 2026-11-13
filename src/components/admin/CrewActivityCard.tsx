@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { CrewDefaultBrands } from '@/components/admin/CrewDefaultBrands';
 
 export type CrewState = 'ok' | 'partial' | 'failed' | 'missed' | 'waiting' | 'paused' | 'unknown';
 
@@ -118,6 +119,7 @@ function CrewRow({ crew }: { crew: CrewStatusRow }) {
           {crew.crew_kind === 'claude_task' && crew.report_to && (
             <p className="text-xs text-muted-foreground">Reports to you by: {crew.report_to}</p>
           )}
+          {crew.crew_kind === 'claude_task' && <CrewDefaultBrands crewKey={crew.crew_key} />}
         </div>
       </div>
     </li>

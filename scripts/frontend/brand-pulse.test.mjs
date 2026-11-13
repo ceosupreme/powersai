@@ -23,6 +23,24 @@ test('amber when only one of publishing or finishing happened, or setup under 50
 test('green when both happened and setup is at least 50%', () => {
   assert.equal(pulse.pulseStatus({ published7: 1, done7: 1, setupPct: 50 }).status, 'green');
 });
+const COASTAL = 'fa710cf6-09fc-45ad-97da-fa50dceec37d';
+const run = (overrides = {}) => ({ id: 'r1', crew_key: 'coastal_blog', status: 'ok', started_at: ago(2), finished_at: ago(1), tried: 'Write article', done: 'Published 1 new article ' + 'x'.repeat(200), flagged: '', details: { brands: [COASTAL] }, ...overrides });
+test('crew feeds include only explicit brand membership, never Life Pulse or defaults', () => {
+  const rows = [run(), run({ id: 'life', details: {} }), run({ id: 'empty', details: { brands: [] } })];
+  const feed = pulse.crewFeedRows(rows, COASTAL, new Map([['coastal_blog', 'Coastal Beauties blog crew']]));
+  assert.equal(feed.length, 1);
+  assert.equal(feed[0].who, 'Coastal Beauties blog crew');
+  assert.equal(feed[0].ownerKind, 'agent');
+  assert.equal(feed[0].at, ago(1));
+  assert.equal(feed[0].text.length, 140);
+  assert.equal(pulse.crewFeedRows(rows, 'stm', new Map()).length, 0);
+});
+test('ok and partial crew runs in seven days count as work, failed and older do not', () => {
+  const runs = [run(), run({ id: 'partial', status: 'partial', finished_at: null }), run({ status: 'failed' }), run({ finished_at: ago(8) }), run({ details: {} })];
+  assert.equal(pulse.crewWorkInLast7(runs, COASTAL, NOW), 2);
+  assert.equal(pulse.pulseStatus({ published7: 0, done7: pulse.crewWorkInLast7(runs, COASTAL, NOW), setupPct: 90 }).status, 'amber');
+  assert.equal(pulse.pulseStatus({ published7: 1, done7: pulse.crewWorkInLast7(runs, COASTAL, NOW), setupPct: 90 }).status, 'green');
+});
 test('a piece counts once per week, placements preferred over published_at', () => {
   const pieces = pulse.publishedPieces(
     [{ id: 'p1', content_item_id: 'i1', live_url: 'https://x', verified_at: ago(1), updated_at: ago(1) },

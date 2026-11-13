@@ -25,6 +25,12 @@ HQ background jobs: the automation sender every 5 minutes, the checkout double-c
 
 The morning brief reads the same list every morning. When a crew failed or missed its run, the push has a line such as "Crews: Weekly HQ run failed; Muse posts missed its run". When everything ran, the brief says nothing about crews.
 
+### Brand activity and default brands
+
+A crew run appears in a brand's "Latest work" when the run lists that brand. Tap it to read "What it tried", "What got done" and, when present, "Needs you", or ask about it. A run marked ok or partial counts as work done for that brand; publishing is still measured separately.
+
+Admins can tap the "Default brands" chips on a crew's row to change which brands its future runs belong to. Defaults apply only when the run does not supply a brands list; an explicit list (including an empty one) always wins. Coastal blog and City Fill default to Coastal Beauties; Local news defaults to San Diego Remix and Temecula & Murrieta News. Multi-brand crews must list the brands they actually touched on each run. Life Pulse runs without brands stay out of brand feeds. Changing defaults does not change old runs or the crew's schedule.
+
 ## The Claude crews
 
 ### Morning brief (every day at 5:56 AM Pacific)

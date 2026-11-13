@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchRowsIn, groupBy } from '@/lib/batchFetch';
+import { fetchAllPages, fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { businessPathProgress, type PathStage, type PathStep } from '@/lib/businessPath';
 import {
-  audienceSeries, moneySplit, moneyWindowStart, outputWeeks, publishedInLast7, publishedPieces, pulseStatus, weeklyTarget,
-  type PublishedPiece, type PulseStatus,
+  audienceSeries, moneySplit, moneyWindowStart, outputWeeks, publishedInLast7, publishedPieces, pulseStatus, weeklyTarget, crewFeedRows, crewWorkInLast7,
+  type PublishedPiece, type PulseStatus, type CrewRunIn,
 } from '@/lib/brandPulse';
 import { STM_VENUE_ID } from '@/hooks/useBrandWorkspace';
 
@@ -12,7 +12,8 @@ const DAY = 86_400_000;
 
 export interface PulseChannel { id: string; platform: string; handle: string | null; url: string | null; followers: number | null; cadence_target: number | null; last_post_at: string | null; status: string; latest: number | null; previous: number | null }
 export interface PulseFeedItem {
-  key: string; at: string; kind: 'task' | 'published' | 'path'; text: string; who: string;
+  key: string; at: string; kind: 'task' | 'published' | 'path' | 'crew'; text: string; who: string;
+  tried?: string | null; done?: string | null; flagged?: string | null; runStatus?: string;
   url?: string | null; detail?: string | null; why?: string | null; ownerKind?: string | null; minutes?: number | null; pillar?: string | null;
 }
 export interface BrandPulse {
@@ -39,7 +40,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
   const since30 = new Date(now - 30 * DAY).toISOString();
   const doneFilter = (q: any) => q.eq('status', 'Done').gte('completed_at', since60);
   const actionCols = 'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,completed_at,completed_by,owner_kind,bar_id,venue_id';
-  const [byBar, byVenue, placements, items, channels, revenue, pathRows, settings, stagesRes, stepsRes, setupRes, leadsRes, propsRes, ordersRes] = await Promise.all([
+  const [byBar, byVenue, placements, items, channels, revenue, pathRows, settings, stagesRes, stepsRes, setupRes, leadsRes, propsRes, ordersRes, crewRuns] = await Promise.all([
     fetchRowsIn<any>('action_items', actionCols, 'bar_id', ids, doneFilter),
     fetchRowsIn<any>('action_items', actionCols, 'venue_id', ids, doneFilter),
     fetchRowsIn<any>('content_placements', 'id,project_id,content_item_id,live_url,verified_at,updated_at,channel,account_label,status,scheduled_for', 'project_id', ids),
@@ -54,10 +55,15 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
     isStm ? T('inbound_leads').select('id', { count: 'exact', head: true }).gte('created_at', since30) : Promise.resolve({ count: 0, error: null }),
     isStm ? T('proposals').select('id', { count: 'exact', head: true }).in('status', ['draft', 'sent', 'viewed', 'open']) : Promise.resolve({ count: 0, error: null }),
     isStm ? T('site_orders').select('id,amount_cents,status,created_at,product_key').gte('created_at', since30) : Promise.resolve({ data: [], error: null }),
+    fetchAllPages<CrewRunIn>(() => T('crew_runs')
+      .select('id,crew_key,status,started_at,finished_at,tried,done,flagged,details', { count: 'exact' })
+      .or(`finished_at.gte.${since60},and(finished_at.is.null,started_at.gte.${since60})`)
+      .or(ids.map((id) => `details->brands.cs.${JSON.stringify([id])}`).join(','))),
   ]);
   for (const r of [stagesRes, stepsRes, setupRes]) if (r.error) throw r.error;
   // Leads, proposals and site orders are extras: if they cannot be read the Money tile still shows revenue.
   const stats = await fetchRowsIn<any>('channel_stats', 'id,channel_id,captured_on,followers', 'channel_id', channels.map((c) => c.id));
+  const crewNames = new Map((await fetchRowsIn<{ key: string; name: string }>('crews', 'key,name', 'key', crewRuns.map((r) => r.crew_key), undefined, ['key'])).map((c) => [c.key, c.name]));
 
   const people = [...new Set([...byBar, ...byVenue].map((a) => a.completed_by).concat(pathRows.map((p) => p.updated_by)).filter(Boolean))] as string[];
   let names = new Map<string, string>();
@@ -89,7 +95,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
   const out = new Map<string, BrandPulse>();
   for (const id of ids) {
     const done = actionsBy.get(id) ?? [];
-    const done7 = done.filter((a) => a.completed_at && new Date(a.completed_at).getTime() >= now - 7 * DAY).length;
+    const done7 = done.filter((a) => a.completed_at && new Date(a.completed_at).getTime() >= now - 7 * DAY).length + crewWorkInLast7(crewRuns, id, now);
     const pls = placementsBy.get(id) ?? [];
     const its = itemsBy.get(id) ?? [];
     const pieces = publishedPieces(pls, its);
@@ -124,6 +130,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
     ].sort((a, b) => a.at.localeCompare(b.at)).slice(0, 5);
 
     const feed: PulseFeedItem[] = [
+      ...crewFeedRows(crewRuns, id, crewNames),
       ...done.filter((a) => a.completed_at).map((a) => ({
         key: `ac-${a.id}`, at: a.completed_at, kind: 'task' as const, text: a.title ?? 'Task finished',
         who: a.owner_kind === 'claude' ? 'Claude' : a.owner_kind === 'agent' ? 'AI agent' : personName(a.completed_by) ?? (a.owner_kind === 'owner' ? 'Owner' : 'Not recorded'),

@@ -26,19 +26,50 @@ const addDays = (day: string, n: number) => {
 };
 
 export function pulseStatus(x: { published7: number; done7: number; setupPct: number | null }): { status: PulseStatus; reason: string } {
-  if (x.published7 === 0 && x.done7 === 0) return { status: 'red', reason: 'Nothing published and no task finished in the last 7 days.' };
+  if (x.published7 === 0 && x.done7 === 0) return { status: 'red', reason: 'Nothing published and no work finished in the last 7 days.' };
   const why: string[] = [];
   if (x.published7 === 0) why.push('Nothing published in the last 7 days');
-  if (x.done7 === 0) why.push('no task finished in the last 7 days');
+  if (x.done7 === 0) why.push('no work finished in the last 7 days');
   if (x.setupPct != null && x.setupPct < 50) why.push(`setup is only ${x.setupPct}% done`);
   if (why.length) {
     const s = why.join('; ');
     return { status: 'amber', reason: `${s[0].toUpperCase()}${s.slice(1)}.` };
   }
-  return { status: 'green', reason: `${x.published7} published and ${x.done7} task${x.done7 === 1 ? '' : 's'} finished in the last 7 days.` };
+  return { status: 'green', reason: `${x.published7} published and ${x.done7} work item${x.done7 === 1 ? '' : 's'} finished in the last 7 days.` };
 }
 
 export const STATUS_RANK: Record<PulseStatus, number> = { red: 0, amber: 1, green: 2 };
+
+export interface CrewRunIn {
+  id: string; crew_key: string; status: string; started_at: string | null; finished_at: string | null;
+  tried: string | null; done: string | null; flagged: string | null; details: unknown;
+}
+export function crewRunBrands(run: CrewRunIn): string[] {
+  if (!run.details || typeof run.details !== 'object' || !('brands' in run.details)) return [];
+  const brands = run.details.brands;
+  return Array.isArray(brands) ? [...new Set(brands.filter((id): id is string => typeof id === 'string'))] : [];
+}
+export const crewRunTime = (run: CrewRunIn) => run.finished_at ?? run.started_at;
+export function crewWorkInLast7(runs: CrewRunIn[], brandId: string, now = Date.now()): number {
+  return runs.filter((r) => {
+    const at = crewRunTime(r);
+    const time = at ? Date.parse(at) : NaN;
+    return crewRunBrands(r).includes(brandId) && ['ok', 'partial'].includes(r.status) && time >= now - 7 * DAY && time <= now;
+  }).length;
+}
+export function crewFeedRows(runs: CrewRunIn[], brandId: string, names: Map<string, string>) {
+  return runs.filter((r) => crewRunBrands(r).includes(brandId)).flatMap((r) => {
+    const at = crewRunTime(r);
+    if (!at) return [];
+    const summary = r.done?.trim().replace(/\s+/g, ' ') || 'No completed work recorded';
+    return [{ key: `crew-${r.id}`, at, kind: 'crew' as const,
+      text: summary.length > 140 ? `${summary.slice(0, 139)}…` : summary,
+      who: names.get(r.crew_key) ?? r.crew_key, ownerKind: 'agent',
+      tried: r.tried, done: r.done, flagged: r.flagged?.trim() || null, runStatus: r.status,
+      detail: `What it tried: ${r.tried || 'Not recorded'}\nWhat got done: ${r.done || 'Not recorded'}${r.flagged?.trim() ? `\nNeeds you: ${r.flagged}` : ''}\nRun status: ${r.status}`,
+    }];
+  });
+}
 
 export interface PlacementIn { id: string; content_item_id: string | null; live_url: string | null; verified_at: string | null; updated_at: string | null; channel?: string | null; account_label?: string | null }
 export interface ItemIn { id: string; title: string | null; published_at: string | null }

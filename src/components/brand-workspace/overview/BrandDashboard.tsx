@@ -348,7 +348,7 @@ function MoneyBreakdown({ pulse, projectId }: { pulse: BrandPulse; projectId: st
 }
 
 // ---------- Latest work ----------
-const KIND_ICON = { task: CheckCircle2, published: Rocket, path: Flag };
+const KIND_ICON = { task: CheckCircle2, published: Rocket, path: Flag, crew: Bot };
 export function LatestWork({ feed, projectId, onOpenTab }: { feed: PulseFeedItem[]; projectId: string; onOpenTab: (t: string) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const [asking, setAsking] = useState<PulseFeedItem | null>(null);
@@ -358,18 +358,24 @@ export function LatestWork({ feed, projectId, onOpenTab }: { feed: PulseFeedItem
       <ol className="divide-y divide-border rounded-xl border border-border bg-card">
         {feed.map((f) => {
           const Icon = KIND_ICON[f.kind]; const isOpen = open === f.key;
-          const agent = f.who === 'Claude' || f.who === 'AI agent';
+          const agent = f.kind === 'crew' || f.who === 'Claude' || f.who === 'AI agent';
           return (
             <li key={f.key}>
-              <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : f.key)} className="flex w-full min-h-14 items-start gap-3 p-3 text-left hover:bg-muted/40">
+              <Button variant="ghost" type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : f.key)} className="flex h-auto w-full min-h-14 items-start justify-start gap-3 whitespace-normal p-3 text-left font-normal hover:bg-muted/40">
                 <Icon className={cn('h-5 w-5 mt-0.5 shrink-0', f.kind === 'published' ? 'text-subject-output' : f.kind === 'path' ? 'text-primary' : 'text-signal-green')} />
                 <span className="min-w-0 flex-1"><span className="block text-sm text-foreground break-words">{f.text}</span>
-                  <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">{agent && <Bot className="h-3 w-3" />}{f.who} · {relativeTime(f.at)}</span></span>
+                  <span className="mt-0.5 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">{agent && <Bot className="h-3 w-3" />}{f.who}{f.kind === 'crew' ? ' · Agent' : ''} · {relativeTime(f.at)}</span></span>
                 <ChevronDown className={cn('h-4 w-4 mt-1 shrink-0 text-muted-foreground transition-transform', isOpen && 'rotate-180')} />
-              </button>
+              </Button>
               {isOpen && <div className="px-3 pb-3">
                 {f.kind === 'task' ? <TaskExplanationBody task={{ title: f.text, detail: f.detail, why: f.why, ownerKind: f.ownerKind, minutes: f.minutes, pillar: f.pillar, status: 'Done', projectId, hideYourPart: true }} onAsk={() => setAsking(f)} />
-                  : <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
+                  : f.kind === 'crew' ? <div className="space-y-3 rounded-md border border-border bg-muted/30 p-3 text-sm">
+                      <div><p className="font-semibold text-subject-audience">What it tried</p><p className="whitespace-pre-wrap break-words">{f.tried || 'Not recorded'}</p></div>
+                      <div><p className="font-semibold text-subject-output">What got done</p><p className="whitespace-pre-wrap break-words">{f.done || 'Not recorded'}</p></div>
+                      {f.flagged && <div><p className="font-semibold text-gold">Needs you</p><p className="whitespace-pre-wrap break-words">{f.flagged}</p></div>}
+                      <p className="text-muted-foreground">Run status: <span className="font-medium text-foreground">{f.runStatus}</span></p>
+                      <Button variant="outline" className="min-h-11" onClick={() => setAsking(f)}><MessageCircleQuestion className="mr-1.5 h-4 w-4" />Ask about this</Button>
+                    </div> : <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
                       {f.detail && <p className="whitespace-pre-wrap">{f.detail}</p>}
                       {f.url && <a className="inline-flex min-h-11 items-center gap-1 text-primary underline" href={f.url} target="_blank" rel="noreferrer">Open {f.kind === 'published' ? 'the post' : 'the proof'} <ExternalLink className="h-3.5 w-3.5" /></a>}
                       {f.kind === 'path' && <Button variant="outline" className="min-h-11" onClick={() => onOpenTab('path')}>Open Business path</Button>}
@@ -380,7 +386,7 @@ export function LatestWork({ feed, projectId, onOpenTab }: { feed: PulseFeedItem
           );
         })}
       </ol>
-      {asking && <TaskAskSheet task={{ title: asking.text, detail: asking.detail, why: asking.why, projectId, status: 'Done', hideYourPart: true }} onClose={() => setAsking(null)} />}
+      {asking && <TaskAskSheet task={{ title: asking.kind === 'crew' ? `${asking.who}: ${asking.text}` : asking.text, detail: asking.detail, why: asking.why, ownerKind: asking.ownerKind, projectId, status: asking.runStatus ?? 'Done', hideYourPart: true }} onClose={() => setAsking(null)} />}
     </>
   );
 }

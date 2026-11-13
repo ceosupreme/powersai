@@ -1,5 +1,10 @@
 # Roadmap
 
+## Brand crew activity
+- [x] Add linked crew runs to shared feeds and status, with expandable Ask detail
+- [x] Approved crew defaults column, insert trigger, defaults editor and guide
+- [x] Verify Coastal Beauties and Supreme Team Media at 380px/desktop, real crew chat reply, one Portfolio crew query and 12 tests (no publishing); editor display checked, live default changes intentionally not made
+
 ## Brand team screen
 - [x] Expand brand assignments and always-visible Business path
 - [x] Today progress, step context/how-to, Whole plan and About

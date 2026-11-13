@@ -57,6 +57,13 @@
       "when": 1794461583440,
       "tag": "0007_business_path",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794614043808,
+      "tag": "0008_crew_default_brand_attribution",
+      "breakpoints": true
     }
   ]
 }

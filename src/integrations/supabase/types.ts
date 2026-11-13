@@ -3305,6 +3305,7 @@ export type Database = {
           calls_function: string | null
           created_at: string
           cron_jobname: string | null
+          default_brand_ids: string[] | null
           key: string
           kind: string
           max_gap: string
@@ -3321,6 +3322,7 @@ export type Database = {
           calls_function?: string | null
           created_at?: string
           cron_jobname?: string | null
+          default_brand_ids?: string[] | null
           key: string
           kind: string
           max_gap: string
@@ -3337,6 +3339,7 @@ export type Database = {
           calls_function?: string | null
           created_at?: string
           cron_jobname?: string | null
+          default_brand_ids?: string[] | null
           key?: string
           kind?: string
           max_gap?: string
@@ -16167,6 +16170,10 @@ export type Database = {
           p_token: string
         }
         Returns: boolean
+      }
+      hq_set_crew_default_brands: {
+        Args: { p_brand_ids: string[]; p_crew_key: string }
+        Returns: undefined
       }
       hq_verify_job_token: {
         Args: { p_function: string; p_token: string }
