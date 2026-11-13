@@ -489,6 +489,7 @@ export default function ProjectHome() {
       {isNonClient && venueId ? (
         <BrandWorkspace
           projectId={venueId}
+          brandName={meta.name}
           isAdmin={isAdmin}
           overallScore={scoreCards?.[0]?.overall}
           nextTen={<NextTenSection projectId={venueId} projectName={meta.name} />}

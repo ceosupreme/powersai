@@ -9,6 +9,27 @@ import { ScoreDataStatus } from '@/components/pillar/ScoreDataStatus';
 import type { BrandWorkCard } from '@/hooks/useBrandWorkspace';
 import type { ChannelStat, SetupStat } from '@/lib/portfolioSort';
 import { compactNumber } from '@/lib/playbookStatus';
+import type { BrandPulse } from '@/hooks/useBrandPulse';
+import { StatusChip } from '@/components/brand-workspace/overview/BrandDashboard';
+
+/** One line of headline numbers in the dashboard's subject colors. */
+function PulseLine({ pulse }: { pulse: BrandPulse }) {
+  const days = pulse.lastWork ? Math.max(0, Math.floor((Date.now() - new Date(pulse.lastWork.at).getTime()) / 86_400_000)) : null;
+  const money = pulse.money.total != null ? formatCurrency(pulse.money.total) : pulse.leads ? `${pulse.leads.last30} leads` : null;
+  return (
+    <div className="mb-3 space-y-1.5">
+      <StatusChip status={pulse.status} />
+      <p className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+        <span className="text-primary font-medium">{pulse.path.placed && pulse.path.stageNumber ? `Stage ${pulse.path.stageNumber}/${pulse.path.stageCount}` : 'Not on path'}</span>
+        <span className="text-subject-output font-medium">{pulse.output.published7} published 7d</span>
+        <span className="text-subject-money font-medium">{money ? `${money} 30d` : 'Money not tracked'}</span>
+      </p>
+      <p className="text-sm text-muted-foreground line-clamp-1">
+        {pulse.lastWork ? <>Last work: {pulse.lastWork.text} · {days === 0 ? 'today' : `${days}d ago`}</> : 'No work recorded in 60 days'}
+      </p>
+    </div>
+  );
+}
 
 /**
  * Overview card for a non-client project (own brand / prospect):
@@ -20,8 +41,11 @@ export function BrandProjectCard({
   work,
   channels,
   setup,
+  pulse,
   onClick,
 }: {
+  /** Dashboard headline numbers; undefined while loading. */
+  pulse?: BrandPulse;
   data: NonClientCardData;
   /** Workload numbers; undefined while loading. */
   work?: BrandWorkCard | null;
@@ -42,6 +66,7 @@ export function BrandProjectCard({
       className={cn(
         'text-left bg-card border border-border rounded-lg p-4 transition-colors hover:border-primary w-full',
         parked && 'border-dashed',
+        pulse?.status === 'red' && 'border-l-4 border-l-destructive',
       )}
     >
       <div className="mb-4 space-y-2">
@@ -50,6 +75,8 @@ export function BrandProjectCard({
           <Badge variant="outline" className="text-[10px] shrink-0">Parked</Badge>
         )}
       </div>
+
+      {pulse && <PulseLine pulse={pulse} />}
 
       <div className="flex items-baseline gap-2 mb-2">
         {data.overall != null ? (

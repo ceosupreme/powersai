@@ -10,16 +10,19 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { ExternalLink, Loader2, Pencil, Plus } from 'lucide-react';
+import { BarChart3, CalendarCheck, ExternalLink, Flag, Gauge, Inbox, LineChart as LineChartIcon, Loader2, Pencil, Plus } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useBrandPulse } from '@/hooks/useBrandPulse';
+import { FEED_ICON, LatestWork, ScoreRing, SectionHeading, ShowMore, StatusChip, SubjectSheet, SubjectTiles, PathSegments, type Subject } from './overview/BrandDashboard';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatting';
 import {
-  CHANNEL_STATUSES, jobByTarget, useBrandActivity, useBrandChannels, useBrandIntel, useBrandKitAssetsView,
+  CHANNEL_STATUSES, jobByTarget, useBrandChannels, useBrandIntel, useBrandKitAssetsView,
   useBrandWorkSummary, useKnowledgeRows, useProjectDocuments, useProjectJobs, useProjectProducts,
   useUpdateBrandChannel, type BrandChannel, type KnowledgeRow,
 } from '@/hooks/useBrandWorkspace';
-import { useCompleteNextTenRow, priorityLabel } from '@/hooks/useNextTen';
+import { priorityLabel } from '@/hooks/useNextTen';
 import { useApproveItem, useAdvanceStage, useProductionBoardItems, canApprove, type BoardItem } from '@/hooks/useContentProduction';
 import { ProductionItemCard } from '@/components/content/ProductionItemCard';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
@@ -40,7 +43,7 @@ import {
 import { CreatePipelineDialog, contentItemFromPain, type PipelineRequest } from '@/components/pipeline/CreatePipelineDialog';
 import { PlaybooksTab } from './PlaybooksTab';
 import { BusinessPathTab } from './BusinessPathTab';
-import { SetupLine, SetupTab } from './SetupTab';
+import { SetupTab } from './SetupTab';
 import { ScreenshotStatsDialog, StatsHistory, latestLine } from './ChannelStats';
 import { useChannelStats } from '@/hooks/useBrandSetup';
 import { composePipeline, outletToDestination, productTypeForFormat, productTypeForName } from '@/lib/pipelineComposer';
@@ -68,8 +71,10 @@ export function BrandWorkspace({
   nextTen,
   pillars,
   setup,
+  brandName,
 }: {
   projectId: string;
+  brandName?: string;
   isAdmin: boolean;
   overallScore: number | null | undefined;
   nextTen: ReactNode;
@@ -116,7 +121,7 @@ export function BrandWorkspace({
       </p>
 
       {tab === 'overview' && (
-        <OverviewTab projectId={projectId} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenSetup={() => select('setup')} />
+        <OverviewTab projectId={projectId} brandName={brandName ?? 'This brand'} overallScore={overallScore} nextTen={nextTen} pillars={pillars} setup={setup} onOpenTab={(k) => select((tabs.find((t) => t.key === k)?.key ?? 'overview') as TabKey)} />
       )}
       {tab === 'path' && <BusinessPathTab projectId={projectId} isAdmin={isAdmin} />}
       {tab === 'setup' && <SetupTab projectId={projectId} canEdit={isAdmin} />}
@@ -144,9 +149,11 @@ function LoadError({ onRetry }: { onRetry: () => void }) {
 
 // ---------------- Overview ----------------
 function OverviewTab({
-  projectId, overallScore, nextTen, pillars, setup, onOpenSetup,
-}: { projectId: string; overallScore: number | null | undefined; nextTen: ReactNode; pillars: ReactNode; setup: ReactNode; onOpenSetup: () => void }) {
+  projectId, brandName, overallScore, nextTen, pillars, setup, onOpenTab,
+}: { projectId: string; brandName: string; overallScore: number | null | undefined; nextTen: ReactNode; pillars: ReactNode; setup: ReactNode; onOpenTab: (key: string) => void }) {
+  const { user } = useAuth();
   const summary = useBrandWorkSummary(projectId);
+  const pulse = useBrandPulse(projectId, user?.id);
   const listSize = useQuery({
     queryKey: ['brand-workspace', 'list-size', projectId],
     queryFn: async () => {
@@ -162,142 +169,137 @@ function OverviewTab({
       return data?.[0]?.actual == null ? null : Number(data[0].actual);
     },
   });
-  const activity = useBrandActivity(projectId);
-  const complete = useCompleteNextTenRow();
   const [reviewPostId, setReviewPostId] = useState<string | null>(null);
   const [standaloneActionId, setStandaloneActionId] = useState<string | null>(null);
+  const [subject, setSubject] = useState<Subject | null>(null);
   const s = summary.data;
+  const p = pulse.data;
   const firstAction = s?.waitingActions[0];
   const firstContent = s?.waitingContent[0];
+  const restActions = s?.waitingActions.slice(1) ?? [];
 
-  const tiles: { label: string; value: string }[] = [
-    { label: 'Overall score', value: overallScore == null ? '—' : String(overallScore) },
-    { label: 'Revenue this month', value: s?.revenueMonth == null ? '—' : formatCurrency(s.revenueMonth) },
-    { label: 'List size', value: listSize.data == null ? '—' : listSize.data.toLocaleString() },
-    { label: 'Followers', value: s?.followers == null ? '—' : s.followers.toLocaleString() },
-    { label: 'Published this month', value: s ? String(s.publishedThisMonth) : '—' },
-    { label: 'Waiting on you', value: s ? String(s.waitingCount) : '—' },
-  ];
-
-  const markDone = async (id: string) => {
-    try {
-      await complete.mutateAsync({ key: `action-${id}`, source: 'Action', step: '', projectId, projectName: '', refId: id, rank: 0 });
-      toast.success('Marked done');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Could not save that step');
-    }
-  };
+  const stepButton = (a: NonNullable<typeof firstAction>, size?: 'sm') => a.jobId
+    ? <Button size={size} className="min-h-11" asChild><Link to={pipelineHref(projectId, a.jobId, a.id)}>Open step & instructions</Link></Button>
+    : <Button size={size} className="min-h-11" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>;
+  const explain = (a: NonNullable<typeof firstAction>) => ({
+    title: a.title, detail: a.detail, why: a.why, ownerKind: a.ownerKind, minutes: a.minutes,
+    priority: priorityLabel(a.priorityRank) === '—' ? null : priorityLabel(a.priorityRank),
+    dueDate: a.dueDate, pillar: a.pillar, status: a.status, projectId, brand: brandName,
+  });
 
   return (
-    <div className="space-y-6">
-      <SetupLine projectId={projectId} onOpen={onOpenSetup} />
-      <Card className="border-primary/40">
-        <CardHeader className="pb-2"><CardTitle className="text-lg">Your next priority</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
-          firstAction ? <>
-            <p className="font-semibold">{firstAction.title}</p>
-            <p className="text-sm text-muted-foreground">This is the highest-priority actionable step currently recorded for the brand. Open it for the work instructions and expected outcome.</p>
-            {firstAction.jobId ?
-              <Button asChild><Link to={pipelineHref(projectId, firstAction.jobId, firstAction.id)}>Start this step</Link></Button> :
-              <Button onClick={() => setStandaloneActionId(firstAction.id)}>Open work instructions</Button>}
-          </> : firstContent ? <>
-            <p className="font-semibold">{firstContent.title}</p>
-            <p className="text-sm text-muted-foreground">The content is ready for review. Check its work and approval requirements first.</p>
-            <Button onClick={() => setReviewPostId(firstContent.id)}>Review this post</Button>
-          </> : <p className="text-sm text-muted-foreground">No owner step is ready right now. Open My Plan or Accounts to set up for other work.</p>}
-        </CardContent>
-      </Card>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {tiles.map((t) => (
-          <div key={t.label} className="rounded-xl border border-primary/25 bg-card p-4">
-            <p className="text-4xl sm:text-5xl font-bold leading-none text-foreground tabular-nums break-words">{t.value}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{t.label}</p>
+    <div className="space-y-8 text-[15px]">
+      {/* 1. Header strip */}
+      <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 space-y-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <ScoreRing score={overallScore} />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground break-words">{brandName}</h2>
+            {pulse.isLoading ? <p className="text-sm text-muted-foreground">Checking recent activity…</p>
+              : p ? <><StatusChip status={p.status} /><p className="text-sm text-muted-foreground leading-snug">{p.reason}</p></>
+              : <p className="text-sm text-muted-foreground">Recent activity could not be loaded.</p>}
+          </div>
+        </div>
+        {p && (p.path.placed && p.path.stageCount > 0 ? (
+          <button type="button" onClick={() => onOpenTab('path')} className="block w-full space-y-2 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm font-semibold text-foreground">Stage {p.path.stageNumber} of {p.path.stageCount}: {p.path.stageName}</p>
+              <span className="text-xs text-muted-foreground shrink-0">{p.path.done} of {p.path.total} steps</span>
+            </div>
+            <PathSegments segments={p.path.segments} current={p.path.stageNumber} />
+          </button>
+        ) : (
+          <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border p-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground"><Flag className="inline h-4 w-4 mr-1" />Not placed on the path yet.</p>
+            <Button variant="outline" className="min-h-11" onClick={() => onOpenTab('path')}>Open Business path</Button>
           </div>
         ))}
-      </div>
-      <BrandWeeklyNumbers projectId={projectId} />
-
-      <Card className="border-primary/40">
-        <CardHeader className="pb-2"><CardTitle className="text-base">Other work needing attention</CardTitle></CardHeader>
-        <CardContent>
+        <div className="rounded-xl border border-primary/40 bg-primary/5 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Next move</p>
           {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
-            !s || s.waitingCount === 0 ? (
-              <p className="text-sm text-muted-foreground">Nothing is waiting on you for this brand.</p>
-            ) : (
-              <ul className="divide-y divide-border">
-                {s.waitingActions.map((a) => (
+          firstAction ? (
+            <TaskExplainer defaultOpen task={explain(firstAction)}
+              header={<p className="font-semibold text-foreground">{firstAction.title}</p>}
+              actions={<div className="mt-3">{stepButton(firstAction)}</div>} />
+          ) : firstContent ? <div className="space-y-2">
+            <p className="font-semibold">{firstContent.title}</p>
+            <p className="text-sm text-muted-foreground">This post is ready for review. Check its work and approval requirements first.</p>
+            <Button className="min-h-11" onClick={() => setReviewPostId(firstContent.id)}>Review this post</Button>
+          </div> : <p className="text-sm text-muted-foreground">No step is ready right now. Open Business path or Accounts to set up for other work.</p>}
+        </div>
+      </section>
+
+      {/* 2. Subject tiles */}
+      <section className="space-y-3">
+        <SectionHeading icon={Gauge} title="How it's doing" aside={<span className="text-xs text-muted-foreground">Tap a tile for details</span>} />
+        {pulse.isLoading ? <Loading /> : pulse.isError ? <LoadError onRetry={() => pulse.refetch()} /> :
+          p && <SubjectTiles pulse={p} onOpen={setSubject} onOpenTab={onOpenTab} />}
+      </section>
+
+      {/* 3. Latest work */}
+      <section className="space-y-3">
+        <SectionHeading icon={FEED_ICON} title="Latest work" />
+        {pulse.isLoading ? <Loading /> : p && <LatestWork feed={p.feed} projectId={projectId} onOpenTab={onOpenTab} />}
+      </section>
+
+      {/* 4. Existing content, organised */}
+      <section className="space-y-3">
+        <SectionHeading icon={Inbox} title="Also waiting on you" tone="text-gold" aside={s ? <Badge variant="secondary">{Math.max(0, s.waitingCount - (firstAction || firstContent ? 1 : 0))}</Badge> : null} />
+        {summary.isLoading ? <Loading /> : summary.isError ? <LoadError onRetry={() => summary.refetch()} /> :
+          !s || (restActions.length === 0 && s.waitingContent.length === (firstAction ? 0 : Math.min(1, s.waitingContent.length))) ? (
+            <p className="text-sm text-muted-foreground">Nothing else is waiting on you for this brand.</p>
+          ) : (
+            <ShowMore height="max-h-[22rem]">
+              <ul className="divide-y divide-border rounded-xl border border-border bg-card px-3">
+                {restActions.map((a) => (
                   <li key={a.id} className="py-3">
-                    <TaskExplainer
-                      task={{
-                        title: a.title, detail: a.detail, why: a.why, ownerKind: a.ownerKind, minutes: a.minutes,
-                        priority: priorityLabel(a.priorityRank) === '—' ? null : priorityLabel(a.priorityRank),
-                        dueDate: a.dueDate, pillar: a.pillar, status: a.status, projectId,
-                      }}
+                    <TaskExplainer task={explain(a)}
                       header={<>
                         <p className="text-sm text-foreground font-medium">{a.title}</p>
                         <div className="mt-1 flex gap-1.5 flex-wrap">
                           <Badge variant="outline" className={cn('text-xs', PRIORITY_CHIP[a.priorityRank])}>
                             {priorityLabel(a.priorityRank) === '—' ? 'No priority' : priorityLabel(a.priorityRank)}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">Step</Badge>
                         </div>
                       </>}
-                      actions={<div className="flex gap-2 mt-2">
-                      {a.jobId ? (
-                        <Button size="sm" asChild>
-                          <Link to={pipelineHref(projectId, a.jobId, a.id)}>Open step & instructions</Link>
-                        </Button>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => setStandaloneActionId(a.id)}>Open instructions</Button>
-                      )}
-                    </div>}
-                    />
+                      actions={<div className="mt-2">{stepButton(a, 'sm')}</div>} />
                   </li>
                 ))}
-                {s.waitingContent.map((c) => (
+                {s.waitingContent.filter((c) => firstAction || c.id !== firstContent?.id).map((c) => (
                   <li key={c.id} className="py-3 flex flex-col gap-2 sm:flex-row sm:items-center">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-foreground">{c.title}</p>
                       <div className="mt-1 flex gap-1.5 flex-wrap">
-                        <Badge variant="outline" className="text-[10px]">Ready to approve</Badge>
-                        <Badge variant="secondary" className="text-[10px]">Quality {dash(c.quality_score)}</Badge>
+                        <Badge variant="outline" className="text-xs">Ready to approve</Badge>
+                        <Badge variant="secondary" className="text-xs">Quality {dash(c.quality_score)}</Badge>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={() => setReviewPostId(c.id)}>Review the post & approve</Button>
-                    </div>
+                    <Button size="sm" className="min-h-11" onClick={() => setReviewPostId(c.id)}>Review the post & approve</Button>
                   </li>
                 ))}
               </ul>
-            )}
-        </CardContent>
-      </Card>
+            </ShowMore>
+          )}
+      </section>
 
-      {nextTen}
-      {pillars}
+      <section className="space-y-3">
+        <SectionHeading icon={CalendarCheck} title="This week's plan" />
+        <ShowMore>{nextTen}</ShowMore>
+      </section>
 
-      <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-base">Activity</CardTitle></CardHeader>
-        <CardContent>
-          {activity.isLoading ? <Loading /> : activity.isError ? <LoadError onRetry={() => activity.refetch()} /> :
-            (activity.data ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">No activity recorded yet.</p>
-            ) : (
-              <ol className="space-y-2">
-                {activity.data!.map((e) => (
-                  <li key={e.key} className="flex items-baseline justify-between gap-3 text-sm">
-                    <span className="text-foreground min-w-0">{e.text}</span>
-                    <span className="text-xs text-muted-foreground shrink-0">{relativeTime(e.at)}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-        </CardContent>
-      </Card>
+      <section className="space-y-3">
+        <SectionHeading icon={BarChart3} title="Scores by area" tone="text-subject-audience" />
+        <ShowMore>{pillars}</ShowMore>
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeading icon={LineChartIcon} title="Weekly numbers" tone="text-subject-output" />
+        <ShowMore><BrandWeeklyNumbers projectId={projectId} /></ShowMore>
+      </section>
 
       {setup}
-      <ActionInstructionDialog projectId={projectId} projectName="This brand" actionId={standaloneActionId} onClose={() => setStandaloneActionId(null)} />
+      {p && <SubjectSheet subject={subject} pulse={p} projectId={projectId} brandName={brandName} listSize={listSize.data ?? null} onClose={() => setSubject(null)} onOpenTab={(t) => { setSubject(null); onOpenTab(t); }} />}
+      <ActionInstructionDialog projectId={projectId} projectName={brandName} actionId={standaloneActionId} onClose={() => setStandaloneActionId(null)} />
       <ContentWorkflowDialog projectId={projectId} itemId={reviewPostId} onClose={() => setReviewPostId(null)} />
     </div>
   );

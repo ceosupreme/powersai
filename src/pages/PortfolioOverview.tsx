@@ -25,6 +25,8 @@ import {
 } from '@/hooks/usePortfolioData';
 import { BrandProjectCard } from '@/components/portfolio/BrandProjectCard';
 import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
+import { useBrandPulses } from '@/hooks/useBrandPulse';
+import { useAuth } from '@/context/AuthContext';
 import { type PortfolioSortKey, SORT_OPTIONS, SORT_STORAGE_KEY, TYPE_CHIPS, portfolioSorter, type ChannelStat, type SetupStat } from '@/lib/portfolioSort';
 import { AllBrandsWaitingStrip } from '@/components/portfolio/AllBrandsWaitingStrip';
 import { useRole } from '@/context/RoleContext';
@@ -425,7 +427,9 @@ export default function PortfolioOverview() {
     const t = TYPE_CHIPS.find((x) => x.key === typeFilter)?.type;
     return t && group === 'brands' ? nonClientCards.filter((c) => typeById.get(c.id) === t) : nonClientCards;
   }, [nonClientCards, typeFilter, typeById, group]);
-  const sorter = useMemo(() => portfolioSorter(sortKey, workById, channelStats, setupStats), [sortKey, workById, channelStats, setupStats]);
+  const { user: pulseUser } = useAuth();
+  const { data: pulseById } = useBrandPulses(group === 'brands' ? cardIds : [], pulseUser?.id);
+  const sorter = useMemo(() => portfolioSorter(sortKey, workById, channelStats, setupStats, pulseById), [sortKey, workById, channelStats, setupStats, pulseById]);
   const activeCards = useMemo(
     () => typed.filter((c) => c.focusStatus !== 'parked').sort(sorter),
     [typed, sorter],
@@ -769,6 +773,7 @@ export default function PortfolioOverview() {
                     work={workById?.get(card.id)}
                     channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
                     setup={group === 'brands' ? setupStats?.get(card.id) : undefined}
+                    pulse={group === 'brands' ? pulseById?.get(card.id) : undefined}
                     onClick={() => handleProjectDrillIn(card.id)}
                   />
                 ))}
@@ -788,6 +793,7 @@ export default function PortfolioOverview() {
                           work={workById?.get(card.id)}
                           channels={group === 'brands' ? (channelStats ? channelStats.get(card.id) ?? { total: 0, live: 0, followers: 0 } : undefined) : undefined}
                     setup={group === 'brands' ? setupStats?.get(card.id) : undefined}
+                    pulse={group === 'brands' ? pulseById?.get(card.id) : undefined}
                           onClick={() => handleProjectDrillIn(card.id)}
                         />
                       ))}

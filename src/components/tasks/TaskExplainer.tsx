@@ -1,9 +1,18 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { ChevronDown, Loader2, MessageCircleQuestion, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+
+/** Phone check that is right on the first draw, so a sheet opened at once slides up instead of in from the side. */
+export function usePhoneSheetSide(): 'bottom' | 'right' {
+  const later = useIsMobile();
+  const [first] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  const [settled, setSettled] = useState(false);
+  useEffect(() => { setSettled(true); }, []);
+  return (settled ? later : first) ? 'bottom' : 'right';
+}
 import { streamAskBarPulse } from '@/lib/askStream';
 import { cn } from '@/lib/utils';
 
@@ -122,8 +131,10 @@ export function TaskExplainer({
 const STARTERS = ['What exactly do I need to do?', 'Why does this matter for this brand?', 'What happens if I skip it?'];
 
 /** Small chat about one task, scoped to its project, using ask-barpulse. */
-export function TaskAskSheet({ task, onClose }: { task: TaskExplanation; onClose: () => void }) {
-  const isMobile = useIsMobile();
+export function TaskAskSheet({ task, onClose, heading = 'Ask about this task', starters = STARTERS }: {
+  task: TaskExplanation; onClose: () => void; heading?: string; starters?: string[];
+}) {
+  const isMobile = usePhoneSheetSide() === 'bottom';
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -166,14 +177,14 @@ export function TaskAskSheet({ task, onClose }: { task: TaskExplanation; onClose
     <Sheet open onOpenChange={(o) => { if (!o) onClose(); }}>
       <SheetContent side={isMobile ? 'bottom' : 'right'} className={cn('flex flex-col gap-3', isMobile ? 'h-[85vh]' : 'w-full sm:max-w-md')}>
         <SheetHeader className="text-left">
-          <SheetTitle className="text-base">Ask about this task</SheetTitle>
+          <SheetTitle className="text-base">{heading}</SheetTitle>
           <SheetDescription className="text-sm">{task.title}</SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto space-y-3" aria-live="polite">
           {messages.length === 0 ? (
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Pick a question or type your own.</p>
-              {STARTERS.map((s) => (
+              {starters.map((s) => (
                 <Button key={s} variant="outline" className="w-full justify-start min-h-11 text-sm h-auto whitespace-normal text-left" onClick={() => ask(s)}>
                   {s}
                 </Button>

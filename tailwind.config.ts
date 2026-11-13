@@ -72,6 +72,12 @@ export default {
         gold: "hsl(var(--gold))",
         blue: "hsl(var(--blue))",
         orange: "hsl(var(--orange))",
+        subject: {
+          setup: "hsl(var(--subject-setup))",
+          output: "hsl(var(--subject-output))",
+          audience: "hsl(var(--subject-audience))",
+          money: "hsl(var(--subject-money))",
+        },
         // Grade Colors
         "grade-a": "hsl(var(--grade-a))",
         "grade-b": "hsl(var(--grade-b))",

@@ -1,8 +1,9 @@
 /** Portfolio brand sorting and type chips. Pure so the rules are testable. */
-export type PortfolioSortKey = 'waiting' | 'score' | 'money' | 'potential' | 'live' | 'followers' | 'gaps' | 'name';
+export type PortfolioSortKey = 'attention' | 'waiting' | 'score' | 'money' | 'potential' | 'live' | 'followers' | 'gaps' | 'name';
 
 export const SORT_OPTIONS: { value: PortfolioSortKey; label: string }[] = [
   { value: 'waiting', label: 'Waiting on you' },
+  { value: 'attention', label: 'Needs attention first' },
   { value: 'score', label: 'Score' },
   { value: 'money', label: 'Money this month' },
   { value: 'potential', label: 'Potential' },
@@ -37,7 +38,10 @@ export function portfolioSorter(
   work?: Map<string, { waitingCount: number }> | null,
   channels?: Map<string, ChannelStat> | null,
   setup?: Map<string, SetupStat> | null,
+  /** Status from the brand dashboard: red (gone quiet) first, then amber, then green. */
+  status?: Map<string, { status: 'green' | 'amber' | 'red' }> | null,
 ) {
+  const rank = (id: string) => ({ red: 0, amber: 1, green: 2 } as const)[status?.get(id)?.status ?? 'green'] ?? 3;
   const byName = (a: SortCard, b: SortCard) => a.name.localeCompare(b.name);
   return (a: SortCard, b: SortCard): number => {
     switch (key) {
@@ -48,6 +52,7 @@ export function portfolioSorter(
       case 'followers': return desc(channels?.get(a.id)?.followers ?? 0, channels?.get(b.id)?.followers ?? 0) || byName(a, b);
       case 'gaps': return desc(setup?.get(a.id)?.gaps ?? null, setup?.get(b.id)?.gaps ?? null) || byName(a, b);
       case 'name': return byName(a, b);
+      case 'attention': return rank(a.id) - rank(b.id) || (work?.get(b.id)?.waitingCount ?? -1) - (work?.get(a.id)?.waitingCount ?? -1) || byName(a, b);
       default:
         return (work?.get(b.id)?.waitingCount ?? -1) - (work?.get(a.id)?.waitingCount ?? -1) || (b.overall ?? -1) - (a.overall ?? -1);
     }

@@ -11,27 +11,27 @@ The "Overview" tab is the first thing you see when you open a brand. It shows th
 ## What you see
 
 From top to bottom:
-- A setup line, for example "Setup: 6 of 14 in place, 8 to set up." with an "Open Setup" link. It only appears when the brand's setup map lists items the brand needs.
-- Six large number tiles. A dash means there is no number yet.
-  - "Overall score": the same weighted score for the current week that the brand's Portfolio card shows.
-  - "Revenue this month": the total of this month's revenue entries for the brand.
-  - "List size": the newest weekly number entered for a KPI (a number you track each week) whose name mentions email or list.
-  - "Followers": the follower counts on the brand's channel records, added together.
-  - "Published this month": placements (one piece put on one channel) that are marked published and were verified during this calendar month.
-  - "Waiting on you": how many items are in the list below.
-- "Waiting on you": your open steps for this brand and its content that is ready for approval.
-  - A step shows its title, a priority badge ("P1" to "P4", or "No priority") and a "Step" badge, with a "Done" button. Steps that belong to a pipeline also have an "Open" button.
-  - A content piece shows "Ready to approve" and its "Quality" score, with a "Done" button that approves it and an "Open" button that opens the "Content" tab.
-  - When there is nothing, it says "Nothing is waiting on you for this brand."
-- "Next 10": the ranked list of the next ten things to do for this brand, with a "Download PDF" button. A row that belongs to a pipeline ends in "· Pipeline" and opens that pipeline when tapped.
-- The score section: "Overall (weighted)", one card per pillar (a scored area of the brand), and short one-glance sections such as "Action plan", "Insights", "Products by stage", "Content pipeline", "Revenue this month" and "Score trend (12 weeks)".
-- "Activity": the last ten things that happened, newest first, each with how long ago. Examples are "Done:" and a step, "Job created:" and a title, "Published on" a channel, "Listed on" an outlet, and research runs. When empty it says "No activity recorded yet."
-- A "Setup" button at the very bottom. It unfolds the older project tools: a "Continue setup" card when go-live steps remain, "Capture link", "Email delivery", "Proposals", and shortcuts to "Weekly Review", "Growth Audit", "Automation Inbox", "Recovery Reports" and "Brand Vault".
+- A header card with the brand's score as a ring, a status chip and one line saying why:
+  - "On track" (green): something was published and a task was finished in the last 7 days, and setup is at least 50% done.
+  - "Needs attention" (amber): nothing was published, or no task was finished, in the last 7 days, or setup is under 50%.
+  - "Gone quiet" (red): nothing was published and no task was finished in the last 7 days.
+- The Business path bar: 8 segments and "Stage 3 of 8: ..." with steps done. Tap it to open "Business path". A brand with no saved path steps shows "Not placed on the path yet" with an "Open Business path" button.
+- "Next move": the top step, already opened so it explains itself, with "Ask about this" and its open button.
+- "How it's doing": four tiles, each with its own color everywhere in this tab:
+  - "Setup" (purple): percent of the needed accounts in place, a bar and "N pieces missing".
+  - "Output" (teal): pieces published in the last 7 days against the weekly target (the posts-per-week targets on the social accounts added together), with an 8-week bar chart. With no target it shows the count only. A post counts when it has a live link, or when its content piece has a published date; the same piece counts once per week.
+  - "Audience" (blue): total followers from the newest saved count per account, the change since the count before, and a trend line. An account with no saved counts uses the follower number on the account itself.
+  - "Money" (green): income entered since the first of last month, split by type. For Supreme Team Media it also shows leads in the last 30 days and open proposals.
+  - A tile with nothing to show says "Not tracking yet", what turns it on, and a link to where you enter it. A chart only draws with at least two points.
+- Tap a tile to open its panel: a sentence on what it measures, a bigger chart, the items behind the number (missing setup pieces, posts published and scheduled, followers per account with last post date, each income entry and the ways to make money not turned on yet) and "Ask about this", which opens the chat with that section's numbers.
+- "Latest work": the last 8 things done for the brand (finished tasks, posts that went live, Business path steps), newest first, with who did it and how long ago. Tap a row for its detail.
+- "Also waiting on you", "This week's plan" (the Next 10), "Scores by area" and "Weekly numbers". Long sections are cut short with a "Show more" button.
+- A "Setup" button at the very bottom with the older project tools.
 
 ## How to use it
 
 ### To finish one of your steps
-1. Find the step in "Waiting on you".
+1. Find the step in "Next move" or "Also waiting on you".
 2. Tap "Done". HQ shows "Marked done" and the step leaves the list.
 3. If the step belongs to a pipeline, HQ moves that pipeline to its next step by itself.
 

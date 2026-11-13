@@ -22,7 +22,8 @@ On "My brands" you then see type chips ("All", "Brands", "Channels", "Apps", "Se
 
 Each brand card shows, top to bottom:
 
-- The brand name, then the overall score with its letter grade and the change since the week before, such as "↑4 WoW".
+- The brand name, then a status chip ("On track", "Needs attention" or "Gone quiet", same rules as the brand Overview) and one line of headline numbers: Business path stage ("Stage 2/8" or "Not on path"), pieces published in the last 7 days, money (or leads for Supreme Team Media) recently, and the last work with how many days ago. A "Gone quiet" card has a red left edge.
+- The overall score with its letter grade and the change since the week before, such as "↑4 WoW".
 - Data lines: how many KPIs (or pillars) were measured and for which week, and "As of" a date, with "stale" added when the data is eight or more days old.
 - "3 live channels · 12.4K followers", or "No channels on file".
 - The Setup line, such as "Setup: 7 of 12 in place, Caution".
@@ -47,10 +48,11 @@ On "Clients" you see "Project Scorecards" as cards or a table, then a "GM Perfor
 ### To sort your brands
 
 1. On "My brands", tap the menu next to "Sort".
-2. Choose one of the eight orders below. Parked brands are sorted the same way inside their own section, and HQ remembers your choice on this device.
+2. Choose one of the nine orders below. Parked brands are sorted the same way inside their own section, and HQ remembers your choice on this device.
 
-The eight orders:
+The nine orders:
 
+- "Needs attention first": "Gone quiet" brands first, then "Needs attention", then "On track"; ties go to the most waiting on you.
 - "Waiting on you": most waiting first; ties go to the higher score. This is the default.
 - "Score": highest overall score first.
 - "Money this month": most revenue this month first.
