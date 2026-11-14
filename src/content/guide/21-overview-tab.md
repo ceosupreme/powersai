@@ -1,5 +1,5 @@
 # Overview tab
-<!-- part: Running a brand | order: 21 | slug: overview-tab | route: /project/:venueId | tags: overview, brand numbers, overall score, revenue this month, list size, followers, published this month, waiting on you, next 10, activity, pillars, scores, download pdf -->
+<!-- part: Running a brand | order: 21 | slug: overview-tab | route: /project/:venueId | tags: overview, brand numbers, overall score, revenue this month, list size, followers, published this month, waiting on you, next 10, activity, pillars, scores, download pdf, website, page views, cta clicks, inquiries -->
 
 The "Overview" tab is the first thing you see when you open a brand. It shows the brand's headline numbers, everything waiting on you for this brand, the brand's Next 10, its scores and its recent activity. Use it for a quick check-in and to clear small tasks without leaving the brand.
 
@@ -26,6 +26,7 @@ From top to bottom:
 - Tap a tile to open its panel: a sentence on what it measures, a bigger chart, the items behind the number (missing setup pieces, posts published and scheduled, followers per account with last post date, each income entry and the ways to make money not turned on yet) and "Ask about this", which opens the chat with that section's numbers.
 - "Latest work": the last 8 things done for the brand (finished tasks, posts that went live, Business path steps), newest first, with who did it and how long ago. Tap a row for its detail.
 - "Also waiting on you", "This week's plan" (the Next 10), "Scores by area" and "Weekly numbers". Long sections are cut short with a "Show more" button.
+- On Supreme Team Media only, a small "Website, last 7 days" section near the bottom: one line with page views, CTA clicks, call requests, inquiries and the first-response rate, then orders from the last 30 days. When there were inquiries, tap "Inquiries by industry" to see which industry pages they came from. It sits low on purpose and does not appear on the other tabs.
 - A "Setup" button at the very bottom with the older project tools.
 
 ## How to use it
@@ -54,6 +55,8 @@ From top to bottom:
 - "P1" to "P4": priority, from P1 (most urgent) to P4 (low).
 - "Step": a single task. It may stand alone or belong to a pipeline.
 - "Ready to approve": a finished piece (production done, file or text attached) with no approval yet, whatever its score.
+- "CTA clicks": taps on the tracked buttons and links of the Supreme Team Media website, such as booking a call, starting the free checkup or opening a blog post. Your own visits from the editor preview are not counted.
+- "First-response rate": the share of the last 7 days' email inquiries that have had a first reply.
 
 ## Good to know
 

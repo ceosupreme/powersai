@@ -24,8 +24,6 @@ The brand header sits at the top:
 - A "Setup wizard" button on the right. It opens the step-by-step setup wizard for the go-live steps, such as lead capture.
 - Admins can tap "See what the team sees" to open a read-only team view. "Viewing as" chooses a person assigned steps on this brand. Tabs and step links keep that choice. Save, completion, help, post editing, uploads and other write controls are hidden; "Back to my dashboard" exits the preview.
 
-On the Supreme Team Media brand only, a "Website, last 7 days" card follows the header, with "Page views", "CTA clicks", "Call requests", "First-response rate", "Inquiries by industry" and orders from the last 30 days.
-
 Below the header is the tab row. On a phone it scrolls sideways, so swipe it left to reach the later tabs.
 - "Overview": the brand at a glance, with headline numbers, what is waiting on you, the brand's Next 10, its scores and recent activity.
 - "Business path": always available to the brand team, showing the current stage and applicable steps with saved status, notes and proof links. Admins set business types, money goal and weekly hours. Done requires a secure proof link; Not needed also counts toward completion. Managers can update their assigned brand's map steps but cannot change settings. When no status is saved, the map explains that the brand has not been placed yet. Until stages are loaded, it says the business path hasn't been loaded yet.

@@ -28,6 +28,7 @@ import { ProductionItemCard } from '@/components/content/ProductionItemCard';
 import { ContentWorkflowDialog } from '@/components/content/ContentWorkflowDialog';
 import { RevenueLaneCard } from './RevenueLaneCard';
 import { BrandWeeklyNumbers } from './BrandWeeklyNumbers';
+import { WebsiteWeekSection } from './overview/WebsiteWeek';
 import { ActionInstructionDialog } from './ActionInstructionDialog';
 import { TaskExplainer } from '@/components/tasks/TaskExplainer';
 import { STAGE_LABELS, nextStageForFormat } from '@/components/content/contentStages';
@@ -296,6 +297,9 @@ function OverviewTab({
         <SectionHeading icon={LineChartIcon} title="Weekly numbers" tone="text-subject-output" />
         <ShowMore><BrandWeeklyNumbers projectId={projectId} /></ShowMore>
       </section>
+
+      {/* Supreme Team Media's own site numbers: kept low and quiet on purpose. */}
+      <WebsiteWeekSection projectId={projectId} />
 
       {setup}
       {p && <SubjectSheet subject={subject} pulse={p} projectId={projectId} brandName={brandName} listSize={listSize.data ?? null} onClose={() => setSubject(null)} onOpenTab={(t) => { setSubject(null); onOpenTab(t); }} />}
