@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { ArrowRight, ChevronDown, ExternalLink, Loader2, MessageCircleQuestion, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { taskLinks } from '@/lib/ownerWork';
+import { parseFacts, taskLinks } from '@/lib/ownerWork';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -50,10 +50,20 @@ const fmtDue = (iso?: string | null) => {
 };
 
 export function yourPartText(ownerKind?: string | null, minutes?: number | null): string {
-  const time = minutes && minutes > 0 ? ` About ${minutes} minutes.` : '';
-  if (ownerKind === 'owner') return `This is waiting on you. You do this step yourself.${time}`;
-  if (ownerKind === 'claude' || ownerKind === 'agent') return `An agent is doing this work. You only review and approve it.${time}`;
-  return `No one has been named for this step yet.${time}`;
+  const m = minutes && minutes > 0 ? minutes : null;
+  if (ownerKind === 'owner') return `This is waiting on you. You do this step yourself.${m ? ` It takes about ${m} minutes.` : ''}`;
+  if (ownerKind === 'claude' || ownerKind === 'agent') {
+    return `An AI agent does this work${m ? ` (about ${m} minutes of the agent's time, not yours)` : ''}. You only step in if the explanation above says something needs your hands, such as a sign-in. Otherwise you review the result.`;
+  }
+  return `No one is assigned to this yet. The explanation above says who is expected to do it.${m ? ` The work is estimated at about ${m} minutes.` : ''}`;
+}
+
+/** "Done when" lines saved on the task: facts.checks, then facts.expected_output. */
+function doneWhen(raw?: string | null): string[] {
+  const { facts } = parseFacts(raw);
+  const checks = Array.isArray(facts?.checks) ? facts.checks.filter((c): c is string => typeof c === 'string' && !!c.trim()) : [];
+  if (checks.length) return checks;
+  return typeof facts?.expected_output === 'string' && facts.expected_output.trim() ? [facts.expected_output] : [];
 }
 
 function Section({ label, tone, children }: { label: string; tone: string; children: ReactNode }) {
@@ -70,6 +80,8 @@ export function TaskExplanationBody({ task, onAsk }: { task: TaskExplanation; on
   const meta = [task.brand, task.priority, task.dueDate ? `due ${fmtDue(task.dueDate)}` : null, task.pillar]
     .filter((v) => v && v !== '—');
   const links = task.status === 'Done' ? [] : taskLinks(task);
+  // Skip saved checks the explanation already spells out.
+  const done = /done when|pass:/i.test(task.detail ?? '') ? [] : doneWhen(task.facts).filter((c) => !(task.detail ?? '').includes(c));
   const linkClass = 'inline-flex min-h-11 items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 text-sm font-medium text-primary hover:bg-primary/20';
   return (
     <div className="mt-3 space-y-3 rounded-md border border-border bg-muted/30 p-3">
@@ -86,6 +98,12 @@ export function TaskExplanationBody({ task, onAsk }: { task: TaskExplanation; on
       {!task.hideYourPart && (
         <Section label="Your part" tone="text-emerald-700 dark:text-emerald-300">
           <p>{yourPartText(task.ownerKind, task.minutes)}</p>
+        </Section>
+      )}
+      {done.length > 0 && (
+        <Section label="Done when" tone="text-foreground">
+          {done.length === 1 ? <p className="break-words">{done[0]}</p>
+            : <ul className="list-disc pl-5 space-y-1">{done.map((c) => <li key={c} className="break-words">{c}</li>)}</ul>}
         </Section>
       )}
       {links.length > 0 && (

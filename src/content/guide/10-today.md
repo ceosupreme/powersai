@@ -33,6 +33,8 @@ Counts describe saved records, not unrecorded activity. The Dashboard does not g
 
 Tap any task in Waiting on me, Next 10, All brands: waiting on you, or a brand's Overview list to open it. You see **What this is**, **Why it matters** (when saved), **Your part** (whether you do it or an agent does and you approve), and the brand, priority, due date and area. The top item in Waiting on me opens by itself.
 
+**Done when** lists the checks saved on the task, so you know what finished looks like. It is hidden when the explanation already says it.
+
 **Where to do this** shows a button for each place the task happens: a link saved on the task, any web address written in its explanation, the sign-in page of each tool it names (for example GoHighLevel, YouTube Studio or KDP), and the HQ step or brand page it belongs to. Buttons to other sites open in a new tab.
 
 Tap **Ask about this** to chat about that one task. Pick a starter question ("What exactly do I need to do?", "Why does this matter for this brand?", "What happens if I skip it?") or type your own. For brands, answers come only from what is saved on the task; anything not saved is called "not recorded".
