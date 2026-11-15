@@ -17,6 +17,10 @@ export function nextTenTask(row: NextTenRow): TaskExplanation {
     pillar: e.pillar ?? null,
     status: e.status ?? (isAction ? null : row.source),
     projectId: row.projectId,
+    facts: e.facts ?? null,
+    outputUrl: e.outputUrl ?? null,
+    jobId: isAction ? row.jobId ?? null : null,
+    stepId: isAction && row.jobId ? row.refId ?? null : null,
     hideYourPart: !isAction,
   };
 }

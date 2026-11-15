@@ -23,6 +23,8 @@ export interface WaitingAction {
   pillar?: string | null;
   dueDate?: string | null;
   status?: string | null;
+  facts?: string | null;
+  outputUrl?: string | null;
 }
 export interface WaitingContent {
   id: string;
@@ -74,6 +76,7 @@ function deriveBrandWorkSummary(projectId: string, x: BrandWorkInputs, now: numb
       priorityRank: priorityRank(a.priority), jobId: a.job_id ?? null, projectId,
       detail: a.detail ?? null, why: a.insight_summary || a.problem_detail || null, ownerKind: a.owner_kind ?? null,
       minutes: a.estimated_minutes ?? null, pillar: a.pillar ?? null, dueDate: a.due_date ?? null, status: a.status ?? null,
+      facts: typeof a.facts === 'string' ? a.facts : null, outputUrl: a.output_url ?? null,
     }))
     .sort((a, b) => a.priorityRank - b.priorityRank);
 

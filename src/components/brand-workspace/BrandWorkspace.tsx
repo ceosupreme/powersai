@@ -186,6 +186,7 @@ function OverviewTab({
     title: a.title, detail: a.detail, why: a.why, ownerKind: a.ownerKind, minutes: a.minutes,
     priority: priorityLabel(a.priorityRank) === '—' ? null : priorityLabel(a.priorityRank),
     dueDate: a.dueDate, pillar: a.pillar, status: a.status, projectId, brand: brandName,
+    facts: a.facts, outputUrl: a.outputUrl, jobId: a.jobId, stepId: a.jobId ? a.id : null,
   });
 
   return (

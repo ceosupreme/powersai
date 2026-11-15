@@ -183,3 +183,87 @@ export const PLATFORM_LABELS: Record<string, string> = {
 };
 
 export const platformLabel = (p: string) => PLATFORM_LABELS[p] ?? p.replace(/_/g, ' ');
+
+
+/** One place a task can be done: a page in HQ (internal) or another site. */
+export interface TaskLink { label: string; url: string; internal: boolean }
+
+/** Sign-in pages for the tools tasks name. First match per tool; the order sets the button order. */
+const TOOL_LINKS: [RegExp, string, string][] = [
+  [/go ?high ?level|highlevel|\bghl\b/i, 'Open GoHighLevel', 'https://app.gohighlevel.com/'],
+  [/meta business suite|facebook page|\binstagram\b/i, 'Open Meta Business Suite', 'https://business.facebook.com/latest/home'],
+  [/youtube/i, 'Open YouTube Studio', 'https://studio.youtube.com/'],
+  [/\bkdp\b|kindle direct/i, 'Open KDP Bookshelf', 'https://kdp.amazon.com/en_US/bookshelf'],
+  [/\betsy\b/i, 'Open Etsy Shop Manager', 'https://www.etsy.com/your/shops/me/dashboard'],
+  [/payhip/i, 'Open Payhip', 'https://payhip.com/dashboard'],
+  [/printful/i, 'Open Printful', 'https://www.printful.com/dashboard'],
+  [/shopify/i, 'Open Shopify admin', 'https://admin.shopify.com/'],
+  [/fourthwall/i, 'Open Fourthwall', 'https://my.fourthwall.com/'],
+  [/tiktok/i, 'Open TikTok Studio', 'https://www.tiktok.com/tiktokstudio'],
+  [/pinterest/i, 'Open Pinterest Business Hub', 'https://www.pinterest.com/business/hub/'],
+  [/metricool/i, 'Open Metricool', 'https://app.metricool.com/'],
+  [/lovable/i, 'Open Lovable', 'https://lovable.dev/'],
+  [/github/i, 'Open GitHub', 'https://github.com/'],
+  [/stripe/i, 'Open Stripe', 'https://dashboard.stripe.com/'],
+  [/canva/i, 'Open Canva', 'https://www.canva.com/'],
+  [/vidiq/i, 'Open vidIQ', 'https://app.vidiq.com/'],
+  [/google business/i, 'Open Google Business Profile', 'https://business.google.com/'],
+  [/godaddy/i, 'Open GoDaddy', 'https://dcc.godaddy.com/'],
+  [/airtable/i, 'Open Airtable', 'https://airtable.com/'],
+  [/higgsfield/i, 'Open Higgsfield', 'https://higgsfield.ai/'],
+  [/drive folder|google drive/i, 'Open Google Drive', 'https://drive.google.com/'],
+  [/scheduled task|claude chat/i, 'Open Claude', 'https://claude.ai/'],
+];
+
+const HOST_LABELS: [RegExp, string][] = [
+  [/docs\.google\.com\/document/, 'Open the Google Doc'],
+  [/docs\.google\.com\/spreadsheets/, 'Open the Google Sheet'],
+  [/drive\.google\.com/, 'Open the Drive folder'],
+  [/claude\.ai/, 'Open in Claude'],
+];
+
+const titleCase = (k: string) => k.replace(/[_-]+/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+
+function urlLabel(url: string): string {
+  for (const [re, label] of HOST_LABELS) if (re.test(url)) return label;
+  try { return `Open ${new URL(url).hostname.replace(/^www\./, '')}`; } catch { return 'Open link'; }
+}
+
+/**
+ * Where to go to do a task, most specific first: links saved on the task
+ * (facts.links, output_url), web addresses written in its text, the tools its
+ * text names, then the HQ step or brand page it belongs to.
+ */
+export function taskLinks(t: {
+  title?: string | null; detail?: string | null; why?: string | null;
+  facts?: string | null; outputUrl?: string | null;
+  projectId?: string | null; jobId?: string | null; stepId?: string | null;
+}): TaskLink[] {
+  const out: TaskLink[] = [];
+  const seen = new Set<string>();
+  const add = (label: string, url: string) => {
+    const u = url.trim();
+    const internal = u.startsWith('/');
+    if (!u || (!internal && !/^https?:\/\//i.test(u))) return;
+    const key = u.replace(/\/+$/, '').toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ label, url: u, internal });
+  };
+
+  const { facts } = parseFacts(t.facts);
+  for (const [k, u] of Object.entries(facts?.links ?? {})) if (typeof u === 'string') add(titleCase(k), u);
+  if (t.outputUrl) add('Open the finished piece', t.outputUrl);
+
+  const text = [t.title, t.detail, t.why].filter(Boolean).join('\n');
+  for (const m of text.match(/https?:\/\/[^\s"'<>)\]]+/gi) ?? []) {
+    const u = m.replace(/[.,;:!?]+$/, '');
+    add(urlLabel(u), u);
+  }
+  const haystack = `${text}\n${typeof facts?.method === 'string' ? facts.method.replace(/_/g, ' ') : ''}`;
+  for (const [re, label, url] of TOOL_LINKS) if (re.test(haystack)) add(label, url);
+
+  if (t.projectId && t.jobId) add('Open this step in HQ', pipelineHref(t.projectId, t.jobId, t.stepId));
+  else if (t.projectId) add('Open this brand in HQ', `/project/${t.projectId}`);
+  return out.slice(0, 5);
+}

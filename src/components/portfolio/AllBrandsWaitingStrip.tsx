@@ -45,6 +45,7 @@ export function AllBrandsWaitingStrip({
                   title: r.title, detail: r.detail, why: r.why, ownerKind: r.ownerKind, minutes: r.minutes,
                   brand: r.brand, priority: priorityLabel(r.priorityRank) === '—' ? null : priorityLabel(r.priorityRank),
                   dueDate: r.dueDate, pillar: r.pillar, status: r.status, projectId: r.projectId,
+                  facts: r.facts, outputUrl: r.outputUrl, jobId: r.jobId, stepId: r.jobId ? r.id : null,
                 }}
                 header={<>
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.brand}</p>

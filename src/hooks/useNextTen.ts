@@ -49,6 +49,8 @@ export interface NextTenRow {
     minutes?: number | null;
     pillar?: string | null;
     status?: string | null;
+    facts?: string | null;
+    outputUrl?: string | null;
   };
 }
 
@@ -288,6 +290,8 @@ function actionNextTenRows(
             ownerKind: a.owner_kind ?? null,
             minutes: a.estimated_minutes ?? null,
             pillar: a.pillar ?? null,
+            facts: typeof a.facts === 'string' ? a.facts : null,
+            outputUrl: a.output_url ?? null,
             status: a.approval_status === 'Approved' ? (a.status ?? 'Open') : (a.approval_status ?? 'Proposed'),
           },
         },
@@ -410,7 +414,7 @@ export async function fetchNextTenForProject(
   try {
     const actionsRes = await supabase
       .from('action_items')
-      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id')
+      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id,facts,output_url')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
     const actionRows = (actionsRes.data ?? []) as any[];
@@ -492,7 +496,7 @@ export async function fetchNextTenForProject(
 
 /** Action item columns the Next 10 and the brand work summaries both read, plus the two project keys. */
 const ACTION_BATCH_COLUMNS =
-  'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id';
+  'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id,facts,output_url';
 
 /** Action items for many projects at once. A row belongs to a project through bar_id or venue_id. */
 export async function fetchActionRowsForProjects(projectIds: string[]): Promise<any[]> {

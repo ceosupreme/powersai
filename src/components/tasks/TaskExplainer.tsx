@@ -1,5 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { ChevronDown, Loader2, MessageCircleQuestion, Send } from 'lucide-react';
+import { ArrowRight, ChevronDown, ExternalLink, Loader2, MessageCircleQuestion, Send } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { taskLinks } from '@/lib/ownerWork';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -30,6 +32,12 @@ export interface TaskExplanation {
   status?: string | null;
   /** Project the "Ask about this" chat is scoped to. */
   projectId?: string | null;
+  /** Raw facts JSON and finished-piece link saved on the task; both feed "Where to do this". */
+  facts?: string | null;
+  outputUrl?: string | null;
+  /** Pipeline job and step the task belongs to, for the "Open this step in HQ" button. */
+  jobId?: string | null;
+  stepId?: string | null;
   /** Hide the "Your part" block (non-action rows). */
   hideYourPart?: boolean;
 }
@@ -61,6 +69,8 @@ function Section({ label, tone, children }: { label: string; tone: string; child
 export function TaskExplanationBody({ task, onAsk }: { task: TaskExplanation; onAsk?: () => void }) {
   const meta = [task.brand, task.priority, task.dueDate ? `due ${fmtDue(task.dueDate)}` : null, task.pillar]
     .filter((v) => v && v !== '—');
+  const links = task.status === 'Done' ? [] : taskLinks(task);
+  const linkClass = 'inline-flex min-h-11 items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 text-sm font-medium text-primary hover:bg-primary/20';
   return (
     <div className="mt-3 space-y-3 rounded-md border border-border bg-muted/30 p-3">
       <Section label="What this is" tone="text-primary">
@@ -76,6 +86,15 @@ export function TaskExplanationBody({ task, onAsk }: { task: TaskExplanation; on
       {!task.hideYourPart && (
         <Section label="Your part" tone="text-emerald-700 dark:text-emerald-300">
           <p>{yourPartText(task.ownerKind, task.minutes)}</p>
+        </Section>
+      )}
+      {links.length > 0 && (
+        <Section label="Where to do this" tone="text-primary">
+          <div className="flex flex-wrap gap-2">
+            {links.map((l) => l.internal
+              ? <Link key={l.url} to={l.url} className={linkClass}>{l.label}<ArrowRight aria-hidden className="h-4 w-4 shrink-0" /></Link>
+              : <a key={l.url} href={l.url} target="_blank" rel="noreferrer" className={linkClass}>{l.label}<ExternalLink aria-hidden className="h-4 w-4 shrink-0" /></a>)}
+          </div>
         </Section>
       )}
       {meta.length > 0 && <p className="text-sm text-muted-foreground">{meta.join(' · ')}</p>}

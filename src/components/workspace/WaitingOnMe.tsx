@@ -32,6 +32,8 @@ export interface WaitingRow {
   ownerKind: string | null;
   minutes: number | null;
   pillar: string | null;
+  facts: string | null;
+  outputUrl: string | null;
 }
 
 /** Badge colors keyed by priority rank (1 = critical … 4 = low). */
@@ -59,7 +61,7 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
     queryFn: async (): Promise<{ open: WaitingRow[]; snoozed: WaitingRow[] }> => {
       const { data, error } = await supabase
         .from('action_items')
-        .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,source,job_id,facts,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
+        .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,source,job_id,facts,output_url,priority,approval_status,status,created_at,due_date,snoozed_until,bar_id,venue_id,owner_kind,depends_on')
         .or(`bar_id.in.(${ids.join(',')}),venue_id.in.(${ids.join(',')})`)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -112,6 +114,8 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
             ownerKind: (a.owner_kind as string) ?? null,
             minutes: (a.estimated_minutes as number) ?? null,
             pillar: (a.pillar as string) ?? null,
+            facts: typeof a.facts === 'string' ? a.facts : null,
+            outputUrl: (a.output_url as string) ?? null,
           } as WaitingRow;
         });
       return {
@@ -253,6 +257,8 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             pillar: row.pillar,
             status: needsDecision(row.approval_status) ? 'Needs your decision' : row.approval_status ?? row.status,
             projectId: row.projectId,
+            facts: row.source === 'brand_help' ? null : row.facts,
+            outputUrl: row.outputUrl,
           }}
           header={
             <div className="flex items-start justify-between gap-2 flex-wrap">
