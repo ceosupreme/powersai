@@ -211,6 +211,19 @@ const TOOL_LINKS: [RegExp, string, string][] = [
   [/godaddy/i, 'Open GoDaddy', 'https://dcc.godaddy.com/'],
   [/airtable/i, 'Open Airtable', 'https://airtable.com/'],
   [/higgsfield/i, 'Open Higgsfield', 'https://higgsfield.ai/'],
+  [/gmail/i, 'Open Gmail drafts', 'https://mail.google.com/mail/u/0/#drafts'],
+  [/\bwhop\b/i, 'Open Whop', 'https://whop.com/dashboard/'],
+  [/amazon associates/i, 'Open Amazon Associates', 'https://affiliate-program.amazon.com/'],
+  [/\(impact\)|impact\.com/i, 'Open Impact', 'https://app.impact.com/'],
+  [/google ads/i, 'Open Google Ads', 'https://ads.google.com/'],
+  [/\bga4\b|google analytics/i, 'Open Google Analytics', 'https://analytics.google.com/'],
+  [/pixel/i, 'Open Meta Events Manager', 'https://business.facebook.com/events_manager2'],
+  [/google calendar/i, 'Open Google Calendar', 'https://calendar.google.com/'],
+  [/chatgpt/i, 'Open ChatGPT', 'https://chatgpt.com/'],
+  [/gemini/i, 'Open Gemini', 'https://gemini.google.com/'],
+  [/gumroad/i, 'Open Gumroad', 'https://gumroad.com/dashboard'],
+  [/udemy/i, 'Open Udemy', 'https://www.udemy.com/instructor/courses/'],
+  [/\bdomain\b/i, 'Check the domain on GoDaddy', 'https://www.godaddy.com/domains'],
   [/drive folder|google drive/i, 'Open Google Drive', 'https://drive.google.com/'],
   [/scheduled task|claude chat/i, 'Open Claude', 'https://claude.ai/'],
 ];
@@ -261,7 +274,9 @@ export function taskLinks(t: {
     add(urlLabel(u), u);
   }
   const haystack = `${text}\n${typeof facts?.method === 'string' ? facts.method.replace(/_/g, ' ') : ''}`;
-  for (const [re, label, url] of TOOL_LINKS) if (re.test(haystack)) add(label, url);
+  // A saved or written link to a tool beats that tool's front door.
+  const hosts = new Set(out.filter((l) => !l.internal).map((l) => new URL(l.url).hostname));
+  for (const [re, label, url] of TOOL_LINKS) if (re.test(haystack) && !hosts.has(new URL(url).hostname)) add(label, url);
 
   if (t.projectId && t.jobId) add('Open this step in HQ', pipelineHref(t.projectId, t.jobId, t.stepId));
   else if (t.projectId) add('Open this brand in HQ', `/project/${t.projectId}`);
