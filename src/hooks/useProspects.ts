@@ -1,7 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type ProspectStatus = 'new' | 'checked' | 'queued' | 'contacted' | 'dead' | 'promoted';
+export type ProspectStatus =
+  | 'new' | 'checked' | 'queued' | 'contacted' | 'replied' | 'meeting' | 'won' | 'dead' | 'promoted';
+
+export type ProspectActivityKind = 'call' | 'text' | 'email' | 'dm' | 'meeting' | 'note' | 'status' | 'auto';
+
+export interface ProspectActivity {
+  id: string;
+  prospect_id: string;
+  kind: ProspectActivityKind;
+  summary: string | null;
+  created_by: string | null;
+  created_at: string;
+}
 
 export interface Prospect {
   id: string;
@@ -25,6 +37,24 @@ export interface Prospect {
   miner_run_id: string | null;
   checked_at: string | null;
   created_at: string;
+  contact_name: string | null;
+  email: string | null;
+  instagram: string | null;
+  platform: string | null;
+  source_url: string | null;
+  lead_type: string | null;
+  offer: string | null;
+  fit_score: number | null;
+  their_words: string | null;
+  sell_notes: string | null;
+  drafted_message: string | null;
+  notes: string | null;
+  assigned_to: string | null;
+  outreach_mode: 'manual' | 'auto';
+  next_follow_up: string | null;
+  last_contacted_at: string | null;
+  last_contact_channel: string | null;
+  found_by: string | null;
 }
 
 export interface MinerRun {
@@ -76,6 +106,54 @@ export function useMinerRuns(limit = 5) {
         .limit(limit);
       if (error) throw error;
       return (data ?? []) as MinerRun[];
+    },
+  });
+}
+
+async function addActivity(prospectId: string, kind: ProspectActivityKind, summary: string | null) {
+  const { data: u } = await supabase.auth.getUser();
+  const { error } = await db.from('prospect_activity').insert({
+    prospect_id: prospectId, kind, summary, created_by: u?.user?.id ?? null,
+  });
+  if (error) throw error;
+}
+
+export function useProspectActivity(prospectId: string | null) {
+  return useQuery({
+    queryKey: ['prospect_activity', prospectId],
+    enabled: !!prospectId,
+    queryFn: async (): Promise<ProspectActivity[]> => {
+      const { data, error } = await db
+        .from('prospect_activity')
+        .select('*')
+        .eq('prospect_id', prospectId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as ProspectActivity[];
+    },
+  });
+}
+
+export interface LeadPerson { id: string; name: string }
+
+/**
+ * People a lead can be assigned to: non-client users. Profiles are readable only
+ * by admins (and each person's own row), so a non-admin sees just themselves.
+ */
+export function useLeadPeople() {
+  return useQuery({
+    queryKey: ['lead_people'],
+    queryFn: async (): Promise<LeadPerson[]> => {
+      const [{ data: roles }, { data: profiles }] = await Promise.all([
+        db.from('user_roles').select('user_id, role'),
+        db.from('profiles').select('id, full_name, email, is_active'),
+      ]);
+      const client = new Set(((roles ?? []) as any[]).filter((r) => r.role === 'client').map((r) => r.user_id));
+      const hasRole = new Set(((roles ?? []) as any[]).map((r) => r.user_id));
+      return ((profiles ?? []) as any[])
+        .filter((p) => hasRole.has(p.id) && !client.has(p.id) && p.is_active !== false)
+        .map((p) => ({ id: p.id, name: p.full_name || p.email || 'Unnamed' }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     },
   });
 }
@@ -166,6 +244,60 @@ export function useProspectMutations() {
       mutationFn: async ({ id, status }: { id: string; status: ProspectStatus }) => {
         const { error } = await db.from('prospects').update({ status }).eq('id', id);
         if (error) throw error;
+      },
+      onSuccess: inv,
+    }),
+
+    /** Stage move from the board, menu or detail: status plus a 'status' activity row. */
+    moveStage: useMutation({
+      mutationFn: async ({ id, status, label }: { id: string; status: ProspectStatus; label: string }) => {
+        const { error } = await db.from('prospects').update({ status }).eq('id', id);
+        if (error) throw error;
+        await addActivity(id, 'status', `Moved to ${label}`);
+      },
+      onMutate: async ({ id, status }) => {
+        await qc.cancelQueries({ queryKey: ['prospects'] });
+        const prev = qc.getQueryData<Prospect[]>(['prospects']);
+        qc.setQueryData<Prospect[]>(['prospects'], (rows) => rows?.map((r) => (r.id === id ? { ...r, status } : r)));
+        return { prev };
+      },
+      onError: (_e, _v, ctx: any) => ctx?.prev && qc.setQueryData(['prospects'], ctx.prev),
+      onSettled: (_d, _e, v) => { inv(); qc.invalidateQueries({ queryKey: ['prospect_activity', v.id] }); },
+    }),
+
+    updateFields: useMutation({
+      mutationFn: async ({ id, patch }: { id: string; patch: Partial<Prospect> }) => {
+        const { error } = await db.from('prospects').update(patch).eq('id', id);
+        if (error) throw error;
+      },
+      onSuccess: inv,
+    }),
+
+    /** Quick log: activity row, last contact stamp, and New -> Contacted (notes are not contact). */
+    logContact: useMutation({
+      mutationFn: async ({ prospect, kind, summary, nextStatus }: {
+        prospect: Prospect; kind: ProspectActivityKind; summary: string; nextStatus: ProspectStatus | null;
+      }) => {
+        await addActivity(prospect.id, kind, summary || null);
+        if (kind === 'note') return;
+        const patch: Record<string, unknown> = { last_contacted_at: new Date().toISOString(), last_contact_channel: kind };
+        if (nextStatus) patch.status = nextStatus;
+        const { error } = await db.from('prospects').update(patch).eq('id', prospect.id);
+        if (error) throw error;
+        if (nextStatus) await addActivity(prospect.id, 'status', 'Moved to Contacted');
+      },
+      onSuccess: (_d, v) => { inv(); qc.invalidateQueries({ queryKey: ['prospect_activity', v.prospect.id] }); },
+    }),
+
+    addLead: useMutation({
+      mutationFn: async (row: {
+        business_name: string; contact_name?: string; phone?: string; email?: string;
+        city?: string; offer?: string; source: string; notes?: string;
+      }) => {
+        const clean = Object.fromEntries(Object.entries(row).map(([k, v]) => [k, typeof v === 'string' ? v.trim() || null : v]));
+        const { data, error } = await db.from('prospects').insert({ ...clean, status: 'new' }).select('id').single();
+        if (error) throw error;
+        return data.id as string;
       },
       onSuccess: inv,
     }),
