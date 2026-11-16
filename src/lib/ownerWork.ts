@@ -280,5 +280,5 @@ export function taskLinks(t: {
 
   if (t.projectId && t.jobId) add('Open this step in HQ', pipelineHref(t.projectId, t.jobId, t.stepId));
   else if (t.projectId) add('Open this brand in HQ', `/project/${t.projectId}`);
-  return out.slice(0, 5);
+  return out.slice(0, 8);
 }
