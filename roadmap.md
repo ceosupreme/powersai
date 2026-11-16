@@ -1,5 +1,9 @@
 # Roadmap
 
+## Leads page
+- [x] One Leads page: list/board, filters, detail sheet, quick log, add lead, CSV/PDF export, manager/staff access via menu switches (unpublished)
+- [ ] Workspace top-5 prospects card: no such card exists in the app yet (waiting on owner decision)
+
 ## Brand crew activity
 - [x] Add linked crew runs to shared feeds and status, with expandable Ask detail
 - [x] Approved crew defaults column, insert trigger, defaults editor and guide

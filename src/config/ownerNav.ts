@@ -77,7 +77,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
     items: [
       { path: '/growth-audit', label: 'Growth Audit', icon: Activity, pageKey: 'growth_audit' },
       { path: '/leak-stack', label: 'Leak Stack', icon: Activity, pageKey: 'leak_stack' },
-      { path: '/prospects', label: 'Prospect Dock', icon: Target, pageKey: 'prospect_dock' },
+      { path: '/prospects', label: 'Leads', icon: Target, pageKey: 'prospect_dock' },
       { path: '/foundation-audit', label: 'Foundation Audit', icon: ShieldCheck, pageKey: 'foundation_audit' },
       { path: '/marketing-hub', label: 'Marketing Hub', icon: Megaphone, pageKey: 'marketing_hub' },
     ],

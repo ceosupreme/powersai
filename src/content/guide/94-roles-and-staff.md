@@ -20,7 +20,7 @@ Each person has an account role and a workspace role, and saving them in "Edit" 
 
 ### What each role gets
 - Admin: everything, always, ignoring the page switches. Only the admin sees "Admin Panel", "Preview Role", and the menu items "Playbooks", "Production Board" and "Answer Bank". Lands on Portfolio.
-- Owner: the full owner menu and the owner-only screens, such as Portfolio, project pages, Growth Audit, Leak Stack, Prospect Dock, Foundation Audit and Marketing Hub, limited by the "Owner" switches. No Admin Panel. Lands on Portfolio.
+- Owner: the full owner menu and the owner-only screens, such as Portfolio, project pages, Growth Audit, Leak Stack, Leads, Foundation Audit and Marketing Hub, limited by the "Owner" switches. No Admin Panel. Lands on Portfolio.
 - General Manager: the same side menu on a computer, and on a phone a bottom bar with "Review", "Insights", "Tasks", "Chat" and "More". Can open Weekly Review, Insights, Team, Tasks, Logs, Chat and any other page switched on for "GM", but not the owner-only screens. Lands on Weekly Review.
 - Lead: the staff layout, plus Tasks, Logs and Chat. Lands on the shift dashboard.
 - Producer and Contributor: the staff layout. Lands on "My Shift".

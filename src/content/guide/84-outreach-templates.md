@@ -45,5 +45,5 @@ Outreach Templates is a library of ready-made sales messages (texts, emails, dir
 - If you copy while blanks are still empty, they come out as bracketed labels such as "[business name]" and a warning appears. Replace them before sending.
 - What you type in the boxes is not saved; it clears when you close the window.
 - Templates belong to your whole account; the project picker does not filter them.
-- The monthly leak amount is meant to come from a prospect's checkup in the Prospect Dock or a Leak Stack run.
-- These templates are separate from the AI "Outreach Drafts" on a CRM company and the "Draft" button in the Prospect Dock.
+- The monthly leak amount is meant to come from a prospect's checkup on the Leads page or a Leak Stack run.
+- These templates are separate from the AI "Outreach Drafts" on a CRM company and the "Draft" button on the Leads page.

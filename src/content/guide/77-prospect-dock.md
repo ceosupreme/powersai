@@ -1,58 +1,45 @@
-# Prospect Dock
-<!-- part: Clients and leads | order: 77 | slug: prospect-dock | route: /prospects | tags: prospect dock, prospecting, mine prospects, google, cold leads, checkup, first touch, sms, loom script, promote, dead, estimated leak -->
+# Leads
+<!-- part: Clients and leads | order: 77 | slug: prospect-dock | route: /prospects | tags: leads, prospect dock, prospecting, mine prospects, google, facebook, instagram, social, board, stages, follow-up, call sheet, export, checkup, first touch, promote, dead -->
 
-The Prospect Dock finds local businesses on Google in a niche and city you choose, runs a quick checkup on each one, and ranks them by how much money they may be losing each month. You can read each checkup, get a first message and a short video script drafted, and move the good ones into the CRM. Use it when you want a fresh list of businesses to reach out to.
+The Leads page holds every lead from every source: businesses found on Google, people found on Facebook and Instagram, and leads you add by hand. Each lead has a stage, an owner, a follow-up date and a record of every call, text and message. Use it to work your leads by hand every day.
 
 ## Where to find it
 
-- On a computer, open "Growth & Marketing" in the side menu and choose "Prospect Dock". On a phone, tap "More", then "Prospect Dock".
+- On a computer, open "Growth & Marketing" in the side menu and choose "Leads". On a phone, tap "More", then "Leads".
 - It covers your whole account, not one project, so the header picker does not change it.
+- Managers and staff can open it only when you switch "Leads" on for their role or for that person in the Admin Panel menu switches. They see every lead, but the "Assigned to" filter starts on "Mine".
 
 ## What you see
 
-- A "Mine Prospects" card with "Niche", "City", "Max results" (10, 20, 30 or 40) and a "Mine prospects" button.
-- A "Last run" line with the niche, city, how many businesses were found, kept and checked, and the run status.
-- Filter tabs: "Active", "Checked", "Promoted" and "All". The list puts the largest estimate first.
-- A card per prospect: name, niche, city, status, star rating and review count, phone, "Est. recoverable" and "Est. risk exposure" per month, and the buttons "Checkup", "Draft", "Promote" and "Dead". A red "Checkup error" line appears if the checkup failed.
+- "Export" and "Add lead" buttons at the top.
+- "Find leads on Google", closed by default. Open it to use the "Mine prospects" card and see the last run.
+- A search box (name, contact, city and what they said), "List" and "Board" buttons, and filters for stage, source, offer, assigned person and outreach (Manual or Auto). A line shows how many leads are showing.
+- Stages, in order: New, Contacted, Replied, Meeting booked, Won, Dead. Leads already sent to the CRM carry an "In CRM" badge.
+- List: one row per lead with name, stage, source (Google, Facebook, Instagram, Manual and others), offer, city, assigned person and next follow-up (red when overdue), plus call, email and "open post" buttons when we have them. Best fit comes first, then the biggest estimated leak, then the newest.
+- Board: one column per stage with a count. On a computer, drag a card to another column. On a phone, scroll sideways and use "Move to" on the card.
 
 ## How to use it
 
-### Find prospects
-1. Choose a "Niche" (only industry types are listed), type a "City" and choose "Max results".
-2. Tap "Mine prospects". The progress text shows "Querying Google Places…" and then counts through each checkup.
-3. Keep the page open until a summary such as "Mined 12 prospects" appears.
+### Work a lead
+1. Tap a lead to open everything we know about it.
+2. Change the stage from the menu under the name.
+3. After you reach out, tap "Called", "Texted", "Emailed", "Messaged" or "Met", type an optional one-line summary and tap "Save". This records the contact and moves a New lead to Contacted. "Add note" records a note without counting as contact.
+4. Edit the "Drafted message" and tap "Copy" to paste it where you send it. Tap "Save message" to keep changes.
+5. Set "Assigned to", "Next follow-up" and "Notes".
+6. The "Outreach" switch marks a lead Manual or Auto. Auto hands it to the outreach sequence, but no sequence is connected yet, so nothing is sent.
+7. "Send to CRM pipeline" moves it into the CRM. "Mark dead" moves it to Dead.
+8. Leads found on Google also show their rating, the two estimates, "Checkup" and "Draft first touch".
 
-### Read a checkup
-1. Tap "Checkup" on a card.
-2. Each leak shows its monthly estimate and whether it is "recoverable" or "risk exposure". The totals are at the bottom.
+### Add a lead
+Tap "Add lead". Only the name is required. Source starts as Manual.
 
-### Draft a first message
-1. Tap "Draft". The AI writes an "SMS / DM" and a "60-second Loom script" from the checkup.
-2. Edit them, tap "Copy", and send from your own phone or email. Nothing sends from here.
+### Export
+Tap "Export" and choose "CSV spreadsheet" or "PDF call sheet". Both include only the leads the current filters show. The PDF puts one lead per block with room for call notes.
 
-### Move a prospect into the CRM
-1. Tap "Promote".
-2. HQ creates a CRM company, a primary contact with the business phone, and an inbound lead that is already marked "Promoted". The prospect's status becomes "promoted".
-
-### Drop a prospect
-1. Tap "Dead".
-2. The prospect leaves the "Active" tab but stays under "All".
-
-## Words on this screen
-
-- Niche: the industry you are searching, taken from your industry project types.
-- Found, kept, checked: businesses Google returned, the ones that passed the filter, and the ones that got a checkup.
-- Checkup: the same leak calculation as the Leak Stack, run on public data.
-- Est. recoverable: estimated money per month the business could win back.
-- Est. risk exposure: estimated losses per month the business could avoid.
-- Status: "new", "queued", "checked", "contacted", "promoted" or "dead".
+### Find leads on Google
+Open "Find leads on Google", pick a niche and a city, choose how many results, and tap "Mine prospects". Each new business gets a quick checkup and appears in New.
 
 ## Good to know
 
-- Only operating businesses with at least three Google reviews are kept.
-- The estimates come from public data and industry defaults, not the business's own books, and the page says so.
-- Checkups run one at a time from your browser. If you leave the page or your phone locks, the rest stay unchecked, and there is no button to check them later; their "Checkup" and "Draft" buttons stay greyed out.
-- Each checked prospect gets a hidden prospect project, which you can see in "Portfolio" under "Prospects".
-- Drafts are not saved. Opening "Draft" again writes new ones.
-- Promoting does not email anyone or start any automation.
-- No button sets "contacted", and "Dead" cannot be undone, although a dead prospect can still be promoted from the "All" tab.
+- The dollar estimates come from public data and industry defaults, not their books.
+- The activity list at the bottom of each lead shows every logged contact, note and stage change, newest first.

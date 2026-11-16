@@ -53,4 +53,4 @@ The Leak Stack estimates how much money a business loses each month to specific 
 - If the project has no time zone, after-hours counts assume Pacific time and show "assumes PT".
 - Leak checks come from the project type. Edit them in "Admin Panel", on the "Pillars" tab, under "Project-Type Config", then "Leak Vectors". The page's own hint, "Admin → Project Types", uses older wording.
 - Only the latest run is shown. Older runs are counted but cannot be opened.
-- The same calculation powers the Prospect Dock checkups and the public free checkup.
+- The same calculation powers the Leads page checkups and the public free checkup.

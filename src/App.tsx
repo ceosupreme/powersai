@@ -278,7 +278,7 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/prospects" element={
-                  <ProtectedRoute allowedRoles={['owner']} pageKey="prospect_dock">
+                  <ProtectedRoute allowedRoles={['owner', 'gm', 'lead', 'foh', 'boh']} pageKey="prospect_dock">
                     <AppLayout><ProspectDock /></AppLayout>
                   </ProtectedRoute>
                 } />

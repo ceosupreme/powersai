@@ -16,7 +16,7 @@ On a computer, the side menu runs down the left in seven groups:
 
 - "Workspace": "Dashboard", "Portfolio", "Weekly Review", "Insights", "Team".
 - "Clients & Leads": "CRM", "Capture Inbox", "Automation Inbox", "Reactivation", "Recovery Reports".
-- "Growth & Marketing": "Growth Audit", "Leak Stack", "Prospect Dock", "Money Lanes", "Marketing Hub".
+- "Growth & Marketing": "Growth Audit", "Leak Stack", "Leads", "Money Lanes", "Marketing Hub".
 - "Content & Production": "Content", "Radar", "Playbooks", "Production Board", "Answer Bank".
 - "Brand & Assets": "Brand Kit", "Offers", "Products", "Affiliate Programs", "Channel Revenue".
 - "Tools": "Tasks", "Logs", "Chat", "Outreach Templates".
@@ -87,7 +87,7 @@ The side menu separates "Growth & Marketing" from "Content & Production". "Chann
 ## Good to know
 
 - HQ remembers your project choice in this browser. When there is no saved choice and you have several projects, it starts on "All brands & clients". With one project, it selects that project.
-- The project picker appears only when you have more than one project, is hidden on Portfolio, and never lists prospects; they live on the Prospect Dock.
+- The project picker appears only when you have more than one project, is hidden on Portfolio, and never lists prospects; they live on the Leads page.
 - The week picker lists completed weeks only and starts on the most recent one.
 - The Tasks and Chat badges appear only in the side menu on a computer; the phone "More" sheet has none.
 - The header search is a short jump list of older screens ("Dashboard", "Revenue", "Labor", "Delivery", "Client Experience" and a few more) plus "New Task" and "New Log". It does not search your data and leaves out most HQ screens.

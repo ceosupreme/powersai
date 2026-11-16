@@ -733,8 +733,8 @@ export default function PortfolioOverview() {
                 'No own-brand projects yet.'
               ) : (
                 <>
-                  Prospects live on the Prospect Dock, where each one carries its checkup, ranking and first-touch draft.{' '}
-                  <Link to="/prospects" className="text-primary underline">Open Prospect Dock</Link>
+                  Prospects live on the Leads page, where each one carries its checkup, ranking and first-touch draft.{' '}
+                  <Link to="/prospects" className="text-primary underline">Open Leads</Link>
                 </>
               )}
             </div>

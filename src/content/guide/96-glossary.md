@@ -8,7 +8,7 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - Project: anything HQ tracks, whether it is one of your brands, a channel, your app, a client or a prospect.
 - Brand: one of your own projects. Brands are set up as an "Internal Brand", a "Content Channel" or an "App Build".
 - Client: a business you do work for. Clients are scored on the client weekly scorecard.
-- Prospect: a business you might pitch. Prospects live on the Prospect Dock, not in the project picker.
+- Prospect: a business you might pitch. Prospects live on the Leads page, not in the project picker.
 - Project type: the kind of project. It decides which pillars the project is scored on.
 - "All projects": no single project is chosen, so Today shows the lists across every active brand.
 - Active and Parked: a parked brand stays on Portfolio but drops out of Dashboard's lists, and the crews skip it.

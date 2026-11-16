@@ -16,7 +16,7 @@ Several public pages collect leads: the contact form on the main site pages, the
 - Free checkup: a lead is created only when the visitor adds an email to unlock the full report. The card shows "Ready" and a summary of what the checkup found.
 - Lead qualifier: the visitor talks or types through "Voice", "Chat" or "Form". The card shows the industry and, when asked, an urgency badge. "Ready" appears only for voice or chat leads the AI judged qualified.
 - Client capture link: the same qualifier, but the lead is credited to that client.
-- Proposal requests arrive with the type "agreement_request", and Prospect Dock promotions arrive already under "Promoted".
+- Proposal requests arrive with the type "agreement_request", and Leads page promotions arrive already under "Promoted".
 
 ## How to use it
 

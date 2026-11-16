@@ -115,7 +115,7 @@ For every order except "Waiting on you", brands with no value go last and ties a
 - The three green dots under "Data Confidence" ("Toast POS", "7shifts", "Asana") are fixed labels, not live connection checks.
 - In "GM Performance", "Avg Score" is just this week's score and "Trend" always shows "--".
 - The "Revenue by Project" chart includes every project, not only clients.
-- The "Prospects" tab always shows a note with an "Open Prospect Dock" link, because prospect projects are not loaded on this screen.
+- The "Prospects" tab always shows a note with an "Open Leads" link, because prospect projects are not loaded on this screen.
 - If you open a client and come back through the menu instead of "← Portfolio", Portfolio shows that client's detail page ("Weekly Scorecard", "Signal Breakdown", "Recent Insights", "Pending Actions"). Tap the back arrow beside the client's name to see the full Portfolio.
 - The tab, the type chip and the cards or table choice reset each visit; only the sort is remembered.
 

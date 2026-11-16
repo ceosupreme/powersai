@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { AppRole } from '@/types/auth';
 import { PageKey, PAGE_CONFIG, ROLE_LABELS } from '@/types/permissions';
 
-const EDITABLE_ROLES: AppRole[] = ['owner', 'gm', 'shift_lead', 'staff'];
+const EDITABLE_ROLES: AppRole[] = ['owner', 'gm', 'manager', 'shift_lead', 'staff'];
 
 interface RolePageDefault {
   role: AppRole;
