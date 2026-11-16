@@ -10587,11 +10587,13 @@ export type Database = {
           city: string | null
           contact_name: string | null
           created_at: string
+          do_not_contact: boolean
           drafted_message: string | null
           email: string | null
           fit_score: number | null
           found_by: string | null
           id: string
+          inbound_lead_id: string | null
           instagram: string | null
           last_contact_channel: string | null
           last_contacted_at: string | null
@@ -10604,6 +10606,8 @@ export type Database = {
           niche: string | null
           notes: string | null
           offer: string | null
+          opt_out_channel: string | null
+          opted_out_at: string | null
           outreach_mode: string
           phone: string | null
           place_id: string | null
@@ -10630,11 +10634,13 @@ export type Database = {
           city?: string | null
           contact_name?: string | null
           created_at?: string
+          do_not_contact?: boolean
           drafted_message?: string | null
           email?: string | null
           fit_score?: number | null
           found_by?: string | null
           id?: string
+          inbound_lead_id?: string | null
           instagram?: string | null
           last_contact_channel?: string | null
           last_contacted_at?: string | null
@@ -10647,6 +10653,8 @@ export type Database = {
           niche?: string | null
           notes?: string | null
           offer?: string | null
+          opt_out_channel?: string | null
+          opted_out_at?: string | null
           outreach_mode?: string
           phone?: string | null
           place_id?: string | null
@@ -10673,11 +10681,13 @@ export type Database = {
           city?: string | null
           contact_name?: string | null
           created_at?: string
+          do_not_contact?: boolean
           drafted_message?: string | null
           email?: string | null
           fit_score?: number | null
           found_by?: string | null
           id?: string
+          inbound_lead_id?: string | null
           instagram?: string | null
           last_contact_channel?: string | null
           last_contacted_at?: string | null
@@ -10690,6 +10700,8 @@ export type Database = {
           niche?: string | null
           notes?: string | null
           offer?: string | null
+          opt_out_channel?: string | null
+          opted_out_at?: string | null
           outreach_mode?: string
           phone?: string | null
           place_id?: string | null
@@ -10710,6 +10722,13 @@ export type Database = {
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "prospects_inbound_lead_id_fkey"
+            columns: ["inbound_lead_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_leads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "prospects_leak_run_id_fkey"
             columns: ["leak_run_id"]
@@ -16263,6 +16282,14 @@ export type Database = {
       hq_set_crew_default_brands: {
         Args: { p_brand_ids: string[]; p_crew_key: string }
         Returns: undefined
+      }
+      hq_team_names: {
+        Args: never
+        Returns: {
+          id: string
+          is_active: boolean
+          name: string
+        }[]
       }
       hq_verify_job_token: {
         Args: { p_function: string; p_token: string }
