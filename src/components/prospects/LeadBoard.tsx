@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { LEAD_STAGES, formatDay, isOverdue, stageOf, todayPacific, type LeadStage } from '@/lib/leads';
 import type { Prospect } from '@/hooks/useProspects';
-import { CrmBadge, SourceBadge, STAGE_TONE } from './LeadBadges';
+import { CrmBadge, DoNotContactBadge, SourceBadge, STAGE_TONE } from './LeadBadges';
 import { LeadContactIcons } from './LeadContactIcons';
 import { LeadMoveMenu } from './LeadMoveMenu';
 import { personName } from './LeadList';
@@ -52,8 +52,9 @@ export const LeadBoard = ({ leads, names, onOpen, onMove }: Props) => {
                     <div className="flex flex-wrap items-center gap-1.5">
                       <h3 className="text-[15px] font-semibold break-words">{p.business_name}</h3>
                       <CrmBadge p={p} />
+                      <DoNotContactBadge p={p} />
                     </div>
-                    {p.phone && <p className="text-sm font-medium tabular-nums">{p.phone}</p>}
+                    {p.phone && <p className={cn('text-sm font-medium tabular-nums', p.do_not_contact && 'text-muted-foreground line-through')}>{p.phone}</p>}
                     <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
                       <SourceBadge p={p} />
                       {p.offer && <span className="text-foreground">{p.offer}</span>}

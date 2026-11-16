@@ -10,6 +10,7 @@ import { useBrandWorkSummaries } from '@/hooks/useBrandWorkspace';
 import { useCampaignStore } from '@/components/marketing-hub/useCampaignStore';
 import { AllProjectsNextTen } from '@/components/workspace/AllProjectsNextTen';
 import { WaitingOnMe } from '@/components/workspace/WaitingOnMe';
+import { TopLeadsCard } from '@/components/workspace/TopLeadsCard';
 import { BrandIdentity } from '@/components/shared/BrandIdentity';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -64,6 +65,7 @@ function OwnerDashboardContent() {
     <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
       {links.filter(l => (!l.admin || isAdmin) && canAccessPage(l.key as any)).map(l=><Link key={l.to} to={l.to} data-hq-section={l.color} className="hq-section hover:shadow-md"><h2 className="text-lg font-bold flex justify-between gap-2">{l.title}<ArrowRight className="h-5 w-5"/></h2><p className="mt-2 text-sm text-muted-foreground">{l.note}</p></Link>)}
     </div>
+    {canAccessPage('prospect_dock') && <TopLeadsCard />}
     {directory.isLoading ? <p role="status">Loading your dashboard…</p> : directory.isError ? <Card className="p-5"><p role="alert">Your brands and client projects could not be loaded.</p><Button onClick={()=>directory.refetch()}>Try again</Button></Card> : <>
       <section className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3" aria-label="Current activity">
         {[...(brands.length ? [['Active brands',String(brands.length)],['Brand work waiting on you',count('waitingCount')],['Brand posts this month',count('publishedThisMonth')]] : [['Client projects',String(projects.filter(p=>p.group==='clients').length)]]),['Live campaigns',campaigns.error?'Unavailable':campaigns.loading?'…':String(campaigns.campaigns.filter(c=>c.status==='Live').length)]].map(([label,value])=><Card key={label} className="p-5 border-t-4 border-t-primary"><p className="text-sm text-muted-foreground">{label}</p><p className="text-3xl font-bold mt-2">{value}</p></Card>)}

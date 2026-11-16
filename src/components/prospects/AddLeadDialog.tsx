@@ -10,7 +10,7 @@ import { useProspectMutations } from '@/hooks/useProspects';
 
 const SOURCES = [
   { v: 'manual', l: 'Manual' }, { v: 'social', l: 'Social' }, { v: 'places', l: 'Google' },
-  { v: 'network', l: 'Network' }, { v: 'jobs', l: 'Job board' },
+  { v: 'network', l: 'Network' }, { v: 'jobs', l: 'Job board' }, { v: 'website', l: 'Website' },
 ];
 const EMPTY = { business_name: '', contact_name: '', phone: '', email: '', city: '', offer: '', source: 'manual', notes: '' };
 

@@ -29,6 +29,9 @@ export interface LeadLike {
   created_at: string;
   promoted_company_id?: string | null;
   next_follow_up?: string | null;
+  do_not_contact?: boolean | null;
+  opted_out_at?: string | null;
+  opt_out_channel?: string | null;
 }
 
 /** new/checked/queued are New; promoted with no other known stage counts as Meeting booked. */
@@ -53,6 +56,7 @@ export function sourceLabel(source: string, platform?: string | null): string {
     case 'manual': return 'Manual';
     case 'jobs': return 'Job board';
     case 'network': return 'Network';
+    case 'website': return 'Website';
     default: return source ? source[0].toUpperCase() + source.slice(1) : 'Unknown';
   }
 }
@@ -97,6 +101,11 @@ export function isOverdue(date: string | null | undefined, todayPT: string): boo
   return !!date && date < todayPT;
 }
 
+/** Follow-up counts as due when it is today or earlier in Pacific time. */
+export function isDue(date: string | null | undefined, todayPT: string): boolean {
+  return !!date && date.slice(0, 10) <= todayPT;
+}
+
 export const todayPacific = (now = new Date()) => now.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
 
 export function formatDay(date: string | null | undefined): string {
@@ -110,7 +119,56 @@ export function stageAfterContact(status: string): string | null {
   return stageOf(status) === 'new' && status !== 'promoted' ? 'contacted' : null;
 }
 
-export const EXPORT_COLUMNS = ['Name', 'Contact', 'Phone', 'Email', 'Stage', 'Source', 'Source link', 'City', 'Offer', 'Fit score', 'Assigned to', 'Next follow-up', 'Last contacted', 'Their words', 'Sell notes', 'Notes'] as const;
+/** How a do-not-contact lead got that way, in plain words. Null when the lead can be contacted. */
+export function doNotContactReason(p: Pick<LeadLike, 'do_not_contact' | 'opted_out_at' | 'opt_out_channel'>): string | null {
+  if (!p.do_not_contact) return null;
+  const when = p.opted_out_at ? ` on ${formatDay(p.opted_out_at)}` : '';
+  switch ((p.opt_out_channel ?? 'manual').toLowerCase()) {
+    case 'sms': case 'text': return `They asked by text to stop${when}.`;
+    case 'email': return `They unsubscribed by email${when}.`;
+    case 'call': case 'phone': return `They asked on a call to stop${when}.`;
+    default: return `Marked by your team${when}.`;
+  }
+}
+
+/** True when the person opted out themselves, so switching it back needs their say-so. */
+export const optedOutThemselves = (p: Pick<LeadLike, 'do_not_contact' | 'opt_out_channel'>) =>
+  !!p.do_not_contact && !['manual', ''].includes((p.opt_out_channel ?? 'manual').toLowerCase());
+
+export type TopLeadReason = 'replied' | 'due' | 'new' | 'contacted';
+export const TOP_LEAD_REASON: Record<TopLeadReason, string> = {
+  replied: 'They replied', due: 'Follow-up due', new: 'New lead', contacted: 'Waiting on them',
+};
+
+/**
+ * The leads to work today, best first. Replies come first, then follow-ups due today or
+ * overdue, then new leads, then contacted leads with no date set. Won, Dead, Meeting booked,
+ * do-not-contact leads and leads with a follow-up date still ahead are left out. Within each
+ * group the Leads list order applies. A person who is not an admin gets their own and unassigned leads.
+ */
+export function topLeads<T extends LeadLike>(
+  rows: readonly T[], todayPT: string, opts: { me?: string | null; isAdmin?: boolean; limit?: number } = {},
+): { lead: T; reason: TopLeadReason }[] {
+  const { me = null, isAdmin = true, limit = 5 } = opts;
+  const rank: Record<TopLeadReason, number> = { replied: 0, due: 1, new: 2, contacted: 3 };
+  const picked: { lead: T; reason: TopLeadReason }[] = [];
+  for (const lead of sortLeads(rows)) {
+    if (lead.do_not_contact) continue;
+    if (!isAdmin && lead.assigned_to && lead.assigned_to !== me) continue;
+    const stage = stageOf(lead.status);
+    if (stage === 'won' || stage === 'dead' || stage === 'meeting') continue;
+    const due = isDue(lead.next_follow_up, todayPT);
+    let reason: TopLeadReason;
+    if (stage === 'replied') reason = 'replied';
+    else if (due) reason = 'due';
+    else if (lead.next_follow_up) continue; // a date still ahead means not yet
+    else reason = stage === 'new' ? 'new' : 'contacted';
+    picked.push({ lead, reason });
+  }
+  return picked.sort((a, b) => rank[a.reason] - rank[b.reason]).slice(0, limit);
+}
+
+export const EXPORT_COLUMNS = ['Name', 'Contact', 'Phone', 'Email', 'Stage', 'Source', 'Source link', 'City', 'Offer', 'Fit score', 'Assigned to', 'Next follow-up', 'Last contacted', 'Their words', 'Sell notes', 'Notes', 'Do not contact'] as const;
 
 export function csvCell(v: unknown): string {
   const s = v == null ? '' : String(v);

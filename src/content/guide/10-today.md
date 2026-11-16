@@ -1,5 +1,5 @@
 # Dashboard
-<!-- part: Workspace | order: 10 | slug: today | route: /workspace | tags: today, workspace, daily, next 10, waiting on me, approve, reject, snooze, decisions, all projects, money lanes, kpi, digest, priorities, run audit now, create campaign, quick generate, growth score, potential -->
+<!-- part: Workspace | order: 10 | slug: today | route: /workspace | tags: today, workspace, daily, leads to work today, top leads, next 10, waiting on me, approve, reject, snooze, decisions, all projects, money lanes, kpi, digest, priorities, run audit now, create campaign, quick generate, growth score, potential -->
 
 The Dashboard is your starting point after signing in as the owner. It shows activity, decisions, next steps, and links to your workspaces.
 
@@ -12,6 +12,7 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 ## What you see
 - The selected brand or client name, or All brands & clients.
 - Shortcuts to Portfolio, Production Board, CRM, and Marketing Hub when your role has access.
+- Leads to work today: up to five leads from the Leads page, shown when your role can open Leads. People who replied come first, then follow-ups due today or overdue, then new leads with the best fit first, then leads you contacted that have no follow-up date. Leads that are booked, won, dead, marked do not contact, or set to a later follow-up date are left out. Tap a lead to open it, tap the phone button to call, or tap "All leads" for the full list. Managers and staff see their own and unassigned leads.
 - Active brand count, brand work waiting on you, posts published this month, and live campaigns. Brand activity appears only when there are active brands in the selection. A client-only selection shows its client count and campaigns.
 - Waiting on me: decisions on action items. Next 10: ranked work using the same rules as the brand workspace. A brand's waiting count can also include content ready for review, so it can exceed the action-only decision list.
 - Your workspaces: distinct colored headers and initials for each brand or client.
@@ -19,7 +20,7 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 
 ## How to use it
 1. Choose All brands & clients to see the overview, or choose one brand or client in the header.
-2. Review waiting decisions and the Next 10 list. Approved work stays in Next 10; snoozed work can be restored from Waiting on me.
+2. Work "Leads to work today" from the top down, then review waiting decisions and the Next 10 list. Approved work stays in Next 10; snoozed work can be restored from Waiting on me.
 3. Open a workspace card for its setup, channels, work, and results.
 4. Use Display in the header to choose Comfortable, Large, or Extra large text, plus light or dark appearance.
 
