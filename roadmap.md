@@ -161,3 +161,4 @@
 
 ## Brand Setup (Build 4)
 - [x] Setup tab, screenshot stats with read-channel-screenshot, channel numbers, Portfolio setup line and Setup gaps sort
+- [x] Sales Phase 0 engine layer: contact points, subject-neutral runs/queue/log, send-time do-not-contact gate, stage rules, opt-out path (screens via GitHub)

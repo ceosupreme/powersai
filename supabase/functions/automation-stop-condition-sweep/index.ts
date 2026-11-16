@@ -38,6 +38,28 @@ Deno.serve(async (req) => {
     }
   }
 
+  // Leads-list prospects: stop on do-not-contact, reply, booking, CRM hand-off, Won or Dead.
+  const { data: stopProspects } = await sb
+    .from("prospects")
+    .select("id")
+    .or("do_not_contact.eq.true,status.in.(replied,meeting,promoted,won,dead)");
+  const prospectIds = (stopProspects ?? []).map((r: { id: string }) => r.id);
+  if (prospectIds.length) {
+    const { data: pruns } = await sb
+      .from("followup_sequence_runs")
+      .select("id")
+      .eq("subject_type", "prospect")
+      .in("subject_id", prospectIds)
+      .neq("status", "halted");
+    const ids = (pruns ?? []).map((r: { id: string }) => r.id);
+    if (ids.length) {
+      await sb.from("followup_sequence_runs")
+        .update({ status: "halted", stop_reason: "stop_condition_sweep", ended_at: new Date().toISOString() })
+        .in("id", ids);
+      stoppedRunIds = stoppedRunIds.concat(ids);
+    }
+  }
+
   const { data: haltedRuns } = await sb
     .from("followup_sequence_runs")
     .select("id")

@@ -1050,6 +1050,8 @@ export type Database = {
           source_run_id: string | null
           status: Database["public"]["Enums"]["automation_queue_status"]
           subject: string | null
+          subject_id: string | null
+          subject_type: string | null
           updated_at: string
         }
         Insert: {
@@ -1077,6 +1079,8 @@ export type Database = {
           source_run_id?: string | null
           status?: Database["public"]["Enums"]["automation_queue_status"]
           subject?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -1104,6 +1108,8 @@ export type Database = {
           source_run_id?: string | null
           status?: Database["public"]["Enums"]["automation_queue_status"]
           subject?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1146,6 +1152,8 @@ export type Database = {
           queue_id: string | null
           raw: Json | null
           subject: string | null
+          subject_id: string | null
+          subject_type: string | null
           to_address: string | null
         }
         Insert: {
@@ -1163,6 +1171,8 @@ export type Database = {
           queue_id?: string | null
           raw?: Json | null
           subject?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
           to_address?: string | null
         }
         Update: {
@@ -1180,6 +1190,8 @@ export type Database = {
           queue_id?: string | null
           raw?: Json | null
           subject?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
           to_address?: string | null
         }
         Relationships: [
@@ -2590,6 +2602,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      contact_points: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          opt_out_channel: string | null
+          opted_out: boolean
+          opted_out_at: string | null
+          prospect_id: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          opt_out_channel?: string | null
+          opted_out?: boolean
+          opted_out_at?: string | null
+          prospect_id: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          opt_out_channel?: string | null
+          opted_out?: boolean
+          opted_out_at?: string | null
+          prospect_id?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_points_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       content_automation_runs: {
         Row: {
@@ -5040,12 +5096,14 @@ export type Database = {
           enrollment_snapshot: Json
           fired_at: string
           id: string
-          lead_id: string
+          lead_id: string | null
           project_id: string
           queued_message_ids: string[]
           started_at: string
           status: string
           stop_reason: string | null
+          subject_id: string
+          subject_type: string
           updated_at: string
         }
         Insert: {
@@ -5054,12 +5112,14 @@ export type Database = {
           enrollment_snapshot?: Json
           fired_at?: string
           id?: string
-          lead_id: string
+          lead_id?: string | null
           project_id: string
           queued_message_ids?: string[]
           started_at?: string
           status?: string
           stop_reason?: string | null
+          subject_id: string
+          subject_type: string
           updated_at?: string
         }
         Update: {
@@ -5068,12 +5128,14 @@ export type Database = {
           enrollment_snapshot?: Json
           fired_at?: string
           id?: string
-          lead_id?: string
+          lead_id?: string | null
           project_id?: string
           queued_message_ids?: string[]
           started_at?: string
           status?: string
           stop_reason?: string | null
+          subject_id?: string
+          subject_type?: string
           updated_at?: string
         }
         Relationships: [
@@ -16204,6 +16266,27 @@ export type Database = {
         Args: { p_key: string; p_lease_seconds?: number }
         Returns: Json
       }
+      hq_contact_gate: {
+        Args: {
+          p_channel: string
+          p_project_id: string
+          p_queue_id: string
+          p_subject_id?: string
+          p_subject_type?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      hq_contact_opt_out: {
+        Args: {
+          p_actor?: string
+          p_channel: string
+          p_prospect_id?: string
+          p_summary?: string
+          p_value?: string
+        }
+        Returns: Json
+      }
       hq_create_pipeline: {
         Args: { p_job: Json; p_new_content?: Json; p_steps: Json }
         Returns: string
@@ -16221,10 +16304,31 @@ export type Database = {
         }
         Returns: Json
       }
+      hq_halt_person_sequences: {
+        Args: {
+          p_inbound_lead_id: string
+          p_prospect_id: string
+          p_reason: string
+        }
+        Returns: number
+      }
       hq_is_email_suppressed: {
         Args: { p_email: string; p_project_id: string }
         Returns: boolean
       }
+      hq_lead_stage_event: {
+        Args: {
+          p_actor?: string
+          p_channel?: string
+          p_event: string
+          p_prospect_id: string
+          p_summary?: string
+        }
+        Returns: Json
+      }
+      hq_lead_stage_rank: { Args: { p_status: string }; Returns: number }
+      hq_normalize_email: { Args: { p_raw: string }; Returns: string }
+      hq_normalize_phone: { Args: { p_raw: string }; Returns: string }
       hq_numbers_fixture_lead: {
         Args: { p_data: Json; p_email: string; p_source: string }
         Returns: boolean
@@ -16282,6 +16386,10 @@ export type Database = {
       hq_set_crew_default_brands: {
         Args: { p_brand_ids: string[]; p_crew_key: string }
         Returns: undefined
+      }
+      hq_subject_person: {
+        Args: { p_subject_id: string; p_subject_type: string }
+        Returns: Record<string, unknown>
       }
       hq_team_names: {
         Args: never

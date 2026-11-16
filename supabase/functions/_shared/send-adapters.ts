@@ -28,6 +28,8 @@ export interface SendResult {
   error?: string;
   raw?: unknown;
   delivery_status?: DeliveryState;
+  /** Set only when the contact gate refused the send. */
+  blocked_reason?: string;
 }
 
 export interface SendAdapter {
@@ -199,6 +201,48 @@ const ADAPTERS: Record<string, SendAdapter> = {
  * unknown adapter name → manual_log fallback (never crashes).
  */
 export function resolveAdapter(
+  channel: AutomationChannel,
+  config: Record<string, unknown> | null | undefined,
+): SendAdapter {
+  return withContactGate(pickAdapter(channel, config));
+}
+
+// Owner-facing alerts and forwards go to the team, never to a lead.
+const OWNER_FACING_KINDS = new Set(["owner_inquiry_alert", "emergency_lead_alert", "inbound_forward", "client_stale_digest"]);
+
+/**
+ * Do-not-contact gate. Every send to a person (queue sends and lead
+ * acknowledgments) asks hq_contact_gate first. A refusal comes back as a
+ * cancelled, not-ok result carrying `blocked_reason`, which
+ * hq_finish_automation_send records and uses to stop the run. Fails closed.
+ */
+export function withContactGate(adapter: SendAdapter): SendAdapter {
+  return {
+    name: adapter.name,
+    supports: (ch) => adapter.supports(ch),
+    async send(input) {
+      const meta = (input.metadata ?? {}) as Record<string, unknown>;
+      if (meta.internal === true && OWNER_FACING_KINDS.has(String(meta.kind ?? ""))) return adapter.send(input);
+      const { data, error } = await svcClient().rpc("hq_contact_gate", {
+        p_queue_id: input.queue_id, p_channel: input.channel, p_to: input.to ?? null, p_project_id: input.project_id,
+        p_subject_type: typeof meta.subject_type === "string" ? meta.subject_type : null,
+        p_subject_id: typeof meta.subject_id === "string" ? meta.subject_id : null,
+      });
+      if (error || !data) {
+        console.error("[send-adapter] contact gate unavailable", { queue_id: input.queue_id, error: error?.message });
+        return { ok: false, provider: adapter.name, error: "contact_gate_unavailable", delivery_status: "queued" };
+      }
+      if ((data as { allowed?: boolean }).allowed !== true) {
+        const reason = String((data as { reason?: string }).reason ?? "blocked");
+        console.log("[send-adapter] blocked by contact gate", { queue_id: input.queue_id, reason });
+        return { ok: false, provider: adapter.name, error: `blocked:${reason}`, delivery_status: "cancelled", blocked_reason: reason };
+      }
+      return adapter.send(input);
+    },
+  };
+}
+
+function pickAdapter(
   channel: AutomationChannel,
   config: Record<string, unknown> | null | undefined,
 ): SendAdapter {

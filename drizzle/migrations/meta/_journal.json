@@ -64,6 +64,20 @@
       "when": 1794614043808,
       "tag": "0008_crew_default_brand_attribution",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794851430299,
+      "tag": "0009_sales_engine_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794851623594,
+      "tag": "0010_claim_send_prospect_subjects",
+      "breakpoints": true
     }
   ]
 }

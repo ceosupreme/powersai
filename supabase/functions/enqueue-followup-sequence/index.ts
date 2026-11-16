@@ -1,13 +1,14 @@
 import { guardEdgeRequest } from '../_shared/auth-guard.ts';
-// Enqueue a follow-up sequence for a single inbound lead.
-// - Idempotent on lead_id (followup_sequence_runs has unique(lead_id))
+// Enqueue a follow-up sequence for one person: an inbound lead or a Leads-list prospect.
+// - One run per person (subject unique + trigger links a prospect to its inbound lead)
 // - Drafts an opener + day-N touches per configured channel via Lovable AI
 // - Inserts into automation_message_queue with dedupe_key = lead:channel:day
 // - Nothing sends from here — operator must approve in queue.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3.8-flash";
+const STM_PROJECT_ID = "34cb1836-6ead-4478-915c-0a9dc552a554";
 const DEFAULT_DAYS = [0, 1, 3, 7, 14, 30];
 
 type Channel = "email" | "sms" | "linkedin_dm" | "instagram_dm";
@@ -31,10 +32,15 @@ Deno.serve(async (req) => {
 
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  let payload: { lead_id?: string } = {};
+  let payload: { lead_id?: string; subject_type?: string; subject_id?: string; project_id?: string } = {};
   try { payload = await req.json(); } catch { /* noop */ }
-  const leadId = payload.lead_id;
-  if (!leadId) return json({ error: "lead_id required" }, 400);
+  const UUID_RE = /^[0-9a-f-]{36}$/i;
+  // Legacy callers send { lead_id }; new callers send { subject_type, subject_id }.
+  const subjectType = payload.subject_type ?? (payload.lead_id ? "inbound_lead" : undefined);
+  const subjectId = payload.subject_id ?? payload.lead_id;
+  if (subjectType !== "inbound_lead" && subjectType !== "prospect") return json({ error: "subject_type must be prospect or inbound_lead" }, 400);
+  if (!subjectId || !UUID_RE.test(subjectId)) return json({ error: "subject_id (or lead_id) required" }, 400);
+  if (payload.project_id && !UUID_RE.test(payload.project_id)) return json({ error: "invalid project_id" }, 400);
 
   const sb = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -42,17 +48,38 @@ Deno.serve(async (req) => {
     { auth: { persistSession: false } },
   );
 
-  const { data: lead } = await sb
-    .from("inbound_leads")
-    .select("*")
-    .eq("id", leadId)
-    .maybeSingle();
-  if (!lead) return json({ error: "lead_not_found" }, 404);
+  // Normalize either kind of lead into one subject the rest of the code uses.
+  let lead: Record<string, any>;
+  let projectId: string | null;
+  let sequenceStart: number;
+  let requireEnrollment: boolean;
+  if (subjectType === "inbound_lead") {
+    const { data } = await sb.from("inbound_leads").select("*").eq("id", subjectId).maybeSingle();
+    if (!data) return json({ error: "lead_not_found" }, 404);
+    lead = data;
+    projectId = (data.captured_for_project_id as string | null) ?? null;
+    if (!projectId) return json({ skipped: true, reason: "no_project_on_lead" });
+    sequenceStart = new Date(data.created_at as string).getTime();
+    requireEnrollment = true;
+  } else {
+    const { data: p } = await sb.from("prospects").select("*").eq("id", subjectId).maybeSingle();
+    if (!p) return json({ error: "prospect_not_found" }, 404);
+    if (p.do_not_contact) return json({ skipped: true, reason: "do_not_contact" });
+    if (["won", "dead"].includes(p.status)) return json({ skipped: true, reason: `stage_${p.status}` });
+    lead = {
+      name: p.contact_name ?? p.business_name, business_name: p.business_name,
+      email: p.email, phone: p.phone,
+      message: [p.their_words, p.sell_notes].filter(Boolean).join("\n\n") || null,
+      project_type: p.offer ?? p.niche ?? null,
+      qualifier_data: { city: p.city, lead_type: p.lead_type, source: p.source, platform: p.platform, website: p.website },
+    };
+    // Leads-list leads are Supreme Team Media's own sales unless a project is named.
+    projectId = payload.project_id ?? STM_PROJECT_ID;
+    sequenceStart = Date.now();
+    requireEnrollment = false;
+  }
 
-  const projectId = (lead.captured_for_project_id as string | null) ?? null;
-  if (!projectId) return json({ skipped: true, reason: "no_project_on_lead" });
-
-  // Check enrollment.
+  // Inbound leads need the project switched on; a prospect is enrolled one at a time on purpose.
   const { data: enr } = await sb
     .from("project_automation_enrollments")
     .select("enabled, config")
@@ -60,9 +87,9 @@ Deno.serve(async (req) => {
     .eq("automation_key", "followup_sequence")
     .maybeSingle();
 
-  if (!enr?.enabled) return json({ skipped: true, reason: "not_enrolled" });
+  if (requireEnrollment && !enr?.enabled) return json({ skipped: true, reason: "not_enrolled" });
 
-  const config = (enr.config ?? {}) as Record<string, unknown>;
+  const config = (enr?.config ?? {}) as Record<string, unknown>;
   const channels = Array.isArray(config.channels) && (config.channels as string[]).length
     ? (config.channels as Channel[]).filter((c) => ["email","sms","linkedin_dm","instagram_dm"].includes(c))
     : ["email"] as Channel[];
@@ -71,12 +98,15 @@ Deno.serve(async (req) => {
     : DEFAULT_DAYS;
   const tone = typeof config.tone === "string" ? (config.tone as string) : "professional, direct, friendly";
 
-  // Atomic-ish run creation. Unique on lead_id.
+  // One person, one sequence: the database refuses a second run for a
+  // prospect or its linked inbound lead (23505).
   const { data: run, error: runErr } = await sb
     .from("followup_sequence_runs")
     .insert({
       project_id: projectId,
-      lead_id: leadId,
+      lead_id: subjectType === "inbound_lead" ? subjectId : null,
+      subject_type: subjectType,
+      subject_id: subjectId,
       enrollment_snapshot: { channels, days, tone },
       status: "active",
     })
@@ -84,7 +114,6 @@ Deno.serve(async (req) => {
     .single();
 
   if (runErr) {
-    // Duplicate (already enqueued) — return existing.
     if ((runErr as { code?: string }).code === "23505") {
       return json({ skipped: true, reason: "already_enqueued" });
     }
@@ -97,7 +126,6 @@ Deno.serve(async (req) => {
     phone: lead.phone,
     business_name: lead.business_name,
   };
-  const leadCreated = new Date(lead.created_at as string).getTime();
 
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
   const drafts: Record<string, { opener?: string; sequence: Array<{ day: number; body: string; subject?: string }> }> = {};
@@ -178,8 +206,11 @@ Sequence days requested: ${days.join(", ")}`;
         body,
         model: MODEL,
         status: "pending_review",
-        scheduled_for: new Date(leadCreated + day * 86_400_000).toISOString(),
-        dedupe_key: `${leadId}:${channel}:${day}`,
+        scheduled_for: new Date(sequenceStart + day * 86_400_000).toISOString(),
+        dedupe_key: subjectType === "inbound_lead" ? `${subjectId}:${channel}:${day}` : `prospect:${subjectId}:${channel}:${day}`,
+        subject_type: subjectType,
+        subject_id: subjectId,
+        metadata: { subject_type: subjectType, subject_id: subjectId },
       });
     }
   }
@@ -197,7 +228,11 @@ Sequence days requested: ${days.join(", ")}`;
 
   const ids = (inserted ?? []).map((r: { id: string }) => r.id);
   await sb.from("followup_sequence_runs").update({ queued_message_ids: ids }).eq("id", run.id);
-  await sb.from("inbound_leads").update({ automation_status: "enrolled" }).eq("id", leadId);
+  if (subjectType === "inbound_lead") {
+    await sb.from("inbound_leads").update({ automation_status: "enrolled" }).eq("id", subjectId);
+  } else {
+    await sb.from("prospect_activity").insert({ prospect_id: subjectId, kind: "auto", summary: `Started a follow-up sequence (${ids.length} messages waiting for approval)` });
+  }
 
   return json({ ok: true, run_id: run.id, queued: ids.length });
 });
