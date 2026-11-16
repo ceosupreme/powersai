@@ -10544,79 +10544,168 @@ export type Database = {
           },
         ]
       }
+      prospect_activity: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          prospect_id: string
+          summary: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          prospect_id: string
+          summary?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          prospect_id?: string
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospect_activity_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prospects: {
         Row: {
+          assigned_to: string | null
           business_name: string
           checked_at: string | null
           city: string | null
+          contact_name: string | null
           created_at: string
+          drafted_message: string | null
+          email: string | null
+          fit_score: number | null
+          found_by: string | null
           id: string
+          instagram: string | null
+          last_contact_channel: string | null
+          last_contacted_at: string | null
           last_error: string | null
+          lead_type: string | null
           leak_run_id: string | null
           leak_total: number | null
           miner_run_id: string | null
+          next_follow_up: string | null
           niche: string | null
+          notes: string | null
+          offer: string | null
+          outreach_mode: string
           phone: string | null
           place_id: string | null
+          platform: string | null
           promoted_company_id: string | null
           promoted_lead_id: string | null
           rating: number | null
           review_count: number | null
           risk_total: number | null
+          sell_notes: string | null
           shell_venue_id: string | null
           snapshot: Json | null
           source: string
+          source_url: string | null
           status: string
+          their_words: string | null
           updated_at: string
           website: string | null
         }
         Insert: {
+          assigned_to?: string | null
           business_name: string
           checked_at?: string | null
           city?: string | null
+          contact_name?: string | null
           created_at?: string
+          drafted_message?: string | null
+          email?: string | null
+          fit_score?: number | null
+          found_by?: string | null
           id?: string
+          instagram?: string | null
+          last_contact_channel?: string | null
+          last_contacted_at?: string | null
           last_error?: string | null
+          lead_type?: string | null
           leak_run_id?: string | null
           leak_total?: number | null
           miner_run_id?: string | null
+          next_follow_up?: string | null
           niche?: string | null
+          notes?: string | null
+          offer?: string | null
+          outreach_mode?: string
           phone?: string | null
           place_id?: string | null
+          platform?: string | null
           promoted_company_id?: string | null
           promoted_lead_id?: string | null
           rating?: number | null
           review_count?: number | null
           risk_total?: number | null
+          sell_notes?: string | null
           shell_venue_id?: string | null
           snapshot?: Json | null
           source?: string
+          source_url?: string | null
           status?: string
+          their_words?: string | null
           updated_at?: string
           website?: string | null
         }
         Update: {
+          assigned_to?: string | null
           business_name?: string
           checked_at?: string | null
           city?: string | null
+          contact_name?: string | null
           created_at?: string
+          drafted_message?: string | null
+          email?: string | null
+          fit_score?: number | null
+          found_by?: string | null
           id?: string
+          instagram?: string | null
+          last_contact_channel?: string | null
+          last_contacted_at?: string | null
           last_error?: string | null
+          lead_type?: string | null
           leak_run_id?: string | null
           leak_total?: number | null
           miner_run_id?: string | null
+          next_follow_up?: string | null
           niche?: string | null
+          notes?: string | null
+          offer?: string | null
+          outreach_mode?: string
           phone?: string | null
           place_id?: string | null
+          platform?: string | null
           promoted_company_id?: string | null
           promoted_lead_id?: string | null
           rating?: number | null
           review_count?: number | null
           risk_total?: number | null
+          sell_notes?: string | null
           shell_venue_id?: string | null
           snapshot?: Json | null
           source?: string
+          source_url?: string | null
           status?: string
+          their_words?: string | null
           updated_at?: string
           website?: string | null
         }
