@@ -28,7 +28,8 @@ export default function ProspectDock() {
   const { data: prospects = [], isLoading } = useProspects();
   const { data: runs = [] } = useMinerRuns(3);
   const { data: types = [] } = useProjectTypes();
-  const { data: people = [] } = useLeadPeople();
+  const { data: team = [] } = useLeadPeople();
+  const people = useMemo(() => team.filter((x) => x.active), [team]);
   const { promote, moveStage } = useProspectMutations();
   const { user, isAdmin, profile } = useAuth();
   const [params, setParams] = useSearchParams();
@@ -59,10 +60,10 @@ export default function ProspectDock() {
   }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const names = useMemo(() => {
-    const m: Record<string, string> = Object.fromEntries(people.map((p) => [p.id, p.name]));
-    if (user?.id) m[user.id] = profile?.full_name || profile?.email || 'You';
+    const m: Record<string, string> = Object.fromEntries(team.map((p) => [p.id, p.name]));
+    if (user?.id && !m[user.id]) m[user.id] = profile?.full_name || profile?.email || 'You';
     return m;
-  }, [people, user?.id, profile?.full_name, profile?.email]);
+  }, [team, user?.id, profile?.full_name, profile?.email]);
 
   const nicheLabels = useMemo(() => Object.fromEntries(types.map((t) => [t.id, t.label])), [types]);
   const sources = useMemo(() => [...new Set(prospects.map((p) => sourceLabel(p.source, p.platform)))].sort(), [prospects]);

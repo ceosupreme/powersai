@@ -55,6 +55,11 @@ export interface Prospect {
   last_contacted_at: string | null;
   last_contact_channel: string | null;
   found_by: string | null;
+  do_not_contact: boolean;
+  opted_out_at: string | null;
+  opt_out_channel: string | null;
+  /** The website inquiry this lead came from, when it arrived through a form. */
+  inbound_lead_id: string | null;
 }
 
 export interface MinerRun {
@@ -134,16 +139,25 @@ export function useProspectActivity(prospectId: string | null) {
   });
 }
 
-export interface LeadPerson { id: string; name: string }
+export interface LeadPerson { id: string; name: string; active: boolean }
 
 /**
- * People a lead can be assigned to: non-client users. Profiles are readable only
- * by admins (and each person's own row), so a non-admin sees just themselves.
+ * The team behind the Leads page: every non-client user, with a name anyone on the
+ * team may see. Names come from the hq_team_names database function, so managers and
+ * staff see who a lead belongs to without being able to read other people's profiles.
+ * Switched-off people stay in the list (active: false) so old assignments keep a name.
  */
 export function useLeadPeople() {
   return useQuery({
     queryKey: ['lead_people'],
     queryFn: async (): Promise<LeadPerson[]> => {
+      const team = await db.rpc('hq_team_names');
+      if (!team.error && Array.isArray(team.data)) {
+        return (team.data as any[])
+          .map((p) => ({ id: p.id as string, name: (p.name as string) || 'Unnamed', active: p.is_active !== false }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+      }
+      // Older databases without the function: admins still see everyone, others just themselves.
       const [{ data: roles }, { data: profiles }] = await Promise.all([
         db.from('user_roles').select('user_id, role'),
         db.from('profiles').select('id, full_name, email, is_active'),
@@ -151,8 +165,8 @@ export function useLeadPeople() {
       const client = new Set(((roles ?? []) as any[]).filter((r) => r.role === 'client').map((r) => r.user_id));
       const hasRole = new Set(((roles ?? []) as any[]).map((r) => r.user_id));
       return ((profiles ?? []) as any[])
-        .filter((p) => hasRole.has(p.id) && !client.has(p.id) && p.is_active !== false)
-        .map((p) => ({ id: p.id, name: p.full_name || p.email || 'Unnamed' }))
+        .filter((p) => hasRole.has(p.id) && !client.has(p.id))
+        .map((p) => ({ id: p.id, name: p.full_name || p.email || 'Unnamed', active: p.is_active !== false }))
         .sort((a, b) => a.name.localeCompare(b.name));
     },
   });
@@ -273,6 +287,20 @@ export function useProspectMutations() {
       onSuccess: inv,
     }),
 
+    /**
+     * Do not contact on or off, with a line in the lead's activity. The database stamps the
+     * date, records who set it and switches outreach back to Manual.
+     */
+    setDoNotContact: useMutation({
+      mutationFn: async ({ id, on }: { id: string; on: boolean }) => {
+        const patch = on ? { do_not_contact: true, opt_out_channel: 'manual' } : { do_not_contact: false };
+        const { error } = await db.from('prospects').update(patch).eq('id', id);
+        if (error) throw error;
+        await addActivity(id, 'status', on ? 'Marked do not contact' : 'Do not contact removed');
+      },
+      onSuccess: (_d, v) => { inv(); qc.invalidateQueries({ queryKey: ['prospect_activity', v.id] }); },
+    }),
+
     /** Quick log: activity row, last contact stamp, and New -> Contacted (notes are not contact). */
     logContact: useMutation({
       mutationFn: async ({ prospect, kind, summary, nextStatus }: {
@@ -316,6 +344,19 @@ export function useProspectMutations() {
         const { data: userRes } = await supabase.auth.getUser();
         const userId = userRes?.user?.id;
         if (!userId) throw new Error('Sign in required');
+
+        // A lead that arrived through a website form already has its inquiry on file, so
+        // promote that inquiry instead of filing a second one (and a second owner alert).
+        if (p.inbound_lead_id) {
+          const { data: companyId, error: pErr } = await db.rpc('hq_promote_inbound_lead', { p_lead_id: p.inbound_lead_id });
+          if (!pErr && companyId) {
+            const { error: uErr } = await db.from('prospects')
+              .update({ status: 'promoted', promoted_lead_id: p.inbound_lead_id, promoted_company_id: companyId })
+              .eq('id', p.id);
+            if (uErr) throw uErr;
+            return { company_id: companyId as string, lead_id: p.inbound_lead_id as string | null };
+          }
+        }
 
         const message = [
           `Sourced by the prospect miner (${p.source}) in ${p.city ?? 'unknown city'}.`,

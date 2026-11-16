@@ -1,5 +1,5 @@
 import type { Prospect } from '@/hooks/useProspects';
-import { formatDay, sourceLabel, stageLabel, stageOf, toCsv } from '@/lib/leads';
+import { doNotContactReason, formatDay, sourceLabel, stageLabel, stageOf, toCsv } from '@/lib/leads';
 
 type Names = Record<string, string>;
 
@@ -11,6 +11,7 @@ function cells(p: Prospect, names: Names) {
     p.next_follow_up ? formatDay(p.next_follow_up) : '',
     p.last_contacted_at ? formatDay(p.last_contacted_at) : '',
     p.their_words, p.sell_notes, p.notes,
+    p.do_not_contact ? `Yes. ${doNotContactReason(p) ?? ''}`.trim() : '',
   ];
 }
 
@@ -53,6 +54,11 @@ export async function exportLeadsPdf(rows: Prospect[], names: Names) {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
     doc.text(doc.splitTextToSize(p.business_name, width)[0], left, y); y += 16;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    if (p.do_not_contact) {
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(180, 0, 0);
+      para('DO NOT CONTACT', doNotContactReason(p));
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(0);
+    }
     para('Contact', [c[1], c[2], c[3]].filter(Boolean).join(' · '));
     para('Stage', [c[4], c[5], c[7], c[8]].filter(Boolean).join(' · '));
     para('Fit score', c[9] != null ? String(c[9]) : null);

@@ -6,20 +6,24 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { formatDollars } from '@/lib/leakStackFormat';
-import { LEAD_STAGES, formatDay, sourceLabel, stageAfterContact, stageOf, type LeadStage } from '@/lib/leads';
+import { LEAD_STAGES, doNotContactReason, formatDay, optedOutThemselves, sourceLabel, stageAfterContact, stageOf, type LeadStage } from '@/lib/leads';
 import {
   useProspectActivity, useProspectMutations,
   type LeadPerson, type Prospect, type ProspectActivityKind, type ProspectStatus,
 } from '@/hooks/useProspects';
 import {
-  ArrowUpRight, Copy, ExternalLink, FileSearch, Globe, Instagram, Mail, MessageSquarePlus,
+  ArrowUpRight, Ban, Copy, ExternalLink, FileSearch, Globe, Instagram, Mail, MessageSquarePlus,
   Phone, Star, XCircle, PhoneCall, MessageSquare, Send, MessagesSquare, Users, StickyNote,
 } from 'lucide-react';
-import { CrmBadge, SourceBadge } from './LeadBadges';
+import { CrmBadge, DoNotContactBadge, SourceBadge } from './LeadBadges';
 
 const QUICK: { kind: ProspectActivityKind; label: string; icon: typeof Phone }[] = [
   { kind: 'call', label: 'Called', icon: PhoneCall },
@@ -64,17 +68,18 @@ interface Props {
 
 export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange, onMove, onCheckup, onDraft, onPromote }: Props) => {
   const isMobile = useIsMobile();
-  const { updateFields, logContact } = useProspectMutations();
+  const { updateFields, logContact, setDoNotContact } = useProspectMutations();
   const { data: activity = [] } = useProspectActivity(p?.id ?? null);
   const [draft, setDraft] = useState('');
   const [notes, setNotes] = useState('');
   const [logKind, setLogKind] = useState<ProspectActivityKind | null>(null);
   const [logText, setLogText] = useState('');
+  const [confirmContactAgain, setConfirmContactAgain] = useState(false);
 
   useEffect(() => {
     setDraft(p?.drafted_message ?? '');
     setNotes(p?.notes ?? '');
-    setLogKind(null); setLogText('');
+    setLogKind(null); setLogText(''); setConfirmContactAgain(false);
   }, [p?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const save = (patch: Partial<Prospect>, ok = 'Saved') =>
@@ -82,6 +87,18 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
       onSuccess: () => toast({ title: ok }),
       onError: (e: any) => toast({ title: 'Could not save', description: e?.message, variant: 'destructive' }),
     });
+
+  const setDnc = (on: boolean) =>
+    p && setDoNotContact.mutate({ id: p.id, on }, {
+      onSuccess: () => toast({ title: on ? 'Marked do not contact' : 'This lead can be contacted again' }),
+      onError: (e: any) => toast({ title: 'Could not save', description: e?.message, variant: 'destructive' }),
+    });
+  /** Someone who opted out themselves needs a second look before the mark comes off. */
+  const toggleDnc = (on: boolean) => {
+    if (!p) return;
+    if (!on && optedOutThemselves(p)) setConfirmContactAgain(true);
+    else setDnc(on);
+  };
 
   const submitLog = () => {
     if (!p || !logKind) return;
@@ -111,18 +128,27 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                 </Select>
                 <SourceBadge p={p} />
                 <CrmBadge p={p} />
+                <DoNotContactBadge p={p} />
               </div>
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
-              <div className="grid grid-cols-2 gap-2">
-                {p.phone ? (
-                  <Button asChild size="lg" variant="outline" className="h-12"><a href={`tel:${p.phone.replace(/[^\d+]/g, '')}`}><Phone className="mr-2 h-4 w-4" />{p.phone}</a></Button>
-                ) : null}
-                {p.email ? (
-                  <Button asChild size="lg" variant="outline" className="h-12 min-w-0"><a href={`mailto:${p.email}`}><Mail className="mr-2 h-4 w-4 shrink-0" /><span className="truncate">{p.email}</span></a></Button>
-                ) : null}
-              </div>
+              {p.do_not_contact ? (
+                <div role="alert" className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 space-y-1">
+                  <p className="flex items-center gap-2 text-base font-semibold text-destructive"><Ban className="h-5 w-5 shrink-0" />Do not contact this lead</p>
+                  <p className="text-[15px]">{doNotContactReason(p)} No calls, texts, emails or messages. Automatic outreach is off for this lead.</p>
+                  {(p.phone || p.email) && <p className="text-sm text-muted-foreground break-words">On file: {[p.phone, p.email].filter(Boolean).join(' · ')}</p>}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {p.phone ? (
+                    <Button asChild size="lg" variant="outline" className="h-12"><a href={`tel:${p.phone.replace(/[^\d+]/g, '')}`}><Phone className="mr-2 h-4 w-4" />{p.phone}</a></Button>
+                  ) : null}
+                  {p.email ? (
+                    <Button asChild size="lg" variant="outline" className="h-12 min-w-0"><a href={`mailto:${p.email}`}><Mail className="mr-2 h-4 w-4 shrink-0" /><span className="truncate">{p.email}</span></a></Button>
+                  ) : null}
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Field label="Source">{sourceLabel(p.source, p.platform)}</Field>
@@ -207,7 +233,18 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                     <p className="text-[15px] font-medium">Outreach: {p.outreach_mode === 'auto' ? 'Auto' : 'Manual'}</p>
                     <p className="text-sm text-muted-foreground">Auto hands this lead to the outreach sequence. No sequence is connected yet.</p>
                   </div>
-                  <Switch checked={p.outreach_mode === 'auto'} aria-label="Automatic outreach" onCheckedChange={(v) => save({ outreach_mode: v ? 'auto' : 'manual' }, v ? 'Set to Auto' : 'Set to Manual')} />
+                  <Switch checked={p.outreach_mode === 'auto'} disabled={p.do_not_contact} aria-label="Automatic outreach" onCheckedChange={(v) => save({ outreach_mode: v ? 'auto' : 'manual' }, v ? 'Set to Auto' : 'Set to Manual')} />
+                </div>
+                <div className={cn('flex items-start justify-between gap-3 rounded-lg border p-3', p.do_not_contact && 'border-destructive/50 bg-destructive/5')}>
+                  <div>
+                    <p className="text-[15px] font-medium">Do not contact</p>
+                    <p className="text-sm text-muted-foreground">
+                      {p.do_not_contact
+                        ? doNotContactReason(p)
+                        : 'Switch on when someone asks you to stop. It blocks automatic messages and flags this lead everywhere.'}
+                    </p>
+                  </div>
+                  <Switch checked={p.do_not_contact} disabled={setDoNotContact.isPending} aria-label="Do not contact" onCheckedChange={toggleDnc} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="lead-notes">Notes</Label>
@@ -243,6 +280,20 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                 )}
               </Section>
             </div>
+            <AlertDialog open={confirmContactAgain} onOpenChange={setConfirmContactAgain}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Contact this lead again?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {doNotContactReason(p)} Only switch this off if they have told you they want to hear from you again.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep do not contact</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => { setConfirmContactAgain(false); setDnc(false); }}>They asked to hear from us</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </>
         )}
       </SheetContent>

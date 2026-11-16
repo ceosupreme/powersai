@@ -3,7 +3,7 @@ import { CalendarClock, MapPin, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDay, isOverdue, todayPacific } from '@/lib/leads';
 import type { Prospect } from '@/hooks/useProspects';
-import { CrmBadge, SourceBadge, StageBadge } from './LeadBadges';
+import { CrmBadge, DoNotContactBadge, SourceBadge, StageBadge } from './LeadBadges';
 import { LeadContactIcons } from './LeadContactIcons';
 
 interface Props { leads: Prospect[]; names: Record<string, string>; onOpen: (p: Prospect) => void }
@@ -33,9 +33,10 @@ export const LeadList = ({ leads, names, onOpen }: Props) => {
                       <StageBadge status={p.status} />
                       <SourceBadge p={p} />
                       <CrmBadge p={p} />
+                      <DoNotContactBadge p={p} />
                     </div>
                     {p.contact_name && <p className="text-sm">{p.contact_name}</p>}
-                    {p.phone && <p className="text-base font-medium tabular-nums">{p.phone}</p>}
+                    {p.phone && <p className={cn('text-base font-medium tabular-nums', p.do_not_contact && 'text-muted-foreground line-through')}>{p.phone}</p>}
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       {p.offer && <span className="text-foreground">{p.offer}</span>}
                       {p.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{p.city}</span>}
