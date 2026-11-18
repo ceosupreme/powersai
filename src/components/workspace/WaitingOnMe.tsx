@@ -5,11 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, ChevronDown } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { fetchActionStatusMap, fetchInactiveJobIds, isSnoozed, needsDecision, priorityLabel, priorityRank } from '@/hooks/useNextTen';
-import { isOwnerVisible, pipelineHref } from '@/lib/ownerWork';
+import {
+  CHANGES_REQUESTED, approvalKindWord, approvalOpenLink, isApprovalCard, isOwnerVisible,
+  parseFacts, pipelineHref, taskLinks,
+} from '@/lib/ownerWork';
+import { Textarea } from '@/components/ui/textarea';
 import { TaskExplainer } from '@/components/tasks/TaskExplainer';
 
 export interface WaitingRow {
@@ -126,19 +130,25 @@ export function useWaitingOnMe(projects: { id: string; name: string }[]) {
   });
 }
 
-type WaitingAction = 'approve' | 'reject' | 'snooze' | 'unsnooze';
+type WaitingAction = 'approve' | 'reject' | 'snooze' | 'unsnooze' | 'changes';
 
 function useWaitingMutation(ids: string[]) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, action }: { id: string; action: WaitingAction }) => {
+    mutationFn: async ({ id, action, card, note }: { id: string; action: WaitingAction; card?: boolean; note?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       const nowIso = new Date().toISOString();
       let patch: Record<string, any> = {};
       if (action === 'approve') {
         patch = { approval_status: 'Approved', approved_at: nowIso, approved_by_id: user?.id ?? null, snoozed_until: null };
+        // An approval card has no further step for the owner: the OK is the whole job.
+        if (card) patch = { ...patch, status: 'Done', completed_at: nowIso };
       } else if (action === 'reject') {
         patch = { approval_status: 'Rejected' };
+        if (card) patch = { ...patch, rejected_at: nowIso, rejected_by_id: user?.id ?? null, rejection_reason: note?.trim() || null };
+      } else if (action === 'changes') {
+        // Sent back with notes: it leaves the owner's lists and becomes the reviser's work.
+        patch = { approval_status: CHANGES_REQUESTED, feedback_note: note?.trim() || null, owner_kind: 'claude', snoozed_until: null };
       } else if (action === 'snooze') {
         patch = { snoozed_until: new Date(Date.now() + 7 * 86400_000).toISOString() };
       } else if (action === 'unsnooze') {
@@ -159,9 +169,11 @@ function useWaitingMutation(ids: string[]) {
           ? 'Approved'
           : v.action === 'reject'
             ? 'Rejected'
-            : v.action === 'snooze'
-              ? 'Snoozed for a week'
-              : 'Back on the list',
+            : v.action === 'changes'
+              ? 'Sent back with your notes'
+              : v.action === 'snooze'
+                ? 'Snoozed for a week'
+                : 'Back on the list',
       );
     },
     onError: (e: any) => toast.error(e?.message ?? 'Could not update that item'),
@@ -204,6 +216,65 @@ function RowActions({
   );
 }
 
+/** Open the piece, then approve it, send it back with notes, or turn it down. */
+function ApprovalActions({
+  row, busy, onRun,
+}: {
+  row: WaitingRow;
+  busy: boolean;
+  onRun: (action: WaitingAction, note?: string) => void;
+}) {
+  const [mode, setMode] = useState<'changes' | 'reject' | null>(null);
+  const [note, setNote] = useState('');
+  const open = approvalOpenLink(taskLinks({
+    title: row.title, detail: row.detail, why: row.why, facts: row.facts, outputUrl: row.outputUrl,
+  }));
+  return (
+    <div className="mt-2 space-y-2">
+      {open && (
+        <a
+          href={open.url}
+          target={open.internal ? undefined : '_blank'}
+          rel="noreferrer"
+          className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 text-sm font-medium text-primary hover:bg-primary/20"
+        >
+          {open.label}<ExternalLink aria-hidden className="h-4 w-4 shrink-0" />
+        </a>
+      )}
+      <div className="grid grid-cols-3 gap-2">
+        <Button className="min-h-11" disabled={busy} onClick={() => onRun('approve')}>Approve</Button>
+        <Button variant="outline" className="min-h-11" disabled={busy}
+          onClick={() => setMode((m) => (m === 'changes' ? null : 'changes'))}>Change it</Button>
+        <Button variant="outline" className="min-h-11" disabled={busy}
+          onClick={() => setMode((m) => (m === 'reject' ? null : 'reject'))}>No</Button>
+      </div>
+      {!mode && !isSnoozed(row.snoozed_until) && (
+        <button type="button" className="min-h-11 text-sm text-muted-foreground underline" disabled={busy}
+          onClick={() => onRun('snooze')}>
+          Not now, ask me again in a week
+        </button>
+      )}
+      {mode && (
+        <div className="space-y-2">
+          <Textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="text-base"
+            rows={3}
+            placeholder={mode === 'changes' ? 'What should change?' : 'Why not? (optional)'}
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button className="min-h-11" disabled={busy || (mode === 'changes' && !note.trim())}
+              onClick={() => onRun(mode, note)}>
+              {mode === 'changes' ? 'Send it back' : 'Turn it down'}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const fmtDate = (iso: string | null) => {
   if (!iso) return null;
   const d = new Date(iso);
@@ -228,9 +299,56 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
       (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') ||
       (a.created_at ?? '').localeCompare(b.created_at ?? ''),
   );
-  const top = ranked.slice(0, 3);
-  const rest = ranked.slice(3);
-  const decisions = open.filter((r) => needsDecision(r.approval_status)).length;
+  // Scripts, ideas and other pieces waiting for an OK come first, in their own group.
+  const approvals = ranked.filter(isApprovalCard);
+  const others = ranked.filter((r) => !isApprovalCard(r));
+  const top = others.slice(0, 3);
+  const rest = others.slice(3);
+  const decisions = others.filter((r) => needsDecision(r.approval_status)).length;
+
+  const renderApproval = (row: WaitingRow) => {
+    const { facts } = parseFacts(row.facts);
+    const since = fmtDate(row.created_at);
+    return (
+      <li key={row.id} className="mb-2 rounded-md border border-primary/30 bg-primary/5 p-3">
+        <TaskExplainer
+          task={{
+            title: row.title,
+            detail: row.detail,
+            why: row.why,
+            ownerKind: row.ownerKind,
+            minutes: row.minutes,
+            brand: row.projectName,
+            status: 'Needs your OK',
+            projectId: row.projectId,
+            facts: row.facts,
+            outputUrl: row.outputUrl,
+            hideYourPart: true,
+          }}
+          header={
+            <div className="min-w-0">
+              <p className="text-sm text-foreground font-medium">
+                <Badge variant="outline" className="mr-2 text-xs border-primary/40 text-primary">{approvalKindWord(facts)}</Badge>
+                {row.title}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {row.projectName}
+                {row.minutes ? ` · about ${row.minutes} min to review` : ''}
+                {since ? ` · waiting since ${since}` : ''}
+              </p>
+            </div>
+          }
+          actions={
+            <ApprovalActions
+              row={row}
+              busy={mutation.isPending}
+              onRun={(action, note) => mutation.mutate({ id: row.id, action, card: true, note })}
+            />
+          }
+        />
+      </li>
+    );
+  };
 
   const renderRow = (row: WaitingRow, highlight = false, defaultOpen = false) => {
     const due = fmtDate(row.due_date);
@@ -318,7 +436,8 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           Waiting on me
           {!isLoading && !isError && open.length > 0 && (
             <span className="ml-2 normal-case tracking-normal text-xs text-muted-foreground">
-              {decisions} to decide
+              {[approvals.length ? `${approvals.length} to approve` : null, decisions ? `${decisions} to decide` : null]
+                .filter(Boolean).join(' · ')}
             </span>
           )}
         </CardTitle>
@@ -341,8 +460,15 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           <p className="text-xs text-muted-foreground">No decisions waiting on you right now.</p>
         ) : (
           <>
+            {approvals.length > 0 && (
+              <div className="mb-4">
+                <p className="mb-2 text-sm font-semibold text-foreground">Scripts and content to approve</p>
+                <ul>{approvals.map(renderApproval)}</ul>
+                {others.length > 0 && <p className="mt-4 text-sm font-semibold text-foreground">Other decisions</p>}
+              </div>
+            )}
             {top.length > 0 && (
-              <ul className="mb-3">{top.map((row, i) => renderRow(row, true, i === 0))}</ul>
+              <ul className="mb-3">{top.map((row, i) => renderRow(row, true, i === 0 && approvals.length === 0))}</ul>
             )}
             <ul>{rest.map((row) => renderRow(row))}</ul>
             {snoozed.length > 0 && (
@@ -355,7 +481,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
                   <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showSnoozed && 'rotate-180')} />
                   Snoozed ({snoozed.length})
                 </button>
-                {showSnoozed && <ul className="mt-2">{snoozed.map((row) => renderRow(row))}</ul>}
+                {showSnoozed && <ul className="mt-2">{snoozed.map((row) => (isApprovalCard(row) ? renderApproval(row) : renderRow(row)))}</ul>}
               </div>
             )}
           </>

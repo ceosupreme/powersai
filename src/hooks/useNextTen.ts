@@ -6,7 +6,7 @@ import { fetchAllPages, fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { PRODUCT_STATUSES } from '@/hooks/useChannelProducts';
 import { foundationStatusKey } from '@/components/foundation-audit/useFoundationScores';
 import { currentWeekRange } from '@/hooks/useEnsureCurrentWeek';
-import { isOwnerVisible, missingDependencyIds } from '@/lib/ownerWork';
+import { isApprovalCard, isOwnerVisible, missingDependencyIds } from '@/lib/ownerWork';
 
 export type NextTenSource = 'Action' | 'Lane' | 'Product' | 'KPI';
 
@@ -266,6 +266,8 @@ function actionNextTenRows(
     seen.add(a.id);
     if (isSnoozed(a.snoozed_until, now)) continue;
     if (!isOwnerVisible(a, statusById)) continue;
+    // Pieces waiting for the owner's OK are decided in Waiting on me, not listed twice.
+    if (isApprovalCard(a) && needsDecision(a.approval_status)) continue;
     const approvalRank = a.approval_status === 'Approved' ? 0 : 1;
     const pr = priorityRank(a.priority);
     const bits = [priorityLabel(pr) !== '—' ? priorityLabel(pr) : null, fmtDue(a.due_date, now)].filter(Boolean);
@@ -414,7 +416,7 @@ export async function fetchNextTenForProject(
   try {
     const actionsRes = await supabase
       .from('action_items')
-      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id,facts,output_url')
+      .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,approval_status,status,created_at,priority,snoozed_until,owner_kind,depends_on,job_id,facts,output_url,source')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`);
     if (actionsRes.error) throw actionsRes.error;
     const actionRows = (actionsRes.data ?? []) as any[];
@@ -496,7 +498,7 @@ export async function fetchNextTenForProject(
 
 /** Action item columns the Next 10 and the brand work summaries both read, plus the two project keys. */
 const ACTION_BATCH_COLUMNS =
-  'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id,facts,output_url';
+  'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at,due_date,bar_id,venue_id,facts,output_url,source';
 
 /** Action items for many projects at once. A row belongs to a project through bar_id or venue_id. */
 export async function fetchActionRowsForProjects(projectIds: string[]): Promise<any[]> {

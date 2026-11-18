@@ -43,6 +43,36 @@ export function pipelineHref(projectId: string, jobId: string, stepId?: string |
   return stepId ? `${route}?step=${encodeURIComponent(stepId)}` : route;
 }
 
+/**
+ * Scripts, ideas, plans and other finished pieces that wait for the owner's OK are
+ * action items filed with this source. They show first in Waiting on me and stay
+ * out of Next 10 until decided, so one list holds them.
+ */
+export const APPROVAL_CARD_SOURCE = 'your_ok';
+
+/** Approval state after the owner sends a piece back with notes; the reviser picks it up. */
+export const CHANGES_REQUESTED = 'Changes requested';
+
+export function isApprovalCard(row: { source?: string | null }): boolean {
+  return row.source === APPROVAL_CARD_SOURCE;
+}
+
+const APPROVAL_KIND_WORDS: Record<string, string> = {
+  script: 'Script', idea: 'Idea', plan: 'Plan', character: 'Character sheet', design: 'Design',
+  shot_list: 'Shot list', brand_kit: 'Brand kit', pick: 'Pick one', footage: 'Stills and clips', post: 'Post',
+};
+
+/** The word shown on an approval card's badge, from facts.kind. */
+export function approvalKindWord(facts: StepFacts | null): string {
+  const k = typeof facts?.kind === 'string' ? facts.kind.trim().toLowerCase() : '';
+  return APPROVAL_KIND_WORDS[k] ?? 'Review';
+}
+
+/** The piece itself: the first saved link that leaves HQ, else the first saved link. */
+export function approvalOpenLink(links: TaskLink[]): TaskLink | null {
+  return links.find((l) => !l.internal) ?? links[0] ?? null;
+}
+
 /** Only finished deliverables, not title-only concepts, wait for final approval. */
 export function isApprovalReady(it: {
   quality_score: number | null;

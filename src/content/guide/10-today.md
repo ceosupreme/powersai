@@ -14,13 +14,13 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 - Shortcuts to Portfolio, Production Board, CRM, and Marketing Hub when your role has access.
 - Leads to work today: up to five leads from the Leads page, shown when your role can open Leads. People who replied come first, then follow-ups due today or overdue, then new leads with the best fit first, then leads you contacted that have no follow-up date. Leads that are booked, won, dead, marked do not contact, or set to a later follow-up date are left out. Tap a lead to open it, tap the phone button to call, or tap "All leads" for the full list. Managers and staff see their own and unassigned leads.
 - Active brand count, brand work waiting on you, posts published this month, and live campaigns. Brand activity appears only when there are active brands in the selection. A client-only selection shows its client count and campaigns.
-- Waiting on me: decisions on action items. Next 10: ranked work using the same rules as the brand workspace. A brand's waiting count can also include content ready for review, so it can exceed the action-only decision list.
+- Waiting on me: scripts, ideas and other finished pieces that need your OK come first, under "Scripts and content to approve". Each card has a button that opens the piece itself, then Approve, Change it (type what should change and it goes back to be revised) and No. Below them sit the other decisions on action items. Next 10: ranked work using the same rules as the brand workspace. A brand's waiting count can also include content ready for review, so it can exceed the action-only decision list.
 - Your workspaces: distinct colored headers and initials for each brand or client.
 - A visible retry message if activity cannot be loaded.
 
 ## How to use it
 1. Choose All brands & clients to see the overview, or choose one brand or client in the header.
-2. Work "Leads to work today" from the top down, then review waiting decisions and the Next 10 list. Approved work stays in Next 10; snoozed work can be restored from Waiting on me.
+2. Work "Leads to work today" from the top down, then review waiting decisions and the Next 10 list. Approved work stays in Next 10; snoozed work can be restored from Waiting on me. A piece waiting for your OK is listed only in Waiting on me, not in Next 10, and leaves the list once you approve it, send it back or turn it down.
 3. Open a workspace card for its setup, channels, work, and results.
 4. Use Display in the header to choose Comfortable, Large, or Extra large text, plus light or dark appearance.
 
