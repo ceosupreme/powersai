@@ -17,11 +17,12 @@ import {
 
 import { TrafficNotice } from './TrafficNotice';
 import { useProjectKpis } from '@/hooks/useProjectKpis';
+import type { StudioPatch } from '@/lib/contentStudio';
 
 const T = (t: string) => (supabase as any).from(t);
 
 export interface PipelineRequest {
-  newContent?: { title: string; summary: string };
+  newContent?: { title: string; summary: string; format?: string; purpose_type?: string; studio?: StudioPatch; request_key?: string };
   projectId: string;
   kind: JobKind;
   title: string;
@@ -89,10 +90,12 @@ function MultiPick({ label, options, value, onChange }: { label: string; options
   );
 }
 
-export function CreatePipelineDialog({ request, onClose, onCreated }: {
+export function CreatePipelineDialog({ request, onClose, onCreated, navigateOnCreated = true }: {
   request: PipelineRequest | null;
   onClose: () => void;
   onCreated?: (jobId: string) => void;
+  /** Studio opens the linked content item in its guided editor after creation. */
+  navigateOnCreated?: boolean;
 }) {
   const open = !!request;
   const navigate = useNavigate();
@@ -234,7 +237,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated }: {
       toast.success('Pipeline ready');
       onCreated?.(jobId);
       onClose();
-      navigate(`/project/${request.projectId}/jobs/${jobId}`);
+      if (navigateOnCreated) navigate(`/project/${request.projectId}/jobs/${jobId}`);
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not create the pipeline');
     } finally { setBusy(false); }

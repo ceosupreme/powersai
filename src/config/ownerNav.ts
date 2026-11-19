@@ -85,6 +85,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
   {
     label: 'Content & Production',
     items: [
+      { path: '/content-studio', label: 'Content Studio', icon: Sparkles, pageKey: 'content_pipeline' },
       { path: '/content', label: 'Content', icon: Film, pageKey: 'content_pipeline' },
       { path: '/radar', label: 'Radar', icon: Radar, pageKey: 'content_pipeline' },
       { path: '/playbooks', label: 'Playbooks', icon: BookOpen, pageKey: 'content_pipeline', adminOnly: true },

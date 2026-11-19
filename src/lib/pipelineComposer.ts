@@ -1,11 +1,21 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { StudioPatch } from '@/lib/contentStudio';
 
 const T = (t: string) => (supabase as any).from(t);
 
 export type JobKind = 'content' | 'product' | 'lane' | 'channel_setup';
 
 export interface ComposeInput {
-  new_content?: { title: string; summary: string };
+  new_content?: {
+    title: string;
+    summary: string;
+    format?: string;
+    purpose_type?: string;
+    /** Stable across retries of the same creation request. */
+    request_key?: string;
+    /** Save the template snapshot and choices in the same transaction as the job. */
+    studio?: StudioPatch;
+  };
   project_id: string;
   kind: JobKind;
   title: string;
@@ -223,7 +233,8 @@ async function methodsByKeys(keys: string[]): Promise<Map<string, MethodRow>> {
 /** Create the job and its steps; returns the job id. */
 export async function composePipeline(input: ComposeInput): Promise<{ jobId: string; recipe: ReturnType<typeof recipeEntry>[] }> {
   const { data: { user } } = await supabase.auth.getUser();
-  const brRes = await T('knowledge_base').select(KB_COLS).eq('venue_id', input.project_id).eq('subcategory', 'brand_rules').limit(1);
+  const brRes = await T('knowledge_base').select(KB_COLS).eq('venue_id', input.project_id)
+    .eq('subcategory', 'brand_rules').eq('status', 'active').order('updated_at', { ascending: false }).limit(1);
   if (brRes.error) throw brRes.error;
   const brandRules: MethodRow | null = (brRes.data ?? [])[0] ?? null;
 
@@ -290,7 +301,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
   const recipe = recipeRows.map(recipeEntry);
   const job = {
     project_id: input.project_id, kind: input.kind, title: input.title,
-    target_type: input.target_type ?? null, target_id: input.target_id ?? null,
+    target_type: input.target_type ?? (input.new_content ? 'content_items' : null), target_id: input.target_id ?? null,
     target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
     recipe, level: input.level, money_destination: input.money_destination || null,
     goal_text: input.goal_text?.trim() || null,

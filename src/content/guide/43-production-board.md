@@ -57,7 +57,8 @@ The Production Board shows the content pieces of all your brands in one place, s
 1. Tap "Import package".
 2. Choose the brand under "Brand".
 3. Choose the package's asset-manifest.json file.
-4. Read the "Created" and "Skipped" lists, then tap "Done".
+4. Read the "Created", "Updated" and "Skipped" lists, then tap "Done". "Updated" means missing material was filled into an existing draft.
+5. Open an imported piece to check its script or finished text, caption, hook, call to action and finished-file links. The manifest may supply these directly or inside its `brief`. A file listed only as asset metadata does not count as the finished production file; use `brief.asset_urls` or `asset_urls` for those links.
 
 
 ### Find the next piece
@@ -93,8 +94,10 @@ The Production Board shows the content pieces of all your brands in one place, s
 - The four-week mix counts every piece created for that brand in the last 28 days, whatever the other filters say.
 - The mix targets come from the brand kit. Edit them in the Brand Kit content strategy section.
 - The board includes every brand that is switched on, parked ones too. If it says "No internal brand projects are switched on yet.", note that the on and off switch is the "Status" switch ("Active" or "Inactive") in the project's edit window in the Admin Panel, not the "Active" and "Parked" buttons on the brand page.
-- A repeat import of the same package adds nothing twice. New pieces start at the stage named in the file, or Idea, and each gets a draft placement.
-- The import reads only the manifest file. It records the files the manifest lists but does not upload them. Not confirmed: where those files must already be stored.
+- Repeat imports reuse the source and family, match each piece by its title and format, and reuse its channel/account placement. Missing fields in drafts are filled; your existing text, production stage and other brief details are preserved. New finished-file links are added once. Approved, scheduled and published pieces are not rewritten by an import.
+- New pieces start at the production stage named in the file, or Idea, and each placement starts as Draft. The manifest cannot approve, schedule or publish a piece. Every post needs a title; malformed fields or scheduled/published stages are rejected before saving any records.
+- File metadata is reused by content hash within the brand kit, or by storage path within the same source and kit when there is no hash. Give each different file its actual stable storage path so files with the same name remain distinguishable.
+- The import reads only the manifest file. It records the files the manifest lists but does not upload them. Finished-file links must already point to accessible work. If a database error interrupts an import, the dialog shows what was saved; fix the issue and repeat the import to finish.
 
 ## Main brand selection
 The Brand filter stays in sync with the main header selector. Choose All brands to return to the full accessible list.

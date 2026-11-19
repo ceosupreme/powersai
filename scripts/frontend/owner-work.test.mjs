@@ -42,11 +42,14 @@ test('pipeline step status words', () => {
   assert.equal(w.deriveStepStatus({ status: 'Open', owner_kind: 'claude', depends_on: null, title: 'a' }, m), 'queued');
 });
 
-test('approval-ready content needs 80+, no fails, not approved', () => {
-  assert.equal(w.isApprovalReady({ quality_score: 80, quality_fails: [], approved_at: null }), true);
-  assert.equal(w.isApprovalReady({ quality_score: 79, quality_fails: [], approved_at: null }), false);
-  assert.equal(w.isApprovalReady({ quality_score: 90, quality_fails: ['x'], approved_at: null }), false);
-  assert.equal(w.isApprovalReady({ quality_score: 90, quality_fails: null, approved_at: '2026-01-01' }), false);
+test('approval-ready content needs a finished deliverable and leaves scores advisory', () => {
+  const finished = { format: 'community', stage: 'script', brief: { script: 'A complete original written post.' },
+    quality_score: 35, quality_fails: ['Try a stronger opening'], approved_at: null };
+  assert.equal(w.isApprovalReady(finished), true);
+  assert.equal(w.isApprovalReady({ ...finished, quality_score: null, quality_fails: null }), true);
+  assert.equal(w.isApprovalReady({ ...finished, quality_score: 100, brief: {} }), false);
+  assert.equal(w.isApprovalReady({ ...finished, stage: 'idea' }), false);
+  assert.equal(w.isApprovalReady({ ...finished, approved_at: '2026-01-01' }), false);
 });
 
 test('facts parse safely and fall back to text', () => {

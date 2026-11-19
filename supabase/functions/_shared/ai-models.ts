@@ -96,6 +96,8 @@ export interface CallAIInput {
   messages: Message[];
   maxTokens?: number;
   temperature?: number;
+  /** Optional deadline for bounded non-streaming work. Existing callers keep their current behavior. */
+  signal?: AbortSignal;
   /** Passed through to Gateway calls only (Anthropic branch ignores). Use for tools / response_format. */
   gatewayExtras?: Record<string, unknown>;
   /** Anthropic tool-use (single-turn cap). Gateway branch ignores. */
@@ -248,6 +250,7 @@ async function callAnthropic(entry: ModelEntry, input: CallAIInput): Promise<Cal
         "content-type": "application/json",
       },
       body: JSON.stringify(body),
+      signal: input.signal,
     });
     if (!resp.ok) {
       const t = await resp.text().catch(() => "");
@@ -327,6 +330,7 @@ async function callGateway(entry: ModelEntry, input: CallAIInput): Promise<CallA
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
+    signal: input.signal,
   });
 
   if (!resp.ok) {

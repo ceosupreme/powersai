@@ -35,6 +35,7 @@ export const EDGE_POLICIES: Readonly<Record<string, EdgePolicy>> = {
   "compute-weekly-scores": ADMIN,
   "content-publish-automation": ADMIN,
   "content-publish-automation-undo": {"mode": "project-manager", "resource": {"field": "run_id", "table": "content_automation_runs", "projectColumn": "project_id"}, "rationale": "Verified operator role and project management permission; clients are denied."},
+  "content-studio-run": { ...MEMBER, rationale: "Authenticated HQ team member; handler resolves the stored task and enforces hq_studio_can_access before service-role claim or provider work." },
   "context-programming-suggest": ADMIN,
   "context-sources-pull": ADMIN,
   "create-checkout-session": {"mode": "public", "limit": 10, "windowSeconds": 3600, "dailyGlobalLimit": 500, "rationale": "Public checkout; prices remain server-owned."},
