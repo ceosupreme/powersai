@@ -37,11 +37,11 @@ test('tool steps count as owner steps', () => {
   assert.equal(c.buildRecipeSteps(br, pt, [], [], [])[1].owner_kind, 'owner');
 });
 
-test('planned methods become one "Method not written yet" Claude step', () => {
+test('unfinished methods cannot become invented production steps', () => {
   const draft = m('kdp', { steps: [{ title: 'a' }, { title: 'b' }] }, 'draft');
   const flagged = m('aff', { adds: [{ title: 'x' }], planned: true });
-  const s = c.buildRecipeSteps(br, null, [draft], [flagged], []);
-  assert.deepEqual(s.slice(1).map((x) => [x.title, x.owner_kind]), [['Method not written yet: kdp', 'claude'], ['Method not written yet: aff', 'claude']]);
+  assert.throws(() => c.buildRecipeSteps(br, null, [draft], [], []), /Finish the how-to guide/);
+  assert.throws(() => c.buildRecipeSteps(br, null, [], [flagged], []), /Finish the how-to guide/);
 });
 
 test('monetization then promotion adds are appended in order', () => {
@@ -57,7 +57,9 @@ test('approval, priority and assignee per step', () => {
   const cl = c.stepRow({ title: 'c', owner_kind: 'claude', method_id: null, method_key: 'k' }, 1, ctx);
   assert.deepEqual([own1.approval_status, own2.approval_status, cl.approval_status], ['Approved', 'Blocked', 'Auto']);
   assert.deepEqual([own1.priority, cl.priority], ['P2-High', 'P3-Medium']);
-  assert.deepEqual([own1.assignee, cl.assignee], ['Allmighty', 'Claude']);
+  assert.deepEqual([own1.assignee, cl.assignee], ['Brand owner', 'Claude']);
+  assert.equal(c.stepRow({ title: 'a', owner_kind: 'owner', method_id: null, method_key: 'k' }, 0,
+    { ...ctx, owner_name: 'Allmighty' }).assignee, 'Allmighty');
   assert.equal(own2.step_order, 4);
 });
 

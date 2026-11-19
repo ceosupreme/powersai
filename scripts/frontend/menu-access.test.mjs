@@ -26,7 +26,7 @@ test('menu rows merge shared page keys, keep admin-only rows separate, dashboard
   const dash = rows.find(r => r.pageKey === 'dashboard' && !r.adminOnly);
   assert.deepEqual(dash.labels, ['Dashboard', 'Portfolio', 'Guide', 'Launch Checklist']);
   assert.equal(dash.alwaysOn, true);
-  assert.deepEqual(rows.find(r => r.pageKey === 'content_pipeline' && !r.adminOnly).labels, ['Content', 'Radar']);
+  assert.deepEqual(rows.find(r => r.pageKey === 'content_pipeline' && !r.adminOnly).labels, ['Content Studio', 'Content', 'Radar']);
   assert.deepEqual(rows.filter(r => r.adminOnly).map(r => r.labels[0]), ['Playbooks', 'Production Board', 'Answer Bank', 'Admin Panel']);
   assert.deepEqual(groups.map(g => g.label), m.OWNER_NAV_GROUPS.map(g => g.label));
 });

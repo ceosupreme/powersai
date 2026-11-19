@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TrafficNotice } from '@/components/pipeline/TrafficNotice';
 import { useApproveItem, canApprove } from '@/hooks/useContentProduction';
+import { contentDeliveryGaps } from '@/lib/contentReadiness';
 import { buildStarterPrompt } from '@/lib/pipelineComposer';
 import { playbookStatus } from '@/lib/playbookStatus';
 import { jobStatusWord } from '@/hooks/usePlaybooks';
@@ -61,7 +62,7 @@ function usePipelineJob(jobId: string | undefined) {
         T('brand_kits').select('bio_short,brand_voice,content_mode').eq('project_id', job.project_id).eq('archived', false).maybeSingle(),
         T('content_sources').select('id,title').eq('project_id', job.project_id).eq('source_type', 'niche_profile').order('updated_at', { ascending: false }).limit(1),
         job.target_type === 'content_items' && job.target_id
-          ? T('content_items').select('id,title,brief,idea_score,performance,quality_score,quality_fails,approved_at').eq('id', job.target_id).maybeSingle()
+          ? T('content_items').select('id,title,format,stage,brief,cta,purpose_type,idea_score,performance,quality_score,quality_fails,approved_at').eq('id', job.target_id).maybeSingle()
           : job.target_type === 'channel_products' && job.target_id
             ? T('channel_products').select('id,name,status,price,monthly_sales').eq('id', job.target_id).maybeSingle()
             : job.target_type === 'knowledge_base' && job.target_id
@@ -209,7 +210,7 @@ export default function PipelineJob() {
     catch { toast.error('Could not copy. Your browser blocked the clipboard.'); }
   };
   const approveTarget = async () => {
-    if (!canApprove(target)) return toast.error('Finish the production work for this piece before approving.');
+    if (!canApprove(target)) return toast.error(contentDeliveryGaps(target).join(' · '));
     try { await approve.mutateAsync(target.id); toast.success('Approved'); refetch(); }
     catch (e: any) { toast.error(e?.message ?? 'The database refused the approval'); }
   };
@@ -390,6 +391,9 @@ export default function PipelineJob() {
                         <span>Fails: {(target.quality_fails ?? []).length ? target.quality_fails.join(', ') : 'none'}</span>
                         {target.approved_at ? <span className="font-semibold">Approved</span> : (
                           <Button size="sm" className="h-7" disabled={approve.isPending || !canApprove(target)} onClick={approveTarget}>Approve</Button>
+                        )}
+                        {!target.approved_at && !canApprove(target) && (
+                          <p className="w-full text-muted-foreground">Needs: {contentDeliveryGaps(target).join(' · ')}</p>
                         )}
                       </div>
                     )}
