@@ -322,6 +322,136 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_handoffs: {
+        Row: {
+          action_item_id: string | null
+          attempts: number
+          claimed_at: string | null
+          completed_at: string | null
+          content_item_id: string | null
+          created_at: string
+          due_at: string | null
+          fallback_agent: string | null
+          from_agent: string
+          id: string
+          kind: string
+          last_run_at: string | null
+          notes: string | null
+          parent_id: string | null
+          result: Json | null
+          result_links: Json
+          schedule: string | null
+          spec: Json
+          status: string
+          studio_claim_token: string | null
+          studio_claimed_by: string | null
+          studio_lease_expires_at: string | null
+          title: string
+          to_agent: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          action_item_id?: string | null
+          attempts?: number
+          claimed_at?: string | null
+          completed_at?: string | null
+          content_item_id?: string | null
+          created_at?: string
+          due_at?: string | null
+          fallback_agent?: string | null
+          from_agent: string
+          id?: string
+          kind?: string
+          last_run_at?: string | null
+          notes?: string | null
+          parent_id?: string | null
+          result?: Json | null
+          result_links?: Json
+          schedule?: string | null
+          spec?: Json
+          status?: string
+          studio_claim_token?: string | null
+          studio_claimed_by?: string | null
+          studio_lease_expires_at?: string | null
+          title: string
+          to_agent: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          action_item_id?: string | null
+          attempts?: number
+          claimed_at?: string | null
+          completed_at?: string | null
+          content_item_id?: string | null
+          created_at?: string
+          due_at?: string | null
+          fallback_agent?: string | null
+          from_agent?: string
+          id?: string
+          kind?: string
+          last_run_at?: string | null
+          notes?: string | null
+          parent_id?: string | null
+          result?: Json | null
+          result_links?: Json
+          schedule?: string | null
+          spec?: Json
+          status?: string
+          studio_claim_token?: string | null
+          studio_claimed_by?: string | null
+          studio_lease_expires_at?: string | null
+          title?: string
+          to_agent?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_handoffs_action_item_id_fkey"
+            columns: ["action_item_id"]
+            isOneToOne: false
+            referencedRelation: "action_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_handoffs_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_handoffs_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_handoffs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_handoffs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "agent_handoffs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "agent_handoffs_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_call_log: {
         Row: {
           cost_usd: number | null
@@ -3074,6 +3204,76 @@ export type Database = {
           },
           {
             foreignKeyName: "content_sources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          default_tier: string
+          description: string
+          id: string
+          project_id: string | null
+          recipe: Json
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+          validation_evidence: Json
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          default_tier?: string
+          description?: string
+          id?: string
+          project_id?: string | null
+          recipe?: Json
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+          validation_evidence?: Json
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          default_tier?: string
+          description?: string
+          id?: string
+          project_id?: string | null
+          recipe?: Json
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          validation_evidence?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_templates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_templates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "content_templates_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "venues"
@@ -9293,6 +9493,159 @@ export type Database = {
         }
         Relationships: []
       }
+      post_results: {
+        Row: {
+          account_followers: number | null
+          account_handle: string | null
+          account_size: string | null
+          account_url: string | null
+          angle: string | null
+          baseline_views: number | null
+          captured_on: string
+          comments: number | null
+          content_item_id: string | null
+          created_at: string
+          data: Json
+          follows_gained: number | null
+          format: string | null
+          hook_text: string | null
+          hook_type: string | null
+          id: string
+          likes: number | null
+          notes: string | null
+          outlier_multiple: number | null
+          owner: string
+          placement_id: string | null
+          platform: string
+          post_url: string
+          posted_at: string | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+          snapshot_day: number | null
+          source: string
+          structure: string | null
+          style: string | null
+          top_questions: string[] | null
+          topic: string | null
+          venue_id: string | null
+          views: number | null
+          why_it_spread: string | null
+        }
+        Insert: {
+          account_followers?: number | null
+          account_handle?: string | null
+          account_size?: string | null
+          account_url?: string | null
+          angle?: string | null
+          baseline_views?: number | null
+          captured_on?: string
+          comments?: number | null
+          content_item_id?: string | null
+          created_at?: string
+          data?: Json
+          follows_gained?: number | null
+          format?: string | null
+          hook_text?: string | null
+          hook_type?: string | null
+          id?: string
+          likes?: number | null
+          notes?: string | null
+          outlier_multiple?: number | null
+          owner: string
+          placement_id?: string | null
+          platform: string
+          post_url: string
+          posted_at?: string | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          snapshot_day?: number | null
+          source?: string
+          structure?: string | null
+          style?: string | null
+          top_questions?: string[] | null
+          topic?: string | null
+          venue_id?: string | null
+          views?: number | null
+          why_it_spread?: string | null
+        }
+        Update: {
+          account_followers?: number | null
+          account_handle?: string | null
+          account_size?: string | null
+          account_url?: string | null
+          angle?: string | null
+          baseline_views?: number | null
+          captured_on?: string
+          comments?: number | null
+          content_item_id?: string | null
+          created_at?: string
+          data?: Json
+          follows_gained?: number | null
+          format?: string | null
+          hook_text?: string | null
+          hook_type?: string | null
+          id?: string
+          likes?: number | null
+          notes?: string | null
+          outlier_multiple?: number | null
+          owner?: string
+          placement_id?: string | null
+          platform?: string
+          post_url?: string
+          posted_at?: string | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          snapshot_day?: number | null
+          source?: string
+          structure?: string | null
+          style?: string | null
+          top_questions?: string[] | null
+          topic?: string | null
+          venue_id?: string | null
+          views?: number | null
+          why_it_spread?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_results_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_results_placement_id_fkey"
+            columns: ["placement_id"]
+            isOneToOne: false
+            referencedRelation: "content_placements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_listings: {
         Row: {
           created_at: string | null
@@ -13136,6 +13489,7 @@ export type Database = {
       }
       trend_watch: {
         Row: {
+          angle: string | null
           captured_on: string
           content_item_id: string | null
           created_at: string
@@ -13144,16 +13498,22 @@ export type Database = {
           geo: string
           id: string
           keyword: string
+          make_by: string | null
           notes: string | null
           peak_months: string[] | null
           search_cost: number
           season_opens: string | null
           source: string
+          source_url: string | null
           timeframe: string
+          trend_type: string | null
+          triaged_by: string | null
           venue_id: string | null
+          why_it_spread: string | null
           yoy_pct: number | null
         }
         Insert: {
+          angle?: string | null
           captured_on?: string
           content_item_id?: string | null
           created_at?: string
@@ -13162,16 +13522,22 @@ export type Database = {
           geo?: string
           id?: string
           keyword: string
+          make_by?: string | null
           notes?: string | null
           peak_months?: string[] | null
           search_cost?: number
           season_opens?: string | null
           source: string
+          source_url?: string | null
           timeframe?: string
+          trend_type?: string | null
+          triaged_by?: string | null
           venue_id?: string | null
+          why_it_spread?: string | null
           yoy_pct?: number | null
         }
         Update: {
+          angle?: string | null
           captured_on?: string
           content_item_id?: string | null
           created_at?: string
@@ -13180,13 +13546,18 @@ export type Database = {
           geo?: string
           id?: string
           keyword?: string
+          make_by?: string | null
           notes?: string | null
           peak_months?: string[] | null
           search_cost?: number
           season_opens?: string | null
           source?: string
+          source_url?: string | null
           timeframe?: string
+          trend_type?: string | null
+          triaged_by?: string | null
           venue_id?: string | null
+          why_it_spread?: string | null
           yoy_pct?: number | null
         }
         Relationships: [
@@ -16001,6 +16372,100 @@ export type Database = {
         }
         Relationships: []
       }
+      post_results_latest: {
+        Row: {
+          account_followers: number | null
+          account_handle: string | null
+          account_size: string | null
+          account_url: string | null
+          angle: string | null
+          baseline_views: number | null
+          captured_on: string | null
+          comments: number | null
+          content_item_id: string | null
+          created_at: string | null
+          data: Json | null
+          follows_gained: number | null
+          format: string | null
+          hook_text: string | null
+          hook_type: string | null
+          id: string | null
+          likes: number | null
+          notes: string | null
+          outlier_multiple: number | null
+          owner: string | null
+          placement_id: string | null
+          platform: string | null
+          post_url: string | null
+          posted_at: string | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+          snapshot_day: number | null
+          source: string | null
+          structure: string | null
+          style: string | null
+          top_questions: string[] | null
+          topic: string | null
+          venue_id: string | null
+          views: number | null
+          why_it_spread: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_results_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_results_placement_id_fkey"
+            columns: ["placement_id"]
+            isOneToOne: false
+            referencedRelation: "content_placements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_asset_map"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "v_brand_setup_summary"
+            referencedColumns: ["venue_id"]
+          },
+          {
+            foreignKeyName: "post_results_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trending_now_momentum: {
+        Row: {
+          days_seen: number | null
+          first_seen: string | null
+          first_traffic: number | null
+          last_seen: string | null
+          latest_headline: string | null
+          latest_traffic: number | null
+          latest_url: string | null
+          momentum: string | null
+          peak_traffic: number | null
+          related_topics: number | null
+          times_seen: number | null
+          topic: string | null
+        }
+        Relationships: []
+      }
       v_ai_call_log_rollup_7d: {
         Row: {
           avg_latency_ms: number | null
@@ -16386,6 +16851,130 @@ export type Database = {
       hq_set_crew_default_brands: {
         Args: { p_brand_ids: string[]; p_crew_key: string }
         Returns: undefined
+      }
+      hq_studio_can_access: { Args: { p_project_id: string }; Returns: boolean }
+      hq_studio_cancel: { Args: { p_handoff_id: string }; Returns: Json }
+      hq_studio_claim: {
+        Args: { p_handoff_id: string; p_worker?: string }
+        Returns: Json
+      }
+      hq_studio_complete: {
+        Args: {
+          p_claim_token: string
+          p_expected_revision: number
+          p_handoff_id: string
+          p_result: Json
+          p_result_links?: Json
+          p_status?: string
+        }
+        Returns: Json
+      }
+      hq_studio_record_result: {
+        Args: { p_content_id: string; p_metrics: Json; p_placement_id: string }
+        Returns: Json
+      }
+      hq_studio_request: {
+        Args: {
+          p_action_item_id?: string
+          p_content_id: string
+          p_expected_revision: number
+          p_idempotency_key: string
+          p_instructions?: string
+          p_task_type: string
+        }
+        Returns: Json
+      }
+      hq_studio_results: {
+        Args: { p_content_id: string }
+        Returns: {
+          account_followers: number | null
+          account_handle: string | null
+          account_size: string | null
+          account_url: string | null
+          angle: string | null
+          baseline_views: number | null
+          captured_on: string
+          comments: number | null
+          content_item_id: string | null
+          created_at: string
+          data: Json
+          follows_gained: number | null
+          format: string | null
+          hook_text: string | null
+          hook_type: string | null
+          id: string
+          likes: number | null
+          notes: string | null
+          outlier_multiple: number | null
+          owner: string
+          placement_id: string | null
+          platform: string
+          post_url: string
+          posted_at: string | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+          snapshot_day: number | null
+          source: string
+          structure: string | null
+          style: string | null
+          top_questions: string[] | null
+          topic: string | null
+          venue_id: string | null
+          views: number | null
+          why_it_spread: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "post_results"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      hq_studio_save: {
+        Args: {
+          p_content_id: string
+          p_expected_revision: number
+          p_patch: Json
+        }
+        Returns: Json
+      }
+      hq_studio_tasks: {
+        Args: { p_content_id: string }
+        Returns: {
+          action_item_id: string | null
+          attempts: number
+          claimed_at: string | null
+          completed_at: string | null
+          content_item_id: string | null
+          created_at: string
+          due_at: string | null
+          fallback_agent: string | null
+          from_agent: string
+          id: string
+          kind: string
+          last_run_at: string | null
+          notes: string | null
+          parent_id: string | null
+          result: Json | null
+          result_links: Json
+          schedule: string | null
+          spec: Json
+          status: string
+          studio_claim_token: string | null
+          studio_claimed_by: string | null
+          studio_lease_expires_at: string | null
+          title: string
+          to_agent: string
+          updated_at: string
+          venue_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "agent_handoffs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       hq_subject_person: {
         Args: { p_subject_id: string; p_subject_type: string }
