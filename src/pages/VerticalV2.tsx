@@ -165,6 +165,8 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
   const sectionOrder = sequence ?? ["local-audience", "leaks", "differentiators", "features", "local-plan", "owner", "offer", "facts", "questions", "contact"].map(key => ({ key, tone: "ivory" }));
   // Prices and packages can sit in two neighboring sections; the first one is the #pricing target.
   const pricingAt = sectionOrder.findIndex((item: { key: string }) => item.key === "offer" || item.key === "packages");
+  // Pages without an offer section show the approved terms line under the starter packages instead.
+  const hasOffer = sectionOrder.some((item: { key: string }) => item.key === "offer");
   const heading = (text: string) => <h2 className="industry-title">{text}</h2>;
   const cards = (items: any[], cols = "three") => <div className={`industry-list industry-list-${cols}`}>{items.map((item, i) => <article key={i}><span className="industry-number">0{i + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>;
   const PriceRow = ({ text, children }: { text: string; children: React.ReactNode }) => text ? <div className="industry-price-row"><p>{text}</p><div className="industry-price-actions">{children}</div></div> : null;
@@ -188,7 +190,7 @@ export default function VerticalV2({ row: baseRow, slug }: { row: any; slug: str
         const picks = arr<string>(layout?.services).map((s) => serviceRows.find((r) => r.slug === s)).filter((r): r is ServicePageRow => !!r);
         return picks.length > 0 && <>{heading(L.services)}<div className="sp-v2-services">{picks.map((r) => <ServiceCard key={r.slug} row={r} from={`v2_${slug.replace(/-/g, "_")}`} trace/>)}</div></>;
       }
-      case "packages": return <>{heading(L.packages)}<StarterStrip src={src}/></>;
+      case "packages": return <>{heading(L.packages)}<StarterStrip src={src}/>{!hasOffer && row.guarantee_line && <p className="industry-lede">{row.guarantee_line}</p>}</>;
       case "areas": return cityRows.length > 0 && <>{heading(L.areas)}<div className="sp-v2-areas">{cityRows.map((c) => <Link key={c.slug} to={`/areas/${c.slug}`} onClick={() => track(`v2_area_${c.slug}`)}><MapPin aria-hidden/>{c.name}</Link>)}</div></>;
       case "contact": return <div className="industry-contact">{heading(L.inquiry_title)}<p>{L.inquiry_sub}</p><VerticalInquiry config={inquiryConfig} biz={biz} language={lang}/></div>;
       default: return null;
