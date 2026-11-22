@@ -169,7 +169,8 @@ export const CreateUserDialog = ({ bars, onUserCreated }: CreateUserDialogProps)
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      const newUserId = data?.user_id || data?.id;
+      // create-user returns { success, user: { id } }; older shapes kept as fallbacks.
+      const newUserId = data?.user?.id || data?.user_id || data?.id;
       createdAccountId = newUserId ?? null;
       if (!newUserId) throw new Error('Account creation did not return a user ID; verify the account before trying again.');
 

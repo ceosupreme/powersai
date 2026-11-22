@@ -196,7 +196,8 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
             </Select>
           )}
 
-          {/* New Task */}
+          {/* New Task (hidden on /tasks, which has its own New Task button) */}
+          {pathname !== '/tasks' && (
           <Button
             variant="outline"
             size="sm"
@@ -207,6 +208,7 @@ export const GlobalHeader = ({ showVenueSelector = false, showDateSelector = tru
             <Plus className="h-4 w-4 text-primary" />
             <span className="hidden md:inline text-sm">New Task</span>
           </Button>
+          )}
 
           {/* Search */}
           <Button

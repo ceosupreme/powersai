@@ -17,7 +17,7 @@ The Production Board shows the content pieces of all your brands in one place, s
   - Content mode: "Any content mode", "Growth", "Baseline" or "Parked".
   - Channel: "Any channel", or one of instagram, facebook, pinterest, tiktok, youtube, blog, email, x, linkedin or other.
 - A "Four-week mix" card, only when one brand is chosen. It shows how many pieces were created for that brand in the last 28 days, a colored bar split by purpose, each purpose's share next to its target (such as "40% · target 30%"), a "No purpose set" count, and red warnings when the mix is off.
-- Stage tabs, each with a count: "Research" (pieces at Idea), "Writing" (Script), "Images" (Design and Thumbnail), "Video" (Record and Edit) and "Scheduling" (Scheduled). After the tabs, "Done:" counts the published pieces.
+- Stage tabs, each with a count: "Research" (pieces at Idea), "Writing" (Script), "Images" (Design and Thumbnail), "Video" (Record and Edit), "Scheduling" (Scheduled), "Published" and "Parked" (pieces set aside). The tab counts add up to the total shown above them. After the tabs, "Live links recorded" counts the published pieces with a saved link.
 - Cards for the pieces in the open tab. Each card shows:
   - Badges: the brand's name, the purpose, "Idea" with the idea score, "Quality" with the quality score, "Approved" once approved, and the format.
   - The title, and the family it belongs to or "No family yet".

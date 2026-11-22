@@ -26,13 +26,16 @@ import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
 
-const TABS: { key: string; label: string; stages: ContentStage[] }[] = [
+// "parked" is a database stage outside ContentStage; it gets its own tab so the
+// header total and the tab counts always add up.
+const TABS: { key: string; label: string; stages: string[] }[] = [
   { key: "research", label: "Research", stages: ["idea"] },
   { key: "writing", label: "Writing", stages: ["script"] },
   { key: "images", label: "Images", stages: ["design", "thumbnail"] },
   { key: "video", label: "Video", stages: ["record", "edit"] },
   { key: "scheduling", label: "Scheduling", stages: ["scheduled"] },
   { key: "published", label: "Published", stages: ["published"] },
+  { key: "parked", label: "Parked", stages: ["parked"] },
 ];
 
 export default function ProductionBoard() {
@@ -230,7 +233,7 @@ export default function ProductionBoard() {
               <TabsTrigger key={t.key} value={t.key}>
                 {t.label}{" "}
                 <span className="ml-1 text-muted-foreground">
-                  {filtered.filter((it) => t.stages.includes(it.stage as ContentStage)).length}
+                  {filtered.filter((it) => t.stages.includes(it.stage as string)).length}
                 </span>
               </TabsTrigger>
             ))}
@@ -240,7 +243,7 @@ export default function ProductionBoard() {
           </TabsList>
 
           {TABS.map((t) => {
-            const rows = filtered.filter((it) => t.stages.includes(it.stage as ContentStage));
+            const rows = filtered.filter((it) => t.stages.includes(it.stage as string));
             return (
               <TabsContent key={t.key} value={t.key} className="mt-4">
                 {rows.length === 0 ? (
