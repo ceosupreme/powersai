@@ -85,6 +85,13 @@
       "when": 1795710238571,
       "tag": "0011_agent_desk_part1",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795710434183,
+      "tag": "0012_agent_desk_part2_fixes",
+      "breakpoints": true
     }
   ]
 }

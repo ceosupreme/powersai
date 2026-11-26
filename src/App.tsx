@@ -59,6 +59,7 @@ const Radar = lazy(() => import("./pages/Radar"));
 const Playbooks = lazy(() => import("./pages/Playbooks"));
 const MethodsRedirect = lazy(() => import("./pages/MethodsRedirect"));
 const ProductionBoard = lazy(() => import("./pages/ProductionBoard"));
+const AgentDesk = lazy(() => import("./pages/AgentDesk"));
 const AnswerBank = lazy(() => import("./pages/AnswerBank"));
 const ChannelRevenue = lazy(() => import("./pages/ChannelRevenue"));
 const AffiliatePrograms = lazy(() => import("./pages/AffiliatePrograms"));
@@ -306,6 +307,11 @@ const App = () => {
                 <Route path="/content-studio" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ContentStudio /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/agent-desk" element={
+                  <ProtectedRoute pageKey="agent_desk">
+                    <AppLayout><AgentDesk /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/content" element={

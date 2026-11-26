@@ -32,7 +32,8 @@ export type PageKey =
   | 'prospect_dock'
   | 'client_approvals'
   | 'outreach_templates'
-  | 'project_home';
+  | 'project_home'
+  | 'agent_desk';
 
 // Roles that use the simplified staff portal layout
 export const STAFF_PORTAL_ROLES: AppRole[] = ['staff', 'shift_lead'];
@@ -104,6 +105,7 @@ export const PAGE_CONFIG: { key: PageKey; label: string; canDisable: boolean }[]
   { key: 'outreach_templates', label: 'Outreach Templates', canDisable: true },
   { key: 'project_home', label: 'Project Home', canDisable: true },
   { key: 'client_approvals', label: 'Client Approvals', canDisable: true },
+  { key: 'agent_desk', label: 'Agent Desk', canDisable: true },
 ];
 
 // Map route paths to page keys
@@ -156,6 +158,7 @@ export const ROUTE_TO_PAGE_KEY: Record<string, PageKey> = {
   '/staff/logs': 'logs',
   '/staff/shift': 'dashboard',
   '/staff/my-shift': 'dashboard',
+  '/agent-desk': 'agent_desk',
 };
 
 /** Resolve dynamic routes without requiring every caller to repeat its page key. */

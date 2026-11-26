@@ -28,6 +28,7 @@ import {
   MessageSquare,
   Rocket,
   Settings,
+  Bot,
   type LucideIcon,
 } from 'lucide-react';
 import type { PageKey } from '@/types/permissions';
@@ -57,6 +58,7 @@ export const OWNER_NAV_GROUPS: OwnerNavGroup[] = [
     items: [
       { path: '/workspace', label: 'Dashboard', icon: Sunrise, pageKey: 'dashboard' },
       { path: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, pageKey: 'dashboard' },
+      { path: '/agent-desk', label: 'Agent Desk', icon: Bot, pageKey: 'agent_desk' },
       { path: '/weekly-review', label: 'Weekly Review', icon: CalendarCheck, pageKey: 'weekly_review' },
       { path: '/insights', label: 'Insights', icon: Lightbulb, pageKey: 'insights' },
       { path: '/employees', label: 'Team', icon: Users, pageKey: 'employees' },
