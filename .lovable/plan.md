@@ -1,115 +1,75 @@
-# Sales system in HQ: calling, texting, email sequences, booking, alerts
+# Agent Desk plan
 
-Plan only. Nothing is built until you approve a phase.
+## What we found in the real mailbox (72 rows, read today)
+- 3 agents plus "owner" as a recipient. Kinds: task, standing job, question, reply, report. Statuses: new, claimed, done, failed, needs owner, cancelled, active.
+- 4 items wait on the owner, the oldest 7 days (Jenna Banks Facebook access question from Muse; Muse's Jenna stats task; Matrix test clips; WO-014).
+- 12 ChatGPT social posts are failed, all "Blocked at the Google Drive image upload"; their Drive folders hold copy but no images.
+- 12 open items are past due; 2 "new" items are over 3 days old; nothing is currently "claimed".
+- 47 rows have proof links (Drive folders, Facebook/Instagram posts); 6 finished items have no proof link.
+- Brand link: 60 rows set the brand (venue_id), 12 do not; some also put brands in `spec.brands` (sometimes text, sometimes a list) or `spec.hq_project_id`.
+- 14 rows link to a to-do (closing the row also closes the to-do, by trigger); 2 link to a Content Studio item. No row uses `parent_id` yet.
 
-## A. What exists and what I would reuse (checked in code)
+## Risks in the current setup
+1. **Only admins can read; nobody can change rows from the app.** There is no update policy, so today the owner cannot answer or close anything in HQ, and brand helpers cannot see their brand's work at all.
+2. **Failed batch has one shared cause** (Drive image upload). It looks like 12 problems but is one. The Desk should group same-reason failures.
+3. **"Needs owner" has no clear question field.** Asks are spread across `notes`, `spec.owner_part`, `spec.detail`, or the title. Answers have nowhere defined to go.
+4. **Brand tagging is inconsistent** (12 untagged, three different places). Brand pages would miss work.
+5. **Due dates and "done" without proof** are not enforced. Fine for agents, but the screen must show it.
+6. Rows created directly in the database skip any app logic, so every rule must live in the database or be read-only display logic that tolerates odd rows.
 
-Confirmed:
-- Leads page `/prospects` (`ProspectDock.tsx`, `src/components/prospects/*`, rules in `src/lib/leads.ts`), `prospects.outreach_mode`, `prospect_activity`, the nine statuses.
-- Send adapters: `supabase/functions/_shared/send-adapters.ts` defines one `SendAdapter` interface with `manual_log` and Resend email. SMS/DM are declared in the channel type but have no adapter. This is the right seam for Twilio and Gmail.
-- Queue engine functions: `automation-queue-sweeper`, `automation-send-approved`, `automation-stop-condition-sweep`, `enqueue-followup-sequence`, `followup-cadence-tick`, `send-adapter-status`, plus shared `automation-state.ts`, `worker-lease.ts`, `webhook-signature.ts`, `inbound-forwarding.ts`.
-- Inbound mail: `resend-inbound-webhook` writes `inbound_emails`.
-- `BookingCta.tsx` reads `site_settings.booking_url`.
-- Owner alerts: `notify-owner-inquiry`, `alert-emergency-lead`.
+## What the owner sees (phone-first)
+One new page, **Agent Desk**, in the side menu (admin can grant it per role/person like other items).
+- **Top strip: "Needs you"** — every item waiting on the owner, oldest first, with how long it has waited and the question in plain words. Big Answer button.
+- **Three agent cards: Claude, Muse, ChatGPT** — "Working on", "Waiting to start", "Stuck", "Finished this week" counts. Tap to filter.
+- **Stuck and late** — failed, past due, or unstarted for over 2 days, with "for 3 days" style ages. Same-reason failures shown as one group ("12 social posts: blocked at the Google Drive image upload").
+- **Repeating jobs** — each standing job, its schedule in words, when it last ran, and a "Missed" flag when the last run is older than its schedule allows.
+- **Recently finished** — with a proof button per link (opens Drive/post). "No proof link" shown plainly when missing.
+- Filters: agent, brand, status words. Search by title.
+- **Task sheet** (tap any row): what was asked (readable view of the instructions, not raw data), who sent it, to whom, due, history (created, last run, finished), result summary, proof links, linked to-do or Content Studio item.
 
-Corrections to your list:
-- The engine is keyed to `inbound_leads`: `followup_sequence_runs` is unique on `lead_id`, and the stop sweep looks up runs by `lead_id`. Prospects are not in it. Your read is right.
-- There is already a `transcribe-audio` function and an `openai-realtime-*` voice pair; voicemail transcripts can reuse the first, and the second is unrelated to calling.
-- Not verified yet (I will check before Phase 1, read-only): the exact queue columns that tie a message to a recipient, and whether `email_suppressions` (it exists, project-scoped) can serve as the opt-out list. If it fits, no new suppression table is needed for email.
+### Owner actions (in the task sheet)
+- **Answer** (for items waiting on him) — writes his answer, sends it back to the agent as ready to start.
+- **Send back with a note** — returns to the same agent as new, note kept.
+- **Hand to another agent** — pick Claude, Muse or ChatGPT.
+- **Cancel** — with optional reason.
+- **Mark done with proof** — paste a Drive link (required) and short summary. This also closes any linked to-do, as today.
+- **Retry group** for a same-reason failed batch.
 
-## B. Recommended architecture, and where I differ
+Muse and ChatGPT, signed in as the owner, use the same sheet with a filter "Show my tasks" (agent picker remembered in the browser) and the same Mark done with proof button.
 
-```text
-Lead (prospects)  <-- one "contact point" per phone/email
-   |                         |
-Sequence run (generic)    Conversations (calls, texts, emails) -> prospect_activity
-   |                         |
-Queue -> Send adapters (Gmail, Twilio SMS, manual)   Webhooks in (Twilio, Gmail push, booking)
-                     |
-            Stop rules + stage rules (one shared module)
-```
+### Brand page
+Brand Today tab > **Latest work** gains agent mailbox rows (finished items with proof) alongside crew runs. A small **"Agents on this brand"** card shows open, stuck and waiting-on-owner counts, linking to the Desk filtered to that brand. Brand helpers see their brand's rows read-only; they cannot act.
 
-Where I would do it differently:
-1. **Bridge prospects and inbound_leads by making the engine target-neutral, not by copying leads.** Add `subject_type` ('prospect' | 'inbound_lead') + `subject_id` to sequence runs and the queue, keep `lead_id` for old rows. Then one inbound form submission auto-creates or links a prospect (via the existing `hq_promote_inbound_lead` style), so the Leads page becomes the single list. Reason: two parallel lead lists is the biggest long-term confusion risk.
-2. **One stage-rules module** (database function, called by every webhook) decides moves: reply -> Replied, booking -> Meeting booked, never moves a lead backward, never touches Won/Dead. Reason: today each feature would otherwise move stages its own way.
-3. **Do-not-contact checked at send time inside the adapter layer**, not only at enroll. Reason: a lead can opt out between queue and send.
-4. **Email: human mail on the root domain in Google Workspace; system mail on a subdomain** (for example `mail.supremeteammedia.com` for Resend sending and login mail, and `in.supremeteammedia.com` if any automated receiving is still wanted). I agree Resend stays only for system/login mail. Reply detection uses Gmail push (Google Pub/Sub watch) with a 10-minute history poll as backup. Reason: push alone can silently stop.
-5. **Booking: build our own** page, but keep it simple at first (one meeting type, weekly hours, buffer, minimum notice). Busy times read from Google Calendar free/busy; event created with a Meet link. Reason: owning it lets booking write straight to the lead; the risk is time-zone bugs, so it gets thorough tests.
-6. **Calling: bridged call as you outlined** (Twilio rings his cell, then the lead, shows the business number). I agree. I would add a "call from my own cell" fallback button (plain tel: link) that still logs the call, for when Twilio is down.
-7. **Alerts: add a phone home-screen web push** later as a third option; email until texting is approved. In-app: a red count on the Leads menu item and an "Needs reply" filter.
-8. **Connection method:** use Lovable's Google connectors (Gmail, Google Calendar) and Twilio connector where they fit, instead of a hand-made OAuth app. Caveat: those connectors act as the builder's one account, which matches the owner today. For per-client installs later, Twilio subaccounts per client still work; Gmail per salesperson would need the per-user Google connection. Decision point for you.
+## Reuse, extend, merge (no second board)
+- **Dashboard "Waiting on me"**: extend; mailbox items waiting on the owner appear there, linking to the task sheet. No separate owner inbox.
+- **Brand Latest work / brand pulse**: extend the existing batched feed with finished mailbox rows; Portfolio "last work" picks them up automatically.
+- **Admin Panel > Crews**: keep as is (it answers "did the scheduled run happen"). Add a link from Crews to the Desk; standing jobs live on the Desk only.
+- **Content Studio requests**: keep showing per-item requests there; the Desk shows them too (same rows) with a link to the Studio item. Studio-claimed rows are read-only on the Desk so the Studio's lease is never broken.
+- **TaskExplainer / Ask**: reuse the "Ask about this" panel in the task sheet.
 
-## C. Phases (recommended order)
+## Database changes (need your approval; additive only)
+1. **Owner action functions** (secure, admin-checked): answer, send back, reassign, cancel, mark done with proof. Each one writes a reply row into the same mailbox (kind "reply", linked by `parent_id`) so agents read answers the same way they read work, and updates the original. No direct table edit rights for the app.
+2. **Two optional columns**: `owner_question text` (what the agent needs from the owner) and `brand_ids uuid[]` (all brands a row covers). A database trigger fills `brand_ids` from `venue_id`, `spec.brands`/`spec.brand_ids` when agents leave it blank, tolerating text or lists, so outside writes stay tidy without agents changing anything. One-time backfill for existing rows.
+3. **Brand helper read policy**: brand-assigned people can read rows tagged with their brand. Existing admin read policy unchanged.
+4. A short note for the agents' instructions: put the ask in `owner_question`, and always add a proof link when done. (Text for you to give them; not code.)
 
-Credit estimates are rough.
+## Left out of version 1
+- Notifications (email/text) when something waits on the owner.
+- Agents creating work orders from the screen; editing instructions.
+- Charts/history beyond "this week".
+- Automatic retry or fixing the Drive upload problem itself (flagged above; it is an agent-side fix).
 
-**Phase 0 — Foundations (no outside accounts).** ~15–25 credits
-- Owner sees: Do-not-contact switch on each lead; "Opted out" badge; inbound form leads appear on Leads automatically; top-5 leads card on Today; real assignee names.
-- Database: `prospects.do_not_contact`, `opted_out_at`, `opt_out_channel`; generic subject columns on runs/queue; `contact_points` (lead, kind, value normalized E.164/lowercase, opted_out); stage-rules function; a safe "team names" view so non-admins see names.
-- Functions: adapter gate for do-not-contact; enqueue accepts prospects.
-- Test without credentials: fully, using `manual_log`.
+## HQ Guide
+New page "Agent Desk"; updates to Today/Waiting on me, Overview Latest work, Nightly crews, Content Studio and glossary (plain words for each status).
 
-**Phase 1 — Calling (Twilio voice).** ~25–35 credits
-- Owner sees: Call button on a lead rings his cell then connects; calls log automatically with length; inbound calls to the business number forward to his cell; missed calls leave voicemail with transcript on the lead; phone settings page with honest "Texting: waiting on carrier approval".
-- Database: `calls` (direction, from/to, status, duration, recording, transcript, prospect_id), `phone_settings` (business number, owner cell, voicemail greeting, texting status).
-- Functions: `twilio-call-start`, `twilio-voice-webhook` (TwiML), `twilio-status-webhook`, voicemail transcription via existing `transcribe-audio`. Signature check on every webhook.
-- Needs from owner: Twilio connection, one business number, his cell, start A2P 10DLC registration now (in parallel).
-- Outside steps: point the number's voice webhook at our function.
-- Test without credentials: TwiML output and call matching logic; real call needs the number.
+## Rough credit estimate
+- Database (functions, columns, trigger, policy, backfill): ~4-6
+- Desk page, task sheet, actions: ~8-12
+- Brand page, Waiting on me, Latest work extensions: ~3-5
+- Guide, tests (status words, stuck/missed rules, brand tagging), phone checks: ~3-4
+- Total roughly 18-27 credits.
 
-**Phase 2 — Gmail sending, reply detection, mail cutover.** ~30–40 credits
-- Owner sees: Email button and sequences send from his real mailbox and thread normally; replies show on the lead and Inbox, sequence stops, stage moves to Replied; owner gets an email alert.
-- Database: `email_threads`/messages linked to prospect (or extend `inbound_emails` with `source` and `prospect_id`), gmail sync cursor.
-- Functions: Gmail send adapter, `gmail-push-webhook`, `gmail-history-poll`, unsubscribe link + one-click List-Unsubscribe page.
-- Needs: Workspace mailbox, Gmail connection, Pub/Sub topic (if via own Google Cloud).
-- DNS cutover order: 1) add subdomain for Resend sending and verify, move system/login senders; 2) lower MX TTL; 3) switch root MX to Google, update SPF to include both, DKIM for Google, DMARC at p=none; 4) keep Resend receiving on the subdomain for 2 weeks and forward anything stray; 5) Inbox Email tab reads both sources.
-- Test without credentials: message building, threading headers, reply matching, unsubscribe.
-
-**Phase 3 — Sequences on leads.** ~20–30 credits
-- Owner sees: Auto switch enrolls the lead in a chosen sequence; each first message waits in the approval inbox; a sequence can be marked "proven" to send without approval; stops on reply, booking, opt-out, Won/Dead; a sequence editor (steps, wait days, channel, template with merge fields).
-- Database: sequence definitions (reuse `automation_bundles` if its shape fits, verified first), per-sequence `approval_mode`, send windows (business hours in lead's time zone).
-- Test without credentials: entirely with `manual_log`.
-
-**Phase 4 — Booking page.** ~30–40 credits
-- Owner sees: public booking page, availability settings, conflict-free slots from his calendar, confirmation + reminder emails (texts later), reschedule/cancel links, lead created/updated and moved to Meeting booked; `booking_url` filled so the site's button uses it.
-- Database: `availability_rules`, `bookings` (token for reschedule/cancel).
-- Functions: `booking-slots`, `booking-create`, `booking-manage`, reminder sweep.
-- Needs: Google Calendar connection.
-- Test without credentials: slot math and time zones with tests; calendar calls need connection.
-
-**Phase 5 — Texting (after A2P approval).** ~20–30 credits
-- Owner sees: text thread on each lead and in Inbox; inbound texts matched by phone or create a lead; missed-call text-back; STOP/START/HELP handled; text alerts to his cell; texts as sequence steps.
-- Database: `text_messages`; uses `contact_points.opted_out`.
-- Functions: Twilio SMS adapter, `twilio-sms-webhook`.
-- Switch stays off in `phone_settings` until approval is recorded.
-
-**Phase 6 — Polish and salespeople.** ~15–20 credits
-- Per-salesperson assignment rules, round-robin, "my day" call list, reporting (contacts per day, reply rate, bookings, won).
-
-## D. What you can safely do outside this chat
-- Safe for you: loading sequence templates and copy once tables exist; seeding availability hours; backfilling `contact_points` from existing prospects with a query I give you; marking known opt-outs.
-- Must be built here together: every schema change, the stage-rules function, adapters and webhooks, and screens, so the types, rules and guide stay in one consistent shape.
-
-## E. Risks and unknowns
-- A2P 10DLC can be rejected; texting date is outside our control.
-- Gmail sending limits (about 2,000/day Workspace) and deliverability of cold email from his main mailbox; I recommend low daily caps and warm-up.
-- Cold-calling/texting law (TCPA, consent for texts to people who never gave their number); texts to scraped leads may need consent first. I would only allow auto-texts to leads with recorded consent or who texted first.
-- Call recording consent in California: two-party; recording off by default, or an announcement.
-- Connector fits for Gmail push and Calendar must be confirmed before Phase 2/4.
-- Leads page fixes along the way: real assignee names (Phase 0), top-5 card on Today (Phase 0), "Add note" not counting as contact (keep, confirm), drag and export untested (test in Phase 0).
-
-## F. What a GoHighLevel user would also expect
-- One unified conversation view per lead across call, text, email.
-- Templates and snippets, merge fields.
-- Tasks/reminders from follow-up dates with a daily list.
-- Lead source tracking and simple reporting.
-- Forms/funnels feeding leads (already have inbound forms).
-- Review requests after Won (engine exists).
-- Pipeline value per deal, and won/lost reasons.
-- Mobile notifications.
-
-## Decisions I need from you
-1. Merge inbound form leads into the Leads list (recommended) or keep them separate?
-2. Use Lovable's Google and Twilio connections, or your own Internal Google app?
-3. Allow auto-texts only to leads with consent (recommended)?
-4. Approve starting with Phase 0 + 1.
+## Technical notes
+- Shared rules in `src/lib/agentDesk.ts` (status words, stuck/late/missed, group-by-failure-reason, readable spec, brand resolution) with tests; one hook `useAgentDesk`.
+- Standing job "missed" uses the schedule text heuristically (daily/weekly/monthly); unrecognized schedules show last run only.
+- Times shown in Pacific.
