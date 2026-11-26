@@ -326,6 +326,7 @@ export type Database = {
         Row: {
           action_item_id: string | null
           attempts: number
+          brand_ids: string[]
           claimed_at: string | null
           completed_at: string | null
           content_item_id: string | null
@@ -337,6 +338,7 @@ export type Database = {
           kind: string
           last_run_at: string | null
           notes: string | null
+          owner_question: string | null
           parent_id: string | null
           result: Json | null
           result_links: Json
@@ -354,6 +356,7 @@ export type Database = {
         Insert: {
           action_item_id?: string | null
           attempts?: number
+          brand_ids?: string[]
           claimed_at?: string | null
           completed_at?: string | null
           content_item_id?: string | null
@@ -365,6 +368,7 @@ export type Database = {
           kind?: string
           last_run_at?: string | null
           notes?: string | null
+          owner_question?: string | null
           parent_id?: string | null
           result?: Json | null
           result_links?: Json
@@ -382,6 +386,7 @@ export type Database = {
         Update: {
           action_item_id?: string | null
           attempts?: number
+          brand_ids?: string[]
           claimed_at?: string | null
           completed_at?: string | null
           content_item_id?: string | null
@@ -393,6 +398,7 @@ export type Database = {
           kind?: string
           last_run_at?: string | null
           notes?: string | null
+          owner_question?: string | null
           parent_id?: string | null
           result?: Json | null
           result_links?: Json
@@ -16626,6 +16632,95 @@ export type Database = {
       }
     }
     Functions: {
+      agent_desk_answer: {
+        Args: { p_answer: string; p_id: string }
+        Returns: Json
+      }
+      agent_desk_append_note: {
+        Args: { _line: string; _notes: string }
+        Returns: string
+      }
+      agent_desk_cancel: {
+        Args: { p_id: string; p_reason?: string }
+        Returns: Json
+      }
+      agent_desk_guard: {
+        Args: { _id: string }
+        Returns: {
+          action_item_id: string | null
+          attempts: number
+          brand_ids: string[]
+          claimed_at: string | null
+          completed_at: string | null
+          content_item_id: string | null
+          created_at: string
+          due_at: string | null
+          fallback_agent: string | null
+          from_agent: string
+          id: string
+          kind: string
+          last_run_at: string | null
+          notes: string | null
+          owner_question: string | null
+          parent_id: string | null
+          result: Json | null
+          result_links: Json
+          schedule: string | null
+          spec: Json
+          status: string
+          studio_claim_token: string | null
+          studio_claimed_by: string | null
+          studio_lease_expires_at: string | null
+          title: string
+          to_agent: string
+          updated_at: string
+          venue_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "agent_handoffs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      agent_desk_log: {
+        Args: {
+          _extra?: Json
+          _note: string
+          _r: Database["public"]["Tables"]["agent_handoffs"]["Row"]
+          _title: string
+        }
+        Returns: undefined
+      }
+      agent_desk_mark_done: {
+        Args: {
+          p_id: string
+          p_label?: string
+          p_summary?: string
+          p_url: string
+        }
+        Returns: Json
+      }
+      agent_desk_mark_posted: {
+        Args: { p_id: string; p_platform: string; p_url: string }
+        Returns: Json
+      }
+      agent_desk_reassign: {
+        Args: { p_id: string; p_note?: string; p_to_agent: string }
+        Returns: Json
+      }
+      agent_desk_retry: {
+        Args: { p_ids: string[]; p_note?: string }
+        Returns: Json
+      }
+      agent_desk_send_back: {
+        Args: { p_id: string; p_note: string }
+        Returns: Json
+      }
+      agent_handoff_resolve_brands: {
+        Args: { _spec: Json; _venue: string }
+        Returns: string[]
+      }
       brand_setup_summaries: {
         Args: { p_venue_ids: string[] }
         Returns: {
@@ -16944,6 +17039,7 @@ export type Database = {
         Returns: {
           action_item_id: string | null
           attempts: number
+          brand_ids: string[]
           claimed_at: string | null
           completed_at: string | null
           content_item_id: string | null
@@ -16955,6 +17051,7 @@ export type Database = {
           kind: string
           last_run_at: string | null
           notes: string | null
+          owner_question: string | null
           parent_id: string | null
           result: Json | null
           result_links: Json
