@@ -1,5 +1,10 @@
 # Roadmap
 
+## Agent Desk Part 3
+- [x] Keep all open mailbox rows and unposted files, refresh every 30 seconds, fetch sheet history, fix monthly cadence; completion companion trigger and 31-row backfill
+- [x] Connect brand Today/Latest work/shared pulse and deduplicated Dashboard asks; preserve brand RLS and admin-only owner actions
+- [x] Update HQ Guide; 29 rule/data/completion tests pass, preview builds pass; signed-in owner 380px/1280px brand links, proof, deduplicated asks, history and refresh checked; answer submission intercepted without writes. Existing guide route/plain-text checks still fail; real helper session not exercised. No publishing or agent-instruction note.
+
 ## Leads page
 - [x] One Leads page: list/board, filters, detail sheet, quick log, add lead, CSV/PDF export, manager/staff access via menu switches (unpublished)
 - [ ] Workspace top-5 prospects card: no such card exists in the app yet (waiting on owner decision)

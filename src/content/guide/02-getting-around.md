@@ -17,7 +17,7 @@ On a computer, the side menu runs down the left in seven groups:
 - "Workspace": "Dashboard", "Portfolio", "Weekly Review", "Insights", "Team".
 - "Clients & Leads": "CRM", "Capture Inbox", "Automation Inbox", "Reactivation", "Recovery Reports".
 - "Growth & Marketing": "Growth Audit", "Leak Stack", "Leads", "Money Lanes", "Marketing Hub".
-- "Content & Production": "Content", "Radar", "Playbooks", "Production Board", "Answer Bank".
+- "Content & Production": "Content Studio", "Agent Desk", "Content", "Radar", "Playbooks", "Production Board", "Answer Bank".
 - "Brand & Assets": "Brand Kit", "Offers", "Products", "Affiliate Programs", "Channel Revenue".
 - "Tools": "Tasks", "Logs", "Chat", "Outreach Templates".
 - "System": "Guide", "Launch Checklist", "Admin Panel".

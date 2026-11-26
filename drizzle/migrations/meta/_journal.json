@@ -92,6 +92,13 @@
       "when": 1795710434183,
       "tag": "0012_agent_desk_part2_fixes",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795711256789,
+      "tag": "0013_agent_handoff_completion_stamp",
+      "breakpoints": true
     }
   ]
 }

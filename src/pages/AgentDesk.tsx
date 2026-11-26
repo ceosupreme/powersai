@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Bot, Search, RefreshCw, Share2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useAgentDesk } from '@/hooks/useAgentDesk';
+import { useAgentDesk, useAgentTaskSheet } from '@/hooks/useAgentDesk';
 import { useCrewStatus, needsALook } from '@/components/admin/CrewActivityCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   AGENTS, agentLabel, buildNeedsYou, groupFailures, isHistoryRow, isSocialPost,
-  isStuck, socialPostState, statusLabel, type AgentHandoffRow,
+  isStuck, socialPostState, statusLabel, isFinishedWork, finishedAt, type AgentHandoffRow,
 } from '@/lib/agentDesk';
 import {
   AgentCardsRow, NeedsYouStrip, RecentlyFinishedSection, RepeatingJobsSection, StuckAndLateSection,
@@ -24,7 +24,7 @@ const MY_AGENT_KEY = 'agent_desk_my_agent';
 export default function AgentDesk() {
   const { isAdmin } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { rows, brands, isLoading, refetch, actions } = useAgentDesk();
+  const { rows, brands, isLoading, error, refetch, actions } = useAgentDesk();
   const { data: crews } = useCrewStatus(isAdmin);
 
   const [view, setView] = useState<'desk' | 'posts'>('desk');
@@ -34,6 +34,8 @@ export default function AgentDesk() {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get('task'));
   const [sheetAction, setSheetAction] = useState<'answer' | 'posted' | null>(null);
+  const selected = useAgentTaskSheet(selectedId);
+  useEffect(() => { setBrandFilter(searchParams.get('brand') || 'all'); setSelectedId(searchParams.get('task')); }, [searchParams]);
 
   useEffect(() => { localStorage.setItem(MY_AGENT_KEY, myAgent); }, [myAgent]);
 
@@ -65,8 +67,8 @@ export default function AgentDesk() {
 
   const socialPosts = useMemo(() => filtered.filter(isSocialPost), [filtered]);
   const madeNotPostedCount = useMemo(
-    () => workRows.filter((r) => isSocialPost(r) && socialPostState(r) === 'made_not_posted').length,
-    [workRows]
+    () => filtered.filter((r) => isSocialPost(r) && socialPostState(r) === 'made_not_posted').length,
+    [filtered]
   );
 
   const needsYou = useMemo(() => buildNeedsYou(filtered), [filtered]);
@@ -76,12 +78,12 @@ export default function AgentDesk() {
   const repeating = useMemo(() => filtered.filter((r) => r.kind === 'standing_task' && r.status === 'active'), [filtered]);
   const recentlyFinished = useMemo(
     () => filtered
-      .filter((r) => r.status === 'done' && (!isSocialPost(r) || socialPostState(r) === 'posted'))
-      .sort((a, b) => new Date(b.completed_at ?? b.updated_at).getTime() - new Date(a.completed_at ?? a.updated_at).getTime()),
+      .filter((r) => isFinishedWork(r) && (finishedAt(r) ?? '') >= new Date(Date.now() - 60 * 86400_000).toISOString())
+      .sort((a, b) => (finishedAt(b) ?? '').localeCompare(finishedAt(a) ?? '')),
     [filtered]
   );
 
-  const selectedRow = useMemo(() => rows.find((r) => r.id === selectedId) ?? null, [rows, selectedId]);
+  const selectedRow = selected.row ?? rows.find((r) => r.id === selectedId) ?? null;
   const openSheet = (row: AgentHandoffRow, action: 'answer' | 'posted' | null = null) => {
     setSelectedId(row.id);
     setSheetAction(action);
@@ -166,14 +168,14 @@ export default function AgentDesk() {
         </div>
       </div>
 
-      {isLoading ? (
+      {error ? <p role="alert" className="text-sm text-destructive">Agent work could not be loaded. <Button variant="outline" onClick={() => refetch()}>Try again</Button></p> : isLoading ? (
         <div className="space-y-3"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
       ) : view === 'posts' ? (
         <AgentDeskPostsView posts={socialPosts} brandNames={brandNames} isAdmin={isAdmin} onSelect={(r, act) => openSheet(r, act ?? null)} />
       ) : (
         <div className="space-y-6">
           <NeedsYouStrip items={needsYou} brandNames={brandNames} isAdmin={isAdmin} onAnswer={(r) => openSheet(r, 'answer')} onSelect={(r) => openSheet(r)} />
-          <AgentCardsRow rows={workRows} selectedAgent={myAgent} onPickAgent={setMyAgent} />
+          <AgentCardsRow rows={filtered} selectedAgent={myAgent} onPickAgent={setMyAgent} />
           <StuckAndLateSection
             failureGroups={failureGroups}
             otherStuck={otherStuck}

@@ -15,6 +15,7 @@ The Dashboard is your starting point after signing in as the owner. It shows act
 - Leads to work today: up to five leads from the Leads page, shown when your role can open Leads. People who replied come first, then follow-ups due today or overdue, then new leads with the best fit first, then leads you contacted that have no follow-up date. Leads that are booked, won, dead, marked do not contact, or set to a later follow-up date are left out. Tap a lead to open it, tap the phone button to call, or tap "All leads" for the full list. Managers and staff see their own and unassigned leads.
 - Active brand count, brand work waiting on you, posts published this month, and live campaigns. Brand activity appears only when there are active brands in the selection. A client-only selection shows its client count and campaigns.
 - Waiting on me: scripts, ideas and other finished pieces that need your OK come first, under "Scripts and content to approve". Each card has a button that opens the piece itself, then Approve, Change it (type what should change and it goes back to be revised) and No. Below them sit the other decisions on action items. Next 10: ranked work using the same rules as the brand workspace. A brand's waiting count can also include content ready for review, so it can exceed the action-only decision list.
+- Agent asks appear inside the same Waiting on me list, oldest first, under "Needs you". A question and its task make one card. Its linked to-do is not repeated. Tap the card to open the Agent Desk task sheet, or Answer to type a reply. When there is no saved question, "What happened" shows the agent's latest explanation instead. Brand helpers can read their brands' asks but cannot answer or change agent work.
 - Your workspaces: distinct colored headers and initials for each brand or client.
 - A visible retry message if activity cannot be loaded.
 
@@ -29,6 +30,8 @@ Each brand has a project: its workspace for content, channels, products, tasks, 
 
 ## Good to know
 Counts describe saved records, not unrecorded activity. The Dashboard does not generate campaign results or publish content automatically. Current work lists are current, even when a report elsewhere is set to an earlier week.
+
+Brand people's Today also shows "Agents on this brand", with open, stuck, waiting-on-owner and made-not-posted counts, and finished agent work with proof in "Latest work". "Open Agent Desk" keeps the brand selected. An admin controls whether Agent Desk appears in each person's menu.
 
 ## Every task explains itself
 

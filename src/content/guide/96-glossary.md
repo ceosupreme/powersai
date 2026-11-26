@@ -25,6 +25,25 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - "Snooze": hide an item for seven days.
 - Capture: save a quick note to the Capture Inbox without sorting it.
 
+## Agent Desk
+
+- Agent Desk: the shared work list for Claude, Muse and ChatGPT. It shows existing work orders, questions, reports, repeating jobs and daily social posts.
+- "Waiting to start": the agent has not picked up the task yet.
+- "Working on it": the agent claimed the task and has not finished.
+- "Needs you": an agent stopped for the owner's answer, or an open ask is addressed to the owner. A question and its task appear together.
+- "What happened": the agent's latest explanation of why work stopped; it is not a question invented from the owner's standing instructions.
+- "Failed": the attempt did not finish successfully. Tasks with the same failure reason can be retried together by the owner.
+- "Finished": a non-post task was marked done. Open its proof link to inspect the work.
+- "Made, not posted": a social post's files are ready, usually in Drive, but no live post link is saved. It is not finished publishing work.
+- "Posted": at least one live post link is recorded. Mark posted records the link and platform; it does not publish anything itself.
+- "Repeating": a standing job stays open and runs on its schedule. "Active" means an ongoing row remains open.
+- "Cancelled": the owner stopped the task. Its record remains available.
+- "Stuck": failed, past due, waiting to start for more than 48 hours, or claimed for more than 24 hours or past its working time limit.
+- "Late": a made-but-unposted post's planned Pacific post date has passed.
+- "Missed": a repeating job has no recent recorded run within its cadence's allowance. Monthly wording wins over weekday names.
+- Proof: a saved link to the actual work, often a Google Drive folder; it does not by itself mean a post is live.
+- History: answers and notes retained under their task, never another job for an agent to pick up.
+
 ## Scores
 
 - Overall score: the weighted average of a project's pillar scores for one week, from 0 to 100.

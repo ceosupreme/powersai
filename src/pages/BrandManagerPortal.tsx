@@ -28,6 +28,11 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BrandTeamAbout } from '@/components/brand-workspace/BrandTeamAbout';
 import { assignedTo, ownerLabel, dependencyFinished, readyFor, teamStepState, orderedSteps, planPosition, teamPeople, defaultTeamViewer, weeklyCompletion, questionStatus, displayTitle, firstDue, minutesText } from '@/lib/brandTeam';
 import { fetchAllPages } from '@/lib/batchFetch';
+import { AgentsOnBrand } from '@/components/agent-desk/AgentsOnBrand';
+import { useAgentDesk } from '@/hooks/useAgentDesk';
+import { agentBrandCounts } from '@/lib/agentDesk';
+import { mailboxFeedRows } from '@/lib/brandPulse';
+import { LatestWork } from '@/components/brand-workspace/overview/BrandDashboard';
 
 const PORTAL_TABS = [
   { key: 'today', label: 'Today' }, { key: 'about', label: 'About' }, { key: 'plan', label: 'My plan' },
@@ -114,6 +119,8 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
   const brand = brands.find((b) => b.id === params.get('brand')) ?? brands[0];
   const view = params.get('view') ?? 'today';
   const businessPath = useBusinessPath(brand.id);
+  const agentDesk = useAgentDesk([brand.id]);
+  const brandAgentRows = agentDesk.rows.filter(r => r.brand_ids.includes(brand.id));
   const pathVisible = !!businessPath.data;
   const stageCount = businessPath.data?.stages.length ?? 0;
   const [wholePlan, setWholePlan] = useState(false);
@@ -507,6 +514,11 @@ export default function BrandManagerPortal({ brands, preview = false }: { brands
         <Card className="p-3"><p className="text-xl font-semibold">{mine.filter(s => s.status === 'Done').length}</p><p className="text-xs text-muted-foreground">Steps completed (all time)</p></Card>
       </section>
       <BrandWeeklyNumbers projectId={brand.id} readOnly={preview} />
+      <AgentsOnBrand brandId={brand.id} counts={agentBrandCounts(brandAgentRows)} loading={agentDesk.isLoading} error={!!agentDesk.error} />
+      <section className="space-y-3"><h2 className="text-lg font-semibold">Latest work</h2>
+        {agentDesk.error ? <p role="alert">Agent work could not be loaded.</p> : agentDesk.isLoading ? <p>Loading agent work…</p> :
+          <LatestWork feed={mailboxFeedRows(brandAgentRows).sort((a,b) => b.at.localeCompare(a.at)).slice(0,8)} projectId={brand.id} onOpenTab={() => go('posts')} />}
+      </section>
     </>}
 
     {view === 'path' && <section className="space-y-4">

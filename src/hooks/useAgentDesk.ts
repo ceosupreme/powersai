@@ -2,31 +2,30 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { AgentHandoffRow } from '@/lib/agentDesk';
+import { fetchAgentDeskRows, fetchAgentHistory, fetchAgentTask } from '@/lib/agentDeskData';
+import { useAuth } from '@/context/AuthContext';
 
 export const AGENT_DESK_KEY = ['agent-desk'] as const;
 
 export interface BrandOption { id: string; name: string }
 
-export function useAgentDesk() {
+export function useAgentDesk(brandIds?: string[]) {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const rowsQuery = useQuery({
-    queryKey: AGENT_DESK_KEY,
+    queryKey: [...AGENT_DESK_KEY, user?.id, brandIds?.slice().sort().join(',') ?? 'all'],
+    enabled: !!user,
     staleTime: 30_000,
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('agent_handoffs')
-        .select('id,created_at,updated_at,from_agent,to_agent,kind,title,status,schedule,due_at,claimed_at,completed_at,last_run_at,parent_id,venue_id,brand_ids,owner_question,notes,spec,result,result_links,action_item_id,content_item_id,studio_lease_expires_at')
-        .order('created_at', { ascending: false })
-        .limit(500);
-      if (error) throw error;
-      return (data ?? []) as AgentHandoffRow[];
-    },
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+    queryFn: () => fetchAgentDeskRows(brandIds),
   });
 
   const brandsQuery = useQuery({
-    queryKey: ['agent-desk-brands'],
+    queryKey: ['agent-desk-brands', user?.id],
+    enabled: !!user,
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data, error } = await supabase.from('venues').select('id,name').order('name');
@@ -35,7 +34,12 @@ export function useAgentDesk() {
     },
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: AGENT_DESK_KEY });
+  const invalidate = () => Promise.all([
+    qc.invalidateQueries({ queryKey: AGENT_DESK_KEY }),
+    qc.invalidateQueries({ queryKey: ['agent-task'] }),
+    qc.invalidateQueries({ queryKey: ['brand-pulse'] }),
+    qc.invalidateQueries({ queryKey: ['waiting-on-me'] }),
+  ]);
 
   const runRpc = async (fn: string, args: Record<string, unknown>, successMsg: string) => {
     const { data, error } = await (supabase as any).rpc(fn, args);
@@ -95,4 +99,19 @@ export function useAgentDesk() {
     refetch: rowsQuery.refetch,
     actions: { answer, sendBack, reassign, cancel, markDone, markPosted, retryGroup },
   };
+}
+
+export function useAgentTaskSheet(id: string | null) {
+  const { user } = useAuth();
+  const task = useQuery({
+    queryKey: ['agent-task', user?.id, id], enabled: !!user && !!id,
+    refetchInterval: 30_000,
+    queryFn: () => id ? fetchAgentTask(id) : null,
+  });
+  const history = useQuery({
+    queryKey: ['agent-task', user?.id, id, 'history'], enabled: !!user && !!id,
+    refetchInterval: 30_000,
+    queryFn: () => id ? fetchAgentHistory(id) : [],
+  });
+  return { row: task.data ?? null, historyRows: history.data ?? [], loading: task.isLoading || history.isLoading, error: task.error ?? history.error };
 }

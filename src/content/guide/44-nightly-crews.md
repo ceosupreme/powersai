@@ -25,6 +25,8 @@ HQ background jobs: the automation sender every 5 minutes, the checkout double-c
 
 The morning brief reads the same list every morning. When a crew failed or missed its run, the push has a line such as "Crews: Weekly HQ run failed; Muse posts missed its run". When everything ran, the brief says nothing about crews.
 
+Agent Desk shows one short scheduled-run health line from this same list, with a link here. Crews remains the place to check whether scheduled runs happened; Agent Desk is the single board for what Claude, Muse and ChatGPT are doing, their questions, posts and work orders. Content Studio keeps its requests attached to the content piece; their task details are also visible on Agent Desk, not copied into a second job board.
+
 ### Brand activity and default brands
 
 A crew run appears in a brand's "Latest work" when the run lists that brand. Tap it to read "What it tried", "What got done" and, when present, "Needs you", or ask about it. A run marked ok or partial counts as work done for that brand; publishing is still measured separately.
@@ -43,7 +45,7 @@ Admins can tap the "Default brands" chips on a crew's row to change which brands
 
 ### Weekly HQ run (Fridays at 2:17 AM Pacific)
 
-- Agent Desk first: it checks the work orders in your Airtable base, verifies or sends back the finished ones, and writes up to three new ones.
+- Agent work orders live in HQ's shared agent mailbox, shown on Agent Desk. Check that page for current work, owner questions and proof rather than a separate Airtable board.
 - It files the playbooks you finish. Drop a finished playbook in the Drive folder "Supreme Team HQ - Playbook Inbox", named for the playbook (for example "Pinterest - playbook"), and it becomes that playbook's next version, word for word. The run does not write playbooks or do niche research: you do that in your own AI threads (your call, November 1, 2026). Other material stays in the inbox, marked new, for you.
 - It does up to six of Claude's ready pipeline steps, no more than three from one job, most urgent first. Each file goes into the brand's folder inside "Supreme Team HQ - Brands", is linked on the step, and the step is marked Done. When the next step is yours, it adds a Life Pulse card with an "Open pipeline" button.
 - It files channel numbers: Metricool followers and posts once a week, your Muse complaint reports into each brand's Answer Bank, and your Muse Facebook stats reports. It also matches placeholder brand colors to your real page images.

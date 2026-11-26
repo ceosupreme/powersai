@@ -23,6 +23,7 @@ On "My brands" you then see type chips ("All", "Brands", "Channels", "Apps", "Se
 Each brand card shows, top to bottom:
 
 - The brand name, then a status chip ("On track", "Needs attention" or "Gone quiet", same rules as the brand Overview) and one line of headline numbers: Business path stage ("Stage 2/8" or "Not on path"), pieces published in the last 7 days, money (or leads for Supreme Team Media) recently, and the last work with how many days ago. A "Gone quiet" card has a red left edge.
+- Finished agent mailbox tasks count as work for every brand they cover. A mailbox post counts as published only with a live link, once per piece, dated by when it was posted. Made-but-unposted files and reply history do not count. These are the same rules as the brand's Today tab, so daily agent posting keeps activity current here too.
 - The overall score with its letter grade and the change since the week before, such as "↑4 WoW".
 - Data lines: how many KPIs (or pillars) were measured and for which week, and "As of" a date, with "stale" added when the data is eight or more days old.
 - "3 live channels · 12.4K followers", or "No channels on file".

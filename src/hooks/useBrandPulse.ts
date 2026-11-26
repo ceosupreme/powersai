@@ -4,15 +4,18 @@ import { fetchAllPages, fetchRowsIn, groupBy } from '@/lib/batchFetch';
 import { businessPathProgress, type PathStage, type PathStep } from '@/lib/businessPath';
 import {
   audienceSeries, moneySplit, moneyWindowStart, outputWeeks, publishedInLast7, publishedPieces, pulseStatus, weeklyTarget, crewFeedRows, crewWorkInLast7,
-  type PublishedPiece, type PulseStatus, type CrewRunIn,
+  mailboxWorkInLast7, mailboxFeedRows, type PublishedPiece, type PulseStatus, type CrewRunIn,
 } from '@/lib/brandPulse';
+import { fetchAgentDeskRows } from '@/lib/agentDeskData';
+import { agentBrandCounts, type AgentHandoffRow, type ProofLink } from '@/lib/agentDesk';
 import { STM_VENUE_ID } from '@/hooks/useBrandWorkspace';
 
 const DAY = 86_400_000;
 
 export interface PulseChannel { id: string; platform: string; handle: string | null; url: string | null; followers: number | null; cadence_target: number | null; last_post_at: string | null; status: string; latest: number | null; previous: number | null }
 export interface PulseFeedItem {
-  key: string; at: string; kind: 'task' | 'published' | 'path' | 'crew'; text: string; who: string;
+  key: string; at: string; kind: 'task' | 'published' | 'path' | 'crew' | 'mailbox'; text: string; who: string;
+  proofLinks?: ProofLink[]; mailboxRow?: AgentHandoffRow;
   tried?: string | null; done?: string | null; flagged?: string | null; runStatus?: string;
   url?: string | null; detail?: string | null; why?: string | null; ownerKind?: string | null; minutes?: number | null; pillar?: string | null;
 }
@@ -20,6 +23,7 @@ export interface BrandPulse {
   projectId: string;
   status: PulseStatus; reason: string;
   done7: number;
+  agents: ReturnType<typeof agentBrandCounts>;
   setup: { pct: number | null; inPlace: number; needed: number; gaps: number };
   path: { placed: boolean; stageNumber: number | null; stageCount: number; stageName: string | null; doneWhen: string | null; done: number; total: number; segments: boolean[] };
   output: { published7: number; target: number | null; weeks: { week: string; label: string; count: number }[]; pieces: PublishedPiece[]; scheduled: { key: string; at: string; title: string; where: string | null }[] };
@@ -40,7 +44,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
   const since30 = new Date(now - 30 * DAY).toISOString();
   const doneFilter = (q: any) => q.eq('status', 'Done').gte('completed_at', since60);
   const actionCols = 'id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,completed_at,completed_by,owner_kind,bar_id,venue_id';
-  const [byBar, byVenue, placements, items, channels, revenue, pathRows, settings, stagesRes, stepsRes, setupRes, leadsRes, propsRes, ordersRes, crewRuns] = await Promise.all([
+  const [byBar, byVenue, placements, items, channels, revenue, pathRows, settings, stagesRes, stepsRes, setupRes, leadsRes, propsRes, ordersRes, crewRuns, mailboxRows] = await Promise.all([
     fetchRowsIn<any>('action_items', actionCols, 'bar_id', ids, doneFilter),
     fetchRowsIn<any>('action_items', actionCols, 'venue_id', ids, doneFilter),
     fetchRowsIn<any>('content_placements', 'id,project_id,content_item_id,live_url,verified_at,updated_at,channel,account_label,status,scheduled_for', 'project_id', ids),
@@ -59,6 +63,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
       .select('id,crew_key,status,started_at,finished_at,tried,done,flagged,details', { count: 'exact' })
       .or(`finished_at.gte.${since60},and(finished_at.is.null,started_at.gte.${since60})`)
       .or(ids.map((id) => `details->brands.cs.${JSON.stringify([id])}`).join(','))),
+    fetchAgentDeskRows(ids, now),
   ]);
   for (const r of [stagesRes, stepsRes, setupRes]) if (r.error) throw r.error;
   // Leads, proposals and site orders are extras: if they cannot be read the Money tile still shows revenue.
@@ -94,11 +99,13 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
 
   const out = new Map<string, BrandPulse>();
   for (const id of ids) {
-    const done = actionsBy.get(id) ?? [];
-    const done7 = done.filter((a) => a.completed_at && new Date(a.completed_at).getTime() >= now - 7 * DAY).length + crewWorkInLast7(crewRuns, id, now);
+    const mail = mailboxRows.filter((r) => r.brand_ids.includes(id));
+    const linked = new Set(mail.filter((r) => r.status === 'done').map((r) => r.action_item_id).filter(Boolean));
+    const done = (actionsBy.get(id) ?? []).filter((a) => !linked.has(a.id));
+    const done7 = done.filter((a) => a.completed_at && new Date(a.completed_at).getTime() >= now - 7 * DAY).length + crewWorkInLast7(crewRuns, id, now) + mailboxWorkInLast7(mail, now);
     const pls = placementsBy.get(id) ?? [];
     const its = itemsBy.get(id) ?? [];
-    const pieces = publishedPieces(pls, its);
+    const pieces = publishedPieces(pls, its, mail);
     const published7 = publishedInLast7(pieces, now);
     const su = setupBy.get(id);
     const needed = Number(su?.needed_count ?? 0);
@@ -130,13 +137,14 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
     ].sort((a, b) => a.at.localeCompare(b.at)).slice(0, 5);
 
     const feed: PulseFeedItem[] = [
+      ...mailboxFeedRows(mail, now),
       ...crewFeedRows(crewRuns, id, crewNames),
       ...done.filter((a) => a.completed_at).map((a) => ({
         key: `ac-${a.id}`, at: a.completed_at, kind: 'task' as const, text: a.title ?? 'Task finished',
         who: a.owner_kind === 'claude' ? 'Claude' : a.owner_kind === 'agent' ? 'AI agent' : personName(a.completed_by) ?? (a.owner_kind === 'owner' ? 'Owner' : 'Not recorded'),
         detail: a.detail, why: a.insight_summary || a.problem_detail || null, ownerKind: a.owner_kind, minutes: a.estimated_minutes, pillar: a.pillar,
       })),
-      ...pieces.filter((p) => p.url).map((p) => ({ key: `pub-${p.key}-${p.week}`, at: p.at, kind: 'published' as const, text: `Published: ${p.title}${p.where ? ` on ${p.where}` : ''}`, who: 'Not recorded', url: p.url })),
+      ...pieces.filter((p) => p.url && !mail.some((r) => r.id === p.key.replace('mail-', '') || (r.content_item_id && p.key === `item-${r.content_item_id}`))).map((p) => ({ key: `pub-${p.key}-${p.week}`, at: p.at, kind: 'published' as const, text: `Published: ${p.title}${p.where ? ` on ${p.where}` : ''}`, who: 'Not recorded', url: p.url })),
       ...statusRows.filter((r: any) => r.updated_at && r.status !== 'not_started').map((r: any) => ({
         key: `path-${r.id}`, at: r.updated_at, kind: 'path' as const,
         text: `Path step ${r.status === 'done' ? 'done' : r.status === 'not_needed' ? 'marked not needed' : `set to ${String(r.status).replace(/_/g, ' ')}`}: ${stepTitle.get(r.step_key) ?? r.step_key}`,
@@ -145,7 +153,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
     ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
 
     out.set(id, {
-      projectId: id, status, reason, done7,
+      projectId: id, status, reason, done7, agents: agentBrandCounts(mail, new Date(now)),
       setup: { pct, inPlace, needed, gaps: Number(su?.gaps ?? 0) },
       path: {
         placed: statusRows.length > 0, stageNumber: cur?.number ?? (prog.stages.length && !cur ? prog.stages.length : null),
@@ -171,6 +179,7 @@ export function useBrandPulses(ids: string[], viewerId: string | null | undefine
     queryKey: ['brand-pulse', key, viewerId ?? null],
     enabled: ids.length > 0,
     staleTime: 60_000,
+    refetchInterval: 30_000,
     queryFn: () => fetchBrandPulses(ids, viewerId ?? null),
   });
 }

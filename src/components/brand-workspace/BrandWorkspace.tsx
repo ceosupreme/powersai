@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { BarChart3, CalendarCheck, ExternalLink, Flag, Gauge, Inbox, LineChart as LineChartIcon, Loader2, Pencil, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useBrandPulse } from '@/hooks/useBrandPulse';
+import { AgentsOnBrand } from '@/components/agent-desk/AgentsOnBrand';
 import { FEED_ICON, LatestWork, ScoreRing, SectionHeading, ShowMore, StatusChip, SubjectSheet, SubjectTiles, PathSegments, type Subject } from './overview/BrandDashboard';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -239,6 +240,7 @@ function OverviewTab({
       </section>
 
       {/* 3. Latest work */}
+      <AgentsOnBrand brandId={projectId} counts={p?.agents} loading={pulse.isLoading} error={pulse.isError} />
       <section className="space-y-3">
         <SectionHeading icon={FEED_ICON} title="Latest work" />
         {pulse.isLoading ? <Loading /> : p && <LatestWork feed={p.feed} projectId={projectId} onOpenTab={onOpenTab} />}

@@ -67,7 +67,7 @@ export function getPublishedLinks(row: AgentHandoffRow): PublishedLink[] {
   if (!raw) return [];
   const arr = Array.isArray(raw) ? raw : [raw];
   return arr
-    .filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).url === 'string')
+    .filter((x): x is Record<string, unknown> => !!x && typeof x === 'object' && typeof (x as Record<string, unknown>).url === 'string' && /^https?:\/\//i.test(String((x as Record<string, unknown>).url)))
     .map((x) => ({
       url: String(x.url),
       platform: String(x.platform ?? 'Social'),
@@ -138,9 +138,9 @@ export function isStandingMissed(row: AgentHandoffRow, now = new Date()): boolea
   if (row.kind !== 'standing_task' || row.status !== 'active') return false;
   const text = `${scheduleTextOf(row)} ${row.title}`.toLowerCase();
   let maxHours: number | null = null;
-  if (/\bdaily\b|every day|each day/.test(text)) maxHours = 36;
+  if (/\bmonthly\b|every month|each month|of every month/.test(text)) maxHours = 35 * 24;
+  else if (/\bdaily\b|every day|each day/.test(text)) maxHours = 36;
   else if (/\bweekly\b|every week|each week|monday|tuesday|wednesday|thursday|friday|saturday|sunday/.test(text)) maxHours = 8.5 * 24;
-  else if (/\bmonthly\b|every month/.test(text)) maxHours = 35 * 24;
   if (!maxHours) return false;
   const ref = row.last_run_at ?? row.created_at;
   return (now.getTime() - new Date(ref).getTime()) > maxHours * 3600_000;
@@ -155,8 +155,6 @@ export function latestNoteLine(notes: string | null | undefined): string | null 
 export function whatHappenedOf(row: AgentHandoffRow): string | null {
   const summary = typeof row.result?.summary === 'string' ? row.result.summary.trim() : '';
   if (summary) return summary;
-  const err = typeof row.result?.error === 'string' ? row.result.error.trim() : '';
-  if (err) return err;
   return latestNoteLine(row.notes);
 }
 
@@ -184,7 +182,7 @@ export function groupFailures(rows: AgentHandoffRow[]): FailureGroup[] {
 
 export function buildNeedsYou(rows: AgentHandoffRow[]): NeedsYouItem[] {
   const byId = new Map(rows.map((r) => [r.id, r]));
-  const waiting = rows.filter((r) => !isHistoryRow(r) && r.status === 'needs_owner');
+  const waiting = rows.filter((r) => !isHistoryRow(r) && (r.status === 'needs_owner' || (r.to_agent === 'owner' && OPEN_AGENT_STATUSES.includes(r.status))));
   const suppressedParents = new Set<string>();
   for (const r of waiting) {
     if ((r.kind === 'question' || r.to_agent === 'owner') && r.parent_id && byId.has(r.parent_id)) {
@@ -293,7 +291,51 @@ export function ageWords(iso: string | null | undefined, now = new Date()): stri
 }
 
 export function isFinishedThisWeek(row: AgentHandoffRow, now = new Date()): boolean {
-  if (row.status !== 'done' || !row.completed_at) return false;
-  if (isSocialPost(row) && socialPostState(row) !== 'posted') return false;
-  return now.getTime() - new Date(row.completed_at).getTime() <= 7 * 86400_000;
+  const at = finishedAt(row);
+  if (!at) return false;
+  const time = Date.parse(at);
+  const [y, m, d] = todayPacificISO(now).split('-').map(Number);
+  const monday = new Date(Date.UTC(y, m - 1, d));
+  monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() || 7) - 1));
+  return time <= now.getTime() && todayPacificISO(new Date(at)) >= monday.toISOString().slice(0, 10);
+}
+
+export const OPEN_AGENT_STATUSES = ['new', 'claimed', 'needs_owner', 'failed', 'active'];
+
+export function belongsOnDesk(row: AgentHandoffRow, since: string): boolean {
+  if (isHistoryRow(row)) return false;
+  return OPEN_AGENT_STATUSES.includes(row.status)
+    || (isSocialPost(row) && socialPostState(row) === 'made_not_posted')
+    || (row.completed_at ?? row.updated_at) >= since
+    || (isSocialPost(row) && (finishedAt(row) ?? '') >= since);
+}
+
+export function isFinishedWork(row: AgentHandoffRow): boolean {
+  if (isHistoryRow(row)) return false;
+  return isSocialPost(row) ? socialPostState(row) === 'posted' : row.status === 'done';
+}
+
+/** Posted time, not the time the files were made; one piece across its live links. */
+export function finishedAt(row: AgentHandoffRow): string | null {
+  if (!isFinishedWork(row)) return null;
+  if (isSocialPost(row)) {
+    const times = getPublishedLinks(row).map((p) => p.posted_at).filter((t): t is string => !!t && Number.isFinite(Date.parse(t))).sort();
+    return times[0] ?? row.updated_at;
+  }
+  return row.completed_at ?? row.updated_at;
+}
+
+export function agentBrandCounts(rows: AgentHandoffRow[], now = new Date()) {
+  const work = rows.filter((r) => !isHistoryRow(r));
+  return {
+    open: work.filter((r) => OPEN_AGENT_STATUSES.includes(r.status)).length,
+    stuck: work.filter((r) => isStuck(r, now) || isStandingMissed(r, now)).length,
+    waiting: buildNeedsYou(work).length,
+    madeNotPosted: work.filter((r) => isSocialPost(r) && socialPostState(r) === 'made_not_posted').length,
+  };
+}
+
+/** Suppress both the question's linked to-do and its parent task's linked to-do. */
+export function needsYouActionIds(items: NeedsYouItem[]): Set<string> {
+  return new Set(items.flatMap((i) => [i.row.action_item_id, i.parentRow?.action_item_id]).filter((id): id is string => !!id));
 }

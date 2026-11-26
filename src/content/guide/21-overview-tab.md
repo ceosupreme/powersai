@@ -1,12 +1,12 @@
-# Overview tab
+# Today tab
 <!-- part: Running a brand | order: 21 | slug: overview-tab | route: /project/:venueId | tags: overview, brand numbers, overall score, revenue this month, list size, followers, published this month, waiting on you, next 10, activity, pillars, scores, download pdf, website, page views, cta clicks, inquiries -->
 
-The "Overview" tab is the first thing you see when you open a brand. It shows the brand's headline numbers, everything waiting on you for this brand, the brand's Next 10, its scores and its recent activity. Use it for a quick check-in and to clear small tasks without leaving the brand.
+The "Today" tab is the first thing you see when you open a brand. It shows the brand's headline numbers, everything waiting on you for this brand, the brand's Next 10, its scores and its recent activity. Use it for a quick check-in and to clear small tasks without leaving the brand.
 
 ## Where to find it
 
-- Open a brand from "Portfolio" under "My brands". It opens on "Overview".
-- From any other tab, tap "Overview" at the start of the tab row.
+- Open a brand from "Portfolio" under "My brands". It opens on "Today".
+- From any other tab, tap "Today" at the start of the tab row.
 
 ## What you see
 
@@ -25,6 +25,8 @@ From top to bottom:
   - A tile with nothing to show says "Not tracking yet", what turns it on, and a link to where you enter it. A chart only draws with at least two points.
 - Tap a tile to open its panel: a sentence on what it measures, a bigger chart, the items behind the number (missing setup pieces, posts published and scheduled, followers per account with last post date, each income entry and the ways to make money not turned on yet) and "Ask about this", which opens the chat with that section's numbers.
 - "Latest work": the last 8 things done for the brand (finished tasks, posts that went live, Business path steps), newest first, with who did it and how long ago. Tap a row for its detail.
+- "Agents on this brand": open work, stuck work, asks waiting on the owner, and posts made but not posted. Open Agent Desk takes you to this brand's agent work. Helpers see it read-only.
+- Latest work includes finished mailbox tasks and posts with a live link, with the agent's name and proof buttons. Reply history and made-not-posted files stay out. A linked to-do is not counted again as finished work. Mailbox posts count in Output once per piece, dated when the first live link was recorded, not when the files were made. Multiple platforms do not multiply the piece count. Portfolio uses these same activity and status rules.
 - "Also waiting on you", "This week's plan" (the Next 10), "Scores by area" and "Weekly numbers". Long sections are cut short with a "Show more" button.
 - On Supreme Team Media only, a small "Website, last 7 days" section near the bottom: one line with page views, CTA clicks, call requests, inquiries and the first-response rate, then orders from the last 30 days. When there were inquiries, tap "Inquiries by industry" to see which industry pages they came from. It sits low on purpose and does not appear on the other tabs.
 - A "Setup" button at the very bottom with the older project tools.

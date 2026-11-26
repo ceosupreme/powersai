@@ -13,6 +13,7 @@ import {
   isStudioLeased, readableSpec, statusLabel, whatHappenedOf, type AgentHandoffRow,
 } from '@/lib/agentDesk';
 import type { useAgentDesk } from '@/hooks/useAgentDesk';
+import { useAgentTaskSheet } from '@/hooks/useAgentDesk';
 
 type Actions = ReturnType<typeof useAgentDesk>['actions'];
 
@@ -29,6 +30,9 @@ interface Props {
 const PLATFORMS = ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'LinkedIn', 'X', 'Other'];
 
 export function AgentDeskTaskSheet({ row, historyRows, brandNames, isAdmin, actions, initialAction, onClose }: Props) {
+  const saved = useAgentTaskSheet(row?.id ?? null);
+  row = saved.row ?? row;
+  historyRows = saved.historyRows;
   const [mode, setMode] = useState<'none' | 'answer' | 'sendBack' | 'reassign' | 'cancel' | 'done' | 'posted'>('none');
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
@@ -238,6 +242,8 @@ export function AgentDeskTaskSheet({ row, historyRows, brandNames, isAdmin, acti
             </div>
           )}
 
+          {saved.loading && <p role="status" className="text-sm text-muted-foreground">Loading task history…</p>}
+          {saved.error && <p role="alert" className="text-sm text-destructive">The latest task or its history could not be loaded.</p>}
           {historyRows.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">History</p>

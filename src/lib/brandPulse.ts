@@ -2,6 +2,7 @@
  * Brand dashboard numbers (status chip, output weeks, audience trend, money split).
  * Pure so the Overview tab and the Portfolio cards share one set of rules.
  */
+import { agentLabel, finishedAt, getProofLinks, getPublishedLinks, isFinishedWork, isSocialPost, type AgentHandoffRow } from './agentDesk';
 export type PulseStatus = 'green' | 'amber' | 'red';
 export const STATUS_WORD: Record<PulseStatus, string> = { green: 'On track', amber: 'Needs attention', red: 'Gone quiet' };
 const DAY = 86_400_000;
@@ -80,7 +81,7 @@ export interface PublishedPiece { key: string; at: string; week: string; title: 
  * verified_at, else updated_at); a content item's published_at counts only when no
  * placement already counted that item in the same week.
  */
-export function publishedPieces(placements: PlacementIn[], items: ItemIn[]): PublishedPiece[] {
+export function publishedPieces(placements: PlacementIn[], items: ItemIn[], mailbox: AgentHandoffRow[] = []): PublishedPiece[] {
   const titles = new Map(items.map((i) => [i.id, i.title]));
   const seen = new Set<string>();
   const out: PublishedPiece[] = [];
@@ -101,7 +102,40 @@ export function publishedPieces(placements: PlacementIn[], items: ItemIn[]): Pub
     seen.add(`${key}|${week}`);
     out.push({ key, at: i.published_at, week, title: i.title || 'Published post', url: null, where: null });
   }
+  for (const row of mailbox) {
+    if (!isSocialPost(row) || !isFinishedWork(row)) continue;
+    const at = finishedAt(row);
+    if (!at) continue;
+    const week = mondayOf(ptDate(at));
+    const key = row.content_item_id ? `item-${row.content_item_id}` : `mail-${row.id}`;
+    const links = getPublishedLinks(row);
+    if (seen.has(`${key}|${week}`) || out.some((p) => p.url && links.some((l) => l.url === p.url))) continue;
+    seen.add(`${key}|${week}`);
+    out.push({ key, at, week, title: row.title, url: links[0]?.url ?? null, where: links[0]?.platform ?? null });
+  }
   return out.sort((a, b) => b.at.localeCompare(a.at));
+}
+
+export function mailboxWorkInLast7(rows: AgentHandoffRow[], now = Date.now()): number {
+  return rows.filter((r) => {
+    const at = finishedAt(r);
+    const time = at ? Date.parse(at) : NaN;
+    return time >= now - 7 * DAY && time <= now;
+  }).length;
+}
+
+export function mailboxFeedRows(rows: AgentHandoffRow[], now = Date.now()) {
+  return rows.filter(isFinishedWork).flatMap((r) => {
+    const at = finishedAt(r);
+    if (!at || Date.parse(at) < now - 60 * DAY || Date.parse(at) > now) return [];
+    return [{ key: `mail-${r.id}`, at, kind: 'mailbox' as const, text: r.title,
+      who: agentLabel(r.to_agent === 'owner' ? r.from_agent : r.to_agent), ownerKind: 'agent',
+      url: getPublishedLinks(r)[0]?.url ?? getProofLinks(r)[0]?.url ?? null,
+      proofLinks: [...getProofLinks(r), ...getPublishedLinks(r).map((p) => ({ url: p.url, label: `Live on ${p.platform}` }))],
+      mailboxRow: r,
+      detail: typeof r.result?.summary === 'string' ? r.result.summary : r.notes,
+    }];
+  });
 }
 
 /** Distinct pieces published in the last 7 days. */

@@ -15,6 +15,11 @@ import {
 } from '@/lib/ownerWork';
 import { Textarea } from '@/components/ui/textarea';
 import { TaskExplainer } from '@/components/tasks/TaskExplainer';
+import { useAuth } from '@/context/AuthContext';
+import { useAgentDesk } from '@/hooks/useAgentDesk';
+import { buildNeedsYou, needsYouActionIds, type AgentHandoffRow } from '@/lib/agentDesk';
+import { NeedsYouStrip } from '@/components/agent-desk/AgentDeskSections';
+import { AgentDeskTaskSheet } from '@/components/agent-desk/AgentDeskTaskSheet';
 
 export interface WaitingRow {
   id: string;
@@ -287,9 +292,16 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
   const { data, isLoading, isError, error, refetch } = useWaitingOnMe(projects);
   const mutation = useWaitingMutation(ids);
   const [showSnoozed, setShowSnoozed] = useState(false);
+  const { isAdmin } = useAuth();
+  const desk = useAgentDesk();
+  const asks = buildNeedsYou(desk.rows).filter(i => !i.brandIds.length || i.brandIds.some(id => ids.includes(id)));
+  const linkedIds = needsYouActionIds(asks);
+  const [selectedAgentRow, setSelectedAgentRow] = useState<AgentHandoffRow | null>(null);
+  const [answerMode, setAnswerMode] = useState(false);
+  const brandNames = new Map(desk.brands.map(b => [b.id, b.name]));
 
-  const open = data?.open ?? [];
-  const snoozed = data?.snoozed ?? [];
+  const open = (data?.open ?? []).filter(r => !linkedIds.has(r.id));
+  const snoozed = (data?.snoozed ?? []).filter(r => !linkedIds.has(r.id));
 
   // Decisions first, then priority, then earliest due date, then oldest.
   const ranked = [...open].sort(
@@ -443,6 +455,11 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-1">
+        {desk.error ? <p role="alert" className="text-sm text-destructive">Agent asks could not be loaded. <Button variant="outline" onClick={() => desk.refetch()}>Try again</Button></p> :
+          desk.isLoading ? <p className="text-sm text-muted-foreground">Checking agent asks…</p> :
+          <NeedsYouStrip items={asks} brandNames={brandNames} isAdmin={isAdmin}
+            onAnswer={r => { setSelectedAgentRow(r); setAnswerMode(true); }}
+            onSelect={r => { setSelectedAgentRow(r); setAnswerMode(false); }} />}
         {isLoading ? (
           <p className="text-xs text-muted-foreground">Loading…</p>
         ) : isError ? (
@@ -457,7 +474,7 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             </div>
           </div>
         ) : open.length === 0 && snoozed.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No decisions waiting on you right now.</p>
+          !asks.length && !desk.isLoading && !desk.error ? <p className="text-xs text-muted-foreground">No decisions waiting on you right now.</p> : null
         ) : (
           <>
             {approvals.length > 0 && (
@@ -487,6 +504,8 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           </>
         )}
       </CardContent>
+      <AgentDeskTaskSheet row={desk.rows.find(r => r.id === selectedAgentRow?.id) ?? selectedAgentRow} historyRows={[]} brandNames={brandNames}
+        isAdmin={isAdmin} actions={desk.actions} initialAction={answerMode ? 'answer' : null} onClose={() => setSelectedAgentRow(null)} />
     </Card>
   );
 };
