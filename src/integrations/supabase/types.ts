@@ -1886,6 +1886,7 @@ export type Database = {
           created_by: string | null
           do_notes: string | null
           dont_notes: string | null
+          drive_folder_id: string | null
           id: string
           mix_targets: Json | null
           primary_font: string | null
@@ -1906,6 +1907,7 @@ export type Database = {
           created_by?: string | null
           do_notes?: string | null
           dont_notes?: string | null
+          drive_folder_id?: string | null
           id?: string
           mix_targets?: Json | null
           primary_font?: string | null
@@ -1926,6 +1928,7 @@ export type Database = {
           created_by?: string | null
           do_notes?: string | null
           dont_notes?: string | null
+          drive_folder_id?: string | null
           id?: string
           mix_targets?: Json | null
           primary_font?: string | null
@@ -16887,6 +16890,10 @@ export type Database = {
         Returns: Json
       }
       hq_lead_stage_rank: { Args: { p_status: string }; Returns: number }
+      hq_mark_daily_post_posted: {
+        Args: { _live_url?: string; _note?: string; _placement_id: string }
+        Returns: Json
+      }
       hq_normalize_email: { Args: { p_raw: string }; Returns: string }
       hq_normalize_phone: { Args: { p_raw: string }; Returns: string }
       hq_numbers_fixture_lead: {

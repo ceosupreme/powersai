@@ -25,6 +25,7 @@ import { ContentWorkflowDialog } from "@/components/content/ContentWorkflowDialo
 import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
+import { DailyPostsSection } from "@/components/daily-posts/DailyPostsSection";
 
 // "parked" is a database stage outside ContentStage; it gets its own tab so the
 // header total and the tab counts always add up.
@@ -229,6 +230,7 @@ export default function ProductionBoard() {
       ) : (
         <Tabs defaultValue="research">
           <TabsList className="flex-wrap h-auto">
+            <TabsTrigger value="daily_posts">Daily posts</TabsTrigger>
             {TABS.map((t) => (
               <TabsTrigger key={t.key} value={t.key}>
                 {t.label}{" "}
@@ -241,6 +243,10 @@ export default function ProductionBoard() {
               Live links recorded: {recordedPublishedCount}
             </span>
           </TabsList>
+
+          <TabsContent value="daily_posts" className="mt-4">
+            <DailyPostsSection projectIds={brand === "all" ? projectIds : [brand]} singleBrand={brand !== "all"} />
+          </TabsContent>
 
           {TABS.map((t) => {
             const rows = filtered.filter((it) => t.stages.includes(it.stage as string));

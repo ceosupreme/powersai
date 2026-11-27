@@ -104,6 +104,7 @@ export function useProductionBoardItems(projectIds: string[]) {
       const { data: items, error } = await T("content_items")
         .select("id,project_id,title,format,stage,brief,cta,family_id,purpose,founder_minutes,due_date,idea_score,quality_score,quality_fails,purpose_type,approved_at,created_at")
         .in("project_id", projectIds)
+        .or("purpose_type.is.null,purpose_type.neq.daily_post")
         .order("created_at", { ascending: false });
       if (error) throw error;
       const rows = (items ?? []) as any[];

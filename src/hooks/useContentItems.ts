@@ -40,6 +40,7 @@ export function useContentItems(projectId: string | null | undefined) {
         .from("content_items" as any)
         .select("*")
         .eq("project_id", projectId!)
+        .or("purpose_type.is.null,purpose_type.neq.daily_post")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as ContentItem[];

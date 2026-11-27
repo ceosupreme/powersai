@@ -27,7 +27,7 @@ export function useStudioCanManage(projectId: string) {
 }
 export function useStudioIdeas(projectId: string | null) {
   return useQuery({ queryKey: ['content-studio', 'ideas', projectId], enabled: !!projectId,
-    queryFn: () => pages<StudioItem>((from, to) => table('content_items').select(itemColumns).eq('project_id', projectId).order('updated_at', { ascending: false }).order('id').range(from, to)) });
+    queryFn: () => pages<StudioItem>((from, to) => table('content_items').select(itemColumns).eq('project_id', projectId).or('purpose_type.is.null,purpose_type.neq.daily_post').order('updated_at', { ascending: false }).order('id').range(from, to)) });
 }
 export function useStudioItem(itemId: string | null) {
   return useQuery({ queryKey: ['content-studio', 'item', itemId], enabled: !!itemId, queryFn: () => loadStudioItem(itemId!) });

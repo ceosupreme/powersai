@@ -14,6 +14,8 @@ import { BarChart3, CalendarCheck, ExternalLink, Flag, Gauge, Inbox, LineChart a
 import { useAuth } from '@/context/AuthContext';
 import { useBrandPulse } from '@/hooks/useBrandPulse';
 import { AgentsOnBrand } from '@/components/agent-desk/AgentsOnBrand';
+import { DailyPostsSection } from '@/components/daily-posts/DailyPostsSection';
+import { STUDIO_DRIVE } from '@/lib/contentStudio';
 import { FEED_ICON, LatestWork, ScoreRing, SectionHeading, ShowMore, StatusChip, SubjectSheet, SubjectTiles, PathSegments, type Subject } from './overview/BrandDashboard';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -238,6 +240,9 @@ function OverviewTab({
         {pulse.isLoading ? <Loading /> : pulse.isError ? <LoadError onRetry={() => pulse.refetch()} /> :
           p && <SubjectTiles pulse={p} onOpen={setSubject} onOpenTab={onOpenTab} />}
       </section>
+
+      {/* 2b. Daily finished posts */}
+      <DailyPostsSection projectIds={[projectId]} singleBrand title="Posts" />
 
       {/* 3. Latest work */}
       <AgentsOnBrand brandId={projectId} counts={p?.agents} loading={pulse.isLoading} error={pulse.isError} />
@@ -927,6 +932,17 @@ function AssetsTab({ projectId }: { projectId: string }) {
   links.forEach((l) => { const k = l.category || 'Other'; byCat.set(k, [...(byCat.get(k) ?? []), l]); });
   return (
     <div className="space-y-6">
+      <section className="rounded-lg border border-border bg-card p-4 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold text-foreground">Finished posts folder</h3>
+          <p className="text-sm text-muted-foreground">Open the Ready to post folder in Google Drive for this brand&apos;s daily packages.</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <a href={STUDIO_DRIVE.find((d) => d.label === 'Ready to post')?.url ?? 'https://drive.google.com/drive/folders/1uR2Oj5y8R9XijfrXVLnRTkqdG8WWXpta'} target="_blank" rel="noreferrer">
+            Open finished posts folder <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
+          </a>
+        </Button>
+      </section>
       <section>
         <h3 className="text-lg font-semibold mb-2">Files</h3>
         {!kit.data?.kit ? <p className="text-sm text-muted-foreground">No brand kit yet. <BrandKitLink projectId={projectId} /></p> :

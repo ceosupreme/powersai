@@ -113,7 +113,7 @@ export async function fetchBrandWorkSummary(projectId: string): Promise<BrandWor
       .from('action_items')
       .select('id,title,detail,insight_summary,problem_detail,estimated_minutes,pillar,due_date,priority,status,approval_status,snoozed_until,owner_kind,depends_on,job_id,created_at')
       .or(`bar_id.eq.${projectId},venue_id.eq.${projectId}`),
-    T('content_items').select('id,title,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at,idea_score').eq('project_id', projectId),
+    T('content_items').select('id,title,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at,idea_score').eq('project_id', projectId).or('purpose_type.is.null,purpose_type.neq.daily_post'),
     T('brand_channels').select('status,cadence_target,last_post_at,followers').eq('project_id', projectId),
     T('channel_product_channels').select('product_id').eq('project_id', projectId),
     T('content_placements').select('id').eq('project_id', projectId).eq('status', 'published').gte('verified_at', start).lt('verified_at', next),
@@ -155,7 +155,7 @@ async function fetchBrandWorkCards(projects: { id: string; name: string }[], wee
   const ids = projects.map((p) => p.id);
   const [actionRows, contentRows, channelRows, linkRows, placementRows, revenueRows] = await Promise.all([
     fetchActionRowsForProjects(ids),
-    fetchRowsIn('content_items', 'project_id,id,title,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at,idea_score', 'project_id', ids),
+    fetchRowsIn('content_items', 'project_id,id,title,format,stage,brief,cta,purpose_type,quality_score,quality_fails,approved_at,idea_score', 'project_id', ids, (q) => q.or('purpose_type.is.null,purpose_type.neq.daily_post')),
     fetchRowsIn('brand_channels', 'project_id,status,cadence_target,last_post_at,followers', 'project_id', ids),
     fetchRowsIn('channel_product_channels', 'project_id,product_id', 'project_id', ids, undefined, ['project_id', 'product_id']),
     fetchRowsIn('content_placements', 'project_id,id', 'project_id', ids,

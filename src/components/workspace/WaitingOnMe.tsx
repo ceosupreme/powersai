@@ -20,6 +20,8 @@ import { useAgentDesk } from '@/hooks/useAgentDesk';
 import { buildNeedsYou, needsYouActionIds, type AgentHandoffRow } from '@/lib/agentDesk';
 import { NeedsYouStrip } from '@/components/agent-desk/AgentDeskSections';
 import { AgentDeskTaskSheet } from '@/components/agent-desk/AgentDeskTaskSheet';
+import { useDailyPosts } from '@/hooks/useDailyPosts';
+import { plainWaitingReason } from '@/lib/dailyPosts';
 
 export interface WaitingRow {
   id: string;
@@ -294,6 +296,8 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
   const [showSnoozed, setShowSnoozed] = useState(false);
   const { isAdmin } = useAuth();
   const desk = useAgentDesk();
+  const dailyPosts = useDailyPosts(projects.map((p) => p.id));
+  const waitingDailyPosts = (dailyPosts.data ?? []).filter((p) => p.post_status === 'waiting_on_owner');
   const asks = buildNeedsYou(desk.rows).filter(i => !i.brandIds.length || i.brandIds.some(id => ids.includes(id)));
   const linkedIds = needsYouActionIds(asks);
   const [selectedAgentRow, setSelectedAgentRow] = useState<AgentHandoffRow | null>(null);
@@ -460,6 +464,25 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
           <NeedsYouStrip items={asks} brandNames={brandNames} isAdmin={isAdmin}
             onAnswer={r => { setSelectedAgentRow(r); setAnswerMode(true); }}
             onSelect={r => { setSelectedAgentRow(r); setAnswerMode(false); }} />}
+        {waitingDailyPosts.length > 0 && (
+          <div className="mb-3 space-y-1.5 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-destructive">
+              Daily posts waiting on you ({waitingDailyPosts.length})
+            </p>
+            <ul className="space-y-1.5">
+              {waitingDailyPosts.map((p) => (
+                <li key={p.id} className="text-sm flex flex-wrap items-center justify-between gap-2">
+                  <span>
+                    <strong className="font-medium text-foreground">{p.brand_name}</strong> ({p.post_date}): {plainWaitingReason(p.waiting_reason, p.waiting_detail)}
+                  </span>
+                  <Link to={`/projects/${p.project_id}`} className="text-xs text-primary underline shrink-0">
+                    Open brand
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {isLoading ? (
           <p className="text-xs text-muted-foreground">Loading…</p>
         ) : isError ? (
