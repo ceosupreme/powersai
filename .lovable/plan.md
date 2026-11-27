@@ -1,74 +1,69 @@
-# AI Recommendation Seat — six public sales pages
+# Agent Desk urgent lane ("Now" and "Queue")
 
-## Route
-`/seat/:category` (e.g. `/seat/family-law`, `/seat/med-spa`), with optional town deep link `/seat/:category/:town` (e.g. `/seat/cosmetic-dentist/carmel-valley`) that pre-selects the town in the visual, the seat panel and the form. A seventh category is a new row, no code. `/for/legal` and `/for/medspa` are untouched. Why not `/for/...`: that route belongs to the other offer, so sharing it would mix the two in navigation, analytics and the sitemap.
+## In one line
+Every job is **Queue** unless whoever posts it says **Now**. A Now job wakes its agent right away. If nobody picks it up, the backup agent is woken, then you see it in Waiting on me.
 
-Prospecting videos can link to the town URL, so the first screen already says "Del Mar" and the person's profession.
+## What you will see on the Agent Desk
+- A new **Now** strip at the top, above "Needs you": each urgent job with the agent's name, the brand, and "waiting 12 min" counting up. It turns amber after the first wait, red when it reaches you.
+- Every job card and the job sheet get a small **Now / Queue** switch. One tap flips it. Flipping to Now wakes the agent straight away; flipping to Queue stops any more wake-ups.
+- On each job: "Woke Claude 9:02 · woke ChatGPT 9:17 · sent to you 9:32", so you can see what HQ already tried.
+- Agent cards show "1 urgent" next to the open count.
+- An urgent job that waited too long also shows in **Waiting on me** on the Dashboard, with "Hand to another agent" and "Move to Queue".
 
-## Sections, in order
-1. **The question** (first screen). Big headline from data, e.g. "Your next client just asked an AI who to hire in Del Mar. It didn't say your name." Below it, the AI answer visual (below). One button: "Check what the AI says about you".
-2. **What it means.** Three short lines: who asks AI, that it names about three businesses, that the rest are invisible. No numbers unless the row supplies a sourced one.
-3. **Why the AI picks who it picks.** Three plain cards: reviews on the sites it reads, credentials stated where it can find them, the same facts repeated everywhere. Category-specific wording (bar membership and certifications for attorneys, board certification for surgeons, CFP/fiduciary for advisors, licenses and project photos for builders).
-4. **The first 90 days.** Timeline in three steps (days 1–30, 31–60, 61–90), each one sentence plus "what you'll see".
-5. **One seat per town.** Seat availability panel (below).
-6. **The price.** One card: install, monthly, six-month term, what's included, what we need from them. No checkout.
-7. **Two angles** (only dentists and surgeons; shown when the row has them): side-by-side "Take a seat for one procedure" vs "Defend the seat you hold", each with its own button that tags the inquiry.
-8. **Questions owners ask.** 5–7 FAQs per category, large type, open one at a time.
-9. **Founder note.** Short Sean Powers line, since 2002, LinkedIn link — trust for older owners.
-10. **One clear action.** Form: name, practice, phone or email, town (pre-filled), angle if relevant, "Claim the seat" or "Check the AI answer first". Lands in existing inquiries.
+## The timing (my suggestion; you can change it)
+- Posted as Now → main agent woken at once.
+- Not picked up in **15 minutes** → backup agent woken (the job's fallback agent).
+- Still not picked up **15 minutes later** → in Waiting on me, and an email to ceosupreme@gmail.com.
+- No backup set → goes straight to you after 15 minutes.
+- "Picked up" means the agent marked it claimed or working. Done, cancelled or moved to Queue stops the clock.
 
-A sticky bottom button on phones repeats the one action.
+## How each agent gets woken
+HQ can always do its part alone: notice a Now job the moment it is saved, decide who to wake, send the wake-up, retry, and escalate to you. Whether the agent then acts depends on what is listening on its side.
 
-## The AI answer visual
-- A neutral "answer card", not any product: ivory card, charcoal text, a small copper sparkle mark of our own, label "An AI assistant's answer" (never ChatGPT/Gemini/Google styling or logos).
-- Top: the question typed out in the visitor's words, with town and category filled in; it types itself once on load (static if reduced motion).
-- Answer: three generic listings — "A Del Mar family law firm with 300+ reviews", etc., drawn from row text, never real names; shown as soft placeholders.
-- Fourth line, faded, with a wine underline: "Your practice — not mentioned." This is the emotional beat.
-- A small caption under it: "Illustration. Not a real AI answer." — honest and in readable size.
-- Town chips under the card switch the town in the question (Del Mar / Carmel Valley / Solana Beach / Rancho Santa Fe).
-- A second state appears in section 6 or after the 90 days: same card with "Your practice" now in slot one — before/after without a fake screenshot.
+HQ will send every wake-up the same way: a short message to an address that agent gives us ("You have an urgent job: <title>. Open job <id>"). The message never carries the job's details, only the pointer, so the agent still reads the board as it does today.
 
-## Seat availability panel
-- Four large town tiles in a 2×2 grid on phones. Each: town name, big word **Open** (copper) or **Taken** (charcoal, wine outline) or **Held for review** (amber, someone is mid-conversation).
-- For dentists/surgeons, a taken general seat can still show "Open by procedure" with a short list (veneers, implants...).
-- Line under it: "We take one business per category per town. When a town is taken, it stays taken while they are a client." Taken tiles offer "Join the waitlist" (same form, tagged).
-- Never shows client names.
+- **Claude.** Claude has no inbox HQ can push into a chat thread. Two options, best first:
+  1. A Claude scheduled task that checks only for urgent jobs every 5 minutes (a tiny read, cheap). This is a timer, but short enough to feel immediate.
+  2. If you run Claude through something that accepts a web address (a webhook into an automation tool that starts a Claude run), HQ calls that address instantly.
+- **Muse and ChatGPT.** Same choice. If their setup can receive a web address call or a message (email, Slack), HQ sends it instantly. If they can only log in and look, they need a short urgent-only check every 5–10 minutes.
+- **Any agent on a timer only.** HQ cannot reach it; the timer is the wake-up. So the backup step and the alert to you are what make sure it isn't missed. I'd set each timer agent's 15-minute wait to start after its next check, so it isn't escalated before it had a chance.
 
-## Data shape (one new table, needs your approval)
-`public.ai_seat_pages` — one row per category:
-- `slug text unique`, `category_name text`, `is_published boolean`, `sort_order int`
-- `meta_title`, `meta_description`, `share_image_url text`
-- `hero_headline`, `hero_subhead`, `cta_primary_label`, `cta_secondary_label text`
-- `answer_question_template text` (uses `{town}`), `answer_listings jsonb` (array of 3 strings), `answer_you_line text`
-- `why_points jsonb` [{title, body}], `plan_90 jsonb` [{range, title, body, you_see}]
-- `install_cents int`, `monthly_cents int`, `term_months int default 6`, `included jsonb` [string], `price_note text`
-- `angles jsonb` nullable [{key: "challenger"|"defender", title, body, cta_label}]
-- `faqs jsonb` [{q, a}], `founder_note text`, `updated_at`
+**What each agent needs on its side:** (a) a place to receive the ping, or a 5-minute urgent-only check, and (b) one new rule in its instructions: "Rows with urgency 'now' addressed to me come first; claim before working." You said you write the agents' instructions yourselves; I'll give you the exact lines to paste.
 
-`public.ai_seat_availability` — one row per category×town (so seat status edits are one-line updates):
-- `page_slug text` FK, `town_slug text`, `town_name text`, `status text check (open|held|taken)`, `procedures_open jsonb` nullable, `sort_order`, unique(page_slug, town_slug)
+Per agent you set, in HQ: wake-up method (web address, email, or timer only) and the address. Kept in a small settings list on the Desk's admin side; web addresses and any keys stay in backend secrets.
 
-RLS: public read of published rows, admin write. You edit with plain SQL updates.
+## What happens to jobs already on the board
+- All 26 open jobs and every old job become **Queue**. Nothing wakes up when this goes live.
+- You can flip any of them to Now afterwards.
+- Standing jobs (repeating ones) stay Queue and can't be set to Now; a single run you need today should be posted as its own job.
 
-Inquiries: reuse `submit-inbound-lead` unchanged — `project_type = 'ai_seat'`, `qualifier_data = {offer:'ai_recommendation_seat', category, town, angle, intent:'claim'|'answer_check'|'waitlist'}`, source `/seat/...`. Admin sees them in Inbound and Leads with a small "AI Seat · Med spa · Del Mar" badge (one-line display change).
+## Setting the level when posting
+- In HQ (Create pipeline, Content Studio, owner actions): a Now/Queue choice, Queue pre-picked.
+- Agents writing straight to the database: they set urgency to 'now' or leave it out (Queue). Anything else is refused. HQ never guesses from the wording.
+- Owner actions on existing jobs (answer, send back, hand over, retry) keep the job's current level; handing a Now job to another agent wakes the new agent.
 
-## SEO and sharing
-Each page prerendered with its own title/description/share image; sitemap adds every published category (and town URLs as canonical to the category page, to avoid six-times-four thin duplicates). Fallback share image generated in the existing share-card style if a row's field is empty.
+## Changes behind the scenes (need your approval)
+- On the mailbox: `urgency` (now/queue, default queue), `urgent_since`, and a small wake-up history (who was woken, when, did it get through).
+- A small table for each agent's wake-up method and address.
+- A database trigger that fires when a job becomes Now, calling one new backend function that sends the ping; a scheduler every minute that handles the 15-minute steps. Both already exist in the project as tools (no new service).
+- One new owner action: set urgency.
 
-## Where I'd differ
-- **Town URLs**, so the video can link straight to "Carmel Valley veneers".
-- **"Held" status**, so two prospects in the same town aren't both promised an open seat.
-- **Answer check before claim** as the safer first step for older, cautious owners; the claim stays the main button.
-- **Show "Illustration" label** — protects truthful-claims rule.
-- **No guarantee wording**: "we work to get you named and keep you there", never "guaranteed #1". Price card says what's included, not outcomes.
-- Not linked from main nav at first; reachable by video links, a footer "AI Recommendation Seat" link and the sitemap. Say if you want it in the header.
-- Copy for all six rows drafted and loaded by me as starting text for you to edit, unless you'd rather load it yourself.
+## Possible conflicts with the current Desk
+- **Claimed but stuck.** Today "stuck" means claimed over 24 hours. For Now jobs I'd add a shorter "claimed but not finished in 2 hours" warning, or urgent jobs would go quiet once claimed. Say if you want that.
+- **Questions to you** (needs_owner) don't wake agents; they already land in Needs you. A Now question just sorts first.
+- **Social posts.** Agents post them daily already. I'd let a post be Now only on its post day (images for today's post), not by default, or the strip fills every morning.
+- **Retry of a failed group** keeps Queue unless you flip it, so a 12-post retry doesn't fire 12 wake-ups.
+- **Content Studio leases** are untouched; a claimed Studio task counts as picked up.
+- **Muse and ChatGPT sign in as you**, so HQ can't tell from the login who flipped a job. The history will show "owner account" for those.
 
-## Left out of v1
-Running real AI answer checks on the page, live seat changes from Leads, checkout, Spanish versions.
+## Left out of version 1
+Text-message alerts, wake-up quiet hours, priority levels beyond two, guessing urgency.
+
+## Running cost
+No new service fee. A minute-by-minute check and an occasional email cost nothing noticeable. Agent timers cost whatever each agent's own platform charges per check.
 
 ## Rough credits
-About 10–15 credits (tables, page, visual, panel, prerender/sitemap, inquiry badge, Guide, seed copy, phone/desktop checks).
+About 8–12 credits, plus 1–2 per agent wake-up method you want tested live.
 
-## Next
-The Drive files plan is ready and I'll show it again after this one.
+## Also ready
+The Drive files plan and the AI Recommendation Seat plan are written; I'll show them again next.
