@@ -1,0 +1,1409 @@
+{
+  "key": "puzzle_book",
+  "title": "Puzzle book method: from a chosen theme to a large-print KDP paperback and printable twin",
+  "version": "2.0",
+  "date": "2026-11-27",
+  "covers": [
+    "large-print word search",
+    "word search",
+    "sudoku",
+    "crossword",
+    "mixed puzzle book"
+  ],
+  "ends_with": "The owner holds the print interior PDF, the full cover PDF, the printable twin files (Letter, A4, start-here, terms, free sample), the verification report, a paste-ready listing kit in the order KDP asks for it and the direct upload link, all in the brand folder linked on the job in HQ.",
+  "outside_hq": [
+    {
+      "what": "Make sure the one KDP account is ready: tax interview and bank details done.",
+      "why": "KDP will not pay royalties without them, and the account rule is one account forever, never a second one.",
+      "how_owner_does_it": "Sign in at kdp.amazon.com, open Your Account at the top, finish any section marked incomplete. Skip this if it is already done.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Make sure a Payhip account exists for the brand, and an Etsy shop if the twin goes on Etsy too.",
+      "why": "The printable twin and the free sample are sold and delivered there; HQ cannot create accounts for him.",
+      "how_owner_does_it": "Open payhip.com and etsy.com/sell, sign up with the brand email, connect payouts. Skip any that already exist.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Receive the printed proof copy in the mail and check it in hand, if he ordered one.",
+      "why": "Only paper shows whether the letters really read as large print at arm's length, whether grids sink into the spine and whether answer marks are dark enough.",
+      "how_owner_does_it": "When the box arrives, follow the proof checklist in stage 8 and tap pass or fail for each line in HQ.",
+      "owner_minutes": 15
+    },
+    {
+      "what": "Click Publish on KDP, Payhip and Etsy.",
+      "why": "Agents never publish or upload on his behalf without his explicit yes; the final button on each site is his.",
+      "how_owner_does_it": "Paste each field from the upload kit in the order shown, then press the publish button named in the kit.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Only if the agents are blocked on Amazon: phone screenshots of the 1 to 3 star reviews on the top five competing puzzle books.",
+      "why": "Amazon restricts AI agents, and the review read must never run from the KDP publishing login.",
+      "how_owner_does_it": "Open each of the five books in the Amazon app, filter reviews to 1, 2 and 3 stars, screenshot them and drop the images in the brand folder.",
+      "owner_minutes": 15
+    }
+  ],
+  "stages": [
+    {
+      "n": 1,
+      "key": "check_shelf",
+      "title": "Check the shelf and mine the reviews",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Study the top 20 competing puzzle books for the main search phrase (for example dog word search large print) and turn their buyers' complaints into a short list of things this book will fix.",
+      "why": "Puzzle buyers review the object: print that is not really large, wrong answer keys, missing words. Their repeated complaints are the cheapest proof of what to fix. For the Dog Lover's book this step is still open in HQ.",
+      "inputs": [
+        "theme and brand",
+        "primary search phrase",
+        "existing competitor check in HQ (for the Dog Lover's book: two dog word search books ranked about #11k with 92 reviews and about #104k with 10 reviews, October 16, 2026)"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "How many competitors to study",
+          "value": "Top 20 books for the main search phrase; read reviews on the top five most closely",
+          "reason": "His KDP Charter sets 20 for books.",
+          "source": "S1"
+        },
+        {
+          "what": "Which reviews to read",
+          "value": "All 1, 2 and 3 star reviews plus the but-sentence in 4 star reviews, keeping 1 star reviews",
+          "reason": "His standard keeps 1 star reviews because they hold the print-size, key and layout failures; the NotebookLM advice to skip them was rejected at merge.",
+          "source": "S1"
+        },
+        {
+          "what": "Where reviews come from",
+          "value": "Amazon reads go to Muse through the HQ agent mailbox, ChatGPT as backup, never the KDP login. If blocked: freely readable copies (Barnes and Noble, Walmart, eBay, Goodreads and mirror stores that show Amazon reviews), then phone screenshots from the owner as the last resort",
+          "reason": "Amazon restricts AI agents; the free copies already show the shelf's main complaints (print too small, word list on another page, too few words).",
+          "source": "S43"
+        },
+        {
+          "what": "Whether a low score stops the book",
+          "value": "No. The score ranks and sharpens the brief; it never blocks a title he picked.",
+          "reason": "Override of November 13, 2026.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Load the brand kit and the brand rules from HQ (for Big Paws Club: brand rules v1.1).",
+        "Run the free validation: search suggestions, top 20 results, sales rank read as relative, page counts, trim, puzzle counts and list prices.",
+        "Request the Amazon review and rank reads from Muse through the HQ agent mailbox, with ChatGPT as backup.",
+        "Cluster the complaints into the shelf's known groups (print size, layout, key, words, theme, difficulty, paper and binding), count how many books and reviewers repeat each, and quote each at ten words or fewer with its link.",
+        "Note what five-star reviews praise (big bold letters, themes that fit, word list beside the grid, mixed difficulty, thick pages); these are must-keeps.",
+        "File each complaint in the Answer Bank (audience_pains) and update the title's notes in HQ."
+      ],
+      "output": [
+        {
+          "name": "Complaint list with links and counts",
+          "format": "table in the job",
+          "lands_in": "the title's notes in HQ and the Answer Bank"
+        },
+        {
+          "name": "Top 20 shelf table (rank, ratings, price, pages, trim, puzzle count, stated point size)",
+          "format": "spreadsheet",
+          "lands_in": "the brand folder, linked on the job in HQ"
+        }
+      ],
+      "check": "At least five complaint groups are filed, each with a quote of ten words or fewer and a working link.",
+      "checks": [
+        "The shelf table holds price and page count for at least ten books.",
+        "The five-star praise list has at least three items."
+      ],
+      "if_fail": "Widen to the second search phrase (for example large print word search for seniors) and repeat. This stage never blocks later stages for a book already built; its findings feed the listing and the stage 6 check.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S6",
+        "S42",
+        "S43",
+        "S44",
+        "S45",
+        "S46"
+      ]
+    },
+    {
+      "n": 2,
+      "key": "approve_brief",
+      "title": "Approve the one-screen brief",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude fills the brief: buyer, puzzle type, the one theme, the list of sub-themes, puzzle count, difficulty mix, specs, the complaints it fixes and the price. The owner picks the price and the author name, then approves.",
+      "why": "Puzzle count, grid size and key layout set the page count, and the page count sets the printing cost, the royalty and the spine. Settling them here prevents the most expensive late change.",
+      "inputs": [
+        "complaint list and praise list",
+        "shelf table",
+        "brand kit"
+      ],
+      "choices": [
+        {
+          "key": "price",
+          "question": "What list price on Amazon.com?",
+          "help": "KDP pays 60 percent minus printing at $9.99 and up, 50 percent below. For the Dog Lover's book (156 pages after rounding) printing is about $3.65, so you earn about $4.14 at $12.99, $2.34 at $9.99 and $5.34 at $14.99. Comparable large-print word search books sell at $12.99 to $17.95.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "12_99",
+              "label": "$12.99",
+              "pick_when": "You want the low end of the shelf's price band with almost twice the royalty of $9.99.",
+              "recommended": true
+            },
+            {
+              "value": "9_99",
+              "label": "$9.99 (the October 16 price)",
+              "pick_when": "You want the cheapest impulse gift on the page and accept about $2.34 a copy.",
+              "recommended": false
+            },
+            {
+              "value": "14_99",
+              "label": "$14.99",
+              "pick_when": "The book has more than 100 puzzles or reviews already show it beats the shelf.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "author_name",
+          "question": "Whose name goes on the cover as author?",
+          "help": "KDP allows a pen name or brand name as long as it does not mislead buyers. The same name must match on the cover, the title page and the KDP Author field.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "brand_name",
+              "label": "The brand name (for example Big Paws Club)",
+              "pick_when": "It is a brand puzzle book; sibling books will share the name.",
+              "recommended": true
+            },
+            {
+              "value": "allmighty_supreme",
+              "label": "Allmighty Supreme",
+              "pick_when": "The book sits on your personal brand.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "brief_ok",
+          "question": "Is the brief right?",
+          "help": "Read the one screen, including the sub-theme list. Approving starts the word lists; nothing is generated before this.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "approve",
+              "label": "Approve",
+              "pick_when": "The buyer, the theme and the sub-themes sound right.",
+              "recommended": true
+            },
+            {
+              "value": "change",
+              "label": "Change something (say it by voice)",
+              "pick_when": "A sub-theme, the count or the difficulty mix is off.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Low-content box",
+          "value": "Not ticked",
+          "reason": "KDP lists puzzle books as not generally low-content and says a wrong box gets the book rejected. Not ticking keeps the free ISBN, Look Inside, series and Expanded Distribution.",
+          "source": "S10"
+        },
+        {
+          "what": "Formats",
+          "value": "Paperback plus printable twin; no Kindle edition",
+          "reason": "KDP's content quality guide lists puzzle books under content unsuited for reading on Kindle and says they are better suited to a physical form.",
+          "source": "S12"
+        },
+        {
+          "what": "Trim, ink and paper",
+          "value": "8.5 x 11 in, black ink, white paper, no bleed",
+          "reason": "8.5 x 11 holds one large-print grid per page and runs 24 to 590 pages on white paper. White matches his seniors test (black on white); APH also allows ivory and never gray.",
+          "source": "S14"
+        },
+        {
+          "what": "Theme",
+          "value": "One theme per volume (for example dogs), with one named sub-theme per puzzle (breeds, dog park, puppy days, famous dogs) and every word fitting its sub-theme",
+          "reason": "Mixed-bag books earn the no-themes review; his standard sets one theme per volume.",
+          "source": "S1"
+        },
+        {
+          "what": "Puzzle count and difficulty mix",
+          "value": "50 to 100 puzzles; a third each easy, medium and hard, labeled on every page, getting harder through the book",
+          "reason": "His standard sets 50 to 80; 100 is kept for the Dog Lover's book because it is already built and competitors sell 100 to 200. Too-easy and too-few-words are repeated complaints.",
+          "source": "S45"
+        },
+        {
+          "what": "Page count",
+          "value": "Front matter about 6 pages, one puzzle per page, a divider, answer keys 2 per page; always an even total",
+          "reason": "KDP rounds the page count up to an even number, so an odd file changes the spine. 100 puzzles come to about 156 pages.",
+          "source": "S17"
+        },
+        {
+          "what": "Large print",
+          "value": "Yes, a large-print book from the start, with the actual letter size stated in the subtitle",
+          "reason": "Older buyers are the main lane; APH sets 18 pt as the floor for anything called large print.",
+          "source": "S36"
+        },
+        {
+          "what": "ISBN",
+          "value": "Free KDP ISBN",
+          "reason": "Available because the book is not low-content; the imprint shows as Independently published.",
+          "source": "S26"
+        },
+        {
+          "what": "Series",
+          "value": "Fill the Series field from book one when the brief plans siblings (for example Big Paws Club Large-Print Puzzles, book 1)",
+          "reason": "Puzzle books can join a series; only low-content and public domain books cannot.",
+          "source": "S19"
+        },
+        {
+          "what": "Weekly slots",
+          "value": "At most two new paperbacks a week across all brands",
+          "reason": "KDP limit: up to 2 new titles per format each week, resetting Sunday 00:00 UTC.",
+          "source": "S20"
+        },
+        {
+          "what": "Timing",
+          "value": "Plan for 3 to 4 weeks of KDP review",
+          "reason": "KDP says reviews for activity books, which include puzzle books, might take 3 to 4 weeks. A book uploaded in late November may miss Christmas.",
+          "source": "S11"
+        }
+      ],
+      "work": [
+        "Fill the brief template (kdp-book kit-contract.md section 1) with the puzzle fields: type, theme, sub-theme list, count, difficulty mix, grid sizes, words per puzzle, key layout.",
+        "Work out the page count and show the royalty at each price option with the math.",
+        "Book the KDP week slot in HQ.",
+        "Register the title on HQ's Products page at status scored, then brief once approved (kdp-book hq-recipes.md)."
+      ],
+      "output": [
+        {
+          "name": "Approved brief with sub-theme list and page math",
+          "format": "one screen in the job, plus brief.md",
+          "lands_in": "the brand folder, linked on the job in HQ"
+        }
+      ],
+      "check": "The owner tapped Approve, and the brief names the buyer, the theme, every sub-theme, the puzzle count, the page count and the price.",
+      "checks": [
+        "The page count is even and the royalty at the chosen price is shown.",
+        "The low-content box is recorded as not ticked."
+      ],
+      "if_fail": "Claude rewrites the brief from his voice note and shows it again. If he skips the brief, Claude uses the recommended options and the card says the brief was not read.",
+      "owner_minutes": 5,
+      "sources": [
+        "S1",
+        "S10",
+        "S11",
+        "S12",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S19",
+        "S20",
+        "S26",
+        "S36"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The recommended option is used for every choice and the brief is approved as written."
+      }
+    },
+    {
+      "n": 3,
+      "key": "word_lists",
+      "title": "Build and check the themed word lists",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude writes one word list per puzzle from its sub-theme, then checks every word for spelling, fit, length, overlap and words that must not appear.",
+      "why": "Misspelled words, random words that do not fit the theme and an unalphabetized list are repeated one-star complaints, and a word hidden inside another word makes a grid unsolvable.",
+      "inputs": [
+        "approved brief and sub-theme list",
+        "brand rules"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Words per puzzle",
+          "value": "Easy 12 to 15, medium 15 to 20, hard 18 to 24",
+          "reason": "His spec is 12 to 24 words per grid; a buyer complained about only 9 words a page.",
+          "source": "S45"
+        },
+        {
+          "what": "Word length",
+          "value": "4 to 12 letters, no spaces or punctuation inside the grid (GOLDEN RETRIEVER becomes GOLDENRETRIEVER in the grid and stays two words in the list)",
+          "reason": "Long words must fit the grid; short words appear by accident too often to count as found once.",
+          "source": "S47"
+        },
+        {
+          "what": "Word checks",
+          "value": "Spelled correctly (dictionary plus a second model read), fits its sub-theme, no trademark or brand name, no word inside another word in the same list, list alphabetized",
+          "reason": "His generator gate rules and the shelf's complaints.",
+          "source": "S1"
+        },
+        {
+          "what": "Sibling overlap",
+          "value": "No sub-theme reused from a sibling title, and at most a third of a sibling's words reused",
+          "reason": "KDP removes books whose content is excessively reused across books; his rule keeps two-thirds of any sibling different.",
+          "source": "S12"
+        },
+        {
+          "what": "Sudoku instead",
+          "value": "No word lists: the brief sets the count per level (for example 25 easy, 25 medium, 25 hard, 25 very hard) and the clue range per level",
+          "reason": "Sudoku has no theme words; difficulty comes from the clues and the solving steps they force.",
+          "source": "S54"
+        },
+        {
+          "what": "Crossword instead",
+          "value": "Claude writes answer words and clues per sub-theme; every clue is checked by a second model solving it cold, and any clue it misses is rewritten",
+          "reason": "Clue correctness is the highest risk in puzzle books because it needs a reader, not a program.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Write each list from the sub-theme; keep a master list of every word used in the book and in every sibling title.",
+        "Run the spell check, the trademark check and the inside-another-word check; replace any failing word.",
+        "Have a second model (ChatGPT) read each list against its sub-theme and flag words that do not fit.",
+        "Alphabetize each list and record it in the book's word file."
+      ],
+      "output": [
+        {
+          "name": "Word file (sub-theme, difficulty, word list per puzzle)",
+          "format": "JSON plus a readable markdown copy",
+          "lands_in": "the brand folder, source subfolder"
+        }
+      ],
+      "check": "Every list passes spelling, fit, length, overlap and trademark checks, and every list is alphabetized.",
+      "checks": [
+        "No word appears inside another word in the same list.",
+        "Overlap with every sibling title is a third or less."
+      ],
+      "if_fail": "Replace the failing words and rerun the checks on that list.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S12",
+        "S45",
+        "S47",
+        "S54"
+      ]
+    },
+    {
+      "n": 4,
+      "key": "generate_grids",
+      "title": "Generate the grids and run the generator gate",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude's own code builds every grid from its word list, then a separate checker solves each finished grid from scratch and rejects any grid that fails.",
+      "why": "A missing, doubled or misplaced word makes a puzzle unusable, and filler letters can spell rude words by accident. Free generators often skip these checks.",
+      "inputs": [
+        "word file",
+        "difficulty rules from the brief"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Generator",
+          "value": "Claude's own Python code, or the free MIT-licensed word-search-generator library, with the checker written separately",
+          "reason": "Free, repeatable and checkable. Free web generators can require a credit line on every puzzle and written permission to sell.",
+          "source": "S53"
+        },
+        {
+          "what": "Grid size and directions by level",
+          "value": "Easy 12 x 12, across and down only; medium 14 x 14, adds diagonals; hard 15 x 15, all eight directions including backwards",
+          "reason": "His spec is 12 x 12 to 16 x 16. 15 cells at about 0.48 in fit the 7.25 in width left after margins. The direction set must match the how-to page.",
+          "source": "S1"
+        },
+        {
+          "what": "Exactly once",
+          "value": "Every listed word is found exactly once across all eight directions in the final grid",
+          "reason": "His generator gate.",
+          "source": "S1"
+        },
+        {
+          "what": "Accidental words",
+          "value": "Scan every grid in all eight directions against an offensive-word list (LDNOOBW English list plus brand additions) at 3 letters and up; regenerate the filler on any hit",
+          "reason": "Accidental rude words in printed word searches do happen; professional tools scan for them.",
+          "source": "S48"
+        },
+        {
+          "what": "Key source",
+          "value": "Re-derive the answer key from the final grid, never from the generator's placement log, and compare the two",
+          "reason": "His generator gate; a wrong key is a repeated complaint.",
+          "source": "S1"
+        },
+        {
+          "what": "No repeats",
+          "value": "Hash each grid plus its sorted word list and reject any match within the book or any sibling title",
+          "reason": "KDP's reuse rule and his sibling rule.",
+          "source": "S12"
+        },
+        {
+          "what": "Sudoku instead",
+          "value": "Generate a full grid, remove clues, and keep a puzzle only when a solver finds exactly one solution; grade difficulty by the solving steps a human-style solver needs, not by clue count alone",
+          "reason": "A proper sudoku has exactly one solution, and fewer than 17 clues can never give one; clue count alone does not fix difficulty.",
+          "source": "S54"
+        },
+        {
+          "what": "Crossword instead",
+          "value": "Grids with 180-degree symmetry, answers of 3 letters or more and no unchecked squares; a second model solves every puzzle from the clues alone before layout",
+          "reason": "The standard American crossword rules.",
+          "source": "S55"
+        },
+        {
+          "what": "Mixed books",
+          "value": "Each puzzle type runs its own gate; the book groups types into sections and keeps the theme across them",
+          "reason": "The no-themes complaint applies to mixed books too.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Generate each grid with a fixed random seed recorded in the word file, so any grid can be rebuilt.",
+        "Run the checker: exactly-once count in eight directions, direction set by level, accidental-word scan, key re-derived and compared, hash against the book and siblings.",
+        "Regenerate any failing grid with a new seed until it passes; never hand-edit a grid.",
+        "Write the verification report: one line per puzzle with pass or fail on each check."
+      ],
+      "output": [
+        {
+          "name": "Grid file and answer key file",
+          "format": "JSON",
+          "lands_in": "the brand folder, source subfolder"
+        },
+        {
+          "name": "Generator gate report",
+          "format": "CSV plus a one-line summary in the job",
+          "lands_in": "the brand folder, linked on the job in HQ"
+        }
+      ],
+      "check": "The report shows every puzzle passing every check, with zero accidental-word hits.",
+      "checks": [
+        "The number of puzzles equals the brief's count.",
+        "Each level uses only its stated directions."
+      ],
+      "if_fail": "Regenerate the failing grids; if a word list keeps failing, send it back to stage 3.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S12",
+        "S47",
+        "S48",
+        "S49",
+        "S52",
+        "S53",
+        "S54",
+        "S55"
+      ]
+    },
+    {
+      "n": 5,
+      "key": "render_files",
+      "title": "Render the interior and the printable twin",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude lays out the print interior PDF and the printable twin in Letter and A4 from the checked grid file.",
+      "why": "Large print that is not large, the word list on another page, keys in tiny type and keys placed between puzzles are the shelf's layout complaints; layout settles all of them.",
+      "inputs": [
+        "grid and key files",
+        "approved brief",
+        "brand fonts and colors"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Grid letters",
+          "value": "20 to 24 pt bold sans serif capitals (for example Arial or Verdana), never under 18 pt measured at final trim; no italics",
+          "reason": "APH sets 18 pt as the large-print floor with sans serif and no italics; RNIB calls 18 pt and up giant print.",
+          "source": "S36"
+        },
+        {
+          "what": "Grid",
+          "value": "Cells about 0.45 to 0.55 in, lines 0.75 to 1 pt solid black, no gray or color fills",
+          "reason": "KDP needs lines 0.75 pt or thicker; APH says to avoid gray elements.",
+          "source": "S17"
+        },
+        {
+          "what": "Word list",
+          "value": "Same page as its grid, alphabetized, 16 to 18 pt, in two or three columns under the grid, with a check box beside each word",
+          "reason": "A buyer complained that word lists were not on the puzzle's page; his spec sets 16 to 18 pt.",
+          "source": "S44"
+        },
+        {
+          "what": "Page header",
+          "value": "Puzzle number, sub-theme title and difficulty level on every puzzle page; page numbers bold, same size as body text, at the outer corner",
+          "reason": "His rule that puzzle, title and key numbers agree, and ACB's page-number rule.",
+          "source": "S37"
+        },
+        {
+          "what": "Answer keys",
+          "value": "Behind a divider page at the back, 2 keys per page, letters 14 pt or larger, found words circled with a thin black outline, never color or gray",
+          "reason": "Keys between puzzles spoil them and colored marks vanish for low-vision readers.",
+          "source": "S1"
+        },
+        {
+          "what": "Front matter",
+          "value": "Title page, copyright page (with the AI and image credit lines), how-to-play page that names the directions per level, a difficulty key, one filled example",
+          "reason": "His five-part skeleton puts a how-to page with a filled example up front.",
+          "source": "S1"
+        },
+        {
+          "what": "Margins",
+          "value": "Inside 0.75 in, outside 0.5 in, top and bottom 0.5 in, no bleed",
+          "reason": "Clears KDP's minimum gutter of 0.5 in for 151 to 300 pages and 0.25 in outside.",
+          "source": "S14"
+        },
+        {
+          "what": "Print file rules",
+          "value": "Fonts fully embedded, any images 300 DPI, even page count, no more than 10 blank pages at the end",
+          "reason": "KDP manuscript rules.",
+          "source": "S17"
+        },
+        {
+          "what": "Printable twin",
+          "value": "The same puzzles and keys as PDF in exact Letter and A4 with all ink inside a 0.5 in margin, plus a start-here page, a terms page and a free 5-puzzle sample; at most 5 files of 20 MB each, names under 70 characters",
+          "reason": "Etsy file limits and his printable spec; the sample is the brand's lead magnet and Payhip preview.",
+          "source": "S58"
+        },
+        {
+          "what": "Sudoku and crossword layout",
+          "value": "Sudoku: one 9 x 9 grid per page for large print, digits 24 pt or larger, thick 2 pt box lines; crossword: grid and clues on one spread, clue text 16 pt or larger",
+          "reason": "Same 18 pt floor and same-page rule applied to the other types; practice.",
+          "source": "S36"
+        }
+      ],
+      "work": [
+        "Render the interior with ReportLab from the grid file at 8.5 x 11 in.",
+        "Render the twin in Letter and A4 from a shared content box of about 7.5 x 10 in, plus the start-here, terms and sample files.",
+        "Check fonts with pdffonts and make the page count even (add a notes page or blank page at the end if needed).",
+        "Record the final page count; the cover is built from it in stage 7."
+      ],
+      "output": [
+        {
+          "name": "Print interior PDF",
+          "format": "PDF",
+          "lands_in": "the brand folder, files subfolder, linked on the job in HQ"
+        },
+        {
+          "name": "Printable twin (Letter, A4, start-here, terms) and 5-puzzle sample",
+          "format": "PDF",
+          "lands_in": "the brand folder, twin subfolder"
+        }
+      ],
+      "check": "The page count is even, all fonts are embedded and every grid and word list sits inside the margins.",
+      "checks": [
+        "Every puzzle page has its word list on the same page.",
+        "Answer keys sit only behind the divider."
+      ],
+      "if_fail": "Shrink the cell size within the 0.45 in floor or move the word list into three columns; never drop the letters below 18 pt.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S14",
+        "S17",
+        "S36",
+        "S37",
+        "S44",
+        "S58"
+      ]
+    },
+    {
+      "n": 6,
+      "key": "bench",
+      "title": "Check the finished files page by page",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude reads the grids and keys back out of the finished PDF itself, solves them again, measures the letters and looks at every page as an image.",
+      "why": "The generator gate checks the data; this checks what the buyer will actually hold. A book can pass the first and still print the wrong key, a doubled page or 16 pt letters. This is the stage the Dog Lover's book restarts at.",
+      "inputs": [
+        "print interior PDF and twin files",
+        "grid and key files",
+        "verification report"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Read back from the PDF",
+          "value": "Extract every grid, word list and key from the PDF text, solve each grid again and compare with the key page",
+          "reason": "His rule to re-derive the key from the final grid, applied to the final file.",
+          "source": "S1"
+        },
+        {
+          "what": "Letter size",
+          "value": "Measure the rendered capital height at final trim and confirm 18 pt or larger on puzzle pages and 14 pt or larger on keys",
+          "reason": "APH's 18 pt floor; his test bench rule to measure at final trim.",
+          "source": "S36"
+        },
+        {
+          "what": "Proofread",
+          "value": "Every page, including the title, copyright, how-to and divider pages, read by Claude and by a second model",
+          "reason": "His shared test bench item 6.",
+          "source": "S1"
+        },
+        {
+          "what": "Counts",
+          "value": "The puzzle count, page count and point size in the planned title and description match the file",
+          "reason": "A subtitle promising content the book lacks is a repeated complaint.",
+          "source": "S1"
+        },
+        {
+          "what": "Dog Lover's book",
+          "value": "First recover the three October 16 files from the build chat into the Big Paws Club Drive folder (none were in Drive on November 27). Run this whole stage on them. If they cannot be recovered, or any check fails, regenerate from stage 4 with the saved spec",
+          "reason": "HQ lists the book as ready to upload, but no check report or proofread exists, and 155 pages is odd, so KDP will count 156 and the spine must be rebuilt.",
+          "source": "S6"
+        }
+      ],
+      "work": [
+        "Extract grids, word lists and keys from the PDF with pdfplumber; rerun the exactly-once, direction and accidental-word checks on the extracted grids.",
+        "Compare every key page with a fresh solve; confirm puzzle number, title and key number agree page by page.",
+        "Measure letter height on rendered pages; render every page to an image and lay them out as a thumbnail grid to catch drift and doubled pages.",
+        "Proofread every page; hash the interior against every sibling title.",
+        "Fill one puzzle as a tired buyer with reading glasses off: can the first word be found in under a minute from the how-to page alone?",
+        "Attach the check report to the job and move HQ's status to needs cover."
+      ],
+      "output": [
+        {
+          "name": "Check report (read-back, key match, letter size, proofread, thumbnail grid, sibling hash)",
+          "format": "PDF report plus a pass line in the job",
+          "lands_in": "the brand folder, linked on the job in HQ"
+        }
+      ],
+      "check": "Every puzzle read back from the PDF passes, every key matches a fresh solve, and letters measure 18 pt or larger at trim.",
+      "checks": [
+        "The thumbnail grid shows no doubled or blank-by-mistake pages.",
+        "The how-to page names exactly the directions the grids use."
+      ],
+      "if_fail": "Fix in the grid file and re-render from stage 5; never patch the PDF by hand.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S6",
+        "S9",
+        "S36"
+      ]
+    },
+    {
+      "n": 7,
+      "key": "make_cover",
+      "title": "Make and approve the cover",
+      "owner": "owner",
+      "doer": "chatgpt",
+      "what": "An image model makes three front-cover concepts from the brand kit (or Claude builds them around a licensed photo); the owner picks one; Claude builds the full wrap from the final page count.",
+      "why": "The cover sells at thumbnail size, and older buyers and gift buyers look for the words large print first. A wrap built for a stale page count is the most common late rejection.",
+      "inputs": [
+        "final even page count",
+        "title, subtitle and author name",
+        "brand kit colors and fonts"
+      ],
+      "choices": [
+        {
+          "key": "cover_concept",
+          "question": "Which cover do you want?",
+          "help": "Judge each one at phone thumbnail size, the way shoppers first see it. Large Print must be readable at that size.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Three front-cover concepts from the brand kit and the top sellers' cover patterns (never copied), each with LARGE PRINT and the puzzle count in big type, shown at full size and at thumbnail size.",
+          "options": [
+            {
+              "value": "concept_1",
+              "label": "Concept 1",
+              "pick_when": "Large Print and the puzzle count read clearly at thumbnail size.",
+              "recommended": true
+            },
+            {
+              "value": "concept_2",
+              "label": "Concept 2",
+              "pick_when": "You want the dog photo or art to lead.",
+              "recommended": false
+            },
+            {
+              "value": "concept_3",
+              "label": "Concept 3",
+              "pick_when": "You want a sample grid on the front so the format is obvious.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "cover_finish",
+          "question": "Matte or glossy cover?",
+          "help": "This is the paperback's surface. It is set on the KDP Paperback Content page.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "matte",
+              "label": "Matte",
+              "pick_when": "You want less glare for older eyes and a soft gift feel.",
+              "recommended": true
+            },
+            {
+              "value": "glossy",
+              "label": "Glossy",
+              "pick_when": "The cover is a bright photo you want to pop.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Paperback cover file",
+          "value": "One PDF with back, spine and front built on KDP's template; bleed 0.125 in; images 300 DPI; barcode area at lower right of the back kept clear",
+          "reason": "KDP cover rules.",
+          "source": "S22"
+        },
+        {
+          "what": "Spine",
+          "value": "Even page count x 0.002252 in on white paper; spine text only at 79 pages or more",
+          "reason": "KDP spine rules. 156 pages gives about 0.351 in.",
+          "source": "S22"
+        },
+        {
+          "what": "Image tool",
+          "value": "ChatGPT or Muse image generation, both in his plans; a licensed stock photo is fine too. Higgsfield only with his go on credits",
+          "reason": "AI generation is his default; credit spends need his separate yes.",
+          "source": "S1"
+        },
+        {
+          "what": "Stock photo",
+          "value": "Keep the photo's license line in the rights folder (the Dog Lover's cover uses an Unsplash photo by Janosch Jost)",
+          "reason": "The Unsplash license allows commercial use without attribution; the record proves where the image came from.",
+          "source": "S59"
+        }
+      ],
+      "work": [
+        "Generate or compose the concepts and show them at full and thumbnail size.",
+        "Download KDP's cover template for 8.5 x 11, white paper and the exact even page count.",
+        "Build the wrap; back cover carries three lines of what is inside, a sample grid image and the brand line; keep the barcode area clear.",
+        "Record the prompts, image tool or photo license in the rights folder."
+      ],
+      "output": [
+        {
+          "name": "Paperback cover PDF",
+          "format": "PDF",
+          "lands_in": "the brand folder, files subfolder"
+        },
+        {
+          "name": "Front cover image for listings",
+          "format": "JPEG",
+          "lands_in": "the brand folder, twin subfolder"
+        }
+      ],
+      "check": "The wrap matches the cover calculator's size for the final even page count.",
+      "checks": [
+        "Title, subtitle and author name match the kit exactly.",
+        "Large Print and the puzzle count read at thumbnail size."
+      ],
+      "if_fail": "Rebuild the wrap from the current page count; if the page count changed, rebuild every time. If he skips the pick, Claude uses concept 1 and matte.",
+      "owner_minutes": 10,
+      "sources": [
+        "S1",
+        "S22",
+        "S59"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Concept 1 is used, with a matte finish where a finish applies."
+      }
+    },
+    {
+      "n": 8,
+      "key": "publish_kdp",
+      "title": "Publish it on KDP as a paperback",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "HQ hands over the upload kit: the files, every KDP field in the order the site asks, and the direct link. The owner saves the paperback as a draft, orders a proof if he says yes, checks it, then publishes.",
+      "why": "Only he may click publish. A printed proof is the one test of whether the letters really read as large print and whether grids sink into the spine.",
+      "inputs": [
+        "print interior PDF",
+        "cover PDF",
+        "listing kit",
+        "AI-content answer",
+        "stage 6 check report"
+      ],
+      "choices": [
+        {
+          "key": "proof",
+          "question": "Order a printed proof before publishing?",
+          "help": "A proof costs the printing cost (about $3.65 for 156 pages at 8.5 x 11) plus shipping, and is stamped Not for Resale. It spends money, so it needs your yes.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "order_proof",
+              "label": "Yes, order one proof (his go required)",
+              "pick_when": "It is the first large-print puzzle book in the family.",
+              "recommended": true
+            },
+            {
+              "value": "previewer_only",
+              "label": "No, publish after the online previewer",
+              "pick_when": "The same layout is already proofed in print, or a holiday date matters more.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "live_link",
+          "question": "Paste the Amazon link when the book is live.",
+          "help": "HQ marks the book live only after you paste the link. Puzzle books can take 3 to 4 weeks in review.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Title and subtitle",
+          "value": "Title names the format and audience in plain words; the subtitle carries the checkable promises: puzzle count, letter size, difficulty levels, answer key included (for example: 100 Dog-Themed Puzzles in 24-Point Print, Easy to Hard, Answer Key Included)",
+          "reason": "His title rule; KDP bans repeated generic words and keyword stuffing; title plus subtitle under 200 characters.",
+          "source": "S23"
+        },
+        {
+          "what": "Large Print box",
+          "value": "Ticked only when the stage 6 check measured 18 pt or more on puzzle pages",
+          "reason": "The box exists on the Paperback Details page; KDP's threshold for it is not on a public page, so the recipe uses APH's 18 pt, which clears the 16 pt figure reported for the box.",
+          "source": "S35"
+        },
+        {
+          "what": "Expanded Distribution",
+          "value": "On at $12.99 (about $1.54 a copy at 156 pages); off at $9.99, where it pays about $0.34",
+          "reason": "Expanded Distribution pays 40 percent of list minus printing.",
+          "source": "S15"
+        },
+        {
+          "what": "Description",
+          "value": "Under 4,000 characters including formatting; puzzle count, letter size, levels, theme list, how keys are marked; no web address, no review request, no price",
+          "reason": "KDP description rules.",
+          "source": "S28"
+        },
+        {
+          "what": "Publishing route",
+          "value": "He clicks Publish. An agent may fill the draft only after a one-tap yes card from him, and the Publish click stays his",
+          "reason": "His skills never publish or upload; his November 18 request moved the clicks to Claude behind a yes card, so the yes card is kept.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Claude: assemble the upload kit (the kit section of this recipe) with every field filled for this book.",
+        "Owner: open the new paperback link, paste each field in order, upload the interior and cover, launch the previewer, save as draft.",
+        "Owner: request a proof if he said yes, then check it: letters readable at arm's length in ordinary room light, nothing sinking into the spine, keys dark and correct on three random puzzles, page count, cover color.",
+        "Owner: press Publish Your Paperback Book.",
+        "Claude: move the HQ status to proof ordered, ready to upload, then live only after he pastes the link."
+      ],
+      "output": [
+        {
+          "name": "Upload kit",
+          "format": "one screen in the job plus upload-kit.md",
+          "lands_in": "the brand folder, linked on the job in HQ"
+        },
+        {
+          "name": "Live paperback link",
+          "format": "URL",
+          "lands_in": "the title's shelves on HQ's Products page"
+        }
+      ],
+      "check": "The owner has pasted a live Amazon link for the paperback.",
+      "checks": [
+        "The AI-content answer given at upload matches the rights folder.",
+        "The low-content box was left unticked."
+      ],
+      "if_fail": "Match KDP's message to the fix list (insufficient gutter, text outside margins, wrong cover size) and return to stage 5 or 7.",
+      "owner_minutes": 40,
+      "sources": [
+        "S2",
+        "S11",
+        "S15",
+        "S23",
+        "S24",
+        "S25",
+        "S27",
+        "S28",
+        "S30",
+        "S35"
+      ],
+      "skip": {
+        "can_skip": false,
+        "rule": "Cannot be skipped. Only the owner can press Publish, so the run waits here and shows in Waiting on me."
+      }
+    },
+    {
+      "n": 9,
+      "key": "list_twin",
+      "title": "List it as a printable twin on Payhip and Etsy",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude prepares the Payhip product, the free 5-puzzle sample and the Etsy listing; the owner pastes and publishes them.",
+      "why": "The same puzzles as a PDF reach buyers who print a page at a time for a parent or a care home, and the free sample builds the brand's email list.",
+      "inputs": [
+        "printable twin files and sample",
+        "listing kit",
+        "front cover image"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Shelves",
+          "value": "Payhip first; Etsy once the brand's shop is open; the brand's own store later",
+          "reason": "His shelf rules, and the Dog Lover's job already names Payhip with Etsy once the shop opens.",
+          "source": "S8"
+        },
+        {
+          "what": "Price",
+          "value": "$5.99 (estimate)",
+          "reason": "Inside his $5 to $20 band for multi-page printables and under half the paperback, so the paperback stays the main offer. HQ's earlier figure was $4.99.",
+          "source": "S1"
+        },
+        {
+          "what": "Payhip settings",
+          "value": "Raise the download limit above the default 5; put the sample in the preview slot; a $0 product carries the sample for email sign-ups",
+          "reason": "His Payhip shelf method.",
+          "source": "S8"
+        },
+        {
+          "what": "Etsy",
+          "value": "Title under 15 words with no repeated word, 13 tags, sizes and download steps in the description, and the AI line",
+          "reason": "His Etsy method and Etsy's file limits.",
+          "source": "S58"
+        }
+      ],
+      "work": [
+        "Write the Payhip page: what is inside with counts, sizes, the sample, an FAQ, the refund line.",
+        "Write the Etsy listing and make the first image a real filled page readable at thumbnail size and marked as a digital download.",
+        "Hand him both kits with the click path; he publishes."
+      ],
+      "output": [
+        {
+          "name": "Payhip and Etsy listing kits",
+          "format": "paste-ready text plus images",
+          "lands_in": "the brand folder, twin subfolder, linked on the job in HQ"
+        }
+      ],
+      "check": "The owner has pasted the live Payhip link (and the Etsy link once listed).",
+      "checks": [
+        "Puzzle and page counts in each listing match the files."
+      ],
+      "if_fail": "Fix the listing text or file and hand it back.",
+      "owner_minutes": 10,
+      "sources": [
+        "S1",
+        "S8",
+        "S58"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The twin is not listed. The run moves to the closing stage and the product is marked as having no twin yet."
+      }
+    },
+    {
+      "n": 10,
+      "key": "register_launch_check",
+      "title": "Register the shelves, launch, and check at 30 days",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude records every live shelf in HQ, makes the launch pack and A+ Content, then at 30 days reads the numbers and recommends feed, fix or kill.",
+      "why": "Every listing reports back so winners get siblings and the rest get fixed or cut.",
+      "inputs": [
+        "live links",
+        "listing kit",
+        "the KDP and Payhip reports he pastes at 30 days"
+      ],
+      "choices": [
+        {
+          "key": "report_30",
+          "question": "Paste this month's KDP report.",
+          "help": "From KDP, open Reports, copy the month's royalties for this title and paste them here.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Shelf rows",
+          "value": "Amazon KDP (paperback), Payhip and Etsy (twin)",
+          "reason": "HQ outlet names must match its list exactly.",
+          "source": "S2"
+        },
+        {
+          "what": "A+ Content",
+          "value": "Three modules: a real puzzle page at full size, a key page, the family of titles",
+          "reason": "Shows buyers the true letter size; built from the Marketing page after publish.",
+          "source": "S31"
+        },
+        {
+          "what": "Sibling trigger",
+          "value": "A sibling (new theme, new grids) starts only when its own search phrase shows demand or this book wins at day 30",
+          "reason": "His variant rule; each KDP sibling is a new interior.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Add a shelf row per outlet with the url and listed date only after he confirmed the link (kdp-book hq-recipes.md section 3).",
+        "Make the launch pack inside the content standard's mix limits: 3 posts and 1 pin pointing at the listing, plus a puzzle-of-the-week post that uses one sample puzzle.",
+        "Write the A+ Content and hand it to him with the Marketing page click path.",
+        "At day 30, log sales and write the feed, fix or kill note."
+      ],
+      "output": [
+        {
+          "name": "Shelf rows and sales rows",
+          "format": "HQ records",
+          "lands_in": "the title on HQ's Products page"
+        },
+        {
+          "name": "Launch pack and A+ Content kit",
+          "format": "content items and paste-ready text",
+          "lands_in": "HQ Production Board, linked on the job"
+        },
+        {
+          "name": "30-day note",
+          "format": "card",
+          "lands_in": "the job in HQ"
+        }
+      ],
+      "check": "Every live outlet has a shelf row with its link, and the 30-day note is written.",
+      "checks": [
+        "No shelf is marked listed without a link he pasted."
+      ],
+      "if_fail": "Views but no sales: fix the cover, title or price. Sales with bad reviews: fix the book and republish.",
+      "owner_minutes": 5,
+      "sources": [
+        "S1",
+        "S2",
+        "S31"
+      ]
+    }
+  ],
+  "upload_kit": {
+    "links": [
+      {
+        "label": "KDP Bookshelf",
+        "url": "https://kdp.amazon.com/en_US/bookshelf",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Start a new paperback",
+        "url": "https://kdp.amazon.com/en_US/title-setup/paperback/new/details",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Cover calculator and template",
+        "url": "https://kdp.amazon.com/cover-calculator",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Printing cost table",
+        "url": "https://kdp.amazon.com/en_US/help/topic/G201834340",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Low-content rules (why the box stays unticked)",
+        "url": "https://kdp.amazon.com/en_US/help/topic/GGE5T76TWKA85DJM",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "AI content rules (Content Guidelines)",
+        "url": "https://kdp.amazon.com/en_US/help/topic/G200672390",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Payhip: add a product",
+        "url": "https://payhip.com/products/add",
+        "verified": "unverified"
+      },
+      {
+        "label": "Etsy: create a listing",
+        "url": "https://www.etsy.com/your/shops/me/listing-editor/create",
+        "verified": "unverified"
+      }
+    ],
+    "fields": [
+      {
+        "page": "Paperback Details",
+        "field": "Language",
+        "what_to_paste": "English",
+        "limit": "pick from list",
+        "source": "S33"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Book Title",
+        "what_to_paste": "The title exactly as on the cover (for example Dog Lover's Large-Print Word Search)",
+        "limit": "title plus subtitle under 200 characters; can't be changed after publishing",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Subtitle",
+        "what_to_paste": "Puzzle count, letter size, levels and answer key, for example 100 Dog-Themed Puzzles in 24-Point Print, Easy to Hard, Answer Key Included",
+        "limit": "counts toward the 200; only promises the stage 6 check confirmed",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Series",
+        "what_to_paste": "The family name and number from the brief (for example Big Paws Club Large-Print Puzzles, 1), or blank if no siblings are planned",
+        "limit": "same series name on every book; puzzle books are eligible",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Edition Number",
+        "what_to_paste": "Leave blank",
+        "limit": "optional",
+        "source": "S35"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Author",
+        "what_to_paste": "The author name he picked in stage 2, spelled as on the cover",
+        "limit": "no HTML",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Contributors",
+        "what_to_paste": "Leave blank",
+        "limit": "never imply a contributor who did not contribute",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Description",
+        "what_to_paste": "The description from the listing kit",
+        "limit": "4,000 characters including formatting codes. Not allowed: web addresses, phone numbers, email addresses, reviews or testimonials, review requests, price or availability, time-limited information, emojis and keyword lists.",
+        "source": "S28"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Publishing Rights",
+        "what_to_paste": "I own the copyright and I hold the necessary publishing rights",
+        "limit": "pick one",
+        "source": "S33"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Primary Audience",
+        "what_to_paste": "Sexually explicit images or title: No. Reading age: leave blank (adult)",
+        "limit": "must answer before categories",
+        "source": "S25"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Primary Marketplace",
+        "what_to_paste": "Amazon.com",
+        "limit": "pick from list",
+        "source": "S33"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Categories",
+        "what_to_paste": "The three categories from the listing kit (puzzles and games, word search, plus one theme category such as pets)",
+        "limit": "3",
+        "source": "S25"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Low-content book",
+        "what_to_paste": "Leave unticked",
+        "limit": "puzzle books are not generally low-content; a wrong box gets the book rejected",
+        "source": "S10"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Large print",
+        "what_to_paste": "Tick it when the stage 6 check measured 18 pt or more on puzzle pages",
+        "limit": "KDP's own threshold is not on a public help page (unverified)",
+        "source": "S35"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Keywords",
+        "what_to_paste": "The seven keyword boxes from the listing kit, one per box (for example word search for seniors, puzzle gift for dog lovers)",
+        "limit": "up to 7; no words already in the title, categories or author; no trademarks or quotation marks",
+        "source": "S24"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Publication Date",
+        "what_to_paste": "Leave blank (first publication)",
+        "limit": "only for previously published books",
+        "source": "S27"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Print ISBN",
+        "what_to_paste": "Get a free KDP ISBN",
+        "limit": "one ISBN per format; can't change after publishing",
+        "source": "S26"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Print Options",
+        "what_to_paste": "Ink and paper: Black and white interior, white paper. Trim size: 8.5 x 11 in. Bleed: No bleed. Cover finish: the finish he picked",
+        "limit": "can't change after publishing",
+        "source": "S27"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Manuscript",
+        "what_to_paste": "Upload the print interior PDF",
+        "limit": "title, subtitle and author must match the Details page",
+        "source": "S27"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Book Cover",
+        "what_to_paste": "Upload a cover you already have: the full cover PDF",
+        "limit": "single PDF, back, spine and front, sized for the even page count",
+        "source": "S22"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "AI-Generated Content",
+        "what_to_paste": "The answer from the rights folder (see the AI question answer below)",
+        "limit": "required for every new book",
+        "source": "S13"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Book Preview",
+        "what_to_paste": "Launch Previewer, page through every page, then approve",
+        "limit": "fix every error it lists",
+        "source": "S29"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Territories",
+        "what_to_paste": "All territories (worldwide rights)",
+        "limit": "pick one",
+        "source": "S27"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Pricing, royalty, and distribution",
+        "what_to_paste": "List price on Amazon.com from stage 2 ($12.99 recommended); let KDP fill other marketplaces; Expanded Distribution on at $12.99, off at $9.99",
+        "limit": "60 percent at $9.99 and up, 50 percent at $9.98 and below, minus printing",
+        "source": "S15"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Request a book proof",
+        "what_to_paste": "Request one proof if he said yes in stage 8",
+        "limit": "proof is stamped Not for Resale",
+        "source": "S30"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Terms & Conditions",
+        "what_to_paste": "Read, then press Publish Your Paperback Book",
+        "limit": "puzzle book review can take 3 to 4 weeks; no changes while In Review",
+        "source": "S11"
+      }
+    ],
+    "ai_question": {
+      "how_to_answer": "Answer from how the book was made. Text: Yes when Claude or another AI wrote the word lists, sub-theme titles, how-to page or clues, which is the default in this recipe. Images: Yes when the cover art or any interior art came from an image model; No when the cover uses a licensed photo and type only (the Dog Lover's cover uses an Unsplash photo). Translations: none. The grids themselves come from an ordinary program placing the words, not an AI-based tool; that reading of KDP's definition is a judgement, so the text answer stays Yes either way.",
+      "source": "S13"
+    }
+  },
+  "borrowed": [
+    {
+      "tool": "Book Bolt",
+      "does": "Word search, sudoku, crossword and maze generators with print-ready PDF export, plus keyword research and a cover designer",
+      "we_replicate": "yes",
+      "how_or_why_not": "Claude's code generates and checks every puzzle and lays out the PDF. Book Bolt's pages do not say it guarantees a unique sudoku solution, its exports are image-based, and reviewers report faulty difficulty settings, so its output would still need our checker.",
+      "price": "Pro, which holds the puzzle tools, about $19.99 a month billed yearly or $23.99 month to month (third-party page, November 13, 2026); his go required",
+      "source": "S50"
+    },
+    {
+      "tool": "word-search-generator (Python library)",
+      "does": "Builds word search grids with set directions, difficulty levels, shapes and an answer key",
+      "we_replicate": "yes",
+      "how_or_why_not": "Usable as the placing engine; its page does not say it checks each word appears exactly once or scans for rude words, so our checker runs after it.",
+      "price": "Free, MIT license (version 5.1.0, April 2026)",
+      "source": "S52"
+    },
+    {
+      "tool": "Free web generators (The Teacher's Corner, Discovery Education Puzzlemaker and similar)",
+      "does": "Make one word search at a time in a browser",
+      "we_replicate": "yes",
+      "how_or_why_not": "Not used: one at a time, no rude-word scan, and The Teacher's Corner requires its credit line on every puzzle and written permission before selling.",
+      "price": "Free",
+      "source": "S53"
+    },
+    {
+      "tool": "Crossword Compiler",
+      "does": "Professional crossword and word search builder with an accidental-word and blacklist check",
+      "we_replicate": "yes",
+      "how_or_why_not": "Borrowed its check: scan every grid for blacklisted words and for keywords that appear twice. Claude's checker does both.",
+      "price": "Paid desktop software, price not checked; not needed",
+      "source": "S48"
+    },
+    {
+      "tool": "KDPBuilder and KDPEasy",
+      "does": "Online puzzle book generators that output KDP-ready interiors",
+      "we_replicate": "yes",
+      "how_or_why_not": "Borrowed their step order (reader, promise, structure, review every puzzle, format, price, upload). Left their large-print sizes: KDPEasy calls 12 to 14 pt large print, below APH's 18 pt floor.",
+      "price": "Credit-based, with a watermark on free use (vendor pages, 2025 and 2026); his go required",
+      "source": "S57"
+    },
+    {
+      "tool": "KDP Print Previewer and cover calculator",
+      "does": "Show how the paperback will print and give the exact wrap size",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is: only Amazon's own tools can say what Amazon will accept.",
+      "price": "Free",
+      "source": "S29"
+    },
+    {
+      "tool": "Canva",
+      "does": "Cover and page design with print PDF export",
+      "we_replicate": "yes",
+      "how_or_why_not": "Image models make the art and Claude builds the wrap on KDP's template; his connected Canva Pro stays optional for hand edits.",
+      "price": "Already in his plan",
+      "source": "S1"
+    }
+  ],
+  "candidates": [
+    {
+      "idea": "Hardcover gift edition of a winning puzzle book.",
+      "why_parked": "No evidence yet that this shelf buys hardcovers; uses a weekly hardcover slot."
+    },
+    {
+      "idea": "Mixed large-print puzzle book (word search, sudoku, mazes) on the same dog theme.",
+      "why_parked": "Wait for the word search's 30-day check; mixed books add the sudoku uniqueness gate."
+    },
+    {
+      "idea": "Large-print crossword book.",
+      "why_parked": "Clue correctness needs a careful read on every clue; start only when a word search sibling wins."
+    },
+    {
+      "idea": "Amazon Ads test at $5 to $10 a day after 10 to 15 honest reviews.",
+      "why_parked": "Spends money; his charter rule waits for reviews."
+    },
+    {
+      "idea": "Sibling themes for other brands' buyers (garden, travel, faith, decades nostalgia).",
+      "why_parked": "Each needs its own search demand; the sibling rule requires new grids and mostly new words."
+    }
+  ],
+  "unverified": [
+    "The point size KDP uses for the Large print box; no public KDP help page states it. The 16 pt figure comes from his standard, reported through Book Bolt.",
+    "Whether KDP's AI definition treats program-placed grids as AI-generated; the recipe answers Yes for text anyway because the word lists come from Claude.",
+    "The exact on-screen order and labels of the KDP paperback setup fields; confirm at the first upload and correct the kit.",
+    "The contents and page count of the October 16 Dog Lover's files: they were not in Google Drive on November 27, 2026, and no check report exists. 155 pages with 100 one-per-page puzzles and full-size keys does not add up, so the key layout is unknown until the files are opened.",
+    "Payhip and Etsy direct links and Payhip fees; taken from his methods.",
+    "Book Bolt prices: third-party page only.",
+    "The printable twin price of $5.99 is an estimate inside his band, not shelf data.",
+    "Difficulty grading by grid size, word count and directions is practice, not a published standard."
+  ],
+  "kind": "product"
+}

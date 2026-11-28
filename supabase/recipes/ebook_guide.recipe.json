@@ -1,0 +1,1435 @@
+{
+  "key": "ebook_guide",
+  "title": "Ebook or PDF guide: from a chosen idea to a phone-friendly paid guide, its free sample and its listings",
+  "version": "1.0",
+  "date": "2026-11-27",
+  "covers": [
+    "how-to guide",
+    "starter kit",
+    "playbook",
+    "checklist pack with teaching",
+    "free sample used as a lead magnet"
+  ],
+  "ends_with": "The owner holds the guide PDF, the worksheet files in Letter and A4, the free sample, the cover and listing images, the free sample live on Payhip, the follow-up emails saved in HQ, a paste-ready listing kit in the order each site asks for it and the direct links, all in the product folder linked on the job in HQ.",
+  "outside_hq": [
+    {
+      "what": "Make sure a Payhip account exists for the brand with payouts connected.",
+      "why": "Payhip is the default checkout and HQ cannot create accounts for him.",
+      "how_owner_does_it": "Sign up at payhip.com with the brand email, connect Stripe or PayPal under payouts. Skip if done.",
+      "owner_minutes": 15
+    },
+    {
+      "what": "Make sure the Etsy shop is open with payments verified, if Etsy was picked.",
+      "why": "Etsy needs his identity, billing and bank details.",
+      "how_owner_does_it": "Open etsy.com/sell, finish shop setup and payments. Skip if done.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Complete the tax form (W-9) wherever a platform asks.",
+      "why": "Platforms hold payouts until tax info is complete.",
+      "how_owner_does_it": "Open the platform's tax or payout settings and fill the W-9. About 5 minutes per platform.",
+      "owner_minutes": 5
+    },
+    {
+      "what": "Press Publish on Payhip and Etsy (or approve the ChatGPT agent's Etsy draft).",
+      "why": "HQ and its agents never publish on his behalf.",
+      "how_owner_does_it": "Paste each field from the kit in the order shown, then press the button named in the kit.",
+      "owner_minutes": 25
+    },
+    {
+      "what": "Only if the brand's email sending is not set up yet: add the sending records at GoDaddy.",
+      "why": "Emails from a new sending domain need SPF, DKIM and DMARC records or they land in spam.",
+      "how_owner_does_it": "Paste the record values Claude puts on the brand's HQ item into GoDaddy DNS. One time per brand.",
+      "owner_minutes": 10
+    },
+    {
+      "what": "Only if the agents are blocked on Etsy and Amazon: phone screenshots of the 1 to 3 star reviews on the top five items.",
+      "why": "The complaint list needs real review text.",
+      "how_owner_does_it": "Open each item in the app, filter reviews to 1 to 3 stars, screenshot and drop the images in the product folder.",
+      "owner_minutes": 15
+    }
+  ],
+  "stages": [
+    {
+      "n": 1,
+      "key": "check_shelf",
+      "title": "Check the shelf and mine the complaints",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Study the 10 to 20 closest paid guides on the shelves this guide will sell on (Payhip, Gumroad, Etsy) plus the top Amazon books on the topic, and turn their buyers' complaints into a fix list, a page-count band and a price band.",
+      "why": "Buyers review the file in their hands, and the complaints repeated on the best sellers are the cheapest proof of what to fix. Guides fail on being thin or generic ('a long article sold in a form of a book'). For the worked example, the Amazon check found weak demand and Gumroad and Etsy were never checked, so its price and shelves are still guesses.",
+      "inputs": [
+        "the chosen idea and brand",
+        "the main search phrase",
+        "the idea score and evidence already in HQ"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "How many competitors to study",
+          "value": "10 to 20 guides across at least two shelves, plus the top 10 Amazon books on the phrase",
+          "reason": "His review-mining protocol sets 10 to 20 for products and printables.",
+          "source": "S1"
+        },
+        {
+          "what": "Which reviews to read",
+          "value": "All 1, 2 and 3 star reviews plus the 'but' sentence in 4 star reviews, keeping 1 star reviews in the read; then Reddit sorted Top and All Time, checked against the past year",
+          "reason": "His standard keeps 1 star reviews because for digital products they hold the download, size and page-count failures. The NotebookLM advice to skip them was rejected at merge.",
+          "source": "S1"
+        },
+        {
+          "what": "Who reads which site",
+          "value": "Claude reads public Gumroad and Payhip product pages and Reddit. Etsy and Amazon reads are requested from Muse through the HQ agent mailbox, with ChatGPT as backup, never through a selling login.",
+          "reason": "Etsy is reached through his other agents, and Amazon restricts AI agents.",
+          "source": "S7"
+        },
+        {
+          "what": "Whether a low score stops the guide",
+          "value": "No. The score ranks and sharpens the brief; it never blocks an idea he picked.",
+          "reason": "Override of November 13, 2026 in his standard.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Load the brand kit from HQ (supreme-content-standard, Step 1) and the brand's row in kdp-book brand-rules.md.",
+        "Search the main phrase on Gumroad and Payhip (public pages) and list the closest 10 to 20 guides with price, page count, rating count and what is included.",
+        "Send Muse one harvest job through the HQ agent mailbox: Etsy top 10 listings for the phrase (price, badges, review count, 1 to 3 star review text) and the top 10 Amazon books (rank, price, pages, 1 to 3 star reviews). ChatGPT is the backup. If both are blocked, use Goodreads and Reddit and ask the owner for phone screenshots of the 1 to 3 star reviews on the top five, about 15 minutes.",
+        "Read Reddit for the phrase sorted Top and All Time, then the past year, and keep the questions that keep coming back.",
+        "Cluster the complaints, count how many items and reviewers repeat each, and quote each at ten words or fewer with its link (review-mining protocol).",
+        "Note what the five-star reviews praise; these are must-keeps.",
+        "Score the Demand Gate per shelf (proven buyers, search demand, gap, price room, each 1 to 5) with links, and file each complaint in the Answer Bank.",
+        "Record the price band and page-count band of the top 10 so the brief can set both."
+      ],
+      "output": [
+        {
+          "name": "Complaint list with counts, quotes and links",
+          "format": "table in the job",
+          "lands_in": "the idea's evidence in HQ and the Answer Bank"
+        },
+        {
+          "name": "Shelf table (title, shelf, price, pages, ratings, sales signal)",
+          "format": "spreadsheet",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "At least five complaint clusters are filed, each with a quote of ten words or fewer and a working link, and the shelf table has at least 10 rows from at least two shelves.",
+      "checks": [
+        "The praise list has at least three items.",
+        "Each shelf has a Demand Gate score with links."
+      ],
+      "if_fail": "Widen to the second search phrase and the next 10 items, add YouTube comments on the top three videos for the phrase, then repeat this stage.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S7",
+        "S9",
+        "S11"
+      ]
+    },
+    {
+      "n": 2,
+      "key": "approve_brief",
+      "title": "Approve the one-screen brief",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude fills the one-screen brief: the buyer, the one job the guide does, the complaints it fixes, the chapter map, the worksheet list, the files, the price and the price ladder. The owner picks the title and the shelves, then approves.",
+      "why": "No brief, no draft. Settling the job, the length and the price here prevents the costliest late change: a guide padded to look bigger, which is the complaint that sinks guides.",
+      "inputs": [
+        "complaint and praise lists",
+        "shelf table and Demand Gate scores",
+        "brand kit"
+      ],
+      "choices": [
+        {
+          "key": "title",
+          "question": "Which title goes on the cover and every listing?",
+          "help": "The title says what it is, who it is for and what it does. On Etsy it must stay under 15 words with no repeated word; the same title is used on every shelf.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Three candidates from the main search phrase, the buyer's own words in the top complaints and the one job of the guide; each under 15 words, no repeated word, no trademark, no 'free', no earnings promise.",
+          "options": [
+            {
+              "value": "candidate_1",
+              "label": "Generated title 1",
+              "pick_when": "It names the buyer's result in the words reviewers and searchers use.",
+              "recommended": true
+            },
+            {
+              "value": "candidate_2",
+              "label": "Generated title 2",
+              "pick_when": "You want the format and the count (30 hustles, 7 steps) to lead.",
+              "recommended": false
+            },
+            {
+              "value": "candidate_3",
+              "label": "Generated title 3",
+              "pick_when": "You want the gap the best sellers leave (the numbers they skip) to lead.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "shelves",
+          "question": "Where should it sell?",
+          "help": "A shelf brings buyers who do not know you (Etsy). A checkout counter sells to people your posts and emails send (Payhip, your brand site). Payhip collects sales tax and VAT for you.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "payhip_etsy",
+              "label": "Payhip plus Etsy, with your brand site linking to Payhip",
+              "pick_when": "Most guides: Etsy finds new buyers, Payhip is the cheapest checkout for your own traffic.",
+              "recommended": true
+            },
+            {
+              "value": "payhip_only",
+              "label": "Payhip only, linked from your site and posts",
+              "pick_when": "The topic has no Etsy demand in the shelf check, or it is about money claims Etsy buyers distrust.",
+              "recommended": false
+            },
+            {
+              "value": "payhip_etsy_gumroad",
+              "label": "Payhip, Etsy and Gumroad",
+              "pick_when": "You want Gumroad's Discover marketplace too, accepting its 30 percent fee on those sales.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "brief_ok",
+          "question": "Is the brief right?",
+          "help": "Read the one screen. Approving starts the interview; nothing is drafted before this.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "approve",
+              "label": "Approve",
+              "pick_when": "The buyer, the job, the chapter map and the price sound right.",
+              "recommended": true
+            },
+            {
+              "value": "change",
+              "label": "Change something (say it by voice)",
+              "pick_when": "Something about the buyer, the promise, a chapter or the price is off.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Format",
+          "value": "One reading PDF at 6 x 9 inch pages with 12 point body text, plus separate worksheet PDFs in exact Letter and A4",
+          "reason": "Gumroad recommends 6 x 9 and 12 point because print-sized PDFs are hard to read on phones; worksheets follow the Printable method's Letter and A4 spec so they print right.",
+          "source": "S21"
+        },
+        {
+          "what": "Length",
+          "value": "Set by the job, never padded: about 10 to 25 pages for a guide that fixes one problem, about 30 to 60 pages for a picker, playbook or starter kit",
+          "reason": "Practitioner range for problem-specific micro guides; the top complaint on money guides is 'very light on usable info'. The worked example's HQ brief sets about 40 pages.",
+          "source": "S41"
+        },
+        {
+          "what": "Price",
+          "value": "Inside the band the shelf check found and the same on every outlet; for the worked example $9",
+          "reason": "His sales playbook prices against what the same product sells for on that shelf, not against cost. The example's comparables run $2.99 to $9 and its HQ band is $7 to $12.",
+          "source": "S5"
+        },
+        {
+          "what": "Price ladder",
+          "value": "Free sample page, then the guide, then one checkout add-on priced at about a third to a half of the guide, then the next rung (bundle, course or service) named on the last page",
+          "reason": "Vendor data puts order bumps at about 20 to 40 percent take rates (estimates, no published method); Kajabi's data shows products under $25 earn little on their own, so the guide must lead somewhere.",
+          "source": "S44"
+        },
+        {
+          "what": "Free version",
+          "value": "One real page of the guide, the one-page cheat sheet, marked as a sample, in Letter and A4",
+          "reason": "His lead magnet rule: the free piece is one real page of the paid product, marked as a sample; it also serves as the Payhip preview file.",
+          "source": "S6"
+        },
+        {
+          "what": "Claims and disclaimers",
+          "value": "No earnings promises; every number dated and sourced; money, health and legal guides carry the brand's educational line (for Allmighty Supreme: income content is educational, results vary)",
+          "reason": "FTC earnings-claim rules, Payhip's ban on get-rich-quick content and his brand rules.",
+          "source": "S1"
+        },
+        {
+          "what": "Whop",
+          "value": "Not used for guides",
+          "reason": "His November 10, 2026 move put courses and kits on his own site, not Whop, and his sales playbook adds Whop only after two other outlets have sales.",
+          "source": "S12"
+        },
+        {
+          "what": "KDP",
+          "value": "Decided at the 30-day check, not now",
+          "reason": "A guide becomes a KDP book only on Amazon demand and a lasting topic; see 'When a guide should also become a KDP book' in recipe.md.",
+          "source": "S14"
+        }
+      ],
+      "work": [
+        "Fill the brief from the kdp-book kit-contract.md section 1 template, with format set to guide.",
+        "Generate three titles and test each against Etsy's title guidance and the brand's banned words.",
+        "Set the chapter map so every chapter ends in one action the buyer can do the same day, and list the worksheets (each with one filled example).",
+        "Name the add-on and the next rung from the brand's rows on HQ's Products page.",
+        "List the gap questions for stage 3.",
+        "Register the guide on HQ's Products page (name, price, funnel stage core, status brief, notes with the brief link)."
+      ],
+      "output": [
+        {
+          "name": "Approved brief",
+          "format": "one screen in the job, plus brief.md",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "The owner tapped Approve, and the brief names the buyer, the one job, at least five fixed complaints, the chapter map, the files, the price and the ladder.",
+      "checks": [
+        "The title is under 15 words with no repeated word, trademark, 'free' or earnings promise.",
+        "The add-on and the next rung each exist on HQ's Products page."
+      ],
+      "if_fail": "Claude rewrites the brief from his voice note and shows it again.",
+      "owner_minutes": 10,
+      "sources": [
+        "S1",
+        "S5",
+        "S6",
+        "S11",
+        "S12",
+        "S14",
+        "S21",
+        "S35",
+        "S41",
+        "S43",
+        "S44",
+        "S45"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The recommended option is used for every choice and the brief is approved as written."
+      }
+    },
+    {
+      "n": 3,
+      "key": "dictate",
+      "title": "Answer the interview by voice",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "The owner answers five to seven questions, one at a time, by voice. His exact words are saved unedited and become the part of the guide no competitor can copy.",
+      "why": "Generic guides are the top complaint, and AI-made products sell poorly when they add nothing a buyer could not get free. His real numbers and mistakes are what make the guide worth paying for. The interview only fills gaps: Claude first pulls what he has already said in posts, threads and Drive documents.",
+      "inputs": [
+        "approved brief and its gap questions",
+        "his existing posts, threads and documents on the topic"
+      ],
+      "choices": [
+        {
+          "key": "interview_mode",
+          "question": "When do you want to answer?",
+          "help": "About 15 minutes by voice. Any form is fine: half sentences, rambling, bad spelling. Every question has skip, don't know, and give me an example.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "now",
+              "label": "Now, by voice",
+              "pick_when": "You have 15 minutes, for example parked between deliveries.",
+              "recommended": true
+            },
+            {
+              "value": "split",
+              "label": "In two short sessions today",
+              "pick_when": "You only have ten-minute gaps.",
+              "recommended": false
+            },
+            {
+              "value": "skip",
+              "label": "Skip, use what I have already said",
+              "pick_when": "You are slammed this week and the topic is well covered in your posts.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "answers",
+          "question": "Answer this question in your own words.",
+          "help": "One question at a time. Say skip at any point.",
+          "type": "voice",
+          "generated": true,
+          "generate_from": "The gap questions from the brief, in kdp-book interview.md knowledge mode: how you do it, what beginners get wrong, what you got wrong, which numbers matter, what you disagree with, the one thing to remember, a real story.",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "What happens if he skips",
+          "value": "Claude builds the owner layer only from his existing material, quoted with its source, leaves [OWNER STORY NEEDED: topic] markers where a story would help, and lists them for his stage 6 read. The guide still moves; the quality card shows the gap.",
+          "reason": "His skill never invents a story, client, number or feeling; scores advise and never block.",
+          "source": "S2"
+        },
+        {
+          "what": "Session length",
+          "value": "Five to seven questions, then show what was captured",
+          "reason": "His interview rule; a guide is shorter than a book, so fewer gaps.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Pull his existing words on the topic first, with the source noted (kdp-book step 2, Owner layer).",
+        "Ask only the gaps, one question at a time (interview.md, Rules for every session).",
+        "Save his answers exactly as given, tagged with the date and the chapter each feeds.",
+        "Flag every number, money, health or legal statement in his answers for the fact sheet."
+      ],
+      "output": [
+        {
+          "name": "Dictation transcript, raw and unedited",
+          "format": "markdown",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ (rights subfolder)"
+        }
+      ],
+      "check": "Every chapter in the map has at least one item from his own words or existing material, or an [OWNER STORY NEEDED] marker listed for stage 6.",
+      "checks": [
+        "No answer was rewritten before saving."
+      ],
+      "if_fail": "Ask one follow-up question for each empty chapter, or record the marker.",
+      "owner_minutes": 15,
+      "sources": [
+        "S2",
+        "S53"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Claude uses only what the owner has already said in posts, threads and documents, quoted with its source, and leaves a marker where a story would help."
+      }
+    },
+    {
+      "n": 4,
+      "key": "fact_sheet_outline",
+      "title": "Build the fact sheet and the outline",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude lists every claim with its source and date, then writes the outline in the guide structure below and two or three openings that deliver a quick win in the first three pages.",
+      "why": "Readers decide in the first chapter: most books keep 25 to 50 percent of readers to the end, and the drop comes early. A guide that gives a win on page one gets finished and used, and a buyer who finishes rarely asks for a refund.",
+      "inputs": [
+        "approved brief",
+        "dictation transcript",
+        "complaint list"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Structure, in order",
+          "value": "Cover; start-here page (who it is for, how to use it in 10 minutes, contents with page numbers, version and date); the quick win; the steps, one chapter each, each ending in a do-this-now box; worksheets or tools, each with one filled example; a troubleshooting page that answers the top three mined complaints; a one-page cheat sheet; a next-step page (the add-on and the next rung); a terms and disclaimer page",
+          "reason": "His five-part skeleton (start here with a filled example, the main pages, a review page, a tips page) adapted to a teaching guide, the micro-guide pattern (steps, expected result, troubleshooting, cheat sheet, version stamp) and the outcome-first ladder from his course notes.",
+          "source": "S1"
+        },
+        {
+          "what": "Chapter shape",
+          "value": "Hook, the step, a worked example, the evidence, do this now, bridge to the next step",
+          "reason": "His chapter anatomy from the kdp-book skill, kept short for a guide.",
+          "source": "S2"
+        },
+        {
+          "what": "Dates on facts",
+          "value": "Every price, pay rate, fee or rule carries 'checked <month year>' and a source in the guide's notes page",
+          "reason": "Money guides go stale fast; his worked example rule says every pay figure is dated and sourced.",
+          "source": "S11"
+        }
+      ],
+      "work": [
+        "Build the claims table from the kdp-book kit-contract.md template; health and money claims get a named source or a flag.",
+        "Write the outline in the structure above, with a page target per section that adds up to the brief's length.",
+        "Write the worksheet specs on his five-part skeleton, each with one filled example row.",
+        "Write two or three openings; each delivers the quick win inside the first three pages.",
+        "Keep a continuity ledger so no tip or example appears twice."
+      ],
+      "output": [
+        {
+          "name": "Fact sheet, outline and openings",
+          "format": "markdown",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "No claim is without a source or a flag, and the quick win starts within the first three pages after the cover.",
+      "checks": [
+        "Every chapter ends in one action the buyer can do the same day.",
+        "The troubleshooting page maps to the top three complaints by name."
+      ],
+      "if_fail": "Cut or flag the unsourced claims and move the quick win forward, then repeat the check.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S10",
+        "S11",
+        "S41",
+        "S49"
+      ]
+    },
+    {
+      "n": 5,
+      "key": "draft_gates",
+      "title": "Draft the guide and run the quality gates",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude drafts one section at a time in the brand voice, then runs the book gates, the fact-check and the compliance pass. ChatGPT runs the critic pass.",
+      "why": "Buyers are tiring of AI-made products that add nothing; on one large marketplace AI items were about one in six uploads but 2.6 percent of sales. The gates are what keep this guide from reading like the generic ones it competes with.",
+      "inputs": [
+        "fact sheet, outline and openings",
+        "dictation transcript",
+        "brand kit"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Gates, in order",
+          "value": "Sweep (scripts/sweep.py --profile book), swap test, specificity floor, repetition, worksheet test, cold read, critic pass, final five",
+          "reason": "His kdp-book gates govern any book-style writing; a guide is held to the same bar.",
+          "source": "S2"
+        },
+        {
+          "what": "Who runs the critic pass",
+          "value": "ChatGPT, with his three-star prompt from kit-contract.md",
+          "reason": "His design, run by an agent so it costs him no time.",
+          "source": "S2"
+        },
+        {
+          "what": "Claim statuses",
+          "value": "Each claim marked verified, qualified, uncertain or contradicted; uncertain and contradicted claims are cut or rewritten as opinion",
+          "reason": "His fact-check rule.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Draft one section at a time; tag items from his own words [OWNER] so he can check them.",
+        "Run the eight gates in order; a section that fails goes back to drafting, never to a patch job.",
+        "Run the compliance pass: no earnings promises, no medical, legal or money instructions (records and education only), every number dated, the brand's educational line where it applies.",
+        "Check the topic against the content bans of each shelf picked (Payhip bans get-rich-quick content, credit repair and unlicensed medical advice; Gumroad bans credit-improvement content).",
+        "Write the AI line for Etsy's description (AI tools helped write the text and make the images)."
+      ],
+      "output": [
+        {
+          "name": "Final manuscript with claims table and gate report",
+          "format": "markdown",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "No top-tier AI tell remains, every chapter is within 40 percent of its page target, and every claim is verified, qualified or cut.",
+      "checks": [
+        "The topic passes every chosen shelf's content bans.",
+        "The AI line is written."
+      ],
+      "if_fail": "Send the failing section back to drafting with the gate's notes.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S8",
+        "S53"
+      ]
+    },
+    {
+      "n": 6,
+      "key": "read_guide",
+      "title": "Read the start on your phone and pick the opening",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "The owner reads the start-here page and the first chapter on his phone, picks one of the openings, taps any item credited to him that is wrong, and says comments by voice.",
+      "why": "The first pages decide whether a buyer finishes or asks for a refund, and the items tagged as his must be true. This is the only part of the guide that needs his eyes.",
+      "inputs": [
+        "final manuscript rendered as a phone preview",
+        "the two or three openings",
+        "the list of [OWNER] items and story markers"
+      ],
+      "choices": [
+        {
+          "key": "opening",
+          "question": "Which opening should the guide start with?",
+          "help": "Each opening gives the quick win a different way. Read them at phone size.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "The openings written in stage 4, shown as the first 150 words each.",
+          "options": [
+            {
+              "value": "opening_1",
+              "label": "Opening 1",
+              "pick_when": "It gets to the win fastest.",
+              "recommended": true
+            },
+            {
+              "value": "opening_2",
+              "label": "Opening 2",
+              "pick_when": "It starts from your own story and you like that better.",
+              "recommended": false
+            },
+            {
+              "value": "opening_3",
+              "label": "Opening 3",
+              "pick_when": "It starts from the buyer's problem in their words.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "owner_items",
+          "question": "Are these items about you right?",
+          "help": "Tap any that are wrong or that you do not want in the guide.",
+          "type": "multi",
+          "generated": true,
+          "generate_from": "Every [OWNER] item in the manuscript, one line each with its chapter.",
+          "options": []
+        },
+        {
+          "key": "comments",
+          "question": "Anything to change?",
+          "help": "Say it by voice; skip if it reads right.",
+          "type": "voice",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "What happens if he skips",
+          "value": "Claude uses opening 1 and keeps only [OWNER] items that have a quoted source.",
+          "reason": "The guide still moves; nothing unconfirmed about him ships.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Render the start-here page and chapter one as a phone-width preview in the job.",
+        "Apply his picks and comments, then re-run the sweep on the changed sections."
+      ],
+      "output": [
+        {
+          "name": "Approved manuscript",
+          "format": "markdown",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "An opening is picked and every [OWNER] item is confirmed or removed.",
+      "checks": [
+        "Changed sections passed the sweep again."
+      ],
+      "if_fail": "Claude rewrites the sections he flagged and shows only those again.",
+      "owner_minutes": 25,
+      "sources": [
+        "S2",
+        "S49"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Opening 1 is used and only owner items with a quoted source are kept."
+      }
+    },
+    {
+      "n": 7,
+      "key": "build_files",
+      "title": "Build the guide PDF, worksheet files and free sample",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude renders the reading PDF, the worksheet files in Letter and A4 and the free sample page, then tests every file the way a buyer will use it.",
+      "why": "Buyers punish files that will not open on a phone, print at the wrong size, or deliver fewer pages than promised. An accessible file (tagged, with a title, bookmarks and alt text) also reads aloud for buyers who use screen readers and reflows better on small screens.",
+      "inputs": [
+        "approved manuscript",
+        "worksheet specs",
+        "brand kit fonts and colors",
+        "cover art from stage 8 when ready (the cover page is swapped in last)"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Build route",
+          "value": "HTML and CSS rendered to PDF with WeasyPrint (free) with tagging on; ReportLab as the fallback",
+          "reason": "WeasyPrint writes tagged PDFs and a PDF/UA variant; its output still has to be checked.",
+          "source": "S51"
+        },
+        {
+          "what": "Accessibility",
+          "value": "Tags, logical reading order, document title and language set, bookmarks for every chapter, alt text on meaningful images, color contrast checked, then a veraPDF machine check",
+          "reason": "The eight-step accessible PDF checklist; veraPDF is the free open-source checker for PDF/UA-1 machine checks.",
+          "source": "S50"
+        },
+        {
+          "what": "File set",
+          "value": "Guide (6 x 9 in), Worksheets in Letter, Worksheets in A4, plus the free sample page in Letter and A4 kept separate; at most 5 files per listing",
+          "reason": "Etsy allows 5 files of 20 MB each with names up to 70 characters that cannot be renamed later.",
+          "source": "S33"
+        },
+        {
+          "what": "File size",
+          "value": "Each file under 10 MB (estimate, chosen to clear Etsy's 20 MB cap and Gumroad's 15.5 MB Send to Kindle limit with room)",
+          "reason": "Etsy and Gumroad limits.",
+          "source": "S20"
+        },
+        {
+          "what": "Links",
+          "value": "Contents entries and next-step links are tappable; the next-step link is a redirect address we control, never a raw checkout link",
+          "reason": "His Canva rule: a link we control can be repaired without breaking sold files.",
+          "source": "S1"
+        },
+        {
+          "what": "Fonts and colors",
+          "value": "Brand kit fonts embedded; for Allmighty Supreme: Montserrat 800 headlines, Inter body, IBM Plex Mono numbers, navy and gold",
+          "reason": "Brand kit in HQ.",
+          "source": "S13"
+        }
+      ],
+      "work": [
+        "Write the guide as one HTML file per the outline; render with WeasyPrint (pip install weasyprint) with tagging turned on, the title, the language and bookmarks.",
+        "Render the worksheets to the Printable spec: exact Letter and A4, all ink inside a 0.5 inch margin, vector text, one filled example.",
+        "Pull the cheat sheet page as the free sample, marked 'Free sample', ending with the guide's link.",
+        "Render every page to images (pdftoppm) and look at each one before calling anything done; lay them out as a thumbnail grid to spot drift and duplicates.",
+        "Run veraPDF for PDF/UA-1 machine checks and fix what it flags, or record what cannot be fixed.",
+        "Open each file on a phone, in Chrome and in Acrobat Reader; tap every contents link; print one worksheet at Actual Size.",
+        "Count pages, worksheets and items, and write the counts into the listing kit so every number matches.",
+        "Name files under 70 characters (01-Start-Here is inside the guide; for example Side-Hustle-Picker-Guide.pdf, Worksheets-Letter.pdf, Worksheets-A4.pdf).",
+        "Save everything to the product folder and link it on the job."
+      ],
+      "output": [
+        {
+          "name": "Guide PDF (6 x 9 in, tagged)",
+          "format": "PDF",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        },
+        {
+          "name": "Worksheet PDFs in Letter and A4",
+          "format": "PDF",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        },
+        {
+          "name": "Free sample page in Letter and A4",
+          "format": "PDF",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        },
+        {
+          "name": "Page thumbnails and test report",
+          "format": "PNG grid plus markdown",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "Every file opens on a phone with fonts intact, every contents link works, each file is under 10 MB, and the page counts match the brief.",
+      "checks": [
+        "veraPDF shows no failures, or each remaining one is listed with its reason.",
+        "One worksheet printed at Actual Size has nothing clipped.",
+        "The tired-user check passes: someone having a bad day can find the quick win in under a minute."
+      ],
+      "if_fail": "Fix the file and rerun the full bench, never only the failed line.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S3",
+        "S13",
+        "S20",
+        "S21",
+        "S33",
+        "S50",
+        "S51",
+        "S52"
+      ]
+    },
+    {
+      "n": 8,
+      "key": "make_cover",
+      "title": "Make and approve the cover and listing images",
+      "owner": "owner",
+      "doer": "chatgpt",
+      "what": "ChatGPT or Muse image generation makes three cover concepts; the owner picks one. Claude then builds the listing images from the real pages.",
+      "why": "The cover and first image are what a shopper judges at thumbnail size. Inside-page images must be real pages of the file, because the listing must show what the buyer gets.",
+      "inputs": [
+        "approved title",
+        "brand kit",
+        "rendered pages"
+      ],
+      "choices": [
+        {
+          "key": "cover",
+          "question": "Which cover?",
+          "help": "Judge them at phone thumbnail size: can you read the title?",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Three concepts from ChatGPT or Muse image generation (both in his plans) with the brand kit colors; title text set by Claude as real type, not baked into the art.",
+          "options": [
+            {
+              "value": "concept_1",
+              "label": "Concept 1",
+              "pick_when": "The title reads clearly at thumbnail size.",
+              "recommended": true
+            },
+            {
+              "value": "concept_2",
+              "label": "Concept 2",
+              "pick_when": "You want a bolder, more graphic look.",
+              "recommended": false
+            },
+            {
+              "value": "concept_3",
+              "label": "Concept 3",
+              "pick_when": "You want a calmer, more premium look.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Listing image set",
+          "value": "1 cover mockup marked 'Digital download', 2 a page grid of real pages, 3 a close-up of the quick win, 4 what is included with counts, 5 how the download works",
+          "reason": "His Etsy method's image order; the first image is readable at thumbnail size and marked as a digital download.",
+          "source": "S7"
+        },
+        {
+          "what": "Sizes",
+          "value": "Gumroad cover 1280 x 720 px and thumbnail at least 600 x 600 px; Etsy and Payhip images square at 2000 x 2000 px",
+          "reason": "Gumroad's help page for its sizes; the Etsy and Payhip size is practice (unverified on an official page).",
+          "source": "S22"
+        },
+        {
+          "what": "Paid generation",
+          "value": "None by default; Higgsfield only with his go on credits",
+          "reason": "His spend rule.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Write three cover prompts with the brand's image style and request them from ChatGPT or Muse.",
+        "Set the title as real type on the picked art and place the cover as page 1 of the guide.",
+        "Build the five listing images from the real rendered pages with Pillow, in the sizes above.",
+        "Save all images to the product folder."
+      ],
+      "output": [
+        {
+          "name": "Cover and listing images",
+          "format": "PNG and JPG",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "The owner picked a cover, and the first listing image shows the title readable at thumbnail size and the words 'Digital download'.",
+      "checks": [
+        "Every inside-page image is a real page of the final file."
+      ],
+      "if_fail": "Generate three new concepts from his voice note.",
+      "owner_minutes": 10,
+      "sources": [
+        "S1",
+        "S7",
+        "S22"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Concept 1 is used, with a matte finish where a finish applies."
+      }
+    },
+    {
+      "n": 9,
+      "key": "email_followup",
+      "title": "Set up the free download and the follow-up emails",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude writes the free sample's sign-up copy and three follow-up emails. The sample goes out as a free ($0) Payhip product, which collects the email address and sends the file at once. The follow-up emails are saved in HQ and send through HQ's own email sequences once that part of the sales system is built.",
+      "why": "The free sample turns a reader into an email address, and the emails turn the address into a sale. In Omnisend's 2025 data, welcome emails converted at 2.11 percent against 0.08 percent for regular campaigns.",
+      "inputs": [
+        "free sample files",
+        "the guide's product page link (added after stage 10)",
+        "the brand's Payhip account"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Where sign-ups go",
+          "value": "A free ($0) Payhip product for the sample: Payhip collects the email address and sends the file at once. Sign-ups are copied into HQ's contacts for the follow-up emails.",
+          "reason": "He decided on November 27, 2026 to cancel GoHighLevel before about December 6, so nothing new is built on it. Payhip is already the guide's main shelf and the fallback in his Lead magnet playbook v2.0.",
+          "source": "S6"
+        },
+        {
+          "what": "The emails",
+          "value": "Email 1 at once: the sample link plus one line and link to the guide (until HQ's sequences are live, Payhip's own delivery email does this job). Email 2 on day 2: one useful lesson from the guide and the offer. Email 3 on day 4: the top question buyers ask, answered, and the offer. One call to action each.",
+          "reason": "His three welcome emails, with the paid offer one click away in emails 1 and 2.",
+          "source": "S6"
+        },
+        {
+          "what": "Rules",
+          "value": "Consent line at sign-up, postal address and working unsubscribe in every footer, a repeat-submission guard, no earnings claims",
+          "reason": "FTC CAN-SPAM and Gmail sender rules as recorded in his playbook.",
+          "source": "S6"
+        }
+      ],
+      "work": [
+        "Write the sign-up block: headline, three benefit lines, button text ('Send me the free page').",
+        "Write the three emails in the brand voice and save them in HQ.",
+        "Write the sequence spec for HQ's sender: who gets it, a skip for people who already got it, email 1 at once, email 2 on day 2, email 3 on day 4.",
+        "Set up the free Payhip product for the sample from the listing kit: price $0, buyer email collected, the sample file attached.",
+        "Run a test sign-up from a phone."
+      ],
+      "output": [
+        {
+          "name": "Sign-up copy, three emails and the sequence spec",
+          "format": "HQ records plus the live free Payhip product",
+          "lands_in": "HQ, linked on the job; the sample on the brand's Payhip store"
+        }
+      ],
+      "check": "A test sign-up on the free Payhip product receives the sample by email within minutes, and its guide link opens the product page.",
+      "checks": [
+        "The three emails are saved in HQ, each footer with the postal address and an unsubscribe line, ready for HQ's sequences."
+      ],
+      "if_fail": "If Payhip's delivery fails, put the sample as a direct download on the brand site's guide page and note it on the job.",
+      "owner_minutes": 0,
+      "sources": [
+        "S6",
+        "S30",
+        "S47",
+        "S48"
+      ]
+    },
+    {
+      "n": 10,
+      "key": "list_it",
+      "title": "List it on Payhip, Etsy and your brand site",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "HQ hands the owner the listing kit below: the files, every field in the order each site asks for it, and the direct links. He pastes, publishes and pastes the live links back.",
+      "why": "HQ and its agents never publish on his behalf. A kit in screen order makes this a paste job, not a writing job.",
+      "inputs": [
+        "all files and images",
+        "listing kit",
+        "shelves picked in stage 2"
+      ],
+      "choices": [
+        {
+          "key": "etsy_route",
+          "question": "Who lists it on Etsy?",
+          "help": "Etsy is reached through your other agents, not Claude.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "chatgpt_agent",
+              "label": "Your ChatGPT agent, after you approve",
+              "pick_when": "You want to save the 15 minutes and approve the draft listing.",
+              "recommended": true
+            },
+            {
+              "value": "me",
+              "label": "I will do it myself",
+              "pick_when": "You want to see the Etsy form yourself the first time.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "live_links",
+          "question": "Paste each live link.",
+          "help": "Copy the address of each live product page and paste it here.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Payhip settings",
+          "value": "PDF stamping on (portrait PDFs under 250 MB); download limit raised from the default 5 to 10",
+          "reason": "Payhip's protection page; a buyer on phone, laptop and tablet can use up 5 downloads.",
+          "source": "S26"
+        },
+        {
+          "what": "Checkout add-on",
+          "value": "Payhip Cross Selling: the guide as trigger, the add-on as the promoted product at 20 percent off, shown in the cart before purchase",
+          "reason": "Payhip's cross-selling works for digital products; the popup option does not show on mobile Buy Now.",
+          "source": "S28"
+        },
+        {
+          "what": "Brand site",
+          "value": "A product card that links to the Payhip product page; no checkout of our own for files until Stripe Tax is on",
+          "reason": "Payhip collects sales tax and VAT; his own Stripe checkout does not unless Stripe Tax is added.",
+          "source": "S5"
+        },
+        {
+          "what": "Etsy AI line and terms",
+          "value": "The description states AI tools helped make the item, the sizes and page counts, the download steps (in a browser, not the Etsy app) and the terms",
+          "reason": "Etsy's Creativity Standards and digital-listing rules as recorded in his standard.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Write the Payhip page: what it is and who it is for, what is included with counts, the sample, a short FAQ (phone, printing, Letter or A4), the refund line for digital files.",
+        "Write the Etsy listing: title, 13 tags of up to 20 characters, description and the AI line.",
+        "Write the brand site product card and send it as a zero-credit commit where the site has GitHub sync, or as paste-ready text.",
+        "Hand him the kit with the links; he publishes; the ChatGPT agent drafts the Etsy listing when he picked that route.",
+        "Run a signed-out test checkout on Payhip to the pay screen."
+      ],
+      "output": [
+        {
+          "name": "Listing kit (Payhip, Etsy, site card, optional Gumroad)",
+          "format": "paste-ready text plus images",
+          "lands_in": "the product folder in Google Drive (Supreme Team HQ - Brands / <brand> / Products / <guide slug>), linked on the job in HQ"
+        }
+      ],
+      "check": "The owner has pasted a live link for every shelf picked, and a signed-out Payhip checkout reaches the pay screen.",
+      "checks": [
+        "Title, page counts and price match on every listing and in the file."
+      ],
+      "if_fail": "Fix the listing text or file and hand back only the changed fields.",
+      "owner_minutes": 30,
+      "sources": [
+        "S1",
+        "S5",
+        "S7",
+        "S25",
+        "S26",
+        "S28",
+        "S31",
+        "S33",
+        "S34",
+        "S38"
+      ],
+      "skip": {
+        "can_skip": false,
+        "rule": "Cannot be skipped. Only the owner can press Publish, so the run waits here and shows in Waiting on me."
+      }
+    },
+    {
+      "n": 11,
+      "key": "register_launch_check",
+      "title": "Register the listings, launch, and check at 30 days",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude records every live listing in HQ, makes the launch pack, then at day 30 reads the numbers and recommends feed, fix or kill, including whether the guide should also become a KDP book.",
+      "why": "Every listing reports back so winners get fed and the rest get fixed or cut.",
+      "inputs": [
+        "live links",
+        "Payhip and Etsy sales and views",
+        "Payhip free sample sign-up counts"
+      ],
+      "choices": [
+        {
+          "key": "report_30",
+          "question": "Paste the 30-day numbers Claude cannot read.",
+          "help": "Etsy: Shop Manager, Stats, this listing. Paste views, favorites and orders. Skip if an agent already read them.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "HQ records",
+          "value": "A listing row per outlet on HQ's Products page (outlet, status live, link, price, date listed) and the product set to live, only after he pasted the link",
+          "reason": "His sales playbook; a listing counts as live only with its link.",
+          "source": "S5"
+        },
+        {
+          "what": "Launch pack",
+          "value": "3 to 5 pins, one teach piece and one offer piece inside the mix limits, a spot on the brand site's shop, and email 2 pointing at the guide",
+          "reason": "His launch pack rules and Pinterest method v1.4.",
+          "source": "S1"
+        },
+        {
+          "what": "30-day rule",
+          "value": "At least one sale or a clear visit-to-sale path; otherwise rework the title, first image and price once, give it 30 more days, then cut it",
+          "reason": "His sales playbook (an estimate to be replaced by our own numbers).",
+          "source": "S5"
+        },
+        {
+          "what": "KDP handoff",
+          "value": "Hand off to the Written book method only when all of these hold: Amazon demand passes its shelf check, the topic stays true for a year or more, and the guide has sold or its sample signs people up. KDP Select stays off while the PDF sells.",
+          "reason": "KDP Select makes the ebook exclusive to KDP for each 90-day term; the Written book method owns KDP files and listings.",
+          "source": "S39"
+        }
+      ],
+      "work": [
+        "Add the listing rows and set the product to live on HQ's Products page.",
+        "Make the launch pack inside the content standard's mix limits.",
+        "At day 30, log sales in HQ's monthly revenue log with an evidence link, sign-ups and sample-to-paid conversion.",
+        "Write the feed, fix or kill note; for a winner, queue brand and persona variants by the variant procedure and test the KDP handoff rule."
+      ],
+      "output": [
+        {
+          "name": "Listing and sales rows",
+          "format": "HQ records",
+          "lands_in": "the product on HQ's Products page"
+        },
+        {
+          "name": "Launch pack",
+          "format": "content items",
+          "lands_in": "HQ Production Board, linked on the job"
+        },
+        {
+          "name": "30-day note",
+          "format": "card",
+          "lands_in": "the job in HQ"
+        }
+      ],
+      "check": "Every live outlet has a listing row with its link, and the 30-day note is written with numbers.",
+      "checks": [
+        "No listing is marked live without a link he pasted."
+      ],
+      "if_fail": "Views but no sales: fix the listing. Sales with refunds or bad reviews: fix the guide and replace the file.",
+      "owner_minutes": 5,
+      "sources": [
+        "S1",
+        "S5",
+        "S6",
+        "S14",
+        "S39"
+      ]
+    }
+  ],
+  "upload_kit": {
+    "links": [
+      {
+        "label": "Payhip: your Products page (then Add new product, Digital Product)",
+        "url": "https://payhip.com/",
+        "verified": "unverified (Payhip blocked automated checks; open Payhip, tap Products)"
+      },
+      {
+        "label": "Payhip help: add a digital product",
+        "url": "https://help.payhip.com/article/59-adding-a-digital-product",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Etsy: Shop Manager listings (then Add a listing)",
+        "url": "https://www.etsy.com/your/shops/me/tools/listings",
+        "verified": "2026-11-27 (from Etsy's help page; not opened)"
+      },
+      {
+        "label": "Gumroad: new product (optional shelf)",
+        "url": "https://gumroad.com/products/new",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Gumroad: checkout upsells",
+        "url": "https://gumroad.com/checkout/upsells",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Whop: products (not used for guides)",
+        "url": "https://whop.com/dashboard/products/",
+        "verified": "2026-11-27"
+      }
+    ],
+    "fields": [
+      {
+        "page": "Payhip, Products",
+        "field": "Add new product, then Digital Product",
+        "what_to_paste": "Tap the buttons",
+        "limit": "none",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Upload product file",
+        "what_to_paste": "The guide PDF and the two worksheet PDFs",
+        "limit": "5 GB per file",
+        "source": "S27"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Title",
+        "what_to_paste": "The title exactly as on the cover",
+        "limit": "same on every shelf",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Price",
+        "what_to_paste": "The brief's price, for example 9",
+        "limit": "no '+' (that turns on pay what you want)",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Cover image",
+        "what_to_paste": "Listing image 1",
+        "limit": "size not stated by Payhip",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Embed audio or video",
+        "what_to_paste": "Leave blank",
+        "limit": "optional",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Product description",
+        "what_to_paste": "The Payhip page text from the kit",
+        "limit": "no earnings promises; Payhip bans get-rich-quick content",
+        "source": "S8"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Visibility",
+        "what_to_paste": "Visible",
+        "limit": "Visible, Invisible or Unlisted",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, Advanced options",
+        "field": "Upload a preview file for your customers",
+        "what_to_paste": "The free sample page (Letter)",
+        "limit": "optional",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, Advanced options",
+        "field": "Other boxes (variations, tax exempt, ebook, sales limit, mailing list, license keys)",
+        "what_to_paste": "Leave unticked",
+        "limit": "optional",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, new product",
+        "field": "Add Product",
+        "what_to_paste": "Press it",
+        "limit": "none",
+        "source": "S25"
+      },
+      {
+        "page": "Payhip, Account, Settings, Advanced Settings",
+        "field": "Protect your PDF files",
+        "what_to_paste": "On",
+        "limit": "portrait PDFs under 250 MB",
+        "source": "S26"
+      },
+      {
+        "page": "Payhip, Account, Settings, Advanced Settings",
+        "field": "Download limit",
+        "what_to_paste": "10",
+        "limit": "default is 5",
+        "source": "S26"
+      },
+      {
+        "page": "Payhip, Marketing, Cross Selling",
+        "field": "Add Cross-Sell",
+        "what_to_paste": "Trigger: the guide. Promoted: the add-on at 20 percent off",
+        "limit": "shown in the cart before purchase",
+        "source": "S28"
+      },
+      {
+        "page": "Etsy, Photo and video",
+        "field": "Photos",
+        "what_to_paste": "The five listing images in order",
+        "limit": "up to 20 photos and 2 videos of 5 to 15 seconds",
+        "source": "S34"
+      },
+      {
+        "page": "Etsy, Category",
+        "field": "Category; What type of item is it?; When was it made?",
+        "what_to_paste": "The kit's category; Digital files; Made to order is not used",
+        "limit": "pick from list",
+        "source": "S34"
+      },
+      {
+        "page": "Etsy, Item details",
+        "field": "Title",
+        "what_to_paste": "The Etsy title from the kit",
+        "limit": "140 characters; keep under 15 words with no repeated word",
+        "source": "S35"
+      },
+      {
+        "page": "Etsy, Item details",
+        "field": "Digital files",
+        "what_to_paste": "Guide PDF, Worksheets-Letter, Worksheets-A4",
+        "limit": "5 files, 20 MB each, names up to 70 characters, cannot be renamed",
+        "source": "S33"
+      },
+      {
+        "page": "Etsy, Item details",
+        "field": "Description",
+        "what_to_paste": "The Etsy description with sizes, page counts, download steps, terms and the AI line",
+        "limit": "AI use disclosed in the description",
+        "source": "S1"
+      },
+      {
+        "page": "Etsy, Item options",
+        "field": "Variations, Attributes, Tags",
+        "what_to_paste": "No variations; the attributes from the kit; the 13 tags",
+        "limit": "no variations on digital items; 13 tags",
+        "source": "S34"
+      },
+      {
+        "page": "Etsy, Pricing and shipping",
+        "field": "Price, Quantity, SKU",
+        "what_to_paste": "The brief's price; leave the default quantity; the guide's slug as SKU",
+        "limit": "$0.20 listing fee, 6.5 percent transaction fee, 3 percent plus $0.25 processing in the US",
+        "source": "S31"
+      },
+      {
+        "page": "Etsy, How it's made",
+        "field": "Who made it and when",
+        "what_to_paste": "I did (designed by the seller)",
+        "limit": "digital items must be made or designed by you",
+        "source": "S33"
+      },
+      {
+        "page": "Etsy, Settings",
+        "field": "Shop section, Feature this listing, Renewal options",
+        "what_to_paste": "The brand's guides section; off; automatic",
+        "limit": "each renewal costs $0.20",
+        "source": "S31"
+      },
+      {
+        "page": "Etsy",
+        "field": "Publish",
+        "what_to_paste": "Press it (or Save as Draft)",
+        "limit": "may take up to 48 hours to show in search",
+        "source": "S34"
+      },
+      {
+        "page": "Brand site",
+        "field": "Product card",
+        "what_to_paste": "Title, one-line promise, cover, price and a Buy button linking to the Payhip product page",
+        "limit": "no own checkout for files until Stripe Tax is on",
+        "source": "S5"
+      },
+      {
+        "page": "Gumroad (optional), New product",
+        "field": "Product type, name, price",
+        "what_to_paste": "E-book; the title; the price",
+        "limit": "up to $5,000",
+        "source": "S18"
+      },
+      {
+        "page": "Gumroad (optional), product page",
+        "field": "Description, URL, Cover, Thumbnail, Call to action, Summary, Additional details",
+        "what_to_paste": "The Payhip text; the slug; 1280 x 720 cover; 600 x 600 thumbnail; 'I want this!'; one line; counts",
+        "limit": "cover under 50 MB, up to 8 covers",
+        "source": "S22"
+      },
+      {
+        "page": "Gumroad (optional), Content tab",
+        "field": "Files",
+        "what_to_paste": "The three PDFs, guide stamped",
+        "limit": "stamping adds 'Sold to' and the buyer's email to page 1; not DRM",
+        "source": "S20"
+      },
+      {
+        "page": "Gumroad (optional), Checkout, Upsells",
+        "field": "New upsell",
+        "what_to_paste": "Cross-sell: the add-on",
+        "limit": "shown after the buyer presses Pay",
+        "source": "S23"
+      },
+      {
+        "page": "Gumroad (optional)",
+        "field": "Publish",
+        "what_to_paste": "Press it",
+        "limit": "10 percent plus $0.50 per sale, plus 2.9 percent plus $0.30 card processing",
+        "source": "S16"
+      }
+    ]
+  },
+  "borrowed": [
+    {
+      "tool": "Designrr",
+      "does": "Turns blog posts, videos, Word or Google Docs into designed ebooks; templates, covers, flipbooks, EPUB export, an AI writer",
+      "we_replicate": "partly",
+      "how_or_why_not": "Claude writes the guide and renders the PDF from HTML with brand fonts; templates and flipbooks are not needed. Transcribing his videos into a guide is replaced by the voice interview and his existing posts.",
+      "price": "$29 to $99 a month (official pricing page, Nov 2026); his go required",
+      "source": "S55"
+    },
+    {
+      "tool": "Beacon",
+      "does": "Lead magnet creator, lead capture forms and resource libraries",
+      "we_replicate": "yes",
+      "how_or_why_not": "Claude renders the sample page; a free Payhip product does capture and delivery.",
+      "price": "Free plan (1 lead magnet a month, 100 leads); Lite $19 a month; Professional $49 a month (official pricing page, Nov 2026); his go required",
+      "source": "S56"
+    },
+    {
+      "tool": "Gamma",
+      "does": "AI-made documents, decks and web pages with PDF export",
+      "we_replicate": "yes",
+      "how_or_why_not": "Claude writes and lays out the guide itself; Gamma's free plan keeps a 'Made with Gamma' badge on exports and its card format suits slides more than a reading guide.",
+      "price": "Free with 400 one-time credits; Plus about $9 and Pro about $18 a month (third-party page, 2026); his go required",
+      "source": "S57"
+    },
+    {
+      "tool": "Canva",
+      "does": "Page and cover design with PDF export",
+      "we_replicate": "yes",
+      "how_or_why_not": "Image models make the art and Claude builds the pages; his Canva Pro stays optional for hand edits.",
+      "price": "He already has Canva Pro (about $180 a year, third-party page, mid-2026)",
+      "source": "S58"
+    },
+    {
+      "tool": "Google Docs",
+      "does": "Drafting, comments and PDF export",
+      "we_replicate": "yes",
+      "how_or_why_not": "Used only if he wants to comment on the draft; its PDF export does not give the phone page size, bookmarks and tagging control this recipe needs.",
+      "price": "Free with a Google account",
+      "source": "none (no platform fact)"
+    },
+    {
+      "tool": "WeasyPrint",
+      "does": "Renders HTML and CSS to PDF, with tagging and a PDF/UA variant",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is: it is the free build route.",
+      "price": "Free, open source",
+      "source": "S51"
+    },
+    {
+      "tool": "veraPDF",
+      "does": "Checks a PDF against PDF/UA-1 machine rules",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is: only a validator can say the tags pass.",
+      "price": "Free, open source",
+      "source": "S52"
+    },
+    {
+      "tool": "Payhip and Gumroad PDF stamping",
+      "does": "Stamps the buyer's email on the PDF so shared copies trace back",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is inside each platform.",
+      "price": "Included",
+      "source": "S26"
+    }
+  ],
+  "candidates": [
+    {
+      "idea": "A 5 to 8 page starter edition (start here, the quick win and the cheat sheet) as the free version instead of one page.",
+      "why_parked": "His lead magnet rule is one real page; practitioners suggest a free preview chapter. Needs his go and a 30-day comparison on one guide."
+    },
+    {
+      "idea": "An EPUB edition next to the PDF for phone and Kindle readers.",
+      "why_parked": "Gumroad suggests it, but worksheets and tables lose their layout in EPUB; test only on a text-heavy guide."
+    },
+    {
+      "idea": "Gumroad Discover for a guide that has sold on Payhip.",
+      "why_parked": "Discover needs $100 of real sales and takes 30 percent; worth it only after sales exist."
+    },
+    {
+      "idea": "Whop for a guide bundled with a community or course.",
+      "why_parked": "His November 10, 2026 move put courses and kits on his own site; fees are now verified (2.7 percent plus $0.30 domestic, plus payout fees)."
+    },
+    {
+      "idea": "A 2026 gig driver tax guide built from the DoorDash taxes video idea (idea score 77) and the mileage log printable.",
+      "why_parked": "Stronger search demand than the worked example and a January to April season; needs his pick and an IRS check of every figure."
+    },
+    {
+      "idea": "Send Payhip buyers and sample sign-ups into HQ's contacts automatically, so they get the next-rung emails.",
+      "why_parked": "Needs HQ's email sequences built first and a tested connection route."
+    }
+  ],
+  "unverified": [
+    "Payhip's direct add-product link and its cover image size; Payhip blocked automated checks today.",
+    "What Payhip's 'Product is an ebook' option changes.",
+    "Gumroad's exact on-screen field labels and order; the help page names the steps but not every label.",
+    "Etsy Creativity Standards AI-disclosure wording; the official page failed to load, taken from his standard (checked Oct and Nov 2026).",
+    "Etsy listing photo size; 2000 x 2000 px is practice.",
+    "Etsy payout schedule for US sellers; the fee pages do not state it.",
+    "Whop's file app name and file limits for digital downloads.",
+    "Gamma prices; the official page shows no prices and third-party credit figures differ (1,000 versus 1,500 a month on Plus).",
+    "Order bump and upsell take rates; all from vendors (SamCart, Kajabi, Focus Digital) with no published method.",
+    "Whether open-source ReportLab can write tagged PDFs; the recipe uses WeasyPrint for that reason.",
+    "Whether Muse can read Etsy and Amazon review pages reliably; stage 1 has fallbacks."
+  ],
+  "kind": "product"
+}

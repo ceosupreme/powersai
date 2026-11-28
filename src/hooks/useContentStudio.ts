@@ -17,7 +17,8 @@ async function pages<T>(query: (from: number, to: number) => PromiseLike<{ data:
 
 export function useStudioTemplates() {
   return useQuery({ queryKey: ['content-studio', 'templates'], queryFn: () => pages<ContentTemplate>((from, to) => table('content_templates')
-    .select('id,slug,version,title,description,project_id,status,default_tier,recipe,created_at').neq('status', 'retired').order('title').order('version', { ascending: false }).range(from, to)) });
+    .select('id,slug,version,title,description,project_id,status,default_tier,recipe,created_at').neq('status', 'retired')
+    .or('recipe->>kind.is.null,recipe->>kind.neq.product').order('title').order('version', { ascending: false }).range(from, to)) });
 }
 export function useStudioCanManage(projectId: string) {
   return useQuery({ queryKey: ['content-studio', 'can-manage', projectId], enabled: !!projectId, queryFn: async (): Promise<boolean> => {
@@ -88,7 +89,16 @@ export function useStudioMutations() {
     if (error) throw error; return data;
   }, onSuccess: invalidate });
   const run = useMutation({ mutationFn: async (taskId: string): Promise<{ task_id: string; status: string; summary?: string }> => {
-    const { data, error } = await supabase.functions.invoke('content-studio-run', { body: { task_id: taskId } });
+    // Invoke only with a real validated user session, never a publishable or tooling credential.
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+    if (!sessionData.session) throw new Error('Sign in before running this saved request.');
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!userData.user) throw new Error('Sign in before running this saved request.');
+    const { data, error } = await supabase.functions.invoke('content-studio-run', {
+      body: { task_id: taskId }, headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
+    });
     if (error) {
       if (error.context instanceof Response) {
         let detail: any; try { detail = await error.context.json(); } catch { /* Keep the SDK error if no JSON was returned. */ }

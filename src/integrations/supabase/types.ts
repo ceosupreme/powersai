@@ -9723,6 +9723,7 @@ export type Database = {
           project_id: string
           recipe: Json
           result_links: Json
+          run_state: Json | null
           status: string
           target_id: string | null
           target_key: string | null
@@ -9747,6 +9748,7 @@ export type Database = {
           project_id: string
           recipe?: Json
           result_links?: Json
+          run_state?: Json | null
           status?: string
           target_id?: string | null
           target_key?: string | null
@@ -9771,6 +9773,7 @@ export type Database = {
           project_id?: string
           recipe?: Json
           result_links?: Json
+          run_state?: Json | null
           status?: string
           target_id?: string | null
           target_key?: string | null
@@ -16821,6 +16824,7 @@ export type Database = {
         Returns: number
       }
       hq_can_inspect_user: { Args: { _user_id: string }; Returns: boolean }
+      hq_check_product_recipe: { Args: { r: Json }; Returns: undefined }
       hq_claim_automation_send: {
         Args: { p_expected_attempted_at?: string; p_queue_id: string }
         Returns: Json

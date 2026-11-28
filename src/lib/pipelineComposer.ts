@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { StudioPatch } from '@/lib/contentStudio';
+import { loadProductTemplate, type ProductTemplate } from './productTemplates';
 
 const T = (t: string) => (supabase as any).from(t);
 
@@ -23,6 +24,8 @@ export interface ComposeInput {
   target_id?: string | null;
   target_key?: string | null;
   product_type?: string | null;
+  /** A stable creation key is required when starting without a product row. */
+  new_product?: { name: string; request_key: string };
   destinations?: string[];
   monetization?: string[];
   promotion?: string[];
@@ -59,6 +62,7 @@ export interface KeyPoints {
 }
 
 export interface PlannedStep {
+  stage_key?: string;
   title: string;
   owner_kind: 'claude' | 'owner';
   method_id: string | null;
@@ -66,6 +70,17 @@ export interface PlannedStep {
   check?: string | null;
   detail?: string | null;
   due_in_days?: number;
+}
+
+export function buildProductSteps(template: ProductTemplate, brandRules: MethodRow | null,
+  destinations: MethodRow[], monetization: MethodRow[], promotion: MethodRow[]): PlannedStep[] {
+  const base = buildRecipeSteps(brandRules, null, destinations, monetization, promotion);
+  return [base[0], ...template.recipe.stages.map(stage => ({
+    stage_key: stage.key, title: stage.title, owner_kind: stage.owner,
+    method_id: template.recipe.kb_id ?? null, method_key: template.slug,
+    detail: [stage.what, stage.why].filter(Boolean).join('\n'), check: stage.check,
+  })), ...base.slice(1).map((s, i) => ({ ...s, stage_key: `extra:${s.method_key ?? 'setup'}:${i}` }))]
+    .map((s, i) => ({ ...s, stage_key: s.stage_key ?? (i === 0 ? 'extra:brand_rules' : `extra:${i}`) }));
 }
 
 export const methodKey = (m: { tags: string[] | null }) =>
@@ -190,7 +205,7 @@ export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; jo
     owner_kind: s.owner_kind,
     title: s.title,
     detail: s.detail ?? s.check ?? null,
-    facts: JSON.stringify({ method: s.method_key ?? '', checks: s.check ? [s.check] : [] }),
+    facts: JSON.stringify({ method: s.method_key ?? '', checks: s.check ? [s.check] : [], ...(s.stage_key ? { stage_key: s.stage_key } : {}) }),
     status: 'Open',
     approval_status: owner ? (i === 0 ? 'Approved' : 'Blocked') : 'Auto',
     priority: owner ? 'P2-High' : 'P3-Medium',
@@ -248,6 +263,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
 
   let recipeRows: MethodRow[] = [];
   let steps: PlannedStep[];
+  const productTemplate = input.kind === 'product' && input.product_type ? await loadProductTemplate(input.product_type) : null;
 
   if (input.kind === 'lane') {
     const destKey = input.lane_item_key ? laneDestinationKey(input.lane_item_key) : null;
@@ -285,6 +301,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     if (missing.length) throw new Error(`Missing playbooks: ${missing.join(', ')}. Update your selections.`);
     const dest = pick(input.destinations), mon = pick(input.monetization), pro = pick(input.promotion);
     const unfinished = [pt, ...dest, ...mon, ...pro].filter(m => {
+      if (productTemplate && m.id === pt.id) return false;
       if (isPlannedMethod(m)) return true;
       const info = parseKeyPoints(m.key_points);
       return m.subcategory === 'product_type' || m.subcategory === 'destination'
@@ -295,7 +312,7 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
       throw new Error('Complete these guides before creating production steps: ' + unfinished.map(m => m.title).join(', '));
     }
     recipeRows = orderRecipe(brandRules, niches, [pt, ...dest, ...mon, ...pro]);
-    steps = buildRecipeSteps(brandRules, pt, dest, mon, pro);
+    steps = productTemplate ? buildProductSteps(productTemplate, brandRules, dest, mon, pro) : buildRecipeSteps(brandRules, pt, dest, mon, pro);
   }
 
   const recipe = recipeRows.map(recipeEntry);
@@ -304,6 +321,8 @@ export async function composePipeline(input: ComposeInput): Promise<{ jobId: str
     target_type: input.target_type ?? (input.new_content ? 'content_items' : null), target_id: input.target_id ?? null,
     target_key: input.target_key ?? input.lane_item_key ?? input.channel_method_key ?? input.channel_method_id ?? null,
     recipe, level: input.level, money_destination: input.money_destination || null,
+    ...(productTemplate ? { product_template_id: productTemplate.id, new_product: input.new_product,
+      target_type: 'channel_products' } : {}),
     goal_text: input.goal_text?.trim() || null,
     goal_pillar_key: input.goal_pillar_key || null,
     goal_kpi_key: input.goal_kpi_key || null,

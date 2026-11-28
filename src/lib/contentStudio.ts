@@ -113,7 +113,7 @@ export function missingStudioPicks(recipe: StudioRecipe | undefined, picks: Reco
   return recipeFields(recipe).filter(f => f.required && !String(picks[f.key] ?? '').trim()).map(f => f.label);
 }
 export function visibleStudioTemplates(templates: ContentTemplate[], projectId: string): ContentTemplate[] {
-  return templates.filter(t => t.status !== 'retired' && (!t.project_id || t.project_id === projectId));
+  return templates.filter(t => t.recipe.kind !== 'product' && t.status !== 'retired' && (!t.project_id || t.project_id === projectId));
 }
 export function studioRepeatMatches(template: ContentTemplate, picks: Record<string, unknown>, items: StudioItem[]): StudioItem[] {
   const keys = studioLines(studioObject(template.recipe.repeat_guard).keys);

@@ -1,0 +1,1604 @@
+{
+  "key": "written_book",
+  "title": "Written book method: from a chosen title to KDP paperback, Kindle edition and printable twin",
+  "version": "2.0",
+  "date": "2026-11-27",
+  "covers": [
+    "written book",
+    "hybrid workbook"
+  ],
+  "ends_with": "The owner holds the print PDF, the full cover PDF, the Kindle EPUB and cover, the printable twin files, a paste-ready listing kit in the order KDP asks for it and the direct upload link, all in the book folder linked on the job in HQ.",
+  "outside_hq": [
+    {
+      "what": "Make sure the one KDP account is ready: tax interview and bank details done.",
+      "why": "KDP will not pay royalties without them, and the account rule is one account forever, never a second one.",
+      "how_owner_does_it": "Sign in at kdp.amazon.com, open Your Account at the top, finish any section marked incomplete. Skip this if it is already done.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Make sure an Etsy shop and a Payhip account exist for the printable twin.",
+      "why": "The printable twin and the free bonus page are sold and delivered there; HQ cannot create accounts for him.",
+      "how_owner_does_it": "Open etsy.com/sell and payhip.com, sign up with the brand email, connect payouts. Skip if both exist.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Receive the printed proof copy in the mail and check it in hand.",
+      "why": "A printed proof is the only way to see the gutter, the spine, ink show-through and real writing room before buyers do.",
+      "how_owner_does_it": "When the box arrives, follow the proof checklist in stage 10 and tap pass or fail for each line in HQ.",
+      "owner_minutes": 20
+    },
+    {
+      "what": "Click Publish on KDP, Etsy and Payhip.",
+      "why": "HQ and its agents never publish or upload on his behalf; he clicks the final button on each site.",
+      "how_owner_does_it": "Paste each field from the upload kit in the order shown, then press the publish button named in the kit.",
+      "owner_minutes": 25
+    },
+    {
+      "what": "Only if the agents are blocked on Amazon: phone screenshots of the 1 to 3 star reviews on the top five books.",
+      "why": "Amazon restricts AI agents, and the review read must never run from the KDP publishing login.",
+      "how_owner_does_it": "Open each of the five books in the Amazon app, filter reviews to 1, 2 and 3 stars, screenshot them and drop the images in the book folder.",
+      "owner_minutes": 15
+    }
+  ],
+  "stages": [
+    {
+      "n": 1,
+      "key": "check_shelf",
+      "title": "Check the shelf and mine the reviews",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Study the top 20 competing books for the title's main search phrase and turn their buyers' complaints into a short list of things this book will fix.",
+      "why": "Buyers review the book in their hands, and the repeated one to three star complaints on best sellers are the cheapest proof of what to fix. For the couples workbook, 20 of the 100 idea points are still open because this has not been done yet.",
+      "inputs": [
+        "chosen title and brand",
+        "primary search phrase",
+        "existing idea score and shelf check in HQ"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "How many competitors to study",
+          "value": "Top 20 books for the main search phrase",
+          "reason": "His KDP Charter sets 20 for books.",
+          "source": "S2"
+        },
+        {
+          "what": "Which reviews to read",
+          "value": "All 1, 2 and 3 star reviews plus the but-sentence in 4 star reviews, keeping 1 star reviews in the read",
+          "reason": "His standard keeps 1 star reviews because they hold the file, size and page-count failures; the NotebookLM advice to skip them was rejected at merge.",
+          "source": "S2"
+        },
+        {
+          "what": "Whether a low score stops the book",
+          "value": "No. The score ranks and sharpens the brief; it never blocks a title he picked.",
+          "reason": "Override of November 13, 2026 in both skills.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Load the brand kit and the brand row in brand-rules.md (kdp-book skill, Session start).",
+        "Run the free 45-minute validation: search suggestions, top 20 results, sales rank read as relative, interest outside Amazon (supreme-content-standard, Books: the KDP Blueprint and Charter).",
+        "Request the Amazon review and rank reads from Muse through the HQ agent mailbox, with ChatGPT as backup, never through the KDP publishing login (kdp-book, Non-negotiables). If the agents are blocked on Amazon, use reviews an agent can read freely (Goodreads, Barnes and Noble, Reddit, Etsy listings) and ask the owner for phone screenshots of the 1 to 3 star reviews on the top five books, about 15 minutes.",
+        "Cluster the complaints, count how many books and reviewers repeat each, quote each at ten words or fewer with its link (review-mining protocol).",
+        "Note what five-star reviews praise; these are must-keeps.",
+        "File each complaint in the Answer Bank and update the title's idea score and evidence in HQ.",
+        "Record page counts and list prices of the top 10 so the brief can set the page range and price band."
+      ],
+      "output": [
+        {
+          "name": "Complaint list with links and counts",
+          "format": "table in the job",
+          "lands_in": "the title's idea evidence in HQ and the Answer Bank"
+        },
+        {
+          "name": "Top 20 shelf table (rank, ratings, price, pages, trim)",
+          "format": "spreadsheet",
+          "lands_in": "the book folder, linked on the job in HQ"
+        }
+      ],
+      "check": "At least five complaint clusters are filed, each with a quote of ten words or fewer and a working link.",
+      "checks": [
+        "The five-star praise list has at least three items.",
+        "The idea score in HQ shows no open points for the original-answer part."
+      ],
+      "if_fail": "Widen to the second search phrase and the next 10 books, then repeat this stage.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "n": 2,
+      "key": "approve_brief",
+      "title": "Approve the one-screen brief",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude fills the one-screen brief: buyer, the one job the book does, the complaints it fixes, chapter map, worksheet list, specs and price. The owner picks the subtitle and the author name, then approves.",
+      "why": "His skill rule is no brief, no draft. Settling buyer, specs and price here prevents the most expensive late change, a page count that moves after the cover is built.",
+      "inputs": [
+        "complaint list and praise list",
+        "shelf table",
+        "brand kit"
+      ],
+      "choices": [
+        {
+          "key": "subtitle",
+          "question": "Which subtitle goes on the cover?",
+          "help": "The subtitle tells a shopper who it is for and what it fixes. Title and subtitle together must stay under 200 characters.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Three candidates from the primary search phrase, the buyer's own words in the top complaints, and the one job of the book; none repeats a title word or uses a trademark, 'bestselling' or 'free'.",
+          "options": [
+            {
+              "value": "candidate_1",
+              "label": "Generated subtitle 1",
+              "pick_when": "It names the buyer's situation in the words reviewers use.",
+              "recommended": true
+            },
+            {
+              "value": "candidate_2",
+              "label": "Generated subtitle 2",
+              "pick_when": "You want the promise up front instead of the situation.",
+              "recommended": false
+            },
+            {
+              "value": "candidate_3",
+              "label": "Generated subtitle 3",
+              "pick_when": "You want the format (how many conversations, how many weeks) to lead.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "author_name",
+          "question": "Whose name goes on the cover as author?",
+          "help": "KDP allows a pen name as long as it does not mislead buyers. The same name must match on the cover, the title page and the KDP Author field.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "allmighty_supreme",
+              "label": "Allmighty Supreme",
+              "pick_when": "The book is on the Allmighty Supreme brand and should grow that name.",
+              "recommended": true
+            },
+            {
+              "value": "sean_powers",
+              "label": "Sean Powers",
+              "pick_when": "You want it tied to the name your Facebook audience knows.",
+              "recommended": false
+            },
+            {
+              "value": "brand_name",
+              "label": "The brand name (for example Big Paws Club)",
+              "pick_when": "The book is a brand book, not a personal one.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "brief_ok",
+          "question": "Is the brief right?",
+          "help": "Read the one screen. Approving starts the interview; nothing is drafted before this.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "approve",
+              "label": "Approve",
+              "pick_when": "The buyer, the job and the chapter map sound right.",
+              "recommended": true
+            },
+            {
+              "value": "change",
+              "label": "Change something (say it by voice)",
+              "pick_when": "Something about the buyer, the promise or a chapter is off.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Format",
+          "value": "Hybrid workbook: short taught sections, about a third of the pages, then fill-in exercises that follow from each lesson",
+          "reason": "His format definition; a workbook that teaches then sets exercises reads as nonfiction, not a low-content book.",
+          "source": "S1"
+        },
+        {
+          "what": "Trim size",
+          "value": "8.5 x 11 in for workbooks two people write in; 6 x 9 in for a guide with no writing pages",
+          "reason": "Both are KDP standard sizes; the larger page gives real writing room for two answer areas.",
+          "source": "S7"
+        },
+        {
+          "what": "Interior",
+          "value": "Black ink on white paper",
+          "reason": "Cheapest print cost and clean writing surface; spine width 0.002252 in per page.",
+          "source": "S17"
+        },
+        {
+          "what": "Page range",
+          "value": "About 110 to 150 pages for the couples workbook",
+          "reason": "HQ estimate of about 120 pages; similar couples workbooks run about 146 to 270 pages (Open Library medians). Estimate.",
+          "source": "S6"
+        },
+        {
+          "what": "Paperback price",
+          "value": "$19.99 at launch",
+          "reason": "Low end of the $19.99 to $24.99 band self-published titles sell at on this shelf. Estimated royalty at 120 pages: 60% of $19.99 minus $3.04 printing = about $8.95.",
+          "source": "S13"
+        },
+        {
+          "what": "Low-content box",
+          "value": "Not ticked",
+          "reason": "KDP lists nonfiction as generally not low-content. Ticking the box removes the free KDP ISBN, the Look Inside preview unless you buy your own ISBN, series and Expanded Distribution. KDP rejects a low-content book that is not marked as one, so the teaching has to be real: about a third of the pages, with each exercise tied to a lesson.",
+          "source": "S9"
+        },
+        {
+          "what": "ISBN",
+          "value": "Free KDP ISBN for the paperback; none needed for Kindle",
+          "reason": "Free for paperback and hardcover; the imprint then shows as Independently published. Each format needs its own ISBN.",
+          "source": "S22"
+        },
+        {
+          "what": "Large print",
+          "value": "No for the couples workbook; a switch for senior-buyer titles",
+          "reason": "His large-print rule is a separate edition with its own ISBN, used when the buyer needs it.",
+          "source": "S1"
+        },
+        {
+          "what": "Weekly slots",
+          "value": "At most two new paperbacks and two new Kindle titles per week across all brands",
+          "reason": "KDP limit: up to 2 new titles per format each week, resetting Sunday 00:00 UTC.",
+          "source": "S10"
+        }
+      ],
+      "work": [
+        "Fill the brief template in kit-contract.md section 1 (kdp-book step 1, Brief, one screen).",
+        "Generate three subtitle candidates and test each against KDP's metadata rules.",
+        "Set the chapter map so every chapter has one worksheet and the worksheets move from noticing to acting (chapter-and-worksheet.md, Worksheet scaffolding).",
+        "List the gap questions the owner must answer in stage 3.",
+        "Book the KDP week slot in HQ so the two-per-week limit is never hit by surprise.",
+        "Register the title on HQ's Products page at status scored, then brief once approved (hq-recipes.md, sections 1 and 2)."
+      ],
+      "output": [
+        {
+          "name": "Approved brief",
+          "format": "one screen in the job, plus brief.md",
+          "lands_in": "the book folder, linked on the job in HQ"
+        }
+      ],
+      "check": "The owner tapped Approve, and the brief names the buyer, the one job, at least five fixed complaints, the chapter map and the specs.",
+      "checks": [
+        "Title plus subtitle is under 200 characters and contains no repeated generic word, trademark, 'bestselling' or 'free'.",
+        "The author name matches the brand rule he picked."
+      ],
+      "if_fail": "Claude rewrites the brief from his voice note and shows it again.",
+      "owner_minutes": 10,
+      "sources": [
+        "S1",
+        "S6",
+        "S7",
+        "S9",
+        "S10",
+        "S13",
+        "S14",
+        "S17",
+        "S19",
+        "S22",
+        "S44"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The recommended option is used for every choice and the brief is approved as written."
+      }
+    },
+    {
+      "n": 3,
+      "key": "dictate",
+      "title": "Answer the interview by voice",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "The owner answers six to eight questions, one at a time, by voice. His exact words are saved unedited and become the part of the book no competitor can copy.",
+      "why": "His skill makes his own experience the owner layer, and every chapter needs at least one real item from it. The interview only fills gaps: Claude first pulls what he has already said in posts, threads and Drive documents.",
+      "inputs": [
+        "approved brief and its gap questions",
+        "his existing posts, threads and documents on the topic"
+      ],
+      "choices": [
+        {
+          "key": "interview_mode",
+          "question": "When do you want to answer?",
+          "help": "About 20 minutes by voice, any form is fine: half sentences, rambling, bad spelling. Every question has skip, don't know, and give me an example.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "now",
+              "label": "Now, by voice",
+              "pick_when": "You have 20 minutes, for example parked between deliveries.",
+              "recommended": true
+            },
+            {
+              "value": "split",
+              "label": "In two short sessions today",
+              "pick_when": "You only have ten-minute gaps.",
+              "recommended": false
+            },
+            {
+              "value": "skip",
+              "label": "Skip, use what I have already said",
+              "pick_when": "You are slammed this week and the topic is well covered in your posts.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "answers",
+          "question": "Answer this question in your own words.",
+          "help": "One question at a time. Say skip at any point.",
+          "type": "voice",
+          "generated": true,
+          "generate_from": "The gap questions from the brief, drawn from interview.md knowledge mode (how you do it, what beginners get wrong, what you got wrong, which numbers matter, what you disagree with, the one thing to remember, what the worksheet should hold, a real story).",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "What happens if he skips",
+          "value": "Claude builds the owner layer only from his existing material, quoted with its source, leaves [OWNER STORY NEEDED: topic] markers where a story would help, and lists the markers in his stage 7 read. The book still moves; the quality card shows the gap.",
+          "reason": "His skill never invents a story, client, number or feeling; scores advise and never block.",
+          "source": "S1"
+        },
+        {
+          "what": "Session length",
+          "value": "Six to eight questions, then show what was captured",
+          "reason": "Interview rule 7.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Pull his existing words on the topic first, with the source noted (kdp-book step 2, Owner layer).",
+        "Ask only the gaps, one question at a time, following interview.md, Rules for every session.",
+        "Save his answers exactly as given, apart from any summary, tagged with the date and the chapter each feeds.",
+        "Flag every number, health, money or legal statement in his answers as needs checking for stage 6."
+      ],
+      "output": [
+        {
+          "name": "Dictation transcript, raw and unedited",
+          "format": "markdown",
+          "lands_in": "the book folder (rights subfolder), linked on the job in HQ"
+        }
+      ],
+      "check": "Every chapter in the map has at least one item from his own words or his existing material, or an [OWNER STORY NEEDED] marker listed for stage 7.",
+      "checks": [
+        "No answer was rewritten before saving."
+      ],
+      "if_fail": "Ask one follow-up question for each empty chapter, or record the marker.",
+      "owner_minutes": 20,
+      "sources": [
+        "S1"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Claude uses only what the owner has already said in posts, threads and documents, quoted with its source, and leaves a marker where a story would help."
+      }
+    },
+    {
+      "n": 4,
+      "key": "fact_sheet_outline",
+      "title": "Build the fact sheet and the outline",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude lists every claim the book will make with its source, then writes the chapter outline, the worksheet specs and two or three openings for the first ten pages.",
+      "why": "Unsourced claims are the hard fail in his standard, and the first ten pages are what Amazon's preview shows, so they are written as candidates and the owner picks one in stage 7.",
+      "inputs": [
+        "approved brief",
+        "dictation",
+        "complaint list"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Chapter shape",
+          "value": "Hook, setup, teaching, evidence, application, bridge",
+          "reason": "His chapter anatomy.",
+          "source": "S1"
+        },
+        {
+          "what": "Word target",
+          "value": "Taught section 6,000 to 12,000 words in total, 800 to 1,800 per chapter",
+          "reason": "His hybrid word targets; 40 percent over target means cut.",
+          "source": "S1"
+        },
+        {
+          "what": "Exercise wording",
+          "value": "Open questions that start with how, what, tell me about or what is it like, never do or did",
+          "reason": "Questions that cannot be answered yes or no invite real answers between partners.",
+          "source": "S43"
+        },
+        {
+          "what": "Two-person layout",
+          "value": "Each conversation page gives Partner one and Partner two their own writing area plus one shared line for what you agree to try",
+          "reason": "The title's promise is a workbook two people fill in together.",
+          "source": "S6"
+        },
+        {
+          "what": "Claims limit",
+          "value": "No therapy, counseling or treatment claims; it is a conversation workbook",
+          "reason": "Flag on the HQ evidence: the shelf is led by therapists.",
+          "source": "S6"
+        }
+      ],
+      "work": [
+        "Build the claims table from kit-contract.md section 2; every claim gets a source and a class (kdp-book step 3, Fact sheet).",
+        "Write the outline with the grounding rule: no term used before it is taught; list what the reader knows walking in (step 4).",
+        "Spec each worksheet on the five-part skeleton: cover match, start-here page with one filled example, the main pages, review pages at intervals, a tips page answering the top three complaints (supreme-content-standard, The five-part skeleton).",
+        "Write two or three openings for the introduction and chapter one.",
+        "Start the continuity ledger (kit-contract.md section 3)."
+      ],
+      "output": [
+        {
+          "name": "Claims table",
+          "format": "markdown table",
+          "lands_in": "the book folder (rights subfolder)"
+        },
+        {
+          "name": "Outline, worksheet specs and candidate openings",
+          "format": "markdown",
+          "lands_in": "the book folder, linked on the job in HQ"
+        }
+      ],
+      "check": "Every claim in the outline has a source or a flag, and every chapter has a worksheet spec with an instruction line and a filled example row.",
+      "checks": [
+        "Two or three distinct openings exist.",
+        "No exercise prompt can be answered yes or no."
+      ],
+      "if_fail": "Back to the brief's chapter map for any chapter without a clear job.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S6",
+        "S43"
+      ]
+    },
+    {
+      "n": 5,
+      "key": "draft",
+      "title": "Draft the book one section at a time",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude drafts each section against the brief, the dictation, the fact sheet and the brand voice, in one thread so the voice holds.",
+      "why": "His compression rule and one-voice rule keep the book short and consistent; over-explaining is the most common reason a section runs long.",
+      "inputs": [
+        "outline and openings",
+        "claims table",
+        "dictation",
+        "brand kit"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Voice",
+          "value": "His plain professional-casual voice for Allmighty Supreme; no em dashes, no hashtags, no urban vernacular",
+          "reason": "Brand row in brand-rules.md and the dash override of November 13, 2026.",
+          "source": "S1"
+        },
+        {
+          "what": "Owner tags",
+          "value": "Every item from his words is tagged [OWNER] in the draft and the tags are removed at file time",
+          "reason": "So he can check each one is real.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Draft one section at a time with the strongest available model (kdp-book step 5, Draft).",
+        "Write the manuscript in the single-file structure with worksheet blocks marked (kit-contract.md section 4).",
+        "Label any illustration as an example; never invent a person, couple or case.",
+        "Keep the continuity ledger current after each section."
+      ],
+      "output": [
+        {
+          "name": "Manuscript draft",
+          "format": "one markdown file with worksheet blocks",
+          "lands_in": "the book folder, linked on the job in HQ"
+        }
+      ],
+      "check": "Every chapter is within 40 percent of its word target and carries at least one [OWNER] item or a listed marker.",
+      "checks": [
+        "Every worksheet block has one instruction line and a filled example row."
+      ],
+      "if_fail": "Cut the over-long section, then redraft it; never patch.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1"
+      ]
+    },
+    {
+      "n": 6,
+      "key": "run_gates",
+      "title": "Run the quality gates and fact-check",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude runs the eight gates in order, then the fact-check and compliance pass, and writes the AI-content answer from how the book was actually made.",
+      "why": "His gates catch the AI tells that cost reviews; KDP requires AI-generated text and images to be declared, and an undisclosed claim or reused interior can block the title.",
+      "inputs": [
+        "manuscript draft",
+        "claims table",
+        "brand allow list"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Gate order",
+          "value": "Sweep, swap test, specificity floor, repetition, worksheet test, cold read, critic pass, final five",
+          "reason": "His order; a section that fails goes back to drafting.",
+          "source": "S1"
+        },
+        {
+          "what": "Critic pass",
+          "value": "Run by a separate model (ChatGPT) with his three-star prompt; the owner pastes it himself only if no agent route is open, about two minutes",
+          "reason": "His critic pass, moved to an agent so his minutes go where only he can help.",
+          "source": "S1"
+        },
+        {
+          "what": "AI-content answer",
+          "value": "Yes for text when Claude drafted the prose, even after heavy edits; yes for images when the cover or any interior art came from an image model; none for translations",
+          "reason": "KDP defines AI-generated as text, images or translations created by an AI tool, even if substantially edited afterwards.",
+          "source": "S8"
+        },
+        {
+          "what": "Sibling rule",
+          "value": "At least two-thirds of the interior differs from any sibling title",
+          "reason": "KDP blocks content that is not significantly different or is excessively reused.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Run python3 scripts/sweep.py on each chapter with --profile book and the brand allow file (kdp-book step 6, gate 1).",
+        "Run gates 2 to 8 exactly as written in kdp-book step 6, including the three cold-read seats in a fresh model.",
+        "Fill one page of every worksheet as the buyer and as a tired user who skips the instructions (supreme-content-standard, Shared test bench item 7).",
+        "Update every claim to verified, qualified, uncertain or contradicted; cut or rewrite as opinion anything uncertain (step 7, Fact-check and compliance).",
+        "Add the brand disclaimer: a conversation workbook, not therapy or counseling.",
+        "Check the title, subtitle and keywords for trademarks; hash the interior against sibling titles.",
+        "Write the AI-content answer into the rights folder and the upload kit."
+      ],
+      "output": [
+        {
+          "name": "Gated manuscript",
+          "format": "markdown",
+          "lands_in": "the book folder, linked on the job in HQ"
+        },
+        {
+          "name": "Quality card (advisory score, gate results, open flags)",
+          "format": "card in the job",
+          "lands_in": "the job in HQ"
+        }
+      ],
+      "check": "No tier A tell remains, no claim is uncertain or contradicted in the text, and the AI-content answer is written down.",
+      "checks": [
+        "Two of three cold-read seats raise no repeated objection that is still unfixed.",
+        "Interior hash shows at least two-thirds difference from every sibling title."
+      ],
+      "if_fail": "Failing sections go back to stage 5 and are redrafted, then gated again.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "n": 7,
+      "key": "read_first_pages",
+      "title": "Read the first ten pages and pick the opening",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "The owner reads the first ten pages on his phone, picks one of the candidate openings, confirms each [OWNER] item is real and says any comments by voice.",
+      "why": "The first ten pages are the storefront in Amazon's preview, and only he can confirm his own stories and voice.",
+      "inputs": [
+        "gated manuscript",
+        "candidate openings",
+        "list of [OWNER] items and open markers"
+      ],
+      "choices": [
+        {
+          "key": "opening",
+          "question": "Which opening should the book start with?",
+          "help": "Each opening is the first page a shopper sees in the free preview.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "The two or three openings written in stage 4, each shown as its first 150 words with a one-line note on its angle.",
+          "options": [
+            {
+              "value": "opening_1",
+              "label": "Opening 1",
+              "pick_when": "It starts from the reader's situation in their own words.",
+              "recommended": true
+            },
+            {
+              "value": "opening_2",
+              "label": "Opening 2",
+              "pick_when": "You want your own story to lead.",
+              "recommended": false
+            },
+            {
+              "value": "opening_3",
+              "label": "Opening 3",
+              "pick_when": "You want the first exercise to start on page one.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "owner_items_ok",
+          "question": "Are all the items marked as yours real?",
+          "help": "Each line quotes something credited to you. Tap any that are wrong.",
+          "type": "multi",
+          "generated": true,
+          "generate_from": "Every [OWNER] item in the manuscript, one line each with its chapter.",
+          "options": []
+        },
+        {
+          "key": "comments",
+          "question": "Anything to change?",
+          "help": "Say it by voice; Claude applies it and reruns the gates on changed sections.",
+          "type": "voice",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "If he does not read",
+          "value": "Claude uses opening 1 and keeps only owner items with a quoted source; the card says the read was skipped",
+          "reason": "Scores and reads advise; they never block shipping.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Owner: read on the phone, tap the opening, tap any wrong owner item, record comments.",
+        "Claude: apply the pick and the comments, remove unconfirmed owner items, rerun the gates on changed sections."
+      ],
+      "output": [
+        {
+          "name": "Final manuscript",
+          "format": "markdown",
+          "lands_in": "the book folder, linked on the job in HQ"
+        }
+      ],
+      "check": "An opening is picked and every [OWNER] item is either confirmed or removed.",
+      "checks": [
+        "Changed sections passed the sweep again."
+      ],
+      "if_fail": "Back to stage 5 for the sections he flagged.",
+      "owner_minutes": 40,
+      "sources": [
+        "S1"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Opening 1 is used and only owner items with a quoted source are kept."
+      }
+    },
+    {
+      "n": 8,
+      "key": "build_files",
+      "title": "Build the print PDF, Kindle EPUB and printable twin",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude renders the print interior PDF, a lean Kindle EPUB and the printable twin in Letter and A4, then looks at every page as an image before calling any file done.",
+      "why": "KDP rejects files for margins, unembedded fonts and wrong sizes, and buyers punish clipped pages and too little writing room; rendering and looking is the cheapest test.",
+      "inputs": [
+        "final manuscript",
+        "brand kit fonts and colors"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Print margins",
+          "value": "Inside 0.75 in, outside 0.5 in, no bleed unless art runs to the edge (then 0.125 in)",
+          "reason": "Clears KDP's minimum gutter for every page count under 500 pages (0.375 in to 150 pages, 0.5 in to 300) and the 0.25 in outside minimum.",
+          "source": "S7"
+        },
+        {
+          "what": "Print file rules",
+          "value": "Fonts embedded, images 300 DPI, text 7 pt or larger, lines 0.75 pt or thicker, even page count",
+          "reason": "KDP interior rules as recorded in his standard.",
+          "source": "S2"
+        },
+        {
+          "what": "Body text and writing lines",
+          "value": "Body 12 pt, left aligned, 1.5 line spacing; writing lines 0.75 to 1 pt at 20 to 30 percent gray, 8 mm apart",
+          "reason": "Learning-material guidance (12 pt, 1.5 spacing, no justified text) and his line spec of 7 to 8 mm for adult handwriting.",
+          "source": "S41"
+        },
+        {
+          "what": "Kindle file",
+          "value": "Reflowable EPUB from pandoc, validated in Kindle Previewer; worksheets become talk-through questions with a pointer to the free printable pages",
+          "reason": "EPUB is a recommended KDP format and must pass Kindle Previewer; his rule keeps Kindle lean because delivery costs apply and fill-in pages do not work on a screen.",
+          "source": "S18"
+        },
+        {
+          "what": "Printable twin",
+          "value": "The full workbook as PDF in exact Letter and A4, all ink inside a 0.5 in margin, with a start-here page and a terms page; at most 5 files of 20 MB each, names under 70 characters",
+          "reason": "Etsy digital file limits and his printable spec.",
+          "source": "S50"
+        }
+      ],
+      "work": [
+        "Produce the print PDF with ReportLab (or the Interior Engine skill if installed) at the chosen trim (kdp-book step 8, Files).",
+        "Check fonts with pdffonts and render every page to images; look at a thumbnail grid for drift and near-duplicate pages (shared test bench items 1 and 4).",
+        "Produce the Kindle EPUB with pandoc and validate it in Kindle Previewer; fix every warning.",
+        "Produce the printable twin in Letter and A4 from a shared content box of about 7.5 x 10.5 in, plus a one-page sample for the free bonus page.",
+        "Count what the listing will promise (pages, conversations, sizes) against what the files deliver.",
+        "Record the final page count; the cover is built from it in stage 9."
+      ],
+      "output": [
+        {
+          "name": "Print interior PDF",
+          "format": "PDF",
+          "lands_in": "the book folder, files subfolder, linked on the job in HQ"
+        },
+        {
+          "name": "Kindle EPUB",
+          "format": "EPUB",
+          "lands_in": "the book folder, files subfolder"
+        },
+        {
+          "name": "Printable twin (Letter, A4, start-here, terms) and one-page sample",
+          "format": "PDF",
+          "lands_in": "the book folder, twin subfolder"
+        }
+      ],
+      "check": "Every page image shows nothing clipped or outside the margins, all fonts are embedded and the Kindle file opens in Kindle Previewer with no errors.",
+      "checks": [
+        "The page count is even and matches the number in the listing draft.",
+        "The tired-user check passes on one conversation page: today's entry can be filled in under a minute without reading the instructions."
+      ],
+      "if_fail": "Fix the element that breaks the margin (a long word or wide table), not the margins; re-render.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S7",
+        "S18",
+        "S27",
+        "S41",
+        "S50"
+      ]
+    },
+    {
+      "n": 9,
+      "key": "make_cover",
+      "title": "Make and approve the cover",
+      "owner": "owner",
+      "doer": "chatgpt",
+      "what": "An image model makes three or four front-cover concepts from the brand kit; the owner picks one; Claude builds the full paperback wrap from the final page count and a separate Kindle cover.",
+      "why": "The cover sells at thumbnail size, and a wrap built for a stale page count is the most common late rejection.",
+      "inputs": [
+        "final page count",
+        "title, subtitle and author name",
+        "brand kit colors and fonts"
+      ],
+      "choices": [
+        {
+          "key": "cover_concept",
+          "question": "Which cover do you want?",
+          "help": "Judge each one at phone thumbnail size, the way shoppers first see it.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Three or four front-cover concepts from the brand kit, the title and the look of the top sellers' covers (pattern, never copied), each shown at full size and at thumbnail size.",
+          "options": [
+            {
+              "value": "concept_1",
+              "label": "Concept 1",
+              "pick_when": "The title reads clearly at thumbnail size.",
+              "recommended": true
+            },
+            {
+              "value": "concept_2",
+              "label": "Concept 2",
+              "pick_when": "You want the image to lead over the words.",
+              "recommended": false
+            },
+            {
+              "value": "concept_3",
+              "label": "Concept 3",
+              "pick_when": "You want the plainest, most premium look.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "cover_finish",
+          "question": "Matte or glossy cover?",
+          "help": "This is the paperback's surface. It is set on the KDP Paperback Content page.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "matte",
+              "label": "Matte",
+              "pick_when": "You want a soft, premium feel for a gift-style workbook.",
+              "recommended": true
+            },
+            {
+              "value": "glossy",
+              "label": "Glossy",
+              "pick_when": "The cover is a bright photo you want to pop.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Paperback cover file",
+          "value": "One PDF with back, spine and front; width = bleed + back + spine + front + bleed, height = bleed + trim height + bleed, bleed 0.125 in; images 300 DPI",
+          "reason": "KDP paperback cover rules.",
+          "source": "S17"
+        },
+        {
+          "what": "Spine",
+          "value": "Page count x 0.002252 in on white paper; spine text only at 79 pages or more",
+          "reason": "KDP spine rules.",
+          "source": "S17"
+        },
+        {
+          "what": "Barcode area",
+          "value": "Lower right of the back cover kept clear",
+          "reason": "KDP places the barcode there.",
+          "source": "S9"
+        },
+        {
+          "what": "Kindle cover",
+          "value": "JPEG, 2,560 x 1,600 px, RGB",
+          "reason": "KDP ebook cover ideal size and format.",
+          "source": "S28"
+        },
+        {
+          "what": "Image tool",
+          "value": "ChatGPT image generation or Muse image generation, both included in his plans; Higgsfield only with his go on credits",
+          "reason": "AI generation is his default for covers; credit spends need his separate yes.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Generate the concepts and show them at full and thumbnail size.",
+        "Download KDP's cover template for the exact trim, paper and page count from the cover calculator.",
+        "Build the wrap on the template; put the back-cover copy from the kit and keep the barcode area clear.",
+        "Export the Kindle front cover at 2,560 x 1,600 px.",
+        "Record the prompts and the image tool in the rights folder; the AI-content answer for images becomes yes."
+      ],
+      "output": [
+        {
+          "name": "Paperback cover PDF",
+          "format": "PDF",
+          "lands_in": "the book folder, files subfolder"
+        },
+        {
+          "name": "Kindle cover",
+          "format": "JPEG",
+          "lands_in": "the book folder, files subfolder"
+        }
+      ],
+      "check": "The wrap matches the cover calculator's size for the final page count to the hundredth of an inch.",
+      "checks": [
+        "Title and author name on the cover match the kit exactly.",
+        "Nothing sits in the barcode area."
+      ],
+      "if_fail": "Rebuild the wrap from the current page count; if the page count changed, rebuild every time.",
+      "owner_minutes": 15,
+      "sources": [
+        "S1",
+        "S9",
+        "S17",
+        "S28"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Concept 1 is used, with a matte finish where a finish applies."
+      }
+    },
+    {
+      "n": 10,
+      "key": "publish_kdp",
+      "title": "Publish it on KDP, paperback first, then Kindle",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "HQ hands over the upload kit: the files, every KDP field in the order the site asks, and the direct link. The owner saves the paperback as a draft, orders a proof, checks it, publishes, then adds the Kindle edition.",
+      "why": "Only he may click publish. Checking a printed proof while the book is still a draft catches gutter, spine and show-through problems before buyers see them.",
+      "inputs": [
+        "print PDF",
+        "cover PDF",
+        "Kindle EPUB and cover",
+        "listing kit",
+        "AI-content answer"
+      ],
+      "choices": [
+        {
+          "key": "proof",
+          "question": "Order a printed proof before publishing?",
+          "help": "A proof costs the printing cost (about $3.04 for 120 pages at 8.5 x 11) plus shipping and is stamped Not for Resale. This spends money, so it needs your yes.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "order_proof",
+              "label": "Yes, order one proof (his go required)",
+              "pick_when": "It is the first book in a family or a new trim size.",
+              "recommended": true
+            },
+            {
+              "value": "previewer_only",
+              "label": "No, publish after the online previewer",
+              "pick_when": "It reuses a trim and layout you have already proofed in print.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "live_links",
+          "question": "Paste the Amazon links when the books are live.",
+          "help": "Paperback first, then Kindle. HQ marks a book live only after you paste the link.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Order of formats",
+          "value": "Paperback first, Kindle second, from the same Bookshelf entry so the two link",
+          "reason": "KDP links the editions 48 hours to one week after each is live.",
+          "source": "S25"
+        },
+        {
+          "what": "KDP Select",
+          "value": "Not enrolled while the printable twin sells the same book as a PDF",
+          "reason": "Select requires the Kindle ebook to be distributed only through KDP during the 90-day term.",
+          "source": "S30"
+        },
+        {
+          "what": "Kindle price",
+          "value": "$9.99 (estimate: about half the paperback, inside the 70 percent band)",
+          "reason": "The 70 percent royalty band on Amazon.com is $2.99 to $12.99 since July 7, 2026.",
+          "source": "S15"
+        },
+        {
+          "what": "Expanded Distribution",
+          "value": "On",
+          "reason": "Extra outlets at 40 percent of list minus printing, about $4.96 at $19.99 and 120 pages; no cost to switch on.",
+          "source": "S13"
+        },
+        {
+          "what": "Description",
+          "value": "Under 4,000 characters including HTML; no web address, no review request, no testimonials",
+          "reason": "KDP description rules prohibit URLs, reviews and requests for reviews.",
+          "source": "S24"
+        },
+        {
+          "what": "Timing",
+          "value": "Expect about 3 business days to go live and up to 72 hours for the detail page; Look Inside 9 to 10 business days",
+          "reason": "KDP Timelines page.",
+          "source": "S25"
+        }
+      ],
+      "work": [
+        "Claude: assemble the upload kit (the kit section of this recipe) with every field filled for this book, the files and the links.",
+        "Owner: open the new paperback link, paste each field in order, upload the files, open the previewer, save as draft.",
+        "Owner: on the Paperback Rights & Pricing page, request a proof if he said yes.",
+        "Owner: check the proof against the proof checklist: gutter, spine text, cover color, writing room, pen show-through on one page, page count.",
+        "Owner: press Publish Your Paperback Book; then on the Bookshelf, add the Kindle eBook to the same title, paste its fields and publish.",
+        "Claude: move the HQ status to proof ordered, ready to upload, then live only after he pastes the link (hq-recipes.md, Status map)."
+      ],
+      "output": [
+        {
+          "name": "Upload kit",
+          "format": "one screen in the job plus upload-kit.md",
+          "lands_in": "the book folder, linked on the job in HQ"
+        },
+        {
+          "name": "Live paperback and Kindle links",
+          "format": "URLs",
+          "lands_in": "the title's shelves on HQ's Products page"
+        }
+      ],
+      "check": "The owner has pasted a live Amazon link for the paperback.",
+      "checks": [
+        "The Kindle link is pasted or the Kindle edition is scheduled for a later week slot.",
+        "The AI-content answer given at upload matches the one in the rights folder."
+      ],
+      "if_fail": "Match KDP's rejection message to the fix list in kdp-facts.md (insufficient gutter, text outside margins, wrong cover size) and return to stage 8 or 9.",
+      "owner_minutes": 45,
+      "sources": [
+        "S1",
+        "S10",
+        "S13",
+        "S14",
+        "S15",
+        "S23",
+        "S24",
+        "S25",
+        "S30",
+        "S31"
+      ],
+      "skip": {
+        "can_skip": false,
+        "rule": "Cannot be skipped. Only the owner can press Publish, so the run waits here and shows in Waiting on me."
+      }
+    },
+    {
+      "n": 11,
+      "key": "list_twin",
+      "title": "List it as a printable twin on Etsy and Payhip",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude prepares both listings and the free bonus page; the owner pastes and publishes them.",
+      "why": "The same work sold as a printable reaches buyers who want to print pages for each partner, and the free one-page sample on Payhip builds the email list until the brand email service is connected.",
+      "inputs": [
+        "printable twin files",
+        "one-page sample",
+        "listing kit"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Shelves",
+          "value": "Etsy for discovery, Payhip as the checkout for his own audience; own store later",
+          "reason": "His shelf rules: Payhip is the cheaper checkout under $10 and handles EU and UK VAT; our own store does not.",
+          "source": "S2"
+        },
+        {
+          "what": "Price",
+          "value": "$9.99",
+          "reason": "Etsy median price for the couples workbook printable phrase in the HQ shelf check.",
+          "source": "S6"
+        },
+        {
+          "what": "Etsy title",
+          "value": "Exact product phrase, then Printable or PDF, then a use-case phrase, then sizes in parentheses; under 15 words, no word repeated",
+          "reason": "Etsy Seller Handbook guidance as recorded in his standard.",
+          "source": "S2"
+        },
+        {
+          "what": "AI line",
+          "value": "State in the Etsy description that AI tools helped make the item",
+          "reason": "Etsy requires AI disclosure in the listing; Payhip does not.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Write the Etsy listing: title, 13 tags, description with sizes, download steps, terms and the AI line (supreme-content-standard, Printable trackers section).",
+        "Make the first listing image a real filled page readable at thumbnail size and marked as a digital download.",
+        "Write the Payhip product page and the $0 bonus product for the one-page sample (kit-contract.md section 7).",
+        "Hand him both kits with the click path; he publishes."
+      ],
+      "output": [
+        {
+          "name": "Etsy listing kit and Payhip page kit",
+          "format": "paste-ready text plus images",
+          "lands_in": "the book folder, twin subfolder, linked on the job in HQ"
+        }
+      ],
+      "check": "The owner has pasted the live Etsy and Payhip links.",
+      "checks": [
+        "The page and size counts in each listing match the files."
+      ],
+      "if_fail": "Fix the listing text or file and hand it back.",
+      "owner_minutes": 15,
+      "sources": [
+        "S2",
+        "S6",
+        "S50"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The twin is not listed. The run moves to the closing stage and the product is marked as having no twin yet."
+      }
+    },
+    {
+      "n": 12,
+      "key": "register_launch_check",
+      "title": "Register the shelves, launch, and check at 30 days",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude records every live shelf in HQ, makes the launch pack and A+ Content, then at 30 days reads the numbers and recommends feed, fix or kill.",
+      "why": "His standard says every listing reports back so winners get fed and the rest get fixed or cut.",
+      "inputs": [
+        "live links",
+        "listing kit",
+        "the KDP report he pastes at 30 days"
+      ],
+      "choices": [
+        {
+          "key": "report_30",
+          "question": "Paste this month's KDP report.",
+          "help": "From KDP, open Reports, copy the month's royalties for this title and paste them here.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Shelf rows",
+          "value": "Amazon KDP (paperback), Kindle (ebook), Etsy and Payhip (twin)",
+          "reason": "HQ outlet names must match its list exactly.",
+          "source": "S1"
+        },
+        {
+          "what": "A+ Content",
+          "value": "Three modules: the promise, a real interior page image, the family of titles; images 300 DPI",
+          "reason": "Built from the Marketing page's A+ Content Manager after publish; appears within about eight business days.",
+          "source": "S32"
+        },
+        {
+          "what": "Reviews",
+          "value": "Free copies may go to readers only when no review is required or influenced; no swaps, no paid reviews, no close friends or family",
+          "reason": "Recorded in his KDP facts from Amazon's review rules.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Add a shelf row per outlet with the url and listed date only after he confirmed the link (hq-recipes.md section 3).",
+        "Register each approved chapter as a content source (hq-recipes.md section 5).",
+        "Make the launch pack inside the content standard's mix limits: 3 to 5 pins, one teach piece and one offer piece, a shop spot on the brand site.",
+        "Write the A+ Content and hand it to him with the Marketing page click path.",
+        "At day 30, log sales (hq-recipes.md section 4) and write the feed, fix or kill note (supreme-content-standard, Step 8: Learn)."
+      ],
+      "output": [
+        {
+          "name": "Shelf rows and sales rows",
+          "format": "HQ records",
+          "lands_in": "the title on HQ's Products page"
+        },
+        {
+          "name": "Launch pack and A+ Content kit",
+          "format": "content items and paste-ready text",
+          "lands_in": "HQ Production Board, linked on the job"
+        },
+        {
+          "name": "30-day note",
+          "format": "card",
+          "lands_in": "the job in HQ"
+        }
+      ],
+      "check": "Every live outlet has a shelf row with its link, and the 30-day note is written.",
+      "checks": [
+        "No shelf is marked listed without a link he pasted."
+      ],
+      "if_fail": "Views but no sales: fix the listing. Sales with bad reviews: fix the book and republish.",
+      "owner_minutes": 5,
+      "sources": [
+        "S1",
+        "S2",
+        "S32"
+      ]
+    }
+  ],
+  "upload_kit": {
+    "links": [
+      {
+        "label": "KDP Bookshelf",
+        "url": "https://kdp.amazon.com/en_US/bookshelf",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Start a new paperback",
+        "url": "https://kdp.amazon.com/en_US/title-setup/paperback/new/details",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Start a new Kindle eBook (only if not adding it from the paperback's Bookshelf entry)",
+        "url": "https://kdp.amazon.com/en_US/title-setup/kindle/new/details",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Cover calculator and template",
+        "url": "https://kdp.amazon.com/cover-calculator",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Printing cost table",
+        "url": "https://kdp.amazon.com/en_US/help/topic/G201834340",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "AI content rules (Content Guidelines)",
+        "url": "https://kdp.amazon.com/en_US/help/topic/G200672390",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Kindle Previewer and other KDP tools",
+        "url": "https://kdp.amazon.com/en_US/help/topic/G200735480",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Etsy: create a listing",
+        "url": "https://www.etsy.com/your/shops/me/listing-editor/create",
+        "verified": "unverified"
+      },
+      {
+        "label": "Payhip: add a product",
+        "url": "https://payhip.com/products/add",
+        "verified": "unverified"
+      }
+    ],
+    "fields": [
+      {
+        "page": "Paperback Details",
+        "field": "Language",
+        "what_to_paste": "English",
+        "limit": "pick from list",
+        "source": "S34"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Book Title",
+        "what_to_paste": "The title exactly as on the cover",
+        "limit": "title plus subtitle under 200 characters; can't be changed after publishing",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Subtitle",
+        "what_to_paste": "The subtitle he picked in stage 2",
+        "limit": "counts toward the 200",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Series",
+        "what_to_paste": "Leave blank for the first book; the family name once a second title exists",
+        "limit": "follows title rules",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Edition Number",
+        "what_to_paste": "Leave blank",
+        "limit": "optional",
+        "source": "S36"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Author",
+        "what_to_paste": "The author name he picked in stage 2, spelled as on the cover",
+        "limit": "no HTML",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Contributors",
+        "what_to_paste": "Leave blank unless a real person contributed",
+        "limit": "optional; never imply a contributor who did not contribute",
+        "source": "S19"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Description",
+        "what_to_paste": "The description from the listing kit",
+        "limit": "4,000 characters including formatting codes. Not allowed: web addresses, phone numbers, email or mail addresses, reviews, quotes or testimonials, requests for reviews, price or availability, time-limited information, emojis and keyword lists.",
+        "source": "S24"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Publishing Rights",
+        "what_to_paste": "I own the copyright and I hold the necessary publishing rights",
+        "limit": "pick one",
+        "source": "S34"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Primary Audience",
+        "what_to_paste": "Sexually explicit images or title: No. Reading age: leave blank (adult)",
+        "limit": "must answer before categories",
+        "source": "S21"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Primary Marketplace",
+        "what_to_paste": "Amazon.com",
+        "limit": "pick from list",
+        "source": "S33"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Categories",
+        "what_to_paste": "The three categories from the listing kit",
+        "limit": "3",
+        "source": "S21"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Low-content book",
+        "what_to_paste": "Leave unticked for a written book or hybrid workbook",
+        "limit": "wrong choice gets the book rejected",
+        "source": "S9"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Large print",
+        "what_to_paste": "Leave unticked unless this is the large-print edition",
+        "limit": "large print needs its own ISBN",
+        "source": "S36"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Keywords",
+        "what_to_paste": "The seven keyword boxes from the listing kit, one per box",
+        "limit": "up to 7; no words already in the title, categories or author; no trademarks, quotes or program names",
+        "source": "S20"
+      },
+      {
+        "page": "Paperback Details",
+        "field": "Publication Date",
+        "what_to_paste": "Leave blank (first publication)",
+        "limit": "only for previously published books",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Print ISBN",
+        "what_to_paste": "Get a free KDP ISBN",
+        "limit": "one ISBN per format; can't change after publishing",
+        "source": "S22"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Print Options",
+        "what_to_paste": "Ink and paper: Black and white interior, white paper. Trim size: 8.5 x 11 in (or the brief's trim). Bleed: No bleed. Cover finish: the finish he picked",
+        "limit": "can't change after publishing",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Manuscript",
+        "what_to_paste": "Upload the print interior PDF",
+        "limit": "title, subtitle and author must match the Details page",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Book Cover",
+        "what_to_paste": "Upload a cover you already have: the full cover PDF",
+        "limit": "single PDF, back, spine and front",
+        "source": "S17"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "AI-Generated Content",
+        "what_to_paste": "The answer from the rights folder (see the AI question answer below)",
+        "limit": "required for every new book",
+        "source": "S8"
+      },
+      {
+        "page": "Paperback Content",
+        "field": "Book Preview",
+        "what_to_paste": "Launch Previewer, page through every page, then approve",
+        "limit": "fix every error it lists",
+        "source": "S27"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Territories",
+        "what_to_paste": "All territories (worldwide rights)",
+        "limit": "pick one",
+        "source": "S23"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Pricing, royalty, and distribution",
+        "what_to_paste": "List price on Amazon.com $19.99; let KDP fill other marketplaces; Expanded Distribution on",
+        "limit": "60 percent royalty at $9.99 and up, minus printing",
+        "source": "S13"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Request a book proof",
+        "what_to_paste": "Request one proof if he said yes in stage 10",
+        "limit": "proof is stamped Not for Resale",
+        "source": "S31"
+      },
+      {
+        "page": "Paperback Rights & Pricing",
+        "field": "Terms & Conditions",
+        "what_to_paste": "Read, then press Publish Your Paperback Book",
+        "limit": "no changes while In Review",
+        "source": "S23"
+      },
+      {
+        "page": "Kindle eBook Details",
+        "field": "Language, Book Title, Subtitle, Series, Edition Number, Author, Contributors, Description, Publishing Rights, Primary Audience, Primary Marketplace, Categories, Keywords",
+        "what_to_paste": "Same as the paperback",
+        "limit": "same rules as above",
+        "source": "S34"
+      },
+      {
+        "page": "Kindle eBook Details",
+        "field": "Pre-order",
+        "what_to_paste": "I am ready to release my book now",
+        "limit": "pre-order needs the final file 72 hours before release",
+        "source": "S25"
+      },
+      {
+        "page": "Kindle eBook Content",
+        "field": "Manuscript",
+        "what_to_paste": "Upload the Kindle EPUB; Digital Rights Management: No",
+        "limit": "EPUB must pass Kindle Previewer",
+        "source": "S18"
+      },
+      {
+        "page": "Kindle eBook Content",
+        "field": "Kindle eBook Cover",
+        "what_to_paste": "Upload the 2,560 x 1,600 px JPEG",
+        "limit": "JPEG or TIFF under 50 MB",
+        "source": "S28"
+      },
+      {
+        "page": "Kindle eBook Content",
+        "field": "AI-Generated Content",
+        "what_to_paste": "Same answer as the paperback",
+        "limit": "required",
+        "source": "S35"
+      },
+      {
+        "page": "Kindle eBook Content",
+        "field": "Kindle eBook Preview",
+        "what_to_paste": "Launch Previewer, check phone and tablet views",
+        "limit": "fix every warning",
+        "source": "S27"
+      },
+      {
+        "page": "Kindle eBook Content",
+        "field": "Kindle eBook ISBN",
+        "what_to_paste": "Leave blank",
+        "limit": "not required for ebooks",
+        "source": "S22"
+      },
+      {
+        "page": "Kindle eBook Pricing",
+        "field": "KDP Select Enrollment",
+        "what_to_paste": "Leave unticked while the printable twin is sold",
+        "limit": "Select makes the ebook exclusive to KDP for 90 days",
+        "source": "S30"
+      },
+      {
+        "page": "Kindle eBook Pricing",
+        "field": "Territories",
+        "what_to_paste": "All territories (worldwide rights)",
+        "limit": "pick one",
+        "source": "S34"
+      },
+      {
+        "page": "Kindle eBook Pricing",
+        "field": "Royalty and Pricing",
+        "what_to_paste": "70 percent royalty; Amazon.com list price $9.99",
+        "limit": "70 percent only between $2.99 and $12.99 on Amazon.com",
+        "source": "S15"
+      },
+      {
+        "page": "Kindle eBook Pricing",
+        "field": "Terms & Conditions",
+        "what_to_paste": "Read, then press Publish Your Kindle eBook",
+        "limit": "live in about 72 hours",
+        "source": "S25"
+      }
+    ],
+    "ai_question": {
+      "how_to_answer": "Answer Yes. For text, choose the option that matches how much of the book Claude drafted (usually the entire work) and that it was edited. For images, choose yes when the cover or any interior art came from an image model. For translations, choose none. AI used only to edit, check or brainstorm his own writing is AI-assisted and is not declared, but in this recipe Claude writes the prose, so text is AI-generated even after heavy edits. Answer from how the book was actually made, never to look better.",
+      "source": "S8"
+    }
+  },
+  "borrowed": [
+    {
+      "tool": "Book Bolt",
+      "does": "Keyword and product research, cover and interior designer, puzzle generators, a Chrome extension that shows sales data on Amazon pages",
+      "we_replicate": "partly",
+      "how_or_why_not": "Claude reproduces the research table, the interior layouts and the listing text. Live Amazon sales estimates cannot be replicated; the recipe reads rank as a relative signal instead.",
+      "price": "About $9.99 to $35.99 a month by plan (third-party page, Nov 2026); his go required",
+      "source": "S48"
+    },
+    {
+      "tool": "Publisher Rocket",
+      "does": "Amazon keyword ideas with estimated searches, category finder, competition analyzer, Amazon Ads keyword lists",
+      "we_replicate": "partly",
+      "how_or_why_not": "Claude builds keywords from search suggestions and the review mining and picks categories from what the top 20 sit in. Estimated monthly searches cannot be replicated for free.",
+      "price": "$199 one time (official site, Nov 2026); his go required",
+      "source": "S45"
+    },
+    {
+      "tool": "Atticus",
+      "does": "Writing editor and formatter that exports a print PDF and an EPUB from one file",
+      "we_replicate": "yes",
+      "how_or_why_not": "Claude writes one markdown manuscript and renders the print PDF with ReportLab and the EPUB with pandoc.",
+      "price": "$147 one time (official site, Black Friday price); his go required",
+      "source": "S46"
+    },
+    {
+      "tool": "Vellum",
+      "does": "Mac-only formatter for ebooks and print with polished book styles",
+      "we_replicate": "yes",
+      "how_or_why_not": "Same route as Atticus; Vellum adds nothing a workbook needs and has no fill-in layouts.",
+      "price": "$199.99 ebooks, $249.99 with print (Reedsy, June 2026); his go required",
+      "source": "S47"
+    },
+    {
+      "tool": "Kindle Create",
+      "does": "Free Amazon app that turns a Word file into a Kindle file and can prepare a paperback interior",
+      "we_replicate": "yes",
+      "how_or_why_not": "The EPUB route replaces it; it stays the fallback if an EPUB will not pass Kindle Previewer. It does not support tables in print yet.",
+      "price": "Free",
+      "source": "S26"
+    },
+    {
+      "tool": "Kindle Previewer and the online Print Previewer",
+      "does": "Show how the ebook and paperback will look and list errors to fix before upload",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is: only Amazon's own previewer can say what Amazon will accept.",
+      "price": "Free",
+      "source": "S27"
+    },
+    {
+      "tool": "KDP cover calculator",
+      "does": "Gives the exact wrap size and a template for trim, paper and page count",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is: the template is the source of truth for the spine.",
+      "price": "Free",
+      "source": "S17"
+    },
+    {
+      "tool": "Canva",
+      "does": "Cover and page design with print PDF export",
+      "we_replicate": "yes",
+      "how_or_why_not": "Image models make the art and Claude builds the wrap on KDP's template; Canva stays optional for hand edits.",
+      "price": "Free plan; Pro about $180 a year for one person (third-party page, mid-2026); his go required for Pro",
+      "source": "S49"
+    }
+  ],
+  "candidates": [
+    {
+      "idea": "Enroll the Kindle edition in KDP Select for one 90-day term while the twin sells only the worksheet pages, then compare earnings.",
+      "why_parked": "Needs his go, and KDP's page does not say whether a PDF of the same book counts against exclusivity."
+    },
+    {
+      "idea": "Amazon Ads test at $5 to $10 a day after 10 to 15 honest reviews.",
+      "why_parked": "Spends money; his charter rule waits for reviews."
+    },
+    {
+      "idea": "Hardcover edition of the couples workbook as a gift version.",
+      "why_parked": "No evidence yet that this shelf buys hardcovers; costs a weekly hardcover slot only."
+    },
+    {
+      "idea": "Splinter versions (engaged couples, newlyweds, long-distance) once the master sells.",
+      "why_parked": "His variant rule launches a version only on its own search demand and keeps two-thirds of the interior different."
+    }
+  ],
+  "unverified": [
+    "The exact on-screen order and labels of the KDP title setup fields; the order here comes from KDP help pages plus two 2026 walkthroughs. Confirm at the first upload and correct the kit.",
+    "The exact options in the AI-Generated Content dropdowns (some sections versus entire work, minimal versus extensive edits); described by one May 2026 article only.",
+    "Whether selling the same book as a PDF breaks KDP Select exclusivity; the official page is silent on PDFs.",
+    "Whether KDP will treat a prompt-heavy couples workbook as low-content; KDP makes the final call.",
+    "Etsy Creativity Standards AI-disclosure wording and Payhip fees; taken from his standard (checked Oct and Nov 2026), official pages failed to load today.",
+    "Book Bolt, Vellum and Canva prices; official pricing pages failed to load, figures are from third-party pages.",
+    "Proof copy shipping cost; the KDP page fetched does not state it.",
+    "Etsy and Payhip direct listing links.",
+    "Kindle Unlimited naming: the KDP Select page now says Kindle+.",
+    "Whether Muse can read Amazon review pages reliably; the fallback routes in stage 1 cover a block."
+  ],
+  "kind": "product"
+}

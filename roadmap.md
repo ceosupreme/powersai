@@ -1,5 +1,11 @@
 # Roadmap
 
+## Product runs Step 1
+- [x] Studio credential refusal localized to authentication, not generation; valid owner session gives 400 for invalid input and native draft 70da0493-7ec1-4eff-914f-d8bc52b315bc completed, model result applied at revision 4. Require a validated real session for frontend runs. Historical reason for service credential mismatch cannot be established from retained logs; no guard/binding changes or worker redeploy.
+- [x] Four source files saved byte-exact; JS/DB shape checks and global ready/guided templates with tagged knowledge links (12/11/11/10 stages)
+- [x] Nullable run_state; authoritative frozen template and key-to-step map via existing hq_create_pipeline, atomic missing-product/link creation and resume; legacy product plans deliberately require explicit keyed conversion instead of replacement
+- [x] 93 targeted/regression tests pass; preview build OK; signed-in Big Paws Club temporary create/resume verified and removed; no later-step screen, Start buttons, agent dispatch, voice, upload kit or publishing
+
 ## Finished posts Step 4: brand Drive files
 - [x] Link owner Drive; shared server-only per-file authorization and streaming previews/downloads
 - [x] Saved brand roots and alias-matched slices; Drive-only today/tomorrow posts and one-source Mark posted with explicit platform captions

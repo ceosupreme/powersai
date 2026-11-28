@@ -1,0 +1,1426 @@
+{
+  "key": "course",
+  "title": "Course method: from an urgent outcome to a small paid course selling on the brand's own site",
+  "version": "1.0",
+  "date": "2026-11-27",
+  "covers": [
+    "small paid course",
+    "mini course",
+    "Action Lab"
+  ],
+  "ends_with": "The owner holds a live course on the brand's learn site with every lesson video, caption file, transcript, worksheet and deliverable in the course folder, a Stripe checkout with its order bump, the welcome emails loaded, a paste-ready upload kit and the live link, all linked on the job in HQ.",
+  "outside_hq": [
+    {
+      "what": "Point the brand's learn address (for example learn.allmightysupreme.com) at the course engine.",
+      "why": "The address did not resolve when checked on November 12, 2026; only he can change his domain's settings.",
+      "how_owner_does_it": "Open the domain's DNS settings at the registrar, add the record Lovable shows under the engine's Domains setting, tap Save. Skip if the address already opens.",
+      "owner_minutes": 10
+    },
+    {
+      "what": "Connect Stripe to the course engine once.",
+      "why": "Lovable needs the Stripe key entered in its editor by the account owner.",
+      "how_owner_does_it": "Open the engine in Lovable, connect Stripe when prompted, paste the key from the Stripe Dashboard under Developers, API keys. Skip if already connected.",
+      "owner_minutes": 10
+    },
+    {
+      "what": "Create the brand's YouTube channel if it has none, for unlisted lesson videos.",
+      "why": "Only he can create a Google account channel.",
+      "how_owner_does_it": "In the YouTube app, tap your picture, Create a channel, use the brand name. Skip if it exists.",
+      "owner_minutes": 5
+    },
+    {
+      "what": "Make the one real test purchase in stage 10.",
+      "why": "A real card is the only proof the checkout works.",
+      "how_owner_does_it": "Follow the stage 10 card on your phone.",
+      "owner_minutes": 5
+    }
+  ],
+  "stages": [
+    {
+      "n": 1,
+      "key": "find_outcome",
+      "title": "Find the urgent outcome people already search for",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude finds what buyers in this niche are searching for and complaining about right now, then turns it into three candidate course outcomes, each one finished result a buyer can reach in one sitting or one week.",
+      "why": "His rule is one specific outcome that people will pay for now because the pain is urgent, and research before building. Buyers ask for refunds when the course promises more than it delivers or they get stuck without an early win, so the outcome has to be small, concrete and wanted.",
+      "inputs": [
+        "brand and niche",
+        "his topic idea, if he has one",
+        "the brand's Answer Bank and idea evidence in HQ",
+        "existing course and product rows for the brand"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Where demand evidence comes from",
+          "value": "Google and YouTube search suggestions, Reddit questions sorted Top and All Time then checked for the past year, the 1 to 3 star reviews of the best-selling books, courses and guides on the same problem, and the brand's own outliers",
+          "reason": "His review-mining protocol and Signal Engine; free routes first.",
+          "source": "S1"
+        },
+        {
+          "what": "What counts as an outcome",
+          "value": "A result the buyer can check they have, written as: When you're done, you'll have ___. If the blank cannot be filled with something concrete, it is a free post, not a paid course",
+          "reason": "His Action Labs finish-line rule.",
+          "source": "S6"
+        },
+        {
+          "what": "How big the outcome is",
+          "value": "Reachable in 45 to 90 minutes of doing, or one short week",
+          "reason": "His Action Labs format; mini courses that try to squeeze in a full course fail.",
+          "source": "S6"
+        },
+        {
+          "what": "Software dates",
+          "value": "Every app or AI feature the outcome depends on is checked on its maker's help page this week, with the date written down",
+          "reason": "Apps change under courses; for example custom GPTs retire on December 11, 2026, so a course built on them would break.",
+          "source": "S39"
+        },
+        {
+          "what": "Whether a weak score stops his idea",
+          "value": "No. The score ranks and sharpens the brief; it never blocks a topic he picked",
+          "reason": "His November 13, 2026 override.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Load the brand kit from HQ and the brand's existing course rows (channel_products and action_items that mention course) so nothing is duplicated.",
+        "Pull Google and YouTube search suggestions for the topic's main phrases and their how-to, for-free, for-beginners and with-a-named-tool variants; save the raw lists with the date.",
+        "Read the top questions on the topic's subreddits (Top, All Time, then past year) and the 1 to 3 star reviews on the best-selling books and courses for the same problem; cluster complaints and quote each at ten words or fewer with its link.",
+        "List the competing paid courses and guides you can see (title, price, promised result, length) and what their buyers praise.",
+        "Check every app, plan limit and feature the outcome needs on the maker's own help page and record the date.",
+        "Write three candidate outcomes, each with its finish-line sentence, the buyer, the urgent pain in the buyer's words, the evidence links and the time to finish.",
+        "File the complaints in the Answer Bank and update the idea score and evidence on the course row in HQ."
+      ],
+      "output": [
+        {
+          "name": "Demand sheet: search suggestions, questions, complaint clusters, competitor table",
+          "format": "spreadsheet",
+          "lands_in": "the course folder in Google Drive under Supreme Team HQ - Brands, brand folder, Courses, course title, linked on the job in HQ"
+        },
+        {
+          "name": "Three candidate outcomes with finish-line sentences and evidence",
+          "format": "card in the job",
+          "lands_in": "the job in HQ and the course row's idea evidence"
+        }
+      ],
+      "check": "Three outcomes exist, each with a finish-line sentence, at least three linked pieces of demand evidence and a dated check of every tool it depends on.",
+      "checks": [
+        "At least five complaint clusters are filed with short quotes and links.",
+        "No outcome depends on a feature its maker has announced will retire."
+      ],
+      "if_fail": "Widen to the neighbouring search phrases and the next ten competitors, or narrow the buyer (for example beginners, small business owners, people over 50) and repeat.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S6",
+        "S39",
+        "S59",
+        "S62"
+      ]
+    },
+    {
+      "n": 2,
+      "key": "approve_brief",
+      "title": "Approve the one-screen course brief",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude fills a one-screen brief: the buyer, the one outcome, the finish-line sentence, the complaints it fixes, the mission map, the price ladder, where it sells and the refund line. The owner picks the title, the price ladder and where it sells, then approves.",
+      "why": "No brief, no build. Settling the outcome, price and host here prevents the costly late changes: a sales page that promises more than the lessons deliver, or a checkout rebuilt on a second platform.",
+      "inputs": [
+        "three candidate outcomes and the demand sheet",
+        "the brand kit and its offer ladder",
+        "the state of the brand's course engine, checkout and email sender"
+      ],
+      "choices": [
+        {
+          "key": "title",
+          "question": "Which outcome and title should this course be?",
+          "help": "Each option is one finished result. The title says the result and the time it takes.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "The three outcomes from stage 1, each written as a title of 12 words or fewer naming the result and the time, plus its finish-line sentence and its strongest piece of evidence.",
+          "options": [
+            {
+              "value": "candidate_1",
+              "label": "Generated outcome 1",
+              "pick_when": "It has the most search and complaint evidence and the smallest finish line.",
+              "recommended": true
+            },
+            {
+              "value": "candidate_2",
+              "label": "Generated outcome 2",
+              "pick_when": "You know this one best from your own work.",
+              "recommended": false
+            },
+            {
+              "value": "candidate_3",
+              "label": "Generated outcome 3",
+              "pick_when": "It leads most naturally into the brand's next paid step.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "price_ladder",
+          "question": "How should it be priced?",
+          "help": "The order bump is a small add-on ticked on the checkout page. The next step is offered on the finish screen and in email after the buyer finishes.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "ladder_27",
+              "label": "$27 course, $17 order bump, $97 next step",
+              "pick_when": "It is the brand's first course or it has no reviews yet. This is your November 10 plan and it matches the $17 to $27 bump pattern in 2026 upsell data.",
+              "recommended": true
+            },
+            {
+              "value": "single_47",
+              "label": "$47 course, no order bump",
+              "pick_when": "The outcome is bigger (a full kit or several finished pieces) and you want one simple price.",
+              "recommended": false
+            },
+            {
+              "value": "founding_27_to_47",
+              "label": "$27 founding price, rising to $47 after 10 reviews",
+              "pick_when": "You want the review-first launch but expect the course to hold a higher price later.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "host",
+          "question": "Where should it sell and play?",
+          "help": "The host is where the buyer pays and watches. Your own site keeps the sale and the customer list; a marketplace may bring buyers but takes more and owns the relationship.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "own_engine",
+              "label": "Your own course engine at the brand's learn address (for example learn.allmightysupreme.com) with Stripe checkout",
+              "pick_when": "Default. The engine is already built, Stripe is live, you keep about $25.92 of a $27 sale and own the list. This is your November 10 decision.",
+              "recommended": true
+            },
+            {
+              "value": "payhip",
+              "label": "Payhip course page",
+              "pick_when": "The brand's engine checkout is not built yet and you want it selling this week; 5 percent fee, Payhip handles EU and UK VAT.",
+              "recommended": false
+            },
+            {
+              "value": "whop",
+              "label": "Whop",
+              "pick_when": "You want a marketplace and affiliates to sell it; read Whop's current platform fee first, because its fee page lists only processing.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "brief_ok",
+          "question": "Is the brief right?",
+          "help": "Read the one screen. Approving starts the interview; nothing is written before this.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "approve",
+              "label": "Approve",
+              "pick_when": "The buyer, the outcome and the missions sound right.",
+              "recommended": true
+            },
+            {
+              "value": "change",
+              "label": "Change something (say it by voice)",
+              "pick_when": "The buyer, the promise or a mission is off.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Format",
+          "value": "An Action Lab: 3 to 5 missions of 10 to 25 minutes each, 45 to 90 minutes in total, ending in one finished deliverable the buyer downloads",
+          "reason": "His Action Labs format; short mini courses of 3 to 5 lessons are the 2026 practitioner pattern.",
+          "source": "S6"
+        },
+        {
+          "what": "Refund line",
+          "value": "14-day money-back on request, stated on the sales page, the checkout and the receipt",
+          "reason": "Matches Teachable's standard 14-day window and keeps trust high for a new brand with no reviews. EU buyers lose the 14-day withdrawal right only if they expressly agree to start right away, so the checkout carries that tick box.",
+          "source": "S25"
+        },
+        {
+          "what": "Claims",
+          "value": "No earnings, income or results promises; examples are labeled as examples; money courses show what the buyer will make (an offer, a plan), never what they will earn",
+          "reason": "FTC money-making notice and Operation AI Comply; Stripe prohibits get-rich-quick offers.",
+          "source": "S34"
+        },
+        {
+          "what": "Sold after it is built",
+          "value": "The course opens for sale only after it is built and produced; no presell",
+          "reason": "His November 12, 2026 decision.",
+          "source": "S8"
+        },
+        {
+          "what": "One live course per brand",
+          "value": "The brief names which existing course this one joins or replaces so each brand always has one live",
+          "reason": "His November 10, 2026 decision.",
+          "source": "S13"
+        }
+      ],
+      "work": [
+        "Fill the brief: buyer, outcome, finish-line sentence, complaints it fixes with links, what five-star buyers praise, mission map with minutes, deliverable, price ladder, host, refund line, next step, launch week.",
+        "Check the title against the brand's banned words and against existing course and book titles for confusion.",
+        "Write the gap questions for the stage 3 interview.",
+        "Register or update the course row on HQ's Products page (channel_products) at status brief, then approved."
+      ],
+      "output": [
+        {
+          "name": "Approved course brief",
+          "format": "one screen in the job plus brief.md",
+          "lands_in": "the course folder, linked on the job in HQ"
+        }
+      ],
+      "check": "The owner tapped Approve, and the brief names the buyer, the finish-line sentence, the mission map, the price ladder, the host and the refund line.",
+      "checks": [
+        "The finish-line sentence names something the buyer can hold or open.",
+        "The total minutes are between 45 and 90."
+      ],
+      "if_fail": "Claude rewrites the brief from his voice note and shows it again.",
+      "owner_minutes": 10,
+      "sources": [
+        "S6",
+        "S8",
+        "S13",
+        "S15",
+        "S25",
+        "S34",
+        "S38",
+        "S53",
+        "S56"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The recommended option is used for every choice and the brief is approved as written."
+      }
+    },
+    {
+      "n": 3,
+      "key": "dictate",
+      "title": "Answer the teaching interview by voice",
+      "owner": "owner",
+      "doer": "owner",
+      "what": "The owner answers six to eight questions by voice about how he actually does this, what beginners get wrong and what he would tell a friend. His words become the parts of the lessons nobody else can copy.",
+      "why": "Teaching is the work he likes most, and his own method is the difference between this course and free answers. Udemy, for example, refuses fully AI-generated courses with minimal instructor input, which shows where the market draws the line.",
+      "inputs": [
+        "approved brief and its gap questions",
+        "his existing posts, threads, Drive documents and saved courses on the topic"
+      ],
+      "choices": [
+        {
+          "key": "interview_mode",
+          "question": "When do you want to answer?",
+          "help": "About 20 minutes by voice. Half sentences are fine. Every question has skip, don't know, and give me an example.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "now",
+              "label": "Now, by voice",
+              "pick_when": "You have 20 minutes, for example parked between deliveries.",
+              "recommended": true
+            },
+            {
+              "value": "split",
+              "label": "In two short sessions today",
+              "pick_when": "You only have ten-minute gaps.",
+              "recommended": false
+            },
+            {
+              "value": "skip",
+              "label": "Skip, use what I have already said",
+              "pick_when": "You are slammed this week and you have posted about this topic before.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "answers",
+          "question": "Answer this question in your own words.",
+          "help": "One question at a time. Say skip at any point.",
+          "type": "voice",
+          "generated": true,
+          "generate_from": "The gap questions from the brief, drawn from the kdp-book interview in knowledge mode: how you do it, the order you do it in, what beginners get wrong, what you got wrong, the one thing to remember, a real moment it worked.",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "What happens if he skips",
+          "value": "Claude uses only his existing material, quoted with its source, and marks each lesson that has no item from him; the course still moves and the quality card shows the gap",
+          "reason": "Nothing is invented; scores advise and never block.",
+          "source": "S2"
+        },
+        {
+          "what": "Recording himself",
+          "value": "Never required. His voice answers are notes, not lesson audio. Using his own voice or face in lessons is an optional later upgrade",
+          "reason": "His standing rule: no filming or recording to make content.",
+          "source": "S13"
+        }
+      ],
+      "work": [
+        "Pull his existing words on the topic first, with sources.",
+        "Ask only the gaps, one question at a time, following the kdp-book interview rules.",
+        "Save his answers unedited, tagged by mission.",
+        "Flag every number, health, money or legal statement for stage 6."
+      ],
+      "output": [
+        {
+          "name": "Interview transcript, raw",
+          "format": "markdown",
+          "lands_in": "the course folder (rights subfolder)"
+        }
+      ],
+      "check": "Every mission has at least one item from his words or existing material, or a marked gap listed for stage 7.",
+      "checks": [
+        "No answer was rewritten before saving."
+      ],
+      "if_fail": "One follow-up question per empty mission, or record the gap.",
+      "owner_minutes": 20,
+      "sources": [
+        "S2",
+        "S13",
+        "S31"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "Claude uses only what the owner has already said in posts, threads and documents, quoted with its source, and leaves a marker where a story would help."
+      }
+    },
+    {
+      "n": 4,
+      "key": "design_missions",
+      "title": "Design the missions and the finished result",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude designs the course backwards from the finished deliverable: the missions, the lessons inside each, the do-this-today assignment and worksheet for each, the I'm stuck hint, the worked example, the one AI step and the deliverable template.",
+      "why": "Completion is what turns buyers into reviews. In Ruzuku's 2026 data, students who finished a lesson in their first week completed at 78 percent against 17 percent for those who did not, and courses with assessments completed at 59 percent against 42 percent.",
+      "inputs": [
+        "approved brief",
+        "interview transcript",
+        "complaint list"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Structure",
+          "value": "3 to 5 missions; each mission is 1 to 3 short lessons, an assignment done inside the mission, and a saved answer that feeds the deliverable",
+          "reason": "His Action Labs format; Kajabi's 2026 guidance is to end every module with an action step and cut anything outside the promised result.",
+          "source": "S6"
+        },
+        {
+          "what": "Lesson video length",
+          "value": "Under 6 minutes per lesson video",
+          "reason": "In 6.9 million edX sessions, median engagement was at most 6 minutes whatever the video length.",
+          "source": "S51"
+        },
+        {
+          "what": "First win",
+          "value": "Mission 1 finishes in 15 minutes or less and produces something real",
+          "reason": "First-week activity is the strongest completion signal in the 2026 data.",
+          "source": "S52"
+        },
+        {
+          "what": "Knowledge check",
+          "value": "One three-question check per mission, answers explained",
+          "reason": "Courses with assessments completed more often.",
+          "source": "S52"
+        },
+        {
+          "what": "AI step",
+          "value": "At most one AI button, where it does the heavy lifting, with a per-student use limit and a paste-ready backup prompt",
+          "reason": "AI calls in a published Lovable app use run credits; the free monthly AI grant is 4 credits.",
+          "source": "S42"
+        },
+        {
+          "what": "Version dating",
+          "value": "Every software step carries the app name, plan and the date it was checked",
+          "reason": "His acceptance test for AI and small business products.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Write the deliverable template first: the sections the buyer will download at the end.",
+        "Map each section to a mission and each mission to its steps (short answer, long answer, choice, number, calculator, built sentence, AI draft, list), the way the engine stores them.",
+        "Write each mission's I'm stuck hint and one worked example per step.",
+        "Write the claims table: every number, rule or product claim with its source.",
+        "List the lesson titles, one job each, with minutes."
+      ],
+      "output": [
+        {
+          "name": "Mission map, step list, deliverable template, claims table",
+          "format": "markdown",
+          "lands_in": "the course folder, linked on the job in HQ"
+        }
+      ],
+      "check": "Every mission ends in a saved answer that appears in the deliverable, mission 1 is 15 minutes or less, and every claim has a source or a flag.",
+      "checks": [
+        "No lesson is planned over 6 minutes of video.",
+        "Total minutes are within the brief's range."
+      ],
+      "if_fail": "Cut content that does not feed the deliverable, then re-time.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S6",
+        "S42",
+        "S51",
+        "S52",
+        "S54"
+      ]
+    },
+    {
+      "n": 5,
+      "key": "write_lessons",
+      "title": "Write the lessons, worksheets and scripts",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude writes every lesson as a short script with its on-screen slide or walkthrough notes, the written lesson text for people who prefer reading, the worksheet and assignment for each mission, and the hints and worked examples.",
+      "why": "Filler and missing steps are the most repeated course complaints. One voice, one source of truth per lesson and nothing invented keep the course short and trustworthy.",
+      "inputs": [
+        "mission map",
+        "interview transcript",
+        "claims table",
+        "brand kit"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Voice",
+          "value": "The brand kit's voice; for Allmighty Supreme his plain professional-casual register, no em dashes, no urban vernacular",
+          "reason": "His brand rules.",
+          "source": "S8"
+        },
+        {
+          "what": "Script pace",
+          "value": "About 150 words per minute, so a 6-minute lesson is about 900 words",
+          "reason": "Average speaking rate in the edX study was 156 words per minute, and faster delivery held attention.",
+          "source": "S51"
+        },
+        {
+          "what": "Lesson shape",
+          "value": "Hook (the problem in the buyer's words), the one move, a shown example, the do-this-now step, the bridge to the next lesson",
+          "reason": "Kdp-book chapter anatomy adapted to a lesson.",
+          "source": "S2"
+        },
+        {
+          "what": "Owner tags",
+          "value": "Every item from his words is tagged OWNER in the draft and removed at file time",
+          "reason": "So he can confirm each is real in stage 7.",
+          "source": "S2"
+        }
+      ],
+      "work": [
+        "Draft one lesson at a time in one thread, against the brief, the interview and the claims table.",
+        "Write slide notes or a step-by-step screen walkthrough for each lesson, with exact menu and button names from the dated tool check.",
+        "Write each mission's worksheet with one instruction line and one filled example row.",
+        "Write the engine step text: title, body, hint, worked example, choices.",
+        "Write the deliverable's export text."
+      ],
+      "output": [
+        {
+          "name": "Lesson scripts, written lessons, worksheets, step text",
+          "format": "one markdown file per mission",
+          "lands_in": "the course folder, linked on the job in HQ"
+        }
+      ],
+      "check": "Every lesson script is 900 words or fewer, every worksheet has an instruction line and a filled example, and every software step names its date checked.",
+      "checks": [
+        "Every mission carries an OWNER item or a listed gap."
+      ],
+      "if_fail": "Cut the long lesson and redraft it; never patch.",
+      "owner_minutes": 0,
+      "sources": [
+        "S2",
+        "S8",
+        "S51"
+      ]
+    },
+    {
+      "n": 6,
+      "key": "run_gates",
+      "title": "Run the quality gates and a cold test run",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude runs the writing gates, then a fresh agent takes the whole course as a beginner on the real apps and must finish the deliverable. Then the claims and compliance pass.",
+      "why": "Buyers punish courses that do not produce the promised result. A cold run on the live apps catches changed menus and missing steps before buyers do, and the compliance pass keeps money and results claims inside FTC and Stripe rules.",
+      "inputs": [
+        "lesson scripts and step text",
+        "claims table",
+        "brand rules"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Gates",
+          "value": "Sweep, swap test, specificity floor, repetition, worksheet test, cold read, critic pass by ChatGPT with the three-star prompt, final five",
+          "reason": "His kdp-book gates, applied to lessons.",
+          "source": "S2"
+        },
+        {
+          "what": "Cold test run",
+          "value": "A fresh agent with no context follows the course on the current apps, timed, and must produce the deliverable; every place it got stuck is fixed",
+          "reason": "His acceptance test: test the workflow the checklist claims to support.",
+          "source": "S1"
+        },
+        {
+          "what": "Money and results claims",
+          "value": "No earnings figures, no typical-results claims without proof, no risk-free, no act now, no no-experience-needed promises",
+          "reason": "These are the practices listed in the FTC money-making notice; the FTC's 2024 AI cases targeted exactly these promises.",
+          "source": "S34"
+        },
+        {
+          "what": "AI disclosure",
+          "value": "One plain line on the sales page and the welcome screen: lessons are produced with AI voice and visuals from the author's own method",
+          "reason": "Honest framing; Udemy requires AI-use disclosure in the course description if the course ever goes there.",
+          "source": "S31"
+        }
+      ],
+      "work": [
+        "Run the sweep script and gates 2 to 8 on each mission.",
+        "Run the cold test run and log time per mission and every stuck point.",
+        "Update the claims table to verified, qualified, uncertain or contradicted; cut uncertain claims.",
+        "Check the title and copy for trademarks and earnings language.",
+        "Write the quality card: advisory score, gate results, cold-run time, open flags."
+      ],
+      "output": [
+        {
+          "name": "Gated scripts and step text",
+          "format": "markdown",
+          "lands_in": "the course folder"
+        },
+        {
+          "name": "Quality card with cold-run log",
+          "format": "card in the job",
+          "lands_in": "the job in HQ"
+        }
+      ],
+      "check": "The cold-run agent finished the deliverable within the brief's minutes, and no claim is uncertain or contradicted in the text.",
+      "checks": [
+        "No sentence promises income or a specific result.",
+        "Every software step matches the app as it is today."
+      ],
+      "if_fail": "Failing lessons go back to stage 5; a step that no longer works goes back to stage 4.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S2",
+        "S17",
+        "S31",
+        "S34",
+        "S36",
+        "S37"
+      ]
+    },
+    {
+      "n": 7,
+      "key": "approve_sample",
+      "title": "Pick the lesson style and approve one sample lesson",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude produces mission 1's first lesson in the recommended style. The owner watches it on his phone, picks the style and voice, confirms the OWNER items are true and approves.",
+      "why": "Only he can judge his brand's look and voice and confirm his own stories. Approving one lesson before producing all of them keeps the credits spent only once.",
+      "inputs": [
+        "gated scripts",
+        "brand kit",
+        "list of OWNER items and gaps"
+      ],
+      "choices": [
+        {
+          "key": "lesson_style",
+          "question": "How should the lessons look?",
+          "help": "All four are made with AI. None needs you on camera.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "voice_slides",
+              "label": "AI voice over clean slides and on-screen steps",
+              "pick_when": "Default. Best for teaching a process; cheapest to update when an app changes.",
+              "recommended": true
+            },
+            {
+              "value": "screen_walkthrough",
+              "label": "AI voice over a built screen walkthrough",
+              "pick_when": "The course is about using an app, and seeing each click matters.",
+              "recommended": false
+            },
+            {
+              "value": "ai_presenter",
+              "label": "AI presenter (your AI clone when ready, or a stock presenter)",
+              "pick_when": "The brand sells on a face and the presenter is labeled as AI.",
+              "recommended": false
+            },
+            {
+              "value": "text_first",
+              "label": "Written lessons with images, no video",
+              "pick_when": "The buyer mostly reads, or you want zero voice credits.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "voice",
+          "question": "Which voice reads the lessons?",
+          "help": "Hear the sample, then pick.",
+          "type": "single",
+          "generated": true,
+          "generate_from": "Two or three ElevenLabs voices that fit the brand kit's voice notes, each reading the same 20 seconds of the sample.",
+          "options": [
+            {
+              "value": "voice_1",
+              "label": "Generated voice 1",
+              "pick_when": "It sounds most like the brand.",
+              "recommended": true
+            },
+            {
+              "value": "voice_2",
+              "label": "Generated voice 2",
+              "pick_when": "You want a calmer read.",
+              "recommended": false
+            },
+            {
+              "value": "clone",
+              "label": "Your AI clone voice",
+              "pick_when": "It is ready and you want the course in your voice.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "credits_go",
+          "question": "Produce all lessons with ElevenLabs on your plan?",
+          "help": "About 1,000 ElevenLabs credits per minute of narration, so a 25-minute course uses about 25,000 credits of your monthly allowance. This spends credits, so it needs your yes.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes, produce all lessons (his go required)",
+              "pick_when": "The sample sounds right.",
+              "recommended": true
+            },
+            {
+              "value": "text_only",
+              "label": "No, keep it text and slides only",
+              "pick_when": "You want no credits spent on this course.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "sample_ok",
+          "question": "Is the sample lesson right?",
+          "help": "Watch it on your phone, tap any OWNER item that is wrong, say comments by voice.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "approve",
+              "label": "Approve",
+              "pick_when": "It looks and sounds like the brand and the OWNER items are true.",
+              "recommended": true
+            },
+            {
+              "value": "change",
+              "label": "Change something (say it by voice)",
+              "pick_when": "Something about the look, voice or a claim is off.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "If he skips",
+          "value": "Claude uses voice over slides with voice 1, keeps only OWNER items with a quoted source, and produces the text-only version until he says yes to credits",
+          "reason": "Nothing waits forever; no credits without his yes.",
+          "source": "S13"
+        },
+        {
+          "what": "Quality bar for AI lessons",
+          "value": "Natural voice at about 150 words a minute with pauses edited out, one idea per slide, real screens instead of stock where a tool is taught, captions on, no AI tells in the script",
+          "reason": "Low-quality AI visuals and audio are what Udemy removes; the edX study found tighter, enthusiastic delivery held attention.",
+          "source": "S31"
+        }
+      ],
+      "work": [
+        "Produce lesson 1 in the recommended style with two or three voice options.",
+        "Show it in the job with the OWNER list.",
+        "Record his picks and comments in the brief."
+      ],
+      "output": [
+        {
+          "name": "Sample lesson video with captions",
+          "format": "MP4 and VTT",
+          "lands_in": "the course folder (media subfolder)"
+        }
+      ],
+      "check": "He picked a style and a voice and tapped Approve, or the skip defaults were applied.",
+      "checks": [
+        "Every OWNER item is confirmed or removed."
+      ],
+      "if_fail": "Claude remakes the sample from his comments.",
+      "owner_minutes": 15,
+      "sources": [
+        "S13",
+        "S31",
+        "S47",
+        "S51"
+      ],
+      "skip": {
+        "can_skip": true,
+        "rule": "The recommended lesson style and voice are used and the sample lesson is approved as made."
+      }
+    },
+    {
+      "n": 8,
+      "key": "produce_media",
+      "title": "Produce the lesson videos, captions and downloads",
+      "owner": "claude",
+      "doer": "tool:elevenlabs_and_hyperframes",
+      "what": "Claude produces every lesson in the approved style: narration with ElevenLabs, slides and screen walkthroughs rendered with HyperFrames, captions and transcripts from the scripts, and the worksheets and deliverable as PDFs.",
+      "why": "Captions and transcripts are the accessibility baseline (WCAG level A) and help buyers who watch on a phone with the sound off. Building visuals from code keeps every lesson editable when an app changes.",
+      "inputs": [
+        "approved sample and picks",
+        "gated scripts and walkthrough notes",
+        "brand kit"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Captions",
+          "value": "A caption file for every video, written from the script so it is exact, with speaker and meaningful sounds noted",
+          "reason": "WCAG 1.2.2 captions are level A; YouTube's automatic captions vary in quality.",
+          "source": "S45"
+        },
+        {
+          "what": "Transcript",
+          "value": "A full text version of each lesson, including what the screen shows",
+          "reason": "WCAG 1.2.3 accepts a full text alternative.",
+          "source": "S46"
+        },
+        {
+          "what": "Video rendering",
+          "value": "HyperFrames renders HTML compositions to MP4 locally, free, Apache 2.0 license",
+          "reason": "No per-render fees.",
+          "source": "S49"
+        },
+        {
+          "what": "Hosting",
+          "value": "Videos uploaded to YouTube as unlisted and embedded in the engine",
+          "reason": "The engine is built for unlisted YouTube embeds so hosting costs nothing; unlisted means anyone with the link can watch, which is acceptable at this price.",
+          "source": "S43"
+        },
+        {
+          "what": "Files",
+          "value": "Worksheets and deliverable template as PDF in Letter size, readable on a phone, 12 point body or larger",
+          "reason": "His shelf rules for downloads.",
+          "source": "S1"
+        }
+      ],
+      "work": [
+        "Generate narration per lesson after his credits yes; trim pauses.",
+        "Build each lesson's slides or walkthrough as a HyperFrames composition and render to MP4.",
+        "Write VTT caption files from the scripts, timed to the audio.",
+        "Build worksheet and deliverable PDFs with ReportLab and look at every page as an image.",
+        "Upload videos to the brand's YouTube channel as unlisted with captions attached and record each link."
+      ],
+      "output": [
+        {
+          "name": "Lesson videos, captions, transcripts, PDFs",
+          "format": "MP4, VTT, markdown, PDF",
+          "lands_in": "the course folder (media and files subfolders)"
+        },
+        {
+          "name": "Unlisted video links",
+          "format": "list",
+          "lands_in": "the upload kit"
+        }
+      ],
+      "check": "Every lesson has a video (or approved text-only page), a caption file, a transcript and a working unlisted link; every PDF opens on a phone with nothing cut off.",
+      "checks": [
+        "No video runs over 6 minutes.",
+        "Captions match the narration word for word."
+      ],
+      "if_fail": "Re-render the failing lesson; if narration is wrong, fix the script and regenerate only that lesson.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S43",
+        "S44",
+        "S45",
+        "S46",
+        "S47",
+        "S49"
+      ]
+    },
+    {
+      "n": 9,
+      "key": "build_sales",
+      "title": "Build the sales page, checkout, order bump and emails",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude writes the sales page, sets up the course, order bump and next-step products in Stripe, writes the welcome and nudge emails, and builds the course into the engine as a draft.",
+      "why": "Warm traffic from his posts wants confirmation, not discovery. The order bump is where low-priced offers make their margin: 2026 upsell data puts order bumps at about 38 percent acceptance, though no public benchmark exists for course sales pages themselves.",
+      "inputs": [
+        "approved brief",
+        "finished files and links",
+        "brand kit"
+      ],
+      "choices": [
+        {
+          "key": "checkout_build",
+          "question": "The brand's engine has no checkout yet. How should it be built? (first course on a brand only)",
+          "help": "Skip this if the engine already takes payments.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "github",
+              "label": "Claude builds it through GitHub, no credits",
+              "pick_when": "The engine's code is linked to GitHub.",
+              "recommended": true
+            },
+            {
+              "value": "lovable",
+              "label": "One Lovable build, estimated 10 to 20 credits (his go required)",
+              "pick_when": "GitHub is not linked or the build is large. Estimate based on the engine's first build at 20 credits.",
+              "recommended": false
+            }
+          ]
+        }
+      ],
+      "decided": [
+        {
+          "what": "Sales page order",
+          "value": "Headline with the result and time, who it is for, the finish-line sentence, what you will have (with a picture of the deliverable), the missions with minutes, a sample lesson, who it is not for, price, refund line, FAQ, the AI-production line",
+          "reason": "His warm-traffic product page rules; overpromising drives refunds.",
+          "source": "S1"
+        },
+        {
+          "what": "Order bump",
+          "value": "One related add-on at $7 to $17 in Stripe Checkout's Cross-sells to field; quantity is always 1",
+          "reason": "Stripe cross-sells need a product with exactly one active price in the same currency.",
+          "source": "S16"
+        },
+        {
+          "what": "Next step",
+          "value": "Offered on the engine's finish screen and in email 3, never before the buyer finishes",
+          "reason": "His Action Labs completion screen and next-step fields.",
+          "source": "S5"
+        },
+        {
+          "what": "Fulfilment",
+          "value": "Access is granted from the checkout.session.completed webhook, works if called twice, and the success page shows access immediately",
+          "reason": "His own-site delivery method.",
+          "source": "S11"
+        },
+        {
+          "what": "Emails",
+          "value": "Receipt and sign-in from the engine; email 1 at purchase (start mission 1 tonight), email 2 at day 2 only if mission 1 is unfinished, email 3 on finishing (the next step), email 4 at day 7 asking for a review",
+          "reason": "First-week activity predicts completion.",
+          "source": "S52"
+        },
+        {
+          "what": "Sending rail",
+          "value": "HQ's own email sequences once that part of the sales system is built. Until then the four emails are saved in HQ, and the course engine sends the receipt and the sign-in.",
+          "reason": "You decided on November 27, 2026 to cancel GoHighLevel.",
+          "source": "S7"
+        },
+        {
+          "what": "Tax",
+          "value": "Turn on Stripe Tax before selling to places where the brand is registered, or sell through Payhip",
+          "reason": "Stripe Tax costs 0.5 percent per transaction where registered; Payhip collects EU and UK VAT.",
+          "source": "S15"
+        }
+      ],
+      "work": [
+        "Write the sales page and the checkout text, including the refund line and the EU immediate-access tick box wording.",
+        "Create the Stripe products: the course at the brief's price, the order bump, the next step; set the cross-sell on the course product.",
+        "Load the course into the engine as a draft: lab, missions, steps, videos, hints, worked examples, deliverable template, AI step and its use limit, next-step fields.",
+        "Write the four emails and load them into the brand's sender as drafts.",
+        "Assemble the upload kit."
+      ],
+      "output": [
+        {
+          "name": "Sales page copy, emails, Stripe product list",
+          "format": "markdown",
+          "lands_in": "the course folder"
+        },
+        {
+          "name": "Course loaded in the engine as draft",
+          "format": "engine records",
+          "lands_in": "the brand's learn site, status draft"
+        },
+        {
+          "name": "Upload kit",
+          "format": "one screen in the job plus upload-kit.md",
+          "lands_in": "the course folder, linked on the job in HQ"
+        }
+      ],
+      "check": "The draft course opens end to end for a test student, the deliverable downloads, and a test-mode checkout shows the order bump.",
+      "checks": [
+        "The sales page promises only what the cold run produced.",
+        "The refund line appears on the sales page, checkout and receipt."
+      ],
+      "if_fail": "Fix the failing piece and repeat the test-mode checkout.",
+      "owner_minutes": 0,
+      "sources": [
+        "S1",
+        "S5",
+        "S7",
+        "S11",
+        "S15",
+        "S16",
+        "S52",
+        "S56",
+        "S57",
+        "S58"
+      ]
+    },
+    {
+      "n": 10,
+      "key": "publish",
+      "title": "Publish it: open sales and make one real test purchase",
+      "owner": "owner",
+      "doer": "claude",
+      "what": "Claude switches the course from draft to published and the checkout to live. The owner makes one real purchase with his own card, checks he gets in on his phone, then Claude refunds it.",
+      "why": "Status truth: nothing is live until a real payment grants real access. A real test purchase is the only way to see the receipt, the sign-in email, the order bump and the mission screens exactly as a buyer does.",
+      "inputs": [
+        "upload kit",
+        "the draft course",
+        "the live Stripe connection"
+      ],
+      "choices": [
+        {
+          "key": "test_purchase",
+          "question": "Make one real $27 purchase now, refunded right after?",
+          "help": "It uses your own card and is refunded in Stripe; you lose only the card fee, about $1.08.",
+          "type": "single",
+          "generated": false,
+          "generate_from": "",
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes, I'll buy it now",
+              "pick_when": "You can spend five minutes on your phone.",
+              "recommended": true
+            },
+            {
+              "value": "later",
+              "label": "Later today",
+              "pick_when": "You are driving; Claude waits and reminds you.",
+              "recommended": false
+            }
+          ]
+        },
+        {
+          "key": "live_link",
+          "question": "Paste the sales page link after you are in.",
+          "help": "HQ marks the course live only after the purchase and sign-in worked.",
+          "type": "text",
+          "generated": false,
+          "generate_from": "",
+          "options": []
+        }
+      ],
+      "decided": [
+        {
+          "what": "Publishing",
+          "value": "Claude publishes the course and switches Stripe to live; publishing is a free action and needs no question, but nothing is called live before the test purchase passes",
+          "reason": "His spend and status-truth rules.",
+          "source": "S13"
+        },
+        {
+          "what": "Pass test",
+          "value": "Receipt email arrives, sign-in code works, mission 1 opens, answers save, order bump line is on the receipt, deliverable downloads",
+          "reason": "His own-site delivery method test.",
+          "source": "S11"
+        }
+      ],
+      "work": [
+        "Claude: set the lab status to published and confirm the learn address opens signed out.",
+        "Owner: open the sales page on the phone, buy with the order bump ticked, open the receipt email, sign in, start mission 1.",
+        "Claude: check the payment, access grant and line items in Stripe and the engine, then refund the test purchase.",
+        "Claude: record the live link and move the course row to live."
+      ],
+      "output": [
+        {
+          "name": "Live sales page and course links",
+          "format": "URLs",
+          "lands_in": "the course row on HQ's Products page"
+        }
+      ],
+      "check": "A real purchase granted access, the deliverable downloaded, and the refund went through.",
+      "checks": [
+        "The course page opens for a visitor who is not signed in."
+      ],
+      "if_fail": "Claude unpublishes, fixes the failing step from the pass test, and asks for one more test purchase.",
+      "owner_minutes": 15,
+      "sources": [
+        "S5",
+        "S11",
+        "S13",
+        "S15"
+      ],
+      "skip": {
+        "can_skip": false,
+        "rule": "Cannot be skipped. Only the owner can press Publish, so the run waits here and shows in Waiting on me."
+      }
+    },
+    {
+      "n": 11,
+      "key": "register_launch_check",
+      "title": "Register the course, launch, and check at 30 days",
+      "owner": "claude",
+      "doer": "claude",
+      "what": "Claude records the live course in HQ, makes the launch pack, and at day 30 reads buyers, completions, refunds and reviews, then recommends feed, fix or kill.",
+      "why": "His standard says every product reports back. Completion and refunds tell whether the course delivers; reviews unlock the higher-priced rungs.",
+      "inputs": [
+        "live links",
+        "engine and Stripe numbers"
+      ],
+      "choices": [],
+      "decided": [
+        {
+          "what": "Launch pack",
+          "value": "One teach piece showing mission 1's result, one offer piece, a course link on the brand site, the free lead magnet pointing to it, and the email to the list",
+          "reason": "His launch pack and the outcome-first content method he filed November 24, 2026.",
+          "source": "S12"
+        },
+        {
+          "what": "Four numbers",
+          "value": "Visitors, buyers, finished courses, revenue after refunds",
+          "reason": "His course engine plan.",
+          "source": "S6"
+        },
+        {
+          "what": "Working",
+          "value": "At least one sale and at least half of buyers finishing mission 1 in 30 days; refunds under 10 percent",
+          "reason": "Estimate: low-ticket refund rates are commonly quoted at 8 to 15 percent without a stated dataset; Teachable treats under 10 percent as good standing.",
+          "source": "S59"
+        }
+      ],
+      "work": [
+        "Add the product_listings row with the live URL and register each mission as a content source.",
+        "Make the launch pack inside the brand's mix limits.",
+        "At day 30 log revenue in channel_revenue with the Stripe report as evidence and write the feed, fix or kill note.",
+        "When 10 reviews exist, flag the brand's next rung as ready."
+      ],
+      "output": [
+        {
+          "name": "Listing row and 30-day note",
+          "format": "HQ records and card",
+          "lands_in": "the course row on HQ's Products page and the job"
+        }
+      ],
+      "check": "The listing row has the live link and the 30-day note is written.",
+      "checks": [
+        "No course is marked live without a passed test purchase."
+      ],
+      "if_fail": "Visitors but no buyers: fix the sales page. Buyers who stall: fix mission 1. Refunds over 10 percent: fix the promise or the lessons.",
+      "owner_minutes": 5,
+      "sources": [
+        "S1",
+        "S6",
+        "S12",
+        "S25",
+        "S59"
+      ]
+    }
+  ],
+  "upload_kit": {
+    "links": [
+      {
+        "label": "Course engine editor (Action Lab Engine in Lovable)",
+        "url": "https://lovable.dev/projects/71cb8d72-9f86-4177-8048-8b8a3dca3693",
+        "verified": "unverified"
+      },
+      {
+        "label": "Stripe: create a product",
+        "url": "https://dashboard.stripe.com/products/create",
+        "verified": "unverified"
+      },
+      {
+        "label": "Stripe: cross-sells (order bump) help",
+        "url": "https://docs.stripe.com/payments/checkout/cross-sells",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Stripe pricing",
+        "url": "https://stripe.com/pricing",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "YouTube: unlisted videos",
+        "url": "https://support.google.com/youtube/answer/157177",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Whop: set up an educational program",
+        "url": "https://docs.whop.com/supported-business-models/educational-programs",
+        "verified": "2026-11-27"
+      },
+      {
+        "label": "Teachable: create and set up your course",
+        "url": "https://support.teachable.com/en/articles/11682451",
+        "verified": "2026-11-27"
+      }
+    ],
+    "fields": [
+      {
+        "page": "Stripe, Product",
+        "field": "Name",
+        "what_to_paste": "The course title",
+        "limit": "as on the sales page",
+        "source": "S16"
+      },
+      {
+        "page": "Stripe, Product",
+        "field": "Description",
+        "what_to_paste": "The finish-line sentence",
+        "limit": "shown at checkout",
+        "source": "S16"
+      },
+      {
+        "page": "Stripe, Product",
+        "field": "Image",
+        "what_to_paste": "The deliverable picture from the sales page",
+        "limit": "one image",
+        "source": "S16"
+      },
+      {
+        "page": "Stripe, Product",
+        "field": "Price",
+        "what_to_paste": "One-time, USD, the brief's price (for example $27)",
+        "limit": "exactly one active price if it is ever used as a cross-sell",
+        "source": "S16"
+      },
+      {
+        "page": "Stripe, Product (order bump)",
+        "field": "Name, Description, Price",
+        "what_to_paste": "The add-on's name, one line on what it adds, one-time $7 to $17",
+        "limit": "exactly one active price, same currency",
+        "source": "S16"
+      },
+      {
+        "page": "Stripe, Product (the course)",
+        "field": "Cross-sells to",
+        "what_to_paste": "Pick the order bump product",
+        "limit": "quantity is fixed at 1",
+        "source": "S16"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Title",
+        "what_to_paste": "The course title",
+        "limit": "12 words or fewer",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Slug",
+        "what_to_paste": "Short web name, for example first-ai-assistant",
+        "limit": "lowercase and hyphens",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Finish line",
+        "what_to_paste": "When you're done, you'll have ...",
+        "limit": "one sentence",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Description",
+        "what_to_paste": "Two to three sentences from the sales page",
+        "limit": "no income claims",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Estimated minutes",
+        "what_to_paste": "From the cold test run",
+        "limit": "45 to 90",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Deliverable title and template",
+        "what_to_paste": "From stage 4",
+        "limit": "every mission feeds a section",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "AI run limit",
+        "what_to_paste": "Uses per student, for example 3",
+        "limit": "AI calls use Lovable run credits",
+        "source": "S42"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Next step title, text, label, link",
+        "what_to_paste": "The next-step offer from the brief",
+        "limit": "shown on the finish screen",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Missions",
+        "field": "Title, minutes, video link, instructions, hint, worked example",
+        "what_to_paste": "From the mission files and the unlisted links",
+        "limit": "one row per mission",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Steps",
+        "field": "Type, title, body, choices, required",
+        "what_to_paste": "From the step text",
+        "limit": "types: short answer, long answer, single or multi choice, number, calculator, built sentence, AI draft, repeating list",
+        "source": "S5"
+      },
+      {
+        "page": "Engine, Labs",
+        "field": "Status",
+        "what_to_paste": "Draft until stage 10, then Published",
+        "limit": "published shows it to buyers",
+        "source": "S5"
+      },
+      {
+        "page": "Alternate host: Payhip",
+        "field": "Product type, title, price, files, description",
+        "what_to_paste": "As above",
+        "limit": "5 percent fee on the free plan",
+        "source": "S10"
+      },
+      {
+        "page": "Alternate host: Whop",
+        "field": "Create whop; Courses app, Begin setup, Add module (title, description); modules, chapters, lessons; Settings; Design store page; Products, Add product (one-time payment)",
+        "what_to_paste": "As above",
+        "limit": "processing 2.7 percent plus 30 cents domestic; platform fee not on the fee page",
+        "source": "S20"
+      },
+      {
+        "page": "Alternate host: Teachable",
+        "field": "Course title, Author, Description, Thumbnail 16:9 1024 x 576; Pricing plan (one-time); Outline (Generate with AI or from scratch); Finish; Publish course",
+        "what_to_paste": "As above",
+        "limit": "Starter $39 a month plus 7.5 percent fee",
+        "source": "S24"
+      }
+    ],
+    "ai_question": {
+      "how_to_answer": "No host he uses asks an AI question for a course on his own site. Say it plainly anyway: one line on the sales page and the welcome screen that the lessons are produced with AI voice and visuals from the author's own method. If the course is ever listed on Udemy, its description must state whether AI was used, and fully AI-generated courses with minimal instructor input are refused there.",
+      "source": "S31"
+    }
+  },
+  "borrowed": [
+    {
+      "tool": "Teachable course wizard",
+      "does": "Basic details, thumbnail, pricing plan, AI outline from the description, then a setup checklist to publish",
+      "we_replicate": "yes",
+      "how_or_why_not": "The brief and mission map do the same, in a better order: outcome first, price after the outline exists. Its Starter plan adds a 7.5 percent fee.",
+      "price": "Starter $39 a month, Builder $89 a month (official, Nov 2026); his go required",
+      "source": "S24"
+    },
+    {
+      "tool": "Kajabi (Cofounder and AI tools)",
+      "does": "AI that drafts outlines, lessons, scripts and sales copy inside a full course platform",
+      "we_replicate": "yes",
+      "how_or_why_not": "Claude drafts the same pieces from his interview and the demand evidence, which a generic generator lacks.",
+      "price": "Basic $179 a month (official, Nov 2026); his go required",
+      "source": "S26"
+    },
+    {
+      "tool": "Thinkific AI outline generator",
+      "does": "Turns an idea into a structured outline",
+      "we_replicate": "yes",
+      "how_or_why_not": "Stage 4 builds the outline backwards from the deliverable.",
+      "price": "Not stated on the page",
+      "source": "S63"
+    },
+    {
+      "tool": "Mini Course Generator",
+      "does": "AI course creator with quizzes, AI voice-over, block builder, paid access",
+      "we_replicate": "partly",
+      "how_or_why_not": "The engine already has missions, checks and an AI step; the voice-over comes from ElevenLabs.",
+      "price": "Plus $39 a month, Pro $79 a month (official, Nov 2026); his go required",
+      "source": "S50"
+    },
+    {
+      "tool": "Udemy course dashboard",
+      "does": "Intended learners, course structure, test video, curriculum, captions, landing page, pricing, promotions, review",
+      "we_replicate": "partly",
+      "how_or_why_not": "Its order of planning the learner before content is kept. Selling there pays 37 percent on organic sales.",
+      "price": "Free to list; revenue share",
+      "source": "S33"
+    },
+    {
+      "tool": "HeyGen",
+      "does": "AI presenter videos",
+      "we_replicate": "no",
+      "how_or_why_not": "Optional for the AI presenter style only; the default is voice over slides.",
+      "price": "Creator $29 a month (official, Nov 2026); his go required",
+      "source": "S48"
+    },
+    {
+      "tool": "HyperFrames",
+      "does": "Renders HTML compositions to MP4",
+      "we_replicate": "no",
+      "how_or_why_not": "Used as is; free and open source.",
+      "price": "Free",
+      "source": "S49"
+    }
+  ],
+  "candidates": [
+    {
+      "idea": "List a longer edition on Udemy as a second shelf once the own-site course has reviews.",
+      "why_parked": "Udemy needs at least 30 minutes of video and 5 lectures and pays 37 percent on organic sales; worth testing only for discovery."
+    },
+    {
+      "idea": "A one-click upsell right after checkout instead of on the finish screen.",
+      "why_parked": "Stripe Checkout has no native one-click post-purchase upsell; it needs a saved card and an extra build. Unverified effort."
+    },
+    {
+      "idea": "A small live cohort version of the same course.",
+      "why_parked": "Cohort courses completed at 53 percent against 42 percent self-paced in 2026 data, but it needs his live time."
+    },
+    {
+      "idea": "Skool for a course plus community.",
+      "why_parked": "Skool now sells one-time courses with Buy Now, but its value is the community; wait until a brand has buyers who want one."
+    }
+  ],
+  "unverified": [
+    "The on-screen labels of the course engine's admin pages; the field list comes from the engine's database columns.",
+    "Whether the course engine is linked to GitHub, which decides the free checkout build route.",
+    "Whop's platform fee on top of processing; its fee page lists processing and payouts only.",
+    "Gumroad: whether card processing is added on top of 10 percent plus 50 cents on direct sales.",
+    "Udemy's current price range per course; its pricing tier page failed to load.",
+    "Typical refund rates for low-priced courses; the quoted 8 to 15 percent has no stated dataset.",
+    "ElevenLabs credits per minute; taken from its pricing page ratio of about 1,000 credits per minute, varies by model.",
+    "Direct links to the engine editor and Stripe's create-product page; they open only after sign-in.",
+    "Whether YouTube accepts uploaded VTT caption files; the page fetched did not list formats.",
+    "Whether HQ's sending engine will have its sequences phase built before this course launches."
+  ],
+  "kind": "product"
+}
