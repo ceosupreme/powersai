@@ -38,6 +38,7 @@ await db.exec(await readFile('drizzle/migrations/0021_sales_desk_final_validatio
 await db.exec(await readFile('drizzle/migrations/0022_sales_desk_null_input_guards.sql','utf8'));
 await db.exec(await readFile('drizzle/migrations/0023_sales_owner_deal_pay_guard.sql','utf8'));
 await db.exec(await readFile('scripts/sql/0001_sales_desk_review_fixes.sql','utf8'));
+await db.exec(await readFile('scripts/sql/0002_sales_owner_deal_by_owner_list.sql','utf8'));
 const row=async(sql,args=[]) => (await db.query(sql,args)).rows[0];
 const asUser=async(id,role='authenticated')=>{await db.exec('RESET ROLE');await db.query("SELECT set_config('test.uid',$1,false),set_config('test.role',$2,false)",[id,role]);};
 const fresh=async(extra='')=>(await row(`INSERT INTO prospects(business_name,phone,email${extra?',created_at':''}) VALUES('Test lead','5555550100','a@example.test'${extra?",now()-interval '10 days'":''}) RETURNING id`)).id;
@@ -128,6 +129,7 @@ test('settings retain the exact packet defaults',async()=>{
   assert.deepEqual(p,{rep_alone:35,rep_with_owner:25,rep_handed_over:15,owner_deal:0,months:12});
 });
 test('owner closes always have zero pay even if another pay level was submitted',async()=>{
+  await db.query("UPDATE sales_settings SET value=$1::jsonb WHERE key='owners'",[JSON.stringify([admin])]);
   const id=await fresh();await asUser(admin);await db.query('SELECT hq_lead_confirm_won($1,$2,799,0,\'rep_alone\',$3)',[id,pkg,admin]);
   assert.equal((await row('SELECT pay_level FROM prospects WHERE id=$1',[id])).pay_level,'owner_deal');
 });
@@ -154,4 +156,10 @@ test('stale sweep leaves parked leads alone',async()=>{
   await db.query("UPDATE prospects SET assigned_to=$2,preview_by=$2 WHERE id=$1",[ids[3],rep]);
   await asUser(admin);await row('SELECT hq_lead_stale_sweep() r');
   for(const id of ids)assert.equal((await row('SELECT assigned_to FROM prospects WHERE id=$1',[id])).assigned_to,rep);
+});
+test('another admin who sells keeps the chosen rep pay; only the owner list makes it the owner\'s deal',async()=>{
+  const partner='10000000-0000-4000-8000-000000000005';await db.query("INSERT INTO user_roles VALUES($1,'admin')",[partner]);
+  await db.query("UPDATE sales_settings SET value=$1::jsonb WHERE key='owners'",[JSON.stringify([admin])]);
+  const id=await fresh();await asUser(admin);await db.query('SELECT hq_lead_confirm_won($1,$2,0,300,\'rep_alone\',$3)',[id,pkg,partner]);
+  assert.equal((await row('SELECT pay_level FROM prospects WHERE id=$1',[id])).pay_level,'rep_alone');
 });
