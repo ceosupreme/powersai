@@ -17128,6 +17128,7 @@ export type Database = {
       }
       hq_sales_require: { Args: { p_admin?: boolean }; Returns: undefined }
       hq_sales_team: { Args: never; Returns: boolean }
+      hq_sales_weekday: { Args: { p_day: string }; Returns: string }
       hq_save_recovery_draft: {
         Args: {
           p_basis: Json
