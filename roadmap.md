@@ -1,5 +1,11 @@
 # Roadmap
 
+## Email-only lead automations
+- [x] Inspect existing queue, contact gate, runs, sender and inquiry alerts; existing 5-minute sweeper and daily stop cron preserved
+- [ ] Settings-backed A–E definitions and enrollment/send-time checks: blocked pending RESEND_WEBHOOK_SECRET, required by the existing signed reply/bounce handler; no automations enabled or backfilled
+- [ ] Admin-editable Automations tab and lead Start/Stop: blocked with email activation pending reply/bounce configuration; no settings or application changes yet
+- [ ] Free Game endpoint and shared-key setup: pending safe shared-secret handoff (generated project secrets cannot be retrieved for another database); no endpoint, key, or deployment yet
+
 ## Leads sales desk steps 1–4
 - [x] Sales schema, shared holds, checked result/preview/close functions, settings and 13:00 UTC daily stale cleanup; isolated runtime checks required five additive repair migrations after the initial migration (not the requested single migration). No script or permission rows edited.
 - [x] Shared queue/cadence/consent/pay rules with concrete frontend and PostgreSQL tests; owner deals forced to zero pay
