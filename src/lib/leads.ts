@@ -44,7 +44,17 @@ export interface LeadLike {
   out_of_tries_at?: string | null;
   time_zone?: string | null;
   text_ok?: boolean | null;
+  lead_type?: string | null;
+  rating?: number | null;
+  review_count?: number | null;
+  pending_close?: Record<string, unknown> | null;
+  pay_level?: string | null;
+  won_confirmed_at?: string | null;
 }
+
+/** Waiting on Sean: the rep tapped "I closed it" or "Hand to Sean" and the owner hasn't confirmed Won yet. */
+export const parkedWithOwner = (p: Pick<LeadLike, 'pending_close' | 'pay_level' | 'won_confirmed_at'>) =>
+  !!p.pending_close || (!!p.pay_level && !p.won_confirmed_at);
 
 /** new/checked/queued are New; promoted with no other known stage counts as Meeting booked. */
 export function stageOf(status: string): LeadStage {
@@ -170,6 +180,7 @@ export function topLeads<T extends LeadLike>(
     if (stage === 'won' || stage === 'dead') continue;
     if (lead.next_try_at ? Date.parse(lead.next_try_at) > now.getTime() : lead.next_follow_up && !isDue(lead.next_follow_up, todayPT)) continue;
     if (lead.preview_by && !lead.preview_link) continue;
+    if (parkedWithOwner(lead)) continue;
     const due = lead.next_try_at ? Date.parse(lead.next_try_at) <= now.getTime() : isDue(lead.next_follow_up, todayPT);
     if (stage === 'meeting' && !due) continue;
     let reason: TopLeadReason;
@@ -226,6 +237,12 @@ export function businessDaysElapsed(from: string, to: string): number {
   while (d < to) { const [y,m,day] = d.split('-').map(Number); const date = new Date(Date.UTC(y,m-1,day+1)); d = date.toISOString().slice(0,10); if (date.getUTCDay() !== 0 && date.getUTCDay() !== 6) n++; }
   return n;
 }
+/** Saturday and Sunday move to Monday, matching hq_sales_weekday in the database. */
+export function weekdayOnOrAfter(day: string): string {
+  const [y,m,d] = day.split('-').map(Number); const date = new Date(Date.UTC(y,m-1,d)); const dow = date.getUTCDay();
+  if (dow === 6) date.setUTCDate(date.getUTCDate()+2); else if (dow === 0) date.setUTCDate(date.getUTCDate()+1);
+  return date.toISOString().slice(0,10);
+}
 export const voicemailAllowed = (attempts: number, c: SalesCadence, hasPreview = false) => !hasPreview && attempts + 1 === c.voicemail_try;
 export const hasInboundContact = (p: LeadLike) => !!p.inbound_lead_id || p.source === 'website';
 export function quietHours(p: LeadLike, c: SalesCadence, now = new Date()): boolean {
@@ -248,10 +265,10 @@ export function nextFailedTry(p: LeadLike, c: SalesCadence, now = new Date()) {
   const day = localParts(now, p.time_zone || 'America/Los_Angeles').day; const attempt = (p.attempt_count ?? 0)+1;
   const part = localParts(now, p.time_zone || 'America/Los_Angeles').hour < 11 ? 'morning' : localParts(now, p.time_zone || 'America/Los_Angeles').hour < 15 ? 'midday' : 'late_afternoon';
   if (p.preview_by) return { attempt_count: attempt, next_day: addBusinessDays(day,c.preview_retry_business_days), part: 'morning', rested: false };
-  const resting=attempt >= c.max_tries && !p.last_contacted_at;
+  const resting=attempt >= c.max_tries;
   const days = resting ? c.rest_days : Math.ceil(c.window_days*attempt/(c.max_tries-1))-Math.ceil(c.window_days*(attempt-1)/(c.max_tries-1));
   const [y,m,d] = day.split('-').map(Number);
-  return { attempt_count: resting ? 0 : attempt, next_day: new Date(Date.UTC(y,m-1,d+days)).toISOString().slice(0,10),
+  return { attempt_count: resting ? 0 : attempt, next_day: weekdayOnOrAfter(new Date(Date.UTC(y,m-1,d+days)).toISOString().slice(0,10)),
     part: part === 'morning' ? 'midday' : part === 'midday' ? 'late_afternoon' : 'morning', rested: resting };
 }
 export function staleReason(p: LeadLike, lastActivity: string | null, c: SalesCadence, now = new Date()): string | null {
@@ -276,9 +293,33 @@ export function scriptFor(rows: LeadScript[], leadType: string|null, step: strin
   const typed = rows.filter(r=>r.lead_type===leadType && r.step===step);
   return typed.length ? typed : rows.filter(r=>r.lead_type==='any' && r.step===step);
 }
+/** Scripts said out loud (call and voicemail), as opposed to the wording the Text and Email buttons fill in. */
+export const isSpokenScript = (r: Pick<LeadScript, 'channel'>) => r.channel !== 'sms' && r.channel !== 'email';
+export function spokenScriptsFor(rows: LeadScript[], leadType: string|null, step: string): LeadScript[] {
+  return scriptFor(rows.filter(isSpokenScript), leadType, step);
+}
+/** Which script step a contact button uses for this lead right now. */
+export function contactStep(p: LeadLike, channel: 'call'|'text'|'email'): string {
+  if (channel === 'email') return 'email_first';
+  if (p.preview_link) return 'preview_call';
+  if (channel === 'text' && p.preview_by) return 'text_after_yes';
+  return 'opener';
+}
+/** The wording a Call, Text or Email button fills in: this lead type first, then 'any', in the right channel. */
+export function contactScript(rows: LeadScript[], p: LeadLike, channel: 'call'|'text'|'email'): LeadScript | undefined {
+  const step = contactStep(p, channel);
+  const fits = (r: LeadScript) => r.step === step && (channel === 'text' ? r.channel === 'sms' : channel === 'email' ? r.channel === 'email' : isSpokenScript(r));
+  return rows.find(r => r.lead_type === p.lead_type && fits(r)) ?? rows.find(r => r.lead_type === 'any' && fits(r));
+}
+export function friendlyTime(iso: string, zone: string): string {
+  return new Date(iso).toLocaleString('en-US', { timeZone: zone, weekday: 'long', hour: 'numeric', minute: '2-digit' });
+}
 export function fillLeadScript(body: string, p: LeadLike, rep: string): string {
-  const values: Record<string,string> = {business:p.business_name,first_name:p.contact_name?.split(' ')[0] || 'there',rep,city:p.city || '—',services:p.their_words || '—',promised_time:p.preview_promised_at ? new Date(p.preview_promised_at).toLocaleString('en-US',{timeZone:p.time_zone || 'America/Los_Angeles'}) : '—',preview_link:p.preview_link || '—',owner:'Sean'};
-  return body.replace(/\{(business|first_name|rep|city|services|promised_time|preview_link|owner)\}/g,(_m,k)=>values[k]);
+  const zone = p.time_zone || 'America/Los_Angeles';
+  const values: Record<string,string> = {business:p.business_name,first_name:p.contact_name?.split(' ')[0] || 'there',rep,city:p.city || '[city]',services:p.their_words || '[their services]',
+    promised_time:p.preview_promised_at ? friendlyTime(p.preview_promised_at, zone) : '[the time you promised]',preview_link:p.preview_link || '[preview link]',owner:'Sean',
+    rating:p.rating != null ? String(Number(p.rating)) : '[stars]',reviews:p.review_count != null ? String(p.review_count) : '[number of]'};
+  return body.replace(/\{(business|first_name|rep|city|services|promised_time|preview_link|owner|rating|reviews)\}/g,(_m,k)=>values[k]);
 }
 
 export const EXPORT_COLUMNS = ['Name', 'Contact', 'Phone', 'Email', 'Stage', 'Source', 'Source link', 'City', 'Offer', 'Fit score', 'Assigned to', 'Next follow-up', 'Last contacted', 'Their words', 'Sell notes', 'Notes', 'Do not contact'] as const;

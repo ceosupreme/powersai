@@ -3,7 +3,7 @@ import { Phone,Mail,MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Prospect } from '@/hooks/useProspects';
 import { salesRpc, useSalesScripts, useWrongPhones } from '@/hooks/useSalesDesk';
-import { contactGate, fillLeadScript, scriptFor, type SalesSettings } from '@/lib/leads';
+import { contactGate, contactScript, fillLeadScript, type SalesSettings } from '@/lib/leads';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -23,9 +23,8 @@ export function SalesContactActions({lead,settings,rep,onSaved=()=>{},compact=fa
     if(contactGate(lead,channel,settings,new Date(),wrongPhone))return;
     const claim=await salesRpc('hq_lead_claim',{p_prospect_id:lead.id});if(!claim.claimed){toast({title:'Someone else is on this lead'});return;}
     held.current=true;
-    const type=channel==='text'?'text_after_yes':channel==='email'?'email_first':lead.preview_link?'preview_call':'opener';
-    const template=scriptFor(scripts,lead.lead_type,type)[0];
-    const text=template?fillLeadScript(template.body,lead,profile?.full_name || rep):'';
+    const template=contactScript(scripts,lead,channel);
+    const text=template?fillLeadScript(template.body,{...lead,their_words:String(lead.preview_answers?.services ?? lead.their_words ?? '')},profile?.full_name || rep):'';
     if(channel==='call'){
       const {error}=await supabase.from('prospect_activity').insert({prospect_id:lead.id,kind:'call',summary:'Dial started',created_by:user?.id});
       if(error)throw error;

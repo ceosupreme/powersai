@@ -95,7 +95,7 @@ test('held by another person and precise future callbacks are excluded',()=>{
 });
 test('cadence spaces four tries inside fourteen days and rotates day parts',()=>{
   const r1=L.nextFailedTry(lead({attempt_count:0}),settings.cadence,now);
-  assert.equal(r1.next_day,'2026-11-21');assert.equal(r1.part,'midday');
+  assert.equal(r1.next_day,'2026-11-23');assert.equal(r1.part,'midday'); // Sat Nov 21 moves to Monday
   const r2=L.nextFailedTry(lead({attempt_count:1}),settings.cadence,new Date('2026-11-21T20:00:00Z'));
   assert.equal(r2.next_day,'2026-11-26');assert.equal(r2.part,'late_afternoon');
   const r3=L.nextFailedTry(lead({attempt_count:2}),settings.cadence,new Date('2026-11-27T00:00:00Z'));
@@ -154,8 +154,8 @@ test('own due assignment follows the due callback lanes and is oldest first',()=
   assert.deepEqual(L.topLeads(rows,'2026-11-16',{me:'me',now,limit:10}).map(r=>r.lead.id),['callback','mine-old','mine-new']);
 });
 test('preview follow-ups never offer another voicemail',()=>{assert.equal(L.voicemailAllowed(1,settings.cadence,true),false);});
-test('only failed tries with no prior conversation enter sixty-day rest',()=>{
-  const r=L.nextFailedTry(lead({attempt_count:3,last_contacted_at:'2026-11-10T17:00:00Z'}),settings.cadence,now);assert.equal(r.rested,false);assert.equal(r.attempt_count,4);
+test('four failed tries rest the lead even after an earlier conversation',()=>{
+  const r=L.nextFailedTry(lead({attempt_count:3,last_contacted_at:'2026-11-10T17:00:00Z'}),settings.cadence,now);assert.equal(r.rested,true);assert.equal(r.attempt_count,0);
 });
 for(const [level,expected] of [['rep_alone',1260],['rep_with_owner',900],['rep_handed_over',540],['owner_deal',0]]){
   test(`${level} pays the packet rate on twelve $300 payments`,()=>{assert.equal(L.salesPay(0,300,level,settings).expected,expected);});
@@ -173,4 +173,36 @@ test('do-not-contact reason says who set it and how', () => {
 });
 test('export has a do-not-contact column', () => {
   assert.equal(L.EXPORT_COLUMNS.at(-1), 'Do not contact');
+});
+test('next tries move off weekends',()=>{
+  assert.equal(L.weekdayOnOrAfter('2026-11-28'),'2026-11-30');assert.equal(L.weekdayOnOrAfter('2026-11-29'),'2026-11-30');assert.equal(L.weekdayOnOrAfter('2026-11-25'),'2026-11-25');
+});
+test('leads waiting on Sean leave the queue until he confirms',()=>{
+  const at=new Date('2026-11-16T19:00:00Z');
+  const rows=[lead({id:'closed',assigned_to:'me',preview_by:'me',preview_link:'https://x.test',pending_close:{package_id:'p'}}),lead({id:'handed',assigned_to:'me',preview_by:'me',preview_link:'https://x.test',pay_level:'rep_handed_over'}),lead({id:'open'})];
+  assert.deepEqual(L.topLeads(rows,'2026-11-16',{me:'me',now:at,limit:10}).map(r=>r.lead.id),['open']);
+  assert.equal(L.parkedWithOwner({pay_level:'rep_alone',won_confirmed_at:'2026-11-16T00:00:00Z'}),false);
+});
+test('each contact button fills the right wording for where the lead is',()=>{
+  const rows=[
+    {id:'call-any',lead_type:'any',step:'opener',channel:'vm_script',name:'',body:''},
+    {id:'sms-inbound',lead_type:'hand_raise',step:'opener',channel:'sms',name:'',body:''},
+    {id:'call-inbound',lead_type:'hand_raise',step:'opener',channel:'vm_script',name:'',body:''},
+    {id:'sms-yes',lead_type:'any',step:'text_after_yes',channel:'sms',name:'',body:''},
+    {id:'sms-ready',lead_type:'any',step:'preview_call',channel:'sms',name:'',body:''},
+    {id:'call-preview',lead_type:'any',step:'preview_call',channel:'vm_script',name:'',body:''},
+    {id:'email-any',lead_type:'any',step:'email_first',channel:'email',name:'',body:''},
+  ];
+  assert.equal(L.contactScript(rows,lead({lead_type:'hand_raise'}),'text').id,'sms-inbound');
+  assert.equal(L.contactScript(rows,lead({lead_type:'hand_raise'}),'call').id,'call-inbound');
+  assert.equal(L.contactScript(rows,lead({preview_by:'me'}),'text').id,'sms-yes');
+  assert.equal(L.contactScript(rows,lead({preview_by:'me',preview_link:'https://x.test'}),'text').id,'sms-ready');
+  assert.equal(L.contactScript(rows,lead({preview_by:'me',preview_link:'https://x.test'}),'call').id,'call-preview');
+  assert.equal(L.contactScript(rows,lead({lead_type:'no_website'}),'email').id,'email-any');
+  assert.deepEqual(L.spokenScriptsFor(rows,'hand_raise','opener').map(r=>r.id),['call-inbound']);
+});
+test('scripts fill rating, reviews and a readable promised time, with fill-in hints when missing',()=>{
+  const body='{rating} stars, {reviews} reviews, ready by {promised_time}';
+  assert.equal(L.fillLeadScript(body,lead({rating:4.8,review_count:62,preview_promised_at:'2026-11-28T18:00:00Z'}),'Maria'),'4.8 stars, 62 reviews, ready by Saturday 10:00 AM');
+  assert.equal(L.fillLeadScript('{rating} stars, {reviews} reviews',lead(),'Maria'),'[stars] stars, [number of] reviews');
 });
