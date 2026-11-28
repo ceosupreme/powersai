@@ -7,6 +7,8 @@ import { LeadList } from '@/components/prospects/LeadList';
 import { LeadBoard } from '@/components/prospects/LeadBoard';
 import { LeadDetailSheet } from '@/components/prospects/LeadDetailSheet';
 import { AddLeadDialog } from '@/components/prospects/AddLeadDialog';
+import { MyNextLead } from '@/components/prospects/MyNextLead';
+import { Tabs,TabsList,TabsTrigger } from '@/components/ui/tabs';
 import { useProjectTypes } from '@/hooks/useProjectTypes';
 import { useLeadPeople, useMinerRuns, useProspects, useProspectMutations, type Prospect, type ProspectStatus } from '@/hooks/useProspects';
 import { useAuth } from '@/context/AuthContext';
@@ -33,6 +35,8 @@ export default function ProspectDock() {
   const { promote, moveStage } = useProspectMutations();
   const { user, isAdmin, profile } = useAuth();
   const [params, setParams] = useSearchParams();
+  const [tab,setTab]=useState(isAdmin?'all':'next');
+  useEffect(()=>{setTab(isAdmin?'all':'next');},[isAdmin]);
 
   const [view, setView] = useState<'list' | 'board'>(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'list' : 'board'));
   const [filters, setFilters] = useState<LeadFilters>(DEFAULT_FILTERS);
@@ -44,9 +48,9 @@ export default function ProspectDock() {
   const [draftFor, setDraftFor] = useState<Prospect | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  // A non-admin sees every lead, but the Assigned filter starts on "Mine".
+  // All leads remain shared; personal queue priority is not an access filter.
   const effective = useMemo<LeadFilters>(
-    () => (assignedTouched || isAdmin ? filters : { ...filters, assigned: 'mine' }),
+    () => filters,
     [filters, assignedTouched, isAdmin],
   );
   const setF = <K extends keyof LeadFilters>(k: K, v: LeadFilters[K]) => {
@@ -118,6 +122,9 @@ export default function ProspectDock() {
           <Button className="h-11" onClick={() => setAddOpen(true)}><Plus className="mr-1.5 h-4 w-4" />Add lead</Button>
         </div>
       </header>
+
+      <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="next">My next lead</TabsTrigger><TabsTrigger value="all">All leads</TabsTrigger></TabsList></Tabs>
+      {tab==='next'?<MyNextLead leads={prospects} names={names} onOpen={openLead} />:<>
 
       <Collapsible open={findOpen} onOpenChange={setFindOpen}>
         <CollapsibleTrigger asChild>
@@ -191,6 +198,7 @@ export default function ProspectDock() {
         <LeadList leads={visible} names={names} onOpen={openLead} />
       )}
 
+      </>}
       <LeadDetailSheet
         prospect={open} people={people} names={names} busy={busyId === open?.id}
         onOpenChange={(v) => !v && openLead(null)} onMove={move}

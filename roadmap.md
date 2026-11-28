@@ -1,5 +1,11 @@
 # Roadmap
 
+## Leads sales desk steps 1–4
+- [x] Sales schema, shared holds, checked result/preview/close functions, settings and 13:00 UTC daily stale cleanup; isolated runtime checks required five additive repair migrations after the initial migration (not the requested single migration). No script or permission rows edited.
+- [x] Shared queue/cadence/consent/pay rules with concrete frontend and PostgreSQL tests; owner deals forced to zero pay
+- [x] My next lead, call return timer/result sheet, scripts and expanded lead sheet; no recording, actual scripts await Claude, missing mailing address blocks email
+- [x] Signed-in 380px queue/results/preview promise and link, 1280px pending-close/owner-confirmed Won tested on one temporary lead, then fixture and jobs removed. Calls/text/mail apps and real rep session not exercised; pay-so-far is explicitly an estimate until client payments are verified. No publishing; guide/plan/permissions untouched. Steps 5–7 remain for next message.
+
 ## Product runs Step 1
 - [x] Studio credential refusal localized to authentication, not generation; valid owner session gives 400 for invalid input and native draft 70da0493-7ec1-4eff-914f-d8bc52b315bc completed, model result applied at revision 4. Require a validated real session for frontend runs. Historical reason for service credential mismatch cannot be established from retained logs; no guard/binding changes or worker redeploy.
 - [x] Four source files saved byte-exact; JS/DB shape checks and global ready/guided templates with tagged knowledge links (12/11/11/10 stages)

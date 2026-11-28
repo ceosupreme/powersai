@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useProspects } from '@/hooks/useProspects';
 import { StageBadge, SourceBadge } from '@/components/prospects/LeadBadges';
+import { LeadContactIcons } from '@/components/prospects/LeadContactIcons';
 import { TOP_LEAD_REASON, formatDay, todayPacific, topLeads, type TopLeadReason } from '@/lib/leads';
 
 const REASON_TONE: Record<TopLeadReason, string> = {
@@ -15,6 +16,8 @@ const REASON_TONE: Record<TopLeadReason, string> = {
   due: 'bg-destructive/10 text-destructive border-destructive/30',
   new: 'bg-signal-green/15 text-signal-green border-signal-green/40',
   contacted: 'bg-muted text-muted-foreground border-border',
+  preview: 'bg-primary/10 text-primary border-primary/40',
+  assigned: 'bg-muted text-muted-foreground border-border',
 };
 
 /**
@@ -35,7 +38,7 @@ export function TopLeadsCard() {
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0 pb-3">
         <div className="space-y-1">
           <CardTitle className="flex items-center gap-2 text-xl"><Target className="h-5 w-5 text-primary" />Leads to work today</CardTitle>
-          <p className="text-sm text-muted-foreground">Replies first, then follow-ups that are due, then your newest and best-fit leads.</p>
+          <p className="text-sm text-muted-foreground">Unanswered inquiries, preview calls, callbacks, then assigned and open leads.</p>
         </div>
         <Button asChild variant="outline" className="h-10 shrink-0"><Link to="/prospects">All leads<ArrowRight className="ml-1.5 h-4 w-4" /></Link></Button>
       </CardHeader>
@@ -66,15 +69,7 @@ export function TopLeadsCard() {
                   </span>
                   {p.their_words && <span className="block text-sm text-muted-foreground line-clamp-2">{p.their_words}</span>}
                 </Link>
-                {p.phone && (
-                  <a
-                    href={`tel:${p.phone.replace(/[^\d+]/g, '')}`}
-                    aria-label={`Call ${p.business_name}`}
-                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-background hover:bg-muted"
-                  >
-                    <Phone className="h-5 w-5" />
-                  </a>
-                )}
+                <LeadContactIcons p={p} />
               </li>
             ))}
           </ol>

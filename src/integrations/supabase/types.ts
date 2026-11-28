@@ -2746,6 +2746,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_wrong: boolean | null
           kind: string
           opt_out_channel: string | null
           opted_out: boolean
@@ -2757,6 +2758,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_wrong?: boolean | null
           kind: string
           opt_out_channel?: string | null
           opted_out?: boolean
@@ -2768,6 +2770,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_wrong?: boolean | null
           kind?: string
           opt_out_channel?: string | null
           opted_out?: boolean
@@ -9151,8 +9154,10 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          lead_type: string | null
           name: string
           sort_order: number
+          step: string | null
           subject: string | null
           updated_at: string
           vertical: string | null
@@ -9164,8 +9169,10 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          lead_type?: string | null
           name: string
           sort_order?: number
+          step?: string | null
           subject?: string | null
           updated_at?: string
           vertical?: string | null
@@ -9177,8 +9184,10 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          lead_type?: string | null
           name?: string
           sort_order?: number
+          step?: string | null
           subject?: string | null
           updated_at?: string
           vertical?: string | null
@@ -11009,11 +11018,17 @@ export type Database = {
       prospects: {
         Row: {
           assigned_to: string | null
+          attempt_count: number | null
+          booked_by: string | null
+          brought_by: string | null
           business_name: string
           checked_at: string | null
           city: string | null
+          client_cancelled_at: string | null
+          closed_by: string | null
           contact_name: string | null
           created_at: string
+          dead_reason: string | null
           do_not_contact: boolean
           drafted_message: string | null
           email: string | null
@@ -11022,26 +11037,39 @@ export type Database = {
           id: string
           inbound_lead_id: string | null
           instagram: string | null
+          intro_call: Json | null
           last_contact_channel: string | null
           last_contacted_at: string | null
           last_error: string | null
+          last_try_part_of_day: string | null
           lead_type: string | null
           leak_run_id: string | null
           leak_total: number | null
           miner_run_id: string | null
           next_follow_up: string | null
+          next_try_at: string | null
           niche: string | null
           notes: string | null
           offer: string | null
           opt_out_channel: string | null
           opted_out_at: string | null
+          out_of_tries_at: string | null
           outreach_mode: string
+          pay_level: string | null
+          pending_close: Json | null
           phone: string | null
           place_id: string | null
           platform: string | null
+          preview_answers: Json | null
+          preview_by: string | null
+          preview_job_id: string | null
+          preview_link: string | null
+          preview_promised_at: string | null
           promoted_company_id: string | null
           promoted_lead_id: string | null
           rating: number | null
+          refund_amount: number | null
+          refund_note: string | null
           review_count: number | null
           risk_total: number | null
           sell_notes: string | null
@@ -11050,17 +11078,34 @@ export type Database = {
           source: string
           source_url: string | null
           status: string
+          text_ok: boolean | null
+          text_ok_at: string | null
+          text_ok_by: string | null
           their_words: string | null
+          time_zone: string | null
           updated_at: string
           website: string | null
+          won_confirmed_at: string | null
+          won_confirmed_by: string | null
+          won_monthly_amount: number | null
+          won_package_id: string | null
+          won_setup_amount: number | null
+          working_by: string | null
+          working_until: string | null
         }
         Insert: {
           assigned_to?: string | null
+          attempt_count?: number | null
+          booked_by?: string | null
+          brought_by?: string | null
           business_name: string
           checked_at?: string | null
           city?: string | null
+          client_cancelled_at?: string | null
+          closed_by?: string | null
           contact_name?: string | null
           created_at?: string
+          dead_reason?: string | null
           do_not_contact?: boolean
           drafted_message?: string | null
           email?: string | null
@@ -11069,26 +11114,39 @@ export type Database = {
           id?: string
           inbound_lead_id?: string | null
           instagram?: string | null
+          intro_call?: Json | null
           last_contact_channel?: string | null
           last_contacted_at?: string | null
           last_error?: string | null
+          last_try_part_of_day?: string | null
           lead_type?: string | null
           leak_run_id?: string | null
           leak_total?: number | null
           miner_run_id?: string | null
           next_follow_up?: string | null
+          next_try_at?: string | null
           niche?: string | null
           notes?: string | null
           offer?: string | null
           opt_out_channel?: string | null
           opted_out_at?: string | null
+          out_of_tries_at?: string | null
           outreach_mode?: string
+          pay_level?: string | null
+          pending_close?: Json | null
           phone?: string | null
           place_id?: string | null
           platform?: string | null
+          preview_answers?: Json | null
+          preview_by?: string | null
+          preview_job_id?: string | null
+          preview_link?: string | null
+          preview_promised_at?: string | null
           promoted_company_id?: string | null
           promoted_lead_id?: string | null
           rating?: number | null
+          refund_amount?: number | null
+          refund_note?: string | null
           review_count?: number | null
           risk_total?: number | null
           sell_notes?: string | null
@@ -11097,17 +11155,34 @@ export type Database = {
           source?: string
           source_url?: string | null
           status?: string
+          text_ok?: boolean | null
+          text_ok_at?: string | null
+          text_ok_by?: string | null
           their_words?: string | null
+          time_zone?: string | null
           updated_at?: string
           website?: string | null
+          won_confirmed_at?: string | null
+          won_confirmed_by?: string | null
+          won_monthly_amount?: number | null
+          won_package_id?: string | null
+          won_setup_amount?: number | null
+          working_by?: string | null
+          working_until?: string | null
         }
         Update: {
           assigned_to?: string | null
+          attempt_count?: number | null
+          booked_by?: string | null
+          brought_by?: string | null
           business_name?: string
           checked_at?: string | null
           city?: string | null
+          client_cancelled_at?: string | null
+          closed_by?: string | null
           contact_name?: string | null
           created_at?: string
+          dead_reason?: string | null
           do_not_contact?: boolean
           drafted_message?: string | null
           email?: string | null
@@ -11116,26 +11191,39 @@ export type Database = {
           id?: string
           inbound_lead_id?: string | null
           instagram?: string | null
+          intro_call?: Json | null
           last_contact_channel?: string | null
           last_contacted_at?: string | null
           last_error?: string | null
+          last_try_part_of_day?: string | null
           lead_type?: string | null
           leak_run_id?: string | null
           leak_total?: number | null
           miner_run_id?: string | null
           next_follow_up?: string | null
+          next_try_at?: string | null
           niche?: string | null
           notes?: string | null
           offer?: string | null
           opt_out_channel?: string | null
           opted_out_at?: string | null
+          out_of_tries_at?: string | null
           outreach_mode?: string
+          pay_level?: string | null
+          pending_close?: Json | null
           phone?: string | null
           place_id?: string | null
           platform?: string | null
+          preview_answers?: Json | null
+          preview_by?: string | null
+          preview_job_id?: string | null
+          preview_link?: string | null
+          preview_promised_at?: string | null
           promoted_company_id?: string | null
           promoted_lead_id?: string | null
           rating?: number | null
+          refund_amount?: number | null
+          refund_note?: string | null
           review_count?: number | null
           risk_total?: number | null
           sell_notes?: string | null
@@ -11144,9 +11232,20 @@ export type Database = {
           source?: string
           source_url?: string | null
           status?: string
+          text_ok?: boolean | null
+          text_ok_at?: string | null
+          text_ok_by?: string | null
           their_words?: string | null
+          time_zone?: string | null
           updated_at?: string
           website?: string | null
+          won_confirmed_at?: string | null
+          won_confirmed_by?: string | null
+          won_monthly_amount?: number | null
+          won_package_id?: string | null
+          won_setup_amount?: number | null
+          working_by?: string | null
+          working_until?: string | null
         }
         Relationships: [
           {
@@ -11175,6 +11274,20 @@ export type Database = {
             columns: ["niche"]
             isOneToOne: false
             referencedRelation: "project_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospects_preview_job_id_fkey"
+            columns: ["preview_job_id"]
+            isOneToOne: false
+            referencedRelation: "agent_handoffs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospects_won_package_id_fkey"
+            columns: ["won_package_id"]
+            isOneToOne: false
+            referencedRelation: "starter_packages"
             referencedColumns: ["id"]
           },
         ]
@@ -11641,6 +11754,24 @@ export type Database = {
           page_key?: string
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      sales_settings: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: Json
         }
         Relationships: []
       }
@@ -16883,6 +17014,36 @@ export type Database = {
         Args: { p_email: string; p_project_id: string }
         Returns: boolean
       }
+      hq_lead_claim: { Args: { p_prospect_id: string }; Returns: Json }
+      hq_lead_confirm_won: {
+        Args: {
+          p_closed_by: string
+          p_deal_id?: string
+          p_monthly: number
+          p_package_id: string
+          p_pay_level: string
+          p_prospect_id: string
+          p_setup: number
+        }
+        Returns: undefined
+      }
+      hq_lead_log_result: {
+        Args: { p_details?: Json; p_prospect_id: string; p_result: string }
+        Returns: Json
+      }
+      hq_lead_mark_cancelled: {
+        Args: { p_at: string; p_prospect_id: string }
+        Returns: undefined
+      }
+      hq_lead_record_refund: {
+        Args: { p_amount: number; p_note: string; p_prospect_id: string }
+        Returns: undefined
+      }
+      hq_lead_release: { Args: { p_prospect_id: string }; Returns: undefined }
+      hq_lead_set_preview_link: {
+        Args: { p_link: string; p_prospect_id: string }
+        Returns: undefined
+      }
       hq_lead_stage_event: {
         Args: {
           p_actor?: string
@@ -16894,6 +17055,7 @@ export type Database = {
         Returns: Json
       }
       hq_lead_stage_rank: { Args: { p_status: string }; Returns: number }
+      hq_lead_stale_sweep: { Args: never; Returns: Json }
       hq_mark_daily_post_posted: {
         Args: { _live_url?: string; _note?: string; _placement_id: string }
         Returns: Json
@@ -16946,6 +17108,26 @@ export type Database = {
         Args: { p_capture_id: string; p_project_id: string; p_type: string }
         Returns: Json
       }
+      hq_sales_business_add: {
+        Args: { p_day: string; p_days: number }
+        Returns: string
+      }
+      hq_sales_business_elapsed: {
+        Args: { p_from: string; p_to: string }
+        Returns: number
+      }
+      hq_sales_owner_ask: {
+        Args: {
+          p_due?: string
+          p_id: string
+          p_spec: Json
+          p_title: string
+          p_type: string
+        }
+        Returns: string
+      }
+      hq_sales_require: { Args: { p_admin?: boolean }; Returns: undefined }
+      hq_sales_team: { Args: never; Returns: boolean }
       hq_save_recovery_draft: {
         Args: {
           p_basis: Json

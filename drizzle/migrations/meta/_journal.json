@@ -127,6 +127,48 @@
       "when": 1795846643602,
       "tag": "0017_product_run_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795847098476,
+      "tag": "0018_leads_sales_desk",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795847399452,
+      "tag": "0019_leads_sales_desk_validation_repairs",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795847503294,
+      "tag": "0020_sales_result_email_repair",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795847683597,
+      "tag": "0021_sales_desk_final_validation",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1795847769682,
+      "tag": "0022_sales_desk_null_input_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795847866882,
+      "tag": "0023_sales_owner_deal_pay_guard",
+      "breakpoints": true
     }
   ]
 }

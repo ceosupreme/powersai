@@ -60,6 +60,16 @@ export interface Prospect {
   opt_out_channel: string | null;
   /** The website inquiry this lead came from, when it arrived through a form. */
   inbound_lead_id: string | null;
+  working_by?: string | null; working_until?: string | null; next_try_at?: string | null;
+  attempt_count?: number | null; last_try_part_of_day?: string | null; out_of_tries_at?: string | null;
+  time_zone?: string | null; text_ok?: boolean | null; text_ok_at?: string | null; text_ok_by?: string | null;
+  brought_by?: string | null; preview_by?: string | null; booked_by?: string | null; closed_by?: string | null;
+  preview_answers?: Record<string, unknown> | null; preview_promised_at?: string | null; preview_link?: string | null;
+  preview_job_id?: string | null; intro_call?: Record<string, unknown> | null; dead_reason?: string | null;
+  won_package_id?: string | null; won_setup_amount?: number | null; won_monthly_amount?: number | null;
+  pay_level?: import('@/lib/leads').PayLevel | null; won_confirmed_at?: string | null; won_confirmed_by?: string | null;
+  pending_close?: Record<string, unknown> | null; client_cancelled_at?: string | null; refund_amount?: number | null; refund_note?: string | null;
+  snapshot?: Record<string, unknown> | null;
 }
 
 export interface MinerRun {
@@ -81,6 +91,7 @@ const db = supabase as any;
 export function useProspects() {
   return useQuery({
     queryKey: ['prospects'],
+    refetchInterval: 20000,
     queryFn: async (): Promise<Prospect[]> => {
       const [{ data, error }, offRes] = await Promise.all([
         db
@@ -265,9 +276,10 @@ export function useProspectMutations() {
     /** Stage move from the board, menu or detail: status plus a 'status' activity row. */
     moveStage: useMutation({
       mutationFn: async ({ id, status, label }: { id: string; status: ProspectStatus; label: string }) => {
-        const { error } = await db.from('prospects').update({ status }).eq('id', id);
+        const event = { contacted: 'first_contact', replied: 'reply', meeting: 'booking' }[status as string];
+        if (!event) throw new Error('Use What happened? for an outcome, or owner confirmation for Won. Stages only move forward.');
+        const { error } = await db.rpc('hq_lead_stage_event', { p_prospect_id: id, p_event: event, p_summary: label });
         if (error) throw error;
-        await addActivity(id, 'status', `Moved to ${label}`);
       },
       onMutate: async ({ id, status }) => {
         await qc.cancelQueries({ queryKey: ['prospects'] });

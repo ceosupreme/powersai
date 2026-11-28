@@ -28,6 +28,7 @@ export function NeedsYouStrip({ items, brandNames, isAdmin, onAnswer, onSelect }
       <div className="space-y-2.5">
         {items.map((item) => {
           const brands = item.brandIds.map((id) => brandNames.get(id)).filter(Boolean) as string[];
+          const previewLate=item.row.spec?.source==='leads_sales_desk'&&item.row.spec?.type==='lead_preview'&&item.row.due_at&&Date.parse(item.row.due_at)<=Date.now();
           return (
             <Card key={item.id} className="border-primary/40 bg-primary/5">
               <CardContent className="p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -40,6 +41,7 @@ export function NeedsYouStrip({ items, brandNames, isAdmin, onAnswer, onSelect }
                     {brands.map((b) => <Badge key={b} variant="secondary" className="text-xs">{b}</Badge>)}
                   </div>
                   <p className="font-semibold text-sm text-foreground">{item.row.title}</p>
+                  {previewLate&&<p role="alert" className="text-sm font-semibold text-destructive">Preview link missing — promised delivery is less than two hours away.</p>}
                   {item.question ? (
                     <p className="text-sm text-foreground/90 whitespace-pre-wrap line-clamp-3">
                       <span className="font-medium text-primary">Question: </span>{item.question}
@@ -50,6 +52,7 @@ export function NeedsYouStrip({ items, brandNames, isAdmin, onAnswer, onSelect }
                     </p>
                   ) : null}
                 </button>
+                {item.row.spec?.source==='leads_sales_desk'&&typeof item.row.spec?.prospect_id==='string'&&<Button asChild variant="outline" size="sm"><a href={`/prospects?lead=${item.row.spec.prospect_id}`}>Open lead</a></Button>}
                 {isAdmin && (
                   <Button size="sm" className="shrink-0" onClick={() => onAnswer(item.row)}>
                     <Send className="h-3.5 w-3.5 mr-1.5" />Answer

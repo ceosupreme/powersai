@@ -24,6 +24,7 @@ import {
   Phone, Star, XCircle, PhoneCall, MessageSquare, Send, MessagesSquare, Users, StickyNote,
 } from 'lucide-react';
 import { CrmBadge, DoNotContactBadge, SourceBadge } from './LeadBadges';
+import { LeadSalesDetails } from './LeadSalesDetails';
 
 const QUICK: { kind: ProspectActivityKind; label: string; icon: typeof Phone }[] = [
   { kind: 'call', label: 'Called', icon: PhoneCall },
@@ -124,7 +125,7 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
               <div className="flex flex-wrap items-center gap-2">
                 <Select value={stageOf(p.status)} onValueChange={(v) => onMove(p, v as LeadStage)}>
                   <SelectTrigger className="h-10 w-44" aria-label="Stage"><SelectValue /></SelectTrigger>
-                  <SelectContent>{LEAD_STAGES.map((s) => <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>)}</SelectContent>
+                  <SelectContent>{LEAD_STAGES.filter(s=>s.key===stageOf(p.status)||['contacted','replied','meeting'].includes(s.key)).map((s) => <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>)}</SelectContent>
                 </Select>
                 <SourceBadge p={p} />
                 <CrmBadge p={p} />
@@ -139,16 +140,8 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                   <p className="text-[15px]">{doNotContactReason(p)} No calls, texts, emails or messages. Automatic outreach is off for this lead.</p>
                   {(p.phone || p.email) && <p className="text-sm text-muted-foreground break-words">On file: {[p.phone, p.email].filter(Boolean).join(' · ')}</p>}
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {p.phone ? (
-                    <Button asChild size="lg" variant="outline" className="h-12"><a href={`tel:${p.phone.replace(/[^\d+]/g, '')}`}><Phone className="mr-2 h-4 w-4" />{p.phone}</a></Button>
-                  ) : null}
-                  {p.email ? (
-                    <Button asChild size="lg" variant="outline" className="h-12 min-w-0"><a href={`mailto:${p.email}`}><Mail className="mr-2 h-4 w-4 shrink-0" /><span className="truncate">{p.email}</span></a></Button>
-                  ) : null}
-                </div>
-              )}
+              ) : null}
+              <LeadSalesDetails key={p.id} lead={p} names={names} lastActor={activity[0]?.created_by} />
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Field label="Source">{sourceLabel(p.source, p.platform)}</Field>
@@ -166,9 +159,9 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                 {p.instagram && <a className={link} href={igUrl(p.instagram)} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" />{p.instagram}</a>}
               </div>
 
-              <Section title="Log what you did">
+              <Section title="Add a note">
                 <div className="grid grid-cols-3 gap-2">
-                  {QUICK.map((q) => (
+                  {QUICK.filter(q=>q.kind==='note').map((q) => (
                     <Button key={q.kind} variant={logKind === q.kind ? 'default' : 'outline'} className="h-11" onClick={() => { setLogKind(q.kind); setLogText(''); }}>
                       <q.icon className="mr-1.5 h-4 w-4" />{q.label}
                     </Button>
@@ -257,9 +250,6 @@ export const LeadDetailSheet = ({ prospect: p, people, names, busy, onOpenChange
                 <div className="grid grid-cols-2 gap-2">
                   <Button className="h-11" onClick={() => onPromote(p)} disabled={p.status === 'promoted' || !!p.promoted_company_id || busy}>
                     <ArrowUpRight className="mr-1.5 h-4 w-4" />Send to CRM pipeline
-                  </Button>
-                  <Button variant="outline" className="h-11 text-destructive" onClick={() => onMove(p, 'dead')} disabled={p.status === 'dead'}>
-                    <XCircle className="mr-1.5 h-4 w-4" />Mark dead
                   </Button>
                 </div>
               </Section>

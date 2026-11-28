@@ -11,7 +11,7 @@ export const LeadMoveMenu = ({ status, onMove }: { status: string; onMove: (s: L
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-      {LEAD_STAGES.filter((s) => s.key !== stageOf(status)).map((s) => (
+      {LEAD_STAGES.filter((s) => s.key !== stageOf(status) && ['contacted','replied','meeting'].includes(s.key)).map((s) => (
         <DropdownMenuItem key={s.key} onSelect={() => onMove(s.key)}>{s.label}</DropdownMenuItem>
       ))}
     </DropdownMenuContent>
