@@ -36,6 +36,7 @@ export interface DailyPostPlacement {
 }
 
 export interface DailyPostPackage {
+  drive_only?: boolean;
   id: string;
   project_id: string;
   brand_name: string;
@@ -197,6 +198,17 @@ export function rankDailyPosts(packages: DailyPostPackage[]): DailyPostPackage[]
     if (b.post_date !== a.post_date) return b.post_date.localeCompare(a.post_date);
     return a.brand_name.localeCompare(b.brand_name);
   });
+}
+
+/** A saved brand/date package wins over its live Drive folder, never two cards. */
+export function mergeDrivePosts(records: DailyPostPackage[], folders: DailyPostPackage[]): DailyPostPackage[] {
+  const keys = new Set(records.map(p => `${p.project_id}:${p.post_date}`));
+  return rankDailyPosts([...records, ...folders.filter(p => {
+    const key = `${p.project_id}:${p.post_date}`;
+    if (keys.has(key)) return false;
+    keys.add(key);
+    return true;
+  })]);
 }
 
 export function countDailyPostsByStatus(packages: DailyPostPackage[]): Record<DailyPostStatus, number> & { total: number } {

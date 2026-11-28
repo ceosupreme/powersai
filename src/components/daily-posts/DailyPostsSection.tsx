@@ -7,6 +7,9 @@ import { Check, Copy, ExternalLink, FileText, FolderOpen, Image as ImageIcon, Lo
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDailyPosts } from "@/hooks/useDailyPosts";
+import { useDrivePosts } from '@/hooks/useBrandDrive';
+import { DriveFileTile, DriveLink } from '@/components/drive/DrivePreview';
+import { parseDailyPostPackage, parseDailyPostPlacement, mergeDrivePosts } from '@/lib/dailyPosts';
 import {
   countDailyPostsByStatus,
   DAILY_POST_STATUS_LABELS,
@@ -43,11 +46,19 @@ interface Props {
 }
 
 export function DailyPostsSection({ projectIds, singleBrand = false, defaultWindow = "today", title = "Daily posts" }: Props) {
-  const { data: allPackages = [], isLoading, isError, refetch } = useDailyPosts(projectIds);
+  const { data: records = [], isLoading, isError, refetch } = useDailyPosts(projectIds);
+  const drive = useDrivePosts(projectIds);
+  const allPackages = useMemo(() => mergeDrivePosts(records, (drive.data?.packages ?? []).map(p => ({
+    ...parseDailyPostPackage({ id: `drive:${p.folder.id}`, project_id: p.projectId, title: `${p.brandName} — ${p.date}`, due_date: p.date,
+      brief: { daily_post: { drive_folder_url: `https://drive.google.com/drive/folders/${p.folder.id}`,
+        post_this_doc_url: p.captionFile ? `https://drive.google.com/file/d/${p.captionFile.id}/view` : null,
+        media: p.files.map(f => ({ drive_file_id: f.id, name: f.name, kind: f.mimeType.startsWith('video/') ? 'video' : 'image' })) } } },
+      (p.captions?.length ? p.captions : [{ channel: 'caption', caption: p.caption }]).map(c => parseDailyPostPlacement({ id: `drive:${p.folder.id}:${c.channel}`, project_id: p.projectId, content_item_id: `drive:${p.folder.id}`, channel: c.channel, status: 'planned', receipt: { caption: c.caption } })), p.brandName), drive_only: true,
+  }))), [records, drive.data]);
   const [dateWindow, setDateWindow] = useState<DailyPostDateWindow>(defaultWindow);
   const [statusFilter, setStatusFilter] = useState<DailyPostStatus | "all">("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
-  const [marking, setMarking] = useState<{ placement: DailyPostPlacement; brandName: string } | null>(null);
+  const [marking, setMarking] = useState<{ placement: DailyPostPlacement; brandName: string; pkg: DailyPostPackage } | null>(null);
 
   const inWindow = useMemo(
     () => filterDailyPostsByDate(allPackages, dateWindow),
@@ -90,6 +101,8 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
 
   return (
     <section className="space-y-4">
+      {drive.isPending && <p role="status" className="text-sm text-muted-foreground">Checking today’s and tomorrow’s Drive folders…</p>}
+      {drive.error && <p role="alert" className="text-sm text-destructive">Drive folders could not be loaded. {drive.error.message} <Button size="sm" variant="outline" onClick={() => drive.refetch()}>Try again</Button></p>}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         <div className="flex flex-wrap gap-1.5">
@@ -145,7 +158,7 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
         <Card className="border-border bg-card">
           <CardContent className="p-5 text-sm text-muted-foreground">
             {allPackages.length === 0
-              ? "No daily post packages have been written to HQ yet. Once the nightly posting job saves them, they will appear here ranked by quality."
+              ? "No posts for this day yet."
               : "No posts match this day and status."}
           </CardContent>
         </Card>
@@ -156,7 +169,7 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
               key={pkg.id}
               pkg={pkg}
               showBrand={!singleBrand}
-              onMarkPosted={(placement) => setMarking({ placement, brandName: pkg.brand_name })}
+              onMarkPosted={(placement) => setMarking({ placement, brandName: pkg.brand_name, pkg })}
             />
           ))}
         </div>
@@ -166,6 +179,7 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
         placement={marking?.placement ?? null}
         brandName={marking?.brandName ?? ""}
         onClose={() => setMarking(null)}
+        drivePackage={marking?.pkg.drive_only ? marking.pkg : null}
       />
     </section>
   );
@@ -233,7 +247,7 @@ function DailyPostCard({
         {pkg.media.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
             {pkg.media.map((m, idx) => (
-              <a
+              m.drive_file_id ? <div key={m.drive_file_id} className="shrink-0 w-56"><DriveFileTile projectId={pkg.project_id} file={{ id: m.drive_file_id, name: m.name || `${m.kind} ${idx + 1}`, mimeType: m.kind === 'video' ? 'video/mp4' : 'image/jpeg' }} /></div> : <a
                 key={`${m.drive_file_id ?? m.url ?? idx}`}
                 href={m.url ?? (m.drive_file_id ? `https://drive.google.com/file/d/${m.drive_file_id}/view` : "#")}
                 target="_blank"
@@ -306,18 +320,10 @@ function DailyPostCard({
 
         <div className="flex flex-wrap gap-2 pt-1 border-t border-border">
           {pkg.drive_folder_url && (
-            <Button asChild size="sm" variant="outline">
-              <a href={pkg.drive_folder_url} target="_blank" rel="noreferrer">
-                <FolderOpen className="h-3.5 w-3.5 mr-1.5" /> Open folder
-              </a>
-            </Button>
+            <DriveLink href={pkg.drive_folder_url} projectId={pkg.project_id}>Open folder</DriveLink>
           )}
           {pkg.post_this_doc_url && (
-            <Button asChild size="sm" variant="outline">
-              <a href={pkg.post_this_doc_url} target="_blank" rel="noreferrer">
-                <FileText className="h-3.5 w-3.5 mr-1.5" /> Open POST THIS
-              </a>
-            </Button>
+            <DriveLink href={pkg.post_this_doc_url} projectId={pkg.project_id}>Open POST THIS</DriveLink>
           )}
         </div>
       </CardContent>

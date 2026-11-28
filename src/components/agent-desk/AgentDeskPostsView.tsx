@@ -1,4 +1,5 @@
 import { ExternalLink, Share2, CheckCircle2, Clock } from 'lucide-react';
+import { DriveLink } from '@/components/drive/DrivePreview';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -72,9 +73,7 @@ export function AgentDeskPostsView({ posts, brandNames, isAdmin, onSelect }: Pro
                       </button>
                       <div className="flex flex-wrap items-center gap-2 shrink-0">
                         {proofs[0] && (
-                          <Button size="sm" variant="outline" asChild>
-                            <a href={proofs[0].url} target="_blank" rel="noreferrer">Drive folder<ExternalLink className="h-3.5 w-3.5 ml-1.5" /></a>
-                          </Button>
+                          <DriveLink href={proofs[0].url}>Drive folder</DriveLink>
                         )}
                         {pub[0] && (
                           <Button size="sm" variant="secondary" asChild>

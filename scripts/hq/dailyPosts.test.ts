@@ -9,9 +9,14 @@ import {
   plainWaitingReason,
   qualityLabel,
   rankDailyPosts,
+  mergeDrivePosts,
 } from "../../src/lib/dailyPosts";
 
 describe("dailyPosts shared rules", () => {
+  it('prefers one saved record over Drive for the same brand and date', () => {
+    const row = (id: string, brand: string, date: string) => parseDailyPostPackage({ id, project_id: brand, due_date: date }, [], brand);
+    assert.deepEqual(mergeDrivePosts([row('saved', 'big-paws', '2026-11-27')], [row('folder', 'big-paws', '2026-11-27'), row('tomorrow', 'big-paws', '2026-11-28')]).map(p => p.id), ['tomorrow', 'saved']);
+  });
   it("identifies daily_post items without dropping null purpose_type", () => {
     assert.equal(isDailyPost({ purpose_type: "daily_post" }), true);
     assert.equal(isDailyPost({ purpose_type: "teach" }), false);

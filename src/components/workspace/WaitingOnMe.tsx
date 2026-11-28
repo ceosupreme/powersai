@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { DriveLink } from '@/components/drive/DrivePreview';
+import { driveId } from '@/lib/brandDrive';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -238,7 +240,7 @@ function ApprovalActions({
   }));
   return (
     <div className="mt-2 space-y-2">
-      {open && (
+      {open && (driveId(open.url) ? <DriveLink href={open.url} projectId={row.projectId ?? undefined}>{open.label}</DriveLink> : (
         <a
           href={open.url}
           target={open.internal ? undefined : '_blank'}
@@ -247,7 +249,7 @@ function ApprovalActions({
         >
           {open.label}<ExternalLink aria-hidden className="h-4 w-4 shrink-0" />
         </a>
-      )}
+      ))}
       <div className="grid grid-cols-3 gap-2">
         <Button className="min-h-11" disabled={busy} onClick={() => onRun('approve')}>Approve</Button>
         <Button variant="outline" className="min-h-11" disabled={busy}

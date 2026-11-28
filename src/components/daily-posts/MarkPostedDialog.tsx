@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useQueryClient } from '@tanstack/react-query';
+import { driveCall, driveId } from '@/lib/brandDrive';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,18 +9,23 @@ import { Label } from "@/components/ui/label";
 import { ClipboardPaste } from "lucide-react";
 import { toast } from "sonner";
 import { useMarkDailyPostPosted } from "@/hooks/useDailyPosts";
-import type { DailyPostPlacement } from "@/lib/dailyPosts";
+import type { DailyPostPlacement, DailyPostPackage } from "@/lib/dailyPosts";
 
 interface Props {
   placement: DailyPostPlacement | null;
   brandName: string;
   onClose: () => void;
+  drivePackage?: DailyPostPackage | null;
 }
 
-export function MarkPostedDialog({ placement, brandName, onClose }: Props) {
+export function MarkPostedDialog({ placement, brandName, onClose, drivePackage }: Props) {
+  const qc = useQueryClient();
+  const [channel, setChannel] = useState('instagram');
+  const [saving, setSaving] = useState(false);
   const [liveUrl, setLiveUrl] = useState("");
   const [note, setNote] = useState("");
   const markPosted = useMarkDailyPostPosted();
+  useEffect(() => { setChannel(placement?.channel === 'caption' ? 'instagram' : placement?.channel ?? 'instagram'); setLiveUrl(''); setNote(''); }, [placement?.id]);
 
   const handlePaste = async () => {
     try {
@@ -36,7 +44,14 @@ export function MarkPostedDialog({ placement, brandName, onClose }: Props) {
       return;
     }
     try {
-      await markPosted.mutateAsync({
+      setSaving(true);
+      if (drivePackage) {
+        const folderId = driveId(drivePackage.drive_folder_url ?? '');
+        if (!folderId) throw new Error('No post folder available.');
+        await driveCall({ action: 'mark', projectId: drivePackage.project_id, date: drivePackage.post_date,
+          fileId: folderId, channel, liveUrl: withLink ? clean : null, note: note.trim() || null });
+        for (const key of ['daily-posts', 'drive-posts', 'agent-desk', 'brand-pulses']) qc.invalidateQueries({ queryKey: [key] });
+      } else await markPosted.mutateAsync({
         placementId: placement.id,
         liveUrl: withLink ? clean : null,
         note: note.trim() || null,
@@ -47,6 +62,8 @@ export function MarkPostedDialog({ placement, brandName, onClose }: Props) {
       onClose();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not save.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -54,12 +71,13 @@ export function MarkPostedDialog({ placement, brandName, onClose }: Props) {
     <Dialog open={!!placement} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Mark {placement?.channel ?? "post"} as posted</DialogTitle>
+          <DialogTitle>Mark {drivePackage ? 'post' : placement?.channel ?? "post"} as posted</DialogTitle>
           <DialogDescription>
             {brandName} — paste the live post link so HQ can verify it.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
+          {drivePackage && <div className="space-y-1.5"><Label>Platform</Label><Select value={channel} onValueChange={setChannel}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{['instagram','facebook','tiktok','google','linkedin','youtube','pinterest','x','other'].map(p => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent></Select></div>}
           <div className="space-y-1.5">
             <Label htmlFor="daily-post-live-url">Live post link</Label>
             <div className="flex gap-2">
@@ -90,14 +108,14 @@ export function MarkPostedDialog({ placement, brandName, onClose }: Props) {
           <Button
             type="button"
             variant="outline"
-            disabled={markPosted.isPending}
+            disabled={markPosted.isPending || saving}
             onClick={() => submit(false)}
           >
             Posted, no link yet
           </Button>
           <Button
             type="button"
-            disabled={markPosted.isPending}
+            disabled={markPosted.isPending || saving}
             onClick={() => submit(true)}
           >
             Save live link

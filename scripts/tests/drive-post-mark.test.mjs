@@ -1,0 +1,28 @@
+import {test,after} from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {PGlite} from '@electric-sql/pglite';
+const db=new PGlite();
+await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role; CREATE SCHEMA auth;
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$SELECT (current_setting('request.jwt.claims',true)::jsonb->>'sub')::uuid$$;
+CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql AS $$SELECT current_setting('request.jwt.claims',true)::jsonb->>'role'$$;
+CREATE TABLE user_roles(user_id uuid,role text);CREATE TABLE venues(id uuid PRIMARY KEY,name text);
+CREATE FUNCTION has_role(u uuid,r text) RETURNS boolean LANGUAGE sql AS $$SELECT EXISTS(SELECT 1 FROM user_roles WHERE user_id=u AND role=r)$$;
+CREATE FUNCTION user_can_access_project(p uuid) RETURNS boolean LANGUAGE sql AS $$SELECT has_role(auth.uid(),'admin')$$;
+CREATE TABLE content_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),project_id uuid,title text,purpose_type text,stage text,due_date date,created_by uuid,brief jsonb,published_at timestamptz);
+CREATE UNIQUE INDEX one_daily ON content_items(project_id,due_date) WHERE purpose_type='daily_post';
+CREATE TABLE content_placements(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),content_item_id uuid,project_id uuid,channel text,status text,receipt jsonb,idempotency_key text UNIQUE,live_url text,verified_at timestamptz,created_at timestamptz DEFAULT now());
+CREATE TABLE agent_handoffs(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),content_item_id uuid,spec jsonb,brand_ids uuid[],result jsonb);
+INSERT INTO user_roles VALUES('00000000-0000-4000-8000-000000000001','admin');INSERT INTO venues VALUES('00000000-0000-4000-8000-000000000002','Big Paws Club');
+INSERT INTO agent_handoffs(spec,brand_ids) VALUES('{"type":"social_post","post_date":"2026-11-27"}',ARRAY['00000000-0000-4000-8000-000000000002'::uuid]);`);
+await db.exec(await readFile('drizzle/migrations/0015_drive_daily_post_mark.sql','utf8'));
+await db.exec(await readFile('drizzle/migrations/0016_drive_post_platform_captions.sql','utf8'));
+after(()=>db.close());
+const call=async(url)=>{await db.exec(`SELECT set_config('request.jwt.claims','{"role":"service_role"}',false)`);return (await db.query(`SELECT hq_mark_drive_daily_post_posted('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','2026-11-27','checked-folder','{"caption":"Big dog gear rule","media":[]}'::jsonb,'instagram',$1,'test') AS result`,[url])).rows[0].result;};
+test('server-only creation refuses a direct authenticated caller',async()=>{await db.exec(`SELECT set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000001"}',false)`);await assert.rejects(()=>db.query(`SELECT hq_mark_drive_daily_post_posted('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','2026-11-27','checked-folder','{}','instagram')`),/Private file service required/);});
+test('no-link mark creates one scheduled record without verified publication',async()=>{const result=await call(null);assert.equal(result.status,'scheduled');const {rows}=await db.query('SELECT status,live_url,verified_at FROM content_placements');assert.deepEqual(rows,[{status:'scheduled',live_url:null,verified_at:null}]);});
+test('live mark reuses that record and links matching mailbox exactly once per platform',async()=>{const link='https://www.instagram.com/p/fixture';await call(link);await call(link);assert.equal((await db.query('SELECT count(*)::int AS n FROM content_items')).rows[0].n,1);assert.equal((await db.query('SELECT count(*)::int AS n FROM content_placements')).rows[0].n,1);const {rows}=await db.query('SELECT content_item_id,result FROM agent_handoffs');assert.ok(rows[0].content_item_id);assert.equal(rows[0].result.published.length,1);assert.equal(rows[0].result.published[0].url,link);assert.equal((await db.query('SELECT live_url,verified_at FROM content_placements')).rows[0].live_url,link);});
+test('explicit Facebook and Instagram captions remain separate; marking one does not post the other',async()=>{
+ await db.exec(`SELECT set_config('request.jwt.claims','{"role":"service_role"}',false)`);
+ const result=(await db.query(`SELECT hq_mark_drive_daily_post_posted('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','2026-11-28','tomorrow-folder','{"caption":"IG text","captions":[{"channel":"instagram","caption":"IG text"},{"channel":"facebook","caption":"FB text"}]}'::jsonb,'instagram','https://www.instagram.com/p/fixture-tomorrow') AS result`)).rows[0].result;
+ assert.equal(result.all_posted,false);
+ const {rows}=await db.query(`SELECT channel,status,receipt->>'caption' AS caption FROM content_placements WHERE content_item_id=$1 ORDER BY channel`,[result.content_item_id]);
+ assert.deepEqual(rows,[{channel:'facebook',status:'planned',caption:'FB text'},{channel:'instagram',status:'published',caption:'IG text'}]);
+});

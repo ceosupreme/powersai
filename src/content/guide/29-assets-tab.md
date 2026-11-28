@@ -1,14 +1,19 @@
-# Assets tab
+# Files and documents
 <!-- part: Running a brand | order: 29 | slug: assets-tab | route: /project/:venueId | tags: assets, files, brand kit, logos, images, links, documents, brand rules, shared plans, review by -->
 
-The "Assets" tab is a read-only shelf of this brand's material: the files and links saved in its brand kit, its own documents and brand rules, and the shared plans that apply across your work. Use it to find a logo, a link or a document quickly without leaving the brand.
+The "Files and documents" tab is a read-only shelf of this brand's material: live Google Drive folders, brand kit files and links, its documents and brand rules, and shared plans.
 
 ## Where to find it
 
-- Open the brand, then tap "Assets", the last tab in the tab row. On a phone, swipe the tab row left to reach it.
+- Open the brand, then tap "Files and documents", the last tab in the tab row. On a phone, swipe the tab row left to reach it.
 - The address ends in ?tab=assets.
 
 ## What you see
+
+- "Drive files": every Drive folder saved in the brand kit links. Open a folder, then any subfolder, as deep as needed. If no folder is saved, HQ tries the brand name, ignoring capitals, parentheses and the difference between & and and.
+- "Ready to post": this brand's folders for today and tomorrow, using Pacific dates. "For your approval": documents whose titles match this brand or the name of a saved brand folder.
+- Pictures show thumbnails. Tap for the full image or video. Google Docs and .md files open as readable text with Copy. Save to phone downloads images and streams videos without holding the whole video in HQ. If playback fails, use Open in Drive for Drive's player.
+- Refresh checks Drive again; open views also check every 30 seconds. Nothing is copied into HQ storage, edited or deleted in Drive.
 
 - "Files": the brand kit's files in a grid, newest first. Images show as small pictures; other files show their type, such as "PDF". The file name sits under each one.
   - If the brand has no brand kit yet, it says "No brand kit yet." with an "Open Brand kit" link.
@@ -41,6 +46,6 @@ The "Assets" tab is a read-only shelf of this brand's material: the files and li
 
 ## Good to know
 
-- Nothing can be added, changed or deleted on this tab.
+- Nothing in Drive can be added, changed or deleted from HQ. Helpers see only their own brands' folders and brand-specific post and approval files. Shared libraries and other brands answer "Not available". Admins can also inspect the shared production libraries and saved task proof links; there is no My Drive browser or Drive search.
 - Files in the grid cannot be opened from here. Open them from the Brand Kit page.
 - Picture previews load through short-lived links, so a preview may take a moment to appear.

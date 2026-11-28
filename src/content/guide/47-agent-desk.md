@@ -39,3 +39,11 @@ Drive files mean the piece was made. A live social link means it was posted. Mad
 ## Related screens
 
 Crews checks whether scheduled runs happened, not a second task board. Content Studio keeps requests with their content item. Dashboard reuses Agent Desk's owner asks and task sheet. Brand Latest work reuses finished mailbox work and proof. Files stay in Drive; HQ stores their links.
+
+## Inspect Drive proof
+
+Tap a Drive proof or post-folder link to look inside HQ. Open subfolders, read Google Docs or .md files with Copy, inspect full images, play videos and Save to phone. If a video cannot play here, Open in Drive uses Drive's player. Downloads stream; HQ does not change Drive files. The view refreshes every 30 seconds, with a Refresh button for an immediate check.
+
+Admins can inspect the shared production folders and Drive links saved on visible mailbox or approval rows. Brand helpers can inspect only their brands' saved folders and their slices of Ready to post and For your approval. Other files say Not available. This is not a Drive search or a My Drive browser.
+
+The brand's Posts cards can exist directly from Drive before an agent writes a daily post record. Mark posted there creates the single HQ package and records the chosen platform; the matching Agent Desk post for that brand and date gets the same live link. Made files still do not prove publication.

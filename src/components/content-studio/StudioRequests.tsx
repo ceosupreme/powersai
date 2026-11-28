@@ -1,4 +1,5 @@
 import { Clock3, RefreshCw } from 'lucide-react';
+import { DriveLink } from '@/components/drive/DrivePreview';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { studioFacts, studioHooks, studioObject, studioTaskStatus, studioTaskType, studioText, studioUrl, type StudioTask } from '@/lib/contentStudio';
@@ -38,7 +39,7 @@ export function StudioRequests({ tasks, loading, error, busy, onRefresh, onCance
           </div></details>}
           {links.map((entry: any, i) => {
             const href = studioUrl(typeof entry === 'string' ? entry : entry?.url);
-            return href ? <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="block break-all text-primary underline">{typeof entry === 'string' ? entry : entry.label || entry.title || href}</a> : null;
+            return href ? <DriveLink key={i} href={href}>{typeof entry === 'string' ? entry : entry.label || entry.title || href}</DriveLink> : null;
           })}
           {task.completed_at && <p>Finished {new Date(task.completed_at).toLocaleString()}</p>}
           {task.status === 'new' && ['research', 'draft'].includes(studioTaskType(task)) && <Button size="sm" disabled={busy} onClick={() => onRun(task)}>Start connected worker</Button>}

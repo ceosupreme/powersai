@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { DriveLink } from '@/components/drive/DrivePreview';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Sparkles, Send, CheckCircle2, RotateCcw, ArrowRightLeft, XCircle, Share2, Lock } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -209,9 +210,7 @@ export function AgentDeskTaskSheet({ row, historyRows, brandNames, isAdmin, acti
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Proof & links</p>
               <div className="flex flex-wrap gap-2">
                 {proofs.map((p) => (
-                  <Button key={p.url} size="sm" variant="outline" asChild>
-                    <a href={p.url} target="_blank" rel="noreferrer">{p.label}<ExternalLink className="h-3.5 w-3.5 ml-1.5" /></a>
-                  </Button>
+                  <DriveLink key={p.url} href={p.url}>{p.label}</DriveLink>
                 ))}
                 {published.map((p) => (
                   <Button key={p.url} size="sm" variant="secondary" asChild>

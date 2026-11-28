@@ -16894,6 +16894,19 @@ export type Database = {
         Args: { _live_url?: string; _note?: string; _placement_id: string }
         Returns: Json
       }
+      hq_mark_drive_daily_post_posted: {
+        Args: {
+          _actor_id: string
+          _channel: string
+          _folder_id: string
+          _live_url?: string
+          _note?: string
+          _post_date: string
+          _project_id: string
+          _snapshot: Json
+        }
+        Returns: Json
+      }
       hq_normalize_email: { Args: { p_raw: string }; Returns: string }
       hq_normalize_phone: { Args: { p_raw: string }; Returns: string }
       hq_numbers_fixture_lead: {

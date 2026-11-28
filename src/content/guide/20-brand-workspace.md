@@ -34,7 +34,7 @@ Below the header is the tab row. On a phone it scrolls sideways, so swipe it lef
 - "Content": every content piece for this brand, with approvals.
 - "Intel": research, meaning the niche profile, the audience's top pains and scored idea briefs.
 - "Playbooks": the written playbooks this brand relies on and how complete they are.
-- "Assets": brand kit files and links, brand documents and shared plans.
+- "Files and documents": live brand Drive folders, today's and tomorrow's Ready to post folders, matching approval docs, brand kit files and links, brand documents and shared plans. Tap Drive files to preview, read, copy or save to phone; nested brand folders stay available at any depth.
 
 ## How to use it
 

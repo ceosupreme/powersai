@@ -42,6 +42,10 @@ HQ uses the same words on many screens. This glossary explains each one in plain
 - "Late": a made-but-unposted post's planned Pacific post date has passed.
 - "Missed": a repeating job has no recent recorded run within its cadence's allowance. Monthly wording wins over weekday names.
 - Proof: a saved link to the actual work, often a Google Drive folder; it does not by itself mean a post is live.
+- Drive root: a brand folder saved in its brand kit links. Its nested folders and files belong to that brand's file view.
+- Drive-only post: today's or tomorrow's Ready to post folder before an agent has saved a daily post record. Mark posted creates the record at that moment; it never creates a second card for the same brand and date.
+- Save to phone: download an image or video from Drive. Videos stream rather than loading the whole file into HQ first.
+- Not available: this file is outside the folders your HQ access allows. A shared Drive connection does not give helpers access to other brands or shared production libraries.
 - History: answers and notes retained under their task, never another job for an agent to pick up.
 
 ## Scores

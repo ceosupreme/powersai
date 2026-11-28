@@ -101,3 +101,13 @@ The Production Board shows the content pieces of all your brands in one place, s
 
 ## Main brand selection
 The Brand filter stays in sync with the main header selector. Choose All brands to return to the full accessible list.
+
+## Daily posts
+
+The Daily posts tab keeps routine post packages separate from production ideas and the content mix. A brand's Today page shows the same cards. Today and Tomorrow use Pacific dates. Until an agent saves a package record, HQ reads that brand's matching Ready to post folder directly from Drive. If both exist for a brand and date, only the saved record appears.
+
+Open images or videos, Save to phone, Copy caption, Open folder or Open POST THIS without leaving HQ. The caption comes from POST THIS first, otherwise the copy-and-posting-notes .md file. Explicit platform caption blocks get separate tabs; HQ does not invent platform variations or infer that a scheduler actually posted something. If there are no separate blocks, the original text appears as one caption. A missing score shows Unscored.
+
+Mark posted records work that is already live; it never publishes. On a Drive-only card, choose the platform and paste the live link. HQ creates the package and that platform's placement at this moment, then uses the same Mark posted action as saved packages. Matching Agent Desk posts receive that live link too. Posted, no link yet creates a scheduled record with a note, not verified publication. No fake live links are required. Other platforms are not assumed to have been posted.
+
+Only real waiting-on-owner exceptions appear in Waiting on me. Routine ready folders do not need owner approval.

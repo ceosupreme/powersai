@@ -1,5 +1,11 @@
 # Roadmap
 
+## Finished posts Step 4: brand Drive files
+- [x] Link owner Drive; shared server-only per-file authorization and streaming previews/downloads
+- [x] Saved brand roots and alias-matched slices; Drive-only today/tomorrow posts and one-source Mark posted with explicit platform captions
+- [x] Shared previews on proof, approval, Studio and Posts links; HQ Guide/glossary updated
+- [x] 22 safety/caption/posting tests pass; signed-in Big Paws Club 380px caption copy, thumbnail/full image/download, root/slice browsing, record creation/readback and cleanup; Sun Run Travel 1280px 38MB video plays and downloads with 206 ranges. Only brand-drive deployed, no publishing. Real helper session and live-link mutation on production mailbox not exercised; mailbox sync tested in isolated database. All temporary daily records removed (0 remain).
+
 ## Agent Desk Part 3
 - [x] Keep all open mailbox rows and unposted files, refresh every 30 seconds, fetch sheet history, fix monthly cadence; completion companion trigger and 31-row backfill
 - [x] Connect brand Today/Latest work/shared pulse and deduplicated Dashboard asks; preserve brand RLS and admin-only owner actions

@@ -25,6 +25,7 @@ export const EDGE_POLICIES: Readonly<Record<string, EdgePolicy>> = {
   "automation-send-approved": ADMIN,
   "automation-stop-condition-sweep": ADMIN,
   "backfill-bev-sales": ADMIN,
+  "brand-drive": { ...MEMBER, methods: ["GET", "POST"], rationale: "Handler validates the human session and RLS-visible brand roots for every file; GET decrypts a short-lived file-scoped ticket and repeats session and ancestry checks before streaming." },
   "capture-classify": ADMIN,
   "checkup-prospect": ADMIN,
   "classify-insight-sentiment": ADMIN,

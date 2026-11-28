@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DriveLink } from '@/components/drive/DrivePreview';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Clapperboard, ExternalLink, FileText, Lightbulb, Loader2, Plus, Save, Search, Sparkles, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,7 +35,7 @@ function errorText(error: any): string {
 }
 function External({ href, children }: { href: unknown; children: React.ReactNode }) {
   const url = studioUrl(href);
-  return url ? <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-4">{children}<ExternalLink className="h-3.5 w-3.5 shrink-0" /></a> : null;
+  return url ? <DriveLink href={url}>{children}</DriveLink> : null;
 }
 function Field({ label, children, help }: { label: string; children: React.ReactNode; help?: string }) {
   return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span>{help && <span className="block text-xs leading-relaxed text-muted-foreground">{help}</span>}{children}</label>;
