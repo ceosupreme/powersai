@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('public.hq_upsert_daily_post(jsonb)'::regprocedure) INTO definition; definition:=replace(definition,$old$ARRAY(SELECT jsonb_array_elements_text(_p->'quality_fails')) ELSE NULL END$old$,$new$ARRAY(SELECT jsonb_array_elements_text(_p->'quality_fails')) ELSE '{}'::text[] END$new$); EXECUTE definition; END $$;

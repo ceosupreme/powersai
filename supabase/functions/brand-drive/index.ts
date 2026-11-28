@@ -4,7 +4,7 @@ import { z } from 'npm:zod@3';
 import { postingCaptions } from './captions.ts';
 import { ADMIN_ROOTS, APPROVAL, READY, FOLDER, driveId, fileAvailable, normalizeName, titleMatches, type BrandRoot, type DriveFile } from './safety.ts';
 const headers = { ...corsHeaders, 'Access-Control-Allow-Headers': `${corsHeaders['Access-Control-Allow-Headers']}, range`, 'Access-Control-Expose-Headers':'Content-Range, Content-Length, Accept-Ranges, Content-Disposition', 'Cache-Control':'no-store', 'Referrer-Policy':'no-referrer' };
-const Input = z.object({ action:z.enum(['brand','list','text','ticket','posts','mark']), fileId:z.string().regex(/^[\w-]{5,200}$/).optional(), projectIds:z.array(z.string().uuid()).max(100).optional(), projectId:z.string().uuid().optional(), date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), channel:z.enum(['instagram','facebook','tiktok','google','linkedin','youtube','pinterest','x','other']).optional(), liveUrl:z.string().url().max(2048).nullable().optional(), note:z.string().max(4000).nullable().optional(), mode:z.enum(['media','thumbnail','download']).optional() });
+const Input = z.object({ action:z.enum(['brand','list','text','ticket','posts','mark']), fileId:z.string().regex(/^[\w-]{5,200}$/).optional(), projectIds:z.array(z.string().uuid()).max(100).optional(), projectId:z.string().uuid().optional(), date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), channel:z.enum(['instagram','facebook','tiktok','google','linkedin','youtube','pinterest','x','threads','other']).optional(), liveUrl:z.string().url().max(2048).nullable().optional(), note:z.string().max(4000).nullable().optional(), mode:z.enum(['media','thumbnail','download']).optional() });
 const env = (key:string) => { const v=Deno.env.get(key)?.trim(); if (!v) throw new Error('File service is not configured'); return v; };
 const gateway='https://connector-gateway.lovable.dev/google_drive/drive/v3';
 async function provider(path:string, params:Record<string,string>={}, extra:Record<string,string>={}) {
@@ -23,7 +23,7 @@ Deno.serve(async req=>{
  if(req.method==='OPTIONS')return new Response('ok',{headers});
  try{
   let accessToken=req.headers.get('Authorization')?.replace(/^Bearer\s+/i,'')??'';
-  let media:{fileId:string;mode:string;exp:number;token:string}|null=null;
+  let media:{fileId:string;mode:string;exp:number;token:string;projectId?:string}|null=null;
   if(req.method==='GET'){media=await openTicket(new URL(req.url).searchParams.get('ticket')??'');if(!media||media.exp<Date.now())return json({error:'File link expired. Reopen the file.'},401);accessToken=media.token;}
   else if(req.method!=='POST')return json({error:'Not available'},405);
   const parsed = media ? null : Input.safeParse(await req.json());
@@ -38,7 +38,7 @@ Deno.serve(async req=>{
   const lists=new Map<string,Promise<DriveFile[]>>();
   const list=(id:string|null,folders=false):Promise<DriveFile[]>=>{const cacheKey=`${id}:${folders}`;const cached=lists.get(cacheKey);if(cached)return cached;const promise=(async()=>{let all:DriveFile[]=[];let page='';do{const r=await provider('/files',{q:`trashed=false${id?` and '${id}' in parents`:''}${folders?` and mimeType='${FOLDER}'`:''}`,fields:'nextPageToken,files(id,name,mimeType,parents,size,webViewLink)',pageSize:'1000',...(page?{pageToken:page}:{}),supportsAllDrives:'true',includeItemsFromAllDrives:'true'});const v=await r.json();all=all.concat(v.files??[]);page=v.nextPageToken??'';}while(page);return all.sort((a,b)=>a.name.localeCompare(b.name));})();lists.set(cacheKey,promise);return promise;};
   let kitQuery=db.from('brand_kits').select('id,project_id,brand_kit_links(url),venues(name)');
-  if(input?.projectId)kitQuery=kitQuery.eq('project_id',input.projectId);
+  if(input?.projectId||media?.projectId)kitQuery=kitQuery.eq('project_id',input?.projectId??media?.projectId);
   else if(input?.projectIds?.length)kitQuery=kitQuery.in('project_id',input.projectIds);
   const {data:kits,error:kitError}=await kitQuery;if(kitError)throw kitError;
   let fallback:Promise<DriveFile[]>|undefined;
@@ -78,7 +78,7 @@ Deno.serve(async req=>{
   if(!input.fileId)return json({error:'Choose a file'},400);const f=await check(input.fileId);
   if(input.action==='list'){if(f.mimeType!==FOLDER)return json({file:f});const children=await list(f.id);const allowed=admin?children:(await Promise.all(children.map(async c=>await available(c.id)?c:null))).filter(Boolean);return json({file:f,files:allowed});}
   if(input.action==='text')return json({file:f,text:await text(f.id)});
-  if(input.action==='ticket'){const expires=Date.now()+30*60_000;return json({file:f,ticket:await ticket({fileId:f.id,mode:input.mode??'media',exp:expires,token:accessToken}),expires});}
+  if(input.action==='ticket'){const expires=Date.now()+30*60_000;return json({file:f,ticket:await ticket({fileId:f.id,mode:input.mode??'media',exp:expires,token:accessToken,projectId:input.projectId}),expires});}
   if(input.action==='mark'){
    const b=brands.find(b=>b.projectId===input.projectId);if(!b||!input.date||!input.channel)return json({error:'Choose a brand, date and platform'},400);
    // It must be the exact matching brand/day slice, not just any authorized folder.

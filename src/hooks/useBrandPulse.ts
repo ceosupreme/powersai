@@ -47,7 +47,7 @@ export async function fetchBrandPulses(ids: string[], viewerId: string | null, n
   const [byBar, byVenue, placements, items, channels, revenue, pathRows, settings, stagesRes, stepsRes, setupRes, leadsRes, propsRes, ordersRes, crewRuns, mailboxRows] = await Promise.all([
     fetchRowsIn<any>('action_items', actionCols, 'bar_id', ids, doneFilter),
     fetchRowsIn<any>('action_items', actionCols, 'venue_id', ids, doneFilter),
-    fetchRowsIn<any>('content_placements', 'id,project_id,content_item_id,live_url,verified_at,updated_at,channel,account_label,status,scheduled_for', 'project_id', ids),
+    fetchRowsIn<any>('content_placements', 'id,project_id,content_item_id,live_url,verified_at,updated_at,channel,account_label,status,scheduled_for,receipt', 'project_id', ids),
     fetchRowsIn<any>('content_items', 'id,project_id,title,published_at,scheduled_at,stage', 'project_id', ids, (q) => q.or('published_at.not.is.null,scheduled_at.not.is.null')),
     fetchRowsIn<any>('brand_channels', 'id,project_id,platform,handle,url,followers,cadence_target,last_post_at,status', 'project_id', ids),
     fetchRowsIn<any>('channel_revenue', 'id,project_id,revenue_type,amount,period_month,source_note', 'project_id', ids, (q) => q.gte('period_month', moneySince)),

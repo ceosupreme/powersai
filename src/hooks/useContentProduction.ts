@@ -21,7 +21,7 @@ export const OWNERSHIP_LABELS: Record<Ownership, string> = {
 
 export const PLACEMENT_CHANNELS = [
   "instagram", "facebook", "pinterest", "tiktok", "youtube",
-  "blog", "email", "x", "linkedin", "other",
+  "blog", "email", "x", "linkedin", "threads", "other",
 ] as const;
 export type PlacementChannel = (typeof PLACEMENT_CHANNELS)[number];
 

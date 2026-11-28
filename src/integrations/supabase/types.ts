@@ -16989,6 +16989,7 @@ export type Database = {
         Args: { p_job: Json; p_new_content?: Json; p_steps: Json }
         Returns: string
       }
+      hq_daily_post_sync: { Args: { _item_id: string }; Returns: boolean }
       hq_dispatch_edge_function: {
         Args: { p_body?: Json; p_function: string }
         Returns: number
@@ -17303,6 +17304,11 @@ export type Database = {
           name: string
         }[]
       }
+      hq_undo_daily_post: {
+        Args: { _placement_id: string; _posted_at: string }
+        Returns: Json
+      }
+      hq_upsert_daily_post: { Args: { _p: Json }; Returns: Json }
       hq_verify_job_token: {
         Args: { p_function: string; p_token: string }
         Returns: boolean

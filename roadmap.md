@@ -1,5 +1,10 @@
 # Roadmap
 
+## Finished Posts approved updates
+- [x] Brand/date/piece uniqueness and server-only hq_upsert_daily_post(jsonb) shipped together; Threads; reversible no-link posting receipts and shared mailbox sync. Existing non-null quality_fails clears to an empty list.
+- [x] Shared daily/finished-Board cards and counts, folder-specific Drive replacement, daily purpose mix and first-comment/account/quality details. Visible-file, brand-scoped thumbnail lookups resolve the observed Drive throttling; only brand-drive deployed for verification.
+- [x] Posts, Board, Agent Desk and glossary guides updated; 44 targeted/regression tests passed and build OK. Real owner 380px November 28 check: 5 Ready, 8 Waiting, 3 Almost ready, 7 Scheduled, 0 Posted; Big Paws Club 87 first, all 3 thumbnails loaded, caption copied and first comment visible. Temporary one-tap post/Undo and 2099 agent create/update/second piece passed; all temporary packages removed. No publishing or product-run source changes.
+
 ## Product runs Step 2
 - [x] Shared Start/Continue entry points for products, product tasks and Content Studio; stable task creation keys resume the original run
 - [x] Keyed owner stage screen, saved choices/approval/skip/output/reopen/resume and upload kit with real-field text and primary/twin live-link gates; existing RLS preserved, no agent dispatch

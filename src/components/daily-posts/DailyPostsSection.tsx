@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Copy, ExternalLink, FileText, FolderOpen, Image as ImageIcon, Loader2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useDailyPosts } from "@/hooks/useDailyPosts";
+import { useDailyPosts, useMarkDailyPostPosted, useUndoDailyPost } from "@/hooks/useDailyPosts";
 import { useDrivePosts } from '@/hooks/useBrandDrive';
 import { DriveFileTile, DriveLink } from '@/components/drive/DrivePreview';
 import { parseDailyPostPackage, parseDailyPostPlacement, mergeDrivePosts } from '@/lib/dailyPosts';
@@ -17,6 +18,7 @@ import {
   filterDailyPostsByDate,
   plainWaitingReason,
   qualityLabel,
+  isPlacementPosted,
   type DailyPostDateWindow,
   type DailyPostPackage,
   type DailyPostPlacement,
@@ -59,6 +61,21 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
   const [statusFilter, setStatusFilter] = useState<DailyPostStatus | "all">("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
   const [marking, setMarking] = useState<{ placement: DailyPostPlacement; brandName: string; pkg: DailyPostPackage } | null>(null);
+  const mark = useMarkDailyPostPosted();
+  const undo = useUndoDailyPost();
+  const confirmPosted = (pkg: DailyPostPackage, pl: DailyPostPlacement, result: any) => {
+    const placement = { ...pl, id: result.placement_id ?? pl.id, content_item_id: result.content_item_id ?? pl.content_item_id };
+    const saved = { ...pkg, id: placement.content_item_id, drive_only: false };
+    toast.success('Posted · link pending', { duration: 10000,
+      action: { label: 'Undo', onClick: () => { if (result.undo_at) undo.mutate({ placementId: placement.id, postedAt: result.undo_at }, { onSuccess: () => toast.success('Posting undone.'), onError: e => toast.error(e.message) }); } },
+      cancel: { label: 'Add the live link', onClick: () => setMarking({ placement, brandName: pkg.brand_name, pkg: saved }) },
+    });
+  };
+  const markOnce = async (pkg: DailyPostPackage, pl: DailyPostPlacement) => {
+    if (pkg.drive_only) { setMarking({ placement: pl, brandName: pkg.brand_name, pkg }); return; }
+    try { confirmPosted(pkg, pl, await mark.mutateAsync({ placementId: pl.id })); }
+    catch (e: any) { toast.error(e.message || 'Could not mark posted.'); }
+  };
 
   const inWindow = useMemo(
     () => filterDailyPostsByDate(allPackages, dateWindow),
@@ -169,7 +186,9 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
               key={pkg.id}
               pkg={pkg}
               showBrand={!singleBrand}
-              onMarkPosted={(placement) => setMarking({ placement, brandName: pkg.brand_name, pkg })}
+              busy={mark.isPending || undo.isPending}
+              onMarkPosted={(placement) => void markOnce(pkg, placement)}
+              onAddLink={(placement) => setMarking({ placement, brandName: pkg.brand_name, pkg })}
             />
           ))}
         </div>
@@ -180,6 +199,7 @@ export function DailyPostsSection({ projectIds, singleBrand = false, defaultWind
         brandName={marking?.brandName ?? ""}
         onClose={() => setMarking(null)}
         drivePackage={marking?.pkg.drive_only ? marking.pkg : null}
+        onMarked={result => { if (marking && result.no_link_noted) confirmPosted(marking.pkg, marking.placement, result); }}
       />
     </section>
   );
@@ -189,10 +209,14 @@ function DailyPostCard({
   pkg,
   showBrand,
   onMarkPosted,
+  onAddLink,
+  busy,
 }: {
   pkg: DailyPostPackage;
   showBrand: boolean;
   onMarkPosted: (placement: DailyPostPlacement) => void;
+  onAddLink: (placement: DailyPostPlacement) => void;
+  busy: boolean;
 }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -210,12 +234,13 @@ function DailyPostCard({
   };
 
   return (
-    <Card className="border-border bg-card">
+    <Card role="article" aria-label={pkg.title} className="border-border bg-card">
       <CardContent className="p-4 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="space-y-0.5">
             {showBrand && <div className="text-xs font-medium text-muted-foreground">{pkg.brand_name}</div>}
             <div className="text-base font-semibold text-foreground">{pkg.title}</div>
+            {pkg.board_piece && <Button asChild size="sm" variant="outline"><Link to={`/production-board?item=${pkg.id}`}>Board piece</Link></Button>}
             <div className="text-xs text-muted-foreground">
               {pkg.post_date}
               {pkg.made_by ? ` · made by ${pkg.made_by}` : ""}
@@ -231,6 +256,8 @@ function DailyPostCard({
             </Badge>
           </div>
         </div>
+        {pkg.quality_notes && <p className="text-sm text-muted-foreground"><strong>Why this score:</strong> {pkg.quality_notes}</p>}
+        {pkg.quality_fails?.map((fail, i) => <p key={i} className="text-sm text-destructive"><strong>Fix before posting:</strong> {fail}</p>)}
 
         {pkg.post_status === "waiting_on_owner" && (
           <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
@@ -272,7 +299,7 @@ function DailyPostCard({
               {pkg.placements.map((pl) => (
                 <TabsTrigger key={pl.id} value={pl.id} className="capitalize">
                   {pl.channel}
-                  {pl.status === "published" ? " ✓" : ""}
+                  {isPlacementPosted(pl) ? pl.status === 'published' ? ' ✓' : ' ✓ link pending' : ''}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -292,8 +319,10 @@ function DailyPostCard({
                   <p className="text-sm text-muted-foreground">No caption saved on this platform yet.</p>
                 )}
                 {pl.posted_no_link_at && pl.status !== "published" && (
-                  <p className="text-xs text-muted-foreground">Noted as posted without a live link yet.</p>
+                  <p className="text-xs text-muted-foreground">Posted · link pending</p>
                 )}
+                {pl.first_comment && <div className="space-y-2"><p className="text-xs font-medium">First comment to add right after posting</p><p className="whitespace-pre-wrap text-sm">{pl.first_comment}</p><Button variant="outline" size="sm" onClick={async () => { try { await navigator.clipboard.writeText(pl.first_comment ?? ''); toast.success('First comment copied.'); } catch { toast.error('Could not copy first comment.'); } }}><Copy className="mr-1.5 h-3.5 w-3.5" />Copy first comment</Button></div>}
+                {pl.notes && <p className="text-xs text-muted-foreground">{pl.notes}</p>}
                 <div className="flex flex-wrap gap-2">
                   {pl.caption && (
                     <Button type="button" size="sm" variant="outline" onClick={() => copyCaption(pl)}>
@@ -307,8 +336,8 @@ function DailyPostCard({
                         View live post <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
                       </a>
                     </Button>
-                  ) : (
-                    <Button type="button" size="sm" onClick={() => onMarkPosted(pl)}>
+                  ) : pl.posted_no_link_at ? <Button variant="outline" size="sm" onClick={() => onAddLink(pl)}>Add the live link</Button> : (
+                    <Button type="button" size="sm" disabled={busy || (pkg.board_piece && pkg.post_status === 'waiting_on_owner')} onClick={() => onMarkPosted(pl)}>
                       Mark posted
                     </Button>
                   )}

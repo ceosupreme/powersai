@@ -1,3 +1,5 @@
+import { canApproveFinishedContent } from './contentReadiness';
+
 export type DailyPostStatus =
   | "ready"
   | "almost_ready"
@@ -32,10 +34,16 @@ export interface DailyPostPlacement {
   caption: string;
   hashtags: string;
   notes: string;
+  first_comment?: string;
   posted_no_link_at: string | null;
 }
 
 export interface DailyPostPackage {
+  piece?: string;
+  board_piece?: boolean;
+  quality_fails?: string[];
+  purpose?: string | null;
+  created_at?: string;
   drive_only?: boolean;
   id: string;
   project_id: string;
@@ -132,6 +140,7 @@ export function parseDailyPostPlacement(raw: any): DailyPostPlacement {
     caption: typeof receipt.caption === "string" ? receipt.caption : "",
     hashtags: typeof receipt.hashtags === "string" ? receipt.hashtags : "",
     notes: typeof receipt.notes === "string" ? receipt.notes : "",
+    first_comment: typeof receipt.first_comment === "string" ? receipt.first_comment : "",
     posted_no_link_at: typeof receipt.posted_no_link_at === "string" ? receipt.posted_no_link_at : null,
   };
 }
@@ -140,7 +149,7 @@ export function resolveDailyPostStatus(
   rawStatus: unknown,
   placements: DailyPostPlacement[],
 ): DailyPostStatus {
-  if (placements.length > 0 && placements.every((p) => p.status === "published")) {
+  if (placements.length > 0 && placements.every(isPlacementPosted)) {
     return "posted";
   }
   if (typeof rawStatus === "string" && VALID_STATUSES.has(rawStatus)) {
@@ -170,6 +179,10 @@ export function parseDailyPostPackage(
     }));
 
   return {
+    piece: typeof dp.piece === 'string' && dp.piece.trim() ? dp.piece : 'main',
+    quality_fails: Array.isArray(rawItem.quality_fails) ? rawItem.quality_fails.filter((v: unknown) => typeof v === 'string') : [],
+    purpose: typeof dp.purpose === 'string' ? dp.purpose : null,
+    created_at: rawItem.created_at,
     id: String(rawItem.id),
     project_id: String(rawItem.project_id),
     brand_name: brandName,
@@ -200,15 +213,43 @@ export function rankDailyPosts(packages: DailyPostPackage[]): DailyPostPackage[]
   });
 }
 
-/** A saved brand/date package wins over its live Drive folder, never two cards. */
+/** Finished Board work joins Posts, but ideas, drafts and unfinished production never do. */
+export function parseBoardPostPackage(raw: any, placements: DailyPostPlacement[], brandName: string): DailyPostPackage | null {
+  if (isDailyPost(raw) || ['idea','parked','record','edit'].includes(raw.stage)) return null;
+  const published = (placements.length > 0 && placements.every(isPlacementPosted)) || (raw.stage === 'published' && !!raw.published_at);
+  if (!published && !canApproveFinishedContent(raw)) return null;
+  const scheduled = raw.stage === 'scheduled' || placements.some(p => p.status === 'scheduled');
+  const time = published ? raw.published_at || placements.find(p => p.verified_at || p.posted_no_link_at)?.verified_at || placements.find(p => p.posted_no_link_at)?.posted_no_link_at : placements.find(p => p.scheduled_for)?.scheduled_for;
+  const date = published && time ? pacificDateStr(0, new Date(time)) : raw.due_date || (time ? pacificDateStr(0, new Date(time)) : '');
+  const status: DailyPostStatus = published ? 'posted' : scheduled ? 'scheduled' : raw.approved_at ? 'ready' : 'waiting_on_owner';
+  const brief = raw.brief && typeof raw.brief === 'object' ? raw.brief : {};
+  const media = (Array.isArray(brief.asset_urls) ? brief.asset_urls : []).filter((u: unknown) => typeof u === 'string').map((url: string) => ({ url, kind: /\.(mp4|mov|webm)(\?|$)/i.test(url) ? 'video' : 'image' }));
+  return { ...parseDailyPostPackage({ ...raw, due_date: date, brief: { daily_post: { media, post_status: status, waiting_reason: 'needs_person_approval', waiting_detail: 'Needs your approval on the Production Board' } } }, placements, brandName), board_piece: true, purpose: mixPurpose(raw) };
+}
+
+export function isPlacementPosted(p: Pick<DailyPostPlacement, 'status' | 'posted_no_link_at'>): boolean {
+  return p.status === 'published' || !!p.posted_no_link_at;
+}
+export function driveFolderId(url: string | null | undefined): string | null {
+  const match = url?.match(/\/folders\/([\w-]+)/);
+  return match?.[1] ?? null;
+}
+/** Replace only this saved folder; legacy main packages without a folder use brand/date. */
 export function mergeDrivePosts(records: DailyPostPackage[], folders: DailyPostPackage[]): DailyPostPackage[] {
-  const keys = new Set(records.map(p => `${p.project_id}:${p.post_date}`));
+  const seen = new Set<string>();
   return rankDailyPosts([...records, ...folders.filter(p => {
-    const key = `${p.project_id}:${p.post_date}`;
-    if (keys.has(key)) return false;
-    keys.add(key);
+    const folder = driveFolderId(p.drive_folder_url);
+    if (records.some(r => !r.board_piece && (folder && driveFolderId(r.drive_folder_url) === folder || (!driveFolderId(r.drive_folder_url) && (r.piece ?? 'main') === 'main' && r.project_id === p.project_id && r.post_date === p.post_date)))) return false;
+    const key = folder ?? p.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   })]);
+}
+
+export function mixPurpose(item: { purpose_type?: string | null; brief?: any }): string | null {
+  const purpose = item.purpose_type === 'daily_post' ? item.brief?.daily_post?.purpose : item.purpose_type;
+  return ['teach','entertain','story','community','proof','offer'].includes(purpose ?? '') ? purpose : null;
 }
 
 export function countDailyPostsByStatus(packages: DailyPostPackage[]): Record<DailyPostStatus, number> & { total: number } {

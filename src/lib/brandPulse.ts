@@ -72,7 +72,7 @@ export function crewFeedRows(runs: CrewRunIn[], brandId: string, names: Map<stri
   });
 }
 
-export interface PlacementIn { id: string; content_item_id: string | null; live_url: string | null; verified_at: string | null; updated_at: string | null; channel?: string | null; account_label?: string | null }
+export interface PlacementIn { id: string; content_item_id: string | null; live_url: string | null; verified_at: string | null; updated_at: string | null; channel?: string | null; account_label?: string | null; receipt?: { posted_no_link_at?: string } | null }
 export interface ItemIn { id: string; title: string | null; published_at: string | null }
 export interface PublishedPiece { key: string; at: string; week: string; title: string; url: string | null; where: string | null }
 
@@ -86,8 +86,8 @@ export function publishedPieces(placements: PlacementIn[], items: ItemIn[], mail
   const seen = new Set<string>();
   const out: PublishedPiece[] = [];
   for (const p of placements) {
-    const at = p.verified_at ?? p.updated_at;
-    if (!p.live_url || !at) continue;
+    const at = p.receipt?.posted_no_link_at ?? p.verified_at ?? p.updated_at;
+    if ((!p.live_url && !p.receipt?.posted_no_link_at) || !at) continue;
     const week = mondayOf(ptDate(at));
     const key = p.content_item_id ? `item-${p.content_item_id}` : `pl-${p.id}`;
     if (seen.has(`${key}|${week}`)) continue;

@@ -34,7 +34,7 @@ Only admins can use these actions. Brand-assigned people can read their brands' 
 
 ## Made versus posted
 
-Drive files mean the piece was made. A live social link means it was posted. Made-not-posted pieces do not appear as finished work in Latest work and do not increase Output. A posted piece counts once for its brand even if it has several platform links, using when it was posted. Finished non-post tasks count as work for all their tagged brands. Today and Portfolio share these rules.
+Drive files mean the piece was made, not posted. A live social link or a person's saved posting confirmation means it was posted. A confirmation without a link says link pending and records who and when; it is not verified publication until a live URL is saved. Made-not-posted pieces do not increase Output. A posted piece counts once for its brand even with several platforms. Finished non-post tasks count as work for all their tagged brands. Today and Portfolio share these rules.
 
 ## Related screens
 
@@ -46,4 +46,4 @@ Tap a Drive proof or post-folder link to look inside HQ. Open subfolders, read G
 
 Admins can inspect the shared production folders and Drive links saved on visible mailbox or approval rows. Brand helpers can inspect only their brands' saved folders and their slices of Ready to post and For your approval. Other files say Not available. This is not a Drive search or a My Drive browser.
 
-The brand's Posts cards can exist directly from Drive before an agent writes a daily post record. Mark posted there creates the single HQ package and records the chosen platform; the matching Agent Desk post for that brand and date gets the same live link. Made files still do not prove publication.
+The brand's Posts cards can exist directly from Drive before an agent writes a daily post record. Mark posted creates the main package and records the chosen platform in one tap after choosing it. Matching Agent Desk posts receive the live link or the person's no-link confirmation. Undo reverses that platform's confirmation too. Separate pieces on one brand/date keep their own package and mailbox links. Made files alone still do not prove posting.

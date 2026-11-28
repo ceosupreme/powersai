@@ -16,9 +16,10 @@ interface Props {
   brandName: string;
   onClose: () => void;
   drivePackage?: DailyPostPackage | null;
+  onMarked?: (result: any) => void;
 }
 
-export function MarkPostedDialog({ placement, brandName, onClose, drivePackage }: Props) {
+export function MarkPostedDialog({ placement, brandName, onClose, drivePackage, onMarked }: Props) {
   const qc = useQueryClient();
   const [channel, setChannel] = useState('instagram');
   const [saving, setSaving] = useState(false);
@@ -45,18 +46,20 @@ export function MarkPostedDialog({ placement, brandName, onClose, drivePackage }
     }
     try {
       setSaving(true);
+      let result: any;
       if (drivePackage) {
         const folderId = driveId(drivePackage.drive_folder_url ?? '');
         if (!folderId) throw new Error('No post folder available.');
-        await driveCall({ action: 'mark', projectId: drivePackage.project_id, date: drivePackage.post_date,
+        result = await driveCall({ action: 'mark', projectId: drivePackage.project_id, date: drivePackage.post_date,
           fileId: folderId, channel, liveUrl: withLink ? clean : null, note: note.trim() || null });
         for (const key of ['daily-posts', 'drive-posts', 'agent-desk', 'brand-pulses']) qc.invalidateQueries({ queryKey: [key] });
-      } else await markPosted.mutateAsync({
+      } else result = await markPosted.mutateAsync({
         placementId: placement.id,
         liveUrl: withLink ? clean : null,
         note: note.trim() || null,
       });
-      toast.success(withLink ? "Marked as posted." : "Saved as posted without link yet.");
+      if (withLink) toast.success('Live link saved.');
+      onMarked?.(result);
       setLiveUrl("");
       setNote("");
       onClose();
@@ -71,14 +74,14 @@ export function MarkPostedDialog({ placement, brandName, onClose, drivePackage }
     <Dialog open={!!placement} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Mark {drivePackage ? 'post' : placement?.channel ?? "post"} as posted</DialogTitle>
+          <DialogTitle>{drivePackage ? 'Choose the platform you posted on' : 'Add the live link'}</DialogTitle>
           <DialogDescription>
-            {brandName} — paste the live post link so HQ can verify it.
+            {brandName} — {drivePackage ? 'HQ records it as posted as soon as you confirm the platform.' : 'The link is optional; this records where it is live.'}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          {drivePackage && <div className="space-y-1.5"><Label>Platform</Label><Select value={channel} onValueChange={setChannel}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{['instagram','facebook','tiktok','google','linkedin','youtube','pinterest','x','other'].map(p => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent></Select></div>}
-          <div className="space-y-1.5">
+          {drivePackage && <div className="space-y-1.5"><Label>Platform</Label><Select value={channel} onValueChange={setChannel}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{['instagram','facebook','tiktok','google','linkedin','youtube','pinterest','x','threads','other'].map(p => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent></Select></div>}
+          {!drivePackage && <><div className="space-y-1.5">
             <Label htmlFor="daily-post-live-url">Live post link</Label>
             <div className="flex gap-2">
               <Input
@@ -102,24 +105,24 @@ export function MarkPostedDialog({ placement, brandName, onClose, drivePackage }
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
-          </div>
+          </div></>}
         </div>
         <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button
+          {drivePackage && <Button
             type="button"
             variant="outline"
             disabled={markPosted.isPending || saving}
             onClick={() => submit(false)}
           >
-            Posted, no link yet
-          </Button>
-          <Button
+            Mark posted
+          </Button>}
+          {!drivePackage && <Button
             type="button"
             disabled={markPosted.isPending || saving}
             onClick={() => submit(true)}
           >
             Save live link
-          </Button>
+          </Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>

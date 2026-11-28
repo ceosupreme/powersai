@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { streamAskBarPulse } from '@/lib/askStream';
 import {
-  AGENTS, agentLabel, formatPacific, getProofLinks, getPublishedLinks, isSocialPost,
+  AGENTS, agentLabel, formatPacific, getProofLinks, getPublishedLinks, getNoLinkPosts, isSocialPost,
   isStudioLeased, readableSpec, statusLabel, whatHappenedOf, type AgentHandoffRow,
 } from '@/lib/agentDesk';
 import type { useAgentDesk } from '@/hooks/useAgentDesk';
@@ -55,6 +55,7 @@ export function AgentDeskTaskSheet({ row, historyRows, brandNames, isAdmin, acti
   const canAct = isAdmin && !leased;
   const proofs = getProofLinks(row);
   const published = getPublishedLinks(row);
+  const noLink = getNoLinkPosts(row);
   const specEntries = readableSpec(row.spec);
   const whatHappened = whatHappenedOf(row);
   const brands = (row.brand_ids ?? []).map((id) => brandNames.get(id)).filter(Boolean) as string[];
@@ -119,6 +120,7 @@ export function AgentDeskTaskSheet({ row, historyRows, brandNames, isAdmin, acti
               <p className="text-foreground whitespace-pre-wrap">{whatHappened}</p>
             </div>
           ) : null}
+          {noLink.map(p => <p key={p.platform} className="text-sm text-muted-foreground">✓ {p.platform} posted · link pending · {formatPacific(p.posted_at)}</p>)}
 
           {canAct && (
             <div className="space-y-3 rounded-lg border border-border p-3">

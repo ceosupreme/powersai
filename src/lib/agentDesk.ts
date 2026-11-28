@@ -79,9 +79,15 @@ export function getPublishedLinks(row: AgentHandoffRow): PublishedLink[] {
 export type SocialPostState = 'posted' | 'made_not_posted' | 'not_made';
 
 export function socialPostState(row: AgentHandoffRow): SocialPostState {
-  if (getPublishedLinks(row).length > 0) return 'posted';
+  if (getPublishedLinks(row).length > 0 || getNoLinkPosts(row).length > 0) return 'posted';
   if (row.status === 'done') return 'made_not_posted';
   return 'not_made';
+}
+
+export function getNoLinkPosts(row: AgentHandoffRow): { platform: string; posted_at: string; by?: string }[] {
+  const raw = row.result?.posted_no_link;
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(p => p && typeof p === 'object' && typeof p.posted_at === 'string' && Number.isFinite(Date.parse(p.posted_at)) && typeof p.platform === 'string');
 }
 
 export function todayPacificISO(now = new Date()): string {
@@ -319,7 +325,7 @@ export function isFinishedWork(row: AgentHandoffRow): boolean {
 export function finishedAt(row: AgentHandoffRow): string | null {
   if (!isFinishedWork(row)) return null;
   if (isSocialPost(row)) {
-    const times = getPublishedLinks(row).map((p) => p.posted_at).filter((t): t is string => !!t && Number.isFinite(Date.parse(t))).sort();
+    const times = [...getPublishedLinks(row), ...getNoLinkPosts(row)].map((p) => p.posted_at).filter((t): t is string => !!t && Number.isFinite(Date.parse(t))).sort();
     return times[0] ?? row.updated_at;
   }
   return row.completed_at ?? row.updated_at;

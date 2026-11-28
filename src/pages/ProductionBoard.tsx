@@ -1,5 +1,6 @@
 import { useApp } from "@/context/AppContext";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ import { CollectionToolbar } from "@/components/shared/CollectionToolbar";
 import { sortCollection } from "@/lib/collectionSort";
 import { Label } from "@/components/ui/label";
 import { DailyPostsSection } from "@/components/daily-posts/DailyPostsSection";
+import { useDailyPosts } from '@/hooks/useDailyPosts';
+import { mixPurpose } from '@/lib/dailyPosts';
 
 // "parked" is a database stage outside ContentStage; it gets its own tab so the
 // header total and the tab counts always add up.
@@ -44,6 +47,7 @@ export default function ProductionBoard() {
   const { data: projects = [], isLoading: loadingProjects } = useBrandProjects();
   const projectIds = useMemo(() => projects.map((p) => p.id), [projects]);
   const { data: items = [], isLoading, refetch } = useProductionBoardItems(projectIds);
+  const { data: postPackages = [] } = useDailyPosts(projectIds);
   const { selectedBar, accessibleBars, setSelectedBar, clearSelectedBar } = useApp();
   const brand = selectedBar?.id ?? 'all';
   const setBrand = (id: string) => { if(id === 'all') clearSelectedBar(); else { const b = accessibleBars.find(b=>b.id===id); if(b) setSelectedBar(b); } };
@@ -54,6 +58,11 @@ export default function ProductionBoard() {
   const [sort, setSort] = useState('due');
   const [attention, setAttention] = useState('all');
   const [selectedWork, setSelectedWork] = useState<{ projectId: string; id: string } | null>(null);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const item = items.find(i => i.id === params.get('item'));
+    if (item) setSelectedWork({ projectId: item.project_id, id: item.id });
+  }, [items, params]);
 
   const nameById = useMemo(
     () => new Map(projects.map((p) => [p.id, p.name])), [projects],
@@ -88,17 +97,18 @@ export default function ProductionBoard() {
   const selectedProject = brand !== "all" ? projects.find((p) => p.id === brand) : undefined;
   const cutoff = Date.now() - 28 * 86400000;
   const recent = selectedProject
-    ? items.filter((it) => it.project_id === brand && new Date(it.created_at).getTime() >= cutoff)
+    ? [...items.filter((it) => it.project_id === brand && new Date(it.created_at).getTime() >= cutoff),
+       ...postPackages.filter(p => !p.board_piece && p.project_id === brand && !!p.purpose && new Date(p.created_at ?? '').getTime() >= cutoff).map(p => ({ purpose_type: 'daily_post', brief: { daily_post: { purpose: p.purpose } } }))]
     : [];
   const mixCounts = PURPOSE_TYPES.map((pt) => ({
-    pt, n: recent.filter((it) => it.purpose_type === pt).length,
+    pt, n: recent.filter((it) => mixPurpose(it) === pt).length,
   }));
   const untyped = recent.filter((it) => !it.purpose_type).length;
   const mixFlags: string[] = [];
   mixCounts.forEach(({ pt, n }) => {
     if (recent.length > 0 && n / recent.length > 0.5) mixFlags.push(`More than half of the last four weeks' pieces are "${pt}".`);
   });
-  const offers = mixCounts.find((m) => m.pt === "offer")!.n;
+  const offers = mixCounts.find((m) => m.pt === "offer")?.n ?? 0;
   if (recent.length > 0 && offers / recent.length > 0.2) mixFlags.push("Offers are more than one in five pieces.");
 
   const recordedPublishedCount = filtered.filter(it =>
@@ -277,7 +287,7 @@ export default function ProductionBoard() {
         </Tabs>
       )}
 
-      <ContentWorkflowDialog projectId={selectedWork?.projectId ?? ''} itemId={selectedWork?.id ?? null} onClose={() => setSelectedWork(null)} />
+      <ContentWorkflowDialog projectId={selectedWork?.projectId ?? ''} itemId={selectedWork?.id ?? null} onClose={() => { setSelectedWork(null); if (params.has('item')) { const next = new URLSearchParams(params); next.delete('item'); setParams(next, { replace: true }); } }} />
       <ImportPackageDialog
         open={importOpen}
         onOpenChange={setImportOpen}

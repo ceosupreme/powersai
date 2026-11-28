@@ -104,10 +104,16 @@ The Brand filter stays in sync with the main header selector. Choose All brands 
 
 ## Daily posts
 
-The Daily posts tab keeps routine post packages separate from production ideas and the content mix. A brand's Today page shows the same cards. Today and Tomorrow use Pacific dates. Until an agent saves a package record, HQ reads that brand's matching Ready to post folder directly from Drive. If both exist for a brand and date, only the saved record appears.
+The Daily posts tab and a brand's Posts meter share one ranked list of routine packages and finished Production Board pieces. Ideas and unfinished drafts stay out. Today and Tomorrow use Pacific dates. Ready to post means approved and not scheduled. Waiting on you means the Board piece still needs your approval; Scheduled and Posted show the saved posting work. Packages rank by quality score, highest first.
+
+A brand can have more than one package on a day: the main piece and separate named pieces. A saved package replaces only its own Drive folder card. A main package without a saved folder replaces the same brand and date. Other folders remain visible. Before a record exists, HQ reads the matching Ready to post folder directly from Drive.
 
 Open images or videos, Save to phone, Copy caption, Open folder or Open POST THIS without leaving HQ. The caption comes from POST THIS first, otherwise the copy-and-posting-notes .md file. Explicit platform caption blocks get separate tabs; HQ does not invent platform variations or infer that a scheduler actually posted something. If there are no separate blocks, the original text appears as one caption. A missing score shows Unscored.
 
-Mark posted records work that is already live; it never publishes. On a Drive-only card, choose the platform and paste the live link. HQ creates the package and that platform's placement at this moment, then uses the same Mark posted action as saved packages. Matching Agent Desk posts receive that live link too. Posted, no link yet creates a scheduled record with a note, not verified publication. No fake live links are required. Other platforms are not assumed to have been posted.
+Mark posted records work you already posted; it never publishes. Tap it on a platform to record your name and the time immediately. The confirmation offers Undo and Add the live link. A link is optional: the platform shows a check and link pending, and the package counts as Posted once every platform is posted. On a Drive-only card, choose the platform first; HQ creates the main package when you confirm. Other platforms are not assumed to have been posted. A later live link makes that placement verified publication. Undo restores the platform's previous state and is refused if a later check has changed its receipt.
+
+First comment to add right after posting has its own Copy button. The small notes line identifies the account when supplied. Why this score explains the quality badge; Fix before posting lists each failed check. Board piece opens the original piece on the Production Board, where its approval rules remain unchanged. Threads is available as a platform.
+
+The four-week mix also counts daily packages using their saved purpose: teach, entertain, story, community, proof or offer. Daily packages without a purpose do not enter the mix or its guardrails.
 
 Only real waiting-on-owner exceptions appear in Waiting on me. Routine ready folders do not need owner approval.

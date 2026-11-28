@@ -58,3 +58,9 @@ The "Content" tab shows every content piece for this brand, such as videos, post
 - The database can refuse an approval. "Approve batch" counts refusals under "Refused by the database" and carries on with the rest.
 - There is no box in HQ for typing an idea or quality score. Claude fills them in: the monthly Radar run sets the idea score on each brief it files, and Claude sets the quality score when it checks a finished piece against the content standard.
 - The Production Board shows the same cards for all brands at once, sorted into stage tabs, but it has no batch button. Batch approval lives here.
+
+## Posts on the brand page
+
+The Posts meter and the Production Board's Daily posts tab show the same date-filtered packages, ranked by quality score. Finished Board work joins the daily packages; ideas and drafts do not. A Board piece waiting for approval says Needs your approval on the Production Board. Tap its Board piece tag to open it.
+
+Each package can have several platform tabs. Copy its caption and, when present, the first comment separately. Mark posted is one tap and records who posted it and when, without requiring a live link. Use Undo in the confirmation to restore it, or Add the live link whenever you have it. A check with link pending means posted but not yet verified with a URL. All platforms must be posted for the package to enter Posted. Drive-only cards ask you to choose the platform first. These actions record posting; they do not send posts to a platform.

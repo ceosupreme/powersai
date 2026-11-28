@@ -4,6 +4,8 @@
 
 - Drive file access, including folder listing, text, thumbnails, and range-streamed media, is decided by `brand-drive/safety.ts` in the single `brand-drive` function; roots come from RLS-visible brand links, shared slices use saved-root aliases, and encrypted short-lived media tickets revalidate the user and file on every request. Drive-only posts create records only through the server-only snapshot RPC on Mark posted, delegating to the shared posting action so Drive remains read-only and HQ has one posting record.
 
+- Finished Posts use brand/date/piece identity and service-only `hq_upsert_daily_post`; `dailyPosts.ts` shares daily/finished-Board ranking, folder-specific replacement and recorded-posting counts. Shared posting/Undo and `hq_daily_post_sync` preserve human receipts and mailbox attribution, while verified publication still requires a URL. Only the mix reads daily purpose overrides, so other daily-post exclusions stay intact.
+
 - Business Path progress and proof validation live in `src/lib/businessPath.ts`, loaded and saved only through `useBusinessPath`; admin and manager screens share `BusinessPathTab` so counts, completion, and proof rules agree. The map is always available to assigned brand teams; settings saves preserve the legacy visibility value.
 - Brand-team viewer labels, readiness, plan ordering and Pacific-week counts live in `src/lib/brandTeam.ts`; admin team view uses URL-scoped presentation identity and read-only child controls, never impersonated write credentials.
 
