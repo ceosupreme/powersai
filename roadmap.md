@@ -1,5 +1,11 @@
 # Roadmap
 
+## Product runs Step 2
+- [x] Shared Start/Continue entry points for products, product tasks and Content Studio; stable task creation keys resume the original run
+- [x] Keyed owner stage screen, saved choices/approval/skip/output/reopen/resume and upload kit with real-field text and primary/twin live-link gates; existing RLS preserved, no agent dispatch
+- [x] 46 targeted state-machine, recipe, composer and database tests passed; build OK; signed-in Big Paws Club 380px create/output/choose/reload/approve/reopen/kit/link flow passed, no horizontal overflow or page errors; all temporary product records removed
+- [x] Publishing requested for the verified Step 2 changes at supremeteammedia.com; deployment completion is not yet confirmed
+
 ## Email-only lead automations
 - [x] Inspect existing queue, contact gate, runs, sender and inquiry alerts; existing 5-minute sweeper and daily stop cron preserved
 - [ ] Settings-backed A–E definitions and enrollment/send-time checks: blocked pending RESEND_WEBHOOK_SECRET, required by the existing signed reply/bounce handler; no automations enabled or backfilled

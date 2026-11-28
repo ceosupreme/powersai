@@ -392,6 +392,8 @@ export const WaitingOnMe = ({ projects }: { projects: { id: string; name: string
             dueDate: row.due_date,
             pillar: row.pillar,
             status: needsDecision(row.approval_status) ? 'Needs your decision' : row.approval_status ?? row.status,
+            jobId: row.jobId,
+            stepId: row.source === 'brand_help' ? null : row.id,
             projectId: row.projectId,
             facts: row.source === 'brand_help' ? null : row.facts,
             outputUrl: row.outputUrl,

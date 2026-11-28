@@ -1,4 +1,5 @@
 import { PainUsageBadge } from '@/components/pipeline/PainUsageBadge';
+import { ProductRunStart } from '@/components/content-studio/ProductRunStart';
 import { EditCrmRecord } from '@/components/crm/EditCrmRecord';
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -189,7 +190,7 @@ function OverviewTab({
     title: a.title, detail: a.detail, why: a.why, ownerKind: a.ownerKind, minutes: a.minutes,
     priority: priorityLabel(a.priorityRank) === '—' ? null : priorityLabel(a.priorityRank),
     dueDate: a.dueDate, pillar: a.pillar, status: a.status, projectId, brand: brandName,
-    facts: a.facts, outputUrl: a.outputUrl, jobId: a.jobId, stepId: a.jobId ? a.id : null,
+    facts: a.facts, outputUrl: a.outputUrl, jobId: a.jobId, stepId: a.id,
   });
 
   return (
@@ -642,6 +643,7 @@ function ProductsTab({ projectId }: { projectId: string }) {
               destinations: [...new Set(p.listings.map((l: any) => outletToDestination(l.outlet)).filter(Boolean))] as string[],
             })}>Make a plan to create this</Button>
           )}
+          <ProductRunStart projectId={projectId} productId={p.id} title={p.name} />
         </div>
       ))}
     </div>

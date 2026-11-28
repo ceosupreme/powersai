@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { DriveLink } from '@/components/drive/DrivePreview';
+import { ProductRunStart } from '@/components/content-studio/ProductRunStart';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Clapperboard, ExternalLink, FileText, Lightbulb, Loader2, Plus, Save, Search, Sparkles, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -117,7 +118,7 @@ export default function ContentStudio() {
   return <div className="mx-auto max-w-7xl space-y-8 p-4 pb-28 md:p-6 md:pb-28">
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div className="max-w-2xl"><div className="mb-2 flex items-center gap-2 text-sm font-medium text-primary"><Clapperboard className="h-5 w-5" />Supreme Team HQ</div><h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Content Studio</h1><p className="mt-3 text-muted-foreground">Find the idea. Make it yours. Build the piece.</p></div>
-      <Button variant="outline" asChild><Link to="/guide?a=content-studio"><BookOpen className="mr-2 h-4 w-4" />How it works</Link></Button>
+      <div className="flex flex-wrap gap-2"><ProductRunStart projectId={projectId} entry /><Button variant="outline" asChild><Link to="/guide?a=content-studio"><BookOpen className="mr-2 h-4 w-4" />How it works</Link></Button></div>
     </header>
     <section className="flex flex-wrap items-end justify-between gap-4 rounded-xl border bg-card p-4">
       <div className="w-full space-y-2 sm:w-80"><Label htmlFor="studio-brand">Create for</Label><Select value={projectId} onValueChange={id => { setParams({ brand: id }); setSearch(''); }}><SelectTrigger id="studio-brand"><SelectValue placeholder={brands.isLoading ? 'Loading brands…' : 'Choose your brand'} /></SelectTrigger><SelectContent>{brands.data?.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent></Select></div>

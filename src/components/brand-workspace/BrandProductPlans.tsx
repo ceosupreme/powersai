@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ProductRunStart } from '@/components/content-studio/ProductRunStart';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Package } from 'lucide-react';
 import { useProjectJobs, useProjectProducts, jobByTarget } from '@/hooks/useBrandWorkspace';
@@ -55,6 +56,7 @@ export function BrandProductPlans({ projectId, readOnly = false }: { projectId: 
                     <span className="text-xs text-muted-foreground shrink-0">{p.status || 'Not started'}</span>
                   </div>
                   {p.price != null && <p className="text-xs text-muted-foreground">Price recorded: {formatCurrency(Number(p.price))}</p>}
+                  <ProductRunStart projectId={projectId} productId={p.id} title={p.name} />
                   {job ? <Button size="sm" variant="outline" asChild>
                     <Link to={pipelineHref(projectId, job)}>Open production plan</Link>
                   </Button> : <Button size="sm" onClick={() => setRequest({

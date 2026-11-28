@@ -55,6 +55,7 @@ const Workspace = lazy(() => import("./pages/Workspace"));
 const BrandKit = lazy(() => import("./pages/BrandKit"));
 const ContentPipeline = lazy(() => import("./pages/ContentPipeline"));
 const ContentStudio = lazy(() => import("./pages/ContentStudio"));
+const ProductRun = lazy(() => import("./pages/ProductRun"));
 const Radar = lazy(() => import("./pages/Radar"));
 const Playbooks = lazy(() => import("./pages/Playbooks"));
 const MethodsRedirect = lazy(() => import("./pages/MethodsRedirect"));
@@ -307,6 +308,11 @@ const App = () => {
                 <Route path="/content-studio" element={
                   <ProtectedRoute pageKey="content_pipeline">
                     <AppLayout><ContentStudio /></AppLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/content-studio/run/:jobId" element={
+                  <ProtectedRoute pageKey="content_pipeline">
+                    <AppLayout><ProductRun /></AppLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/agent-desk" element={

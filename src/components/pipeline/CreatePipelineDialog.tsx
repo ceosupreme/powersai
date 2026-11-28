@@ -18,10 +18,13 @@ import {
 import { TrafficNotice } from './TrafficNotice';
 import { useProjectKpis } from '@/hooks/useProjectKpis';
 import type { StudioPatch } from '@/lib/contentStudio';
+import { GuidedProductForm } from '@/components/content-studio/GuidedProductForm';
 
 const T = (t: string) => (supabase as any).from(t);
 
 export interface PipelineRequest {
+  guidedProduct?: boolean;
+  productRequestKey?: string;
   newContent?: { title: string; summary: string; format?: string; purpose_type?: string; studio?: StudioPatch; request_key?: string };
   projectId: string;
   kind: JobKind;
@@ -100,7 +103,7 @@ export function CreatePipelineDialog({ request, onClose, onCreated, navigateOnCr
   const open = !!request;
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const methods = useMethodOptions(open);
+  const methods = useMethodOptions(open && !request?.guidedProduct);
   const kpis = useProjectKpis(request?.projectId ?? null);
   const brandGoal = useQuery({
     queryKey: ['pipeline-composer', 'brand-goal', request?.projectId],
@@ -242,6 +245,8 @@ export function CreatePipelineDialog({ request, onClose, onCreated, navigateOnCr
       toast.error(e?.message ?? 'Could not create the pipeline');
     } finally { setBusy(false); }
   };
+
+  if (request?.guidedProduct) return <GuidedProductForm projectId={request.projectId} productId={request.targetId} title={request.title} type={request.productType} requestKey={request.productRequestKey} onClose={onClose} onCreated={onCreated} />;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && !busy && onClose()}>

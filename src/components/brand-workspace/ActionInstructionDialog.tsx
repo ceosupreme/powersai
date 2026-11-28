@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ProductRunStart } from '@/components/content-studio/ProductRunStart';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -85,6 +86,7 @@ export function ActionInstructionDialog({ projectId, projectName, actionId, onCl
       {row.isLoading ? <p role="status">Opening the task…</p> : row.isError ?
         <p role="alert">The task could not be loaded. Try again from the brand page.</p> :
         row.data && <div className="space-y-4">
+          <ProductRunStart projectId={projectId} taskId={row.data.id} title={row.data.title} />
           <div className="text-xs text-muted-foreground">
             {row.data.due_date ? 'Due ' + row.data.due_date.slice(0, 10) : 'No due date'}
             {row.data.estimated_minutes != null ? ' · About ' + row.data.estimated_minutes + ' minutes' : ''}

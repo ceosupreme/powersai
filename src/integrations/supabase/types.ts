@@ -17093,6 +17093,17 @@ export type Database = {
         Args: { p_job_id: string; p_paused: boolean }
         Returns: undefined
       }
+      hq_product_run_event: {
+        Args: {
+          p_action: string
+          p_details?: Json
+          p_job_id: string
+          p_revision: number
+          p_stage_key: string
+        }
+        Returns: Json
+      }
+      hq_product_run_outlets: { Args: { r: Json; state: Json }; Returns: Json }
       hq_promote_inbound_lead: { Args: { p_lead_id: string }; Returns: string }
       hq_record_delivery_event: {
         Args: {

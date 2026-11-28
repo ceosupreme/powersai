@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
+import { ProductRunStart } from '@/components/content-studio/ProductRunStart';
 import { ArrowRight, ChevronDown, ExternalLink, Loader2, MessageCircleQuestion, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { parseFacts, taskLinks } from '@/lib/ownerWork';
@@ -116,6 +117,7 @@ export function TaskExplanationBody({ task, onAsk }: { task: TaskExplanation; on
         </Section>
       )}
       {meta.length > 0 && <p className="text-sm text-muted-foreground">{meta.join(' · ')}</p>}
+      {!task.hideYourPart && task.projectId && <ProductRunStart projectId={task.projectId} jobId={task.jobId} taskId={task.stepId} title={task.title} />}
       {onAsk && task.projectId && (
         <Button type="button" variant="outline" size="sm" className="min-h-11" onClick={onAsk}>
           <MessageCircleQuestion className="h-4 w-4 mr-1.5" /> Ask about this

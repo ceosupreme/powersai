@@ -62,6 +62,7 @@ export interface KeyPoints {
 }
 
 export interface PlannedStep {
+  doer?: string;
   stage_key?: string;
   title: string;
   owner_kind: 'claude' | 'owner';
@@ -76,6 +77,7 @@ export function buildProductSteps(template: ProductTemplate, brandRules: MethodR
   destinations: MethodRow[], monetization: MethodRow[], promotion: MethodRow[]): PlannedStep[] {
   const base = buildRecipeSteps(brandRules, null, destinations, monetization, promotion);
   return [base[0], ...template.recipe.stages.map(stage => ({
+    doer: stage.doer,
     stage_key: stage.key, title: stage.title, owner_kind: stage.owner,
     method_id: template.recipe.kb_id ?? null, method_key: template.slug,
     detail: [stage.what, stage.why].filter(Boolean).join('\n'), check: stage.check,
@@ -209,7 +211,7 @@ export function stepRow(s: PlannedStep, i: number, ctx: { project_id: string; jo
     status: 'Open',
     approval_status: owner ? (i === 0 ? 'Approved' : 'Blocked') : 'Auto',
     priority: owner ? 'P2-High' : 'P3-Medium',
-    assignee: owner ? (ctx.owner_name || 'Brand owner') : 'Claude',
+    assignee: owner ? (ctx.owner_name || 'Brand owner') : s.doer || 'Claude',
     assignee_id: owner ? ctx.user_id : null,
     source: 'pipeline',
     is_manual: true,

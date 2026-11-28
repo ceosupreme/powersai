@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('public.hq_product_run_event(uuid,integer,text,text,jsonb)'::regprocedure) INTO definition; EXECUTE replace(definition, '''twin_listed''', '''twin listed'''); END $$;

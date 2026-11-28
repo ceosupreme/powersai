@@ -20,7 +20,7 @@ export function nextTenTask(row: NextTenRow): TaskExplanation {
     facts: e.facts ?? null,
     outputUrl: e.outputUrl ?? null,
     jobId: isAction ? row.jobId ?? null : null,
-    stepId: isAction && row.jobId ? row.refId ?? null : null,
+    stepId: isAction ? row.refId ?? null : null,
     hideYourPart: !isAction,
   };
 }
