@@ -204,3 +204,7 @@
 - [x] Sales Phase 0 engine layer: contact points, subject-neutral runs/queue/log, send-time do-not-contact gate, stage rules, opt-out path (screens via GitHub)
 - [x] Agent Desk part 1: database (owner actions, tidy-up trigger, brand read access)
 - [ ] Agent Desk part 2 and 3: screens (waiting on owner's next message)
+
+## AI Recommendation Seat pages
+- [x] Category/town schema and row-driven pages, existing inquiry path and badges
+- [x] Validate phone layout, permissions, and no-JavaScript saved HTML; document SQL shape and publish refresh (live snapshot awaits owner rows and publishing)

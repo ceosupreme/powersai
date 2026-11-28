@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Ban } from 'lucide-react';
 import { inCrm, optedOutThemselves, sourceLabel, stageLabel, stageOf, type LeadStage } from '@/lib/leads';
 import type { Prospect } from '@/hooks/useProspects';
+import { LeadSeatBadge } from '@/components/marketing/seat/SeatInquiryBadge';
 
 export const STAGE_TONE: Record<LeadStage, string> = {
   new: 'bg-muted text-foreground border-border',
@@ -18,8 +19,8 @@ export const StageBadge = ({ status, className }: { status: string; className?: 
   return <Badge variant="outline" className={cn('text-xs', STAGE_TONE[s], className)}>{stageLabel(s)}</Badge>;
 };
 
-export const SourceBadge = ({ p }: { p: Pick<Prospect, 'source' | 'platform'> }) => (
-  <Badge variant="secondary" className="text-xs font-normal">{sourceLabel(p.source, p.platform)}</Badge>
+export const SourceBadge = ({ p }: { p: Pick<Prospect, 'source' | 'platform'> & { inbound_lead_id?: string | null } }) => (
+  <><Badge variant="secondary" className="text-xs font-normal">{sourceLabel(p.source, p.platform)}</Badge><LeadSeatBadge inboundId={p.inbound_lead_id} /></>
 );
 
 /** Shown wherever a lead appears, so nobody calls, texts or emails a person who must not be contacted. */

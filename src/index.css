@@ -3139,3 +3139,25 @@
 }
 
 /* editorial-hero-sync-v2 */
+
+/* AI Seat: local public-page palette, never applied to HQ or other routes. */
+.stm-studio.ai-seat-site {
+  --seat-ivory: 42 35% 96%;
+  --seat-charcoal: 30 6% 13%;
+  --seat-copper: 22 48% 37%;
+  --seat-amber: 37 77% 49%;
+  --seat-wine: 340 36% 31%;
+  --seat-rule: 35 18% 80%;
+  --seat-muted: 30 7% 36%;
+  --seat-white: 0 0% 100%;
+  --paper: var(--seat-ivory);
+  --ink: var(--seat-charcoal);
+  --ink-muted: var(--seat-muted);
+  --surface: var(--seat-white);
+  --band: var(--seat-charcoal);
+  --band-text: var(--seat-ivory);
+  --rule: var(--seat-rule);
+  --cobalt: var(--seat-copper);
+  --primary: var(--seat-copper);
+  --primary-foreground: var(--seat-white);
+}

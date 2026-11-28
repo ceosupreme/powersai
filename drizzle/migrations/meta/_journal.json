@@ -211,6 +211,20 @@
       "when": 1795850104336,
       "tag": "0029_daily_post_quality_fails_default",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795902092184,
+      "tag": "0030_ai_recommendation_seat_pages",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795902372275,
+      "tag": "0031_validate_ai_seat_content",
+      "breakpoints": true
     }
   ]
 }

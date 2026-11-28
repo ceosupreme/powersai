@@ -1,0 +1,22 @@
+import {test,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+const db=new PGlite();
+const admin='00000000-0000-4000-8000-000000000001',helper='00000000-0000-4000-8000-000000000002';
+await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role; CREATE SCHEMA auth;
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$SELECT nullif(current_setting('app.uid',true),'')::uuid$$;
+CREATE FUNCTION public.has_role(u uuid,r text) RETURNS boolean LANGUAGE sql AS $$SELECT u='${admin}'::uuid AND r='admin'$$;`);
+for(const f of ['0030_ai_recommendation_seat_pages.sql','0031_validate_ai_seat_content.sql']) await db.exec(await readFile(`drizzle/migrations/${f}`,'utf8'));
+after(()=>db.close());
+const row=(await db.query("SELECT id FROM ai_seat_pages WHERE slug='family-law'")).rows[0];
+await db.query("INSERT INTO ai_seat_availability(page_id,town,town_slug) VALUES($1,'Del Mar','del-mar')",[row.id]);
+async function role(r,u=helper){await db.exec('RESET ROLE');await db.query("SELECT set_config('app.uid',$1,false)",[u]);await db.exec(`SET ROLE ${r}`);}
+test('anonymous visitors cannot read the unpublished sample or its towns',async()=>{await role('anon');assert.equal((await db.query('SELECT count(*)::int n FROM ai_seat_pages')).rows[0].n,0);assert.equal((await db.query('SELECT count(*)::int n FROM ai_seat_availability')).rows[0].n,0);await db.exec('RESET ROLE');});
+test('helper cannot publish or create Seat content; admin can',async()=>{await role('authenticated');assert.equal((await db.query("UPDATE ai_seat_pages SET status='published' RETURNING id")).rows.length,0);await assert.rejects(db.query("INSERT INTO ai_seat_pages(slug,category) VALUES('helper-row','Helper')"),/row-level security/);await role('authenticated',admin);assert.equal((await db.query("UPDATE ai_seat_pages SET status='published' WHERE slug='family-law' RETURNING status")).rows[0].status,'published');await db.exec('RESET ROLE');});
+test('public published page and matching town are readable with explicit grants',async()=>{await role('anon');assert.equal((await db.query('SELECT count(*)::int n FROM ai_seat_pages')).rows[0].n,1);assert.equal((await db.query('SELECT town FROM ai_seat_availability')).rows[0].town,'Del Mar');await assert.rejects(db.query("UPDATE ai_seat_availability SET status='taken'"),/permission denied/);await db.exec('RESET ROLE');});
+test('availability only accepts open, held, taken',async()=>{for(const status of ['open','held','taken']) await db.query('UPDATE ai_seat_availability SET status=$1',[status]);await assert.rejects(db.query("UPDATE ai_seat_availability SET status='reserved'"),/check constraint/);});
+test('page status only accepts draft, published, archived',async()=>{await assert.rejects(db.query("UPDATE ai_seat_pages SET status='live'"),/check constraint/);});
+test('published pages require row-authored illustration and goal disclosures',async()=>{await assert.rejects(db.query("UPDATE ai_seat_pages SET labels=labels-'illustration'"),/labels.illustration/);await assert.rejects(db.query("UPDATE ai_seat_pages SET labels=labels-'goal'"),/labels.goal/);});
+test('facts require the sourced array shape; empty arrays remain valid',async()=>{await assert.rejects(db.query("UPDATE ai_seat_pages SET market_facts='[{\"figure\":\"42\",\"label\":\"Fact\"}]'"),/Facts need/);await db.query("UPDATE ai_seat_pages SET market_facts='[]'");});
+test('SQL row edits update the content timestamp',async()=>{const old=(await db.query('SELECT updated_at FROM ai_seat_pages')).rows[0].updated_at; await new Promise(r=>setTimeout(r,5)); await db.query("UPDATE ai_seat_pages SET headline='Updated category headline'");assert.ok(new Date((await db.query('SELECT updated_at FROM ai_seat_pages')).rows[0].updated_at).getTime()>new Date(old).getTime());});

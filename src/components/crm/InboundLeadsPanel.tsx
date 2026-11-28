@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SeatInquiryBadge } from '@/components/marketing/seat/SeatInquiryBadge';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -191,7 +192,8 @@ export function InboundLeadsPanel() {
                       {lead.business_name && (
                         <span className="text-xs text-muted-foreground">· {lead.business_name}</span>
                       )}
-                      {lead.project_type && (
+                      {lead.project_type === 'ai_seat' && <SeatInquiryBadge qualifier={lead.qualifier_data} />}
+                      {lead.project_type && lead.project_type !== 'ai_seat' && (
                         <Badge variant="secondary" className="text-[10px]">{lead.project_type}</Badge>
                       )}
                       {lead.urgency_class && <UrgencyBadge cls={lead.urgency_class} />}

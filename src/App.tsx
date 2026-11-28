@@ -108,6 +108,7 @@ import AreasHub from "./pages/AreasHub";
 import AreaDetail from "./pages/AreaDetail";
 import Startups from "./pages/Startups";
 const HomeHeroReview = lazy(() => import("./pages/review/HomeHeroReview"));
+const AiSeat = lazy(() => import("./pages/AiSeat"));
 // Unlisted client proposals (content in src/content/proposals.ts); never prerendered or indexed.
 const Proposal = lazy(() => import("./pages/Proposal"));
 // The HQ app loads in its own pieces, so visitors to the public site only download the public pages.
@@ -167,6 +168,8 @@ const App = () => {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/startups" element={<Startups />} />
+                <Route path="/seat/:category" element={<Waiting><AiSeat /></Waiting>} />
+                <Route path="/seat/:category/:town" element={<Waiting><AiSeat /></Waiting>} />
                 <Route path="/_review/home-hero" element={<Suspense fallback={null}><HomeHeroReview /></Suspense>} />
                 {/* Public Work / Portfolio showcase (does NOT collide with internal /portfolio). */}
                 <Route path="/work" element={<Work />} />

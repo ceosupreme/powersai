@@ -727,6 +727,176 @@ export type Database = {
           },
         ]
       }
+      ai_seat_availability: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          page_id: string
+          procedures: Json
+          sort_order: number
+          status: string
+          town: string
+          town_slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string
+          page_id: string
+          procedures?: Json
+          sort_order?: number
+          status?: string
+          town: string
+          town_slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          page_id?: string
+          procedures?: Json
+          sort_order?: number
+          status?: string
+          town?: string
+          town_slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_seat_availability_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "ai_seat_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_seat_pages: {
+        Row: {
+          angles: Json
+          answer_listings: Json
+          category: string
+          created_at: string
+          faq_title: string
+          faqs: Json
+          form_body: string
+          form_title: string
+          headline: string
+          id: string
+          included: Json
+          install: string
+          labels: Json
+          market_facts: Json
+          meaning_body: string
+          meaning_title: string
+          meta_description: string
+          meta_title: string
+          monthly: string
+          ninety_days: Json
+          ninety_days_title: string
+          offer: string
+          price_note: string | null
+          price_title: string
+          question: string
+          requirements: Json
+          seats_body: string
+          seats_title: string
+          share_image_url: string | null
+          slug: string
+          status: string
+          term: string
+          trust_body: string
+          trust_title: string
+          updated_at: string
+          video_url: string | null
+          why_points: Json
+          why_title: string
+        }
+        Insert: {
+          angles?: Json
+          answer_listings?: Json
+          category: string
+          created_at?: string
+          faq_title?: string
+          faqs?: Json
+          form_body?: string
+          form_title?: string
+          headline?: string
+          id?: string
+          included?: Json
+          install?: string
+          labels?: Json
+          market_facts?: Json
+          meaning_body?: string
+          meaning_title?: string
+          meta_description?: string
+          meta_title?: string
+          monthly?: string
+          ninety_days?: Json
+          ninety_days_title?: string
+          offer?: string
+          price_note?: string | null
+          price_title?: string
+          question?: string
+          requirements?: Json
+          seats_body?: string
+          seats_title?: string
+          share_image_url?: string | null
+          slug: string
+          status?: string
+          term?: string
+          trust_body?: string
+          trust_title?: string
+          updated_at?: string
+          video_url?: string | null
+          why_points?: Json
+          why_title?: string
+        }
+        Update: {
+          angles?: Json
+          answer_listings?: Json
+          category?: string
+          created_at?: string
+          faq_title?: string
+          faqs?: Json
+          form_body?: string
+          form_title?: string
+          headline?: string
+          id?: string
+          included?: Json
+          install?: string
+          labels?: Json
+          market_facts?: Json
+          meaning_body?: string
+          meaning_title?: string
+          meta_description?: string
+          meta_title?: string
+          monthly?: string
+          ninety_days?: Json
+          ninety_days_title?: string
+          offer?: string
+          price_note?: string | null
+          price_title?: string
+          question?: string
+          requirements?: Json
+          seats_body?: string
+          seats_title?: string
+          share_image_url?: string | null
+          slug?: string
+          status?: string
+          term?: string
+          trust_body?: string
+          trust_title?: string
+          updated_at?: string
+          video_url?: string | null
+          why_points?: Json
+          why_title?: string
+        }
+        Relationships: []
+      }
       app_config: {
         Row: {
           id: string
